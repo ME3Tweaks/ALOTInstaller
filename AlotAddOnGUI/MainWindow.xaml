@@ -1,12 +1,42 @@
-﻿<Window x:Class="AlotAddOnGUI.MainWindow"
+﻿<Controls:MetroWindow x:Class="AlotAddOnGUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AlotAddOnGUI"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        ResizeMode="NoResize"
+        BorderBrush="{DynamicResource AccentColorBrush}"
+        BorderThickness="1"
+        Title="ALOT AddOn Installer" Height="340" Width="525">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="10" />
+        </Grid.RowDefinitions>
+        <Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
+            <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Download the listed files to the Downloaded_Mods directory. Once they've all been downloaded, press install to install the addon." TextWrapping="Wrap" />
+        </Label>
+        <Label Grid.Column="0" Grid.Row="1" x:Name="AddonFilesLabel" HorizontalAlignment="Center" Content="AddOn Files" Margin="168,0"/>
+        <UniformGrid Grid.Column="0" Grid.Row="2" x:Name="AddonFilesGrid" Columns="3" Rows="5" Background="Olive"/>
+        <Grid Grid.Row="3" Grid.Column="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.5*" />
+                <ColumnDefinition Width="0.5*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Button x:Name="Button_InstallME2" Grid.Row="1" Grid.Column="0" Content="Install for ME2" Click="Button_InstallME2_Click"/>
+            <Button x:Name="Button_InstallME3" Grid.Row="1" Grid.Column="1" Content="Install for ME3" Click="Button_InstallME3_Click"/>
+        </Grid>
+        <Controls:MetroProgressBar x:Name="Install_ProgressBar" Grid.Column="0" Grid.Row="4"/>
     </Grid>
-</Window>
+</Controls:MetroWindow>
