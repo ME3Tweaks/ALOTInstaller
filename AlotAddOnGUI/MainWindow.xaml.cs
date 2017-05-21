@@ -31,6 +31,9 @@ namespace AlotAddOnGUI
     public partial class MainWindow : MetroWindow
     {
         public const string UPDATE_OPERATION_LABEL = "UPDATE_OPERATION_LABEL";
+        public const string UPDATE_PROGRESSBAR_INDETERMINATE = "SET_PROGRESSBAR_DETERMINACY";
+        public const string BINARY_DIRECTORY = "bin\\";
+
         private bool Installing = false;
         private readonly BackgroundWorker InstallWorker = new BackgroundWorker();
         private List<AddonFile> addonfiles;
@@ -76,6 +79,9 @@ namespace AlotAddOnGUI
                 {
                     case UPDATE_OPERATION_LABEL:
                         AddonFilesLabel.Content = (string)tc.Data;
+                        break;
+                    case UPDATE_PROGRESSBAR_INDETERMINATE:
+                        Install_ProgressBar.IsIndeterminate = (bool)tc.Data;
                         break;
                 }
             }
@@ -133,7 +139,7 @@ namespace AlotAddOnGUI
                     Install_ProgressBar.IsIndeterminate = true;
                     AddonFilesLabel.Content = "Downloading latest installer manifest";
                     File.Delete(@"manifest.xml");
-                    await webClient.DownloadFileTaskAsync("https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml", @"manifest.xml");
+                    await webClient.DownloadFileTaskAsync("https://rawgit.com/Mgamerz/AlotAddOnGUI/master/manifest.xml", @"manifest.xml");
                     Log.Information("Manifest fetched.");
                     readManifest();
                     Log.Information("Manifest read. Switching over to user control");
@@ -250,7 +256,7 @@ namespace AlotAddOnGUI
                     case ".zip":
                     case ".rar":
                         {
-                            string exe = "7z\\7z.exe";
+                            string exe = BINARY_DIRECTORY+"7z.exe";
                             string args = "x Downloaded_Mods\\" + af.Filename + " -aoa -r -oExtracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
                             runProcess(exe, args);
                             completed++;
@@ -260,6 +266,7 @@ namespace AlotAddOnGUI
                         }
                     case ".tpf":
                         {
+
                             File.Copy("Downloaded_Mods\\" + af.Filename, "Extracted_Mods\\" + af.Filename, true);
                             completed++;
                             int progress = (int)((float)completed / (float)addonstoinstall.Count * 100);
@@ -271,7 +278,18 @@ namespace AlotAddOnGUI
                 }
             }
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting TPFs..."));
+            Thread.Sleep(2000);
 
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting MOD files..."));
+            Thread.Sleep(3000);
+
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Removing Duplicates..."));
+            Thread.Sleep(7000);
+
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing to create MEM package..."));
+            Thread.Sleep(5000);
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Creating MEM Package..."));
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
         }
 
         private int runProcess(string exe, string args)
