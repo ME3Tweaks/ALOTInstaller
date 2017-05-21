@@ -1,12 +1,15 @@
 ﻿using MahApps.Metro.Controls;
+using RunProcessAsTask;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,6 +30,7 @@ namespace AlotAddOnGUI
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        public const string UPDATE_OPERATION_LABEL = "UPDATE_OPERATION_LABEL";
         private bool Installing = false;
         private readonly BackgroundWorker InstallWorker = new BackgroundWorker();
         private List<AddonFile> addonfiles;
@@ -38,17 +42,50 @@ namespace AlotAddOnGUI
                   .WriteTo.LiterateConsole()
                 .WriteTo.RollingFile("logs\\alotaddoninstaller-{Date}.txt")
               .CreateLogger();
+
             Log.Information("Logger Started for ALOT Installer.");
-            Log.Information("Program Version: "+ System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
+            Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
 
             InitializeComponent();
-            //readManifest();
             DispatcherTimer dt = new DispatcherTimer();
             dt.Tick += new EventHandler(timer_Tick);
-            dt.Interval = new TimeSpan(0, 0, 5); // execute every hour
+            dt.Interval = new TimeSpan(0, 0, 5); // execute every 5s
             dt.Start();
-            //this.Loaded += new RoutedEventHandler(Window_Loaded);
+
+            InstallWorker.DoWork += InstallAddon;
+            InstallWorker.ProgressChanged += InstallProgressChanged;
+            InstallWorker.RunWorkerCompleted += InstallCompleted;
+            InstallWorker.WorkerReportsProgress = true;
         }
+
+        private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            HeaderLabel.Text = "Installation completed!";
+        }
+
+        private void InstallProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            if (e.UserState is null)
+            {
+                Install_ProgressBar.Value = e.ProgressPercentage;
+            }
+            else
+            {
+                ThreadCommand tc = (ThreadCommand)e.UserState;
+                switch (tc.Command)
+                {
+                    case UPDATE_OPERATION_LABEL:
+                        AddonFilesLabel.Content = (string)tc.Data;
+                        break;
+                }
+            }
+        }
+
+        private void InstallAddon(object sender, DoWorkEventArgs e)
+        {
+            ExtractAddons((int)e.Argument); //arg is game id.
+        }
+
         // Tick handler    
         private void timer_Tick(object sender, EventArgs e)
         {
@@ -91,6 +128,7 @@ namespace AlotAddOnGUI
             {
                 using (WebClient webClient = new WebClient())
                 {
+                    webClient.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
                     Log.Information("Fetching latest manifest from github");
                     Install_ProgressBar.IsIndeterminate = true;
                     AddonFilesLabel.Content = "Downloading latest installer manifest";
@@ -151,36 +189,103 @@ namespace AlotAddOnGUI
             public string DownloadLink { get; set; }
             public CheckBox AssociatedCheckBox { get; set; }
             public bool ExistenceChecked { get; set; }
+            public bool SelectedForInstall { get; set; }
+        }
+
+        public class ThreadCommand
+        {
+            public ThreadCommand(string command, object data)
+            {
+                this.Command = command;
+                this.Data = data;
+            }
+            public string Command;
+            public object Data;
         }
 
         private void Button_InstallME2_Click(object sender, RoutedEventArgs e)
         {
             InitInstall();
-            ExtractAddons(2);
+            InstallWorker.RunWorkerAsync(2);
         }
 
         private void Button_InstallME3_Click(object sender, RoutedEventArgs e)
         {
             InitInstall();
-            ExtractAddons(3);
+            InstallWorker.RunWorkerAsync(3);
         }
 
         private void ExtractAddons(int game)
         {
+
+            Log.Information("Extracting Addons for Mass Effect " + game);
+
             string basepath = System.AppDomain.CurrentDomain.BaseDirectory + @"Downloaded_Mods\";
             string destinationpath = System.AppDomain.CurrentDomain.BaseDirectory + @"Extracted_Mods\";
+            Log.Information("Created Destination Path");
+
             Directory.CreateDirectory(destinationpath);
 
             List<AddonFile> addonstoinstall = new List<AddonFile>();
             foreach (AddonFile af in addonfiles)
             {
-                if (af.AssociatedCheckBox.IsChecked.Value && game == 2 ? af.Game_ME2 : af.Game_ME3)
+                if (af.SelectedForInstall && (game == 2 ? af.Game_ME2 : af.Game_ME3))
                 {
+                    Log.Information("Adding Addon to installation list: " + af.FriendlyName);
                     addonstoinstall.Add(af);
                 }
-
             }
 
+            int completed = 0;
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting Mods..."));
+            foreach (AddonFile af in addonstoinstall)
+            {
+                Log.Information("Processing extraction on " + af.Filename);
+
+                string fileextension = System.IO.Path.GetExtension(af.Filename);
+
+                switch (fileextension)
+                {
+                    case ".7z":
+                    case ".zip":
+                    case ".rar":
+                        {
+                            string exe = "7z\\7z.exe";
+                            string args = "x Downloaded_Mods\\" + af.Filename + " -aoa -r -oExtracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
+                            runProcess(exe, args);
+                            completed++;
+                            int progress = (int)((float)completed / (float)addonstoinstall.Count * 100);
+                            InstallWorker.ReportProgress(progress);
+                            break;
+                        }
+                    case ".tpf":
+                        {
+                            File.Copy("Downloaded_Mods\\" + af.Filename, "Extracted_Mods\\" + af.Filename, true);
+                            completed++;
+                            int progress = (int)((float)completed / (float)addonstoinstall.Count * 100);
+                            InstallWorker.ReportProgress(progress);
+                            break;
+                        }
+                    case ".mod":
+                        break;
+                }
+            }
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting TPFs..."));
+
+        }
+
+        private int runProcess(string exe, string args)
+        {
+            Log.Information("Running process: " + exe + " " + args);
+            Process p = new Process();
+            p.StartInfo.CreateNoWindow = true;
+            p.StartInfo.FileName = exe;
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.Arguments = args;
+            p.Start();
+            p.WaitForExit();
+            Thread.Sleep(1500);
+            return p.ExitCode;
         }
 
         private void InitInstall()
@@ -190,6 +295,11 @@ namespace AlotAddOnGUI
             Button_InstallME3.IsEnabled = false;
             AddonFilesLabel.Content = "Preparing to install...";
             HeaderLabel.Text = "Now installing ALOT AddOn. Don't close this window until the process completes. It will take a few minutes to install.";
+            foreach (AddonFile af in addonfiles)
+            {
+                af.SelectedForInstall = af.AssociatedCheckBox.IsChecked.Value;
+                af.AssociatedCheckBox.IsEnabled = false; //disable clicks
+            }
             // Install_ProgressBar.IsIndeterminate = true;
         }
     }
