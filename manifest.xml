@@ -1,15 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <alotaddonmanifest>
-<addonfile>
-	<processing>
-		<nvcompress>
-			<file>WeaponM-8AvengerHD\MASSEFFECT3.EXE_0x8BA3F0F1.dds</file>
-			<file>WeaponM-8AvengerHD\MASSEFFECT3.EXE_0xB3CBFCAB.dds</file>
-		</nvcompress>
-		<duplicates>
-			<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0x417194BC_Shade_hed_Spec.dds</duplicate>
-			<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0x62EEF54C_Shade_hed_Norm.dds</duplicate>
-			<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds</duplicate>
-		</duplicates>
-	</processing>
-</addonfile>
+	<addonfile friendlyname="HR Predator Texture" author="TheDarkFalkon">
+		<games masseffect2="true" masseffect3="true"/>
+		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPredator_HRv1.5.zip"/>
+	</addonfile>
+	<addonfile friendlyname="HR Shuriken Texture" author="TheDarkFalkon">
+		<games masseffect2="true" masseffect3="true"/>
+		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnShuriken_HRv1.5.zip"/>
+	</addonfile>
+	<addonfile friendlyname="HR Mantis Texture" author="TheDarkFalkon">
+		<games masseffect2="true" masseffect3="true"/>
+		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnMantis_HRv1.5.zip"/>
+	</addonfile>
+	<addonfile friendlyname="HR Katana Texture" author="TheDarkFalkon">
+		<games masseffect2="true" masseffect3="true"/>
+		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnKatana_HRv1.5.zip"/>
+	</addonfile>
+	<addonfile friendlyname="HR Carnifex Texture" author="TheDarkFalkon">
+		<games masseffect2="true" masseffect3="true"/>
+		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCarnifex_HRv1.5.zip"/>
+	</addonfile>
+	<addonfile friendlyname="HR Paladin Texture" author="TheDarkFalkon">
+		<games masseffect2="true" masseffect3="true"/>
+		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPaladin_HRv1.5.zip"/>
+	</addonfile>
+	<addonfile friendlyname="HR Phaeston Texture" author="TheDarkFalkon">
+		<games masseffect2="true" masseffect3="true"/>
+		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPhaeston_HRv1.5.zip"/>
+	</addonfile>
+	<addonfile friendlyname="HR Cain Texture" author="TheDarkFalkon">
+		<games masseffect2="true" masseffect3="true"/>
+		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCain_HRv1.5.zip"/>
+	</addonfile>
+	<addonfile friendlyname="Processing Test">
+		<games masseffect2="true" masseffect3="false"/>
+		<file downloadlink="http://google.com" filename="TEST.zip"/>
+		<processing>
+			<nvcompress>
+				<file>WeaponM-8AvengerHD\MASSEFFECT3.EXE_0x8BA3F0F1.dds</file>
+				<file>WeaponM-8AvengerHD\MASSEFFECT3.EXE_0xB3CBFCAB.dds</file>
+			</nvcompress>
+			<duplicates>
+				<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0x417194BC_Shade_hed_Spec.dds</duplicate>
+				<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0x62EEF54C_Shade_hed_Norm.dds</duplicate>
+				<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds</duplicate>
+			</duplicates>
+		</processing>
+	</addonfile>
 </alotaddonmanifest>
