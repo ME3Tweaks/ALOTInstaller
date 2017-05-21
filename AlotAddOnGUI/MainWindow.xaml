@@ -9,7 +9,8 @@
         ResizeMode="NoResize"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
-        Title="ALOT AddOn Installer" Height="340" Width="525">
+        Title="ALOT AddOn Installer" Height="340" Width="525"
+        Loaded="Window_Loaded">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -24,7 +25,7 @@
         <Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
             <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Download the listed files to the Downloaded_Mods directory. Once they've all been downloaded, press install to install the addon." TextWrapping="Wrap" />
         </Label>
-        <Label Grid.Column="0" Grid.Row="1" x:Name="AddonFilesLabel" HorizontalAlignment="Center" Content="AddOn Files" Margin="168,0"/>
+        <Label Grid.Column="0" Grid.Row="1" x:Name="AddonFilesLabel" HorizontalContentAlignment="Center" Content="AddOn Files"/>
         <UniformGrid Grid.Column="0" Grid.Row="2" x:Name="AddonFilesGrid" Columns="3" Rows="5" Background="Olive"/>
         <Grid Grid.Row="3" Grid.Column="0">
             <Grid.ColumnDefinitions>

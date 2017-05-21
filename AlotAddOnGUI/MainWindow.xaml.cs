@@ -1,9 +1,11 @@
 ﻿using MahApps.Metro.Controls;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -31,8 +33,16 @@ namespace AlotAddOnGUI
 
         public MainWindow()
         {
+            Log.Logger = new LoggerConfiguration()
+                   .MinimumLevel.Debug()
+                  .WriteTo.LiterateConsole()
+                .WriteTo.RollingFile("logs\\alotaddoninstaller-{Date}.txt")
+              .CreateLogger();
+            Log.Information("Logger Started for ALOT Installer.");
+            Log.Information("Program Version: "+ System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
+
             InitializeComponent();
-            readManifest();
+            //readManifest();
             DispatcherTimer dt = new DispatcherTimer();
             dt.Tick += new EventHandler(timer_Tick);
             dt.Interval = new TimeSpan(0, 0, 5); // execute every hour
@@ -62,25 +72,48 @@ namespace AlotAddOnGUI
                         af.AssociatedCheckBox.IsChecked = af.AssociatedCheckBox.IsEnabled;
                         af.ExistenceChecked = true;
                     }
-                    af.AssociatedCheckBox.ToolTip = af.AssociatedCheckBox.IsEnabled ? "File is downloaded and ready for install" : "Required file is missing: "+af.Filename;
+                    af.AssociatedCheckBox.ToolTip = af.AssociatedCheckBox.IsEnabled ? "File is downloaded and ready for install" : "Required file is missing: " + af.Filename;
                     //
                 }
             }
             //Install_ProgressBar.Value = 30;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //what advantages do I have running code here? 
+            await FetchManifest();
+            //readManifest();
+        }
 
-            readManifest();
+        private async Task FetchManifest()
+        {
+            {
+                using (WebClient webClient = new WebClient())
+                {
+                    Log.Information("Fetching latest manifest from github");
+                    Install_ProgressBar.IsIndeterminate = true;
+                    AddonFilesLabel.Content = "Downloading latest installer manifest";
+                    File.Delete(@"manifest.xml");
+                    await webClient.DownloadFileTaskAsync("https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml", @"manifest.xml");
+                    Log.Information("Manifest fetched.");
+                    readManifest();
+                    Log.Information("Manifest read. Switching over to user control");
+
+                    Install_ProgressBar.IsIndeterminate = false;
+                    AddonFilesLabel.Content = "Addon Files";
+                }
+            }
         }
 
         private void readManifest()
         {
-            Console.WriteLine(File.Exists(@"manifest.xml"));
-            Console.WriteLine(Directory.GetCurrentDirectory());
-
+            //if (!File.Exists(@"manifest.xml"))
+            //{
+            //    await FetchManifest();
+            //    return;
+            //}
+            Log.Information("Reading manifest...");
             XElement rootElement = XElement.Load(@"manifest.xml");
 
             var elemn1 = rootElement.Elements();
@@ -138,7 +171,7 @@ namespace AlotAddOnGUI
             string destinationpath = System.AppDomain.CurrentDomain.BaseDirectory + @"Extracted_Mods\";
             Directory.CreateDirectory(destinationpath);
 
-            List<AddonFile> addonstoinstall = new  List<AddonFile>();
+            List<AddonFile> addonstoinstall = new List<AddonFile>();
             foreach (AddonFile af in addonfiles)
             {
                 if (af.AssociatedCheckBox.IsChecked.Value && game == 2 ? af.Game_ME2 : af.Game_ME3)
@@ -157,7 +190,7 @@ namespace AlotAddOnGUI
             Button_InstallME3.IsEnabled = false;
             AddonFilesLabel.Content = "Preparing to install...";
             HeaderLabel.Text = "Now installing ALOT AddOn. Don't close this window until the process completes. It will take a few minutes to install.";
-           // Install_ProgressBar.IsIndeterminate = true;
+            // Install_ProgressBar.IsIndeterminate = true;
         }
     }
 }
