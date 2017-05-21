@@ -1,0 +1,15 @@
+<alotaddonmanifset>
+<addonfile>
+	<processing>
+		<nvcompress>
+			<file>WeaponM-8AvengerHD\MASSEFFECT3.EXE_0x8BA3F0F1.dds</file>
+			<file>WeaponM-8AvengerHD\MASSEFFECT3.EXE_0xB3CBFCAB.dds</file>
+		</nvcompress>
+		<duplicates>
+			<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0x417194BC_Shade_hed_Spec.dds</duplicate>
+			<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0x62EEF54C_Shade_hed_Norm.dds</duplicate>
+			<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds</duplicate>
+		</duplicates>
+	</processing>
+</addonfile>
+</alotaddonmanifest>
