@@ -24,19 +24,141 @@
 		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPaladin_HRv1.5.zip"/>
 	</addonfile>
-	<addonfile friendlyname="HD M-8 Avenger" author="TheDarkFalkon">
-		<games masseffect2="true" masseffect3="true"/>
-		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon M-8 Avenger  HD OPTIMIZED 2 by TheDarkFalkon.tpf"/>
-	</addonfile>
 	<addonfile friendlyname="HR Phaeston Texture" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPhaeston_HRv1.65.zip"/>
 	</addonfile>
-	
 	<addonfile friendlyname="HR Cain Texture" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCain_HRv1.5.zip"/>
 	</addonfile>
+
+	<addonfile friendlyname="HD M-8 Avenger" author="TheDarkFalkon">
+		<games masseffect2="true" masseffect3="true"/>
+		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon M-8 Avenger  HD OPTIMIZED 2 by TheDarkFalkon.tpf"/>
+	</addonfile>
+	<addonfile friendlyname="HR M-92 Mantis" author="TheDarkFalkon">
+		<games masseffect2="true" masseffect3="true"/>
+		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf"/>
+	</addonfile>
+
+	<addonfile friendlyname="Alliance Blues - 4096" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/79" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Alliance Cruiser" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Armax Arena Cerberus Female" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/185" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Armax Arena Cerberus Male" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/185" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Armor Sets Pack for ME3" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/134" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Ashley Alternate Armor" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/13" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Ashley Alternate From Ashes Armor" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/15" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Ashley CE Armor" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/95" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Ashley Default" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/4" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Citadel Enviromentals 102" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Combat Fatigues" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/141" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="EDI AAP Armor" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/118" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="EDI Alt Outfit Pack" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/238" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="EDI From Ashes Outfit ALT version" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/273" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Fourth Casual Black" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/301" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Garrus Alternate Armor" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/6" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Kai Leng" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Kaidan Alt From Ashes Armor in Original Black" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/17" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Kaidan CE Armor" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/294" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Kaidan Default Armor" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/290" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Kuwashii Visor and reticule fix" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/134" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Liara Alt From Ashes Armor" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/8" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Liara Alternate Armor" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/12" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Liara CE Armor" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/140" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Maya Brooks" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="N7 Hoody" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/45" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="N7 Valiant" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/85" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Science Uniforms" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/161" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Vega Alt From Ashes Armor in Original Blue" author="Ottemis">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/7" filename=""/>
+	</addonfile>
+
 	<addonfile friendlyname="Processing Test">
 		<games masseffect2="true" masseffect3="false"/>
 		<file downloadlink="http://google.com" filename="TEST.zip"/>
