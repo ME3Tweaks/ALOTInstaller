@@ -161,11 +161,11 @@
 	
 	<addonfile friendlyname="Holograms HD (MEM)" author="JimbobJeffers">
 		<games masseffect2="true" masseffect3="false"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/134" filename=""/>
+		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/134" filename="Holograms HD (MEM)-134-1-0.zip"/>
 	</addonfile>
 	<addonfile friendlyname="Holograms HD (MEM)" author="JimbobJeffers">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/527" filename=""/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/527" filename="Holograms HD (MEM)-527-1-0.zip"/>
 	</addonfile>
 
 	<addonfile friendlyname="Processing Test">
