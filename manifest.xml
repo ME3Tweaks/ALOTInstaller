@@ -158,9 +158,18 @@
 		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/7" filename=""/>
 	</addonfile>
+	
+	<addonfile friendlyname="Holograms HD (MEM)" author="JimbobJeffers">
+		<games masseffect2="true" masseffect3="false"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/134" filename=""/>
+	</addonfile>
+	<addonfile friendlyname="Holograms HD (MEM)" author="JimbobJeffers">
+		<games masseffect2="false" masseffect3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/527" filename=""/>
+	</addonfile>
 
 	<addonfile friendlyname="Processing Test">
-		<games masseffect2="true" masseffect3="false"/>
+		<games masseffect2="f" masseffect3="false"/>
 		<file downloadlink="http://google.com" filename="TEST.zip"/>
 		<processing>
 			<nvcompress>
