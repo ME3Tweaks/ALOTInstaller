@@ -169,13 +169,9 @@
 	</addonfile>
 
 	<addonfile friendlyname="Processing Test">
-		<games masseffect2="f" masseffect3="false"/>
+		<games masseffect2="false" masseffect3="false"/>
 		<file downloadlink="http://google.com" filename="TEST.zip"/>
 		<processing>
-			<nvcompress>
-				<file>WeaponM-8AvengerHD\MASSEFFECT3.EXE_0x8BA3F0F1.dds</file>
-				<file>WeaponM-8AvengerHD\MASSEFFECT3.EXE_0xB3CBFCAB.dds</file>
-			</nvcompress>
 			<duplicates>
 				<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0x417194BC_Shade_hed_Spec.dds</duplicate>
 				<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0x62EEF54C_Shade_hed_Norm.dds</duplicate>
