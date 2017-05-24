@@ -9,8 +9,9 @@
         ResizeMode="NoResize"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
-        Title="ALOT AddOn Installer" Height="340" Width="525"
+        Title="ALOT AddOn Installer" Height="600" Width="800"
         Loaded="Window_Loaded">
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -26,7 +27,88 @@
             <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Download the listed files to the Downloaded_Mods directory. Once they've all been downloaded, press install to install the addon." TextWrapping="Wrap" />
         </Label>
         <Label Grid.Column="0" Grid.Row="1" x:Name="AddonFilesLabel" HorizontalContentAlignment="Center" Content="AddOn Files"/>
-        <UniformGrid Grid.Column="0" Grid.Row="2" x:Name="AddonFilesGrid" Columns="3" Rows="5" Background="Olive"/>
+        <ListView Grid.Column="0" Grid.Row="2" Name="lvUsers">
+            <!-- This is what each list item looks like-->
+            <!--<ListView.View>
+                <GridView>
+                    <GridViewColumn Width="120" DisplayMemberBinding="{Binding Author}" />
+                    <GridViewColumn Width="50" DisplayMemberBinding="{Binding DownloadLink}" />
+                </GridView>
+                
+            </ListView.View>-->
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding FriendlyName}" FontWeight="Bold" VerticalAlignment="Center" />
+
+                        <StackPanel FlowDirection="RightToLeft"  Grid.Row="0" Grid.Column="1"  Orientation="Horizontal">
+                            <Border ToolTip="This file applies to Mass Effect 3" Padding="2" BorderThickness="1" BorderBrush="Chartreuse" Background="CadetBlue" CornerRadius="2" VerticalAlignment="Center">
+                                <TextBlock FontSize="10"  Text="ME3" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border ToolTip="This file applies to Mass Effect 2" Margin="5" Padding="2" BorderThickness="1" BorderBrush="Red" Background="DarkMagenta" CornerRadius="2" VerticalAlignment="Center">
+                                <TextBlock  FontSize="10"  Text="ME2" VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+
+
+                        <TextBlock HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0" >
+                            <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Filename}">
+                                <Hyperlink.Style >
+                                    <Style TargetType="Hyperlink"
+                                            BasedOn="{StaticResource {x:Type Hyperlink}}">
+                                        <Setter Property="Foreground" Value="#0C0"/>
+                                    </Style>
+                                </Hyperlink.Style>
+                                Download Link
+                            </Hyperlink>
+                        </TextBlock>
+
+                        <TextBlock HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1" Text="{Binding Filename}" FontWeight="Bold" VerticalAlignment="Center" />
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+            <!-- This is what each group looks like -->
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.ContainerStyle>
+                        <Style TargetType="{x:Type GroupItem}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Expander IsExpanded="False">
+                                            <Expander.Header>
+                                                <StackPanel Orientation="Vertical">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="20" VerticalAlignment="Bottom" />
+                                                        <StackPanel Orientation="Vertical">
+                                                            <TextBlock Text="{Binding ItemCount,StringFormat='has {0} files ready'}" FontSize="10" FontWeight="Bold" FontStyle="Italic" Margin="10,0,0,0" VerticalAlignment="Bottom" />
+                                                            <TextBlock Text="{Binding ItemCount,StringFormat='has {0} files total'}" FontSize="10" FontWeight="Bold" FontStyle="Italic" Margin="10,0,0,0" VerticalAlignment="Bottom" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                    <ProgressBar Minimum="0" Maximum="100" Value="40" IsIndeterminate="true"></ProgressBar>
+                                                </StackPanel>
+                                            </Expander.Header>
+                                            <ItemsPresenter />
+                                        </Expander>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </GroupStyle.ContainerStyle>
+                </GroupStyle>
+            </ListView.GroupStyle>
+        </ListView>
+
+        <!--<UniformGrid Grid.Column="0" Grid.Row="2" x:Name="AddonFilesGrid" Columns="3" Rows="5" Background="Olive"/>-->
         <Grid Grid.Row="3" Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.5*" />

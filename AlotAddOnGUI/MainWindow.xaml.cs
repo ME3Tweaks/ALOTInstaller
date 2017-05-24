@@ -1,25 +1,21 @@
 ﻿using MahApps.Metro.Controls;
-using RunProcessAsTask;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using System.Windows.Forms;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml.Linq;
 
@@ -37,6 +33,7 @@ namespace AlotAddOnGUI
         private bool Installing = false;
         private readonly BackgroundWorker InstallWorker = new BackgroundWorker();
         private List<AddonFile> addonfiles;
+        NotifyIcon nIcon = new NotifyIcon();
 
         public MainWindow()
         {
@@ -59,6 +56,8 @@ namespace AlotAddOnGUI
             InstallWorker.ProgressChanged += InstallProgressChanged;
             InstallWorker.RunWorkerCompleted += InstallCompleted;
             InstallWorker.WorkerReportsProgress = true;
+
+            
         }
 
         private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -108,14 +107,9 @@ namespace AlotAddOnGUI
                 foreach (AddonFile af in addonfiles)
                 {
                     //Check for file existence
-                    Console.WriteLine("Checking for file: " + basepath + af.Filename);
-                    af.AssociatedCheckBox.IsEnabled = File.Exists(basepath + af.Filename);
-                    if (!af.ExistenceChecked)
-                    {
-                        af.AssociatedCheckBox.IsChecked = af.AssociatedCheckBox.IsEnabled;
-                        af.ExistenceChecked = true;
-                    }
-                    af.AssociatedCheckBox.ToolTip = af.AssociatedCheckBox.IsEnabled ? "File is downloaded and ready for install" : "Required file is missing: " + af.Filename;
+                    //Console.WriteLine("Checking for file: " + basepath + af.Filename);
+
+                    //af.AssociatedCheckBox.ToolTip = af.AssociatedCheckBox.IsEnabled ? "File is downloaded and ready for install" : "Required file is missing: " + af.Filename;
                     //
                 }
             }
@@ -161,28 +155,48 @@ namespace AlotAddOnGUI
             XElement rootElement = XElement.Load(@"manifest.xml");
 
             var elemn1 = rootElement.Elements();
-
             addonfiles = (from e in rootElement.Elements("addonfile")
-                          select new AddonFile
-                          {
-                              Author = (string)e.Attribute("author"),
-                              FriendlyName = (string)e.Attribute("friendlyname"),
-                              Game_ME2 = bool.Parse((string)e.Element("games").Attribute("masseffect2")),
-                              Game_ME3 = bool.Parse((string)e.Element("games").Attribute("masseffect3")),
-                              Filename = (string)e.Element("file").Attribute("filename"),
-                              DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
-                              ExistenceChecked = false
-                          }).ToList();
-            foreach (AddonFile addon in addonfiles)
-            {
-                CheckBox cb = new CheckBox();
-                cb.Content = addon.FriendlyName;
-                cb.ToolTip = "Required file: " + addon.Filename;
+                                 select new AddonFile
+                                 {
+                                     Author = (string)e.Attribute("author"),
+                                     FriendlyName = (string)e.Attribute("friendlyname"),
+                                     Game_ME2 = bool.Parse((string)e.Element("games").Attribute("masseffect2")),
+                                     Game_ME3 = bool.Parse((string)e.Element("games").Attribute("masseffect3")),
+                                     Filename = (string)e.Element("file").Attribute("filename"),
+                                     DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
+                                     ExistenceChecked = false
+                                 }).ToList();
+            //This is inefficient, but workable since we are using a small dataset.
+            lvUsers.ItemsSource = addonfiles;
+            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
+            PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
+            view.GroupDescriptions.Add(groupDescription);
 
-                cb.Margin = new Thickness(10, 10, 10, 10);
-                addon.AssociatedCheckBox = cb;
-                AddonFilesGrid.Children.Add(cb);
-            }
+            //bool groupfound = false;
+            //foreach (AddonFileAuthorGroup group in addonfileauthorgroups)
+            //{
+            //    if (group.Author.Equals(addon.Author))
+            //    {
+            //        group.Files.Add(addon);
+            //        groupfound = true;
+            //        break;
+            //    }
+            //}
+            //if (!groupfound)
+            //{
+            //    AddonFileAuthorGroup group = new AddonFileAuthorGroup();
+            //    group.Author = addon.Author;
+            //    group.Files = new List<AddonFile>();
+            //    group.Files.Add(addon);
+            //    addonfileauthorgroups.Add(group);
+            //}
+
+        }
+
+        public class AddonFileAuthorGroup
+        {
+            public string Author { get; set; }
+            public List<AddonFile> Files { get; set; }
         }
 
         public class AddonFile
@@ -193,7 +207,7 @@ namespace AlotAddOnGUI
             public bool Game_ME3 { get; set; }
             public string Filename { get; set; }
             public string DownloadLink { get; set; }
-            public CheckBox AssociatedCheckBox { get; set; }
+            public System.Windows.Controls.CheckBox AssociatedCheckBox { get; set; }
             public bool ExistenceChecked { get; set; }
             public bool SelectedForInstall { get; set; }
         }
@@ -256,7 +270,7 @@ namespace AlotAddOnGUI
                     case ".zip":
                     case ".rar":
                         {
-                            string exe = BINARY_DIRECTORY+"7z.exe";
+                            string exe = BINARY_DIRECTORY + "7z.exe";
                             string args = "x Downloaded_Mods\\" + af.Filename + " -aoa -r -oExtracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
                             runProcess(exe, args);
                             completed++;
@@ -304,6 +318,24 @@ namespace AlotAddOnGUI
             p.WaitForExit();
             Thread.Sleep(1500);
             return p.ExitCode;
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            System.Diagnostics.Process.Start(e.Uri.ToString());
+            this.nIcon.Visible = true;
+            //this.WindowState = System.Windows.WindowState.Minimized;
+            this.nIcon.Icon = new Icon(@"../../images/info.ico");
+            string fname = (string) ((Hyperlink)e.Source).Tag;
+            this.nIcon.ShowBalloonTip(14000, "Downloading ALOT Addon File", "Download the file named \""+fname+"\"", ToolTipIcon.Info);
+        }
+
+        private void Downloadlink_Clicked(object sender, RoutedEventArgs e)
+        {
+            this.nIcon.Visible = true;
+            //this.WindowState = System.Windows.WindowState.Minimized;
+            this.nIcon.Icon = new Icon(@"../../images/info.ico");
+            this.nIcon.ShowBalloonTip(14000, "Downloading ALOT Addon File", "Download the file named XXX", ToolTipIcon.Info);
         }
 
         private void InitInstall()
