@@ -106,6 +106,7 @@ namespace AlotAddOnGUI
 
                 foreach (AddonFile af in addonfiles)
                 {
+                    af.Ready = File.Exists(basepath + af.Filename);
                     //Check for file existence
                     //Console.WriteLine("Checking for file: " + basepath + af.Filename);
 
@@ -164,7 +165,7 @@ namespace AlotAddOnGUI
                                      Game_ME3 = bool.Parse((string)e.Element("games").Attribute("masseffect3")),
                                      Filename = (string)e.Element("file").Attribute("filename"),
                                      DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
-                                     ExistenceChecked = false
+                                     Ready = false
                                  }).ToList();
             //This is inefficient, but workable since we are using a small dataset.
             lvUsers.ItemsSource = addonfiles;
@@ -193,12 +194,6 @@ namespace AlotAddOnGUI
 
         }
 
-        public class AddonFileAuthorGroup
-        {
-            public string Author { get; set; }
-            public List<AddonFile> Files { get; set; }
-        }
-
         public class AddonFile
         {
             public string Author { get; set; }
@@ -207,8 +202,7 @@ namespace AlotAddOnGUI
             public bool Game_ME3 { get; set; }
             public string Filename { get; set; }
             public string DownloadLink { get; set; }
-            public System.Windows.Controls.CheckBox AssociatedCheckBox { get; set; }
-            public bool ExistenceChecked { get; set; }
+            public bool Ready { get; set; }
             public bool SelectedForInstall { get; set; }
         }
 
@@ -345,11 +339,6 @@ namespace AlotAddOnGUI
             Button_InstallME3.IsEnabled = false;
             AddonFilesLabel.Content = "Preparing to install...";
             HeaderLabel.Text = "Now installing ALOT AddOn. Don't close this window until the process completes. It will take a few minutes to install.";
-            foreach (AddonFile af in addonfiles)
-            {
-                af.SelectedForInstall = af.AssociatedCheckBox.IsChecked.Value;
-                af.AssociatedCheckBox.IsEnabled = false; //disable clicks
-            }
             // Install_ProgressBar.IsIndeterminate = true;
         }
     }

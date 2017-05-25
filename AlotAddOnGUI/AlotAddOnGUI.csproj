@@ -133,6 +133,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Resource Include="images\info.ico" />
+    <Resource Include="images\greencheckmark.png" />
+    <Resource Include="images\orangedownload.png" />
     <Content Include="memodder\MassEffectModder.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
