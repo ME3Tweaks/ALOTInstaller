@@ -68,31 +68,31 @@
 	</addonfile>
 	<addonfile friendlyname="Ashley Alternate From Ashes Armor" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/15" filename="ME3 HR Ashley Alt From Ashes Armor for Texmod-15-1-0.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/15/#files" filename="ME3 HR Ashley Alt From Ashes Armor for Texmod-15-1-0.rar"/>
 	</addonfile>
 	<addonfile friendlyname="Ashley CE Armor" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/95" filename="ME3 HR Ashley CE Armor for Texmod-95-1-0.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/95/#files" filename="ME3 HR Ashley CE Armor for Texmod-95-1-0.rar"/>
 	</addonfile>
 	<addonfile friendlyname="Ashley Default" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/4" filename="ME3 HR Ashley Default for Texmod-4-1-1.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/4/#files" filename="ME3 HR Ashley Default for Texmod-4-1-1.rar"/>
 	</addonfile>
 	<addonfile friendlyname="Citadel Enviromentals 102" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename="Citadel Enviromentals 102-276-1-0.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/#files" filename="Citadel Enviromentals 102-276-1-0.rar"/>
 	</addonfile>
 	<addonfile friendlyname="Combat Fatigues" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/141" filename="HR Combat Fatigues for Texmod-141-1-0.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/141/#files" filename="HR Combat Fatigues for Texmod-141-1-0.rar"/>
 	</addonfile>
 	<addonfile friendlyname="EDI AAP Armor" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/118" filename="ME3 HR EDI AAP Armor-118-1-1.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/118/#files" filename="ME3 HR EDI AAP Armor-118-1-1.rar"/>
 	</addonfile>
 	<addonfile friendlyname="EDI Alt Outfit Pack" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/238" filename="EDI Alt Outfit Pack-238-1-2.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/238/#files" filename="EDI Alt Outfit Pack-238-1-2.rar"/>
 	</addonfile>
 	<addonfile friendlyname="EDI From Ashes Outfit ALT version" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
@@ -100,15 +100,15 @@
 	</addonfile>
 	<addonfile friendlyname="Fourth Casual Black" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/301" filename="HR Fourth Casual Black-301-1-0.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/301/#files" filename="HR Fourth Casual Black-301-1-0.rar"/>
 	</addonfile>
 	<addonfile friendlyname="Garrus Alternate Armor" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/6" filename="ME3 HR Garrus Alternate Armor for Texmod-6-1-0.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/6/#files" filename="ME3 HR Garrus Alternate Armor for Texmod-6-1-0.rar"/>
 	</addonfile>
 	<addonfile friendlyname="Kai Leng" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename="HR Kai Leng-276-1-0.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/#files" filename="HR Kai Leng-276-1-0.rar"/>
 	</addonfile>
 	<addonfile friendlyname="Kaidan Alt From Ashes Armor in Original Black" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
@@ -161,22 +161,10 @@
 	
 	<addonfile friendlyname="Holograms HD (MEM)" author="JimbobJeffers">
 		<games masseffect2="true" masseffect3="false"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/134" filename="Holograms HD (MEM)-134-1-0.zip"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/134/#files" filename="Holograms HD (MEM)-134-1-0.zip"/>
 	</addonfile>
 	<addonfile friendlyname="Holograms HD (MEM)" author="JimbobJeffers">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/527" filename="Holograms HD (MEM)-527-1-0.zip"/>
-	</addonfile>
-
-	<addonfile friendlyname="Processing Test">
-		<games masseffect2="false" masseffect3="false"/>
-		<file downloadlink="http://google.com" filename="TEST.zip"/>
-		<processing>
-			<duplicates>
-				<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0x417194BC_Shade_hed_Spec.dds</duplicate>
-				<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0x62EEF54C_Shade_hed_Norm.dds</duplicate>
-				<duplicate>ME3_Armax_Arena_Cerberus_M_Ottemis\MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds</duplicate>
-			</duplicates>
-		</processing>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/527/#files" filename="Holograms HD (MEM)-527-1-0.zip"/>
 	</addonfile>
 </alotaddonmanifest>
