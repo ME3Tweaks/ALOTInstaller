@@ -9,8 +9,9 @@
         ResizeMode="NoResize"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
-        Title="ALOT AddOn Installer" Height="600" Width="800"
-        Loaded="Window_Loaded">
+        Title="ALOT Addon Builder" Height="600" Width="800"
+        Loaded="Window_Loaded"
+        Drop="File_Drop" AllowDrop="true">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -24,7 +25,7 @@
             <RowDefinition Height="10" />
         </Grid.RowDefinitions>
         <Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
-            <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Download the listed files to the Downloaded_Mods directory. Once they've all been downloaded, press install to install the addon." TextWrapping="Wrap" />
+            <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Download the listed files, then drag and drop the files onto this window.&#x0a;Once all items are ready, build the addon." TextWrapping="Wrap" />
         </Label>
         <Label Grid.Column="0" Grid.Row="1" x:Name="AddonFilesLabel" HorizontalContentAlignment="Center" Content="AddOn Files"/>
         <ListView Grid.Column="0" Grid.Row="2" Name="lvUsers">
@@ -112,7 +113,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
-                                        <Expander IsExpanded="False">
+                                        <Expander IsExpanded="True">
                                             <Expander.Header>
                                                 <StackPanel Orientation="Vertical">
                                                     <StackPanel Orientation="Horizontal">
@@ -122,7 +123,6 @@
                                                             <TextBlock Text="{Binding ItemCount,StringFormat='has {0} files total'}" FontSize="10" FontWeight="Bold" FontStyle="Italic" Margin="10,0,0,0" VerticalAlignment="Bottom" />
                                                         </StackPanel>
                                                     </StackPanel>
-                                                    <ProgressBar Minimum="0" Maximum="100" Value="40" IsIndeterminate="true"></ProgressBar>
                                                 </StackPanel>
                                             </Expander.Header>
                                             <ItemsPresenter />
@@ -145,8 +145,8 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Button x:Name="Button_InstallME2" Grid.Row="1" Grid.Column="0" Content="Install for ME2" Click="Button_InstallME2_Click"/>
-            <Button x:Name="Button_InstallME3" Grid.Row="1" Grid.Column="1" Content="Install for ME3" Click="Button_InstallME3_Click"/>
+            <Button x:Name="Button_InstallME2" Grid.Row="1" Grid.Column="0" Content="Build ME2 Addon" Click="Button_InstallME2_Click"/>
+            <Button x:Name="Button_InstallME3" Grid.Row="1" Grid.Column="1" Content="Build ME3 Addon" Click="Button_InstallME3_Click"/>
         </Grid>
         <Controls:MetroProgressBar Minimum="0" Maximum="100" x:Name="Install_ProgressBar" Grid.Column="0" Grid.Row="4"/>
     </Grid>
