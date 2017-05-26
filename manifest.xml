@@ -2,7 +2,6 @@
 <alotaddonmanifest>
 	<addonfile friendlyname="Weapon Norms" author="CreeperLava">
 		<file downloadlink="http://google.com" filename="Norms-CreeperLava.7z"/>
-		<games masseffect2="true" masseffect3="true"/>
 		<packagefile me2only="true" sourcename="0xB9AB2301.dds" destinationname="_0xB9AB2301.dds"/>
 		<packagefile me2only="true" sourcename="0xD111E01F.dds" destinationname="_0xD111E01F.dds"/>
 		<packagefile me2only="true" sourcename="0xFA1F9E55.dds" destinationname="_0xFA1F9E55.dds"/>
@@ -16,7 +15,6 @@
 		<packagefile me3only="true" sourcename="0xE023CF45.dds" destinationname="_0xE023CF45.dds"/>
 	</addonfile>	
 	<addonfile friendlyname="HR Predator Texture" author="TheDarkFalkon">
-		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPredator_HRv1.5.zip"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0xA4E25886.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x17836EC0.dds" destinationname="WPN_PSTa_Diff_0x17836EC0.dds"/>
@@ -25,7 +23,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xF4295780.dds" destinationname="WPN_PSTa_Tint_0xF4295780.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Shuriken Texture" author="TheDarkFalkon">
-		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnShuriken_HRv1.5.zip"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WPN_PSTc_Diff_0x71A3F10A.dds"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/>
@@ -33,11 +30,9 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WPN_PSTc_Diff_0x71A3F10A.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/></addonfile>
 	<addonfile friendlyname="HR Mantis Texture" author="TheDarkFalkon">
-		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnMantis_HRv1.5.zip"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds"/></addonfile>
 	<addonfile friendlyname="HR Katana Texture" author="TheDarkFalkon">
-		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnKatana_HRv1.5.zip"/>		
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0x738FAA8B.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB0DD05E4.dds" destinationname="WPN_BLSb_Spec_0xB0DD05E4.dds"/>
@@ -45,7 +40,6 @@
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0xA56179D6.dds"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB0DD05E4.dds" destinationname="WPN_BLSb_Spec_0xB0DD05E4.dds"/></addonfile>
 	<addonfile friendlyname="HR Carnifex Texture" author="TheDarkFalkon">
-		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCarnifex_HRv1.5.zip"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x073BF3F5.dds" destinationname="WPN_PSTb_Spec_0x073BF3F5.dds"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x6085274E.dds" destinationname="WPN_PSTb_Diff_0x6085274E.dds"/>
@@ -65,7 +59,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE1EDE859.dds" destinationname="WPN_ASLg_Diff_0xE1EDE859.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEEFDCFA9.dds" destinationname="WPN_ASLg_Spec_0xEEFDCFA9.dds"/></addonfile>
 	<addonfile friendlyname="HR Cain Texture" author="TheDarkFalkon">
-		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCain_HRv1.7.zip"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x637DADD4.dds" destinationname="WPN_HVYb_Diff_0x637DADD4.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds"/>
@@ -74,20 +67,17 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_0xB617BCBE.dds"/></addonfile>
 	<addonfile friendlyname="HD M-8 Avenger" author="TheDarkFalkon">
-		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon M-8 Avenger  HD OPTIMIZED 2 by TheDarkFalkon.tpf"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_Stack_0x3400C716.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR M-92 Mantis" author="TheDarkFalkon">
-		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x3463B385.dds"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x13703FFD.dds"/>
 	</addonfile>
 
 	<addonfile friendlyname="Alliance Blues - 4096" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/79" filename="ME3 HR Alliance Blues for Texmod-79-1-0.rar"/>		
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3D517229_NPC_spec.dds" destinationname="HMF_ARM_CTHa_Cnc_Spec_0x3D517229.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6D9F3946_NPC2_spec.dds" destinationname="HMM_ARM_CTHa_Cnc_Spec_0x6D9F3946.dds"/>
