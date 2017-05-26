@@ -3,12 +3,13 @@
 	<addonfile friendlyname="HR Predator Texture" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPredator_HRv1.5.zip"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0xA4E25886.dds"/> <!-- Me2 -->
 	</addonfile>
 	<addonfile friendlyname="HR Shuriken Texture" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnShuriken_HRv1.5.zip"/>
-		<packagefile sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WWPN_PSTc_Diff_0x71A3F10A.dds"/>
-		<packagefile sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WWPN_PSTc_Diff_0x71A3F10A.dds"/> <!-- Me3 -->
+		<packagefile sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/> <!-- Me3 -->
 	</addonfile>
 	<addonfile friendlyname="HR Mantis Texture" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
@@ -18,15 +19,21 @@
 			<duplicate>MASSEFFECT3.EXE_0x3463B385.dds</duplicate>
 			<duplicate>MASSEFFECT3.EXE_0xE023CF45.dds</duplicate>
 		</duplicates>-->
-		<packagefile sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds"/> <!-- Me3 -->
+		<packagefile sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x13703FFD.dds"/> <!-- Me2 -->
+
 	</addonfile>
 	<addonfile friendlyname="HR Katana Texture" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
-		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnKatana_HRv1.5.zip"/>
+		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnKatana_HRv1.5.zip"/>		
+		<packagefile sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0xA56179D6.dds"/> <!-- Me2 -->
+		<packagefile sourcename="MASSEFFECT3.EXE_0xB0DD05E4.dds" destinationname="WPN_BLSb_Spec_0xB0DD05E4.dds"/> <!-- Me2 -->
 	</addonfile>
 	<addonfile friendlyname="HR Carnifex Texture" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCarnifex_HRv1.5.zip"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x073BF3F5.dds" destinationname="WPN_PSTb_Spec_0x073BF3F5.dds"/> <!-- Me2 -->
+		<packagefile sourcename="MASSEFFECT3.EXE_0x6085274E.dds" destinationname="WPN_PSTb_Diff_0x6085274E.dds"/> <!-- Me2 -->
 	</addonfile>
 	<addonfile friendlyname="HR Paladin Texture" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
@@ -40,10 +47,11 @@
 		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCain_HRv1.7.zip"/>
 	</addonfile>
-
 	<addonfile friendlyname="HD M-8 Avenger" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon M-8 Avenger  HD OPTIMIZED 2 by TheDarkFalkon.tpf"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds"/> <!-- ME2-->
+		<packagefile sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_Stack_0x3400C716.dds"/> <!-- ME2-->
 	</addonfile>
 	<addonfile friendlyname="HR M-92 Mantis" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
@@ -52,15 +60,36 @@
 
 	<addonfile friendlyname="Alliance Blues - 4096" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/79" filename="ME3 HR Alliance Blues for Texmod-79-1-0.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/79" filename="ME3 HR Alliance Blues for Texmod-79-1-0.rar"/>		
+		<packagefile sourcename="MASSEFFECT3.EXE_0x0BEBC775_NPC_diff.dds" destinationname="HMF_ARM_CTHa_Cnc_Diff_0x0BEBC775.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x2CE94E76_alliance_norm.dds" destinationname="HMM_ARM_CTHa_Nav_Norm_Stack_0x2CE94E76.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x3D517229_NPC_spec.dds" destinationname="HMF_ARM_CTHa_Cnc_Spec_0x3D517229.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x6D9F3946_NPC2_spec.dds" destinationname="HMM_ARM_CTHa_Cnc_Spec_0x6D9F3946.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x77B54F3A_Anderson_diff.dds" destinationname="HMM_ARM_ANDb_Diff_0x77B54F3A.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x8141169E_Hackett_diff.dds" destinationname="HMM_ARM_CTHj_DIFF_0x8141169E.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x97801EB1_alliance_spec.dds" destinationname="HMM_ARM_CTHa_Nav_SPwr_Stack_0x97801EB1.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0xA1313E98_alliance_diff.dds" destinationname="HMM_ARM_CTHa_Nav_Diff_Stack_0xA1313E98.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0xB6B03658_Anderson_spec.dds" destinationname="HMM_ARM_ANDb_SPEC_0xB6B03658.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0xBD8FCAC7_AndersonDirt_diff.dds" destinationname="HMM_ARM_ANDc_Diff_0xBD8FCAC7.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0xC2D6EFE3_Hackett_spec.dds" destinationname="HMM_ARM_CTHj_SPEC_0xC2D6EFE3.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0xD4F23697_NPC2_diff.dds" destinationname="HMM_ARM_CTHa_Cnc_Diff_0xD4F23697.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0xE31BBD8E_AndersonDirt_spec.dds" destinationname="HMM_ARM_ANDc_Spec_0xE31BBD8E.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Alliance Cruiser" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename="HR Alliance Cruiser-276-1-0.rar"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x1D95B08D_Acruiser_diff.dds" destinationname="AlliCruiserA_Diff_Cine_0x1D95B08D.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x326E381C_Acruiser_spec.dds" destinationname="AlliCruiserA_CustomMask2_Cine_0x326E381C.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Armax Arena Cerberus Female" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/185" filename="Armax Arena Cerberus Female-185-1-0.rar"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x417194BC_Shade_hed_Spec.dds" destinationname="HMM_HGR_SHP_FBDj_Spec_0x417194BC.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x5B05FCBB_Shade_Diff.dds" destinationname="HMF_ARM_FBDj_Diff_0x5B05FCBB.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x62EEF54C_Shade_hed_Norm.dds" destinationname="HMM_HGR_SHP_FBDj_Norm_0x62EEF54C.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x7186E843_Shade_Norm.dds" destinationname="HMF_ARM_FBDj_Norm_0x16A3CA0E.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x7186E843_Shade_Norm.dds" destinationname="HMF_ARM_FBDj_Norm_0x7186E843.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x73B170C7_Shade_Spec.dds" destinationname="HMF_ARM_FBDj_Spec_0x73B170C7.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Armax Arena Cerberus Male" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
@@ -97,10 +126,14 @@
 	<addonfile friendlyname="EDI AAP Armor" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/118/#files" filename="ME3 HR EDI AAP Armor-118-1-1.rar"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x4894C1E8_edi_squadlight.dds" destinationname="EDI3Glow_0x4894C1E8.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x83EB9F88_edi_squaddark.dds" destinationname="EDI3_0x83EB9F88.dds"/>
 	</addonfile>
 	<addonfile friendlyname="EDI Alt Outfit Pack" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/238/#files" filename="EDI Alt Outfit Pack-238-1-2.rar"/>
+		<packagefile sourcename="HMF_ARM_EDId_Diff_0xEDC36D3F_Otte.dds" destinationname="HMF_ARM_EDId_Diff_0xEDC36D3F.dds"/>
+		<packagefile sourcename="HMF_ARM_EDId_Spec_0x6ADA93CE_Otte.dds" destinationname="HMF_ARM_EDId_Spec_0x6ADA93CE.dds"/>
 	</addonfile>
 	<addonfile friendlyname="EDI From Ashes Outfit ALT version" author="Ottemis">
 		<games masseffect2="false" masseffect3="true"/>
