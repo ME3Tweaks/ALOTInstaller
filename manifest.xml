@@ -7,10 +7,8 @@
 	<addonfile friendlyname="HR Shuriken Texture" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnShuriken_HRv1.5.zip"/>
-		<packagefiles>
-			<packagefile sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WWPN_PSTc_Diff_0x71A3F10A.dds"/>
-			<packagefile sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/>
-		</packagefiles>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WWPN_PSTc_Diff_0x71A3F10A.dds"/>
+		<packagefile sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Mantis Texture" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
@@ -20,9 +18,7 @@
 			<duplicate>MASSEFFECT3.EXE_0x3463B385.dds</duplicate>
 			<duplicate>MASSEFFECT3.EXE_0xE023CF45.dds</duplicate>
 		</duplicates>-->
-		<packagefiles>
-			<packagefile sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds"/>
-		</packagefiles>
+		<packagefile sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Katana Texture" author="TheDarkFalkon">
 		<games masseffect2="true" masseffect3="true"/>
