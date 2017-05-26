@@ -567,10 +567,10 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds"/>
 	</addonfile>
 
-	<addonfile friendlyname="Holograms HD (MEM)" author="JimbobJeffers">
+	<addonfile friendlyname="Holograms HD (MEM) - For ME2" author="JimbobJeffers">
 		<games masseffect2="true" masseffect3="false"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/134/#files" filename="Holograms HD (MEM)-134-1-0.zip"/></addonfile>
-	<addonfile friendlyname="Holograms HD (MEM)" author="JimbobJeffers">
+	<addonfile friendlyname="Holograms HD (MEM) - For ME3" author="JimbobJeffers">
 		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/527/#files" filename="Holograms HD (MEM)-527-1-0.zip"/></addonfile>
 </alotaddonmanifest>
