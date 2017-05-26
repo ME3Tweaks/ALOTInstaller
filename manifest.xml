@@ -61,11 +61,7 @@
 	<addonfile friendlyname="HR Cain Texture" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCain_HRv1.7.zip"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x637DADD4.dds" destinationname="WPN_HVYb_Diff_0x637DADD4.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8BA3F0F1.dds" destinationname="WPN_ASLa_Tint_0x8BA3F0F1.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0x1843668E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_0xB617BCBE.dds"/></addonfile>
+		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds"/></addonfile>
 	<addonfile friendlyname="HD M-8 Avenger" author="TheDarkFalkon">
 		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon M-8 Avenger  HD OPTIMIZED 2 by TheDarkFalkon.tpf"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds"/>
