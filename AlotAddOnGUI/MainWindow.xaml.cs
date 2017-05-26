@@ -297,14 +297,14 @@ namespace AlotAddOnGUI
 
         private void Button_InstallME2_Click(object sender, RoutedEventArgs e)
         {
-            InitInstall();
+            InitInstall(2);
             Button_InstallME2.Content = "Building...";
             InstallWorker.RunWorkerAsync(2);
         }
 
         private void Button_InstallME3_Click(object sender, RoutedEventArgs e)
         {
-            InitInstall();
+            InitInstall(3);
             Button_InstallME3.Content = "Building...";
             InstallWorker.RunWorkerAsync(3);
         }
@@ -345,6 +345,8 @@ namespace AlotAddOnGUI
                     case ".zip":
                     case ".rar":
                         {
+                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting "+af.FriendlyName));
+
                             Log.Information("Extracting file: " + af.Filename);
                             string exe = BINARY_DIRECTORY + "7z.exe";
                             string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
@@ -479,6 +481,10 @@ namespace AlotAddOnGUI
                 string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + MEM_STAGING_DIR + "\" \"" + EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\ALOT_ME" + game + "_Addon.mem";
                 runProcess(exe, args);
             }
+
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+            InstallWorker.ReportProgress(100);
+
             //Directory.Delete(MEM_STAGING_DIR, true);
             //Directory.Delete("Extracted_Mods",true);
         }
@@ -515,7 +521,7 @@ namespace AlotAddOnGUI
             this.nIcon.ShowBalloonTip(14000, "Downloading ALOT Addon File", "Download the file named XXX", ToolTipIcon.Info);
         }
 
-        private void InitInstall()
+        private void InitInstall(int game)
         {
             Installing = true;
             Button_InstallME2.IsEnabled = false;
@@ -532,17 +538,17 @@ namespace AlotAddOnGUI
             Directory.CreateDirectory(MEM_STAGING_DIR);
 
             AddonFilesLabel.Content = "Preparing to install...";
-            HeaderLabel.Text = "Now installing ALOT AddOn. Don't close this window until the process completes. It will take a few minutes to install.";
+            HeaderLabel.Text = "Now building the ALOT Addon for Mass Effect "+game+ ".\nDon't close this window until the process completes.";
             // Install_ProgressBar.IsIndeterminate = true;
         }
 
-        private void File_Drop(object sender, System.Windows.DragEventArgs e)
+        private async void File_Drop(object sender, System.Windows.DragEventArgs e)
         {
             if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
                 // Note that you can have more than one file.
                 string[] files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
-
+                List<AddonFile> filesimported = new List<AddonFile>();
                 // Assuming you have one file that you care about, pass it off to whatever
                 // handling code you have defined.
                 foreach (string file in files)
@@ -557,10 +563,20 @@ namespace AlotAddOnGUI
                             string destination = basepath + af.Filename;
                             Log.Information("Copying dragged file to downloaded mods directory: " + file);
                             File.Copy(file, destination, true);
+                            filesimported.Add(af);
                             timer_Tick(null, null);
                             break;
                         }
                     }
+                }
+                if (filesimported.Count > 0)
+                {
+                    string message = "The following files have been imported to ALOT Addon Builder:";
+                    foreach (AddonFile af in filesimported)
+                    {
+                        message += "\n - " + af.FriendlyName;
+                    }
+                    await this.ShowMessageAsync(filesimported.Count+" file"+(filesimported.Count != 1 ? "s" : "")+" imported", message);
                 }
             }
         }
