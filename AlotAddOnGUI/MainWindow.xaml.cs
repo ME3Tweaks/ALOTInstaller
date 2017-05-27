@@ -32,11 +32,15 @@ namespace AlotAddOnGUI
         public const string UPDATE_PROGRESSBAR_INDETERMINATE = "SET_PROGRESSBAR_DETERMINACY";
         public const string BINARY_DIRECTORY = "bin\\";
 
+        private DispatcherTimer backgroundticker;
+
         private bool Installing = false;
         private readonly BackgroundWorker InstallWorker = new BackgroundWorker();
         private BindingList<AddonFile> addonfiles;
         NotifyIcon nIcon = new NotifyIcon();
         private const string MEM_OUTPUT_DIR = "MEM_Packages";
+        private const string MEM_OUTPUT_DISPLAY_DIR = "MEM__Packages";
+
         private const string MEM_STAGING_DIR = "MEM_PACKAGE_STAGING";
         private string EXE_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory;
 
@@ -54,10 +58,25 @@ namespace AlotAddOnGUI
             InitializeComponent();
         }
 
-        private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private async void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            HeaderLabel.Text = "Process completed";
-            AddonFilesLabel.Content = "MEM Packages placed in the " + MEM_OUTPUT_DIR + " folder";
+            Installing = false;
+            SetupButtons();
+            int result = (int)e.Result;
+            switch (result)
+            {
+                case 1:
+                    HeaderLabel.Text = "An error occured building the Addon. You can possibly find more information in the logs.";
+                    AddonFilesLabel.Content = "Addon not successfully built";
+                    await this.ShowMessageAsync("Error building Addon", "An error occured building the Addon. The files in the logs directory may help diagnose the issue.");
+                    break;
+                case 2:
+                case 3:
+                    HeaderLabel.Text = "Addon Created";
+                    AddonFilesLabel.Content = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
+                    await this.ShowMessageAsync("ALOT Addon for Mass Effect "+result+" has been built", "You can install the Addon MEM files with Mass Effect Modder after you've installed the main ALOT MEM file.");
+                    break;
+            }
         }
 
         private void InstallProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -83,7 +102,8 @@ namespace AlotAddOnGUI
 
         private void InstallAddon(object sender, DoWorkEventArgs e)
         {
-            ExtractAddons((int)e.Argument); //arg is game id.
+            bool result = ExtractAddons((int)e.Argument); //arg is game id.
+            e.Result = result ? (int)e.Argument : 1; //1 = Error
         }
 
         // Tick handler    
@@ -126,6 +146,12 @@ namespace AlotAddOnGUI
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            SetupButtons();
+            await FetchManifest();
+        }
+
+        private async void SetupButtons()
+        {
             string me3map = Environment.GetEnvironmentVariable("LocalAppData") + @"\MassEffectModder\me3map.bin";
             string me2map = Environment.GetEnvironmentVariable("LocalAppData") + @"\MassEffectModder\me2map.bin";
 
@@ -133,16 +159,19 @@ namespace AlotAddOnGUI
             Log.Information("ME3 Texture Map exists: " + File.Exists(me3map));
             if (File.Exists(me2map) || File.Exists(me3map))
             {
-                DispatcherTimer dt = new DispatcherTimer();
-                dt.Tick += new EventHandler(timer_Tick);
-                dt.Interval = new TimeSpan(0, 0, 5); // execute every 5s
-                dt.Start();
+                if (backgroundticker == null)
+                {
+                    backgroundticker = new DispatcherTimer();
+                    backgroundticker.Tick += new EventHandler(timer_Tick);
+                    backgroundticker.Interval = new TimeSpan(0, 0, 5); // execute every 5s
+                    backgroundticker.Start();
 
-                InstallWorker.DoWork += InstallAddon;
-                InstallWorker.ProgressChanged += InstallProgressChanged;
-                InstallWorker.RunWorkerCompleted += InstallCompleted;
-                InstallWorker.WorkerReportsProgress = true;
-                await FetchManifest();
+
+                    InstallWorker.DoWork += InstallAddon;
+                    InstallWorker.ProgressChanged += InstallProgressChanged;
+                    InstallWorker.RunWorkerCompleted += InstallCompleted;
+                    InstallWorker.WorkerReportsProgress = true;
+                }
 
                 if (!File.Exists(me2map))
                 {
@@ -151,6 +180,12 @@ namespace AlotAddOnGUI
                     Button_InstallME2.ToolTip = "Mass Effect 2 Texture Map not found. To install ALOT for Mass Effect 2 a texture map must be created.";
                     Button_InstallME2.Content = "ME2 Texture Map Missing";
                 }
+                else
+                {
+                    Button_InstallME2.IsEnabled = true;
+                    Button_InstallME2.ToolTip = "Click to build ALOT Addon for Mass Effect 2";
+                    Button_InstallME2.Content = "Build Addon for ME2";
+                }
                 if (!File.Exists(me3map))
                 {
                     Log.Information("ME3 Texture Map missing - disabling ME3 install");
@@ -158,13 +193,18 @@ namespace AlotAddOnGUI
                     Button_InstallME3.ToolTip = "Mass Effect 3 Texture Map not found. To install ALOT for Mass Effect 3 a texture map must be created.";
                     Button_InstallME3.Content = "ME3 Texture Map Missing";
                 }
+                else
+                {
+                    Button_InstallME3.IsEnabled = true;
+                    Button_InstallME3.ToolTip = "Click to build ALOT Addon for Mass Effect 3";
+                    Button_InstallME3.Content = "Build Addon for ME3";
+                }
             }
             else
             {
                 await this.ShowMessageAsync("No ME2/ME3 Texture Maps Found", "ALOT Addon Builder requires you to build a texture map for ME2 or ME3 before you can use it.\nOne will be created during the main ALOT installation process.");
                 Environment.Exit(1);
             }
-
         }
 
         private async Task FetchManifest()
@@ -205,8 +245,8 @@ namespace AlotAddOnGUI
                             {
                                 Author = (string)e.Attribute("author"),
                                 FriendlyName = (string)e.Attribute("friendlyname"),
-                                Game_ME2 = bool.Parse((string)e.Element("games").Attribute("masseffect2")),
-                                Game_ME3 = bool.Parse((string)e.Element("games").Attribute("masseffect3")),
+                                Game_ME2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("masseffect2") : false,
+                                Game_ME3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("masseffect3") : false,
                                 Filename = (string)e.Element("file").Attribute("filename"),
                                 DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
                                 Ready = false,
@@ -215,10 +255,21 @@ namespace AlotAddOnGUI
                                    {
                                        SourceName = (string)r.Attribute("sourcename"),
                                        DestinationName = (string)r.Attribute("destinationname"),
-                                   }).ToList()
+                                       ME2Only = r.Attribute("me2only") != null ? true : false,
+                                       ME3Only = r.Attribute("me3only") != null ? true : false,
+                                   }).ToList(),
                             }).ToList();
             addonfiles = new BindingList<AddonFile>(linqlist);
-            //This is inefficient, but workable since we are using a small dataset.
+            foreach (AddonFile af in addonfiles)
+            {
+                //Set Game ME2/ME3
+                foreach (PackageFile pf in af.PackageFiles)
+                {
+                    //Damn I did not think this one through very well
+                    af.Game_ME2 |= pf.ME2Only || (!pf.ME2Only && !pf.ME3Only);
+                    af.Game_ME3 |= pf.ME3Only || (!pf.ME2Only && !pf.ME3Only);
+                }
+            }
             lvUsers.ItemsSource = addonfiles;
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
@@ -282,6 +333,8 @@ namespace AlotAddOnGUI
         {
             public string SourceName { get; set; }
             public string DestinationName { get; set; }
+            public bool ME2Only { get; set; }
+            public bool ME3Only { get; set; }
         }
 
         public class ThreadCommand
@@ -295,21 +348,51 @@ namespace AlotAddOnGUI
             public object Data;
         }
 
-        private void Button_InstallME2_Click(object sender, RoutedEventArgs e)
+        private async void Button_InstallME2_Click(object sender, RoutedEventArgs e)
         {
-            InitInstall(2);
-            Button_InstallME2.Content = "Building...";
-            InstallWorker.RunWorkerAsync(2);
+            if (await InstallPrecheck(2))
+            {
+                InitInstall(2);
+                Button_InstallME2.Content = "Building...";
+                InstallWorker.RunWorkerAsync(2);
+            }
         }
 
-        private void Button_InstallME3_Click(object sender, RoutedEventArgs e)
+        private async void Button_InstallME3_Click(object sender, RoutedEventArgs e)
         {
-            InitInstall(3);
-            Button_InstallME3.Content = "Building...";
-            InstallWorker.RunWorkerAsync(3);
+            if (await InstallPrecheck(3))
+            {
+
+                InitInstall(3);
+                Button_InstallME3.Content = "Building...";
+                InstallWorker.RunWorkerAsync(3);
+            }
         }
 
-        private void ExtractAddons(int game)
+        private async Task<bool> InstallPrecheck(int game)
+        {
+            timer_Tick(null, null);
+            int nummissing = 0;
+            foreach (AddonFile af in addonfiles)
+            {
+                if (af.Game_ME2 && game == 2 || af.Game_ME3 && game == 3)
+                {
+                    if (!af.Ready)
+                    {
+                        nummissing++;
+                    }
+                }
+            }
+
+            if (nummissing == 0)
+            {
+                return true;
+            }
+            MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect " + game + " addon are missing - do you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
+            return result == MessageDialogResult.Affirmative;
+        }
+
+        private bool ExtractAddons(int game)
         {
 
             Log.Information("Extracting Addons for Mass Effect " + game);
@@ -332,6 +415,10 @@ namespace AlotAddOnGUI
 
             int completed = 0;
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting Mods..."));
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+
+            InstallWorker.ReportProgress(0);
+
             bool modextractrequired = false;
             foreach (AddonFile af in addonstoinstall)
             {
@@ -345,17 +432,42 @@ namespace AlotAddOnGUI
                     case ".zip":
                     case ".rar":
                         {
-                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting "+af.FriendlyName));
+                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Processing " + af.FriendlyName));
 
                             Log.Information("Extracting file: " + af.Filename);
                             string exe = BINARY_DIRECTORY + "7z.exe";
                             string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
                             string args = "x \"" + EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename + "\" -aoa -r -o\"" + extractpath + "\"";
                             runProcess(exe, args);
+                            if (Directory.GetFiles(extractpath, "*.tpf").Length > 0)
+                            {
+                                //Extract the TPFs
+                                exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+                                args = "-extract-tpf \"" + extractpath + "\" \"" + extractpath + "\"";
+                                runProcess(exe, args);
+                            }
 
-                            exe = BINARY_DIRECTORY + "MassEffectModder.exe";
-                            args = "-extract-tpf \"" + extractpath + "\" \"" + extractpath + "\"";
-                            runProcess(exe, args);
+                            if (Directory.GetFiles(extractpath, "*.mod").Length > 0)
+                            {
+                                //Extract the MOD
+                                exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+                                args = "-extract-mod " + game + " \"" + extractpath + "\" \"" + extractpath + "\"";
+                                runProcess(exe, args);
+                            }
+                            string[] memfiles = Directory.GetFiles(extractpath, "*.mem");
+                            if (memfiles.Length > 0)
+                            {
+                                //Copy MEM File - append game
+                                foreach (string memfile in memfiles)
+                                {
+                                    string name = Path.GetFileNameWithoutExtension(memfile);
+                                    string ext = Path.GetExtension(memfile);
+                                    File.Copy(memfile, EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\" + name + " - ME" + game + ext, true);
+                                }
+
+                            }
+
+
 
 
                             List<string> files = new List<string>();
@@ -366,13 +478,14 @@ namespace AlotAddOnGUI
 
                             foreach (string file in files)
                             {
+
                                 Log.Information("Deleting existing file (if any): " + extractpath + "\\" + Path.GetFileName(file));
+
                                 string destination = extractpath + "\\" + Path.GetFileName(file);
                                 File.Delete(destination);
                                 Log.Information(file + " -> " + destination);
                                 File.Move(file, destination);
                             }
-
 
                             completed++;
                             int progress = (int)((float)completed / (float)addonstoinstall.Count * 100);
@@ -381,6 +494,8 @@ namespace AlotAddOnGUI
                         }
                     case ".tpf":
                         {
+                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
+
                             string source = EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename;
                             string destination = EXE_DIRECTORY + "Extracted_Mods\\" + Path.GetFileName(af.Filename);
                             File.Copy(source, destination, true);
@@ -392,6 +507,8 @@ namespace AlotAddOnGUI
                         }
                     case ".mod":
                         {
+                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
+
                             modextractrequired = true;
                             completed++;
                             int progress = (int)((float)completed / (float)addonstoinstall.Count * 100);
@@ -400,6 +517,8 @@ namespace AlotAddOnGUI
                         }
                     case ".mem":
                         {
+                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
+
                             //Copy to output folder
                             File.Copy(EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename, EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\" + af.Filename, true);
                             completed++;
@@ -408,6 +527,8 @@ namespace AlotAddOnGUI
                             break;
                         }
                 }
+                InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+
             }
 
             //if (tpfextractrequired)
@@ -473,7 +594,7 @@ namespace AlotAddOnGUI
 
             InstallWorker.ReportProgress(0);
 
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Building Addon MEM Package..."));
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Building Addon MEM Package... This will take some time."));
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
             {
                 Log.Information("Building MEM Package.");
@@ -485,8 +606,10 @@ namespace AlotAddOnGUI
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
             InstallWorker.ReportProgress(100);
 
-            //Directory.Delete(MEM_STAGING_DIR, true);
-            //Directory.Delete("Extracted_Mods",true);
+            Directory.Delete(MEM_STAGING_DIR, true);
+            Directory.Delete("Extracted_Mods", true);
+            return true;
+
         }
 
         private int runProcess(string exe, string args)
@@ -513,14 +636,6 @@ namespace AlotAddOnGUI
             this.nIcon.ShowBalloonTip(14000, "Downloading ALOT Addon File", "Download the file named \"" + fname + "\"", ToolTipIcon.Info);
         }
 
-        private void Downloadlink_Clicked(object sender, RoutedEventArgs e)
-        {
-            this.nIcon.Visible = true;
-            //this.WindowState = System.Windows.WindowState.Minimized;
-            this.nIcon.Icon = new Icon(@"../../images/info.ico");
-            this.nIcon.ShowBalloonTip(14000, "Downloading ALOT Addon File", "Download the file named XXX", ToolTipIcon.Info);
-        }
-
         private void InitInstall(int game)
         {
             Installing = true;
@@ -534,11 +649,16 @@ namespace AlotAddOnGUI
                 Directory.Delete(destinationpath, true);
             }
 
+            if (Directory.Exists(MEM_STAGING_DIR))
+            {
+                Directory.Delete(MEM_STAGING_DIR, true);
+            }
+
             Directory.CreateDirectory(MEM_OUTPUT_DIR);
             Directory.CreateDirectory(MEM_STAGING_DIR);
 
             AddonFilesLabel.Content = "Preparing to install...";
-            HeaderLabel.Text = "Now building the ALOT Addon for Mass Effect "+game+ ".\nDon't close this window until the process completes.";
+            HeaderLabel.Text = "Now building the ALOT Addon for Mass Effect " + game + ".\nDon't close this window until the process completes.";
             // Install_ProgressBar.IsIndeterminate = true;
         }
 
@@ -576,7 +696,7 @@ namespace AlotAddOnGUI
                     {
                         message += "\n - " + af.FriendlyName;
                     }
-                    await this.ShowMessageAsync(filesimported.Count+" file"+(filesimported.Count != 1 ? "s" : "")+" imported", message);
+                    await this.ShowMessageAsync(filesimported.Count + " file" + (filesimported.Count != 1 ? "s" : "") + " imported", message);
                 }
             }
         }
