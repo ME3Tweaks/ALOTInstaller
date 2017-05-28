@@ -53,9 +53,8 @@ namespace AlotAddOnGUI
               .CreateLogger();
             Log.Information("Logger Started for ALOT Installer.");
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
-
-
             InitializeComponent();
+            Title = "ALOT Addon Builder " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
         }
 
         private async void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -74,7 +73,7 @@ namespace AlotAddOnGUI
                 case 3:
                     HeaderLabel.Text = "Addon Created";
                     AddonFilesLabel.Content = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
-                    await this.ShowMessageAsync("ALOT Addon for Mass Effect "+result+" has been built", "You can install the Addon MEM files with Mass Effect Modder after you've installed the main ALOT MEM file.");
+                    await this.ShowMessageAsync("ALOT Addon for Mass Effect " + result + " has been built", "You can install the Addon MEM files with Mass Effect Modder after you've installed the main ALOT MEM file.");
                     break;
             }
         }
@@ -132,6 +131,7 @@ namespace AlotAddOnGUI
                     {
                         // Code to run on the GUI thread.
                         Install_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
+                        AddonFilesLabel.Content = "Addon Files [" + numdone + "/" + addonfiles.Count + "]";
                     });
                     //Check for file existence
                     //Console.WriteLine("Checking for file: " + basepath + af.Filename);
@@ -237,10 +237,13 @@ namespace AlotAddOnGUI
             //    return;
             //}
             Log.Information("Reading manifest...");
-            XElement rootElement = XElement.Load(@"manifest.xml");
+            List<AddonFile> linqlist = null;
+            try
+            {
+                XElement rootElement = XElement.Load(@"manifest.xml");
 
-            var elemn1 = rootElement.Elements();
-            var linqlist = (from e in rootElement.Elements("addonfile")
+                var elemn1 = rootElement.Elements();
+                linqlist = (from e in rootElement.Elements("addonfile")
                             select new AddonFile
                             {
                                 Author = (string)e.Attribute("author"),
@@ -248,18 +251,29 @@ namespace AlotAddOnGUI
                                 Game_ME2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("masseffect2") : false,
                                 Game_ME3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("masseffect3") : false,
                                 Filename = (string)e.Element("file").Attribute("filename"),
+                                Tooltipname = e.Attribute("tooltipname") != null ? (string)e.Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
                                 DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
                                 Ready = false,
                                 PackageFiles = e.Elements("packagefile")
-                                   .Select(r => new PackageFile
-                                   {
-                                       SourceName = (string)r.Attribute("sourcename"),
-                                       DestinationName = (string)r.Attribute("destinationname"),
-                                       ME2Only = r.Attribute("me2only") != null ? true : false,
-                                       ME3Only = r.Attribute("me3only") != null ? true : false,
-                                   }).ToList(),
+                                    .Select(r => new PackageFile
+                                    {
+                                        SourceName = (string)r.Attribute("sourcename"),
+                                        DestinationName = (string)r.Attribute("destinationname"),
+                                        ME2Only = r.Attribute("me2only") != null ? true : false,
+                                        ME3Only = r.Attribute("me3only") != null ? true : false,
+                                    }).ToList(),
                             }).ToList();
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error has occured parsing the XML!");
+                Log.Error(e.Message);
+                AddonFilesLabel.Content = "Error parsing manifest XML! Check the logs.";
+                return;
+            }
+            linqlist = linqlist.OrderBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList();
             addonfiles = new BindingList<AddonFile>(linqlist);
+            
             foreach (AddonFile af in addonfiles)
             {
                 //Set Game ME2/ME3
@@ -274,26 +288,6 @@ namespace AlotAddOnGUI
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
             view.GroupDescriptions.Add(groupDescription);
-
-            //bool groupfound = false;
-            //foreach (AddonFileAuthorGroup group in addonfileauthorgroups)
-            //{
-            //    if (group.Author.Equals(addon.Author))
-            //    {
-            //        group.Files.Add(addon);
-            //        groupfound = true;
-            //        break;
-            //    }
-            //}
-            //if (!groupfound)
-            //{
-            //    AddonFileAuthorGroup group = new AddonFileAuthorGroup();
-            //    group.Author = addon.Author;
-            //    group.Files = new List<AddonFile>();
-            //    group.Files.Add(addon);
-            //    addonfileauthorgroups.Add(group);
-            //}
-
         }
 
         public sealed class AddonFile : INotifyPropertyChanged
@@ -306,6 +300,7 @@ namespace AlotAddOnGUI
             public bool Game_ME2 { get; set; }
             public bool Game_ME3 { get; set; }
             public string Filename { get; set; }
+            public string Tooltipname { get; set; }
             public string DownloadLink { get; set; }
             public List<String> Duplicates { get; set; }
             public List<PackageFile> PackageFiles { get; set; }
@@ -631,9 +626,9 @@ namespace AlotAddOnGUI
             System.Diagnostics.Process.Start(e.Uri.ToString());
             this.nIcon.Visible = true;
             //this.WindowState = System.Windows.WindowState.Minimized;
-            this.nIcon.Icon = new Icon(@"../../images/info.ico");
+            this.nIcon.Icon = Properties.Resources.tooltiptrayicon;
             string fname = (string)((Hyperlink)e.Source).Tag;
-            this.nIcon.ShowBalloonTip(14000, "Downloading ALOT Addon File", "Download the file named \"" + fname + "\"", ToolTipIcon.Info);
+            this.nIcon.ShowBalloonTip(14000, "Downloading ALOT Addon File", "Download the file titled \"" + fname + "\"", ToolTipIcon.Info);
         }
 
         private void InitInstall(int game)

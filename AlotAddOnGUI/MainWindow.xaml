@@ -65,7 +65,7 @@
                             <StackPanel x:Name="Download_Hyperlink" Orientation="Horizontal">
                                 <Image Height="15" Width="15"  Source="images/orangedownload.png"/>
                                 <TextBlock Margin="5,0">
-                                    <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Filename}">
+                                    <Hyperlink ToolTip="{Binding DownloadLink}" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
                                         <Hyperlink.Style >
                                             <Style TargetType="Hyperlink"
                                                     BasedOn="{StaticResource {x:Type Hyperlink}}">
