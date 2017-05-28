@@ -77,7 +77,7 @@
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x13703FFD.dds"/>
 	</addonfile>
 
-	<addonfile friendlyname="Alliance Blues - 4096" author="Ottemis">
+	<addonfile friendlyname="ME3 HR Alliance Blues - 4096" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/79/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D79&amp;pUp=1" filename="ME3 HR Alliance Blues for Texmod-79-1-0.rar"/>		
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3D517229_NPC_spec.dds" destinationname="HMF_ARM_CTHa_Cnc_Spec_0x3D517229.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6D9F3946_NPC2_spec.dds" destinationname="HMM_ARM_CTHa_Cnc_Spec_0x6D9F3946.dds"/>
@@ -93,13 +93,13 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0BEBC775_NPC_diff.dds" destinationname="HMF_ARM_CTHa_Cnc_Diff_0x0BEBC775.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x2CE94E76_alliance_norm.dds" destinationname="HMM_ARM_CTHa_Nav_Norm_Stack_0x2CE94E76.dds"/>
 	</addonfile>
-	<addonfile friendlyname="Alliance Cruiser" author="Ottemis">
+	<addonfile friendlyname="HR Alliance Cruiser" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D276&amp;pUp=1" filename="HR Alliance Cruiser-276-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x1D95B08D_Acruiser_diff.dds" destinationname="AlliCruiserA_Diff_Cine_0x1D95B08D.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x326E381C_Acruiser_spec.dds" destinationname="AlliCruiserA_CustomMask2_Cine_0x326E381C.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Armax Arena Cerberus Female" author="Ottemis">
-		<file downloadlink="/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D185&amp;pUp=1" filename="Armax Arena Cerberus Female-185-1-0.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D185&amp;pUp=1" filename="Armax Arena Cerberus Female-185-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x417194BC_Shade_hed_Spec.dds" destinationname="HMM_HGR_SHP_FBDj_Spec_0x417194BC.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5B05FCBB_Shade_Diff.dds" destinationname="HMF_ARM_FBDj_Diff_0x5B05FCBB.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x62EEF54C_Shade_hed_Norm.dds" destinationname="HMM_HGR_SHP_FBDj_Norm_0x62EEF54C.dds"/>
@@ -429,7 +429,7 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xBC526E87_helm_alt_diff.dds" destinationname="TUR_HGRb_Garrus_Diff_0xBC526E87.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEC2CF8A7_face_norm.dds" destinationname="TUR_HED_PROGarrus_Norm_0xEC2CF8A7.dds"/>
 	</addonfile>
-	<addonfile friendlyname="Kai Leng" author="Ottemis">
+	<addonfile friendlyname="HR Kai Leng" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D276&amp;pUp=1" filename="HR Kai Leng-276-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x123B4AC0_Shadow_Sword_norm.dds" destinationname="WPN_MLEa_Norm_0x123B4AC0.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x819EE45D_shade_kai.dds" destinationname="HMM_ARM_LENGa_Diff_0x819EE45D.dds"/>
@@ -462,7 +462,7 @@
 		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Spec_4096x4096.dds" destinationname="HMM_ARM_KAIa_Spec_0x438F51F8.dds"/>
 		<packagefile me3only="true" sourcename="HMM_HGRa_KAI_Diff_0x2366F731.dds" destinationname="HMM_HGRa_KAI_Diff_0x2366F731.dds"/>
 	</addonfile>
-	<addonfile friendlyname="Kuwashii Visor and reticule fix" author="Ottemis">
+	<addonfile friendlyname="HR Kuwashii Visor and reticule fix" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/134/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D134&amp;pUp=1" filename="Kuwashii Visor fix-134-1-1.rar"/>
 		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Norm.dds" destinationname="HMM_HGR_SHPd_Norm_0x2E612B33.dds"/>
 		<packagefile me3only="true" sourcename="Visor_Frame.dds" destinationname="Visor_Frame_0x3BA605E1.dds"/>
@@ -493,7 +493,7 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x72156F55_Norm.dds" destinationname="ASA_ARM_LIAe_Norm_0x72156F55.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xBA98711B_helm_diff.dds" destinationname="ASA_ARM_LIAe_HGR_Diff_0xBA98711B.dds"/>
 	</addonfile>
-	<addonfile friendlyname="Maya Brooks" author="Ottemis">
+	<addonfile friendlyname="HR Maya Brooks" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D276&amp;pUp=1" filename="HR Maya Brooks-276-1-0.rar"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_FTLa_Diff_Ottemis.dds" destinationname="HMF_ARM_FTLa_Diff_0x8C060CC8.dds"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_FTLa_Norm_0x8803C0CA_Otte.dds" destinationname="HMF_ARM_FTLa_Norm_0x8803C0CA.dds"/>
