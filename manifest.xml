@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotaddonmanifest>
 	<addonfile friendlyname="Weapon Norms" author="CreeperLava">
-		<file downloadlink="http://google.com" filename="Norms-CreeperLava.7z"/>
+		<file downloadlink="https://onedrive.live.com/download?cid=DBE0E01C958EBA9F&resid=DBE0E01C958EBA9F%21394&authkey=AFUczvJaSfxmE3s" filename="Norms-CreeperLava.7z"/>
 		<packagefile me2only="true" sourcename="0xB9AB2301.dds" destinationname="_0xB9AB2301.dds"/>
 		<packagefile me2only="true" sourcename="0xD111E01F.dds" destinationname="_0xD111E01F.dds"/>
 		<packagefile me2only="true" sourcename="0xFA1F9E55.dds" destinationname="_0xFA1F9E55.dds"/>
