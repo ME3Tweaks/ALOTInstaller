@@ -94,13 +94,11 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x2CE94E76_alliance_norm.dds" destinationname="HMM_ARM_CTHa_Nav_Norm_Stack_0x2CE94E76.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Alliance Cruiser" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D276&amp;pUp=1" filename="HR Alliance Cruiser-276-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x1D95B08D_Acruiser_diff.dds" destinationname="AlliCruiserA_Diff_Cine_0x1D95B08D.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x326E381C_Acruiser_spec.dds" destinationname="AlliCruiserA_CustomMask2_Cine_0x326E381C.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Armax Arena Cerberus Female" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D185&amp;pUp=1" filename="Armax Arena Cerberus Female-185-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x417194BC_Shade_hed_Spec.dds" destinationname="HMM_HGR_SHP_FBDj_Spec_0x417194BC.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5B05FCBB_Shade_Diff.dds" destinationname="HMF_ARM_FBDj_Diff_0x5B05FCBB.dds"/>
@@ -110,7 +108,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x73B170C7_Shade_Spec.dds" destinationname="HMF_ARM_FBDj_Spec_0x73B170C7.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Armax Arena Cerberus Male" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/185/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D185&amp;pUp=1" filename="Armax Arena Cerberus Male-185-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x11D30EDE_Shade_hed_Diff.dds" destinationname="HMM_HGR_SHP_FBDj_Diff_0x11D30EDE.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x49903884_ShadeM_Spec.dds" destinationname="HMM_ARM_SHP_FBDj_Spec_0x43A21729.dds"/>
@@ -119,7 +116,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFC4B849C_ShadeM_Diff.dds" destinationname="HMM_ARM_SHP_FBDj_Diff_0xFC4B849C.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Armor Sets Pack for ME3" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/134/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D134&amp;pUp=1" filename="ME3 HR Armor Sets Pack-134-1-1.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0281248D_Serrice_chest_male_Tint.dds" destinationname="HMM_ARM_SHPc_Tor_Tint_0x0281248D.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x058009AC_Rosen_legs_Spec.dds" destinationname="HMM_ARM_SHPe_Leg_Spec_0x058009AC.dds"/>
@@ -248,7 +244,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFD90FB39_Kassa_leg_Spec.dds" destinationname="HMM_ARM_SHPb_Leg_Spec_0xFD90FB39.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Ashley Alternate Armor" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/13/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D13&amp;pUp=1" filename="ME3 HR Ashley Alternate Armor for Texmod-13-1.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x004C469C_Ash_hed_spec.dds" destinationname="HMF_HGRa_ASH_spec_0x004C469C.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x32A99FFC_Ash_diff.dds" destinationname="HMF_ARM_ASHb_Diff_0x32A99FFC.dds"/>
@@ -257,14 +252,12 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEAA787FF_ash_norm.dds" destinationname="HMF_ARM_ASHb_Norm_0xEAA787FF.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Ashley Alternate From Ashes Armor" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/15/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D15&amp;pUp=1" filename="ME3 HR Ashley Alt From Ashes Armor for Texmod-15-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0B6E3832_Ash_Diff.dds" destinationname="HMF_ARM_ASHf_Diff_0x0B6E3832.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x750DEC99_Ash_Spec.dds" destinationname="HMF_ARM_ASHf_Spec_0x750DEC99.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x79AF2C8F_Ash_norm.dds" destinationname="HMF_ARM_ASHf_Norm_0x79AF2C8F.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Ashley CE Armor" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/95/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D95&amp;pUp=1" filename="ME3 HR Ashley CE Armor for Texmod-95-1-0.rar"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_ASHa_Diff_0xDCEA8572_Otte.dds" destinationname="HMF_ARM_ASHe_Diff_0xDCEA8572.dds"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_ASHe_Norm_0xB1A560A9_Otte.dds" destinationname="HMF_ARM_ASHe_Norm_0xB1A560A9.dds"/>
@@ -273,7 +266,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD43F8502_squad.dds" destinationname="Ashley2_0xD43F8502.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Ashley Default" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/4/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D4&amp;pUp=1" filename="ME3 HR Ashley Default for Texmod-4-1-1.rar"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_ASHa_Diff_4096x4096.dds" destinationname="HMF_ARM_ASHa_Diff_0xA1C88649.dds"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_ASHa_Norm_2048x2048.dds" destinationname="HMF_ARM_ASHa_Norm_0x0EF68859.dds"/>
@@ -282,7 +274,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x46AF2F43_squad.dds" destinationname="Ashley0Glow_0x46AF2F43.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Citadel Enviromentals 102" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D276&amp;pUp=1" filename="Citadel Enviromentals 102-276-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0136D18F_branch2.dds" destinationname="Pres_Branch_01_Mask_0x0136D18F.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0290AFDB_ferns.dds" destinationname="Pres_GardenFern_Diff_0x0290AFDB.dds"/>
@@ -376,7 +367,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFB40CDAE_hovercar_spec.dds" destinationname="HoverCar01_Int_Roof_Spec_Cine_0xFB40CDAE.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Combat Fatigues" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/141/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D141&amp;pUp=1" filename="HR Combat Fatigues for Texmod-141-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x150F70BF_Gellix_Male_diff.dds" destinationname="HMM_ARM_CTHb_Cer_Diff_0x150F70BF.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x1DC7A460_Grissom_Male_spec.dds" destinationname="HMM_ARM_CTHb_Gri_Spec_0x1DC7A460.dds"/>
@@ -400,19 +390,16 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE8B022DA_Grissom_Male_Norm.dds" destinationname="HMM_ARM_CTHb_Gri_Norm_0xE8B022DA.dds"/>
 	</addonfile>
 	<addonfile friendlyname="EDI AAP Armor" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/118/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D118&amp;pUp=1" filename="ME3 HR EDI AAP Armor-118-1-1.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4894C1E8_edi_squadlight.dds" destinationname="EDI3Glow_0x4894C1E8.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x83EB9F88_edi_squaddark.dds" destinationname="EDI3_0x83EB9F88.dds"/>
 	</addonfile>
 	<addonfile friendlyname="EDI Alt Outfit Pack" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/238/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D238&amp;pUp=1" filename="EDI Alt Outfit Pack-238-1-2.rar"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_EDId_Diff_0xEDC36D3F_Otte.dds" destinationname="HMF_ARM_EDId_Diff_0xEDC36D3F.dds"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_EDId_Spec_0x6ADA93CE_Otte.dds" destinationname="HMF_ARM_EDId_Spec_0x6ADA93CE.dds"/>
 	</addonfile>
 	<addonfile friendlyname="EDI From Ashes Outfit ALT version" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D273&amp;pUp=1" filename="EDI From Ashes Outfit ALT version-273-1-0.rar"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_EDIe_Diff_0x1608E029_Overlay_Otte.dds" destinationname="HMF_ARM_EDIe_Diff_0x1608E029.dds"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_EDIe_Spec_0xAE0C176D_Overlay_Otte.dds" destinationname="HMF_ARM_EDIb_Spec_0xAE0C176D.dds"/>
@@ -421,7 +408,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDIg_Norm_0xE3618AF0.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Fourth Casual Black" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/301/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D301&amp;pUp=1" filename="HR Fourth Casual Black-301-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x07CE12D3-Male.dds" destinationname="HMM_ARM_CTHi_CLN_DIFF_0x07CE12D3.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x1004C012_Male.dds" destinationname="HMM_ARM_CTHi_CLN_Spec_0x1004C012.dds"/>
@@ -434,7 +420,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xF750CD22_Female_Blood.dds" destinationname="HMM_ARM_CTHi_Diff_0xF750CD22.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Garrus Face" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/6/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D6&amp;pUp=1" filename="ME3 HR Garrus Alternate Armor for Texmod-6-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x00D06559_Gar_alt_norm.dds" destinationname="TUR_ARM_GARb_Norm_0x00D06559.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x06675BBF_Gar_alt_spec.dds" destinationname="TUR_ARM_GARb_Spec_0x06675BBF.dds"/>
@@ -445,7 +430,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEC2CF8A7_face_norm.dds" destinationname="TUR_HED_PROGarrus_Norm_0xEC2CF8A7.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Kai Leng" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D276&amp;pUp=1" filename="HR Kai Leng-276-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x123B4AC0_Shadow_Sword_norm.dds" destinationname="WPN_MLEa_Norm_0x123B4AC0.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x819EE45D_shade_kai.dds" destinationname="HMM_ARM_LENGa_Diff_0x819EE45D.dds"/>
@@ -457,13 +441,11 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds" destinationname="HMM_ARM_SHP_FBDj_Norm_0xB8E01EB0.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Kaidan Alt From Ashes Armor in Original Black" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/17/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D17&amp;pUp=1" filename="ME3 HR Kaidan Alt From Ashes Armor in Original Black for Texmod-17-1.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7FDEA5C1_bulk_kai_s.dds" destinationname="HMM_ARM_KAIe_Diff_0x7FDEA5C1.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB7E585E7_bulk_kai_spec_s.dds" destinationname="HMM_ARM_KAIe_Spec_0xB7E585E7.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Kaidan CE Armor" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/294/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D294&amp;pUp=1" filename="HR Kaidan CE Armor-294-1-0.rar"/>
 		<packagefile me3only="true" sourcename="HMM_ARM_KAId_Diff_0x252BDB00_Otte.dds" destinationname="HMM_ARM_KAId_Diff_0x252BDB00.dds"/>
 		<packagefile me3only="true" sourcename="HMM_ARM_KAId_Norm_0x8BF209CE_Otte.dds" destinationname="HMM_ARM_KAId_Norm_0x8BF209CE.dds"/>
@@ -474,7 +456,6 @@
 		<packagefile me3only="true" sourcename="HMM_HGRc_KAI_Diff_0x0D7A8165_Otte.dds" destinationname="HMM_HGRc_KAI_Diff_0x0D7A8165.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Kaidan Default Armor" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/290/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D290&amp;pUp=1" filename="HR Kaidan Default Armor-290-1-0.rar"/>
 		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Diff_4096.dds" destinationname="HMM_ARM_KAIa_Diff_0xA252CF95.dds"/>
 		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Norm_4096.dds" destinationname="HMM_ARM_KAIa_Norm_0x2D3AD537.dds"/>
@@ -482,7 +463,6 @@
 		<packagefile me3only="true" sourcename="HMM_HGRa_KAI_Diff_0x2366F731.dds" destinationname="HMM_HGRa_KAI_Diff_0x2366F731.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Kuwashii Visor and reticule fix" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/134/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D134&amp;pUp=1" filename="Kuwashii Visor fix-134-1-1.rar"/>
 		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Norm.dds" destinationname="HMM_HGR_SHPd_Norm_0x2E612B33.dds"/>
 		<packagefile me3only="true" sourcename="Visor_Frame.dds" destinationname="Visor_Frame_0x3BA605E1.dds"/>
@@ -494,21 +474,18 @@
 		<packagefile me3only="true" sourcename="TUR_HED_PROGarrus_Holo_Diff.dds" destinationname="TUR_HED_PROGarrus_Holo_Diff_0xCF0810CD.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Liara Alt From Ashes Armor" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/8/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D8&amp;pUp=1" filename="ME3 HR Liara Alt From Ashes Armor for Texmod-8-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4394D753_Liara_Ashes_Spec.dds" destinationname="ASA_ARM_LIAg_SPEC_0x4394D753.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x87712BB0_Liara_Ashes_Diff.dds" destinationname="ASA_ARM_LIAg_Diff_0x87712BB0.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD1B0BC02_Norm.dds" destinationname="ASA_ARM_LIAg_Norm_0xD1B0BC02.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Liara Alternate Armor" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/12/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D12&amp;pUp=1" filename="ME3 HR Liara Alternate Armor for Texmod-12-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x066306A3_Liara_norm.dds" destinationname="ASA_ARM_LIAf_Norm_0x066306A3.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8A3624EC_Liara_diff.dds" destinationname="ASA_ARM_LIAf_Diff_0x8A3624EC.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xF8FE187D_Liara_spec.dds" destinationname="ASA_ARM_LIAf_Spec_0xF8FE187D.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Liara CE Armor" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/140/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D140&amp;pUp=1" filename="HR Liara CE Armor for Texmod-140-1-0.rar"/>
 		<packagefile me3only="true" sourcename="0x547F3A29_ASA_ARM_LIAe_Diff_Otte.dds" destinationname="ASA_ARM_LIAe_Diff_0x547F3A29.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x28E843CF_helm.spec.dds" destinationname="ASA_ARM_LIAe_HGR_Spec_0x28E843CF.dds"/>
@@ -517,14 +494,12 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xBA98711B_helm_diff.dds" destinationname="ASA_ARM_LIAe_HGR_Diff_0xBA98711B.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Maya Brooks" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D276&amp;pUp=1" filename="HR Maya Brooks-276-1-0.rar"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_FTLa_Diff_Ottemis.dds" destinationname="HMF_ARM_FTLa_Diff_0x8C060CC8.dds"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_FTLa_Norm_0x8803C0CA_Otte.dds" destinationname="HMF_ARM_FTLa_Norm_0x8803C0CA.dds"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_FTLa_Spec_0xBE1A9E16_Otte.dds" destinationname="HMF_ARM_FTLa_Spec_0xBE1A9E16.dds"/>
 	</addonfile>
 	<addonfile friendlyname="N7 Hoody" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/45/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D45&amp;pUp=1" filename="ME3 HR N7 Hoody for Texmod-45-1.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x2229B5FF_N7_Fem_spec.dds" destinationname="HMF_ARM_CTHj_SPEC_0x2229B5FF.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x39D0044D_N7_Fem_norm.dds" destinationname="HMF_ARM_CTHj_NM_0x39D0044D.dds"/>
@@ -534,13 +509,11 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE6E3CF23_N7_Male_Norm.dds" destinationname="SHP_Hoddie_nm_0xE6E3CF23.dds"/>
 	</addonfile>
 	<addonfile friendlyname="N7 Valiant" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/85/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D85&amp;pUp=1" filename="ME3 HR N7 Valiant-85-1-1.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x2E43D1C3-Valiant.dds" destinationname="WPN_SNPh_Diff_0x2E43D1C3.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE8C1F592-valiant.dds" destinationname="WPN_SNPh_Spec_Promo_0xE8C1F592.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Science Uniforms" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/161/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D161&amp;pUp=1" filename="ME3 HR Science Uniforms for Texmod-161-1-1.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0DBC9411_ScienceF_diff.dds" destinationname="HMF_ARM_ANN_Diff_0x8654F217.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0DBC9411_ScienceF_diff.dds" destinationname="HMF_ARM_CTHh_Nor_Diff_Stack_0x0DBC9411.dds"/>
@@ -563,7 +536,6 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFEE369BE_Science_NPC_spec.dds" destinationname="HMF_ARM_CTHh_Tnt_Diff_0xFEE369BE.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Vega Alt From Ashes Armor in Original Blue" author="Ottemis">
-		<games masseffect2="false" masseffect3="true"/>
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/7/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D7&amp;pUp=1" filename="ME3 HR Vega Alt From Ashes Armor in Original Blue for Texmod-7-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4327860C_vega.dds" destinationname="James3_0x4327860C.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6E247C12_bulk_spec_s.dds" destinationname="HMM_ARM_SANf_Spec_0x6E247C12.dds"/>
