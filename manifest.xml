@@ -14,7 +14,7 @@
 		<packagefile me3only="true" sourcename="0x4466892A.dds" destinationname="_0x4466892A.dds"/>
 		<packagefile me3only="true" sourcename="0xE023CF45.dds" destinationname="_0xE023CF45.dds"/>
 	</addonfile>	
-	<addonfile friendlyname="HR Predator Texture" author="TheDarkFalkon">
+	<addonfile friendlyname="HR Predator Texture" tooltipname="WpnPredator_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPredator_HRv1.5.zip"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0xA4E25886.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x17836EC0.dds" destinationname="WPN_PSTa_Diff_0x17836EC0.dds"/>
@@ -22,52 +22,56 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0xA4E25886.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xF4295780.dds" destinationname="WPN_PSTa_Tint_0xF4295780.dds"/>
 	</addonfile>
-	<addonfile friendlyname="HR Shuriken Texture" author="TheDarkFalkon">
+	<addonfile friendlyname="HR Shuriken Texture" tooltipname="WpnShuriken_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnShuriken_HRv1.5.zip"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WPN_PSTc_Diff_0x71A3F10A.dds"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x057B3D5A.dds" destinationname="WPN_PSTc_Tint_0x057B3D5A.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WPN_PSTc_Diff_0x71A3F10A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/></addonfile>
-	<addonfile friendlyname="HR Mantis Texture" author="TheDarkFalkon">
+		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/>
+	</addonfile>
+	<addonfile friendlyname="HR Mantis Texture" tooltipname="WpnMantis_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnMantis_HRv1.5.zip"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds"/></addonfile>
-	<addonfile friendlyname="HR Katana Texture" author="TheDarkFalkon">
+		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds"/>
+	</addonfile>
+	<addonfile friendlyname="HR Katana Texture" tooltipname="WpnKatana_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnKatana_HRv1.5.zip"/>		
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0x738FAA8B.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB0DD05E4.dds" destinationname="WPN_BLSb_Spec_0xB0DD05E4.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE999983A.dds" destinationname="WPN_BLSb_Tint_0xE999983A.dds"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0xA56179D6.dds"/>
-		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB0DD05E4.dds" destinationname="WPN_BLSb_Spec_0xB0DD05E4.dds"/></addonfile>
-	<addonfile friendlyname="HR Carnifex Texture" author="TheDarkFalkon">
+		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB0DD05E4.dds" destinationname="WPN_BLSb_Spec_0xB0DD05E4.dds"/>
+	</addonfile>
+	<addonfile friendlyname="HR Carnifex Texture" tooltipname="WpnCarnifex_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCarnifex_HRv1.5.zip"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x073BF3F5.dds" destinationname="WPN_PSTb_Spec_0x073BF3F5.dds"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x6085274E.dds" destinationname="WPN_PSTb_Diff_0x6085274E.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x073BF3F5.dds" destinationname="WPN_PSTb_Spec_0x073BF3F5.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6085274E.dds" destinationname="WPN_PSTb_Diff_0x6085274E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x809FC86B.dds" destinationname="WPN_PSTb_Tint_0x809FC86B.dds"/></addonfile>
-	<addonfile friendlyname="HR Paladin Texture" author="TheDarkFalkon">
-		<games masseffect2="true" masseffect3="true"/>
+		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x809FC86B.dds" destinationname="WPN_PSTb_Tint_0x809FC86B.dds"/>
+	</addonfile>
+	<addonfile friendlyname="HR Paladin Texture" tooltipname="WpnPaladin_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPaladin_HRv1.5.zip"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x498B35ED.dds" destinationname="WPN_PSTm_Diff_0x498B35ED.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB8151BBB.dds" destinationname="WPN_PSTm_Spec_0xB8151BBB.dds"/>
 	</addonfile>
-	<addonfile friendlyname="HR Phaeston Texture" author="TheDarkFalkon">
-		<games masseffect2="true" masseffect3="true"/>
+	<addonfile friendlyname="HR Phaeston Texture" tooltipname="WpnPhaeston_HRv1.65.zi" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPhaeston_HRv1.65.zip"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA18F8A44.dds" destinationname="WPN_ASLg_Tint_0xA18F8A44.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE1EDE859.dds" destinationname="WPN_ASLg_Diff_0xE1EDE859.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEEFDCFA9.dds" destinationname="WPN_ASLg_Spec_0xEEFDCFA9.dds"/></addonfile>
-	<addonfile friendlyname="HR Cain Texture" author="TheDarkFalkon">
+		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEEFDCFA9.dds" destinationname="WPN_ASLg_Spec_0xEEFDCFA9.dds"/>
+	</addonfile>
+	<addonfile friendlyname="HR Cain Texture" tooltipname="WpnCain_HRv1.7.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCain_HRv1.7.zip"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x637DADD4.dds" destinationname="WPN_HVYb_Diff_0x637DADD4.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds"/></addonfile>
-	<addonfile friendlyname="HD M-8 Avenger" author="TheDarkFalkon">
+		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds"/>
+	</addonfile>
+	<addonfile friendlyname="HD M-8 Avenger" tooltipname="Weapon M-8 Avenger  HD OPTIMIZED 2 by TheDarkFalkon.tpf" author="TheDarkFalkon">
 		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon M-8 Avenger  HD OPTIMIZED 2 by TheDarkFalkon.tpf"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_Stack_0x3400C716.dds"/>
 	</addonfile>
-	<addonfile friendlyname="HR M-92 Mantis" author="TheDarkFalkon">
+	<addonfile friendlyname="HR M-92 Mantis" tooltipname="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf" author="TheDarkFalkon">
 		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x3463B385.dds"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x13703FFD.dds"/>
