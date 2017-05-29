@@ -99,6 +99,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Updater\AnonymousPipes.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -147,6 +148,9 @@
     <Content Include="7z\7z.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Updater\GHUpdater.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="images\info.ico" />
     <Resource Include="images\greencheckmark.png" />
     <Resource Include="images\orangedownload.png" />
@@ -185,11 +189,13 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(TargetDir)bin" mkdir "$(TargetDir)bin"
 if not exist "$(TargetDir)Downloaded_Mods" mkdir "$(TargetDir)Downloaded_Mods"
-xcopy "$(SolutionDir)BuildCache\Downloaded_Mods" "$(TargetDir)Downloaded_Mods\" /y
+robocopy "$(SolutionDir)BuildCache\Downloaded_Mods" "$(TargetDir)Downloaded_Mods\"
+copy /y "$(TargetDir)Updater\GHUpdater.exe" "$(TargetDir)bin\GHUpdater.exe"
 copy /y "$(TargetDir)7z\7z.exe" "$(TargetDir)bin\7z.exe"
 copy /y "$(TargetDir)7z\7z.dll" "$(TargetDir)bin\7z.dll"
 copy /y "$(TargetDir)memodder\MassEffectModder.exe" "$(TargetDir)bin\MassEffectModder.exe"
 rmdir /s /q "$(TargetDir)memodder"
-rmdir /s /q "$(TargetDir)7z"</PostBuildEvent>
+rmdir /s /q "$(TargetDir)7z"
+rmdir /s /q "$(TargetDir)Updater"</PostBuildEvent>
   </PropertyGroup>
 </Project>

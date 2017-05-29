@@ -10,6 +10,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,6 +29,8 @@ namespace AlotAddOnGUI
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
+        private AnonymousPipes pipe;
+        ProgressDialogController updateprogresscontroller;
         public const string UPDATE_OPERATION_LABEL = "UPDATE_OPERATION_LABEL";
         public const string UPDATE_PROGRESSBAR_INDETERMINATE = "SET_PROGRESSBAR_DETERMINACY";
         public const string BINARY_DIRECTORY = "bin\\";
@@ -53,8 +56,101 @@ namespace AlotAddOnGUI
               .CreateLogger();
             Log.Information("Logger Started for ALOT Installer.");
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
-            InitializeComponent();
             Title = "ALOT Addon Builder " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
+            InitializeComponent();
+            RunUpdater();
+        }
+
+        private async void RunUpdater()
+        {
+            await Task.Delay(TimeSpan.FromSeconds(4));
+
+            Log.Information("Running updater.");
+            string updaterpath = EXE_DIRECTORY + BINARY_DIRECTORY + "GHUpdater.exe";
+            string temppath = Path.GetTempPath() + "GHUpdater.exe";
+            File.Copy(updaterpath, temppath, true);
+            pipe = new AnonymousPipes("Server end of the pipe.", temppath, "additionalArgs=your_own_command_line_args_here", delegate (String msg)
+            {
+                Dispatcher.Invoke((MethodInvoker)async delegate ()
+                {
+                    //UI THREAD
+                    string[] clientmessage = msg.Split();
+                    switch (clientmessage[0])
+                    {
+                        case "UPDATE_DOWNLOAD_COMPLETE":
+                            if (updateprogresscontroller != null)
+                            {
+                                //updateprogresscontroller.SetTitle("Update ready to install");
+                                //updateprogresscontroller.SetMessage("Update will install in 5 seconds.");
+                                string updatemessage = "EXECUTE_UPDATE \"" + System.AppDomain.CurrentDomain.FriendlyName + "\" \"" + EXE_DIRECTORY + "\"";
+                                Log.Information("Executing update: " + updatemessage);
+                                pipe.SendText(updatemessage);
+                                Environment.Exit(0);
+                            }
+                            break;
+                        case "UPDATE_DOWNLOAD_PROGRESS":
+                            if (clientmessage.Length != 2)
+                            {
+                                Log.Warning("UPDATE_DOWNLOAD_PROGRESS message was not length 2 - ignoring message");
+                                return;
+                            }
+                            if (updateprogresscontroller != null)
+                            {
+                                double value = Double.Parse(clientmessage[1]);
+                                updateprogresscontroller.SetProgress(value);
+                            }
+                            break;
+                        case "UP_TO_DATE":
+                            Log.Information("GHUpdater reporting app is up to date");
+                            //pipe.SendText("KILL_UPDATER");
+                            //pipe.Close();
+                            Thread.Sleep(250);
+                            File.Delete(temppath);
+                            break;
+                        case "UPDATE_AVAILABLE":
+                            if (clientmessage.Length != 2)
+                            {
+                                Log.Warning("UPDATE_AVAILABLE message was not length 2 - ignoring message");
+                                return;
+                            }
+                            Log.Information("Github Updater reports program update: " + clientmessage[1] + " is available.");
+                            MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + clientmessage[1] + " is available. Install the update?", MessageDialogStyle.AffirmativeAndNegative);
+                            if (result == MessageDialogResult.Affirmative)
+                            {
+                                pipe.SendText("INITIATE_DOWNLOAD");
+                                updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "ALOT Addon Builder is updating. Please wait...");
+                                updateprogresscontroller.SetIndeterminate();
+                            }
+                            else
+                            {
+                                pipe.SendText("KILL_UPDATER");
+                                pipe.Close();
+                                Log.Information("User declined update, shutting down updater");
+                            }
+                            break;
+                            Log.Information("Github Updater reports program is up to date.");
+                            break;
+                    }
+                });
+            }, delegate ()
+            {
+                // We're disconnected!
+                try
+                {
+
+                    Dispatcher.Invoke((MethodInvoker)delegate ()
+                    {
+                        //UITHREAD
+                        var source = PresentationSource.FromVisual(this);
+                        if (source == null || source.IsDisposed)
+                        {
+                            AddonFilesLabel.Content = "Lost connection to update client";
+                        }
+                    });
+                }
+                catch (Exception) { }
+            });
+            pipe.SendText("START_UPDATE_CHECK Mgamerz AlotAddOnGUI " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
         }
 
         private async void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -115,7 +211,7 @@ namespace AlotAddOnGUI
             // code to execute periodically
             if (addonfiles != null)
             {
-                Console.WriteLine("Checking for files existence...");
+                //Console.WriteLine("Checking for files existence...");
                 string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
                 int numdone = 0;
                 foreach (AddonFile af in addonfiles)
@@ -273,7 +369,7 @@ namespace AlotAddOnGUI
             }
             linqlist = linqlist.OrderBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList();
             addonfiles = new BindingList<AddonFile>(linqlist);
-            
+
             foreach (AddonFile af in addonfiles)
             {
                 //Set Game ME2/ME3
