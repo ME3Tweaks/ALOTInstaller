@@ -102,6 +102,9 @@ namespace AlotAddOnGUI
                             Thread.Sleep(250);
                             File.Delete(temppath);
                             break;
+                        case "ERROR_CHECKING_FOR_UPDATES":
+                            AddonFilesLabel.Content = "Error occured checking for updates";
+                            break;
                         case "UPDATE_AVAILABLE":
                             if (clientmessage.Length != 2)
                             {

@@ -157,7 +157,6 @@
     <Resource Include="images\greencheckmark.png" />
     <Resource Include="images\orangedownload.png" />
     <Resource Include="ALOTADDON.ico" />
-    <Content Include="GithubUpdater.exe" />
     <Content Include="memodder\MassEffectModder.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
