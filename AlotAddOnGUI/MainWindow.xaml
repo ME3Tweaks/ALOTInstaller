@@ -25,10 +25,10 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
-            <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Download the listed files, then drag and drop the files onto this window.&#x0a;Once all items are ready, build the addon." TextWrapping="Wrap" />
+            <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
         </Label>
         <Label Grid.Column="0" Grid.Row="1" x:Name="AddonFilesLabel" HorizontalContentAlignment="Center" Content="AddOn Files"/>
-        <ProgressBar Minimum="0" Maximum="100" x:Name="Install_ProgressBar" Grid.Column="0" Grid.Row="2"/>
+        <ProgressBar Minimum="0" Maximum="100" x:Name="Install_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true"/>
 
         <ListView Grid.Column="0" Grid.Row="3" Name="lvUsers">
             <!-- This is what each list item looks like-->

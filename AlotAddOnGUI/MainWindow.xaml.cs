@@ -52,19 +52,18 @@ namespace AlotAddOnGUI
         {
             InitializeComponent();
             Title = "ALOT Addon Builder " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
-            InitializeComponent();
-            RunUpdater();
+            HeaderLabel.Text = "Preparing application...";
         }
 
-        private async void RunUpdater()
+        private void RunUpdater()
         {
-            await Task.Delay(TimeSpan.FromSeconds(4));
 
-            Log.Information("Running updater.");
+            Log.Information("Running GHUpdater.");
+            AddonFilesLabel.Content = "Checking for application updates";
             string updaterpath = EXE_DIRECTORY + BINARY_DIRECTORY + "GHUpdater.exe";
             string temppath = Path.GetTempPath() + "GHUpdater.exe";
             File.Copy(updaterpath, temppath, true);
-            pipe = new AnonymousPipes("Server end of the pipe.", temppath, "additionalArgs=your_own_command_line_args_here", delegate (String msg)
+            pipe = new AnonymousPipes("GHUPDATE_SERVER.", temppath, "", delegate (String msg)
             {
                 Dispatcher.Invoke((MethodInvoker)async delegate ()
                 {
@@ -77,6 +76,7 @@ namespace AlotAddOnGUI
                             {
                                 //updateprogresscontroller.SetTitle("Update ready to install");
                                 //updateprogresscontroller.SetMessage("Update will install in 5 seconds.");
+                                await this.ShowMessageAsync("ALOT Addon Builder update ready", "The program will close and update in the background, then reopen. It should only take a few seconds.");
                                 string updatemessage = "EXECUTE_UPDATE \"" + System.AppDomain.CurrentDomain.FriendlyName + "\" \"" + EXE_DIRECTORY + "\"";
                                 Log.Information("Executing update: " + updatemessage);
                                 pipe.SendText(updatemessage);
@@ -97,13 +97,20 @@ namespace AlotAddOnGUI
                             break;
                         case "UP_TO_DATE":
                             Log.Information("GHUpdater reporting app is up to date");
-                            //pipe.SendText("KILL_UPDATER");
-                            //pipe.Close();
                             Thread.Sleep(250);
-                            File.Delete(temppath);
+                            try
+                            {
+                                File.Delete(temppath);
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error("Error deleting TEMP GHUpdater.exe: " + e.ToString());
+                            }
+                            await FetchManifest();
                             break;
                         case "ERROR_CHECKING_FOR_UPDATES":
                             AddonFilesLabel.Content = "Error occured checking for updates";
+                            await FetchManifest();
                             break;
                         case "UPDATE_AVAILABLE":
                             if (clientmessage.Length != 2)
@@ -124,6 +131,7 @@ namespace AlotAddOnGUI
                                 pipe.SendText("KILL_UPDATER");
                                 pipe.Close();
                                 Log.Information("User declined update, shutting down updater");
+                                await FetchManifest();
                             }
                             break;
                     }
@@ -246,7 +254,7 @@ namespace AlotAddOnGUI
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SetupButtons();
-            await FetchManifest();
+            RunUpdater();
         }
 
         private async void SetupButtons()
@@ -318,20 +326,20 @@ namespace AlotAddOnGUI
                     try
                     {
                         await webClient.DownloadFileTaskAsync("https://rawgit.com/Mgamerz/AlotAddOnGUI/master/manifest.xml", @"manifest-new.xml");
-                        File.Delete(@"manifest.xml");
-                        File.Move(@"manifest-new.xml", @"manifest.xml");
+                        File.Delete(EXE_DIRECTORY + @"manifest.xml");
+                        File.Move(EXE_DIRECTORY + @"manifest-new.xml", EXE_DIRECTORY + @"manifest.xml");
                         Log.Information("Manifest fetched.");
                     }
                     catch (WebException e)
                     {
                         Log.Error("Exception occured getting manifest from server: " + e.ToString());
-                        if (File.Exists(@"manifest.xml"))
+                        if (File.Exists(EXE_DIRECTORY + @"manifest.xml"))
                         {
                             Log.Information("Reading existing manifest.");
                         }
 
                     }
-                    if (!File.Exists(@"manifest.xml"))
+                    if (!File.Exists(EXE_DIRECTORY + @"manifest.xml"))
                     {
                         Log.Fatal("No local manifest exists to use, exiting...");
                         await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for addon. Information that is required to build the addon is not available. Check the program logs.");
@@ -342,7 +350,8 @@ namespace AlotAddOnGUI
                     Log.Information("Manifest read. Switching over to user control");
 
                     Install_ProgressBar.IsIndeterminate = false;
-                    AddonFilesLabel.Content = "Addon Files";
+                    HeaderLabel.Text = "Download the listed files, then drag and drop the files onto this window.\nOnce all items are ready, build the addon.";
+                    AddonFilesLabel.Content = "Scanning...";
                     timer_Tick(null, null);
                 }
             }
@@ -741,7 +750,8 @@ namespace AlotAddOnGUI
             {
                 Directory.Delete(MEM_STAGING_DIR, true);
                 Directory.Delete("Extracted_Mods", true);
-            } catch (IOException e)
+            }
+            catch (IOException e)
             {
                 Log.Error("Unable to delete staging and target directories. Addon should have been built however.\n" + e.ToString());
             }
@@ -788,9 +798,10 @@ namespace AlotAddOnGUI
                 {
                     Directory.Delete(MEM_STAGING_DIR, true);
                 }
-            } catch (System.IO.IOException e)
+            }
+            catch (System.IO.IOException e)
             {
-                Log.Error("Unable to delete staging and target directories.\n"+e.ToString());
+                Log.Error("Unable to delete staging and target directories.\n" + e.ToString());
                 await this.ShowMessageAsync("Error occured while preparing directories", "ALOT Addon Builder was unable to cleanup some directories. Make sure all file explorer windows are closed that may be open in the working directories.");
                 return;
             }
