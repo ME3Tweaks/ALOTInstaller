@@ -70,6 +70,10 @@
 		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon M-8 Avenger  HD OPTIMIZED 2 by TheDarkFalkon.tpf"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds"/>
 		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_Stack_0x3400C716.dds"/>
+		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8BA3F0F1.dds" destinationname="WPN_ASLa_Tint_0x8BA3F0F1.dds"/>
+		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0x1843668E.dds"/>
+		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds"/>
+		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_0xB617BCBE.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR M-92 Mantis" tooltipname="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf" author="TheDarkFalkon">
 		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf"/>
