@@ -404,7 +404,7 @@
 		<packagefile me3only="true" sourcename="HMF_ARM_EDId_Spec_0x6ADA93CE_Otte.dds" destinationname="HMF_ARM_EDId_Spec_0x6ADA93CE.dds"/>
 	</addonfile>
 	<addonfile friendlyname="EDI From Ashes Outfit ALT version" author="Ottemis">
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D273&amp;pUp=1" filename="EDI From Ashes Outfit ALT version-273-1-0.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/273/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D273&amp;pUp=1" filename="EDI From Ashes Outfit ALT version-273-1-0.rar"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_EDIe_Diff_0x1608E029_Overlay_Otte.dds" destinationname="HMF_ARM_EDIe_Diff_0x1608E029.dds"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_EDIe_Spec_0xAE0C176D_Overlay_Otte.dds" destinationname="HMF_ARM_EDIb_Spec_0xAE0C176D.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDIb_Norm_0x4C200F45.dds"/>
