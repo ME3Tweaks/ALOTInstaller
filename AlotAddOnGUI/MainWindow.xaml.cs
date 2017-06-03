@@ -342,6 +342,7 @@ namespace AlotAddOnGUI
                 linqlist = (from e in rootElement.Elements("addonfile")
                             select new AddonFile
                             {
+                                ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
                                 Author = (string)e.Attribute("author"),
                                 FriendlyName = (string)e.Attribute("friendlyname"),
                                 Game_ME2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("masseffect2") : false,
@@ -390,7 +391,7 @@ namespace AlotAddOnGUI
         {
             public event PropertyChangedEventHandler PropertyChanged;
             private bool m_ready;
-
+            public bool ProcessAsModFile { get; set; }
             public string Author { get; set; }
             public string FriendlyName { get; set; }
             public bool Game_ME2 { get; set; }
@@ -486,6 +487,9 @@ namespace AlotAddOnGUI
         private bool ExtractAddons(int game)
         {
 
+            string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + MEM_STAGING_DIR + "\\";
+
+
             Log.Information("Extracting Addons for Mass Effect " + game);
 
             string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
@@ -537,13 +541,28 @@ namespace AlotAddOnGUI
                                 args = "-extract-tpf \"" + extractpath + "\" \"" + extractpath + "\"";
                                 runProcess(exe, args);
                             }
-
-                            if (Directory.GetFiles(extractpath, "*.mod").Length > 0)
+                            string[] modfiles = Directory.GetFiles(extractpath, "*.mod");
+                            if (modfiles.Length > 0)
                             {
-                                //Extract the MOD
-                                exe = BINARY_DIRECTORY + "MassEffectModder.exe";
-                                args = "-extract-mod " + game + " \"" + extractpath + "\" \"" + extractpath + "\"";
-                                runProcess(exe, args);
+                                if (af.ProcessAsModFile)
+                                {
+                                    //Move to MEM_STAGING
+
+                                    foreach (string modfile in modfiles)
+                                    {
+                                        Log.Information("Copying modfile to staging directory (ProcessAsModFile=true): " + modfile);
+                                        File.Copy(modfile, stagingdirectory + Path.GetFileName(modfile),true);
+                                    }
+                                }
+                                else
+                                {
+                                    //Extract the MOD
+                                    Log.Information("Extracting modfiles in directory: " + extractpath);
+
+                                    exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+                                    args = "-extract-mod " + game + " \"" + extractpath + "\" \"" + extractpath + "\"";
+                                    runProcess(exe, args);
+                                }
                             }
                             string[] memfiles = Directory.GetFiles(extractpath, "*.mem");
                             if (memfiles.Length > 0)
@@ -661,8 +680,7 @@ namespace AlotAddOnGUI
             }
 
             basepath = EXE_DIRECTORY + @"Extracted_Mods\";
-            string destbasepath = System.AppDomain.CurrentDomain.BaseDirectory + MEM_STAGING_DIR + "\\";
-            Directory.CreateDirectory(destbasepath);
+            Directory.CreateDirectory(stagingdirectory);
             int numcompleted = 0;
             foreach (AddonFile af in addonstoinstall)
             {
@@ -672,7 +690,7 @@ namespace AlotAddOnGUI
                     {
                         Log.Information("Copying Package File: " + pf.SourceName + "->" + pf.DestinationName);
                         string extractedpath = basepath + Path.GetFileNameWithoutExtension(af.Filename) + "\\" + pf.SourceName;
-                        string destination = destbasepath + pf.DestinationName;
+                        string destination = stagingdirectory + pf.DestinationName;
                         File.Copy(extractedpath, destination, true);
                         numcompleted++;
                         int progress = (int)((float)numcompleted / (float)totalfiles * 100);
