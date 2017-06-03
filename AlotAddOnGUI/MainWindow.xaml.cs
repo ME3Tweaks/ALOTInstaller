@@ -33,11 +33,15 @@ namespace AlotAddOnGUI
         ProgressDialogController updateprogresscontroller;
         public const string UPDATE_OPERATION_LABEL = "UPDATE_OPERATION_LABEL";
         public const string UPDATE_PROGRESSBAR_INDETERMINATE = "SET_PROGRESSBAR_DETERMINACY";
+        public const string INCREMENT_COMPLETION_EXTRACTION = "INCREMENT_COMPLETION_EXTRACTION";
         public const string ERROR_OCCURED = "ERROR_OCCURED";
         public const string BINARY_DIRECTORY = "bin\\";
 
         private DispatcherTimer backgroundticker;
-
+        private int completed = 0;
+        //private int addonstoinstall = 0;
+        private int CURRENT_GAME_BUILD = 0; //set when extraction is run/finished
+        private int ADDONSTOINSTALL_COUNT = 0;
         private bool Installing = false;
         private readonly BackgroundWorker InstallWorker = new BackgroundWorker();
         private BindingList<AddonFile> addonfiles;
@@ -47,6 +51,7 @@ namespace AlotAddOnGUI
 
         private const string MEM_STAGING_DIR = "MEM_PACKAGE_STAGING";
         private string EXE_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory;
+        private string STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + MEM_STAGING_DIR + "\\";
 
         public MainWindow()
         {
@@ -172,7 +177,7 @@ namespace AlotAddOnGUI
                     break;
                 case 2:
                 case 3:
-                    HeaderLabel.Text = "Addon Created";
+                    HeaderLabel.Text = "Addon Created.\nThe MEM packages for the addon have been placed into the "+MEM_OUTPUT_DISPLAY_DIR+" directory.";
                     AddonFilesLabel.Content = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
                     await this.ShowMessageAsync("ALOT Addon for Mass Effect " + result + " has been built", "You can install the Addon MEM files with Mass Effect Modder after you've installed the main ALOT MEM file.");
                     break;
@@ -201,6 +206,10 @@ namespace AlotAddOnGUI
                         Install_ProgressBar.Value = 0;
                         await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                         break;
+                    case INCREMENT_COMPLETION_EXTRACTION:
+                        Interlocked.Increment(ref completed);
+                        Install_ProgressBar.Value = (completed / (double)ADDONSTOINSTALL_COUNT) * 100;
+                        break;
                 }
             }
         }
@@ -228,7 +237,7 @@ namespace AlotAddOnGUI
                 foreach (AddonFile af in addonfiles)
                 {
                     bool ready = File.Exists(basepath + af.Filename);
-                    if (af.Ready != ready)
+                    if (af.Ready != ready && (af.Game_ME2 || af.Game_ME3)) //ensure the file applies to something
                     {
                         af.Ready = ready;
                     }
@@ -251,7 +260,7 @@ namespace AlotAddOnGUI
             //Install_ProgressBar.Value = 30;
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SetupButtons();
             RunUpdater();
@@ -369,7 +378,7 @@ namespace AlotAddOnGUI
             try
             {
                 XElement rootElement = XElement.Load(@"manifest.xml");
-
+                string version = (string)rootElement.Attribute("version") ?? "";
                 var elemn1 = rootElement.Elements();
                 linqlist = (from e in rootElement.Elements("addonfile")
                             select new AddonFile
@@ -392,6 +401,10 @@ namespace AlotAddOnGUI
                                         ME3Only = r.Attribute("me3only") != null ? true : false,
                                     }).ToList(),
                             }).ToList();
+                if (!version.Equals(""))
+                {
+                    Title += " - Manifest version " + version;
+                }
             }
             catch (Exception e)
             {
@@ -451,6 +464,10 @@ namespace AlotAddOnGUI
                 if (handler != null)
                     handler(this, new PropertyChangedEventArgs(propertyName));
             }
+
+            public override string ToString() {
+                return FriendlyName;
+            }
         }
 
         public class PackageFile
@@ -468,6 +485,12 @@ namespace AlotAddOnGUI
                 this.Command = command;
                 this.Data = data;
             }
+
+            public ThreadCommand(string command)
+            {
+                this.Command = command;
+            }
+
             public string Command;
             public object Data;
         }
@@ -478,8 +501,140 @@ namespace AlotAddOnGUI
             {
                 InitInstall(2);
                 Button_InstallME2.Content = "Building...";
+                CURRENT_GAME_BUILD = 2;
                 InstallWorker.RunWorkerAsync(2);
             }
+        }
+
+        private bool ExtractAddon(AddonFile af)
+        {
+            string prefix = "[" + Path.GetFileNameWithoutExtension(af.Filename) + "] ";
+            Log.Information(prefix + "Processing extraction on " + af.Filename);
+            string fileextension = System.IO.Path.GetExtension(af.Filename);
+            try
+            {
+                switch (fileextension)
+                {
+                    case ".7z":
+                    case ".zip":
+                    case ".rar":
+                        {
+                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Processing " + af.FriendlyName));
+
+                            Log.Information(prefix + "Extracting file: " + af.Filename);
+                            string exe = BINARY_DIRECTORY + "7z.exe";
+                            string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
+                            string args = "x \"" + EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename + "\" -aoa -r -o\"" + extractpath + "\"";
+                            runProcess(exe, args);
+                            if (Directory.GetFiles(extractpath, "*.tpf").Length > 0)
+                            {
+                                //Extract the TPFs
+                                exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+                                args = "-extract-tpf \"" + extractpath + "\" \"" + extractpath + "\"";
+                                runProcess(exe, args);
+                            }
+                            string[] modfiles = Directory.GetFiles(extractpath, "*.mod", SearchOption.AllDirectories);
+                            if (modfiles.Length > 0)
+                            {
+                                if (af.ProcessAsModFile)
+                                {
+                                    //Move to MEM_STAGING
+
+                                    foreach (string modfile in modfiles)
+                                    {
+                                        Log.Information(prefix + "Copying modfile to staging directory (ProcessAsModFile=true): " + modfile);
+                                        File.Copy(modfile, STAGING_DIRECTORY + Path.GetFileName(modfile), true);
+                                    }
+                                }
+                                else
+                                {
+                                    //Extract the MOD
+                                    Log.Information("Extracting modfiles in directory: " + extractpath);
+
+                                    exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+                                    args = "-extract-mod " + CURRENT_GAME_BUILD + " \"" + extractpath + "\" \"" + extractpath + "\"";
+                                    runProcess(exe, args);
+                                }
+                            }
+                            string[] memfiles = Directory.GetFiles(extractpath, "*.mem");
+                            if (memfiles.Length > 0)
+                            {
+                                //Copy MEM File - append game
+                                foreach (string memfile in memfiles)
+
+                                {
+                                    Log.Information("-- Subtask: Move MEM file to output directory" + memfile);
+
+                                    string name = Path.GetFileNameWithoutExtension(memfile);
+                                    string ext = Path.GetExtension(memfile);
+                                    File.Copy(memfile, EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\" + name + " - ME" + CURRENT_GAME_BUILD + ext, true);
+                                }
+                            }
+
+                            List<string> files = new List<string>();
+                            foreach (string file in Directory.EnumerateFiles(extractpath, "*.dds", SearchOption.AllDirectories))
+                            {
+                                files.Add(file);
+                            }
+
+                            foreach (string file in files)
+                            {
+
+                                string destination = extractpath + "\\" + Path.GetFileName(file);
+                                if (!destination.ToLower().Equals(file.ToLower()))
+                                {
+                                    Log.Information("Deleting existing file (if any): " + extractpath + "\\" + Path.GetFileName(file));
+                                    File.Delete(destination);
+                                    Log.Information(file + " -> " + destination);
+                                    File.Move(file, destination);
+                                }
+                                else
+                                {
+                                    Log.Information("File is already in correct place, no further processing necessary: " + extractpath + "\\" + Path.GetFileName(file));
+                                }
+                            }
+                            InstallWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
+                            break;
+                        }
+                    case ".tpf":
+                        {
+                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
+
+                            string source = EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename;
+                            string destination = EXE_DIRECTORY + "Extracted_Mods\\" + Path.GetFileName(af.Filename);
+                            File.Copy(source, destination, true);
+                            InstallWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
+                            break;
+                        }
+                    case ".mod":
+                        {
+                            //Currently not used
+                            //InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
+                            //completed++;
+                            //int progress = (int)((float)completed / (float)addonstoinstall.Count * 100);
+                            //InstallWorker.ReportProgress(progress);
+                            break;
+                        }
+                    case ".mem":
+                        {
+                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
+
+                            //Copy to output folder
+                            File.Copy(EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename, EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\" + af.Filename, true);
+                            InstallWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
+                            break;
+                        }
+                }
+                InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+            }
+            catch (Exception e)
+            {
+                Log.Error("ERROR EXTRACTING AND PROCESSING FILE!");
+                Log.Error(e.ToString());
+                InstallWorker.ReportProgress(0, new ThreadCommand("ERROR_OCCURED", e.Message));
+                return false;
+            }
+            return true;
         }
 
         private async void Button_InstallME3_Click(object sender, RoutedEventArgs e)
@@ -489,6 +644,7 @@ namespace AlotAddOnGUI
 
                 InitInstall(3);
                 Button_InstallME3.Content = "Building...";
+                CURRENT_GAME_BUILD = 3;
                 InstallWorker.RunWorkerAsync(3);
             }
         }
@@ -539,156 +695,32 @@ namespace AlotAddOnGUI
                     addonstoinstall.Add(af);
                 }
             }
-
+            ADDONSTOINSTALL_COUNT = addonstoinstall.Count;
             int completed = 0;
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting Mods..."));
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
 
             InstallWorker.ReportProgress(0);
 
-            bool modextractrequired = false;
-            foreach (AddonFile af in addonstoinstall)
+            bool modextractrequired = false; //not used currently.
+
+            int threads = Environment.ProcessorCount;
+            if (threads > 1)
             {
-                Log.Information("Processing extraction on " + af.Filename);
-                string fileextension = System.IO.Path.GetExtension(af.Filename);
-                try
+                threads--; //cores - 1
+            }
+            bool[] results = addonstoinstall.AsParallel().WithDegreeOfParallelism(threads).Select(ExtractAddon).ToArray();
+            foreach (bool result in results)
+            {
+                if (!result)
                 {
-                    switch (fileextension)
-                    {
-                        case ".7z":
-                        case ".zip":
-                        case ".rar":
-                            {
-                                InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Processing " + af.FriendlyName));
-
-                                Log.Information("Extracting file: " + af.Filename);
-                                string exe = BINARY_DIRECTORY + "7z.exe";
-                                string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
-                                string args = "x \"" + EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename + "\" -aoa -r -o\"" + extractpath + "\"";
-                                runProcess(exe, args);
-                                if (Directory.GetFiles(extractpath, "*.tpf").Length > 0)
-                                {
-                                    //Extract the TPFs
-                                    exe = BINARY_DIRECTORY + "MassEffectModder.exe";
-                                    args = "-extract-tpf \"" + extractpath + "\" \"" + extractpath + "\"";
-                                    runProcess(exe, args);
-                                }
-                                string[] modfiles = Directory.GetFiles(extractpath, "*.mod");
-                                if (modfiles.Length > 0)
-                                {
-                                    if (af.ProcessAsModFile)
-                                    {
-                                        //Move to MEM_STAGING
-
-                                        foreach (string modfile in modfiles)
-                                        {
-                                            Log.Information("Copying modfile to staging directory (ProcessAsModFile=true): " + modfile);
-                                            File.Copy(modfile, stagingdirectory + Path.GetFileName(modfile), true);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        //Extract the MOD
-                                        Log.Information("Extracting modfiles in directory: " + extractpath);
-
-                                        exe = BINARY_DIRECTORY + "MassEffectModder.exe";
-                                        args = "-extract-mod " + game + " \"" + extractpath + "\" \"" + extractpath + "\"";
-                                        runProcess(exe, args);
-                                    }
-                                }
-                                string[] memfiles = Directory.GetFiles(extractpath, "*.mem");
-                                if (memfiles.Length > 0)
-                                {
-                                    //Copy MEM File - append game
-                                    foreach (string memfile in memfiles)
-
-                                    {
-                                        Log.Information("-- Subtask: Move MEM file to output directory" + memfile);
-
-                                        string name = Path.GetFileNameWithoutExtension(memfile);
-                                        string ext = Path.GetExtension(memfile);
-                                        File.Copy(memfile, EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\" + name + " - ME" + game + ext, true);
-                                    }
-                                }
-
-
-
-
-                                List<string> files = new List<string>();
-                                foreach (string file in Directory.EnumerateFiles(extractpath, "*.dds", SearchOption.AllDirectories))
-                                {
-                                    files.Add(file);
-                                }
-
-                                foreach (string file in files)
-                                {
-
-                                    string destination = extractpath + "\\" + Path.GetFileName(file);
-                                    if (!destination.ToLower().Equals(file.ToLower()))
-                                    {
-                                        Log.Information("Deleting existing file (if any): " + extractpath + "\\" + Path.GetFileName(file));
-                                        File.Delete(destination);
-                                        Log.Information(file + " -> " + destination);
-                                        File.Move(file, destination);
-                                    }
-                                    else
-                                    {
-                                        Log.Information("File is already in correct place, no further processing necessary: " + extractpath + "\\" + Path.GetFileName(file));
-                                    }
-                                }
-
-                                completed++;
-                                int progress = (int)((float)completed / (float)addonstoinstall.Count * 100);
-                                InstallWorker.ReportProgress(progress);
-                                break;
-                            }
-                        case ".tpf":
-                            {
-                                InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
-
-                                string source = EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename;
-                                string destination = EXE_DIRECTORY + "Extracted_Mods\\" + Path.GetFileName(af.Filename);
-                                File.Copy(source, destination, true);
-
-                                completed++;
-                                int progress = (int)((float)completed / (float)addonstoinstall.Count * 100);
-                                InstallWorker.ReportProgress(progress);
-                                break;
-                            }
-                        case ".mod":
-                            {
-                                InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
-
-                                modextractrequired = true;
-                                completed++;
-                                int progress = (int)((float)completed / (float)addonstoinstall.Count * 100);
-                                InstallWorker.ReportProgress(progress);
-                                break;
-                            }
-                        case ".mem":
-                            {
-                                InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
-
-                                //Copy to output folder
-                                File.Copy(EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename, EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\" + af.Filename, true);
-                                completed++;
-                                int progress = (int)((float)completed / (float)addonstoinstall.Count * 100);
-                                InstallWorker.ReportProgress(progress);
-                                break;
-                            }
-                    }
+                    Log.Error("Failed to extract a file! Check previous entries in this log");
                     InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
-                }
-                catch (Exception e)
-                {
-                    Log.Error("ERROR EXTRACTING AND PROCESSING FILE!");
-                    Log.Error(e.ToString());
-                    InstallWorker.ReportProgress(0, new ThreadCommand("ERROR_OCCURED", e.Message));
-
+                    InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Failed to extract a file - check logs"));
+                    CURRENT_GAME_BUILD = 0; //reset
                     return false;
                 }
             }
-
             //if (tpfextractrequired)
             {
                 InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
@@ -771,6 +803,7 @@ namespace AlotAddOnGUI
             {
                 Log.Error("Unable to delete staging and target directories. Addon should have been built however.\n" + e.ToString());
             }
+            CURRENT_GAME_BUILD = 0; //reset
             return true;
 
         }
