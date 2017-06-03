@@ -398,18 +398,18 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4894C1E8_edi_squadlight.dds" destinationname="EDI3Glow_0x4894C1E8.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x83EB9F88_edi_squaddark.dds" destinationname="EDI3_0x83EB9F88.dds"/>
 	</addonfile>
-	<addonfile friendlyname="EDI Alt Outfit Pack" author="Ottemis">
+	<addonfile friendlyname="EDI Alt Outfit Pack" author="Ottemis" processasmodfile="true">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/238/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D238&amp;pUp=1" filename="EDI Alt Outfit Pack-238-1-2.rar"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_EDId_Diff_0xEDC36D3F_Otte.dds" destinationname="HMF_ARM_EDId_Diff_0xEDC36D3F.dds"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_EDId_Spec_0x6ADA93CE_Otte.dds" destinationname="HMF_ARM_EDId_Spec_0x6ADA93CE.dds"/>
+		<!-- <packagefile me3only="true" sourcename="HMF_ARM_EDId_Diff_0xEDC36D3F_Otte.dds" destinationname="HMF_ARM_EDId_Diff_0xEDC36D3F.dds"/>
+		<packagefile me3only="true" sourcename="HMF_ARM_EDId_Spec_0x6ADA93CE_Otte.dds" destinationname="HMF_ARM_EDId_Spec_0x6ADA93CE.dds"/> -->
 	</addonfile>
-	<addonfile friendlyname="EDI From Ashes Outfit ALT version" author="Ottemis">
+	<addonfile friendlyname="EDI From Ashes Outfit ALT version" author="Ottemis" processasmodfile="true">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/273/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D273&amp;pUp=1" filename="EDI From Ashes Outfit ALT version-273-1-0.rar"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_EDIe_Diff_0x1608E029_Overlay_Otte.dds" destinationname="HMF_ARM_EDIe_Diff_0x1608E029.dds"/>
+		<!-- <packagefile me3only="true" sourcename="HMF_ARM_EDIe_Diff_0x1608E029_Overlay_Otte.dds" destinationname="HMF_ARM_EDIe_Diff_0x1608E029.dds"/>
 		<packagefile me3only="true" sourcename="HMF_ARM_EDIe_Spec_0xAE0C176D_Overlay_Otte.dds" destinationname="HMF_ARM_EDIb_Spec_0xAE0C176D.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDIb_Norm_0x4C200F45.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDId_Norm_0x191C1B10.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDIg_Norm_0xE3618AF0.dds"/>
+		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDIg_Norm_0xE3618AF0.dds"/> -->
 	</addonfile>
 	<addonfile friendlyname="Fourth Casual Black" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/301/?tab=2&amp;navtag=http%3A%2F%2Fwww.nexusmods.com%2Fmasseffect3%2Fajax%2Fmodfiles%2F%3Fid%3D301&amp;pUp=1" filename="HR Fourth Casual Black-301-1-0.rar"/>
