@@ -1,3 +1,9 @@
-# ALOT of Textures Addon - GUI Installer
+# ALOT Addon Builder
 
-This work in progress software will provide a GUI interface that makes it much easier to install the ALOT Addon for Mass Effect 2 and Mass Effect 3.
+This tool can build a MEM (Mass Effect Modder) package to install high resolution textures for Mass Effect 2 and 3. It compiles mods by third party users who did not grant permission to include their files in the precompiled ALOT MEM package.
+
+![Screenshot](http://i.imgur.com/Bz0Ungb.png)
+
+[ALOT for Mass Effect 2](http://www.nexusmods.com/masseffect2/mods/68)
+
+[ALOT for Mass Effect 3](http://www.nexusmods.com/masseffect3/mods/363)
