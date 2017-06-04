@@ -202,7 +202,9 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(TargetDir)bin" mkdir "$(TargetDir)bin"
 if not exist "$(TargetDir)Downloaded_Mods" mkdir "$(TargetDir)Downloaded_Mods"
+if exist "$(SolutionDir)BuildCache\Downloaded_Mods" (
 robocopy "$(SolutionDir)BuildCache\Downloaded_Mods" "$(TargetDir)Downloaded_Mods"
+)
 copy /y "$(TargetDir)Updater\GHUpdater.exe" "$(TargetDir)bin\GHUpdater.exe"
 copy /y "$(TargetDir)7z\7z.exe" "$(TargetDir)bin\7z.exe"
 copy /y "$(TargetDir)7z\7z.dll" "$(TargetDir)bin\7z.dll"
@@ -214,6 +216,6 @@ if exist "$(TargetDir)7z" rmdir /s /q "$(TargetDir)7z"
 if exist "$(TargetDir)Updater" rmdir /s /q "$(TargetDir)Updater"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>if $(ConfigurationName) == Debug ("%25ProgramFiles%25\Microsoft Visual Studio\2017\Community\Common7\IDE\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt") ELSE ("%25ProgramFiles%25\Microsoft Visual Studio\2017\Community\Common7\IDE\TextTransform.exe" -a !!revision!true -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt")</PreBuildEvent>
+    <PreBuildEvent>if $(ConfigurationName) == Debug ("$(DevEnvDir)TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt") ELSE ("$(DevEnvDir)TextTransform.exe" -a !!revision!true -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt")</PreBuildEvent>
   </PropertyGroup>
 </Project>
