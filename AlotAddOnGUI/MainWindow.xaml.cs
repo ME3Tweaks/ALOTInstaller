@@ -262,7 +262,6 @@ namespace AlotAddOnGUI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            SetupButtons();
             RunUpdater();
         }
 
@@ -430,6 +429,7 @@ namespace AlotAddOnGUI
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
             view.GroupDescriptions.Add(groupDescription);
+            SetupButtons();
         }
 
         public sealed class AddonFile : INotifyPropertyChanged
@@ -653,6 +653,7 @@ namespace AlotAddOnGUI
         {
             timer_Tick(null, null);
             int nummissing = 0;
+            bool oneisready = false;
             foreach (AddonFile af in addonfiles)
             {
                 if (af.Game_ME2 && game == 2 || af.Game_ME3 && game == 3)
@@ -661,13 +662,24 @@ namespace AlotAddOnGUI
                     {
                         nummissing++;
                     }
-                }
+                    else
+                    {
+                        oneisready = true;
+                    }
+                } 
             }
 
             if (nummissing == 0)
             {
                 return true;
             }
+
+            if (!oneisready)
+            {
+                await this.ShowMessageAsync("No files available for building", "There are no files available in the Downloaded_Mods folder to build an addon for Mass Effect " + game + ".");
+                return false;
+            }
+
             MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect " + game + " addon are missing - do you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
             return result == MessageDialogResult.Affirmative;
         }

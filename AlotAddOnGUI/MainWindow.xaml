@@ -146,8 +146,8 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Button x:Name="Button_InstallME2" Grid.Row="1" Grid.Column="0" Content="Build ME2 Addon" Click="Button_InstallME2_Click"/>
-            <Button x:Name="Button_InstallME3" Grid.Row="1" Grid.Column="1" Content="Build ME3 Addon" Click="Button_InstallME3_Click"/>
+            <Button x:Name="Button_InstallME2" Grid.Row="1" Grid.Column="0" Content="Please Wait" IsEnabled="false"  Click="Button_InstallME2_Click"/>
+            <Button x:Name="Button_InstallME3" Grid.Row="1" Grid.Column="1" Content="Please Wait" IsEnabled="false" Click="Button_InstallME3_Click"/>
         </Grid>
     </Grid>
 </Controls:MetroWindow>
