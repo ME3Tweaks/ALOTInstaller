@@ -103,7 +103,7 @@
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x326E381C_Acruiser_spec.dds" destinationname="AlliCruiserA_CustomMask2_Cine_0x326E381C.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Armax Arena Cerberus Female" author="Ottemis">
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename="Armax Arena Cerberus Female-185-1-0.rar"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/185" filename="Armax Arena Cerberus Female-185-1-0.rar"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x417194BC_Shade_hed_Spec.dds" destinationname="HMM_HGR_SHP_FBDj_Spec_0x417194BC.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5B05FCBB_Shade_Diff.dds" destinationname="HMF_ARM_FBDj_Diff_0x5B05FCBB.dds"/>
 		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x62EEF54C_Shade_hed_Norm.dds" destinationname="HMM_HGR_SHP_FBDj_Norm_0x62EEF54C.dds"/>
