@@ -62,11 +62,14 @@ namespace AlotAddOnGUI
 
         private void RunUpdater()
         {
-
             Log.Information("Running GHUpdater.");
             AddonFilesLabel.Content = "Checking for application updates";
             string updaterpath = EXE_DIRECTORY + BINARY_DIRECTORY + "GHUpdater.exe";
             string temppath = Path.GetTempPath() + "GHUpdater.exe";
+            var versInfo = FileVersionInfo.GetVersionInfo(updaterpath);
+            String fileVersion = versInfo.FileVersion;
+            Log.Information("GHUpdater.exe version: " + fileVersion);
+
             File.Copy(updaterpath, temppath, true);
             pipe = new AnonymousPipes("GHUPDATE_SERVER.", temppath, "", delegate (String msg)
             {
@@ -82,7 +85,7 @@ namespace AlotAddOnGUI
                                 //updateprogresscontroller.SetTitle("Update ready to install");
                                 //updateprogresscontroller.SetMessage("Update will install in 5 seconds.");
                                 await this.ShowMessageAsync("ALOT Addon Builder update ready", "The program will close and update in the background, then reopen. It should only take a few seconds.");
-                                string updatemessage = "EXECUTE_UPDATE \"" + System.AppDomain.CurrentDomain.FriendlyName + "\" \"" + EXE_DIRECTORY + "\"";
+                                string updatemessage = "EXECUTE_UPDATE_AND_START_PROCESS \"" + System.AppDomain.CurrentDomain.FriendlyName + "\" \"" + EXE_DIRECTORY + "\"";
                                 Log.Information("Executing update: " + updatemessage);
                                 pipe.SendText(updatemessage);
                                 Environment.Exit(0);
@@ -135,9 +138,20 @@ namespace AlotAddOnGUI
                             {
                                 pipe.SendText("KILL_UPDATER");
                                 pipe.Close();
-                                Log.Information("User declined update, shutting down updater");
+                                try
+                                {
+                                    File.Delete(temppath);
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Error("Error deleting TEMP GHUpdater.exe: " + e.ToString());
+                                }
+
                                 await FetchManifest();
                             }
+                            break;
+                        default:
+                            Log.Error("Unknown message from updater client: " + msg);
                             break;
                     }
                 });
@@ -162,6 +176,128 @@ namespace AlotAddOnGUI
             pipe.SendText("START_UPDATE_CHECK Mgamerz AlotAddOnGUI " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
         }
 
+        private void RunMEMUpdater()
+        {
+            Log.Information("Running GHUpdater for MEM.");
+            AddonFilesLabel.Content = "Checking for Mass Effect Modder updates";
+            string updaterpath = EXE_DIRECTORY + BINARY_DIRECTORY + "GHUpdater.exe";
+            string temppath = Path.GetTempPath() + "GHUpdater-MEM.exe";
+            File.Copy(updaterpath, temppath, true);
+            pipe = new AnonymousPipes("GHUPDATE_SERVER_MEM.", temppath, "", delegate (String msg)
+            {
+                Dispatcher.Invoke((MethodInvoker)async delegate ()
+                {
+                    //UI THREAD
+                    string[] clientmessage = msg.Split();
+                    switch (clientmessage[0])
+                    {
+                        case "UPDATE_DOWNLOAD_COMPLETE":
+                            if (updateprogresscontroller != null)
+                            {
+                                //updateprogresscontroller.SetTitle("Update ready to install");
+                                //updateprogresscontroller.SetMessage("Update will install in 5 seconds.");
+                                //await this.ShowMessageAsync("ALOT Addon Builder update ready", "The program will close and update in the background, then reopen. It should only take a few seconds.");
+                                string updatemessage = "EXECUTE_UPDATE \"" + EXE_DIRECTORY + "bin\\\"";
+                                Log.Information("Executing update: " + updatemessage);
+                                pipe.SendText(updatemessage);
+                                //Environment.Exit(0);
+                            }
+                            break;
+                        case "UPDATE_DOWNLOAD_PROGRESS":
+                            if (clientmessage.Length != 2)
+                            {
+                                Log.Warning("UPDATE_DOWNLOAD_PROGRESS message was not length 2 - ignoring message");
+                                return;
+                            }
+                            if (updateprogresscontroller != null)
+                            {
+                                double value = Double.Parse(clientmessage[1]);
+                                updateprogresscontroller.SetProgress(value);
+                            }
+                            break;
+                        case "UP_TO_DATE":
+                            Log.Information("GHUpdater reporting MEM is up to date");
+                            Thread.Sleep(250);
+                            try
+                            {
+                                File.Delete(temppath);
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error("Error deleting TEMP GHUpdater-MEM.exe: " + e.ToString());
+                            }
+                            //await FetchManifest();
+                            break;
+                        case "ERROR_CHECKING_FOR_UPDATES":
+                            AddonFilesLabel.Content = "Error occured checking for MEM updates";
+                            break;
+                        case "UPDATE_AVAILABLE":
+                            if (clientmessage.Length != 2)
+                            {
+                                Log.Warning("UPDATE_AVAILABLE message was not length 2 - ignoring message");
+                                return;
+                            }
+                            Log.Information("Github Updater reports program update: " + clientmessage[1] + " is available.");
+                            //MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + clientmessage[1] + " is available. Install the update?", MessageDialogStyle.AffirmativeAndNegative);
+                            //if (result == MessageDialogResult.Affirmative)
+                            //{
+                            pipe.SendText("INITIATE_DOWNLOAD");
+                            updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder is updating. Please wait...", true);
+                            updateprogresscontroller.SetIndeterminate();
+                            //}
+                            //else
+                            //{
+                            //    pipe.SendText("KILL_UPDATER");
+                            //    pipe.Close();
+                            //    Log.Information("User declined update, shutting down updater");
+                            //    await FetchManifest();
+                            //}
+                            break;
+                        case "UPDATE_COMPLETED":
+                            AddonFilesLabel.Content = "MassEffectModder has been updated.";
+                            if (updateprogresscontroller != null)
+                            {
+                                await updateprogresscontroller.CloseAsync();
+                            }
+                            try
+                            {
+                                File.Delete(temppath);
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error("Error deleting TEMP GHUpdater-MEM.exe: " + e.ToString());
+                            }
+                            break;
+                        default:
+                            Log.Error("Unknown message from updater client: " + msg);
+                            break;
+                    }
+                });
+            }, delegate ()
+            {
+                // We're disconnected!
+                try
+                {
+
+                    Dispatcher.Invoke((MethodInvoker)delegate ()
+                    {
+                        //UITHREAD
+                        var source = PresentationSource.FromVisual(this);
+                        if (source == null || source.IsDisposed)
+                        {
+                            AddonFilesLabel.Content = "Lost connection to update client";
+                        }
+                    });
+                }
+                catch (Exception) { }
+            });
+            Thread.Sleep(2000);
+            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
+            int fileVersion = versInfo.FileMajorPart;
+            Log.Information("Local Mass Effect Modder version: " + fileVersion);
+            pipe.SendText("START_UPDATE_CHECK MassEffectModder MassEffectModder " + fileVersion);
+        }
+
         private async void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             Installing = false;
@@ -177,7 +313,7 @@ namespace AlotAddOnGUI
                     break;
                 case 2:
                 case 3:
-                    HeaderLabel.Text = "Addon Created.\nThe MEM packages for the addon have been placed into the "+MEM_OUTPUT_DISPLAY_DIR+" directory.";
+                    HeaderLabel.Text = "Addon Created.\nThe MEM packages for the addon have been placed into the " + MEM_OUTPUT_DISPLAY_DIR + " directory.";
                     AddonFilesLabel.Content = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
                     await this.ShowMessageAsync("ALOT Addon for Mass Effect " + result + " has been built", "You can install the Addon MEM files with Mass Effect Modder after you've installed the main ALOT MEM file.");
                     break;
@@ -355,12 +491,15 @@ namespace AlotAddOnGUI
                     }
 
                     readManifest();
+
                     Log.Information("Manifest read. Switching over to user control");
 
                     Install_ProgressBar.IsIndeterminate = false;
                     HeaderLabel.Text = "Download the listed files, then drag and drop the files onto this window.\nOnce all items are ready, build the addon.";
                     AddonFilesLabel.Content = "Scanning...";
                     timer_Tick(null, null);
+                    RunMEMUpdater();
+
                 }
             }
         }
@@ -465,7 +604,8 @@ namespace AlotAddOnGUI
                     handler(this, new PropertyChangedEventArgs(propertyName));
             }
 
-            public override string ToString() {
+            public override string ToString()
+            {
                 return FriendlyName;
             }
         }
@@ -666,7 +806,7 @@ namespace AlotAddOnGUI
                     {
                         oneisready = true;
                     }
-                } 
+                }
             }
 
             if (nummissing == 0)
@@ -780,13 +920,16 @@ namespace AlotAddOnGUI
                 {
                     foreach (PackageFile pf in af.PackageFiles)
                     {
-                        Log.Information("Copying Package File: " + pf.SourceName + "->" + pf.DestinationName);
-                        string extractedpath = basepath + Path.GetFileNameWithoutExtension(af.Filename) + "\\" + pf.SourceName;
-                        string destination = stagingdirectory + pf.DestinationName;
-                        File.Copy(extractedpath, destination, true);
-                        numcompleted++;
-                        int progress = (int)((float)numcompleted / (float)totalfiles * 100);
-                        InstallWorker.ReportProgress(progress);
+                        if (game == 2 && pf.ME2Only || game == 3 && pf.ME3Only || (!pf.ME3Only && !pf.ME2Only))
+                        {
+                            Log.Information("Copying Package File: " + pf.SourceName + "->" + pf.DestinationName);
+                            string extractedpath = basepath + Path.GetFileNameWithoutExtension(af.Filename) + "\\" + pf.SourceName;
+                            string destination = stagingdirectory + pf.DestinationName;
+                            File.Copy(extractedpath, destination, true);
+                            numcompleted++;
+                            int progress = (int)((float)numcompleted / (float)totalfiles * 100);
+                            InstallWorker.ReportProgress(progress);
+                        }
                         //  Thread.Sleep(1000);
                     }
                 }
@@ -885,6 +1028,11 @@ namespace AlotAddOnGUI
             {
                 // Note that you can have more than one file.
                 string[] files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
+                Log.Information("Files dropped:");
+                foreach (String file in files)
+                {
+                    Log.Information(" -" + file);
+                }
                 List<AddonFile> filesimported = new List<AddonFile>();
                 // Assuming you have one file that you care about, pass it off to whatever
                 // handling code you have defined.
@@ -903,6 +1051,10 @@ namespace AlotAddOnGUI
                             filesimported.Add(af);
                             timer_Tick(null, null);
                             break;
+                        }
+                        else
+                        {
+                            Log.Information("Dragged file does not match addonfile or file is already ready: " + af.Filename);
                         }
                     }
                 }
