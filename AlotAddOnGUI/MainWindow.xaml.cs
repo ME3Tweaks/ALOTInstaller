@@ -173,6 +173,8 @@ namespace AlotAddOnGUI
                 }
                 catch (Exception) { }
             });
+            //pipe.SendText("START_UPDATE_CHECK Mgamerz AlotAddOnGUI 1.0.0.0");
+
             pipe.SendText("START_UPDATE_CHECK Mgamerz AlotAddOnGUI " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
         }
 
@@ -648,6 +650,8 @@ namespace AlotAddOnGUI
 
         private bool ExtractAddon(AddonFile af)
         {
+            string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + MEM_STAGING_DIR + "\\";
+
             string prefix = "[" + Path.GetFileNameWithoutExtension(af.Filename) + "] ";
             Log.Information(prefix + "Processing extraction on " + af.Filename);
             string fileextension = System.IO.Path.GetExtension(af.Filename);
@@ -703,11 +707,11 @@ namespace AlotAddOnGUI
                                 foreach (string memfile in memfiles)
 
                                 {
-                                    Log.Information("-- Subtask: Move MEM file to output directory" + memfile);
+                                    Log.Information("-- Subtask: Move MEM file to staging directory" + memfile);
 
                                     string name = Path.GetFileNameWithoutExtension(memfile);
                                     string ext = Path.GetExtension(memfile);
-                                    File.Copy(memfile, EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\" + name + " - ME" + CURRENT_GAME_BUILD + ext, true);
+                                    File.Copy(memfile, stagingdirectory + "\\" + name + " - ME" + CURRENT_GAME_BUILD + ext, true);
                                 }
                             }
 
