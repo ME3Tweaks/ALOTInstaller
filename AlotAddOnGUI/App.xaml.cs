@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -30,12 +31,27 @@ namespace AlotAddOnGUI
 
         void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            string errorMessage = string.Format("An unhandled application exception occurred. This exception is not being handled, only logged: {0}", e.Exception.Message);
-            string st = e.ToString();
+            string errorMessage = string.Format("ALOT Addon GUI has encountered an uncaught error! This exception is not being handled, only logged for debugging:");
+            string st = FlattenException(e.Exception);
             Log.Error(errorMessage);
             Log.Error(st);
             //MetroDial.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             //e.Handled = true;
+        }
+
+        public static string FlattenException(Exception exception)
+        {
+            var stringBuilder = new StringBuilder();
+
+            while (exception != null)
+            {
+                stringBuilder.AppendLine(exception.Message);
+                stringBuilder.AppendLine(exception.StackTrace);
+
+                exception = exception.InnerException;
+            }
+
+            return stringBuilder.ToString();
         }
     }
 

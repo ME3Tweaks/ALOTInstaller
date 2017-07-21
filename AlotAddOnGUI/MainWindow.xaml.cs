@@ -471,7 +471,7 @@ namespace AlotAddOnGUI
                     AddonFilesLabel.Content = "Downloading latest installer manifest";
                     try
                     {
-                        await webClient.DownloadFileTaskAsync("https://rawgit.com/Mgamerz/AlotAddOnGUI/master/manifest.xml", @"manifest-new.xml");
+                        await webClient.DownloadFileTaskAsync("https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml", @"manifest-new.xml");
                         File.Delete(EXE_DIRECTORY + @"manifest.xml");
                         File.Move(EXE_DIRECTORY + @"manifest-new.xml", EXE_DIRECTORY + @"manifest.xml");
                         Log.Information("Manifest fetched.");
@@ -494,7 +494,7 @@ namespace AlotAddOnGUI
 
                     readManifest();
 
-                    Log.Information("Manifest read. Switching over to user control");
+                    Log.Information("readManifest() has completed. Switching over to user control");
 
                     Install_ProgressBar.IsIndeterminate = false;
                     HeaderLabel.Text = "Download the listed files, then drag and drop the files onto this window.\nOnce all items are ready, build the addon.";
@@ -938,7 +938,7 @@ namespace AlotAddOnGUI
                     }
                 }
             }
-
+            Log.Information("Completed staging.");
 
             InstallWorker.ReportProgress(0);
 
