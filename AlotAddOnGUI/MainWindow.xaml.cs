@@ -9,8 +9,10 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -34,8 +36,10 @@ namespace AlotAddOnGUI
         public const string UPDATE_OPERATION_LABEL = "UPDATE_OPERATION_LABEL";
         public const string UPDATE_PROGRESSBAR_INDETERMINATE = "SET_PROGRESSBAR_DETERMINACY";
         public const string INCREMENT_COMPLETION_EXTRACTION = "INCREMENT_COMPLETION_EXTRACTION";
+        public const string SHOW_DEBUG_DIALOG = "SHOW_DEBUG_DIALOG";
         public const string ERROR_OCCURED = "ERROR_OCCURED";
         public const string BINARY_DIRECTORY = "bin\\";
+        private bool errorOccured = false;
 
         private DispatcherTimer backgroundticker;
         private int completed = 0;
@@ -185,7 +189,7 @@ namespace AlotAddOnGUI
             string updaterpath = EXE_DIRECTORY + BINARY_DIRECTORY + "GHUpdater.exe";
             string temppath = Path.GetTempPath() + "GHUpdater-MEM.exe";
             File.Copy(updaterpath, temppath, true);
-            pipe = new AnonymousPipes("GHUPDATE_SERVER_MEM.", temppath, "", delegate (String msg)
+            pipe = new AnonymousPipes("GHUPDATE_SERVER_MEM", temppath, "", delegate (String msg)
             {
                 Dispatcher.Invoke((MethodInvoker)async delegate ()
                 {
@@ -302,9 +306,10 @@ namespace AlotAddOnGUI
 
         private async void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            Log.Information("Background thread has exited - starting InstallCompleted()");
+            int result = (int)e.Result;
             Installing = false;
             SetupButtons();
-            int result = (int)e.Result;
             switch (result)
             {
                 case 1:
@@ -315,9 +320,20 @@ namespace AlotAddOnGUI
                     break;
                 case 2:
                 case 3:
-                    HeaderLabel.Text = "Addon Created.\nThe MEM packages for the addon have been placed into the " + MEM_OUTPUT_DISPLAY_DIR + " directory.";
-                    AddonFilesLabel.Content = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
-                    await this.ShowMessageAsync("ALOT Addon for Mass Effect " + result + " has been built", "You can install the Addon MEM files with Mass Effect Modder after you've installed the main ALOT MEM file.");
+                    if (errorOccured)
+                    {
+                        HeaderLabel.Text = "Addon built with errors.\nThe Addon was built but some files did not process correctly and were skipped.\nThe MEM packages for the addon have been placed into the " + MEM_OUTPUT_DISPLAY_DIR + " directory.";
+                        AddonFilesLabel.Content = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
+                        await this.ShowMessageAsync("ALOT Addon for Mass Effect " + result + " was built, but had errors", "Some files had errors occured during the build process. These files were skipped. Your game may look strange in some parts if you use the built Addon. You should report this to the developers on Discord.\nYou can install the Addon MEM files with Mass Effect Modder after you've installed the main ALOT MEM file.");
+
+                    }
+                    else
+                    {
+                        HeaderLabel.Text = "Addon Created.\nThe MEM packages for the addon have been placed into the " + MEM_OUTPUT_DISPLAY_DIR + " directory.";
+                        AddonFilesLabel.Content = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
+                        await this.ShowMessageAsync("ALOT Addon for Mass Effect " + result + " has been built", "You can install the Addon MEM files with Mass Effect Modder after you've installed the main ALOT MEM file.");
+                    }
+                    errorOccured = false;
                     break;
             }
         }
@@ -343,6 +359,9 @@ namespace AlotAddOnGUI
                         Install_ProgressBar.IsIndeterminate = false;
                         Install_ProgressBar.Value = 0;
                         await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
+                        break;
+                    case SHOW_DEBUG_DIALOG:
+                        await this.ShowMessageAsync("Debugging Dialog", "Extraction completed. Check your MEM_STAGING_DIR for files.");
                         break;
                     case INCREMENT_COMPLETION_EXTRACTION:
                         Interlocked.Increment(ref completed);
@@ -491,7 +510,7 @@ namespace AlotAddOnGUI
                         await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for addon. Information that is required to build the addon is not available. Check the program logs.");
                         Environment.Exit(1);
                     }
-
+                    Button_About.IsEnabled = true;
                     readManifest();
 
                     Log.Information("readManifest() has completed. Switching over to user control");
@@ -926,10 +945,19 @@ namespace AlotAddOnGUI
                     {
                         if (game == 2 && pf.ME2Only || game == 3 && pf.ME3Only || (!pf.ME3Only && !pf.ME2Only))
                         {
-                            Log.Information("Copying Package File: " + pf.SourceName + "->" + pf.DestinationName);
                             string extractedpath = basepath + Path.GetFileNameWithoutExtension(af.Filename) + "\\" + pf.SourceName;
-                            string destination = stagingdirectory + pf.DestinationName;
-                            File.Copy(extractedpath, destination, true);
+                            if (File.Exists(extractedpath))
+                            {
+                                Log.Information("Copying Package File: " + pf.SourceName + "->" + pf.DestinationName);
+                                string destination = stagingdirectory + pf.DestinationName;
+                                File.Copy(extractedpath, destination, true);
+                            }
+                            else
+                            {
+                                Log.Error("File specified by manifest doesn't exist after extraction: " + extractedpath);
+                                errorOccured = true;
+                            }
+
                             numcompleted++;
                             int progress = (int)((float)numcompleted / (float)totalfiles * 100);
                             InstallWorker.ReportProgress(progress);
@@ -970,15 +998,75 @@ namespace AlotAddOnGUI
         private int runProcess(string exe, string args)
         {
             Log.Information("Running process: " + exe + " " + args);
-            Process p = new Process();
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.FileName = exe;
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.Arguments = args;
-            p.Start();
-            p.WaitForExit();
-            //Thread.Sleep(1500);
-            return p.ExitCode;
+            using (Process p = new Process())
+            {
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.FileName = exe;
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.Arguments = args;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.RedirectStandardError = true;
+
+                StringBuilder output = new StringBuilder();
+                StringBuilder error = new StringBuilder();
+
+                using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
+                using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
+                {
+                    p.OutputDataReceived += (sender, e) =>
+                    {
+                        if (e.Data == null)
+                        {
+                            outputWaitHandle.Set();
+                        }
+                        else
+                        {
+                            output.AppendLine(e.Data);
+                        }
+                    };
+                    p.ErrorDataReceived += (sender, e) =>
+                    {
+                        if (e.Data == null)
+                        {
+                            errorWaitHandle.Set();
+                        }
+                        else
+                        {
+                            error.AppendLine(e.Data);
+                        }
+                    };
+
+                    p.Start();
+                    int timeout = 600000;
+                    p.BeginOutputReadLine();
+                    p.BeginErrorReadLine();
+
+                    if (p.WaitForExit(timeout) &&
+                        outputWaitHandle.WaitOne(timeout) &&
+                        errorWaitHandle.WaitOne(timeout))
+                    {
+                        // Process completed. Check process.ExitCode here.
+                        string outputmsg = "Process output of " + exe + " " + args + ":";
+                        if (output.ToString().Length > 0)
+                        {
+                            outputmsg += "\nStandard:\n" + output.ToString();
+                        }
+                        if (error.ToString().Length > 0)
+                        {
+                            outputmsg += "\nError:\n" + error.ToString();
+                        }
+                        Log.Information(outputmsg);
+                        return p.ExitCode;
+                    }
+                    else
+                    {
+                        // Timed out.
+                        Log.Error("Process timed out: " + exe +" "+args);
+                        return -1;
+                    }
+                    
+                }
+            }
         }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
@@ -1058,7 +1146,7 @@ namespace AlotAddOnGUI
                         }
                         else
                         {
-                            Log.Information("Dragged file does not match addonfile or file is already ready: " + af.Filename);
+                            //Log.Information("Dragged file does not match addonfile or file is already ready: " + af.Filename);
                         }
                     }
                 }
@@ -1072,6 +1160,21 @@ namespace AlotAddOnGUI
                     await this.ShowMessageAsync(filesimported.Count + " file" + (filesimported.Count != 1 ? "s" : "") + " imported", message);
                 }
             }
+        }
+
+        private async void Button_About_Click(object sender, RoutedEventArgs e)
+        {
+            string title = "ALOT Addon Builder " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version + "\n";
+
+            string ghupdaterver = "GHUpdater Version: " + FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "GHUpdater.exe").FileVersion;
+
+
+            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
+            int fileVersion = versInfo.FileMajorPart;
+
+            string credits = "MEM Version: " + fileVersion + "\n" + ghupdaterver + "\n\nBrought to you by:\n - Mgamerz\n - CreeperLava\n - aquadran\n\nSource code: https://github.com/Mgamerz/AlotAddOnGUI\nLicensed under GPLv3";
+            await this.ShowMessageAsync(title, credits);
+
         }
     }
 }

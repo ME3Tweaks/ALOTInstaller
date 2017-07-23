@@ -7,17 +7,17 @@ using System.Resources;
 
 // General Information
 
-[assembly: AssemblyTitle("ALOTAddonBuilder")]
+[assembly: AssemblyTitle("ALOT Addon Builder")]
 [assembly: AssemblyDescription("Builds the ALOT Addon File for ME2/ME3")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ME3Tweaks")]
-[assembly: AssemblyProduct("ALOTAddonBuilder")]
+[assembly: AssemblyProduct("ALOT Addon Builder")]
 [assembly: AssemblyCopyright("Copyright © 2017 ME3Tweaks")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Version informationr(
-[assembly: AssemblyVersion("1.2.35.107")]
-[assembly: AssemblyFileVersion("1.2.35.107")]
+[assembly: AssemblyVersion("1.2.53.167")]
+[assembly: AssemblyFileVersion("1.2.53.167")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 

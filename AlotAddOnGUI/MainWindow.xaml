@@ -140,14 +140,16 @@
         <!--<UniformGrid Grid.Column="0" Grid.Row="2" x:Name="AddonFilesGrid" Columns="3" Rows="5" Background="Olive"/>-->
         <Grid Grid.Row="4" Grid.Column="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.5*" />
-                <ColumnDefinition Width="0.5*" />
+                <ColumnDefinition Width="0.45*" />
+                <ColumnDefinition Width="0.1*" />
+                <ColumnDefinition Width="0.45*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Button x:Name="Button_InstallME2" Grid.Row="1" Grid.Column="0" Content="Please Wait" IsEnabled="false"  Click="Button_InstallME2_Click"/>
-            <Button x:Name="Button_InstallME3" Grid.Row="1" Grid.Column="1" Content="Please Wait" IsEnabled="false" Click="Button_InstallME3_Click"/>
+            <Button x:Name="Button_InstallME2" Grid.Column="0" Content="Please Wait" IsEnabled="false"  Click="Button_InstallME2_Click"/>
+            <Button x:Name="Button_About" Grid.Column="1" Content="About" IsEnabled="false" Click="Button_About_Click"/>
+            <Button x:Name="Button_InstallME3" Grid.Column="2" Content="Please Wait" IsEnabled="false" Click="Button_InstallME3_Click"/>
         </Grid>
     </Grid>
 </Controls:MetroWindow>

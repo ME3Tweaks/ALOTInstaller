@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.Win32;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -19,14 +20,21 @@ namespace AlotAddOnGUI
         {
             Log.Logger = new LoggerConfiguration()
                    .MinimumLevel.Debug()
-                  .WriteTo.LiterateConsole()
                 .WriteTo.RollingFile("logs\\alotaddoninstaller-{Date}.txt")
               .CreateLogger();
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
             Log.Information("=====================================================");
             Log.Information("Logger Started for ALOT Installer.");
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
-            Log.Information("System information:\n"+Utilities.GetOperatingSystemInfo());
+            Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
+            string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
+            Log.Information("Running Windows "+releaseId);
+
+            string version = System.Reflection.Assembly
+                     .GetExecutingAssembly()
+                     .GetReferencedAssemblies()
+                     .Where(x => x.Name == "System.Core").First().Version.ToString();
+            Log.Information("Running on .NET " + version);
         }
 
         void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
