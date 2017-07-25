@@ -468,14 +468,14 @@
 	</addonfile>
 	<addonfile friendlyname="HR Kuwashii Visor and reticule fix" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/134" filename="Kuwashii Visor fix-134-1-1.rar"/>
-		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Norm.dds" destinationname="HMM_HGR_SHPd_Norm_0x2E612B33.dds"/>
-		<packagefile me3only="true" sourcename="Visor_Frame.dds" destinationname="Visor_Frame_0x3BA605E1.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Tint.dds" destinationname="HMM_HGR_SHPd_Tint_0x571D8154.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Diff.dds" destinationname="HMM_HGR_SHPd_Diff_0x7B7E64C5.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Spec.dds" destinationname="HMM_HGR_SHPd_Spec_0xB9ECA94B.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Visor.dds" destinationname="HMM_HGR_SHPd_Visor_0xCAD2B039.dds"/>
-		<packagefile me3only="true" sourcename="TUR_HED_PROGarrus_Holo_Diff.dds" destinationname="Garrus_Visor_0x904BD94E.dds"/>
-		<packagefile me3only="true" sourcename="TUR_HED_PROGarrus_Holo_Diff.dds" destinationname="TUR_HED_PROGarrus_Holo_Diff_0xCF0810CD.dds"/>
+		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Norm_0x2E612B33.dds" destinationname="HMM_HGR_SHPd_Norm_0x2E612B33.dds"/>
+		<packagefile me3only="true" sourcename="Visor_Frame_0x3BA605E1.dds" destinationname="Visor_Frame_0x3BA605E1.dds"/>
+		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Tint_0x571D8154.dds" destinationname="HMM_HGR_SHPd_Tint_0x571D8154.dds"/>
+		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Diff_0x7B7E64C5.dds" destinationname="HMM_HGR_SHPd_Diff_0x7B7E64C5.dds"/>
+		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Spec_0xB9ECA94B.dds" destinationname="HMM_HGR_SHPd_Spec_0xB9ECA94B.dds"/>
+		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Visor_0xCAD2B039.dds" destinationname="HMM_HGR_SHPd_Visor_0xCAD2B039.dds"/>
+		<packagefile me3only="true" sourcename="TUR_HED_PROGarrus_Holo_Diff_0xCF0810CD.dds" destinationname="Garrus_Visor_0x904BD94E.dds"/>
+		<packagefile me3only="true" sourcename="TUR_HED_PROGarrus_Holo_Diff_0xCF0810CD.dds" destinationname="TUR_HED_PROGarrus_Holo_Diff_0xCF0810CD.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Liara Alt From Ashes Armor" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/8" filename="ME3 HR Liara Alt From Ashes Armor for Texmod-8-1-0.rar"/>
