@@ -461,9 +461,9 @@
 	</addonfile>
 	<addonfile friendlyname="Kaidan Default Armor" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/290" filename="HR Kaidan Default Armor-290-1-0.rar"/>
-		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Diff_4096.dds" destinationname="HMM_ARM_KAIa_Diff_0xA252CF95.dds"/>
-		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Norm_4096.dds" destinationname="HMM_ARM_KAIa_Norm_0x2D3AD537.dds"/>
-		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Spec_4096x4096.dds" destinationname="HMM_ARM_KAIa_Spec_0x438F51F8.dds"/>
+		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Diff_4096_0xA252CF95.dds" destinationname="HMM_ARM_KAIa_Diff_0xA252CF95.dds"/>
+		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Norm_4096_0x2D3AD537.dds" destinationname="HMM_ARM_KAIa_Norm_0x2D3AD537.dds"/>
+		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Spec_4096x4096_0x438F51F8.dds" destinationname="HMM_ARM_KAIa_Spec_0x438F51F8.dds"/>
 		<packagefile me3only="true" sourcename="HMM_HGRa_KAI_Diff_0x2366F731.dds" destinationname="HMM_HGRa_KAI_Diff_0x2366F731.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Kuwashii Visor and reticule fix" author="Ottemis">
