@@ -29,12 +29,6 @@ namespace AlotAddOnGUI
             Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
             string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
             Log.Information("Running Windows "+releaseId);
-
-            string version = System.Reflection.Assembly
-                     .GetExecutingAssembly()
-                     .GetReferencedAssemblies()
-                     .Where(x => x.Name == "System.Core").First().Version.ToString();
-            Log.Information("Running on .NET " + version);
         }
 
         void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

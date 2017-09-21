@@ -197,18 +197,31 @@
   </Target>
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(TargetDir)bin" mkdir "$(TargetDir)bin"
+
 if not exist "$(TargetDir)Downloaded_Mods" mkdir "$(TargetDir)Downloaded_Mods"
+
 copy /y "$(TargetDir)Updater\GHUpdater.exe" "$(TargetDir)bin\GHUpdater.exe"
+
 copy /y "$(TargetDir)7z\7z.exe" "$(TargetDir)bin\7z.exe"
 copy /y "$(TargetDir)7z\7z.dll" "$(TargetDir)bin\7z.dll"
+
 copy /y "$(TargetDir)memodder\MassEffectModder.exe" "$(TargetDir)bin\MassEffectModder.exe"
-if exist "$(TargetDir)lib" del /s "$(TargetDir)lib\*.pdb"&gt;NUL
+
+if exist "$(TargetDir)lib"  del /s "$(TargetDir)lib\*.pdb"&gt;NUL
 if exist "$(TargetDir)lib" del /s "$(TargetDir)lib\manifest*.xml"&gt;NUL
+
 if exist "$(TargetDir)memodder" rmdir /s /q "$(TargetDir)memodder"
+
 if exist "$(TargetDir)7z" rmdir /s /q "$(TargetDir)7z"
+
 if exist "$(TargetDir)Updater" rmdir /s /q "$(TargetDir)Updater"
+if $(ConfigurationName) == Debug echo DEBUG MODE
+
+
 if $(ConfigurationName) == Debug (robocopy "$(SolutionDir)BuildCache\Downloaded_Mods" "$(TargetDir)Downloaded_Mods")
+
 if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.cmd" "$(TargetDir)..\ReleaseBuilder.bat" /y)
+
 if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.ps1" "$(TargetDir)..\ReleaseBuilder.ps1" /y)</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

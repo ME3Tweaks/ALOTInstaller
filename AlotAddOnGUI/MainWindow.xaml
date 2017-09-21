@@ -59,6 +59,9 @@
                             <Border x:Name="GameIcon_ME2" ToolTip="This file applies to Mass Effect 2" Margin="5" Padding="2" BorderThickness="1" BorderBrush="Red" Background="DarkMagenta" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME2_Text" FontSize="10"  Text="ME2" VerticalAlignment="Center"/>
                             </Border>
+                            <Border x:Name="GameIcon_ME1" ToolTip="This file applies to Mass Effect" Padding="2" BorderThickness="1" BorderBrush="AliceBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
+                                <TextBlock x:Name="GameIcon_ME1_Text" FontSize="10"  Text="ME1" VerticalAlignment="Center"/>
+                            </Border>
                         </StackPanel>
 
                         <StackPanel  HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0" >
@@ -87,6 +90,12 @@
                     </Grid>
 
                     <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Game_ME1}" Value="False">
+                            <Setter TargetName="GameIcon_ME1" Property="Background" Value="Black"/>
+                            <Setter TargetName="GameIcon_ME1_Text" Property="Foreground" Value="Gray"/>
+                            <Setter TargetName="GameIcon_ME1" Property="BorderBrush" Value="Black"/>
+                            <Setter TargetName="GameIcon_ME1" Property="ToolTip" Value="This file does not apply to Mass Effect"/>
+                        </DataTrigger>
                         <DataTrigger Binding="{Binding Game_ME2}" Value="False">
                             <Setter TargetName="GameIcon_ME2" Property="Background" Value="Black"/>
                             <Setter TargetName="GameIcon_ME2_Text" Property="Foreground" Value="Gray"/>
@@ -140,16 +149,19 @@
         <!--<UniformGrid Grid.Column="0" Grid.Row="2" x:Name="AddonFilesGrid" Columns="3" Rows="5" Background="Olive"/>-->
         <Grid Grid.Row="4" Grid.Column="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.45*" />
+                <ColumnDefinition Width="0.30*" />
+                <ColumnDefinition Width="0.30*" />
+                <ColumnDefinition Width="0.30*" />
                 <ColumnDefinition Width="0.1*" />
-                <ColumnDefinition Width="0.45*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Button x:Name="Button_InstallME2" Grid.Column="0" Content="Please Wait" IsEnabled="false"  Click="Button_InstallME2_Click"/>
-            <Button x:Name="Button_About" Grid.Column="1" Content="About" IsEnabled="false" Click="Button_About_Click"/>
+            <Button x:Name="Button_InstallME1" Grid.Column="0" Content="Please Wait" IsEnabled="false" Click="Button_InstallME1_Click"/>
+            <Button x:Name="Button_InstallME2" Grid.Column="1" Content="Please Wait" IsEnabled="false"  Click="Button_InstallME2_Click"/>
             <Button x:Name="Button_InstallME3" Grid.Column="2" Content="Please Wait" IsEnabled="false" Click="Button_InstallME3_Click"/>
+            <Button x:Name="Button_About" Grid.Column="3" Content="About" IsEnabled="false" Click="Button_About_Click"/>
+
         </Grid>
     </Grid>
 </Controls:MetroWindow>

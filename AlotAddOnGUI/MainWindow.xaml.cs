@@ -12,6 +12,8 @@ using System.Linq;
 using System.Management;
 using System.Net;
 using System.Reflection;
+using System.Security;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -59,6 +61,7 @@ namespace AlotAddOnGUI
 
         public MainWindow()
         {
+            Log.Information("MainWindow() is starting");
             InitializeComponent();
             Title = "ALOT Addon Builder " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             HeaderLabel.Text = "Preparing application...";
@@ -312,12 +315,13 @@ namespace AlotAddOnGUI
             SetupButtons();
             switch (result)
             {
-                case 1:
+                case -1:
                     HeaderLabel.Text = "An error occured building the Addon. The logs directory will have more information.";
                     AddonFilesLabel.Content = "Addon not successfully built";
                     Installing = true; //don't udpate the ticker
                     //await this.ShowMessageAsync("Error building Addon", "An error occured building the Addon. The files in the logs directory may help diagnose the issue.");
                     break;
+                case 1:
                 case 2:
                 case 3:
                     if (errorOccured)
@@ -374,8 +378,7 @@ namespace AlotAddOnGUI
         private void InstallAddon(object sender, DoWorkEventArgs e)
         {
             bool result = ExtractAddons((int)e.Argument); //arg is game id.
-            e.Result = result ? (int)e.Argument : 1; //1 = Error
-
+            e.Result = result ? (int)e.Argument : -1; //1 = Error
         }
 
         // Tick handler    
@@ -394,7 +397,7 @@ namespace AlotAddOnGUI
                 foreach (AddonFile af in addonfiles)
                 {
                     bool ready = File.Exists(basepath + af.Filename);
-                    if (af.Ready != ready && (af.Game_ME2 || af.Game_ME3)) //ensure the file applies to something
+                    if (af.Ready != ready) //ensure the file applies to something
                     {
                         af.Ready = ready;
                     }
@@ -417,19 +420,22 @@ namespace AlotAddOnGUI
             //Install_ProgressBar.Value = 30;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            RunUpdater();
+            Log.Information("Window_Loaded()");
+            bool hasWriteAccess = await testWriteAccess();
+            if (hasWriteAccess) RunUpdater();
         }
 
         private async void SetupButtons()
         {
+            string me1map = Environment.GetEnvironmentVariable("LocalAppData") + @"\MassEffectModder\me1map.bin";
             string me3map = Environment.GetEnvironmentVariable("LocalAppData") + @"\MassEffectModder\me3map.bin";
             string me2map = Environment.GetEnvironmentVariable("LocalAppData") + @"\MassEffectModder\me2map.bin";
-
+            Log.Information("ME1 Texture Map exists: " + File.Exists(me1map));
             Log.Information("ME2 Texture Map exists: " + File.Exists(me2map));
             Log.Information("ME3 Texture Map exists: " + File.Exists(me3map));
-            if (File.Exists(me2map) || File.Exists(me3map))
+            if (File.Exists(me1map) || File.Exists(me2map) || File.Exists(me3map))
             {
                 if (backgroundticker == null)
                 {
@@ -443,6 +449,20 @@ namespace AlotAddOnGUI
                     InstallWorker.ProgressChanged += InstallProgressChanged;
                     InstallWorker.RunWorkerCompleted += InstallCompleted;
                     InstallWorker.WorkerReportsProgress = true;
+                }
+
+                if (!File.Exists(me1map))
+                {
+                    Log.Information("ME1 Texture Map missing - disabling ME1 install");
+                    Button_InstallME1.IsEnabled = false;
+                    Button_InstallME1.ToolTip = "Mass Effect Texture Map not found. To install ALOT for Mass Effect a texture map must be created.";
+                    Button_InstallME1.Content = "ME1 Texture Map Missing";
+                }
+                else
+                {
+                    Button_InstallME1.IsEnabled = true;
+                    Button_InstallME1.ToolTip = "Click to build ALOT Addon for Mass Effect";
+                    Button_InstallME1.Content = "Build Addon for ME1";
                 }
 
                 if (!File.Exists(me2map))
@@ -474,7 +494,8 @@ namespace AlotAddOnGUI
             }
             else
             {
-                await this.ShowMessageAsync("No ME2/ME3 Texture Maps Found", "ALOT Addon Builder requires you to build a texture map for ME2 or ME3 before you can use it.\nOne will be created during the main ALOT installation process.");
+                Log.Error("No texture maps were found. Can't build an addon. Shutting down...");
+                await this.ShowMessageAsync("No ME1/ME2/ME3 Texture Maps Found", "ALOT Addon Builder requires you to build a texture map for at least one Mass Effect (1, 2, 3) game before you can use it.\nOne will be created during the main ALOT installation process or during a texture scan in MEM.");
                 Environment.Exit(1);
             }
         }
@@ -490,6 +511,14 @@ namespace AlotAddOnGUI
                     AddonFilesLabel.Content = "Downloading latest installer manifest";
                     try
                     {
+                        //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", EXE_DIRECTORY + @"manifest.xml");
+                        string url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml";
+                        if (File.Exists(EXE_DIRECTORY+"BETA_VERSION"))
+                        {
+                            Log.Information("BETA_VERSION file exists. Using BETA manifest.");
+                            url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
+                            Title += " BETA MODE ";
+                        }
                         await webClient.DownloadFileTaskAsync("https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml", @"manifest-new.xml");
                         File.Delete(EXE_DIRECTORY + @"manifest.xml");
                         File.Move(EXE_DIRECTORY + @"manifest-new.xml", EXE_DIRECTORY + @"manifest.xml");
@@ -545,8 +574,9 @@ namespace AlotAddOnGUI
                                 ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
                                 Author = (string)e.Attribute("author"),
                                 FriendlyName = (string)e.Attribute("friendlyname"),
-                                Game_ME2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("masseffect2") : false,
-                                Game_ME3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("masseffect3") : false,
+                                Game_ME1 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me1") : false,
+                                Game_ME2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me2") : false,
+                                Game_ME3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me3") : false,
                                 Filename = (string)e.Element("file").Attribute("filename"),
                                 Tooltipname = e.Attribute("tooltipname") != null ? (string)e.Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
                                 DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
@@ -556,8 +586,14 @@ namespace AlotAddOnGUI
                                     {
                                         SourceName = (string)r.Attribute("sourcename"),
                                         DestinationName = (string)r.Attribute("destinationname"),
-                                        ME2Only = r.Attribute("me2only") != null ? true : false,
-                                        ME3Only = r.Attribute("me3only") != null ? true : false,
+                                        TPFSource = (string)r.Attribute("tpfsource"),
+                                        MoveDirectly = r.Attribute("movedirectly") != null ? true : false,
+                                        CopyDirectly = r.Attribute("copydirectly") != null ? true : false,
+                                        Delete = r.Attribute("delete") != null ? true : false,
+                                        ME1 = r.Attribute("me1") != null ? true : false,
+                                        ME2 = r.Attribute("me2") != null ? true : false,
+                                        ME3 = r.Attribute("me3") != null ? true : false,
+                                        Processed = false
                                     }).ToList(),
                             }).ToList();
                 if (!version.Equals(""))
@@ -577,12 +613,17 @@ namespace AlotAddOnGUI
 
             foreach (AddonFile af in addonfiles)
             {
-                //Set Game ME2/ME3
+                //Set Game
                 foreach (PackageFile pf in af.PackageFiles)
                 {
                     //Damn I did not think this one through very well
-                    af.Game_ME2 |= pf.ME2Only || (!pf.ME2Only && !pf.ME3Only);
-                    af.Game_ME3 |= pf.ME3Only || (!pf.ME2Only && !pf.ME3Only);
+                    af.Game_ME1 |= pf.ME1;
+                    af.Game_ME2 |= pf.ME2;
+                    af.Game_ME3 |= pf.ME3;
+                    if (!af.Game_ME1 && !af.Game_ME2 && !af.Game_ME3)
+                    {
+                        af.Game_ME1 = af.Game_ME2 = af.Game_ME3 = true; //if none is set, then its set to all
+                    }
                 }
             }
             lvUsers.ItemsSource = addonfiles;
@@ -599,6 +640,7 @@ namespace AlotAddOnGUI
             public bool ProcessAsModFile { get; set; }
             public string Author { get; set; }
             public string FriendlyName { get; set; }
+            public bool Game_ME1 { get; set; }
             public bool Game_ME2 { get; set; }
             public bool Game_ME3 { get; set; }
             public string Filename { get; set; }
@@ -635,8 +677,14 @@ namespace AlotAddOnGUI
         {
             public string SourceName { get; set; }
             public string DestinationName { get; set; }
-            public bool ME2Only { get; set; }
-            public bool ME3Only { get; set; }
+            public bool MoveDirectly { get; set; }
+            public bool CopyDirectly { get; set; }
+            public bool Delete { get; set; }
+            public string TPFSource { get; set; }
+            public bool ME1 { get; set; }
+            public bool ME2 { get; set; }
+            public bool ME3 { get; set; }
+            public bool Processed { get; set; }
         }
 
         public class ThreadCommand
@@ -660,10 +708,12 @@ namespace AlotAddOnGUI
         {
             if (await InstallPrecheck(2))
             {
-                InitInstall(2);
-                Button_InstallME2.Content = "Building...";
-                CURRENT_GAME_BUILD = 2;
-                InstallWorker.RunWorkerAsync(2);
+                if (await InitInstall(2))
+                {
+                    Button_InstallME2.Content = "Building...";
+                    CURRENT_GAME_BUILD = 2;
+                    InstallWorker.RunWorkerAsync(2);
+                }
             }
         }
 
@@ -691,11 +741,46 @@ namespace AlotAddOnGUI
                             runProcess(exe, args);
                             if (Directory.GetFiles(extractpath, "*.tpf").Length > 0)
                             {
+                                //check for copy directly items first, and move them.
+
+                                string[] tpffiles = Directory.GetFiles(extractpath, "*.tpf");
+
+
+                                foreach (string tpf in tpffiles)
+                                {
+                                    string name = Path.GetFileName(tpf);
+                                    foreach (PackageFile pf in af.PackageFiles)
+                                    {
+                                        if (pf.MoveDirectly && pf.SourceName == name)
+                                        {
+                                            Log.Information("MoveDirectly specified - moving TPF to staging: " + name);
+                                            File.Move(tpf, STAGING_DIRECTORY + name);
+                                            pf.Processed = true; //no more ops on this package file.
+                                            break;
+                                        }
+                                        if (pf.CopyDirectly && pf.SourceName == name)
+                                        {
+                                            Log.Information("CopyDirectly specified - copy TPF to staging: " + name);
+                                            File.Copy(tpf, STAGING_DIRECTORY + name, true);
+                                            pf.Processed = true; //We will still extract this as it is a copy step.
+                                            break;
+                                        }
+                                        if (pf.Delete && pf.SourceName == name)
+                                        {
+                                            Log.Information("Delete specified - deleting unused TPF: " + name);
+                                            File.Delete(tpf);
+                                            pf.Processed = true; //no more ops on this package file.
+                                            break;
+                                        }
+                                    }
+                                }
+
                                 //Extract the TPFs
                                 exe = BINARY_DIRECTORY + "MassEffectModder.exe";
                                 args = "-extract-tpf \"" + extractpath + "\" \"" + extractpath + "\"";
                                 runProcess(exe, args);
                             }
+
                             string[] modfiles = Directory.GetFiles(extractpath, "*.mod", SearchOption.AllDirectories);
                             if (modfiles.Length > 0)
                             {
@@ -804,11 +889,12 @@ namespace AlotAddOnGUI
         {
             if (await InstallPrecheck(3))
             {
-
-                InitInstall(3);
-                Button_InstallME3.Content = "Building...";
-                CURRENT_GAME_BUILD = 3;
-                InstallWorker.RunWorkerAsync(3);
+                if (await InitInstall(3))
+                {
+                    Button_InstallME3.Content = "Building...";
+                    CURRENT_GAME_BUILD = 3;
+                    InstallWorker.RunWorkerAsync(3);
+                }
             }
         }
 
@@ -819,7 +905,7 @@ namespace AlotAddOnGUI
             bool oneisready = false;
             foreach (AddonFile af in addonfiles)
             {
-                if (af.Game_ME2 && game == 2 || af.Game_ME3 && game == 3)
+                if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
                     if (!af.Ready)
                     {
@@ -864,7 +950,7 @@ namespace AlotAddOnGUI
             List<AddonFile> addonstoinstall = new List<AddonFile>();
             foreach (AddonFile af in addonfiles)
             {
-                if (af.Ready && (game == 2 ? af.Game_ME2 : af.Game_ME3))
+                if (af.Ready && (game == 1 && af.Game_ME1 || game == 2 && af.Game_ME2 || game == 3 && af.Game_ME3))
                 {
                     Log.Information("Adding Addon to installation list: " + af.FriendlyName);
                     addonstoinstall.Add(af);
@@ -943,7 +1029,7 @@ namespace AlotAddOnGUI
                 {
                     foreach (PackageFile pf in af.PackageFiles)
                     {
-                        if (game == 2 && pf.ME2Only || game == 3 && pf.ME3Only || (!pf.ME3Only && !pf.ME2Only))
+                        if ((game == 1 && pf.ME1 || game == 2 && pf.ME2 || game == 3 && pf.ME3) && !pf.Processed)
                         {
                             string extractedpath = basepath + Path.GetFileNameWithoutExtension(af.Filename) + "\\" + pf.SourceName;
                             if (File.Exists(extractedpath))
@@ -983,7 +1069,7 @@ namespace AlotAddOnGUI
             InstallWorker.ReportProgress(100);
             try
             {
-                Directory.Delete(MEM_STAGING_DIR, true);
+                //Directory.Delete(MEM_STAGING_DIR, true);
                 Directory.Delete("Extracted_Mods", true);
             }
             catch (IOException e)
@@ -1061,10 +1147,10 @@ namespace AlotAddOnGUI
                     else
                     {
                         // Timed out.
-                        Log.Error("Process timed out: " + exe +" "+args);
+                        Log.Error("Process timed out: " + exe + " " + args);
                         return -1;
                     }
-                    
+
                 }
             }
         }
@@ -1079,7 +1165,7 @@ namespace AlotAddOnGUI
             this.nIcon.ShowBalloonTip(14000, "Downloading ALOT Addon File", "Download the file titled \"" + fname + "\"", ToolTipIcon.Info);
         }
 
-        private async void InitInstall(int game)
+        private async Task<bool> InitInstall(int game)
         {
             Log.Information("Deleting any pre-existing Extracted_Mods folder.");
             string destinationpath = System.AppDomain.CurrentDomain.BaseDirectory + @"Extracted_Mods\";
@@ -1099,10 +1185,11 @@ namespace AlotAddOnGUI
             {
                 Log.Error("Unable to delete staging and target directories.\n" + e.ToString());
                 await this.ShowMessageAsync("Error occured while preparing directories", "ALOT Addon Builder was unable to cleanup some directories. Make sure all file explorer windows are closed that may be open in the working directories.");
-                return;
+                return false;
             }
 
             Installing = true;
+            Button_InstallME1.IsEnabled = false;
             Button_InstallME2.IsEnabled = false;
             Button_InstallME3.IsEnabled = false;
 
@@ -1112,6 +1199,7 @@ namespace AlotAddOnGUI
             AddonFilesLabel.Content = "Preparing to install...";
             HeaderLabel.Text = "Now building the ALOT Addon for Mass Effect " + game + ".\nDon't close this window until the process completes.";
             // Install_ProgressBar.IsIndeterminate = true;
+            return true;
         }
 
         private async void File_Drop(object sender, System.Windows.DragEventArgs e)
@@ -1175,6 +1263,41 @@ namespace AlotAddOnGUI
             string credits = "MEM Version: " + fileVersion + "\n" + ghupdaterver + "\n\nBrought to you by:\n - Mgamerz\n - CreeperLava\n - aquadran\n\nSource code: https://github.com/Mgamerz/AlotAddOnGUI\nLicensed under GPLv3";
             await this.ShowMessageAsync(title, credits);
 
+        }
+
+        private async Task<bool> testWriteAccess()
+        {
+            try
+            {
+                using (var file = File.Create("write_permissions_test")) ;
+                File.Delete("write_permissions_test");
+                return true;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                await this.ShowMessageAsync("Running from write-protected directory", "Your user account doesn't have write permissions to the current directory. Move ALOT Addon Builder to somewhere where yours does, like the Documents folder.");
+                Environment.Exit(1);
+                return false;
+            }
+            catch (Exception e)
+            {
+                //do nothing with other ones, I guess.
+                Log.Error("Permissions test failure: " + e.Message);
+            }
+            return true;
+        }
+
+        private async void Button_InstallME1_Click(object sender, RoutedEventArgs e)
+        {
+            if (await InstallPrecheck(1))
+            {
+                if (await InitInstall(1))
+                {
+                    Button_InstallME1.Content = "Building...";
+                    CURRENT_GAME_BUILD = 1;
+                    InstallWorker.RunWorkerAsync(1);
+                }
+            }
         }
     }
 }
