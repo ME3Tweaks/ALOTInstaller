@@ -222,7 +222,8 @@ if $(ConfigurationName) == Debug (robocopy "$(SolutionDir)BuildCache\Downloaded_
 
 if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.cmd" "$(TargetDir)..\ReleaseBuilder.bat" /y)
 
-if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.ps1" "$(TargetDir)..\ReleaseBuilder.ps1" /y)</PostBuildEvent>
+if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.ps1" "$(TargetDir)..\ReleaseBuilder.ps1" /y)
+if $(ConfigurationName) == Release rmdir /s /q "$(TargetDir)logs</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>if $(ConfigurationName) == Debug ("%25ProgramFiles%25\Microsoft Visual Studio\2017\Community\Common7\IDE\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt") ELSE ("%25ProgramFiles%25\Microsoft Visual Studio\2017\Community\Common7\IDE\TextTransform.exe" -a !!revision!true -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt")</PreBuildEvent>

@@ -519,7 +519,7 @@ namespace AlotAddOnGUI
                             url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
                             Title += " BETA MODE ";
                         }
-                        await webClient.DownloadFileTaskAsync("https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml", @"manifest-new.xml");
+                        await webClient.DownloadFileTaskAsync(url, @"manifest-new.xml");
                         File.Delete(EXE_DIRECTORY + @"manifest.xml");
                         File.Move(EXE_DIRECTORY + @"manifest-new.xml", EXE_DIRECTORY + @"manifest.xml");
                         Log.Information("Manifest fetched.");
