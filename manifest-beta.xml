@@ -118,7 +118,6 @@ Asari.tpf-->
 		<packagefile me1="true" sourcename="SOV_Norm_Stack.dds" destinationname="SOV_Norm_Stack_0xEFE31493.dds"/>
 		<packagefile me1="true" sourcename="SOV_Norm_Stack.dds" destinationname="0xA3E8FC46.dds"/>
 		<packagefile me1="true" sourcename="Sov_Diff_Stack.dds" destinationname="0xB8E9A16C.dds"/>
-		<packagefile me1="true" sourcename="Sov_Diff_Stack.dds" destinationname="0xD79EDCAD.dds"/>
 		<packagefile me1="true" sourcename="Sov_Diff_Stack.dds" destinationname="Sov_Diff_Stack_0xF6AA0402.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Weapon Norms" author="CreeperLava">
