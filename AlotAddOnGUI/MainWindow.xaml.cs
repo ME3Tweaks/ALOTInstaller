@@ -316,7 +316,8 @@ namespace AlotAddOnGUI
             switch (result)
             {
                 case -1:
-                    HeaderLabel.Text = "An error occured building the Addon. The logs directory will have more information.";
+                default:
+                    HeaderLabel.Text = "An error occured building the Addon. The logs directory will have more information on what happened.";
                     AddonFilesLabel.Content = "Addon not successfully built";
                     Installing = true; //don't udpate the ticker
                     //await this.ShowMessageAsync("Error building Addon", "An error occured building the Addon. The files in the logs directory may help diagnose the issue.");
@@ -1058,11 +1059,22 @@ namespace AlotAddOnGUI
 
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Building Addon MEM Package... This will take some time."));
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+            int buildresult = -2;
             {
                 Log.Information("Building MEM Package.");
                 string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
-                string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + MEM_STAGING_DIR + "\" \"" + EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\ALOT_ME" + game + "_Addon.mem";
-                runProcess(exe, args);
+                string filename = "ALOT_ME" + game + "_Addon.mem";
+                string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + MEM_STAGING_DIR + "\" \"" + EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\"+filename;
+                buildresult = runProcess(exe, args);
+                if (buildresult != 0)
+                {
+                    Log.Error("Non-Zero return code! Something probably went wrong.");
+                }
+                if (buildresult == 0 && !File.Exists(EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\" + filename))
+                {
+                    Log.Error("Process went OK but no outputfile... Something probably went wrong.");
+                    buildresult = -1;
+                }
             }
 
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
@@ -1077,7 +1089,7 @@ namespace AlotAddOnGUI
                 Log.Error("Unable to delete staging and target directories. Addon should have been built however.\n" + e.ToString());
             }
             CURRENT_GAME_BUILD = 0; //reset
-            return true;
+            return buildresult == 0;
 
         }
 
