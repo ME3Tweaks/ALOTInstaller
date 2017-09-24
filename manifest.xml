@@ -1,556 +1,671 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="1.05">
+<alotaddonmanifest version="2.0">
+	<addonfile friendlyname="MEUITM" tooltipname="MEUITM tpfs compilation Advanced users only-1-1-2.zip" author="CDAMJC">
+		<file downloadlink="http://www.nexusmods.com/masseffect/download/30" filename="MEUITM tpfs compilation Advanced users only-1-1-2.zip"/>
+
+
+
+<!--
+Rachni and Queen.tpf
+ASHarmor.tpf
+CoucilandUdina.tpf
+Elcor.tpf
+volus.tpf
+Kaiden_new.tpf
+Husks.tpf
+LightandShadowMaps.tpf
+Garrus Face.tpf
+Turian Tattoos.tpf
+sheploo.tpf
+HumanNPCClothing.tpf
+
+Thorian.tpf
+Gethtransportsmaller.tpf
+Tali.tpf
+N7Armors.tpf
+Benezia.tpf
+Anderson.tpf
+ASH.tpf
+Salarian NPC.tpf
+Scientists.tpf
+Avina.tpf
+Normandy.tpf
+Geth Trooper.tpf
+Liara Body.tpf
+GethHopper.tpf
+Mako.tpf
+Liara Face.tpf
+
+Femshep.tpf
+Normandy Uniforms.tpf
+Filmgrain.tpf
+Turian Armors.tpf
+Reporter robot.tpf
+Joker_New.tpf
+Keepers.tpf
+Saren.tpf
+MaleShep.tpf
+Wrex.tpf
+Hanar.tpf
+Chakwas.tpf
+Asari.tpf-->
+		<packagefile me1="true" sourcename="Rachni and Queen.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="ASHarmor.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="CoucilandUdina.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Elcor.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="volus.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Kaiden_new.tpf" movedirectly="true"/>
+
+		<packagefile me1="true" sourcename="Husks.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="LightandShadowMaps.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Garrus Face.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Turian Tattoos.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="sheploo.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="HumanNPCClothing.tpf" movedirectly="true"/>
+
+		<packagefile me1="true" sourcename="Thorian.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Gethtransportsmaller.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Tali.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="N7Armors.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Benezia.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Anderson.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="ASH.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Salarian NPC.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Scientists.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Avina.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Normandy.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Geth Trooper.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Liara Body.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="GethHopper.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Mako.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Liara Face.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Femshep.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Normandy Uniforms.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Filmgrain.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Turian Armors.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Reporter robot.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Joker_New.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Keepers.tpf" movedirectly="true"/>
+
+
+
+
+		<packagefile me1="true" sourcename="Saren.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MaleShep.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Wrex.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Hanar.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Chakwas.tpf" movedirectly="true"/>
+		<packagefile me1="true" sourcename="Asari.tpf" movedirectly="true"/>
+
+
+		<!-- special processing -->
+		<packagefile me1="true" sourcename="Kaiden.tpf" delete="true"/>
+		<packagefile me1="true" sourcename="Joker.tpf" delete="true"/>
+		<packagefile me1="true" sourcename="FemShepNoShine.tpf" delete="true"/>
+		<packagefile me1="true" sourcename="Sovereign.tpf" copydirectly="true"/> <!-- copy not move. -->
+
+		<!-- Must extract specific .dds files from the tpf. Do not use all of them. tpfsource="Sovereign.tpf"  -->
+
+		<!-- Maybe MEM bug, missing hash on extract 
+		<packagefile me1="true" sourcename="Sov_Diff_Stack_0xF6AA0402.dds" destinationname="Sov_Diff_Stack_0xF6AA0402.dds"/>
+		<packagefile me1="true" sourcename="Sov_Spec_Stack_0x5F42DC3A.dds" destinationname="Sov_Spec_Stack_0x5F42DC3A.dds"/>
+		<packagefile me1="true" sourcename="SOV_Norm_Stack_0xEFE31493.dds" destinationname="SOV_Norm_Stack_0xEFE31493.dds"/>
+		<packagefile me1="true" sourcename="SOV_Norm_Stack_0xEFE31493.dds" destinationname="0xA3E8FC46.dds"/>
+		<packagefile me1="true" sourcename="Sov_Diff_Stack_0xF6AA0402.dds" destinationname="0xB8E9A16C.dds"/>
+		<packagefile me1="true" sourcename="Sov_Diff_Stack_0xF6AA0402.dds" destinationname="0xD79EDCAD.dds"/> -->
+
+		<packagefile me1="true" sourcename="Sov_Spec_Stack.dds" destinationname="Sov_Spec_Stack_0x5F42DC3A.dds"/>
+		<packagefile me1="true" sourcename="SOV_Norm_Stack.dds" destinationname="SOV_Norm_Stack_0xEFE31493.dds"/>
+		<packagefile me1="true" sourcename="SOV_Norm_Stack.dds" destinationname="0xA3E8FC46.dds"/>
+		<packagefile me1="true" sourcename="Sov_Diff_Stack.dds" destinationname="0xB8E9A16C.dds"/>
+		<packagefile me1="true" sourcename="Sov_Diff_Stack.dds" destinationname="Sov_Diff_Stack_0xF6AA0402.dds"/>
+	</addonfile>
 	<addonfile friendlyname="Weapon Norms" author="CreeperLava">
 		<file downloadlink="https://onedrive.live.com/download?cid=DBE0E01C958EBA9F&amp;resid=DBE0E01C958EBA9F%21394&amp;authkey=AFUczvJaSfxmE3s" filename="Norms-CreeperLava.7z"/>
-		<packagefile me2only="true" sourcename="0xB9AB2301.dds" destinationname="_0xB9AB2301.dds"/>
-		<packagefile me2only="true" sourcename="0xD111E01F.dds" destinationname="_0xD111E01F.dds"/>
-		<packagefile me2only="true" sourcename="0xFA1F9E55.dds" destinationname="_0xFA1F9E55.dds"/>
-		<packagefile me2only="true" sourcename="0x524A8E10.dds" destinationname="_0x524A8E10.dds"/>
-		<packagefile me2only="true" sourcename="0xBF5485DF.dds" destinationname="_0xBF5485DF.dds"/>
-		<packagefile me3only="true" sourcename="0x6B2720E6.dds" destinationname="_0x6B2720E6.dds"/>
-		<packagefile me3only="true" sourcename="0x7DF368A4.dds" destinationname="_0x7DF368A4.dds"/>
-		<packagefile me3only="true" sourcename="0x10471125.dds" destinationname="_0x10471125.dds"/>
-		<packagefile me3only="true" sourcename="0xB6E94663.dds" destinationname="_0xB6E94663.dds"/>
-		<packagefile me3only="true" sourcename="0x4466892A.dds" destinationname="_0x4466892A.dds"/>
-		<packagefile me3only="true" sourcename="0xE023CF45.dds" destinationname="_0xE023CF45.dds"/>
+		<packagefile me2="true" sourcename="0xB9AB2301.dds" destinationname="_0xB9AB2301.dds"/>
+		<packagefile me2="true" sourcename="0xD111E01F.dds" destinationname="_0xD111E01F.dds"/>
+		<packagefile me2="true" sourcename="0xFA1F9E55.dds" destinationname="_0xFA1F9E55.dds"/>
+		<packagefile me2="true" sourcename="0x524A8E10.dds" destinationname="_0x524A8E10.dds"/>
+		<packagefile me2="true" sourcename="0xBF5485DF.dds" destinationname="_0xBF5485DF.dds"/>
+		<packagefile me3="true" sourcename="0x6B2720E6.dds" destinationname="_0x6B2720E6.dds"/>
+		<packagefile me3="true" sourcename="0x7DF368A4.dds" destinationname="_0x7DF368A4.dds"/>
+		<packagefile me3="true" sourcename="0x10471125.dds" destinationname="_0x10471125.dds"/>
+		<packagefile me3="true" sourcename="0xB6E94663.dds" destinationname="_0xB6E94663.dds"/>
+		<packagefile me3="true" sourcename="0x4466892A.dds" destinationname="_0x4466892A.dds"/>
+		<packagefile me3="true" sourcename="0xE023CF45.dds" destinationname="_0xE023CF45.dds"/>
 	</addonfile>	
 	<addonfile friendlyname="HR Predator Texture" tooltipname="WpnPredator_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPredator_HRv1.5.zip"/>
-		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0xA4E25886.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x17836EC0.dds" destinationname="WPN_PSTa_Diff_0x17836EC0.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0x7E3D8CAD.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0xA4E25886.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xF4295780.dds" destinationname="WPN_PSTa_Tint_0xF4295780.dds"/>
+		<packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0xA4E25886.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x17836EC0.dds" destinationname="WPN_PSTa_Diff_0x17836EC0.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0x7E3D8CAD.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0xA4E25886.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF4295780.dds" destinationname="WPN_PSTa_Tint_0xF4295780.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Shuriken Texture" tooltipname="WpnShuriken_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnShuriken_HRv1.5.zip"/>
-		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WPN_PSTc_Diff_0x71A3F10A.dds"/>
-		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x057B3D5A.dds" destinationname="WPN_PSTc_Tint_0x057B3D5A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WPN_PSTc_Diff_0x71A3F10A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/>
+		<packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WPN_PSTc_Diff_0x71A3F10A.dds"/>
+		<packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x057B3D5A.dds" destinationname="WPN_PSTc_Tint_0x057B3D5A.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Mantis Texture" tooltipname="WpnMantis_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnMantis_HRv1.5.zip"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Katana Texture" tooltipname="WpnKatana_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnKatana_HRv1.5.zip"/>		
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0x738FAA8B.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB0DD05E4.dds" destinationname="WPN_BLSb_Spec_0xB0DD05E4.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE999983A.dds" destinationname="WPN_BLSb_Tint_0xE999983A.dds"/>
-		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0xA56179D6.dds"/>
-		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB0DD05E4.dds" destinationname="WPN_BLSb_Spec_0xB0DD05E4.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0x738FAA8B.dds"/>
+		<packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0xB0DD05E4.dds" destinationname="WPN_BLSb_Spec_0xB0DD05E4.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE999983A.dds" destinationname="WPN_BLSb_Tint_0xE999983A.dds"/>
+		<packagefile me2="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0xA56179D6.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Carnifex Texture" tooltipname="WpnCarnifex_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCarnifex_HRv1.5.zip"/>
-		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x073BF3F5.dds" destinationname="WPN_PSTb_Spec_0x073BF3F5.dds"/>
-		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x6085274E.dds" destinationname="WPN_PSTb_Diff_0x6085274E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x073BF3F5.dds" destinationname="WPN_PSTb_Spec_0x073BF3F5.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6085274E.dds" destinationname="WPN_PSTb_Diff_0x6085274E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x809FC86B.dds" destinationname="WPN_PSTb_Tint_0x809FC86B.dds"/>
+		<packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x073BF3F5.dds" destinationname="WPN_PSTb_Spec_0x073BF3F5.dds"/>
+		<packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x6085274E.dds" destinationname="WPN_PSTb_Diff_0x6085274E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x809FC86B.dds" destinationname="WPN_PSTb_Tint_0x809FC86B.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Paladin Texture" tooltipname="WpnPaladin_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPaladin_HRv1.5.zip"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x498B35ED.dds" destinationname="WPN_PSTm_Diff_0x498B35ED.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB8151BBB.dds" destinationname="WPN_PSTm_Spec_0xB8151BBB.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x498B35ED.dds" destinationname="WPN_PSTm_Diff_0x498B35ED.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB8151BBB.dds" destinationname="WPN_PSTm_Spec_0xB8151BBB.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Phaeston Texture" tooltipname="WpnPhaeston_HRv1.65.zi" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnPhaeston_HRv1.65.zip"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA18F8A44.dds" destinationname="WPN_ASLg_Tint_0xA18F8A44.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE1EDE859.dds" destinationname="WPN_ASLg_Diff_0xE1EDE859.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEEFDCFA9.dds" destinationname="WPN_ASLg_Spec_0xEEFDCFA9.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA18F8A44.dds" destinationname="WPN_ASLg_Tint_0xA18F8A44.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE1EDE859.dds" destinationname="WPN_ASLg_Diff_0xE1EDE859.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEEFDCFA9.dds" destinationname="WPN_ASLg_Spec_0xEEFDCFA9.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Cain Texture" tooltipname="WpnCain_HRv1.7.zip" author="TheDarkFalkon">
 		<file downloadlink="http://social.bioware.com/project/8376/#files" filename="WpnCain_HRv1.7.zip"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x637DADD4.dds" destinationname="WPN_HVYb_Diff_0x637DADD4.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x637DADD4.dds" destinationname="WPN_HVYb_Diff_0x637DADD4.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HD M-8 Avenger" tooltipname="Weapon M-8 Avenger  HD OPTIMIZED 2 by TheDarkFalkon.tpf" author="TheDarkFalkon">
 		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon M-8 Avenger  HD OPTIMIZED 2 by TheDarkFalkon.tpf"/>
-		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds"/>
-		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_Stack_0x3400C716.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8BA3F0F1.dds" destinationname="WPN_ASLa_Tint_0x8BA3F0F1.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0x1843668E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_0xB617BCBE.dds"/>
+		<packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds"/>
+		<packagefile me2="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_Stack_0x3400C716.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8BA3F0F1.dds" destinationname="WPN_ASLa_Tint_0x8BA3F0F1.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0x1843668E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_0xB617BCBE.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR M-92 Mantis" tooltipname="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf" author="TheDarkFalkon">
 		<file downloadlink="https://onedrive.live.com/?id=12B53096D995629D%21574&amp;cid=12B53096D995629D" filename="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x3463B385.dds"/>
-		<packagefile me2only="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x13703FFD.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x3463B385.dds"/>
+		<packagefile me2="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x13703FFD.dds"/>
 	</addonfile>
 
 	<addonfile friendlyname="ME3 HR Alliance Blues - 4096" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/79" filename="ME3 HR Alliance Blues for Texmod-79-1-0.rar"/>		
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3D517229_NPC_spec.dds" destinationname="HMF_ARM_CTHa_Cnc_Spec_0x3D517229.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6D9F3946_NPC2_spec.dds" destinationname="HMM_ARM_CTHa_Cnc_Spec_0x6D9F3946.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x77B54F3A_Anderson_diff.dds" destinationname="HMM_ARM_ANDb_Diff_0x77B54F3A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8141169E_Hackett_diff.dds" destinationname="HMM_ARM_CTHj_DIFF_0x8141169E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x97801EB1_alliance_spec.dds" destinationname="HMM_ARM_CTHa_Nav_SPwr_Stack_0x97801EB1.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA1313E98_alliance_diff.dds" destinationname="HMM_ARM_CTHa_Nav_Diff_Stack_0xA1313E98.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB6B03658_Anderson_spec.dds" destinationname="HMM_ARM_ANDb_SPEC_0xB6B03658.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xBD8FCAC7_AndersonDirt_diff.dds" destinationname="HMM_ARM_ANDc_Diff_0xBD8FCAC7.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xC2D6EFE3_Hackett_spec.dds" destinationname="HMM_ARM_CTHj_SPEC_0xC2D6EFE3.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD4F23697_NPC2_diff.dds" destinationname="HMM_ARM_CTHa_Cnc_Diff_0xD4F23697.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE31BBD8E_AndersonDirt_spec.dds" destinationname="HMM_ARM_ANDc_Spec_0xE31BBD8E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0BEBC775_NPC_diff.dds" destinationname="HMF_ARM_CTHa_Cnc_Diff_0x0BEBC775.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x2CE94E76_alliance_norm.dds" destinationname="HMM_ARM_CTHa_Nav_Norm_Stack_0x2CE94E76.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3D517229_NPC_spec.dds" destinationname="HMF_ARM_CTHa_Cnc_Spec_0x3D517229.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6D9F3946_NPC2_spec.dds" destinationname="HMM_ARM_CTHa_Cnc_Spec_0x6D9F3946.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x77B54F3A_Anderson_diff.dds" destinationname="HMM_ARM_ANDb_Diff_0x77B54F3A.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8141169E_Hackett_diff.dds" destinationname="HMM_ARM_CTHj_DIFF_0x8141169E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x97801EB1_alliance_spec.dds" destinationname="HMM_ARM_CTHa_Nav_SPwr_Stack_0x97801EB1.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA1313E98_alliance_diff.dds" destinationname="HMM_ARM_CTHa_Nav_Diff_Stack_0xA1313E98.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB6B03658_Anderson_spec.dds" destinationname="HMM_ARM_ANDb_SPEC_0xB6B03658.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xBD8FCAC7_AndersonDirt_diff.dds" destinationname="HMM_ARM_ANDc_Diff_0xBD8FCAC7.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xC2D6EFE3_Hackett_spec.dds" destinationname="HMM_ARM_CTHj_SPEC_0xC2D6EFE3.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD4F23697_NPC2_diff.dds" destinationname="HMM_ARM_CTHa_Cnc_Diff_0xD4F23697.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE31BBD8E_AndersonDirt_spec.dds" destinationname="HMM_ARM_ANDc_Spec_0xE31BBD8E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0BEBC775_NPC_diff.dds" destinationname="HMF_ARM_CTHa_Cnc_Diff_0x0BEBC775.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x2CE94E76_alliance_norm.dds" destinationname="HMM_ARM_CTHa_Nav_Norm_Stack_0x2CE94E76.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Alliance Cruiser" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename="HR Alliance Cruiser-276-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x1D95B08D_Acruiser_diff.dds" destinationname="AlliCruiserA_Diff_Cine_0x1D95B08D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x326E381C_Acruiser_spec.dds" destinationname="AlliCruiserA_CustomMask2_Cine_0x326E381C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x1D95B08D_Acruiser_diff.dds" destinationname="AlliCruiserA_Diff_Cine_0x1D95B08D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x326E381C_Acruiser_spec.dds" destinationname="AlliCruiserA_CustomMask2_Cine_0x326E381C.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Armax Arena Cerberus Female" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/185" filename="Armax Arena Cerberus Female-185-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x417194BC_Shade_hed_Spec.dds" destinationname="HMM_HGR_SHP_FBDj_Spec_0x417194BC.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5B05FCBB_Shade_Diff.dds" destinationname="HMF_ARM_FBDj_Diff_0x5B05FCBB.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x62EEF54C_Shade_hed_Norm.dds" destinationname="HMM_HGR_SHP_FBDj_Norm_0x62EEF54C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7186E843_Shade_Norm.dds" destinationname="HMF_ARM_FBDj_Norm_0x16A3CA0E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7186E843_Shade_Norm.dds" destinationname="HMF_ARM_FBDj_Norm_0x7186E843.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x73B170C7_Shade_Spec.dds" destinationname="HMF_ARM_FBDj_Spec_0x73B170C7.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x417194BC_Shade_hed_Spec.dds" destinationname="HMM_HGR_SHP_FBDj_Spec_0x417194BC.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5B05FCBB_Shade_Diff.dds" destinationname="HMF_ARM_FBDj_Diff_0x5B05FCBB.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x62EEF54C_Shade_hed_Norm.dds" destinationname="HMM_HGR_SHP_FBDj_Norm_0x62EEF54C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7186E843_Shade_Norm.dds" destinationname="HMF_ARM_FBDj_Norm_0x16A3CA0E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7186E843_Shade_Norm.dds" destinationname="HMF_ARM_FBDj_Norm_0x7186E843.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x73B170C7_Shade_Spec.dds" destinationname="HMF_ARM_FBDj_Spec_0x73B170C7.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Armax Arena Cerberus Male" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/185" filename="Armax Arena Cerberus Male-185-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x11D30EDE_Shade_hed_Diff.dds" destinationname="HMM_HGR_SHP_FBDj_Diff_0x11D30EDE.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x49903884_ShadeM_Spec.dds" destinationname="HMM_ARM_SHP_FBDj_Spec_0x43A21729.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x49903884_ShadeM_Spec.dds" destinationname="HMM_ARM_SHP_FBDj_Spec_0x49903884.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFC4B849C_ShadeM_Diff.dds" destinationname="HMM_ARM_SHP_FBDj_Diff_0x4F886DD5.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFC4B849C_ShadeM_Diff.dds" destinationname="HMM_ARM_SHP_FBDj_Diff_0xFC4B849C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x11D30EDE_Shade_hed_Diff.dds" destinationname="HMM_HGR_SHP_FBDj_Diff_0x11D30EDE.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x49903884_ShadeM_Spec.dds" destinationname="HMM_ARM_SHP_FBDj_Spec_0x43A21729.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x49903884_ShadeM_Spec.dds" destinationname="HMM_ARM_SHP_FBDj_Spec_0x49903884.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFC4B849C_ShadeM_Diff.dds" destinationname="HMM_ARM_SHP_FBDj_Diff_0x4F886DD5.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFC4B849C_ShadeM_Diff.dds" destinationname="HMM_ARM_SHP_FBDj_Diff_0xFC4B849C.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Armor Sets Pack for ME3" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/134" filename="ME3 HR Armor Sets Pack-134-1-1.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0281248D_Serrice_chest_male_Tint.dds" destinationname="HMM_ARM_SHPc_Tor_Tint_0x0281248D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x058009AC_Rosen_legs_Spec.dds" destinationname="HMM_ARM_SHPe_Leg_Spec_0x058009AC.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x05CC6194_armax_slv_strp.dds" destinationname="HMM_ARM_SHPg_Slv_Strp_0x05CC6194.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0AAE60A2_hahne_sld_norm.dds" destinationname="HMM_ARM_SHPf_Sld_Norm_0x0AAE60A2.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0DD2FAEE_hahne_tor_diff.dds" destinationname="HMM_ARM_SHPf_Tor_Diff_0x0DD2FAEE.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0E371AB7_Rosen_chest_norm.dds" destinationname="HMM_ARM_SHPe_Tor_Norm_0x0E371AB7.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x12686E6D_N7arm_Male_Tint.dds" destinationname="HMM_ARM_SHPa_Slv_Tint_0x12686E6D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x127FF465_Kassa_chest_Strp.dds" destinationname="HMM_ARM_SHPb_Tor_Strp_0x127FF465.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x12CE0A29_Serrice_Sld.dds" destinationname="HMM_ARM_SHPc_Sld_Diff_0x12CE0A29.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x17083FEF_ariake_leg_spec.dds" destinationname="HMM_ARM_SHPh_Leg_Spec_0x17083FEF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x183653DB_Kassa_arm_Spec.dds" destinationname="HMM_ARM_SHPb_Slv_Spec_0x183653DB.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x193578BF_Rosen_arm_Strp.dds" destinationname="HMM_ARM_SHPe_Slv_Strp_0x193578BF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x229A781D_ariake_torF_tint.dds" destinationname="HMF_ARM_SHPh_Tor_Tint_0x229A781D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x245A9DE5_ariake_slv_strp.dds" destinationname="HMM_ARM_SHPh_Slv_Strp_0x245A9DE5.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x25541CC3_Rosen_leg_norm.dds" destinationname="HMM_ARM_SHPe_Leg_Norm_0x25541CC3.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x29898D7A_Kassa_chest_Spec.dds" destinationname="HMM_ARM_SHPb_Tor_Spec_0x29898D7A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x2B3258B8_Serrice_Leg_Strp.dds" destinationname="HMM_ARM_SHPc_Leg_Strp_0x2B3258B8.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x31EBCF56_Serrice_Tor.dds" destinationname="HMF_ARM_SHPc_Tor_Spec_0x31EBCF56.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3213EF92_armax_torF_spec.dds" destinationname="HMM_ARM_SHPg_Tor_Spec_0x3213EF92.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x37EF5785_Serrice_Tor.dds" destinationname="HMF_ARM_SHPc_Tor_Diff_0x37EF5785.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3A242863_hahne_tor_norm.dds" destinationname="HMM_ARM_SHPf_Tor_Norm_0x3A242863.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3A4770F2_Serrice_leg_Norm.dds" destinationname="HMM_ARM_SHPc_Leg_Norm_0x3A4770F2.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3B2CC670_ariake_slv_tint.dds" destinationname="HMM_ARM_SHPh_Slv_Tint_0x3B2CC670.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3B308725_ariake_torF_diff.dds" destinationname="HMF_ARM_SHPh_Tor_Diff_0x3B308725.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3C08AA05_hahne_sld_tint.dds" destinationname="HMM_ARM_SHPf_Sld_Tint_0x3C08AA05.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3E76B910_ariake_tor_norm.dds" destinationname="HMM_ARM_SHPh_Tor_Norm_0x3E76B910.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x434ED151_ariake_sld_norm.dds" destinationname="HMM_ARM_SHPh_Sld_Norm_0x434ED151.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x45445B8C_hahne_arm_norm.dds" destinationname="HMM_ARM_SHPf_Slv_Norm_0x45445B8C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4B07A730_Kassa_arm_Norm.dds" destinationname="HMM_ARM_SHPb_Slv_Norm_0x4B07A730.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4B0BA88B_armax_torF_norm.dds" destinationname="HMM_ARM_SHPg_Tor_Norm_0x4B0BA88B.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x50ECF576_Serrice_Tor_F_Tint.dds" destinationname="HMF_ARM_SHPc_Tor_Tint_0x50ECF576.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x53D1012F_Kassa_leg_Strp.dds" destinationname="HMM_ARM_SHPb_Leg_Strp_0x53D1012F.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x540BB920_hahne_tor_spec.dds" destinationname="HMM_ARM_SHPf_Tor_Spec_0x540BB920.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x546E3A61_hahne_tor_strp.dds" destinationname="HMM_ARM_SHPf_Tor_Strp_0x546E3A61.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x555B831B_armax_sld_tint.dds" destinationname="HMM_ARM_SHPg_Sld_Tint_0x555B831B.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x56B48C7C_ariake_slv_diff.dds" destinationname="HMM_ARM_SHPh_Slv_Diff_0x56B48C7C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x56C6A935_Serrice_Tor_Strp.dds" destinationname="HMF_ARM_SHPc_Tor_Strp_0x56C6A935.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x581DFD46_armax_slv_norm.dds" destinationname="HMM_ARM_SHPg_Slv_Norm_0x581DFD46.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5ACA77DF_ariake_torF_spec.dds" destinationname="HMF_ARM_SHPh_Tor_Spec_0x5ACA77DF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5BA06126_ariake_sld_strp.dds" destinationname="HMM_ARM_SHPh_Sld_Strp_0x5BA06126.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5C643794_armax_leg_diff.dds" destinationname="HMM_ARM_SHPg_Leg_Diff_0x5C643794.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5D223318_Kassa_sld_Spec.dds" destinationname="HMM_ARM_SHPb_Sld_Spec_0x5D223318.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5ECD5D88_armax_sld_spec.dds" destinationname="HMM_ARM_SHPg_Sld_Spec_0x5ECD5D88.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x60D3A871_kassa_leg_norm.dds" destinationname="HMM_ARM_SHPb_Leg_Norm_0x60D3A871.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x64037452_Rosen_helmet.dds" destinationname="HMM_HGR_SHPh_Diff_0x64037452.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6AD00919_Serrice_sld_Norm.dds" destinationname="HMM_ARM_SHPc_Sld_Norm_0x6AD00919.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6E9B1E10_Kassa_chest_Tint.dds" destinationname="HMM_ARM_SHPb_Tor_Tint_0x6E9B1E10.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6F11E1DA_Serrice_tor_Male_Norm.dds" destinationname="HMM_ARM_SHPc_Tor_Norm_0x6F11E1DA.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x718C5305_ariake_sld_diff.dds" destinationname="HMM_ARM_SHPh_Sld_Diff_0x718C5305.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x71C47231_arm_ael.dds" destinationname="HMM_ARM_SHPc_Slv_Diff_0x71C47231.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x72E97E78_Serrice_Sld.dds" destinationname="HMM_ARM_SHPc_Sld_Spec_0x72E97E78.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x741E6F78_Serrice_Leg.dds" destinationname="HMM_ARM_SHPc_Leg_Diff_0x741E6F78.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7688D2D7_helmet.dds" destinationname="HMM_HGR_SHPh_Spec_0x7688D2D7.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x789BACCF_Rosen_legs_Diff.dds" destinationname="HMM_ARM_SHPe_Leg_Diff_0x789BACCF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7C2C96DE_ariake_torM_spec.dds" destinationname="HMM_ARM_SHPh_Tor_Spec_0x7C2C96DE.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7CD56E22_hahne_arm_strp.dds" destinationname="HMM_ARM_SHPf_Slv_Strp_0x7CD56E22.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7D65E36F_Serrice_arm_Norm.dds" destinationname="HMM_ARM_SHPc_Slv_Norm_0x7D65E36F.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7FDF3ADA_armax_leg_tint.dds" destinationname="HMM_ARM_SHPg_Leg_Tint_0x7FDF3ADA.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8314CB05_armax_torM_tint.dds" destinationname="HMM_ARM_SHPg_Tor_Tint_0x8314CB05.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x84E75509_ariake_sld_tint.dds" destinationname="HMM_ARM_SHPh_Sld_Tint_0x84E75509.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x854CCAB6_armax_leg_strp.dds" destinationname="HMM_ARM_SHPg_Leg_Strp_0x854CCAB6.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8600D59D_Rosen_chest_Diff.dds" destinationname="HMM_ARM_SHPe_Tor_Diff_0x8600D59D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x865D76DE_Rosen_sld_Spec.dds" destinationname="HMM_ARM_SHPe_Sld_Spec_0x865D76DE.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x86BADE06_armax_torM_spec.dds" destinationname="HMM_ARM_SHPg_Tor_Spec_0x86BADE06.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8782C778_ariake_slv_spec.dds" destinationname="HMM_ARM_SHPh_Slv_Spec_0x8782C778.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8C20CC16_armax_torM_strp.dds" destinationname="HMM_ARM_SHPg_Tor_Strp_0x8C20CC16.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x90772C01_ariake_torM_tint.dds" destinationname="HMM_ARM_SHPh_Tor_Tint_0x90772C01.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x93D23744_Kassa_sld_Norm.dds" destinationname="HMM_ARM_SHPb_Sld_Norm_0x93D23744.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x94302333_Kassa_chest_Diff.dds" destinationname="HMM_ARM_SHPb_Tor_Diff_0x94302333.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x94F2C9E0_hahne_arm_diff.dds" destinationname="HMM_ARM_SHPf_Slv_Diff_0x94F2C9E0.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x966CB9B4_Serrice_chest_Male_Spec.dds" destinationname="HMM_ARM_SHPc_Tor_Spec_0x966CB9B4.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x992AA222_armax_torF_tint.dds" destinationname="HMM_ARM_SHPg_Tor_Tint_0x992AA222.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x9B3343E6_arm_ael.dds" destinationname="HMM_ARM_SHPc_Slv_Spec_0x9B3343E6.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x9C4AE5A1_hahne_arm_tint.dds" destinationname="HMM_ARM_SHPf_Slv_Tint_0x9C4AE5A1.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x9DD6D962_ariake_leg_strp.dds" destinationname="HMM_ARM_SHPh_Leg_Strp_0x9DD6D962.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x9EB0AA76_Kassa_sld_Strp.dds" destinationname="HMM_ARM_SHPb_Sld_Strp_0x9EB0AA76.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA267DB65_Ariake_torM_diff.dds" destinationname="HMM_ARM_SHPh_Tor_Diff_0xA267DB65.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA3A851AB_hahne_leg_norm.dds" destinationname="HMM_ARM_SHPf_Leg_Norm_0xA3A851AB.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA4B3FBEB_armax_sld_diff.dds" destinationname="HMM_ARM_SHPg_Sld_Diff_0xA4B3FBEB.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA999302C_Rosen_arm_norm.dds" destinationname="HMM_ARM_SHPe_Slv_Norm_0xA999302C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAA6ED439_Rosen_leg_Strp.dds" destinationname="HMM_ARM_SHPe_Leg_Strp_0xAA6ED439.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAAA7E029_ariake_torF_strp.dds" destinationname="HMF_ARM_SHPh_Tor_Strp_0xAAA7E029.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAB9E15A7_Serrice_tor_F_norm.dds" destinationname="HMF_ARM_SHPc_Tor_Norm_0xAB9E15A7.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAC0E772E_hahne_sld_diff.dds" destinationname="HMM_ARM_SHPf_Sld_Diff_0xAC0E772E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xADEC3E54_Serrice_chest_Male_Diff.dds" destinationname="HMM_ARM_SHPc_Tor_Diff_0xADEC3E54.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAE00CDA9_hahne_arm_spec.dds" destinationname="HMM_ARM_SHPf_Slv_Spec_0xAE00CDA9.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB33F9F76_ariake_slv_norm.dds" destinationname="HMM_ARM_SHPh_Slv_Norm_0xB33F9F76.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB405363A_hahne_leg_tint.dds" destinationname="HMM_ARM_SHPf_Leg_Tint_0xB405363A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB654B6CD_armax_torM_norm.dds" destinationname="HMM_ARM_SHPg_Tor_Norm_0xB654B6CD.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB6D92E49_armax_leg_norm.dds" destinationname="HMM_ARM_SHPg_Leg_Norm_0xB6D92E49.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xC0918B88_armax_sld_strp.dds" destinationname="HMM_ARM_SHPg_Sld_Strp_0xC0918B88.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xC25D3C40_Kassa_arm_Diff.dds" destinationname="HMM_ARM_SHPb_Slv_Diff_0xC25D3C40.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xC4453983_Rosen_sld_Strp.dds" destinationname="HMM_ARM_SHPe_Sld_Strp_0xC4453983.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xC5B8DCFF_Rosen_arm_Diff.dds" destinationname="HMM_ARM_SHPe_Slv_Diff_0xC5B8DCFF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xC8726864_Serrice_tor_Male_Strp.dds" destinationname="HMM_ARM_SHPc_Tor_Strp_0xC8726864.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xCA4E2AE9_ariake_torM_strp.dds" destinationname="HMM_ARM_SHPh_Tor_Strp_0xCA4E2AE9.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xCA8A2960_Kassa_sld_Diff.dds" destinationname="HMM_ARM_SHPb_Sld_Diff_0xCA8A2960.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xCB6245DC_hahne_sld_strp.dds" destinationname="HMM_ARM_SHPf_Sld_Strp_0xCB6245DC.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xCE37ECF4_armax_torF_strp.dds" destinationname="HMM_ARM_SHPg_Tor_Strp_0xCE37ECF4.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xCEA5FA49_ariake_sld_spec.dds" destinationname="HMM_ARM_SHPh_Sld_Spec_0xCEA5FA49.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xCEBF2BBE_hahne_tor_tint.dds" destinationname="HMM_ARM_SHPf_Tor_Tint_0xCEBF2BBE.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xCF762691_Kassa_chest_Norm.dds" destinationname="HMM_ARM_SHPb_Tor_Norm_0xCF762691.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD22B7EEC_armax_slv_diff.dds" destinationname="HMM_ARM_SHPg_Slv_Diff_0xD22B7EEC.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD62BDEC9_Rosen_sld_norm.dds" destinationname="HMM_ARM_SHPe_Sld_Norm_0xD62BDEC9.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD6B336DA_hahne_leg_strp.dds" destinationname="HMM_ARM_SHPf_Leg_Strp_0xD6B336DA.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD7C9D0FE_armax_leg_spec.dds" destinationname="HMM_ARM_SHPg_Leg_Spec_0xD7C9D0FE.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD872461D_hahne_leg_spec.dds" destinationname="HMM_ARM_SHPf_Leg_Spec_0xD872461D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xDC4D44F1_Kassa_arm_Strp.dds" destinationname="HMM_ARM_SHPb_Slv_Strp_0xDC4D44F1.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xDD81E7C4_armax_slv_tint.dds" destinationname="HMM_ARM_SHPg_Slv_Tint_0xDD81E7C4.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xDED775D2_Rosen_chest_spec.dds" destinationname="HMM_ARM_SHPe_Tor_Spec_0xDED775D2.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE2D09524_Serrice_Leg.dds" destinationname="HMM_ARM_SHPc_Leg_Spec_0xE2D09524.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE5C1B2BF_ariake_leg_diff.dds" destinationname="HMM_ARM_SHPh_Leg_Diff_0xE5C1B2BF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE9B25BD5_Serrice_Slv_Strp.dds" destinationname="HMM_ARM_SHPc_Slv_Strp_0xE9B25BD5.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE9CB127B_Kassa_leg_Diff.dds" destinationname="HMM_ARM_SHPb_Leg_Diff_0xE9CB127B.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE9EE807A_armax_torM_diff.dds" destinationname="HMM_ARM_SHPg_Tor_Diff_0xE9EE807A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEA996003_hahne_sld_spec.dds" destinationname="HMM_ARM_SHPf_Sld_Spec_0xEA996003.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEE8A8D96_Armax_slv_Spec.dds" destinationname="HMM_ARM_SHPg_Slv_Spec_0xEE8A8D96.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xF300E2BF_hahne_leg_diff.dds" destinationname="HMM_ARM_SHPf_Leg_Diff_0xF300E2BF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xF695A28F_Rosen_chest_Strp.dds" destinationname="HMM_ARM_SHPe_Tor_Strp_0xF695A28F.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xF94D30C6_Rosen_arm_Spec.dds" destinationname="HMM_ARM_SHPe_Slv_Spec_0xF94D30C6.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xF987F429_Rosen_sld_Diff.dds" destinationname="HMM_ARM_SHPe_Sld_Diff_0xF987F429.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFA33CE47_Serrice_Sld_Tint.dds" destinationname="HMM_ARM_SHPc_Sld_Tint_0xFA33CE47.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFAA75142_armax_torF_diff.dds" destinationname="HMM_ARM_SHPg_Tor_Diff_0xFAA75142.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFCC43FCB_Serrice_Sld_Strp.dds" destinationname="HMM_ARM_SHPc_Sld_Strp_0xFCC43FCB.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFD90FB39_Kassa_leg_Spec.dds" destinationname="HMM_ARM_SHPb_Leg_Spec_0xFD90FB39.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0281248D_Serrice_chest_male_Tint.dds" destinationname="HMM_ARM_SHPc_Tor_Tint_0x0281248D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x058009AC_Rosen_legs_Spec.dds" destinationname="HMM_ARM_SHPe_Leg_Spec_0x058009AC.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x05CC6194_armax_slv_strp.dds" destinationname="HMM_ARM_SHPg_Slv_Strp_0x05CC6194.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0AAE60A2_hahne_sld_norm.dds" destinationname="HMM_ARM_SHPf_Sld_Norm_0x0AAE60A2.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0DD2FAEE_hahne_tor_diff.dds" destinationname="HMM_ARM_SHPf_Tor_Diff_0x0DD2FAEE.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0E371AB7_Rosen_chest_norm.dds" destinationname="HMM_ARM_SHPe_Tor_Norm_0x0E371AB7.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x12686E6D_N7arm_Male_Tint.dds" destinationname="HMM_ARM_SHPa_Slv_Tint_0x12686E6D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x127FF465_Kassa_chest_Strp.dds" destinationname="HMM_ARM_SHPb_Tor_Strp_0x127FF465.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x12CE0A29_Serrice_Sld.dds" destinationname="HMM_ARM_SHPc_Sld_Diff_0x12CE0A29.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x17083FEF_ariake_leg_spec.dds" destinationname="HMM_ARM_SHPh_Leg_Spec_0x17083FEF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x183653DB_Kassa_arm_Spec.dds" destinationname="HMM_ARM_SHPb_Slv_Spec_0x183653DB.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x193578BF_Rosen_arm_Strp.dds" destinationname="HMM_ARM_SHPe_Slv_Strp_0x193578BF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x229A781D_ariake_torF_tint.dds" destinationname="HMF_ARM_SHPh_Tor_Tint_0x229A781D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x245A9DE5_ariake_slv_strp.dds" destinationname="HMM_ARM_SHPh_Slv_Strp_0x245A9DE5.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x25541CC3_Rosen_leg_norm.dds" destinationname="HMM_ARM_SHPe_Leg_Norm_0x25541CC3.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x29898D7A_Kassa_chest_Spec.dds" destinationname="HMM_ARM_SHPb_Tor_Spec_0x29898D7A.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x2B3258B8_Serrice_Leg_Strp.dds" destinationname="HMM_ARM_SHPc_Leg_Strp_0x2B3258B8.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x31EBCF56_Serrice_Tor.dds" destinationname="HMF_ARM_SHPc_Tor_Spec_0x31EBCF56.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3213EF92_armax_torF_spec.dds" destinationname="HMM_ARM_SHPg_Tor_Spec_0x3213EF92.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x37EF5785_Serrice_Tor.dds" destinationname="HMF_ARM_SHPc_Tor_Diff_0x37EF5785.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3A242863_hahne_tor_norm.dds" destinationname="HMM_ARM_SHPf_Tor_Norm_0x3A242863.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3A4770F2_Serrice_leg_Norm.dds" destinationname="HMM_ARM_SHPc_Leg_Norm_0x3A4770F2.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3B2CC670_ariake_slv_tint.dds" destinationname="HMM_ARM_SHPh_Slv_Tint_0x3B2CC670.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3B308725_ariake_torF_diff.dds" destinationname="HMF_ARM_SHPh_Tor_Diff_0x3B308725.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3C08AA05_hahne_sld_tint.dds" destinationname="HMM_ARM_SHPf_Sld_Tint_0x3C08AA05.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3E76B910_ariake_tor_norm.dds" destinationname="HMM_ARM_SHPh_Tor_Norm_0x3E76B910.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x434ED151_ariake_sld_norm.dds" destinationname="HMM_ARM_SHPh_Sld_Norm_0x434ED151.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x45445B8C_hahne_arm_norm.dds" destinationname="HMM_ARM_SHPf_Slv_Norm_0x45445B8C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4B07A730_Kassa_arm_Norm.dds" destinationname="HMM_ARM_SHPb_Slv_Norm_0x4B07A730.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4B0BA88B_armax_torF_norm.dds" destinationname="HMM_ARM_SHPg_Tor_Norm_0x4B0BA88B.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x50ECF576_Serrice_Tor_F_Tint.dds" destinationname="HMF_ARM_SHPc_Tor_Tint_0x50ECF576.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x53D1012F_Kassa_leg_Strp.dds" destinationname="HMM_ARM_SHPb_Leg_Strp_0x53D1012F.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x540BB920_hahne_tor_spec.dds" destinationname="HMM_ARM_SHPf_Tor_Spec_0x540BB920.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x546E3A61_hahne_tor_strp.dds" destinationname="HMM_ARM_SHPf_Tor_Strp_0x546E3A61.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x555B831B_armax_sld_tint.dds" destinationname="HMM_ARM_SHPg_Sld_Tint_0x555B831B.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x56B48C7C_ariake_slv_diff.dds" destinationname="HMM_ARM_SHPh_Slv_Diff_0x56B48C7C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x56C6A935_Serrice_Tor_Strp.dds" destinationname="HMF_ARM_SHPc_Tor_Strp_0x56C6A935.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x581DFD46_armax_slv_norm.dds" destinationname="HMM_ARM_SHPg_Slv_Norm_0x581DFD46.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5ACA77DF_ariake_torF_spec.dds" destinationname="HMF_ARM_SHPh_Tor_Spec_0x5ACA77DF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5BA06126_ariake_sld_strp.dds" destinationname="HMM_ARM_SHPh_Sld_Strp_0x5BA06126.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5C643794_armax_leg_diff.dds" destinationname="HMM_ARM_SHPg_Leg_Diff_0x5C643794.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5D223318_Kassa_sld_Spec.dds" destinationname="HMM_ARM_SHPb_Sld_Spec_0x5D223318.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5ECD5D88_armax_sld_spec.dds" destinationname="HMM_ARM_SHPg_Sld_Spec_0x5ECD5D88.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x60D3A871_kassa_leg_norm.dds" destinationname="HMM_ARM_SHPb_Leg_Norm_0x60D3A871.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x64037452_Rosen_helmet.dds" destinationname="HMM_HGR_SHPh_Diff_0x64037452.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6AD00919_Serrice_sld_Norm.dds" destinationname="HMM_ARM_SHPc_Sld_Norm_0x6AD00919.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E9B1E10_Kassa_chest_Tint.dds" destinationname="HMM_ARM_SHPb_Tor_Tint_0x6E9B1E10.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6F11E1DA_Serrice_tor_Male_Norm.dds" destinationname="HMM_ARM_SHPc_Tor_Norm_0x6F11E1DA.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x718C5305_ariake_sld_diff.dds" destinationname="HMM_ARM_SHPh_Sld_Diff_0x718C5305.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x71C47231_arm_ael.dds" destinationname="HMM_ARM_SHPc_Slv_Diff_0x71C47231.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x72E97E78_Serrice_Sld.dds" destinationname="HMM_ARM_SHPc_Sld_Spec_0x72E97E78.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x741E6F78_Serrice_Leg.dds" destinationname="HMM_ARM_SHPc_Leg_Diff_0x741E6F78.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7688D2D7_helmet.dds" destinationname="HMM_HGR_SHPh_Spec_0x7688D2D7.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x789BACCF_Rosen_legs_Diff.dds" destinationname="HMM_ARM_SHPe_Leg_Diff_0x789BACCF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7C2C96DE_ariake_torM_spec.dds" destinationname="HMM_ARM_SHPh_Tor_Spec_0x7C2C96DE.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7CD56E22_hahne_arm_strp.dds" destinationname="HMM_ARM_SHPf_Slv_Strp_0x7CD56E22.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7D65E36F_Serrice_arm_Norm.dds" destinationname="HMM_ARM_SHPc_Slv_Norm_0x7D65E36F.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7FDF3ADA_armax_leg_tint.dds" destinationname="HMM_ARM_SHPg_Leg_Tint_0x7FDF3ADA.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8314CB05_armax_torM_tint.dds" destinationname="HMM_ARM_SHPg_Tor_Tint_0x8314CB05.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x84E75509_ariake_sld_tint.dds" destinationname="HMM_ARM_SHPh_Sld_Tint_0x84E75509.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x854CCAB6_armax_leg_strp.dds" destinationname="HMM_ARM_SHPg_Leg_Strp_0x854CCAB6.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8600D59D_Rosen_chest_Diff.dds" destinationname="HMM_ARM_SHPe_Tor_Diff_0x8600D59D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x865D76DE_Rosen_sld_Spec.dds" destinationname="HMM_ARM_SHPe_Sld_Spec_0x865D76DE.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x86BADE06_armax_torM_spec.dds" destinationname="HMM_ARM_SHPg_Tor_Spec_0x86BADE06.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8782C778_ariake_slv_spec.dds" destinationname="HMM_ARM_SHPh_Slv_Spec_0x8782C778.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8C20CC16_armax_torM_strp.dds" destinationname="HMM_ARM_SHPg_Tor_Strp_0x8C20CC16.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x90772C01_ariake_torM_tint.dds" destinationname="HMM_ARM_SHPh_Tor_Tint_0x90772C01.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x93D23744_Kassa_sld_Norm.dds" destinationname="HMM_ARM_SHPb_Sld_Norm_0x93D23744.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x94302333_Kassa_chest_Diff.dds" destinationname="HMM_ARM_SHPb_Tor_Diff_0x94302333.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x94F2C9E0_hahne_arm_diff.dds" destinationname="HMM_ARM_SHPf_Slv_Diff_0x94F2C9E0.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x966CB9B4_Serrice_chest_Male_Spec.dds" destinationname="HMM_ARM_SHPc_Tor_Spec_0x966CB9B4.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x992AA222_armax_torF_tint.dds" destinationname="HMM_ARM_SHPg_Tor_Tint_0x992AA222.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9B3343E6_arm_ael.dds" destinationname="HMM_ARM_SHPc_Slv_Spec_0x9B3343E6.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9C4AE5A1_hahne_arm_tint.dds" destinationname="HMM_ARM_SHPf_Slv_Tint_0x9C4AE5A1.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9DD6D962_ariake_leg_strp.dds" destinationname="HMM_ARM_SHPh_Leg_Strp_0x9DD6D962.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9EB0AA76_Kassa_sld_Strp.dds" destinationname="HMM_ARM_SHPb_Sld_Strp_0x9EB0AA76.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA267DB65_Ariake_torM_diff.dds" destinationname="HMM_ARM_SHPh_Tor_Diff_0xA267DB65.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA3A851AB_hahne_leg_norm.dds" destinationname="HMM_ARM_SHPf_Leg_Norm_0xA3A851AB.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA4B3FBEB_armax_sld_diff.dds" destinationname="HMM_ARM_SHPg_Sld_Diff_0xA4B3FBEB.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA999302C_Rosen_arm_norm.dds" destinationname="HMM_ARM_SHPe_Slv_Norm_0xA999302C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAA6ED439_Rosen_leg_Strp.dds" destinationname="HMM_ARM_SHPe_Leg_Strp_0xAA6ED439.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAAA7E029_ariake_torF_strp.dds" destinationname="HMF_ARM_SHPh_Tor_Strp_0xAAA7E029.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAB9E15A7_Serrice_tor_F_norm.dds" destinationname="HMF_ARM_SHPc_Tor_Norm_0xAB9E15A7.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAC0E772E_hahne_sld_diff.dds" destinationname="HMM_ARM_SHPf_Sld_Diff_0xAC0E772E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xADEC3E54_Serrice_chest_Male_Diff.dds" destinationname="HMM_ARM_SHPc_Tor_Diff_0xADEC3E54.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAE00CDA9_hahne_arm_spec.dds" destinationname="HMM_ARM_SHPf_Slv_Spec_0xAE00CDA9.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB33F9F76_ariake_slv_norm.dds" destinationname="HMM_ARM_SHPh_Slv_Norm_0xB33F9F76.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB405363A_hahne_leg_tint.dds" destinationname="HMM_ARM_SHPf_Leg_Tint_0xB405363A.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB654B6CD_armax_torM_norm.dds" destinationname="HMM_ARM_SHPg_Tor_Norm_0xB654B6CD.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB6D92E49_armax_leg_norm.dds" destinationname="HMM_ARM_SHPg_Leg_Norm_0xB6D92E49.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xC0918B88_armax_sld_strp.dds" destinationname="HMM_ARM_SHPg_Sld_Strp_0xC0918B88.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xC25D3C40_Kassa_arm_Diff.dds" destinationname="HMM_ARM_SHPb_Slv_Diff_0xC25D3C40.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xC4453983_Rosen_sld_Strp.dds" destinationname="HMM_ARM_SHPe_Sld_Strp_0xC4453983.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xC5B8DCFF_Rosen_arm_Diff.dds" destinationname="HMM_ARM_SHPe_Slv_Diff_0xC5B8DCFF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xC8726864_Serrice_tor_Male_Strp.dds" destinationname="HMM_ARM_SHPc_Tor_Strp_0xC8726864.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCA4E2AE9_ariake_torM_strp.dds" destinationname="HMM_ARM_SHPh_Tor_Strp_0xCA4E2AE9.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCA8A2960_Kassa_sld_Diff.dds" destinationname="HMM_ARM_SHPb_Sld_Diff_0xCA8A2960.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCB6245DC_hahne_sld_strp.dds" destinationname="HMM_ARM_SHPf_Sld_Strp_0xCB6245DC.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCE37ECF4_armax_torF_strp.dds" destinationname="HMM_ARM_SHPg_Tor_Strp_0xCE37ECF4.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCEA5FA49_ariake_sld_spec.dds" destinationname="HMM_ARM_SHPh_Sld_Spec_0xCEA5FA49.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCEBF2BBE_hahne_tor_tint.dds" destinationname="HMM_ARM_SHPf_Tor_Tint_0xCEBF2BBE.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCF762691_Kassa_chest_Norm.dds" destinationname="HMM_ARM_SHPb_Tor_Norm_0xCF762691.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD22B7EEC_armax_slv_diff.dds" destinationname="HMM_ARM_SHPg_Slv_Diff_0xD22B7EEC.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD62BDEC9_Rosen_sld_norm.dds" destinationname="HMM_ARM_SHPe_Sld_Norm_0xD62BDEC9.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD6B336DA_hahne_leg_strp.dds" destinationname="HMM_ARM_SHPf_Leg_Strp_0xD6B336DA.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD7C9D0FE_armax_leg_spec.dds" destinationname="HMM_ARM_SHPg_Leg_Spec_0xD7C9D0FE.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD872461D_hahne_leg_spec.dds" destinationname="HMM_ARM_SHPf_Leg_Spec_0xD872461D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xDC4D44F1_Kassa_arm_Strp.dds" destinationname="HMM_ARM_SHPb_Slv_Strp_0xDC4D44F1.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xDD81E7C4_armax_slv_tint.dds" destinationname="HMM_ARM_SHPg_Slv_Tint_0xDD81E7C4.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xDED775D2_Rosen_chest_spec.dds" destinationname="HMM_ARM_SHPe_Tor_Spec_0xDED775D2.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE2D09524_Serrice_Leg.dds" destinationname="HMM_ARM_SHPc_Leg_Spec_0xE2D09524.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE5C1B2BF_ariake_leg_diff.dds" destinationname="HMM_ARM_SHPh_Leg_Diff_0xE5C1B2BF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE9B25BD5_Serrice_Slv_Strp.dds" destinationname="HMM_ARM_SHPc_Slv_Strp_0xE9B25BD5.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE9CB127B_Kassa_leg_Diff.dds" destinationname="HMM_ARM_SHPb_Leg_Diff_0xE9CB127B.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE9EE807A_armax_torM_diff.dds" destinationname="HMM_ARM_SHPg_Tor_Diff_0xE9EE807A.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEA996003_hahne_sld_spec.dds" destinationname="HMM_ARM_SHPf_Sld_Spec_0xEA996003.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEE8A8D96_Armax_slv_Spec.dds" destinationname="HMM_ARM_SHPg_Slv_Spec_0xEE8A8D96.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF300E2BF_hahne_leg_diff.dds" destinationname="HMM_ARM_SHPf_Leg_Diff_0xF300E2BF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF695A28F_Rosen_chest_Strp.dds" destinationname="HMM_ARM_SHPe_Tor_Strp_0xF695A28F.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF94D30C6_Rosen_arm_Spec.dds" destinationname="HMM_ARM_SHPe_Slv_Spec_0xF94D30C6.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF987F429_Rosen_sld_Diff.dds" destinationname="HMM_ARM_SHPe_Sld_Diff_0xF987F429.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFA33CE47_Serrice_Sld_Tint.dds" destinationname="HMM_ARM_SHPc_Sld_Tint_0xFA33CE47.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFAA75142_armax_torF_diff.dds" destinationname="HMM_ARM_SHPg_Tor_Diff_0xFAA75142.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFCC43FCB_Serrice_Sld_Strp.dds" destinationname="HMM_ARM_SHPc_Sld_Strp_0xFCC43FCB.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFD90FB39_Kassa_leg_Spec.dds" destinationname="HMM_ARM_SHPb_Leg_Spec_0xFD90FB39.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Ashley Alternate Armor" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/13" filename="ME3 HR Ashley Alternate Armor for Texmod-13-1.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x004C469C_Ash_hed_spec.dds" destinationname="HMF_HGRa_ASH_spec_0x004C469C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x32A99FFC_Ash_diff.dds" destinationname="HMF_ARM_ASHb_Diff_0x32A99FFC.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8000D282_ash_spec.dds" destinationname="HMF_ARM_ASHb_Spec_0x8000D282.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8EE48F3F_Ash_hed_diff.dds" destinationname="HMF_HGRa_ASH_dif_0x8EE48F3F.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEAA787FF_ash_norm.dds" destinationname="HMF_ARM_ASHb_Norm_0xEAA787FF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x004C469C_Ash_hed_spec.dds" destinationname="HMF_HGRa_ASH_spec_0x004C469C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x32A99FFC_Ash_diff.dds" destinationname="HMF_ARM_ASHb_Diff_0x32A99FFC.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8000D282_ash_spec.dds" destinationname="HMF_ARM_ASHb_Spec_0x8000D282.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8EE48F3F_Ash_hed_diff.dds" destinationname="HMF_HGRa_ASH_dif_0x8EE48F3F.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEAA787FF_ash_norm.dds" destinationname="HMF_ARM_ASHb_Norm_0xEAA787FF.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Ashley Alternate From Ashes Armor" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/15" filename="ME3 HR Ashley Alt From Ashes Armor for Texmod-15-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0B6E3832_Ash_Diff.dds" destinationname="HMF_ARM_ASHf_Diff_0x0B6E3832.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x750DEC99_Ash_Spec.dds" destinationname="HMF_ARM_ASHf_Spec_0x750DEC99.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x79AF2C8F_Ash_norm.dds" destinationname="HMF_ARM_ASHf_Norm_0x79AF2C8F.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0B6E3832_Ash_Diff.dds" destinationname="HMF_ARM_ASHf_Diff_0x0B6E3832.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x750DEC99_Ash_Spec.dds" destinationname="HMF_ARM_ASHf_Spec_0x750DEC99.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x79AF2C8F_Ash_norm.dds" destinationname="HMF_ARM_ASHf_Norm_0x79AF2C8F.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Ashley CE Armor" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/95" filename="ME3 HR Ashley CE Armor for Texmod-95-1-0.rar"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_ASHa_Diff_0xDCEA8572_Otte.dds" destinationname="HMF_ARM_ASHe_Diff_0xDCEA8572.dds"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_ASHe_Norm_0xB1A560A9_Otte.dds" destinationname="HMF_ARM_ASHe_Norm_0xB1A560A9.dds"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_ASHe_Spec_0xC208CB56_Otte.dds" destinationname="HMF_ARM_ASHe_Spec_0xC208CB56.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA7983BFB_squad.dds" destinationname="Ashley2Glow_0xA7983BFB.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD43F8502_squad.dds" destinationname="Ashley2_0xD43F8502.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_ASHa_Diff_0xDCEA8572_Otte.dds" destinationname="HMF_ARM_ASHe_Diff_0xDCEA8572.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_ASHe_Norm_0xB1A560A9_Otte.dds" destinationname="HMF_ARM_ASHe_Norm_0xB1A560A9.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_ASHe_Spec_0xC208CB56_Otte.dds" destinationname="HMF_ARM_ASHe_Spec_0xC208CB56.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA7983BFB_squad.dds" destinationname="Ashley2Glow_0xA7983BFB.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD43F8502_squad.dds" destinationname="Ashley2_0xD43F8502.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Ashley Default" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/4" filename="ME3 HR Ashley Default for Texmod-4-1-1.rar"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_ASHa_Diff_4096x4096.dds" destinationname="HMF_ARM_ASHa_Diff_0xA1C88649.dds"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_ASHa_Norm_2048x2048.dds" destinationname="HMF_ARM_ASHa_Norm_0x0EF68859.dds"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_ASHa_Spec_4096x4096.dds" destinationname="HMF_ARM_ASHa_Spec_0x5B479723.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3432581C_squad.dds" destinationname="Ashley0_0x3432581C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x46AF2F43_squad.dds" destinationname="Ashley0Glow_0x46AF2F43.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_ASHa_Diff_4096x4096.dds" destinationname="HMF_ARM_ASHa_Diff_0xA1C88649.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_ASHa_Norm_2048x2048.dds" destinationname="HMF_ARM_ASHa_Norm_0x0EF68859.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_ASHa_Spec_4096x4096.dds" destinationname="HMF_ARM_ASHa_Spec_0x5B479723.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3432581C_squad.dds" destinationname="Ashley0_0x3432581C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x46AF2F43_squad.dds" destinationname="Ashley0Glow_0x46AF2F43.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Citadel Enviromentals 102" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename="Citadel Enviromentals 102-276-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0136D18F_branch2.dds" destinationname="Pres_Branch_01_Mask_0x0136D18F.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0290AFDB_ferns.dds" destinationname="Pres_GardenFern_Diff_0x0290AFDB.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x02D6EF89_plating.dds" destinationname="PRS_TRIMS_DIFF_0x02D6EF89.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x076AA689_terminal2.dds" destinationname="Terminal01_Msk3_0x076AA689.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0A7FA145_leaves2.dds" destinationname="VistaLeaf_Mask_0x0A7FA145.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0E08C5FA_car_damaged.dds" destinationname="HoverCar01b_Dam_Diff_0x0E08C5FA.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0E4E63DA_branch.dds" destinationname="Pres_Branch_01_Diff_0x0E4E63DA.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0FF70774_plating3.dds" destinationname="Neon_FloorTiles01_Diff_0x0FF70774.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x1698C717_floor.dds" destinationname="Cit_Floor_04_Diff_0x1698C717.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x175D445E_floor_spectre.dds" destinationname="Floor_01_Norm_0x175D445E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x1ABD0B7E_table.dds" destinationname="Bar_Table_02_diff_0x1ABD0B7E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x1F1435FD_plating2.dds" destinationname="Paradise_Door02_Diff_0x1F1435FD.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x23CDD861_skybox.dds" destinationname="Sky_Diff_0x23CDD861.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x28C332D0_tiles.dds" destinationname="STA20_WALL04_Mask_0x28C332D0.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x2CB551F9_poster_blasto.dds" destinationname="Blasto_0x2CB551F9.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x313A472A_poster_rosenkov.dds" destinationname="Sign_Armor_0x313A472A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x35328022_leafcollection.dds" destinationname="Dream_Herbs01_Diff_0x35328022.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x35328022_leafcollection.dds" destinationname="Dream_Herbs01_Diff_0x547B56E2.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x35328022_leafcollection.dds" destinationname="prp_herbs_dp_0x4B61D65E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x37707AE5_norm_tiles.dds" destinationname="STA20_WALL04_Norm_0x37707AE5.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x37D6F8F5_floor_spectre.dds" destinationname="Floor_01_Diff_0x37D6F8F5.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x38C49411_hoverCsec_spec.dds" destinationname="HoverCar02_Cinematic_Roof_Spec_0x38C49411.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3920161C_poster_csec.dds" destinationname="Csec01_0x3920161C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x39C4CA55_fields.dds" destinationname="STA20_Moss_Diff_0x39C4CA55.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x413DAA67_car.dds" destinationname="HoverCar01_Citadel_Diff_0x413DAA67.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x44FB16C9_fern_elep_norm.dds" destinationname="Leaf_Norm_0x44FB16C9.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x47263F94_hoverCsec_diff.dds" destinationname="HoverCar02_Cinematic_Diff_0x47263F94.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4A5DECC2_castor-norm.dds" destinationname="Plant01_Norm_0x4A5DECC2.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4D01C6BA_floor.dds" destinationname="Cit_Floor_02_Mask_0x4D01C6BA.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4F663C68_fern_elephant.dds" destinationname="Leaf_Diff_0x4F663C68.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x50321D9B_poster_lady.dds" destinationname="Girl01_0x50321D9B.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x50CD9F5C_poster_hackett.dds" destinationname="Alliance01_0x50CD9F5C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5176D70A_castor-plant.dds" destinationname="Plant01_Diff_0x5176D70A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x52CEC2D2_poster_rosenkov.dds" destinationname="Rosenkov01_0x52CEC2D2.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x53BEF35F_tiles.dds" destinationname="Cit_Floor_05_Spec_0x53BEF35F.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x568410BD_planter.dds" destinationname="Planter01a_Msk3_0x568410BD.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x575706E3_planter.dds" destinationname="Planter02_S_Diff_0x575706E3.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x59238BBA_hovercar_diff.dds" destinationname="HoverCar01_Int_Roof_Diff_Cine_0x59238BBA.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5A1EEA8D_bed.dds" destinationname="BedMedical02_Diff_0x5A1EEA8D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6491CA6E_citadel_bench.dds" destinationname="Bench02_Diff_0x6491CA6E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x64AAE52B_poster_kassa.dds" destinationname="Kassa01_0x64AAE52B.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x674D63E8_leaves.dds" destinationname="VistaLeaf_Diff_0x674D63E8.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x675A19EF_chair.dds" destinationname="ChairReclining01_Msk3_0x675A19EF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x681EEF7C_terminal1.dds" destinationname="ComputerWall01_blue_Diff_0x681EEF7C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x69078402_poster_gun.dds" destinationname="Armax01_0x69078402.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6A278A65_table.dds" destinationname="TableCoffee01_Diff_0x6A278A65.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6BE8D8A8_couch.dds" destinationname="Couch07_Diff_0x6BE8D8A8.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x70ABACED_planter_norm.dds" destinationname="Planter02_S_Norm_0x70ABACED.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x70E5177E_poster_sirta.dds" destinationname="Sirta01_0x70E5177E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x72F75189_planter.dds" destinationname="Planter01a_Diff_0x72F75189.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x774B1122_poster_purgatory.dds" destinationname="Purgatory01_0x774B1122.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7A48D080_treetrunk.dds" destinationname="DreamTree01_Diff_0x87F9B25D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7A48D080_treetrunk.dds" destinationname="DreamTree01_DiffDreamTree01_Diff_0x7A48D080.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7A700133_hovercar_interior_diff.dds" destinationname="HoverCar01_Int_Diff_Cine_0x7A700133.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7D4BE270_plant-norm.dds" destinationname="FoliageSheet_Norm_0x7D4BE270.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x83F5DD08_plating_arrow.dds" destinationname="Cit_Trims_Diff_0x83F5DD08.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x858741E4_trunknorm.dds" destinationname="DreamTree01_Norm_0x91EAF5D3.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x858741E4_trunknorm.dds" destinationname="DreamTree01_NormDreamTree01_Diff_0x858741E4.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8C1BCBFD_terminal2.dds" destinationname="Terminal01_Diff_0x8C1BCBFD.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x9107C8CB_keyboard.dds" destinationname="H_keyboard_tex_0x9107C8CB.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x919369D5_laptop1.dds" destinationname="Computer02_Diff_0x919369D5.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x94C513D7_plating.dds" destinationname="PRS_TRIMS02_DIFF_0x94C513D7.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x95405B07_tiles.dds" destinationname="Cit_Floor_05_Diff_0x95405B07.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x959AE624_chair.dds" destinationname="ChairReclining01_Diff_0x959AE624.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x974D5341_chair1.dds" destinationname="Bio_Bench_01_Diff_0x974D5341.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x98AA080E_chair1.dds" destinationname="Bio_Bench_01_Norm_0x98AA080E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA1B5D86A_picknick.dds" destinationname="TablePrison_Diff_0xA1B5D86A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA55C2B6D_poster_redplanet.dds" destinationname="Elanuso1_0xA55C2B6D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA583280F_terminal1.dds" destinationname="ComputerWall01_Msk3_0xA583280F.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA613EA46_plating.dds" destinationname="STA60_WALL01_Diff_0xA613EA46.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA613EA46_plating.dds" destinationname="STA60_WALL01_Diff_0xDBEEB538.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA6302C2A_fallen_leaves.dds" destinationname="Leaf_Decal_01_Diff_0xA6302C2A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAC0AA003_chair2.dds" destinationname="Bench03_Diff_0xAC0AA003.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAC9756E4_plating_circle.dds" destinationname="DockingArm_DIFF_0xAC9756E4.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAD5802B6_plating.dds" destinationname="DockingArmB_DIFF_0xAD5802B6.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB3030584_poster_armali.dds" destinationname="Armali01_0xB3030584.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB9729407_plantcollection.dds" destinationname="Dream_FoliageSheet_Diff_0xB9729407.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB9729407_plantcollection.dds" destinationname="FoliageSheet_Diff_0xAC73E11C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xBB22292D_hovercar_interior_spec.dds" destinationname="HoverCar01_Int_Spec_Cine_0xBB22292D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xBFFD445F_conifer.dds" destinationname="AsariHub_Tree_Diff_0xBFFD445F.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xCACFD7FF_chair3.dds" destinationname="ChairUtility01_Worn_Msk3_0xCACFD7FF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xCB567582_bed_spec.dds" destinationname="BedMedical02_Msk3_0xCB567582.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD2B72AA8_branch.dds" destinationname="Pres_Branch_01_Norm_0xD2B72AA8.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD4500267_floor.dds" destinationname="Cit_Floor_04_Norm_0xD4500267.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD84662B3_fallen_norm.dds" destinationname="Leaf_Decal_01_Norm_0xD84662B3.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE1841958_table.dds" destinationname="Bar_Table_02_spec_0xE1841958.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEC8B5D02_chair3.dds" destinationname="ChairUtility01_Diff_0xEC8B5D02.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEF972DD0_hoverCsec_diff.dds" destinationname="HoverCar02_Cinematic_Roof_Diff_0xEF972DD0.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEFD86ED2_car_damaged.dds" destinationname="HoverCar01b_Dam_Msk3_0xEFD86ED2.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFB40CDAE_hovercar_spec.dds" destinationname="HoverCar01_Int_Roof_Spec_Cine_0xFB40CDAE.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0136D18F_branch2.dds" destinationname="Pres_Branch_01_Mask_0x0136D18F.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0290AFDB_ferns.dds" destinationname="Pres_GardenFern_Diff_0x0290AFDB.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x02D6EF89_plating.dds" destinationname="PRS_TRIMS_DIFF_0x02D6EF89.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x076AA689_terminal2.dds" destinationname="Terminal01_Msk3_0x076AA689.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0A7FA145_leaves2.dds" destinationname="VistaLeaf_Mask_0x0A7FA145.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0E08C5FA_car_damaged.dds" destinationname="HoverCar01b_Dam_Diff_0x0E08C5FA.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0E4E63DA_branch.dds" destinationname="Pres_Branch_01_Diff_0x0E4E63DA.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0FF70774_plating3.dds" destinationname="Neon_FloorTiles01_Diff_0x0FF70774.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x1698C717_floor.dds" destinationname="Cit_Floor_04_Diff_0x1698C717.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x175D445E_floor_spectre.dds" destinationname="Floor_01_Norm_0x175D445E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x1ABD0B7E_table.dds" destinationname="Bar_Table_02_diff_0x1ABD0B7E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x1F1435FD_plating2.dds" destinationname="Paradise_Door02_Diff_0x1F1435FD.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x23CDD861_skybox.dds" destinationname="Sky_Diff_0x23CDD861.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x28C332D0_tiles.dds" destinationname="STA20_WALL04_Mask_0x28C332D0.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x2CB551F9_poster_blasto.dds" destinationname="Blasto_0x2CB551F9.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x313A472A_poster_rosenkov.dds" destinationname="Sign_Armor_0x313A472A.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x35328022_leafcollection.dds" destinationname="Dream_Herbs01_Diff_0x35328022.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x35328022_leafcollection.dds" destinationname="Dream_Herbs01_Diff_0x547B56E2.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x35328022_leafcollection.dds" destinationname="prp_herbs_dp_0x4B61D65E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x37707AE5_norm_tiles.dds" destinationname="STA20_WALL04_Norm_0x37707AE5.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x37D6F8F5_floor_spectre.dds" destinationname="Floor_01_Diff_0x37D6F8F5.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x38C49411_hoverCsec_spec.dds" destinationname="HoverCar02_Cinematic_Roof_Spec_0x38C49411.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3920161C_poster_csec.dds" destinationname="Csec01_0x3920161C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x39C4CA55_fields.dds" destinationname="STA20_Moss_Diff_0x39C4CA55.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x413DAA67_car.dds" destinationname="HoverCar01_Citadel_Diff_0x413DAA67.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x44FB16C9_fern_elep_norm.dds" destinationname="Leaf_Norm_0x44FB16C9.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x47263F94_hoverCsec_diff.dds" destinationname="HoverCar02_Cinematic_Diff_0x47263F94.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4A5DECC2_castor-norm.dds" destinationname="Plant01_Norm_0x4A5DECC2.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4D01C6BA_floor.dds" destinationname="Cit_Floor_02_Mask_0x4D01C6BA.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4F663C68_fern_elephant.dds" destinationname="Leaf_Diff_0x4F663C68.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x50321D9B_poster_lady.dds" destinationname="Girl01_0x50321D9B.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x50CD9F5C_poster_hackett.dds" destinationname="Alliance01_0x50CD9F5C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5176D70A_castor-plant.dds" destinationname="Plant01_Diff_0x5176D70A.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x52CEC2D2_poster_rosenkov.dds" destinationname="Rosenkov01_0x52CEC2D2.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x53BEF35F_tiles.dds" destinationname="Cit_Floor_05_Spec_0x53BEF35F.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x568410BD_planter.dds" destinationname="Planter01a_Msk3_0x568410BD.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x575706E3_planter.dds" destinationname="Planter02_S_Diff_0x575706E3.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x59238BBA_hovercar_diff.dds" destinationname="HoverCar01_Int_Roof_Diff_Cine_0x59238BBA.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5A1EEA8D_bed.dds" destinationname="BedMedical02_Diff_0x5A1EEA8D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6491CA6E_citadel_bench.dds" destinationname="Bench02_Diff_0x6491CA6E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x64AAE52B_poster_kassa.dds" destinationname="Kassa01_0x64AAE52B.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x674D63E8_leaves.dds" destinationname="VistaLeaf_Diff_0x674D63E8.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x675A19EF_chair.dds" destinationname="ChairReclining01_Msk3_0x675A19EF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x681EEF7C_terminal1.dds" destinationname="ComputerWall01_blue_Diff_0x681EEF7C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x69078402_poster_gun.dds" destinationname="Armax01_0x69078402.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6A278A65_table.dds" destinationname="TableCoffee01_Diff_0x6A278A65.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6BE8D8A8_couch.dds" destinationname="Couch07_Diff_0x6BE8D8A8.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x70ABACED_planter_norm.dds" destinationname="Planter02_S_Norm_0x70ABACED.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x70E5177E_poster_sirta.dds" destinationname="Sirta01_0x70E5177E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x72F75189_planter.dds" destinationname="Planter01a_Diff_0x72F75189.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x774B1122_poster_purgatory.dds" destinationname="Purgatory01_0x774B1122.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7A48D080_treetrunk.dds" destinationname="DreamTree01_Diff_0x87F9B25D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7A48D080_treetrunk.dds" destinationname="DreamTree01_DiffDreamTree01_Diff_0x7A48D080.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7A700133_hovercar_interior_diff.dds" destinationname="HoverCar01_Int_Diff_Cine_0x7A700133.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7D4BE270_plant-norm.dds" destinationname="FoliageSheet_Norm_0x7D4BE270.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x83F5DD08_plating_arrow.dds" destinationname="Cit_Trims_Diff_0x83F5DD08.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x858741E4_trunknorm.dds" destinationname="DreamTree01_Norm_0x91EAF5D3.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x858741E4_trunknorm.dds" destinationname="DreamTree01_NormDreamTree01_Diff_0x858741E4.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8C1BCBFD_terminal2.dds" destinationname="Terminal01_Diff_0x8C1BCBFD.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9107C8CB_keyboard.dds" destinationname="H_keyboard_tex_0x9107C8CB.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x919369D5_laptop1.dds" destinationname="Computer02_Diff_0x919369D5.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x94C513D7_plating.dds" destinationname="PRS_TRIMS02_DIFF_0x94C513D7.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x95405B07_tiles.dds" destinationname="Cit_Floor_05_Diff_0x95405B07.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x959AE624_chair.dds" destinationname="ChairReclining01_Diff_0x959AE624.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x974D5341_chair1.dds" destinationname="Bio_Bench_01_Diff_0x974D5341.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x98AA080E_chair1.dds" destinationname="Bio_Bench_01_Norm_0x98AA080E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA1B5D86A_picknick.dds" destinationname="TablePrison_Diff_0xA1B5D86A.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA55C2B6D_poster_redplanet.dds" destinationname="Elanuso1_0xA55C2B6D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA583280F_terminal1.dds" destinationname="ComputerWall01_Msk3_0xA583280F.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA613EA46_plating.dds" destinationname="STA60_WALL01_Diff_0xA613EA46.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA613EA46_plating.dds" destinationname="STA60_WALL01_Diff_0xDBEEB538.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA6302C2A_fallen_leaves.dds" destinationname="Leaf_Decal_01_Diff_0xA6302C2A.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAC0AA003_chair2.dds" destinationname="Bench03_Diff_0xAC0AA003.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAC9756E4_plating_circle.dds" destinationname="DockingArm_DIFF_0xAC9756E4.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAD5802B6_plating.dds" destinationname="DockingArmB_DIFF_0xAD5802B6.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB3030584_poster_armali.dds" destinationname="Armali01_0xB3030584.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB9729407_plantcollection.dds" destinationname="Dream_FoliageSheet_Diff_0xB9729407.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB9729407_plantcollection.dds" destinationname="FoliageSheet_Diff_0xAC73E11C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xBB22292D_hovercar_interior_spec.dds" destinationname="HoverCar01_Int_Spec_Cine_0xBB22292D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xBFFD445F_conifer.dds" destinationname="AsariHub_Tree_Diff_0xBFFD445F.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCACFD7FF_chair3.dds" destinationname="ChairUtility01_Worn_Msk3_0xCACFD7FF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCB567582_bed_spec.dds" destinationname="BedMedical02_Msk3_0xCB567582.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD2B72AA8_branch.dds" destinationname="Pres_Branch_01_Norm_0xD2B72AA8.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD4500267_floor.dds" destinationname="Cit_Floor_04_Norm_0xD4500267.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD84662B3_fallen_norm.dds" destinationname="Leaf_Decal_01_Norm_0xD84662B3.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE1841958_table.dds" destinationname="Bar_Table_02_spec_0xE1841958.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEC8B5D02_chair3.dds" destinationname="ChairUtility01_Diff_0xEC8B5D02.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEF972DD0_hoverCsec_diff.dds" destinationname="HoverCar02_Cinematic_Roof_Diff_0xEF972DD0.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEFD86ED2_car_damaged.dds" destinationname="HoverCar01b_Dam_Msk3_0xEFD86ED2.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFB40CDAE_hovercar_spec.dds" destinationname="HoverCar01_Int_Roof_Spec_Cine_0xFB40CDAE.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Combat Fatigues" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/141" filename="HR Combat Fatigues for Texmod-141-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x150F70BF_Gellix_Male_diff.dds" destinationname="HMM_ARM_CTHb_Cer_Diff_0x150F70BF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x1DC7A460_Grissom_Male_spec.dds" destinationname="HMM_ARM_CTHb_Gri_Spec_0x1DC7A460.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x2C128252_Gellix_Fem_Norm.dds" destinationname="HMF_ARM_CTHb_Cer_Norm_0x2C128252.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x41D66C03_Normandy_Fem_Norm.dds" destinationname="HMF_ARM_CTHb_Nav_Norm_Stack_0x41D66C03.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x43D7585A_Normandy_Male_diff.dds" destinationname="HMM_ARM_CTHb_Nav_Diff_Stack_0x43D7585A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x49CE915C_Gellix_Fem_diff.dds" destinationname="HMF_ARM_CTHb_Cer_Diff_0x49CE915C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x65D1F538_Grissom_Male_diff.dds" destinationname="HMM_ARM_CTHb_Gri_Diff_0x65D1F538.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x68602BEC_Grissom_Fem_Norm.dds" destinationname="HMF_ARM_CTHb_Gri_Norm_0x68602BEC.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x874BF960_NPC_Male_spec.dds" destinationname="HMM_ARM_CTHb_Tnt_Diff_0x874BF960.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x98A16C00_Normandy_Male_Norm.dds" destinationname="HMM_ARM_CTHb_Nav_Norm_Stack_0x98A16C00.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x998B4C11_Normandy_Fem_spec.dds" destinationname="HMF_ARM_CTHb_Nav_SPwr_Stack_0x998B4C11.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x9F8F1CC2_NPC_fem_spec.dds" destinationname="HMF_ARM_CTHb_Tnt_Diff_0x9F8F1CC2.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA318B36B_Grissom_Fem_diff.dds" destinationname="HMF_ARM_CTHb_Gri_Diff_0xA318B36B.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xBED19D45_Gellix_Male_Norm.dds" destinationname="HMM_ARM_CTHb_Cer_Norm_0xBED19D45.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD00A3D59_Normandy_Fem_diff.dds" destinationname="HMF_ARM_CTHb_Nav_Diff_Stack_0xD00A3D59.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD9B0B3D8_Gellix_Fem_spec.dds" destinationname="HMF_ARM_CTHb_Cer_Spec_0xD9B0B3D8.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE09AA6B9_Normandy_Male_spec.dds" destinationname="HMM_ARM_CTHb_Nav_Spwr_Stack_0xE09AA6B9.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE0CA7646_Grissom_Fem_spec.dds" destinationname="HMF_ARM_CTHb_Gri_Spec_0xE0CA7646.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE11C764C_Gellix_Male_spec.dds" destinationname="HMM_ARM_CTHb_Cer_Spec_0xE11C764C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE8B022DA_Grissom_Male_Norm.dds" destinationname="HMM_ARM_CTHb_Gri_Norm_0xE8B022DA.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x150F70BF_Gellix_Male_diff.dds" destinationname="HMM_ARM_CTHb_Cer_Diff_0x150F70BF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x1DC7A460_Grissom_Male_spec.dds" destinationname="HMM_ARM_CTHb_Gri_Spec_0x1DC7A460.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x2C128252_Gellix_Fem_Norm.dds" destinationname="HMF_ARM_CTHb_Cer_Norm_0x2C128252.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x41D66C03_Normandy_Fem_Norm.dds" destinationname="HMF_ARM_CTHb_Nav_Norm_Stack_0x41D66C03.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x43D7585A_Normandy_Male_diff.dds" destinationname="HMM_ARM_CTHb_Nav_Diff_Stack_0x43D7585A.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x49CE915C_Gellix_Fem_diff.dds" destinationname="HMF_ARM_CTHb_Cer_Diff_0x49CE915C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x65D1F538_Grissom_Male_diff.dds" destinationname="HMM_ARM_CTHb_Gri_Diff_0x65D1F538.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x68602BEC_Grissom_Fem_Norm.dds" destinationname="HMF_ARM_CTHb_Gri_Norm_0x68602BEC.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x874BF960_NPC_Male_spec.dds" destinationname="HMM_ARM_CTHb_Tnt_Diff_0x874BF960.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x98A16C00_Normandy_Male_Norm.dds" destinationname="HMM_ARM_CTHb_Nav_Norm_Stack_0x98A16C00.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x998B4C11_Normandy_Fem_spec.dds" destinationname="HMF_ARM_CTHb_Nav_SPwr_Stack_0x998B4C11.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9F8F1CC2_NPC_fem_spec.dds" destinationname="HMF_ARM_CTHb_Tnt_Diff_0x9F8F1CC2.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA318B36B_Grissom_Fem_diff.dds" destinationname="HMF_ARM_CTHb_Gri_Diff_0xA318B36B.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xBED19D45_Gellix_Male_Norm.dds" destinationname="HMM_ARM_CTHb_Cer_Norm_0xBED19D45.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD00A3D59_Normandy_Fem_diff.dds" destinationname="HMF_ARM_CTHb_Nav_Diff_Stack_0xD00A3D59.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD9B0B3D8_Gellix_Fem_spec.dds" destinationname="HMF_ARM_CTHb_Cer_Spec_0xD9B0B3D8.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE09AA6B9_Normandy_Male_spec.dds" destinationname="HMM_ARM_CTHb_Nav_Spwr_Stack_0xE09AA6B9.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE0CA7646_Grissom_Fem_spec.dds" destinationname="HMF_ARM_CTHb_Gri_Spec_0xE0CA7646.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE11C764C_Gellix_Male_spec.dds" destinationname="HMM_ARM_CTHb_Cer_Spec_0xE11C764C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE8B022DA_Grissom_Male_Norm.dds" destinationname="HMM_ARM_CTHb_Gri_Norm_0xE8B022DA.dds"/>
 	</addonfile>
 	<addonfile friendlyname="EDI AAP Armor" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/118" filename="ME3 HR EDI AAP Armor-118-1-1.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4894C1E8_edi_squadlight.dds" destinationname="EDI3Glow_0x4894C1E8.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x83EB9F88_edi_squaddark.dds" destinationname="EDI3_0x83EB9F88.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4894C1E8_edi_squadlight.dds" destinationname="EDI3Glow_0x4894C1E8.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x83EB9F88_edi_squaddark.dds" destinationname="EDI3_0x83EB9F88.dds"/>
 	</addonfile>
 	<addonfile friendlyname="EDI Alt Outfit Pack" author="Ottemis" processasmodfile="true">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/238" filename="EDI Alt Outfit Pack-238-1-2.rar"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_EDId_Diff_0xEDC36D3F_Otte.dds" destinationname="HMF_ARM_EDId_Diff_0xEDC36D3F.dds"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_EDId_Spec_0x6ADA93CE_Otte.dds" destinationname="HMF_ARM_EDId_Spec_0x6ADA93CE.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_EDId_Diff_0xEDC36D3F_Otte.dds" destinationname="HMF_ARM_EDId_Diff_0xEDC36D3F.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_EDId_Spec_0x6ADA93CE_Otte.dds" destinationname="HMF_ARM_EDId_Spec_0x6ADA93CE.dds"/>
 	</addonfile>
 	<addonfile friendlyname="EDI From Ashes Outfit ALT version" author="Ottemis" processasmodfile="true">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/273" filename="EDI From Ashes Outfit ALT version-273-1-0.rar"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_EDIe_Diff_0x1608E029_Overlay_Otte.dds" destinationname="HMF_ARM_EDIe_Diff_0x1608E029.dds"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_EDIe_Spec_0xAE0C176D_Overlay_Otte.dds" destinationname="HMF_ARM_EDIb_Spec_0xAE0C176D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDIb_Norm_0x4C200F45.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDId_Norm_0x191C1B10.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDIg_Norm_0xE3618AF0.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_EDIe_Diff_0x1608E029_Overlay_Otte.dds" destinationname="HMF_ARM_EDIe_Diff_0x1608E029.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_EDIe_Spec_0xAE0C176D_Overlay_Otte.dds" destinationname="HMF_ARM_EDIb_Spec_0xAE0C176D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDIb_Norm_0x4C200F45.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDId_Norm_0x191C1B10.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDIg_Norm_0xE3618AF0.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Fourth Casual Black" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/301" filename="HR Fourth Casual Black-301-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x07CE12D3-Male.dds" destinationname="HMM_ARM_CTHi_CLN_DIFF_0x07CE12D3.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x1004C012_Male.dds" destinationname="HMM_ARM_CTHi_CLN_Spec_0x1004C012.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x2A69C435-Female.dds" destinationname="HMM_ARM_CTHi_Diff_0x2A69C435.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x39EFC4A6-Female.dds" destinationname="HMM_ARM_CTHi_SPEC_0x39EFC4A6.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8FBB722E_Male_norm.dds" destinationname="HMM_ARM_CTHi_CLN_NORM_0x8FBB722E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8FBB722E_Male_norm.dds" destinationname="HMM_ARM_CTHi_DMG_Norm_0x44310CEE.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x9DF01FEC_Male_Blood.dds" destinationname="HMM_ARM_CTHi_DMG_Diff_0x9DF01FEC.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAF098936_Female_norm.dds" destinationname="HMM_ARM_CTHi_NORM_0xAF098936.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xF750CD22_Female_Blood.dds" destinationname="HMM_ARM_CTHi_Diff_0xF750CD22.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x07CE12D3-Male.dds" destinationname="HMM_ARM_CTHi_CLN_DIFF_0x07CE12D3.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x1004C012_Male.dds" destinationname="HMM_ARM_CTHi_CLN_Spec_0x1004C012.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x2A69C435-Female.dds" destinationname="HMM_ARM_CTHi_Diff_0x2A69C435.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x39EFC4A6-Female.dds" destinationname="HMM_ARM_CTHi_SPEC_0x39EFC4A6.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8FBB722E_Male_norm.dds" destinationname="HMM_ARM_CTHi_CLN_NORM_0x8FBB722E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8FBB722E_Male_norm.dds" destinationname="HMM_ARM_CTHi_DMG_Norm_0x44310CEE.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9DF01FEC_Male_Blood.dds" destinationname="HMM_ARM_CTHi_DMG_Diff_0x9DF01FEC.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAF098936_Female_norm.dds" destinationname="HMM_ARM_CTHi_NORM_0xAF098936.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF750CD22_Female_Blood.dds" destinationname="HMM_ARM_CTHi_Diff_0xF750CD22.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Garrus Face" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/6" filename="ME3 HR Garrus Alternate Armor for Texmod-6-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x00D06559_Gar_alt_norm.dds" destinationname="TUR_ARM_GARb_Norm_0x00D06559.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x06675BBF_Gar_alt_spec.dds" destinationname="TUR_ARM_GARb_Spec_0x06675BBF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x182A4F29_face_jeanluc_edit_diff.dds" destinationname="TUR_HED_PROGarrus_Diff_0x182A4F29.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x1DFB5018_face_jeanluc_edit_spec.dds" destinationname="TUR_HED_PROGarrus_Spec_0x1DFB5018.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB2650E4C_Gar_alt_diff.dds" destinationname="TUR_ARM_GARb_Diff_0xB2650E4C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xBC526E87_helm_alt_diff.dds" destinationname="TUR_HGRb_Garrus_Diff_0xBC526E87.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xEC2CF8A7_face_norm.dds" destinationname="TUR_HED_PROGarrus_Norm_0xEC2CF8A7.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x00D06559_Gar_alt_norm.dds" destinationname="TUR_ARM_GARb_Norm_0x00D06559.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x06675BBF_Gar_alt_spec.dds" destinationname="TUR_ARM_GARb_Spec_0x06675BBF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x182A4F29_face_jeanluc_edit_diff.dds" destinationname="TUR_HED_PROGarrus_Diff_0x182A4F29.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x1DFB5018_face_jeanluc_edit_spec.dds" destinationname="TUR_HED_PROGarrus_Spec_0x1DFB5018.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB2650E4C_Gar_alt_diff.dds" destinationname="TUR_ARM_GARb_Diff_0xB2650E4C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xBC526E87_helm_alt_diff.dds" destinationname="TUR_HGRb_Garrus_Diff_0xBC526E87.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEC2CF8A7_face_norm.dds" destinationname="TUR_HED_PROGarrus_Norm_0xEC2CF8A7.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Kai Leng" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename="HR Kai Leng-276-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x123B4AC0_Shadow_Sword_norm.dds" destinationname="WPN_MLEa_Norm_0x123B4AC0.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x819EE45D_shade_kai.dds" destinationname="HMM_ARM_LENGa_Diff_0x819EE45D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x81DEA68E_Shadow_Sword_Diff.dds" destinationname="WPN_MLEa_Diff_0x81DEA68E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x981B9C31_shade_kai.dds" destinationname="HMM_ARM_LENGa_Spec_0x981B9C31.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xA960DA3A_Shadow_Sword_Spec.dds" destinationname="WPN_MLEa_Spec_0xA960DA3A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds" destinationname="HMM_ARM_LENGa_Norm_0x1021D654.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds" destinationname="HMM_ARM_SHP_FBDj_Norm_0x419B626B.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds" destinationname="HMM_ARM_SHP_FBDj_Norm_0xB8E01EB0.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x123B4AC0_Shadow_Sword_norm.dds" destinationname="WPN_MLEa_Norm_0x123B4AC0.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x819EE45D_shade_kai.dds" destinationname="HMM_ARM_LENGa_Diff_0x819EE45D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x81DEA68E_Shadow_Sword_Diff.dds" destinationname="WPN_MLEa_Diff_0x81DEA68E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x981B9C31_shade_kai.dds" destinationname="HMM_ARM_LENGa_Spec_0x981B9C31.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA960DA3A_Shadow_Sword_Spec.dds" destinationname="WPN_MLEa_Spec_0xA960DA3A.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds" destinationname="HMM_ARM_LENGa_Norm_0x1021D654.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds" destinationname="HMM_ARM_SHP_FBDj_Norm_0x419B626B.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds" destinationname="HMM_ARM_SHP_FBDj_Norm_0xB8E01EB0.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Kaidan Alt From Ashes Armor in Original Black" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/17" filename="ME3 HR Kaidan Alt From Ashes Armor in Original Black for Texmod-17-1.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x7FDEA5C1_bulk_kai_s.dds" destinationname="HMM_ARM_KAIe_Diff_0x7FDEA5C1.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB7E585E7_bulk_kai_spec_s.dds" destinationname="HMM_ARM_KAIe_Spec_0xB7E585E7.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7FDEA5C1_bulk_kai_s.dds" destinationname="HMM_ARM_KAIe_Diff_0x7FDEA5C1.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB7E585E7_bulk_kai_spec_s.dds" destinationname="HMM_ARM_KAIe_Spec_0xB7E585E7.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Kaidan CE Armor" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/294" filename="HR Kaidan CE Armor-294-1-0.rar"/>
-		<packagefile me3only="true" sourcename="HMM_ARM_KAId_Diff_0x252BDB00_Otte.dds" destinationname="HMM_ARM_KAId_Diff_0x252BDB00.dds"/>
-		<packagefile me3only="true" sourcename="HMM_ARM_KAId_Norm_0x8BF209CE_Otte.dds" destinationname="HMM_ARM_KAId_Norm_0x8BF209CE.dds"/>
-		<packagefile me3only="true" sourcename="HMM_ARM_KAId_Spec_0xF0E2B0B9_Otte.dds" destinationname="HMM_ARM_KAId_Spec_0xF0E2B0B9.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGRa_KAI_Norm.dds" destinationname="HMM_HGR_SANe_Norm_0x3864AC0F.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGRa_KAI_Norm.dds" destinationname="HMM_HGR_SHPa_Norm_0x11C5E0FA.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGRa_KAI_Spec_0xEAA640A4.dds" destinationname="HMM_HGR_SANe_Spec_0x144D4A60.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGRc_KAI_Diff_0x0D7A8165_Otte.dds" destinationname="HMM_HGRc_KAI_Diff_0x0D7A8165.dds"/>
+		<packagefile me3="true" sourcename="HMM_ARM_KAId_Diff_0x252BDB00_Otte.dds" destinationname="HMM_ARM_KAId_Diff_0x252BDB00.dds"/>
+		<packagefile me3="true" sourcename="HMM_ARM_KAId_Norm_0x8BF209CE_Otte.dds" destinationname="HMM_ARM_KAId_Norm_0x8BF209CE.dds"/>
+		<packagefile me3="true" sourcename="HMM_ARM_KAId_Spec_0xF0E2B0B9_Otte.dds" destinationname="HMM_ARM_KAId_Spec_0xF0E2B0B9.dds"/>
+		<packagefile me3="true" sourcename="HMM_HGRa_KAI_Norm.dds" destinationname="HMM_HGR_SANe_Norm_0x3864AC0F.dds"/>
+		<packagefile me3="true" sourcename="HMM_HGRa_KAI_Norm.dds" destinationname="HMM_HGR_SHPa_Norm_0x11C5E0FA.dds"/>
+		<packagefile me3="true" sourcename="HMM_HGRa_KAI_Spec_0xEAA640A4.dds" destinationname="HMM_HGR_SANe_Spec_0x144D4A60.dds"/>
+		<packagefile me3="true" sourcename="HMM_HGRc_KAI_Diff_0x0D7A8165_Otte.dds" destinationname="HMM_HGRc_KAI_Diff_0x0D7A8165.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Kaidan Default Armor" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/290" filename="HR Kaidan Default Armor-290-1-0.rar"/>
-		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Diff_4096.dds" destinationname="HMM_ARM_KAIa_Diff_0xA252CF95.dds"/>
-		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Norm_4096.dds" destinationname="HMM_ARM_KAIa_Norm_0x2D3AD537.dds"/>
-		<packagefile me3only="true" sourcename="HMM_ARM_KAIa_Spec_4096x4096.dds" destinationname="HMM_ARM_KAIa_Spec_0x438F51F8.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGRa_KAI_Diff_0x2366F731.dds" destinationname="HMM_HGRa_KAI_Diff_0x2366F731.dds"/>
+		<packagefile me3="true" sourcename="HMM_ARM_KAIa_Diff_4096.dds" destinationname="HMM_ARM_KAIa_Diff_0xA252CF95.dds"/>
+		<packagefile me3="true" sourcename="HMM_ARM_KAIa_Norm_4096.dds" destinationname="HMM_ARM_KAIa_Norm_0x2D3AD537.dds"/>
+		<packagefile me3="true" sourcename="HMM_ARM_KAIa_Spec_4096x4096.dds" destinationname="HMM_ARM_KAIa_Spec_0x438F51F8.dds"/>
+		<packagefile me3="true" sourcename="HMM_HGRa_KAI_Diff_0x2366F731.dds" destinationname="HMM_HGRa_KAI_Diff_0x2366F731.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Kuwashii Visor and reticule fix" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/134" filename="Kuwashii Visor fix-134-1-1.rar"/>
-		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Norm_0x2E612B33.dds" destinationname="HMM_HGR_SHPd_Norm_0x2E612B33.dds"/>
-		<packagefile me3only="true" sourcename="Visor_Frame_0x3BA605E1.dds" destinationname="Visor_Frame_0x3BA605E1.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Tint_0x571D8154.dds" destinationname="HMM_HGR_SHPd_Tint_0x571D8154.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Diff_0x7B7E64C5.dds" destinationname="HMM_HGR_SHPd_Diff_0x7B7E64C5.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Spec_0xB9ECA94B.dds" destinationname="HMM_HGR_SHPd_Spec_0xB9ECA94B.dds"/>
-		<packagefile me3only="true" sourcename="HMM_HGR_SHPd_Visor_0xCAD2B039.dds" destinationname="HMM_HGR_SHPd_Visor_0xCAD2B039.dds"/>
-		<packagefile me3only="true" sourcename="TUR_HED_PROGarrus_Holo_Diff_0xCF0810CD.dds" destinationname="Garrus_Visor_0x904BD94E.dds"/>
-		<packagefile me3only="true" sourcename="TUR_HED_PROGarrus_Holo_Diff_0xCF0810CD.dds" destinationname="TUR_HED_PROGarrus_Holo_Diff_0xCF0810CD.dds"/>
+		<packagefile me3="true" sourcename="HMM_HGR_SHPd_Norm_0x2E612B33.dds" destinationname="HMM_HGR_SHPd_Norm_0x2E612B33.dds"/>
+		<packagefile me3="true" sourcename="Visor_Frame_0x3BA605E1.dds" destinationname="Visor_Frame_0x3BA605E1.dds"/>
+		<packagefile me3="true" sourcename="HMM_HGR_SHPd_Tint_0x571D8154.dds" destinationname="HMM_HGR_SHPd_Tint_0x571D8154.dds"/>
+		<packagefile me3="true" sourcename="HMM_HGR_SHPd_Diff_0x7B7E64C5.dds" destinationname="HMM_HGR_SHPd_Diff_0x7B7E64C5.dds"/>
+		<packagefile me3="true" sourcename="HMM_HGR_SHPd_Spec_0xB9ECA94B.dds" destinationname="HMM_HGR_SHPd_Spec_0xB9ECA94B.dds"/>
+		<packagefile me3="true" sourcename="HMM_HGR_SHPd_Visor_0xCAD2B039.dds" destinationname="HMM_HGR_SHPd_Visor_0xCAD2B039.dds"/>
+		<packagefile me3="true" sourcename="TUR_HED_PROGarrus_Holo_Diff_0xCF0810CD.dds" destinationname="Garrus_Visor_0x904BD94E.dds"/>
+		<packagefile me3="true" sourcename="TUR_HED_PROGarrus_Holo_Diff_0xCF0810CD.dds" destinationname="TUR_HED_PROGarrus_Holo_Diff_0xCF0810CD.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Liara Alt From Ashes Armor" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/8" filename="ME3 HR Liara Alt From Ashes Armor for Texmod-8-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4394D753_Liara_Ashes_Spec.dds" destinationname="ASA_ARM_LIAg_SPEC_0x4394D753.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x87712BB0_Liara_Ashes_Diff.dds" destinationname="ASA_ARM_LIAg_Diff_0x87712BB0.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD1B0BC02_Norm.dds" destinationname="ASA_ARM_LIAg_Norm_0xD1B0BC02.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4394D753_Liara_Ashes_Spec.dds" destinationname="ASA_ARM_LIAg_SPEC_0x4394D753.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x87712BB0_Liara_Ashes_Diff.dds" destinationname="ASA_ARM_LIAg_Diff_0x87712BB0.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD1B0BC02_Norm.dds" destinationname="ASA_ARM_LIAg_Norm_0xD1B0BC02.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Liara Alternate Armor" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/12" filename="ME3 HR Liara Alternate Armor for Texmod-12-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x066306A3_Liara_norm.dds" destinationname="ASA_ARM_LIAf_Norm_0x066306A3.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8A3624EC_Liara_diff.dds" destinationname="ASA_ARM_LIAf_Diff_0x8A3624EC.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xF8FE187D_Liara_spec.dds" destinationname="ASA_ARM_LIAf_Spec_0xF8FE187D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x066306A3_Liara_norm.dds" destinationname="ASA_ARM_LIAf_Norm_0x066306A3.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8A3624EC_Liara_diff.dds" destinationname="ASA_ARM_LIAf_Diff_0x8A3624EC.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF8FE187D_Liara_spec.dds" destinationname="ASA_ARM_LIAf_Spec_0xF8FE187D.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Liara CE Armor" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/140" filename="HR Liara CE Armor for Texmod-140-1-0.rar"/>
-		<packagefile me3only="true" sourcename="0x547F3A29_ASA_ARM_LIAe_Diff_Otte.dds" destinationname="ASA_ARM_LIAe_Diff_0x547F3A29.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x28E843CF_helm.spec.dds" destinationname="ASA_ARM_LIAe_HGR_Spec_0x28E843CF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x633D960E.dds" destinationname="ASA_ARM_LIAe_Spec_0x633D960E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x72156F55_Norm.dds" destinationname="ASA_ARM_LIAe_Norm_0x72156F55.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xBA98711B_helm_diff.dds" destinationname="ASA_ARM_LIAe_HGR_Diff_0xBA98711B.dds"/>
+		<packagefile me3="true" sourcename="0x547F3A29_ASA_ARM_LIAe_Diff_Otte.dds" destinationname="ASA_ARM_LIAe_Diff_0x547F3A29.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x28E843CF_helm.spec.dds" destinationname="ASA_ARM_LIAe_HGR_Spec_0x28E843CF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x633D960E.dds" destinationname="ASA_ARM_LIAe_Spec_0x633D960E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x72156F55_Norm.dds" destinationname="ASA_ARM_LIAe_Norm_0x72156F55.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xBA98711B_helm_diff.dds" destinationname="ASA_ARM_LIAe_HGR_Diff_0xBA98711B.dds"/>
 	</addonfile>
 	<addonfile friendlyname="HR Maya Brooks" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename="HR Maya Brooks-276-1-0.rar"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_FTLa_Diff_Ottemis.dds" destinationname="HMF_ARM_FTLa_Diff_0x8C060CC8.dds"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_FTLa_Norm_0x8803C0CA_Otte.dds" destinationname="HMF_ARM_FTLa_Norm_0x8803C0CA.dds"/>
-		<packagefile me3only="true" sourcename="HMF_ARM_FTLa_Spec_0xBE1A9E16_Otte.dds" destinationname="HMF_ARM_FTLa_Spec_0xBE1A9E16.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_FTLa_Diff_Ottemis.dds" destinationname="HMF_ARM_FTLa_Diff_0x8C060CC8.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_FTLa_Norm_0x8803C0CA_Otte.dds" destinationname="HMF_ARM_FTLa_Norm_0x8803C0CA.dds"/>
+		<packagefile me3="true" sourcename="HMF_ARM_FTLa_Spec_0xBE1A9E16_Otte.dds" destinationname="HMF_ARM_FTLa_Spec_0xBE1A9E16.dds"/>
 	</addonfile>
 	<addonfile friendlyname="N7 Hoody" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/45" filename="ME3 HR N7 Hoody for Texmod-45-1.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x2229B5FF_N7_Fem_spec.dds" destinationname="HMF_ARM_CTHj_SPEC_0x2229B5FF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x39D0044D_N7_Fem_norm.dds" destinationname="HMF_ARM_CTHj_NM_0x39D0044D.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8E26C08C_N7_Fem_diff.dds" destinationname="HMF_ARM_CTHj_DIF_0x8E26C08C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xDA4751AD_N7_Male_diff.dds" destinationname="SHP_Hoddie_dif_0xDA4751AD.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE2D2CA1F_N7_Male_spec.dds" destinationname="HMM_ARM_CTHk_SPEC_0xE2D2CA1F.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE6E3CF23_N7_Male_Norm.dds" destinationname="SHP_Hoddie_nm_0xE6E3CF23.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x2229B5FF_N7_Fem_spec.dds" destinationname="HMF_ARM_CTHj_SPEC_0x2229B5FF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x39D0044D_N7_Fem_norm.dds" destinationname="HMF_ARM_CTHj_NM_0x39D0044D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8E26C08C_N7_Fem_diff.dds" destinationname="HMF_ARM_CTHj_DIF_0x8E26C08C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xDA4751AD_N7_Male_diff.dds" destinationname="SHP_Hoddie_dif_0xDA4751AD.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE2D2CA1F_N7_Male_spec.dds" destinationname="HMM_ARM_CTHk_SPEC_0xE2D2CA1F.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE6E3CF23_N7_Male_Norm.dds" destinationname="SHP_Hoddie_nm_0xE6E3CF23.dds"/>
 	</addonfile>
 	<addonfile friendlyname="N7 Valiant" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/85" filename="ME3 HR N7 Valiant-85-1-1.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x2E43D1C3-Valiant.dds" destinationname="WPN_SNPh_Diff_0x2E43D1C3.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE8C1F592-valiant.dds" destinationname="WPN_SNPh_Spec_Promo_0xE8C1F592.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x2E43D1C3-Valiant.dds" destinationname="WPN_SNPh_Diff_0x2E43D1C3.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE8C1F592-valiant.dds" destinationname="WPN_SNPh_Spec_Promo_0xE8C1F592.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Science Uniforms" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/161" filename="ME3 HR Science Uniforms for Texmod-161-1-1.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0DBC9411_ScienceF_diff.dds" destinationname="HMF_ARM_ANN_Diff_0x8654F217.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x0DBC9411_ScienceF_diff.dds" destinationname="HMF_ARM_CTHh_Nor_Diff_Stack_0x0DBC9411.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x17ED5207_scienceM_diff.dds" destinationname="HMM_ARM_CTHh_GRT_Diff_0x17ED5207.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x185F7751_Science_RedF_diff.dds" destinationname="HMF_ARM_CTHh_Doc_Diff_Stack_0x185F7751.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x21E79784_NPC_H_tint.dds" destinationname="HMM_ARM_CTHh_Tnt_Mask_0x21E79784.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x22B4602C_ScienceF_Liara_spec.dds" destinationname="HMF_ARM_CTHh_Liara_Spec_0x22B4602C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3121945E_ScienceF_Liara_diff.dds" destinationname="HMF_ARM_CTHh_Liara_Diff_0x3121945E.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x3439BCC9_NPC_H_spec.dds" destinationname="HMM_ARM_CTHh_Tnt_Diff_0x3439BCC9.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x5FBF924F_ScienceM_spec.dds" destinationname="HMM_ARM_CTHh_Nor_Spec_0x5FBF924F.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x767E9347_ScienceF_spec.dds" destinationname="HMF_ARM_CTHh_Nor_SPwr_Stack_0x767E9347.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x8C33664C_ScienceM_diff.dds" destinationname="HMM_ARM_CTHh_Nor_Diff_0x8C33664C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x9819D0EB_female_norm.dds" destinationname="HMF_ARM_CTHh_Doc_Norm_Stack_0x9819D0EB.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xAB7D3A93_scienceM_spec.dds" destinationname="HMM_ARM_CTHh_GRT_Spec_0xAB7D3A93.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB23701F2_male_norm.dds" destinationname="HMM_ARM_CTHh_Nor_Norm_0xB23701F2.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xB52E75DF_NPC_H_strp.dds" destinationname="HMM_ARM_CTHh_Tnt_Strp_0xB52E75DF.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD8B5DDBC_NPC_strp1.dds" destinationname="HMF_ARM_CTHh_Tnt_Strp_0xD8B5DDBC.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xDD8ECF34_NPC_tint.dds" destinationname="HMF_ARM_CTHh_Tnt_Mask_0xDD8ECF34.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xE40CD20A_NPC_tint.dds" destinationname="HMF_ARM_CTHh_Tnt_Strp2_0xE40CD20A.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xFEE369BE_Science_NPC_spec.dds" destinationname="HMF_ARM_CTHh_Tnt_Diff_0xFEE369BE.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0DBC9411_ScienceF_diff.dds" destinationname="HMF_ARM_ANN_Diff_0x8654F217.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0DBC9411_ScienceF_diff.dds" destinationname="HMF_ARM_CTHh_Nor_Diff_Stack_0x0DBC9411.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x17ED5207_scienceM_diff.dds" destinationname="HMM_ARM_CTHh_GRT_Diff_0x17ED5207.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x185F7751_Science_RedF_diff.dds" destinationname="HMF_ARM_CTHh_Doc_Diff_Stack_0x185F7751.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x21E79784_NPC_H_tint.dds" destinationname="HMM_ARM_CTHh_Tnt_Mask_0x21E79784.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x22B4602C_ScienceF_Liara_spec.dds" destinationname="HMF_ARM_CTHh_Liara_Spec_0x22B4602C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3121945E_ScienceF_Liara_diff.dds" destinationname="HMF_ARM_CTHh_Liara_Diff_0x3121945E.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3439BCC9_NPC_H_spec.dds" destinationname="HMM_ARM_CTHh_Tnt_Diff_0x3439BCC9.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5FBF924F_ScienceM_spec.dds" destinationname="HMM_ARM_CTHh_Nor_Spec_0x5FBF924F.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x767E9347_ScienceF_spec.dds" destinationname="HMF_ARM_CTHh_Nor_SPwr_Stack_0x767E9347.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8C33664C_ScienceM_diff.dds" destinationname="HMM_ARM_CTHh_Nor_Diff_0x8C33664C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9819D0EB_female_norm.dds" destinationname="HMF_ARM_CTHh_Doc_Norm_Stack_0x9819D0EB.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAB7D3A93_scienceM_spec.dds" destinationname="HMM_ARM_CTHh_GRT_Spec_0xAB7D3A93.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB23701F2_male_norm.dds" destinationname="HMM_ARM_CTHh_Nor_Norm_0xB23701F2.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB52E75DF_NPC_H_strp.dds" destinationname="HMM_ARM_CTHh_Tnt_Strp_0xB52E75DF.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD8B5DDBC_NPC_strp1.dds" destinationname="HMF_ARM_CTHh_Tnt_Strp_0xD8B5DDBC.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xDD8ECF34_NPC_tint.dds" destinationname="HMF_ARM_CTHh_Tnt_Mask_0xDD8ECF34.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE40CD20A_NPC_tint.dds" destinationname="HMF_ARM_CTHh_Tnt_Strp2_0xE40CD20A.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFEE369BE_Science_NPC_spec.dds" destinationname="HMF_ARM_CTHh_Tnt_Diff_0xFEE369BE.dds"/>
 	</addonfile>
 	<addonfile friendlyname="Vega Alt From Ashes Armor in Original Blue" author="Ottemis">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/7" filename="ME3 HR Vega Alt From Ashes Armor in Original Blue for Texmod-7-1-0.rar"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x4327860C_vega.dds" destinationname="James3_0x4327860C.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6E247C12_bulk_spec_s.dds" destinationname="HMM_ARM_SANf_Spec_0x6E247C12.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0x6E443315_bulk_vega_s.dds" destinationname="HMM_ARM_SANf_Diff_0x6E443315.dds"/>
-		<packagefile me3only="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4327860C_vega.dds" destinationname="James3_0x4327860C.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E247C12_bulk_spec_s.dds" destinationname="HMM_ARM_SANf_Spec_0x6E247C12.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E443315_bulk_vega_s.dds" destinationname="HMM_ARM_SANf_Diff_0x6E443315.dds"/>
+		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds"/>
 	</addonfile>
-
 	<addonfile friendlyname="Holograms HD (MEM) - For ME2" author="JimbobJeffers">
-		<games masseffect2="true" masseffect3="false"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/134" filename="Holograms HD (MEM)-134-1-0.zip"/></addonfile>
+		<games me1="false" me2="true" me3="false"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/134" filename="Holograms HD (MEM)-134-1-0.zip"/>
+	</addonfile>
 	<addonfile friendlyname="Holograms HD (MEM) - For ME3" author="JimbobJeffers">
-		<games masseffect2="false" masseffect3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/527" filename="Holograms HD (MEM)-527-1-0.zip"/></addonfile>
+		<games me1="false" me2="false" me3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/527" filename="Holograms HD (MEM)-527-1-0.zip"/>
+	</addonfile>
 </alotaddonmanifest>
