@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace AlotAddOnGUI
     {
         public App() : base()
         {
+            Directory.CreateDirectory("logs");
             Log.Logger = new LoggerConfiguration()
                    .MinimumLevel.Debug()
                 .WriteTo.RollingFile("logs\\alotaddoninstaller-{Date}.txt")

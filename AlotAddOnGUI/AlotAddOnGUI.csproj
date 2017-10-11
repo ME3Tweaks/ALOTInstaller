@@ -226,7 +226,8 @@ if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.ps1" "$(T
 if $(ConfigurationName) == Release rmdir /s /q "$(TargetDir)logs</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>if $(ConfigurationName) == Debug ("%25ProgramFiles%25\Microsoft Visual Studio\2017\Community\Common7\IDE\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt") ELSE ("%25ProgramFiles%25\Microsoft Visual Studio\2017\Community\Common7\IDE\TextTransform.exe" -a !!revision!true -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt")</PreBuildEvent>
+    <PreBuildEvent>if $(ConfigurationName) == Debug ("%25ProgramFiles%25\Microsoft Visual Studio\2017\Community\Common7\IDE\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt") ELSE ("%25ProgramFiles%25\Microsoft Visual Studio\2017\Community\Common7\IDE\TextTransform.exe" -a !!revision!true -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt")
+if $(ConfigurationName) == Release (copy /Y "$(SolutionDir)manifest.xml" "$(ProjectDir)$(OutDir)manifest-bundled.xml")</PreBuildEvent>
   </PropertyGroup>
   <Target Name="PostBuildMacros">
     <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">

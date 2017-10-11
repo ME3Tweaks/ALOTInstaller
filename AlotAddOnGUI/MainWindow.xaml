@@ -27,7 +27,18 @@
         <Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
             <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
         </Label>
-        <Label Grid.Column="0" Grid.Row="1" x:Name="AddonFilesLabel" HorizontalContentAlignment="Center" Content="AddOn Files"/>
+        <Label Grid.Column="0" Grid.Row="1" x:Name="AddonFilesLabel" HorizontalContentAlignment="Center" Content="AddOn Files">
+            <Label.ToolTip>
+                <ToolTip>
+                    <StackPanel>
+                        <TextBlock>The sum of all addon files does not match the sum of all files in the manifest because
+                        <LineBreak />
+                        some files apply to more than one game.
+                        </TextBlock>
+                    </StackPanel>
+                </ToolTip>
+            </Label.ToolTip>
+        </Label>
         <ProgressBar Minimum="0" Maximum="100" x:Name="Install_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true"/>
 
         <ListView Grid.Column="0" Grid.Row="3" Name="lvUsers">

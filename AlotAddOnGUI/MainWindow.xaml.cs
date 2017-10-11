@@ -42,6 +42,7 @@ namespace AlotAddOnGUI
         public const string ERROR_OCCURED = "ERROR_OCCURED";
         public const string BINARY_DIRECTORY = "bin\\";
         private bool errorOccured = false;
+        private bool UsingBundledManifest = false;
 
         private DispatcherTimer backgroundticker;
         private int completed = 0;
@@ -84,7 +85,7 @@ namespace AlotAddOnGUI
                 {
                     //UI THREAD
                     string[] clientmessage = msg.Split();
-                    switch (clientmessage[0])
+                    switch (clientmessage[0].Trim())
                     {
                         case "UPDATE_DOWNLOAD_COMPLETE":
                             if (updateprogresscontroller != null)
@@ -187,124 +188,150 @@ namespace AlotAddOnGUI
 
         private void RunMEMUpdater()
         {
+
             Log.Information("Running GHUpdater for MEM.");
             AddonFilesLabel.Content = "Checking for Mass Effect Modder updates";
             string updaterpath = EXE_DIRECTORY + BINARY_DIRECTORY + "GHUpdater.exe";
             string temppath = Path.GetTempPath() + "GHUpdater-MEM.exe";
-            File.Copy(updaterpath, temppath, true);
-            pipe = new AnonymousPipes("GHUPDATE_SERVER_MEM", temppath, "", delegate (String msg)
+            try
             {
-                Dispatcher.Invoke((MethodInvoker)async delegate ()
-                {
-                    //UI THREAD
-                    string[] clientmessage = msg.Split();
-                    switch (clientmessage[0])
-                    {
-                        case "UPDATE_DOWNLOAD_COMPLETE":
-                            if (updateprogresscontroller != null)
-                            {
-                                //updateprogresscontroller.SetTitle("Update ready to install");
-                                //updateprogresscontroller.SetMessage("Update will install in 5 seconds.");
-                                //await this.ShowMessageAsync("ALOT Addon Builder update ready", "The program will close and update in the background, then reopen. It should only take a few seconds.");
-                                string updatemessage = "EXECUTE_UPDATE \"" + EXE_DIRECTORY + "bin\\\"";
-                                Log.Information("Executing update: " + updatemessage);
-                                pipe.SendText(updatemessage);
-                                //Environment.Exit(0);
-                            }
-                            break;
-                        case "UPDATE_DOWNLOAD_PROGRESS":
-                            if (clientmessage.Length != 2)
-                            {
-                                Log.Warning("UPDATE_DOWNLOAD_PROGRESS message was not length 2 - ignoring message");
-                                return;
-                            }
-                            if (updateprogresscontroller != null)
-                            {
-                                double value = Double.Parse(clientmessage[1]);
-                                updateprogresscontroller.SetProgress(value);
-                            }
-                            break;
-                        case "UP_TO_DATE":
-                            Log.Information("GHUpdater reporting MEM is up to date");
-                            Thread.Sleep(250);
-                            try
-                            {
-                                File.Delete(temppath);
-                            }
-                            catch (Exception e)
-                            {
-                                Log.Error("Error deleting TEMP GHUpdater-MEM.exe: " + e.ToString());
-                            }
-                            //await FetchManifest();
-                            break;
-                        case "ERROR_CHECKING_FOR_UPDATES":
-                            AddonFilesLabel.Content = "Error occured checking for MEM updates";
-                            break;
-                        case "UPDATE_AVAILABLE":
-                            if (clientmessage.Length != 2)
-                            {
-                                Log.Warning("UPDATE_AVAILABLE message was not length 2 - ignoring message");
-                                return;
-                            }
-                            Log.Information("Github Updater reports program update: " + clientmessage[1] + " is available.");
-                            //MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + clientmessage[1] + " is available. Install the update?", MessageDialogStyle.AffirmativeAndNegative);
-                            //if (result == MessageDialogResult.Affirmative)
-                            //{
-                            pipe.SendText("INITIATE_DOWNLOAD");
-                            updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder is updating. Please wait...", true);
-                            updateprogresscontroller.SetIndeterminate();
-                            //}
-                            //else
-                            //{
-                            //    pipe.SendText("KILL_UPDATER");
-                            //    pipe.Close();
-                            //    Log.Information("User declined update, shutting down updater");
-                            //    await FetchManifest();
-                            //}
-                            break;
-                        case "UPDATE_COMPLETED":
-                            AddonFilesLabel.Content = "MassEffectModder has been updated.";
-                            if (updateprogresscontroller != null)
-                            {
-                                await updateprogresscontroller.CloseAsync();
-                            }
-                            try
-                            {
-                                File.Delete(temppath);
-                            }
-                            catch (Exception e)
-                            {
-                                Log.Error("Error deleting TEMP GHUpdater-MEM.exe: " + e.ToString());
-                            }
-                            break;
-                        default:
-                            Log.Error("Unknown message from updater client: " + msg);
-                            break;
-                    }
-                });
-            }, delegate ()
+                File.Copy(updaterpath, temppath, true);
+            }
+            catch (Exception e)
             {
-                // We're disconnected!
+                //MEM updater file copy failed it seems.
+                Log.Error("Error copying MEM updater: " + e.ToString());
+                temppath = EXE_DIRECTORY + BINARY_DIRECTORY + "GHUpdater-MEM.exe";
                 try
                 {
-
-                    Dispatcher.Invoke((MethodInvoker)delegate ()
+                    File.Copy(updaterpath, temppath, true);
+                }
+                catch (Exception ex)
+                {
+                    Log.Fatal("Can't copy failsafe MEM updater: " + e.ToString());
+                }
+            }
+            if (File.Exists(temppath))
+            {
+                pipe = new AnonymousPipes("GHUPDATE_SERVER_MEM", temppath, "", delegate (String msg)
+                {
+                    Dispatcher.Invoke((MethodInvoker)async delegate ()
                     {
-                        //UITHREAD
-                        var source = PresentationSource.FromVisual(this);
-                        if (source == null || source.IsDisposed)
+                        //UI THREAD
+                        string[] clientmessage = msg.Split();
+                        switch (clientmessage[0])
                         {
-                            AddonFilesLabel.Content = "Lost connection to update client";
+                            case "UPDATE_DOWNLOAD_COMPLETE":
+                                if (updateprogresscontroller != null)
+                                {
+                                    //updateprogresscontroller.SetTitle("Update ready to install");
+                                    //updateprogresscontroller.SetMessage("Update will install in 5 seconds.");
+                                    //await this.ShowMessageAsync("ALOT Addon Builder update ready", "The program will close and update in the background, then reopen. It should only take a few seconds.");
+                                    string updatemessage = "EXECUTE_UPDATE \"" + EXE_DIRECTORY + "bin\\\"";
+                                    Log.Information("Executing update: " + updatemessage);
+                                    pipe.SendText(updatemessage);
+                                    //Environment.Exit(0);
+                                }
+                                break;
+                            case "UPDATE_DOWNLOAD_PROGRESS":
+                                if (clientmessage.Length != 2)
+                                {
+                                    Log.Warning("UPDATE_DOWNLOAD_PROGRESS message was not length 2 - ignoring message");
+                                    return;
+                                }
+                                if (updateprogresscontroller != null)
+                                {
+                                    double value = Double.Parse(clientmessage[1]);
+                                    updateprogresscontroller.SetProgress(value);
+                                }
+                                break;
+                            case "UP_TO_DATE":
+                                Log.Information("GHUpdater reporting MEM is up to date");
+                                Thread.Sleep(250);
+                                try
+                                {
+                                    File.Delete(temppath);
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Error("Error deleting TEMP GHUpdater-MEM.exe: " + e.ToString());
+                                }
+                                //await FetchManifest();
+                                break;
+                            case "ERROR_CHECKING_FOR_UPDATES":
+                                AddonFilesLabel.Content = "Error occured checking for MEM updates";
+                                break;
+                            case "UPDATE_AVAILABLE":
+                                if (clientmessage.Length != 2)
+                                {
+                                    Log.Warning("UPDATE_AVAILABLE message was not length 2 - ignoring message");
+                                    return;
+                                }
+                                Log.Information("Github Updater reports program update: " + clientmessage[1] + " is available.");
+                                //MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + clientmessage[1] + " is available. Install the update?", MessageDialogStyle.AffirmativeAndNegative);
+                                //if (result == MessageDialogResult.Affirmative)
+                                //{
+                                pipe.SendText("INITIATE_DOWNLOAD");
+                                updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder is updating. Please wait...", true);
+                                updateprogresscontroller.SetIndeterminate();
+                                //}
+                                //else
+                                //{
+                                //    pipe.SendText("KILL_UPDATER");
+                                //    pipe.Close();
+                                //    Log.Information("User declined update, shutting down updater");
+                                //    await FetchManifest();
+                                //}
+                                break;
+                            case "UPDATE_COMPLETED":
+                                AddonFilesLabel.Content = "MassEffectModder has been updated.";
+                                if (updateprogresscontroller != null)
+                                {
+                                    await updateprogresscontroller.CloseAsync();
+                                }
+                                try
+                                {
+                                    File.Delete(temppath);
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Error("Error deleting TEMP GHUpdater-MEM.exe: " + e.ToString());
+                                }
+                                break;
+                            default:
+                                Log.Error("Unknown message from updater client: " + msg);
+                                break;
                         }
                     });
-                }
-                catch (Exception) { }
-            });
-            Thread.Sleep(2000);
-            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
-            int fileVersion = versInfo.FileMajorPart;
-            Log.Information("Local Mass Effect Modder version: " + fileVersion);
-            pipe.SendText("START_UPDATE_CHECK MassEffectModder MassEffectModder " + fileVersion);
+                }, delegate ()
+                {
+                    // We're disconnected!
+                    try
+                    {
+
+                        Dispatcher.Invoke((MethodInvoker)delegate ()
+                        {
+                            //UITHREAD
+                            var source = PresentationSource.FromVisual(this);
+                            if (source == null || source.IsDisposed)
+                            {
+                                AddonFilesLabel.Content = "Lost connection to update client";
+                            }
+                        });
+                    }
+                    catch (Exception) { }
+                });
+                Thread.Sleep(2000);
+                var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
+                int fileVersion = versInfo.FileMajorPart;
+                Log.Information("Local Mass Effect Modder version: " + fileVersion);
+                pipe.SendText("START_UPDATE_CHECK MassEffectModder MassEffectModder " + fileVersion);
+            }
+            else
+            {
+                Log.Error("MEM updater was not able to be extracted! Skipping for now.");
+                AddonFilesLabel.Content = "Unable to check for MEM updates (see logs)";
+            }
         }
 
         private async void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -395,12 +422,30 @@ namespace AlotAddOnGUI
                 //Console.WriteLine("Checking for files existence...");
                 string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
                 int numdone = 0;
+
+                int numME1Files = 0;
+                int numME2Files = 0;
+                int numME3Files = 0;
+                int numME1FilesReady = 0;
+                int numME2FilesReady = 0;
+                int numME3FilesReady = 0;
                 foreach (AddonFile af in addonfiles)
                 {
+                    if (af.Game_ME1) numME1Files++;
+                    if (af.Game_ME2) numME2Files++;
+                    if (af.Game_ME3) numME3Files++;
                     bool ready = File.Exists(basepath + af.Filename);
                     if (af.Ready != ready) //ensure the file applies to something
                     {
                         af.Ready = ready;
+
+                    }
+
+                    if (af.Ready)
+                    {
+                        if (af.Game_ME1) numME1FilesReady++;
+                        if (af.Game_ME2) numME2FilesReady++;
+                        if (af.Game_ME3) numME3FilesReady++;
                     }
                     numdone += ready ? 1 : 0;
                     System.Windows.Application.Current.Dispatcher.Invoke(
@@ -408,7 +453,7 @@ namespace AlotAddOnGUI
                     {
                         // Code to run on the GUI thread.
                         Install_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
-                        AddonFilesLabel.Content = "Addon Files [" + numdone + "/" + addonfiles.Count + "]";
+                        AddonFilesLabel.Content = "ME1: " + numME1FilesReady + "/" + numME1Files + " - ME2: " + numME2FilesReady + "/" + numME2Files + " - ME3: " + numME3FilesReady + "/" + numME3Files;
                     });
                     //Check for file existence
                     //Console.WriteLine("Checking for file: " + basepath + af.Filename);
@@ -509,12 +554,12 @@ namespace AlotAddOnGUI
                     webClient.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
                     Log.Information("Fetching latest manifest from github");
                     Install_ProgressBar.IsIndeterminate = true;
-                    AddonFilesLabel.Content = "Downloading latest installer manifest";
+                    AddonFilesLabel.Content = "Downloading latest addon manifest";
                     try
                     {
                         //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", EXE_DIRECTORY + @"manifest.xml");
                         string url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml";
-                        if (File.Exists(EXE_DIRECTORY+"BETA_VERSION"))
+                        if (File.Exists(EXE_DIRECTORY + "BETA_VERSION"))
                         {
                             Log.Information("BETA_VERSION file exists. Using BETA manifest.");
                             url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
@@ -527,12 +572,15 @@ namespace AlotAddOnGUI
                     }
                     catch (WebException e)
                     {
-                        Log.Error("Exception occured getting maAttributeom server: " + e.ToString());
-                        if (File.Exists(EXE_DIRECTORY + @"manifest.xml"))
+                        File.Delete(EXE_DIRECTORY + @"manifest-new.xml");
+                        Log.Error("Exception occured getting manifest from server: " + e.ToString());
+                        if (!File.Exists(EXE_DIRECTORY + @"manifest.xml") && File.Exists(EXE_DIRECTORY + @"manifest-bundled.xml"))
                         {
-                            Log.Information("Reading existing manifest.");
+                            Log.Information("Reading bundled manifest instead.");
+                            File.Delete(EXE_DIRECTORY + @"manifest.xml");
+                            File.Copy(EXE_DIRECTORY + @"manifest-bundled.xml", EXE_DIRECTORY + @"manifest.xml");
+                            UsingBundledManifest = true;
                         }
-
                     }
                     if (!File.Exists(EXE_DIRECTORY + @"manifest.xml"))
                     {
@@ -546,7 +594,7 @@ namespace AlotAddOnGUI
                     Log.Information("readManifest() has completed. Switching over to user control");
 
                     Install_ProgressBar.IsIndeterminate = false;
-                    HeaderLabel.Text = "Download the listed files, then drag and drop the files onto this window.\nOnce all items are ready, build the addon.";
+                    HeaderLabel.Text = "Download the listed files, then drag and drop the files onto this window. Do not extract any of the files.\nOnce all files for your game are ready, you can build the addon.";
                     AddonFilesLabel.Content = "Scanning...";
                     timer_Tick(null, null);
                     RunMEMUpdater();
@@ -555,7 +603,7 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void readManifest()
+        private async void readManifest()
         {
             //if (!File.Exists(@"manifest.xml"))
             //{
@@ -600,12 +648,20 @@ namespace AlotAddOnGUI
                 if (!version.Equals(""))
                 {
                     Title += " - Manifest version " + version;
+                    if (UsingBundledManifest)
+                    {
+                        Title += " (Bundled)";
+                        Log.Information("Using bundled manifest. Something might be wrong...");
+                    }
+
                 }
+                //throw new Exception("Test error.");
             }
             catch (Exception e)
             {
                 Log.Error("Error has occured parsing the XML!");
                 Log.Error(e.Message);
+                MessageDialogResult result = await this.ShowMessageAsync("Error reading Addon manifest", "An error occured while reading the manifest file for buildable addons. This may indicate a network failure or a packaging failure by Mgamerz - Please submit an issue to github (http://github.com/mgamerz/alotaddongui/issues) and include the most recent log file from the logs directory.\nYou may attempt to remedy this by deleting the manifest.xml file next to this program's EXE after closing the program.", MessageDialogStyle.Affirmative);
                 AddonFilesLabel.Content = "Error parsing manifest XML! Check the logs.";
                 return;
             }
@@ -1064,7 +1120,7 @@ namespace AlotAddOnGUI
                 Log.Information("Building MEM Package.");
                 string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
                 string filename = "ALOT_ME" + game + "_Addon.mem";
-                string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + MEM_STAGING_DIR + "\" \"" + EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\"+filename;
+                string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + MEM_STAGING_DIR + "\" \"" + EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\" + filename;
                 buildresult = runProcess(exe, args);
                 if (buildresult != 0)
                 {
