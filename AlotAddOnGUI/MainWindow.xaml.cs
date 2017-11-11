@@ -475,13 +475,24 @@ namespace AlotAddOnGUI
 
         private async void SetupButtons()
         {
-            string me1map = Environment.GetEnvironmentVariable("LocalAppData") + @"\MassEffectModder\me1map.bin";
-            string me3map = Environment.GetEnvironmentVariable("LocalAppData") + @"\MassEffectModder\me3map.bin";
-            string me2map = Environment.GetEnvironmentVariable("LocalAppData") + @"\MassEffectModder\me2map.bin";
-            Log.Information("ME1 Texture Map exists: " + File.Exists(me1map));
-            Log.Information("ME2 Texture Map exists: " + File.Exists(me2map));
-            Log.Information("ME3 Texture Map exists: " + File.Exists(me3map));
-            if (File.Exists(me1map) || File.Exists(me2map) || File.Exists(me3map))
+            string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+            string args = "-get-installed-games";
+            int installedGames = runProcess(exe, args);
+            Log.Information("Get-Installed-Games bitmask returned " + installedGames);
+            bool me1Installed = (installedGames & 1) != 0;
+            bool me2Installed = (installedGames & 2) != 0;
+            bool me3Installed = (installedGames & 4) != 0;
+            Log.Information("ME1 Installed: " + me1Installed);
+            Log.Information("ME2 Installed: " + me2Installed);
+            Log.Information("ME3 Installed: " + me3Installed);
+
+            //string me1map = Environment.GetEnvironmentVariable("LocalAppData") + @"\MassEffectModder\me1map.bin";
+            //string me3map = Environment.GetEnvironmentVariable("LocalAppData") + @"\MassEffectModder\me3map.bin";
+            //string me2map = Environment.GetEnvironmentVariable("LocalAppData") + @"\MassEffectModder\me2map.bin";
+            //Log.Information("ME1 Texture Map exists: " + File.Exists(me1map));
+            //Log.Information("ME2 Texture Map exists: " + File.Exists(me2map));
+            //Log.Information("ME3 Texture Map exists: " + File.Exists(me3map));
+            if (me1Installed || me2Installed || me3Installed)
             {
                 if (backgroundticker == null)
                 {
@@ -497,12 +508,13 @@ namespace AlotAddOnGUI
                     InstallWorker.WorkerReportsProgress = true;
                 }
 
-                if (!File.Exists(me1map))
+
+                if (!me1Installed)
                 {
-                    Log.Information("ME1 Texture Map missing - disabling ME1 install");
+                    Log.Information("ME1 not installed - disabling ME1 install");
                     Button_InstallME1.IsEnabled = false;
-                    Button_InstallME1.ToolTip = "Mass Effect Texture Map not found. To install ALOT for Mass Effect a texture map must be created.";
-                    Button_InstallME1.Content = "ME1 Texture Map Missing";
+                    Button_InstallME1.ToolTip = "Mass Effect is not installed. To build the addon for ME1 the game must already be installed";
+                    Button_InstallME1.Content = "ME1 Not Installed";
                 }
                 else
                 {
@@ -511,12 +523,12 @@ namespace AlotAddOnGUI
                     Button_InstallME1.Content = "Build Addon for ME1";
                 }
 
-                if (!File.Exists(me2map))
+                if (!me2Installed)
                 {
-                    Log.Information("ME2 Texture Map missing - disabling ME2 install");
+                    Log.Information("ME2 not installed - disabling ME2 install");
                     Button_InstallME2.IsEnabled = false;
-                    Button_InstallME2.ToolTip = "Mass Effect 2 Texture Map not found. To install ALOT for Mass Effect 2 a texture map must be created.";
-                    Button_InstallME2.Content = "ME2 Texture Map Missing";
+                    Button_InstallME2.ToolTip = "Mass Effect 2 is not installed. To build the addon for ME2 the game must already be installed";
+                    Button_InstallME2.Content = "ME2 Not Installed";
                 }
                 else
                 {
@@ -524,12 +536,13 @@ namespace AlotAddOnGUI
                     Button_InstallME2.ToolTip = "Click to build ALOT Addon for Mass Effect 2";
                     Button_InstallME2.Content = "Build Addon for ME2";
                 }
-                if (!File.Exists(me3map))
+
+                if (!me3Installed)
                 {
-                    Log.Information("ME3 Texture Map missing - disabling ME3 install");
+                    Log.Information("ME3 not installed - disabling ME3 install");
                     Button_InstallME3.IsEnabled = false;
-                    Button_InstallME3.ToolTip = "Mass Effect 3 Texture Map not found. To install ALOT for Mass Effect 3 a texture map must be created.";
-                    Button_InstallME3.Content = "ME3 Texture Map Missing";
+                    Button_InstallME3.ToolTip = "Mass Effect 3 is not installed. To build the addon for ME3 the game must already be installed";
+                    Button_InstallME3.Content = "ME3 Not Installed";
                 }
                 else
                 {
@@ -540,12 +553,11 @@ namespace AlotAddOnGUI
             }
             else
             {
-                Log.Error("No texture maps were found. Can't build an addon. Shutting down...");
-                await this.ShowMessageAsync("No ME1/ME2/ME3 Texture Maps Found", "ALOT Addon Builder requires you to build a texture map for at least one Mass Effect (1, 2, 3) game before you can use it.\nOne will be created during the main ALOT installation process or during a texture scan in MEM.");
+                Log.Error("No trilogy games are installed Can't build an addon. Shutting down...");
+                await this.ShowMessageAsync("None of the Mass Effect Trilogy games are installed", "ALOT Addon Builder requires at least one of the trilogy games to be installed before you can use it.");
                 Environment.Exit(1);
             }
         }
-
         private async Task FetchManifest()
         {
             {

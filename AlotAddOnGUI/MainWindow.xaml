@@ -30,12 +30,7 @@
         <Label Grid.Column="0" Grid.Row="1" x:Name="AddonFilesLabel" HorizontalContentAlignment="Center" Content="AddOn Files">
             <Label.ToolTip>
                 <ToolTip>
-                    <StackPanel>
-                        <TextBlock>The sum of all addon files does not match the sum of all files in the manifest because
-                        <LineBreak />
-                        some files apply to more than one game.
-                        </TextBlock>
-                    </StackPanel>
+                    <TextBlock>The number of addon files that are ready for each specific game.</TextBlock>
                 </ToolTip>
             </Label.ToolTip>
         </Label>
