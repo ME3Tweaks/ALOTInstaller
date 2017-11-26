@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="3.0">
+<alotaddonmanifest version="3.0.1">
 	<addonfile friendlyname="MEUITM" tooltipname="MEUITM tpfs compilation Advanced users only-1-1-2.zip" author="CDAMJC">
 		<file downloadlink="http://www.nexusmods.com/masseffect/download/30" filename="MEUITM tpfs compilation Advanced users only-1-1-2.zip"/>
 <!--
@@ -140,9 +140,9 @@ Asari.tpf-->
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Norm_0x413007EA.dds" destinationname="0x413007EA.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Spec_0x3B912C80.dds" destinationname="0x3B912C80.dds"/>
 	</addonfile>
-	<addonfile friendlyname="Ashley Complexion Tweak" tooltipname="Ash Complexion Tweak - .MEM" author="Ellise">
-		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" filename="el_Ashley Complexion Tweak.7z-569-1-0.7z"/>
-		<packagefile me3="true" sourcename="el_Ashley Complexion Tweak.mem" movedirectly="true"/>
+	<addonfile friendlyname="Ashley Complexion Tweak" tooltipname="Ash Complexion Tweak" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" filename="el_AshComplexionTweak.7z-569-1-0.7z"/>
+		<packagefile me3="true" sourcename="el_AshComplexionTweak.tpf" movedirectly="true"/>
 	</addonfile>
 	<addonfile friendlyname="Jacob Complexion Tweak" author="Ellise">
 		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/578/?" filename="el_JacobComplexionTweak.7z-578-1-0.7z"/>
