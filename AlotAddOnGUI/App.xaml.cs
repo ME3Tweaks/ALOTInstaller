@@ -22,7 +22,7 @@ namespace AlotAddOnGUI
             Directory.CreateDirectory("logs");
             Log.Logger = new LoggerConfiguration()
                    .MinimumLevel.Debug()
-                .WriteTo.RollingFile("logs\\alotaddoninstaller-{Date}.txt")
+                .WriteTo.RollingFile("logs\\alotaddoninstaller-{Date}.txt", flushToDiskInterval: new TimeSpan(0, 0, 15))
               .CreateLogger();
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
             Log.Information("=====================================================");
@@ -30,7 +30,7 @@ namespace AlotAddOnGUI
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
             Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
             string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
-            Log.Information("Running Windows "+releaseId);
+            Log.Information("Running Windows " + releaseId);
         }
 
         void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

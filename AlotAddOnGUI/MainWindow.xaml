@@ -27,7 +27,8 @@
         <Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
             <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
         </Label>
-        <Label Grid.Column="0" Grid.Row="1" x:Name="AddonFilesLabel" HorizontalContentAlignment="Center" Content="AddOn Files">
+        <Label Grid.Column="0" Grid.Row="1"  HorizontalContentAlignment="Center">
+            <TextBlock x:Name="AddonFilesLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
             <Label.ToolTip>
                 <ToolTip>
                     <TextBlock>The number of addon files that are ready for each specific game.</TextBlock>
@@ -170,4 +171,12 @@
 
         </Grid>
     </Grid>
+    <Controls:MetroWindow.Flyouts>
+        <Controls:FlyoutsControl>
+            <Controls:Flyout x:Name="ImportFailedFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom" Height="30">
+                <Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>
+            </Controls:Flyout>
+        </Controls:FlyoutsControl>
+    </Controls:MetroWindow.Flyouts>
+
 </Controls:MetroWindow>

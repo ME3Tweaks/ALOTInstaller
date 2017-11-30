@@ -17,7 +17,7 @@ using System.Resources;
 [assembly: AssemblyCulture("")]
 
 // Version informationr(
-[assembly: AssemblyVersion("2.0.24.51")]
-[assembly: AssemblyFileVersion("2.0.24.51")]
+[assembly: AssemblyVersion("2.0.37.122")]
+[assembly: AssemblyFileVersion("2.0.37.122")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 
