@@ -126,23 +126,21 @@ Asari.tpf-->
 		<packagefile me2="true" sourcename="HMM_HED_PRO_WKL_BLK_0xF3AFF836.dds" destinationname="0x3D10B5B5.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x91B1C512.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x44390218.dds"/>
-		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0xA567A7D5.dds"/>
+		<packagefile me2="true" me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0xA567A7D5.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x9C0D9E90.dds"/>
-		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Spec_0x056BFB1F.dds" destinationname="0x056BFB1F.dds"/>
+		<packagefile me2="true" me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Spec_0x056BFB1F.dds" destinationname="0x056BFB1F.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Face_Diff_0xD818CC82.dds" destinationname="0x77C06CBF.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Face_Norm_0xF815F202.dds" destinationname="0x9EDE1459.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PRO_WKL_BLK_0xF3AFF836.dds" destinationname="0xF3AFF836.dds"/>
-		<packagefile me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0xA567A7D5.dds"/>
-		<packagefile me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Spec_0x056BFB1F.dds" destinationname="0x056BFB1F.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusiveman_Face_Diff_0xD818CC82.dds" destinationname="0xD818CC82.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusiveman_Face_Norm_0xF815F202.dds" destinationname="0xF815F202.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Diff_0xCB14400D.dds" destinationname="0xCB14400D.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Norm_0x413007EA.dds" destinationname="0x413007EA.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Spec_0x3B912C80.dds" destinationname="0x3B912C80.dds"/>
 	</addonfile>
-	<addonfile friendlyname="Ashley Complexion Tweak" tooltipname="Ash Complexion Tweak" author="Ellise">
-		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" filename="el_AshComplexionTweak.7z-569-1-0.7z"/>
-		<packagefile me3="true" sourcename="el_AshComplexionTweak.tpf" movedirectly="true"/>
+	<addonfile friendlyname="Ashley Complexion Tweak" tooltipname="Ash Complexion Tweak - .MEM" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" filename="el_Ashley Complexion Tweak.7z-569-1-0.7z"/>
+		<packagefile me3="true" sourcename="el_Ashley Complexion Tweak.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile friendlyname="Jacob Complexion Tweak" author="Ellise">
 		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/578/?" filename="el_JacobComplexionTweak.7z-578-1-0.7z"/>
