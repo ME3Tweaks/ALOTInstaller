@@ -2,19 +2,19 @@
 <alotaddonmanifest version="3.0.1">
 	<addonfile friendlyname="ALOT for ME1 - Main" tooltipname="Main file of ALOT for ME1" author="CreeperLava">
 		<file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1-83-2017-5-0.7z"/>
-		<packagefile me3="true" sourcename="ALOT_ME1.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="ALOT_ME1.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile friendlyname="ALOT for ME1 - Update" tooltipname="Update file of ALOT for ME1" author="CreeperLava">
 		<file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1 - Update-83-2017-5-0.7z"/>
-		<packagefile me3="true" sourcename="ALOT_ME1_Update.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="ALOT_ME1_Update.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile friendlyname="ALOT for ME2 - Main" tooltipname="Main file of ALOT for ME2" author="CreeperLava">
 		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/" filename="ALOT for ME2-68-2017-5-0.7z"/>
-		<packagefile me3="true" sourcename="ALOT_ME2.mem" movedirectly="true"/>
+		<packagefile me2="true" sourcename="ALOT_ME2.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile friendlyname="ALOT for ME2 - Update" tooltipname="Update file of ALOT for ME2" author="CreeperLava">
 		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/" filename="ALOT for ME2 - Update-68-2017-5-0.7z"/>
-		<packagefile me3="true" sourcename="ALOT_ME2_Update.mem" movedirectly="true"/>
+		<packagefile me2="true" sourcename="ALOT_ME2_Update.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile friendlyname="ALOT for ME3 - Main" tooltipname="Main file of ALOT for ME3" author="CreeperLava">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT for ME3-363-2017-5-0.7z"/>
