@@ -27,50 +27,6 @@
 	
 	<addonfile friendlyname="MEUITM" tooltipname="MEUITM tpfs compilation Advanced users only-1-1-2.zip" author="CDAMJC">
 		<file downloadlink="http://www.nexusmods.com/masseffect/download/30" filename="MEUITM tpfs compilation Advanced users only-1-1-2.zip"/>
-<!--
-Rachni and Queen.tpf
-ASHarmor.tpf
-CoucilandUdina.tpf
-Elcor.tpf
-volus.tpf
-Kaiden_new.tpf
-Husks.tpf
-LightandShadowMaps.tpf
-Garrus Face.tpf
-Turian Tattoos.tpf
-sheploo.tpf
-HumanNPCClothing.tpf
-
-Thorian.tpf
-Gethtransportsmaller.tpf
-Tali.tpf
-N7Armors.tpf
-Benezia.tpf
-Anderson.tpf
-ASH.tpf
-Salarian NPC.tpf
-Scientists.tpf
-Avina.tpf
-Normandy.tpf
-Geth Trooper.tpf
-Liara Body.tpf
-GethHopper.tpf
-Mako.tpf
-Liara Face.tpf
-
-Femshep.tpf
-Normandy Uniforms.tpf
-Filmgrain.tpf
-Turian Armors.tpf
-Reporter robot.tpf
-Joker_New.tpf
-Keepers.tpf
-Saren.tpf
-MaleShep.tpf
-Wrex.tpf
-Hanar.tpf
-Chakwas.tpf
-Asari.tpf-->
 		<packagefile me1="true" sourcename="Rachni and Queen.tpf" movedirectly="true"/>
 		<packagefile me1="true" sourcename="ASHarmor.tpf" movedirectly="true"/>
 		<packagefile me1="true" sourcename="CoucilandUdina.tpf" movedirectly="true"/>
