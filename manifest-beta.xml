@@ -209,7 +209,7 @@ Asari.tpf-->
 	</addonfile>
 	<addonfile friendlyname="FemShep High Quality textures" author="heleuss">
 		<file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z"/>
-		<packagefile me2="true" sourcename="[ME2] KH_eyes.tpf" movedirectly="true"/>
+		<packagefile me2="true" sourcename="[ME2] KH_femShep_eyes.tpf" movedirectly="true"/>
 		<packagefile me2="true" sourcename="[ME2] KH_femShep_eyebrows.tpf" movedirectly="true"/>
 		<packagefile me2="true" sourcename="[ME2] KH_femShep_eyelashes.tpf" movedirectly="true"/>
 		<packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true"/>
