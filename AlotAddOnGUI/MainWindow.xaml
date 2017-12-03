@@ -11,6 +11,7 @@
         BorderThickness="1"
         Title="ALOT Addon Builder" Height="600" Width="800"
         Loaded="Window_Loaded"
+        WindowButtonCommandsOverlayBehavior="Never"
         Drop="File_Drop" AllowDrop="true">
 
     <Grid>
@@ -39,13 +40,6 @@
 
         <ListView Grid.Column="0" Grid.Row="3" Name="lvUsers">
             <!-- This is what each list item looks like-->
-            <!--<ListView.View>
-                <GridView>
-                    <GridViewColumn Width="120" DisplayMemberBinding="{Binding Author}" />
-                    <GridViewColumn Width="50" DisplayMemberBinding="{Binding DownloadLink}" />
-                </GridView>
-                
-            </ListView.View>-->
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
@@ -167,12 +161,46 @@
             <Button x:Name="Button_InstallME1" Grid.Column="0" Content="Please Wait" IsEnabled="false" Click="Button_InstallME1_Click"/>
             <Button x:Name="Button_InstallME2" Grid.Column="1" Content="Please Wait" IsEnabled="false"  Click="Button_InstallME2_Click"/>
             <Button x:Name="Button_InstallME3" Grid.Column="2" Content="Please Wait" IsEnabled="false" Click="Button_InstallME3_Click"/>
-            <Button x:Name="Button_About" Grid.Column="3" Content="About" IsEnabled="false" Click="Button_About_Click"/>
+            <Button x:Name="Button_Settings" Grid.Column="3" Content="Settings" IsEnabled="false" Click="Button_Settings_Click"/>
 
         </Grid>
     </Grid>
     <Controls:MetroWindow.Flyouts>
         <Controls:FlyoutsControl>
+            <Controls:Flyout x:Name="SettingsFlyout" Header="Settings" IsPinned="False" Theme="Accent" Position="Right" Width="300">
+                <!--<Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>-->
+                <StackPanel Margin="10">
+                    <CheckBox Margin="5" x:Name="Checkbox_SpaceSaving" Content="Save Disk Space"/>
+                    <CheckBox Margin="5" x:Name="Checkbox_HideFiles" Content="Hide files for games not installed"/>
+                    <Label FontSize="16" Margin="5,0,0,0" Content="Backup Status"/>
+                    <Button x:Name="Button_ME1Backup" Margin="20,0,0,0" Content="ME1: Not Backed Up" Click="Button_ME1Backup_Click">
+                        <!--<Button.Template>
+                            <ControlTemplate TargetType="{x:Type Button}">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Button.Template>-->
+                    </Button>
+                    <Button x:Name="Button_ME2Backup" Margin="20,0,0,0" Content="ME2: Not Backed Up" Click="Button_ME2Backup_Click">
+                        <!--<Button.Template>
+                            <ControlTemplate TargetType="{x:Type Button}">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Button.Template>-->
+                    </Button>
+                    <Button x:Name="Button_ME3Backup" Margin="20,0,0,0" Content="ME3: Not Backed Up" Click="Button_ME3Backup_Click">
+                        <!--<Button.Template>
+                            <ControlTemplate TargetType="{x:Type Button}">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Button.Template>-->
+                    </Button>
+
+                    <Label FontSize="16" Margin="5,0,0,0" Content="ALOT Installation Status"/>
+                    <Label Margin="20,0,0,0" x:Name="Label_ALOTStatus_ME1" Content="ME1: Not Installed"/>
+                    <Label Margin="20,0,0,0" x:Name="Label_ALOTStatus_ME2" Content="ME2: Not Installed"/>
+                    <Label Margin="20,0,0,0" x:Name="Label_ALOTStatus_ME3" Content="ME3: Not Installed"/>
+                </StackPanel>
+            </Controls:Flyout>
             <Controls:Flyout x:Name="ImportFailedFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom" Height="30">
                 <Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>
             </Controls:Flyout>

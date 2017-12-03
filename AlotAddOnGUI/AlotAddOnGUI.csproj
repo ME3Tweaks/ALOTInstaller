@@ -57,16 +57,21 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommandLine, Version=2.0.275.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommandLineParser.2.1.1-beta\lib\net45\CommandLine.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Octokit, Version=0.28.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octokit.0.28.0\lib\net45\Octokit.dll</HintPath>
     </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.2.5.0\lib\net45\Serilog.dll</HintPath>
     </Reference>
     <Reference Include="Serilog.Sinks.File, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\packages\Serilog.Sinks.File.3.2.0\lib\net45\Serilog.Sinks.File.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\Serilog.Sinks.File.4.0.0\lib\net45\Serilog.Sinks.File.dll</HintPath>
     </Reference>
     <Reference Include="Serilog.Sinks.RollingFile, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.Sinks.RollingFile.3.3.0\lib\net45\Serilog.Sinks.RollingFile.dll</HintPath>
@@ -99,8 +104,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="classes\CopyDir.cs" />
     <Compile Include="classes\FlashWindowHelper.cs" />
     <Compile Include="classes\IniFile.cs" />
+    <Compile Include="classes\StreamIO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -202,8 +209,6 @@
 
 if not exist "$(TargetDir)Downloaded_Mods" mkdir "$(TargetDir)Downloaded_Mods"
 
-copy /y "$(TargetDir)Updater\GHUpdater.exe" "$(TargetDir)bin\GHUpdater.exe"
-
 copy /y "$(TargetDir)7z\7z.exe" "$(TargetDir)bin\7z.exe"
 copy /y "$(TargetDir)7z\7z.dll" "$(TargetDir)bin\7z.dll"
 
@@ -220,7 +225,7 @@ if exist "$(TargetDir)Updater" rmdir /s /q "$(TargetDir)Updater"
 if $(ConfigurationName) == Debug echo DEBUG MODE
 
 
-if $(ConfigurationName) == Debug (robocopy "$(SolutionDir)BuildCache\Downloaded_Mods" "$(TargetDir)Downloaded_Mods")
+::if $(ConfigurationName) == Debug (robocopy "$(SolutionDir)BuildCache\Downloaded_Mods" "$(TargetDir)Downloaded_Mods")
 
 if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.cmd" "$(TargetDir)..\ReleaseBuilder.bat" /y)
 

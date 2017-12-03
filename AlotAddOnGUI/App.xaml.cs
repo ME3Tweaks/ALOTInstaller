@@ -1,12 +1,16 @@
-﻿using Microsoft.Win32;
+﻿using AlotAddOnGUI.classes;
+using CommandLine;
+using Microsoft.Win32;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -19,14 +23,74 @@ namespace AlotAddOnGUI
     {
         public App() : base()
         {
-            Directory.CreateDirectory("logs");
+            string[] args = Environment.GetCommandLineArgs();
+            string preLogMessages = "";
+            Parsed<Options> parsedItems = null;
+            string loggingBasePath = System.AppDomain.CurrentDomain.BaseDirectory;
+            string updateDestinationPath = null;
+            if (args.Length > 0)
+            {
+                var result = Parser.Default.ParseArguments<Options>(args);
+                if (result.GetType() == typeof(Parsed<Options>))
+                {
+                    //Parsing succeeded - have to do update check to keep logs in order...
+                    parsedItems = (Parsed<Options>)result;
+                    if (parsedItems.Value.UpdateDest != null)
+                    {
+                        if (Directory.Exists(parsedItems.Value.UpdateDest))
+                        {
+                            updateDestinationPath = parsedItems.Value.UpdateDest;
+                            loggingBasePath = updateDestinationPath;
+                        } else
+                        {
+                            preLogMessages += "Directory doesn't exist for update: " + parsedItems.Value.UpdateDest;
+                        }
+                    }
+                }
+            }
+
+            Directory.CreateDirectory(loggingBasePath + "\\logs");
             Log.Logger = new LoggerConfiguration()
                    .MinimumLevel.Debug()
-                .WriteTo.RollingFile("logs\\alotaddoninstaller-{Date}.txt", flushToDiskInterval: new TimeSpan(0, 0, 15))
+                .WriteTo.RollingFile(loggingBasePath + "\\logs\\alotaddoninstaller-{Date}.txt", flushToDiskInterval: new TimeSpan(0, 0, 15))
               .CreateLogger();
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
             Log.Information("=====================================================");
             Log.Information("Logger Started for ALOT Installer.");
+            if (preLogMessages != "")
+            {
+                Log.Information("Prelogger messages: " + preLogMessages);
+            }
+            if (args.Length > 0)
+            {
+                string commandlineargs = "";
+                for (int i = 0; i < args.Length; i++)
+                {
+                    commandlineargs += args[i] + " ";
+                }
+                Log.Information("Command line arguments: " + commandlineargs);
+            }
+            //Update Mode
+            if (updateDestinationPath != null)
+            {
+                Log.Information("In update mode. Update destination: " + updateDestinationPath);
+                Log.Information("Applying update");
+                CopyDir.CopyAll(new DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory), new DirectoryInfo(updateDestinationPath));
+                Log.Information("Files copied - rebooting into normal mode");
+                ProcessStartInfo psi = new ProcessStartInfo(updateDestinationPath + "\\" + System.AppDomain.CurrentDomain.FriendlyName);
+                psi.WorkingDirectory = updateDestinationPath;
+                Process.Start(psi);
+                Environment.Exit(0);
+                System.Windows.Application.Current.Shutdown();
+            }
+
+            //Normal Mode
+            if (Directory.Exists(loggingBasePath + "Update"))
+            {
+                Thread.Sleep(1000);
+                Log.Information("Removing Update directory");
+                Directory.Delete(loggingBasePath + "Update", true);
+            }
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
             Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
             string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
@@ -57,6 +121,14 @@ namespace AlotAddOnGUI
 
             return stringBuilder.ToString();
         }
+    }
+
+    class Options
+    {
+        [Option('u', "update-dest",
+          HelpText = "Copies AddonBuilder and everything in the current directory (and subdirectories) into the listed directory, then reboots using the new EXE.")]
+        public string UpdateDest { get; set; }
+
     }
 
 }
