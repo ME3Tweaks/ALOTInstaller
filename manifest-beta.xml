@@ -1,51 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="3.0.1">
+<alotaddonmanifest version="3.0.2">
+	<addonfile alotversion="5" friendlyname="ALOT for ME1 - Main" tooltipname="Main file of ALOT for ME1" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1-83-2017-5-0.7z"/>
+		<packagefile me1="true" sourcename="ALOT_ME1.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile alotupdate="true" friendlyname="ALOT for ME1 - Update" tooltipname="Update file of ALOT for ME1" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1 - Update-83-2017-5-0.7z"/>
+		<packagefile me1="true" sourcename="ALOT_ME1_Update.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile alotversion="5" friendlyname="ALOT for ME2 - Main" tooltipname="Main file of ALOT for ME2" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/" filename="ALOT for ME2-68-2017-5-0.7z"/>
+		<packagefile me2="true" sourcename="ALOT_ME2.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile alotupdate="true" friendlyname="ALOT for ME2 - Update" tooltipname="Update file of ALOT for ME2" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/" filename="ALOT for ME2 - Update-68-2017-5-0.7z"/>
+		<packagefile me2="true" sourcename="ALOT_ME2_Update.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile alotversion="5" friendlyname="ALOT for ME3 - Main" tooltipname="Main file of ALOT for ME3" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT for ME3-363-2017-5-0.7z"/>
+		<packagefile me3="true" sourcename="ALOT_ME3.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile alotupdate="true" friendlyname="ALOT for ME3 - Update" tooltipname="Update file of ALOT for ME3" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT for ME3 - Update-363-2017-5-0.7z"/>
+		<packagefile me3="true" sourcename="ALOT_ME3_Update.mem" movedirectly="true"/>
+	</addonfile>
+	
 	<addonfile friendlyname="MEUITM" tooltipname="MEUITM tpfs compilation Advanced users only-1-1-2.zip" author="CDAMJC">
 		<file downloadlink="http://www.nexusmods.com/masseffect/download/30" filename="MEUITM tpfs compilation Advanced users only-1-1-2.zip"/>
-<!--
-Rachni and Queen.tpf
-ASHarmor.tpf
-CoucilandUdina.tpf
-Elcor.tpf
-volus.tpf
-Kaiden_new.tpf
-Husks.tpf
-LightandShadowMaps.tpf
-Garrus Face.tpf
-Turian Tattoos.tpf
-sheploo.tpf
-HumanNPCClothing.tpf
-
-Thorian.tpf
-Gethtransportsmaller.tpf
-Tali.tpf
-N7Armors.tpf
-Benezia.tpf
-Anderson.tpf
-ASH.tpf
-Salarian NPC.tpf
-Scientists.tpf
-Avina.tpf
-Normandy.tpf
-Geth Trooper.tpf
-Liara Body.tpf
-GethHopper.tpf
-Mako.tpf
-Liara Face.tpf
-
-Femshep.tpf
-Normandy Uniforms.tpf
-Filmgrain.tpf
-Turian Armors.tpf
-Reporter robot.tpf
-Joker_New.tpf
-Keepers.tpf
-Saren.tpf
-MaleShep.tpf
-Wrex.tpf
-Hanar.tpf
-Chakwas.tpf
-Asari.tpf-->
 		<packagefile me1="true" sourcename="Rachni and Queen.tpf" movedirectly="true"/>
 		<packagefile me1="true" sourcename="ASHarmor.tpf" movedirectly="true"/>
 		<packagefile me1="true" sourcename="CoucilandUdina.tpf" movedirectly="true"/>
@@ -126,23 +107,21 @@ Asari.tpf-->
 		<packagefile me2="true" sourcename="HMM_HED_PRO_WKL_BLK_0xF3AFF836.dds" destinationname="0x3D10B5B5.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x91B1C512.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x44390218.dds"/>
-		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0xA567A7D5.dds"/>
+		<packagefile me2="true" me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0xA567A7D5.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x9C0D9E90.dds"/>
-		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Spec_0x056BFB1F.dds" destinationname="0x056BFB1F.dds"/>
+		<packagefile me2="true" me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Spec_0x056BFB1F.dds" destinationname="0x056BFB1F.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Face_Diff_0xD818CC82.dds" destinationname="0x77C06CBF.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Face_Norm_0xF815F202.dds" destinationname="0x9EDE1459.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PRO_WKL_BLK_0xF3AFF836.dds" destinationname="0xF3AFF836.dds"/>
-		<packagefile me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0xA567A7D5.dds"/>
-		<packagefile me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Spec_0x056BFB1F.dds" destinationname="0x056BFB1F.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusiveman_Face_Diff_0xD818CC82.dds" destinationname="0xD818CC82.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusiveman_Face_Norm_0xF815F202.dds" destinationname="0xF815F202.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Diff_0xCB14400D.dds" destinationname="0xCB14400D.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Norm_0x413007EA.dds" destinationname="0x413007EA.dds"/>
 		<packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Spec_0x3B912C80.dds" destinationname="0x3B912C80.dds"/>
 	</addonfile>
-	<addonfile friendlyname="Ashley Complexion Tweak" tooltipname="Ash Complexion Tweak" author="Ellise">
-		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" filename="el_AshComplexionTweak.7z-569-1-0.7z"/>
-		<packagefile me3="true" sourcename="el_AshComplexionTweak.tpf" movedirectly="true"/>
+	<addonfile friendlyname="Ashley Complexion Tweak" tooltipname="Ash Complexion Tweak - .MEM" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" filename="el_Ashley Complexion Tweak.7z-569-1-0.7z"/>
+		<packagefile me3="true" sourcename="el_Ashley Complexion Tweak.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile friendlyname="Jacob Complexion Tweak" author="Ellise">
 		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/578/?" filename="el_JacobComplexionTweak.7z-578-1-0.7z"/>
@@ -186,7 +165,7 @@ Asari.tpf-->
 	</addonfile>
 	<addonfile friendlyname="FemShep High Quality textures" author="heleuss">
 		<file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z"/>
-		<packagefile me2="true" sourcename="[ME2] KH_eyes.tpf" movedirectly="true"/>
+		<packagefile me2="true" sourcename="[ME2] KH_femShep_eyes.tpf" movedirectly="true"/>
 		<packagefile me2="true" sourcename="[ME2] KH_femShep_eyebrows.tpf" movedirectly="true"/>
 		<packagefile me2="true" sourcename="[ME2] KH_femShep_eyelashes.tpf" movedirectly="true"/>
 		<packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true"/>
