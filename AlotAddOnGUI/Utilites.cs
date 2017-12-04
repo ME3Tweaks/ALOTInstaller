@@ -74,7 +74,7 @@ namespace AlotAddOnGUI
                             GameEXEPath = Path.Combine(path, @"Binaries\Win32\MassEffect3.exe");
                             break;
                     }
-                    
+
                     if (File.Exists(GameEXEPath))
                         return path; //we have path now
                     else
@@ -102,6 +102,74 @@ namespace AlotAddOnGUI
                 path = (string)Registry.GetValue(softwareKey + key64 + gameKey, entry, null);
             }
             return path;
+        }
+
+        public static bool IsDirectoryEmpty(string path)
+        {
+            return !Directory.EnumerateFileSystemEntries(path).Any();
+        }
+
+        internal static void WriteRegistryKey(RegistryKey subkey, string subpath, string value, string data)
+        {
+            int i = 0;
+            string[] subkeys = subpath.Split('\\');
+            while (i < subkeys.Length)
+            {
+                subkey = subkey.CreateSubKey(subkeys[i]);
+                i++;
+            }
+            subkey.SetValue(value, data);
+        }
+
+        internal static void WriteRegistryKey(RegistryKey subkey, string subpath, string value, int data)
+        {
+            int i = 0;
+            string[] subkeys = subpath.Split('\\');
+            while (i < subkeys.Length)
+            {
+                subkey = subkey.CreateSubKey(subkeys[i]);
+                i++;
+            }
+            subkey.SetValue(value, data);
+        }
+
+        public static string GetRegistrySettingString(string name)
+        {
+            string softwareKey = @"HKEY_CURRENT_USER\" + MainWindow.REGISTRY_KEY;
+            return (string)Registry.GetValue(softwareKey, name, null);
+        }
+
+        public static bool? GetRegistrySettingBool(string name)
+        {
+            string softwareKey = @"HKEY_CURRENT_USER\" + MainWindow.REGISTRY_KEY;
+
+            int? value = (int?)Registry.GetValue(softwareKey, name, null);
+            if (value != null)
+            {
+                return value > 0;
+            }
+            return null;
+        }
+
+        public static string GetGameBackupPath(int game)
+        {
+            string entry = "";
+            switch (game)
+            {
+                case 1:
+                    entry = "ME1VanillaBackupLocation";
+                    return Utilities.GetRegistrySettingString(entry);
+                case 2:
+                    entry = "ME2VanillaBackupLocation";
+                    return Utilities.GetRegistrySettingString(entry);
+                case 3:
+                    //Check for backup via registry - Use Mod Manager's game backup key to find backup.
+                    string softwareKey = @"HKEY_CURRENT_USER\SOFTWARE\Mass Effect 3 Mod Manager";
+                    entry = "VanillaCopyLocation";
+                    return (string)Registry.GetValue(softwareKey, entry, null);
+                default:
+                    return null;
+            }
         }
     }
 }

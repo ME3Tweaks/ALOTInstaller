@@ -43,6 +43,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid>
+                        
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -170,8 +171,9 @@
             <Controls:Flyout x:Name="SettingsFlyout" Header="Settings" IsPinned="False" Theme="Accent" Position="Right" Width="300">
                 <!--<Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>-->
                 <StackPanel Margin="10">
-                    <CheckBox Margin="5" x:Name="Checkbox_SpaceSaving" Content="Save Disk Space"/>
-                    <CheckBox Margin="5" x:Name="Checkbox_HideFiles" Content="Hide files for games not installed"/>
+                    <CheckBox Margin="5" x:Name="Checkbox_SpaceSaving" Content="Save Disk Space" ToolTip="Deletes files after each stage rather than the end. May save some intermediate disk space during build."/>
+                    <CheckBox Margin="5" x:Name="Checkbox_HideFiles" Content="Hide files for games not installed" Click="Checkbox_HideFiles_Click" ToolTip="Hide files that don't apply to games you don't have installed."/>
+                    <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
                     <Label FontSize="16" Margin="5,0,0,0" Content="Backup Status"/>
                     <Button x:Name="Button_ME1Backup" Margin="20,0,0,0" Content="ME1: Not Backed Up" Click="Button_ME1Backup_Click">
                         <!--<Button.Template>
@@ -199,6 +201,11 @@
                     <Label Margin="20,0,0,0" x:Name="Label_ALOTStatus_ME1" Content="ME1: Not Installed"/>
                     <Label Margin="20,0,0,0" x:Name="Label_ALOTStatus_ME2" Content="ME2: Not Installed"/>
                     <Label Margin="20,0,0,0" x:Name="Label_ALOTStatus_ME3" Content="ME3: Not Installed"/>
+                    <Label FontSize="16" Margin="5,0,0,0" Content="Internals"/>
+                    <Label Margin="20,0,0,0" x:Name="Label_MEMVersion" Content="MEM Version: TBD"/>
+                    <Button x:Name="Button_ViewLog" Margin="20,0,0,0" Content="View log" Click="Button_ViewLog_Click"/>
+                    <Button x:Name="Button_ReportIssue" Margin="20,0,0,0" Content="Report an issue" Click="Button_ReportIssue_Click"/>
+
                 </StackPanel>
             </Controls:Flyout>
             <Controls:Flyout x:Name="ImportFailedFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom" Height="30">
