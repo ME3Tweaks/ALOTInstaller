@@ -53,8 +53,8 @@ namespace AlotAddOnGUI
         private int ADDONSTOINSTALL_COUNT = 0;
         private bool Installing = false;
         public static readonly string REGISTRY_KEY = @"SOFTWARE\ALOTAddon";
-        private readonly BackgroundWorker InstallWorker = new BackgroundWorker();
-        private readonly BackgroundWorker BackupWorker = new BackgroundWorker();
+        private BackgroundWorker InstallWorker = new BackgroundWorker();
+        private BackgroundWorker BackupWorker = new BackgroundWorker();
 
         private BindingList<AddonFile> addonfiles;
         NotifyIcon nIcon = new NotifyIcon();
@@ -738,10 +738,7 @@ namespace AlotAddOnGUI
                     InstallWorker.RunWorkerCompleted += InstallCompleted;
                     InstallWorker.WorkerReportsProgress = true;
                 }
-
-
-
-
+                
                 if (!me1Installed)
                 {
                     Log.Information("ME1 not installed - disabling ME1 install");
@@ -1135,9 +1132,26 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void Button_ME1Backup_Click(object sender, RoutedEventArgs e)
+        private async void Button_ME1Backup_Click(object sender, RoutedEventArgs e)
         {
-
+            if (ValidateGameBackup(1))
+            {
+                //Game is backed up
+                MetroDialogSettings settings = new MetroDialogSettings();
+                settings.NegativeButtonText = "Cancel";
+                settings.AffirmativeButtonText = "Restore";
+                MessageDialogResult result = await this.ShowMessageAsync("Restoring Mass Effect to unmodified state", "Restoring Mass Effect will wipe out all mods and put your game back to an unmodified state. Are you sure you want to do this?", MessageDialogStyle.AffirmativeAndNegative, settings);
+                if (result == MessageDialogResult.Affirmative)
+                {
+                    //RESTORE
+                    RestoreGame(1);
+                }
+            }
+            else
+            {
+                //MEM - VERIFY VANILLA FOR BACKUP
+                BackupGame(1);
+            }
         }
         private async void Button_ME2Backup_Click(object sender, RoutedEventArgs e)
         {
@@ -1202,8 +1216,8 @@ namespace AlotAddOnGUI
                 await this.ShowMessageAsync("Directory is not empty", "The backup destination directory must be empty.");
                 return;
             }
-
-            BackupWorker.DoWork += RestoreGame;
+            BackupWorker = new BackgroundWorker();
+            BackupWorker.DoWork += BackupGame;
             BackupWorker.WorkerReportsProgress = true;
             BackupWorker.ProgressChanged += BackupWorker_ProgressChanged;
             BackupWorker.RunWorkerCompleted += BackupCompleted;
@@ -1277,6 +1291,17 @@ namespace AlotAddOnGUI
                         break;
                 }
             }
+        }
+
+        private void BackupGame(object sender, DoWorkEventArgs e)
+        {
+            string gamePath = Utilities.GetGamePath(BACKUP_THREAD_GAME);
+            string backupPath = (string)e.Argument;
+            if (gamePath != null)
+            {
+                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, -1, 0);
+            }
+            e.Result = backupPath;
         }
 
         private void RestoreGame(object sender, DoWorkEventArgs e)
@@ -2192,6 +2217,7 @@ namespace AlotAddOnGUI
 
         private void RestoreGame(int game)
         {
+            BackupWorker = new BackgroundWorker();
             BackupWorker.DoWork += RestoreGame;
             BackupWorker.WorkerReportsProgress = true;
             BackupWorker.ProgressChanged += BackupWorker_ProgressChanged;
