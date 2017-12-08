@@ -40,7 +40,7 @@ namespace AlotAddOnGUI
         public const string UPDATE_OPERATION_LABEL = "UPDATE_OPERATION_LABEL";
         public const string UPDATE_PROGRESSBAR_INDETERMINATE = "SET_PROGRESSBAR_DETERMINACY";
         public const string INCREMENT_COMPLETION_EXTRACTION = "INCREMENT_COMPLETION_EXTRACTION";
-        public const string SHOW_DEBUG_DIALOG = "SHOW_DEBUG_DIALOG";
+        public const string SHOW_DIALOG = "SHOW_DIALOG";
         public const string ERROR_OCCURED = "ERROR_OCCURED";
         public const string BINARY_DIRECTORY = "bin\\";
         private bool errorOccured = false;
@@ -621,8 +621,9 @@ namespace AlotAddOnGUI
                         Install_ProgressBar.Value = 0;
                         await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                         break;
-                    case SHOW_DEBUG_DIALOG:
-                        await this.ShowMessageAsync("Debugging Dialog", "Extraction completed. Check your MEM_STAGING_DIR for files.");
+                    case SHOW_DIALOG:
+                        KeyValuePair<string, string> messageStr = (KeyValuePair<string, string>)tc.Data;
+                        await this.ShowMessageAsync(messageStr.Key, messageStr.Value);
                         break;
                     case INCREMENT_COMPLETION_EXTRACTION:
                         Interlocked.Increment(ref completed);
@@ -738,7 +739,7 @@ namespace AlotAddOnGUI
                     InstallWorker.RunWorkerCompleted += InstallCompleted;
                     InstallWorker.WorkerReportsProgress = true;
                 }
-                
+
                 if (!me1Installed)
                 {
                     Log.Information("ME1 not installed - disabling ME1 install");
@@ -746,13 +747,13 @@ namespace AlotAddOnGUI
                     Button_InstallME1.ToolTip = "Mass Effect is not installed. To build the addon for ME1 the game must already be installed";
                     Button_InstallME1.Content = "ME1 Not Installed";
                     Button_ME1Backup.IsEnabled = false;
-                    ValidateGameBackup(1);
                 }
                 else
                 {
                     Button_InstallME1.IsEnabled = true;
                     Button_InstallME1.ToolTip = "Click to build ALOT Addon for Mass Effect";
                     Button_InstallME1.Content = "Build Addon for ME1";
+                    ValidateGameBackup(1);
                 }
 
                 if (!me2Installed)
@@ -801,7 +802,7 @@ namespace AlotAddOnGUI
             {
                 case 1:
                     {
-                        string path = Utilities.GetGameBackupPath(game);
+                        string path = Utilities.GetGameBackupPath(1);
                         if (path != null)
                         {
                             Button_ME1Backup.Content = "ME1: Backed Up";
@@ -846,7 +847,6 @@ namespace AlotAddOnGUI
                         return path != null;
                     }
                 default:
-
                     return false;
             }
         }
@@ -1260,7 +1260,7 @@ namespace AlotAddOnGUI
             HeaderLabel.Text = PRIMARY_HEADER;
         }
 
-        private void BackupWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private async void BackupWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             if (e.UserState is null)
             {
@@ -1282,8 +1282,9 @@ namespace AlotAddOnGUI
                         Install_ProgressBar.Value = 0;
                         //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                         break;
-                    case SHOW_DEBUG_DIALOG:
-                        //await this.ShowMessageAsync("Debugging Dialog", "Extraction completed. Check your MEM_STAGING_DIR for files.");
+                    case SHOW_DIALOG:
+                        KeyValuePair<string, string> messageStr = (KeyValuePair<string, string>)tc.Data;
+                        await this.ShowMessageAsync(messageStr.Key, messageStr.Value);
                         break;
                     case INCREMENT_COMPLETION_EXTRACTION:
                         Interlocked.Increment(ref completed);
@@ -1295,6 +1296,26 @@ namespace AlotAddOnGUI
 
         private void BackupGame(object sender, DoWorkEventArgs e)
         {
+            //verify vanilla
+            Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
+            string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+            string args = "-check-game-data-only-vanilla " + BACKUP_THREAD_GAME + " -ipc";
+            List<string> acceptedIPC = new List<string>();
+            acceptedIPC.Add("OVERALL_PROGRESS");
+            BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Verifying game data..."));
+
+            runMEM2(exe, args, BackupWorker, acceptedIPC);
+            while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+            {
+                Thread.Sleep(250);
+            }
+            int buildresult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+            if (buildresult != 0)
+            {
+                BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Game is modified", "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has modified files and cannot serve as a backup.")));
+                e.Result = null;
+                return;
+            }
             string gamePath = Utilities.GetGamePath(BACKUP_THREAD_GAME);
             string backupPath = (string)e.Argument;
             if (gamePath != null)
@@ -1302,6 +1323,11 @@ namespace AlotAddOnGUI
                 CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, -1, 0);
             }
             e.Result = backupPath;
+        }
+
+        private string getGameNumberSuffix(int gameNumber)
+        {
+            return gameNumber == 1 ? "" : " " + gameNumber;
         }
 
         private void RestoreGame(object sender, DoWorkEventArgs e)
@@ -1672,17 +1698,19 @@ namespace AlotAddOnGUI
                 string filename = "ALOT_ME" + game + "_Addon.mem";
                 string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + MEM_STAGING_DIR + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
 
-                runMEM2(exe, args);
+                runMEM2(exe, args, InstallWorker);
                 while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
                 {
                     Thread.Sleep(250);
                 }
 
-
-
-
                 buildresult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 BACKGROUND_MEM_PROCESS = null;
+                if (buildresult != 1)
+                {
+                    InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up staging directories"));
+                }
+
                 if (buildresult != 0)
                 {
                     Log.Error("Non-Zero return code! Something probably went wrong.");
@@ -1720,7 +1748,7 @@ namespace AlotAddOnGUI
             return EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\ME" + game + "\\";
         }
 
-        private void runMEM2(string exe, string args)
+        private void runMEM2(string exe, string args, BackgroundWorker worker, List<string> acceptedIPC = null)
         {
             Debug.WriteLine("Running process: " + exe + " " + args);
             Log.Information("Running process: " + exe + " " + args);
@@ -1733,18 +1761,27 @@ namespace AlotAddOnGUI
                     string command = str.Substring(5);
                     int endOfCommand = command.IndexOf(' ');
                     command = command.Substring(0, endOfCommand);
-                    string param = str.Substring(endOfCommand + 5).Trim();
-                    switch (command)
+                    if (acceptedIPC == null || acceptedIPC.Contains(command))
                     {
-                        case "OVERALL_PROGRESS":
-                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
-                            int percentInt = Convert.ToInt32(param);
-                            InstallWorker.ReportProgress(percentInt);
-                            break;
-                        case "PROCESSING_FILE":
-                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
-                            break;
+                        string param = str.Substring(endOfCommand + 5).Trim();
+                        switch (command)
+                        {
+                            case "OVERALL_PROGRESS":
+                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+                                int percentInt = Convert.ToInt32(param);
+                                worker.ReportProgress(percentInt);
+                                break;
+                            case "PROCESSING_FILE":
+                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
+                                break;
+                            default:
+                                Log.Information("Unknown IPC command: " + command);
+                                break;
+                        }
                     }
+                } else
+                {
+                    Log.Information("Realtime Process Output: " + str);
                 }
             };
             BACKGROUND_MEM_PROCESS.Run();
@@ -2173,7 +2210,7 @@ namespace AlotAddOnGUI
         private void Checkbox_HideFiles_Click(object sender, RoutedEventArgs e)
         {
             ApplyFiltering();
-            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_HIDENONRELEVANTFILES, ((bool) Checkbox_HideFiles.IsChecked ? 1 : 0));
+            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_HIDENONRELEVANTFILES, ((bool)Checkbox_HideFiles.IsChecked ? 1 : 0));
         }
 
         private void Checkbox_SaveDiskSpace_Click(object sender, RoutedEventArgs e)
