@@ -69,13 +69,13 @@ namespace AlotAddOnGUI
         private bool me3Installed;
 
         private static readonly string SETTINGSTR_HIDENONRELEVANTFILES = "HideNonRelevantFiles";
-        private static readonly string SETTINGSTR_SAVEDISKSPACE = "SaveDiskSpace";
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files, then drag and drop the files onto this window. Do not extract any of the files.\nOnce all files for your game are ready, you can build the addon.";
-        private bool SAVEDISKSPACE = false;
         private string SETTINGSTR_BETAMODE = "BetaMode";
         private bool HIDENONRELEVANTFILES = false;
-        private bool LOADINGSETTINGS = false;
+        private List<string> BACKGROUND_MEM_PROCESS_ERRORS;
+        private const string SHOW_DIALOG_YES_NO = "SHOW_DIALOG_YES_NO";
+        private bool CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = false;
 
         public bool USING_BETA { get; private set; }
         public bool SpaceSaving { get; private set; }
@@ -1192,7 +1192,30 @@ namespace AlotAddOnGUI
             }
             else
             {
+                //Addon-Precheck
+                List<string> folders = ME3Constants.getStandardDLCFolders();
+                string me3DLCPath = ME3Constants.GetDLCPath();
+                List<string> dlcFolders = new List<string>();
+                foreach (string s in Directory.GetDirectories(me3DLCPath))
+                {
+                    dlcFolders.Add(s.Remove(0, me3DLCPath.Length + 1)); //+1 for the final \\
+                }
+                var hasCustomDLC = dlcFolders.Except(folders);
+                if (hasCustomDLC.Count() > 0)
+                {
+                    //Game is modified
+                    string message = "Additional folders in the DLC directory were detected:";
+                    foreach (string str in hasCustomDLC)
+                    {
+                        message += "\n - " + str;
+                    }
+
+                    message += "\n\nThis installation cannot be used for backup as it has been modified.";
+                    await this.ShowMessageAsync("Mass Effect 3 is modified", message);
+                    return;
+                }
                 //MEM - VERIFY VANILLA FOR BACKUP
+
                 BackupGame(3);
 
             }
@@ -1200,6 +1223,13 @@ namespace AlotAddOnGUI
 
         private async void BackupGame(int game)
         {
+            if (detectInstalledALOTVersion(game) != 0)
+            {
+                //Game is modified via ALOT flag
+                await this.ShowMessageAsync("ALOT is installed", "You cannot backup an installation that has ALOT already installed. You will need to redownload the game, then back it up.");
+                return;
+            }
+
             var openFolder = new CommonOpenFileDialog();
             openFolder.IsFolderPicker = true;
             openFolder.Title = "Select backup destination";
@@ -1286,6 +1316,22 @@ namespace AlotAddOnGUI
                         KeyValuePair<string, string> messageStr = (KeyValuePair<string, string>)tc.Data;
                         await this.ShowMessageAsync(messageStr.Key, messageStr.Value);
                         break;
+                    case SHOW_DIALOG_YES_NO:
+                        ThreadCommandDialogOptions tcdo = (ThreadCommandDialogOptions)tc.Data;
+                        MetroDialogSettings settings = new MetroDialogSettings();
+                        settings.NegativeButtonText = tcdo.NegativeButtonText;
+                        settings.AffirmativeButtonText = tcdo.AffirmativeButtonText;
+                        MessageDialogResult result = await this.ShowMessageAsync(tcdo.title, tcdo.message, MessageDialogStyle.AffirmativeAndNegative, settings);
+                        if (result == MessageDialogResult.Negative)
+                        {
+                            CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = false;
+                        }
+                        else
+                        {
+                            CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = true;
+                        }
+                        tcdo.signalHandler.Set();
+                        break;
                     case INCREMENT_COMPLETION_EXTRACTION:
                         Interlocked.Increment(ref completed);
                         Install_ProgressBar.Value = (completed / (double)ADDONSTOINSTALL_COUNT) * 100;
@@ -1302,6 +1348,7 @@ namespace AlotAddOnGUI
             string args = "-check-game-data-only-vanilla " + BACKUP_THREAD_GAME + " -ipc";
             List<string> acceptedIPC = new List<string>();
             acceptedIPC.Add("OVERALL_PROGRESS");
+            acceptedIPC.Add("ERROR");
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Verifying game data..."));
 
             runMEM2(exe, args, BackupWorker, acceptedIPC);
@@ -1312,9 +1359,29 @@ namespace AlotAddOnGUI
             int buildresult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
             if (buildresult != 0)
             {
-                BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Game is modified", "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has modified files and cannot serve as a backup.")));
-                e.Result = null;
-                return;
+                string modified = "";
+                string gameDir = Utilities.GetGamePath(BACKUP_THREAD_GAME);
+                foreach (String error in BACKGROUND_MEM_PROCESS_ERRORS)
+                {
+                    modified += "\n - " + error.Remove(0, gameDir.Length + 1);
+                }
+                ThreadCommandDialogOptions tcdo = new ThreadCommandDialogOptions();
+                tcdo.signalHandler = new EventWaitHandle(false, EventResetMode.AutoReset);
+                tcdo.title = "Game is modified";
+                tcdo.message = "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has files that do not match what is in the MEM database.\nYou can continue to back this installation up, but it may not be truly unmodified." + modified;
+                tcdo.NegativeButtonText = "Abort";
+                tcdo.AffirmativeButtonText = "Continue";
+                BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG_YES_NO, tcdo));
+                tcdo.signalHandler.WaitOne();
+                //Thread resumes
+                if (!CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS)
+                {
+                    e.Result = null;
+                    return;
+                } else
+                {
+                    CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = false; //reset
+                }
             }
             string gamePath = Utilities.GetGamePath(BACKUP_THREAD_GAME);
             string backupPath = (string)e.Argument;
@@ -1706,6 +1773,7 @@ namespace AlotAddOnGUI
 
                 buildresult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 BACKGROUND_MEM_PROCESS = null;
+                BACKGROUND_MEM_PROCESS_ERRORS = null;
                 if (buildresult != 1)
                 {
                     InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up staging directories"));
@@ -1753,6 +1821,8 @@ namespace AlotAddOnGUI
             Debug.WriteLine("Running process: " + exe + " " + args);
             Log.Information("Running process: " + exe + " " + args);
             BACKGROUND_MEM_PROCESS = new ConsoleApp(exe, args);
+            BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
+
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
@@ -1774,12 +1844,17 @@ namespace AlotAddOnGUI
                             case "PROCESSING_FILE":
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
                                 break;
+                            case "ERROR":
+                                Log.Information("[ERROR] Realtime Process Output: " + param);
+                                BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
+                                break;
                             default:
                                 Log.Information("Unknown IPC command: " + command);
                                 break;
                         }
                     }
-                } else
+                }
+                else
                 {
                     Log.Information("Realtime Process Output: " + str);
                 }
@@ -2213,12 +2288,6 @@ namespace AlotAddOnGUI
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_HIDENONRELEVANTFILES, ((bool)Checkbox_HideFiles.IsChecked ? 1 : 0));
         }
 
-        private void Checkbox_SaveDiskSpace_Click(object sender, RoutedEventArgs e)
-        {
-            SAVEDISKSPACE = (bool)Checkbox_SpaceSaving.IsChecked;
-            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_SAVEDISKSPACE, ((bool)Checkbox_SpaceSaving.IsChecked ? 1 : 0));
-        }
-
         private void Button_ViewLog_Click(object sender, RoutedEventArgs e)
         {
             var directory = new DirectoryInfo("logs");
@@ -2233,17 +2302,11 @@ namespace AlotAddOnGUI
 
         private void LoadSettings()
         {
-            LOADINGSETTINGS = true;
-
-            SAVEDISKSPACE = Utilities.GetRegistrySettingBool(SETTINGSTR_SAVEDISKSPACE) ?? false;
             USING_BETA = Utilities.GetRegistrySettingBool(SETTINGSTR_BETAMODE) ?? false;
             HIDENONRELEVANTFILES = Utilities.GetRegistrySettingBool(SETTINGSTR_HIDENONRELEVANTFILES) ?? true;
 
-            Checkbox_SpaceSaving.IsChecked = SAVEDISKSPACE;
             Checkbox_BetaMode.IsChecked = USING_BETA;
             Checkbox_HideFiles.IsChecked = HIDENONRELEVANTFILES;
-
-            LOADINGSETTINGS = false;
         }
 
         private void Button_ReportIssue_Click(object sender, RoutedEventArgs e)
@@ -2289,6 +2352,15 @@ namespace AlotAddOnGUI
         {
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_BETAMODE, ((bool)Checkbox_BetaMode.IsChecked ? 1 : 0));
             USING_BETA = (bool)Checkbox_BetaMode.IsChecked;
+        }
+
+        private void Button_MEMVersion_Click(object sender, RoutedEventArgs e)
+        {
+            ShowStatus("Starting MassEffectModder.exe",3000);
+            SettingsFlyout.IsOpen = false;
+            string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+            string args = "";// "-install-addon-file \""+path+"\" -game "+result;
+            runProcess(exe, args, true);
         }
     }
 }

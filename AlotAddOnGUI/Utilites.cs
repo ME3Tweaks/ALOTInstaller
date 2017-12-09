@@ -44,6 +44,11 @@ namespace AlotAddOnGUI
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Gets the MEM game path. If the MEM game path is not set, the one from the registry is used.
+        /// </summary>
+        /// <param name="gameID"></param>
+        /// <returns></returns>
         public static String GetGamePath(int gameID)
         {
             //Read config file.

@@ -117,14 +117,15 @@
     <Compile Include="classes\CopyDir.cs" />
     <Compile Include="classes\FlashWindowHelper.cs" />
     <Compile Include="classes\IniFile.cs" />
+    <Compile Include="classes\ME3Constants.cs" />
     <Compile Include="classes\StreamIO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyInfo.tt</DependentUpon>
     </Compile>
+    <Compile Include="ThreadCommandDialogOptions.cs" />
     <Compile Include="Utilites.cs" />
-    <Compile Include="Updater\AnonymousPipes.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -173,9 +174,6 @@
     </Content>
     <Content Include="7z\7z.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Updater\GHUpdater.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="images\info.ico" />
     <Resource Include="images\greencheckmark.png" />

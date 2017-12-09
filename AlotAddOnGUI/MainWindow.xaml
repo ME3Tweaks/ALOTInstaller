@@ -6,10 +6,9 @@
         xmlns:local="clr-namespace:AlotAddOnGUI"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
-        ResizeMode="NoResize"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
-        Title="ALOT Addon Builder" Height="600" Width="800"
+        Title="ALOT Addon Builder" MinHeight="600" MinWidth="800" Height="600" Width="800"
         Loaded="Window_Loaded"
         WindowButtonCommandsOverlayBehavior="Never"
         Drop="File_Drop" AllowDrop="true">
@@ -170,26 +169,25 @@
         <Controls:FlyoutsControl>
             <Controls:Flyout x:Name="SettingsFlyout" Header="Settings" IsPinned="False" Theme="Accent" Position="Right" Width="300">
                 <!--<Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>-->
-                <StackPanel Margin="10">
-                    <CheckBox Margin="5" x:Name="Checkbox_SpaceSaving" Content="Save Disk Space" ToolTip="Deletes files after each stage rather than the end. May save some intermediate disk space during build."/>
+                <StackPanel Margin="5">
                     <CheckBox Margin="5" x:Name="Checkbox_HideFiles" Content="Hide files for games not installed" Click="Checkbox_HideFiles_Click" ToolTip="Hide files that don't apply to games you don't have installed."/>
                     <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
                     <Label FontSize="16" Margin="5,0,0,0" Content="Backup Status"/>
-                    <Button x:Name="Button_ME1Backup" Margin="20,0,0,0" Content="ME1: Not Backed Up" Click="Button_ME1Backup_Click">
+                    <Button x:Name="Button_ME1Backup" Margin="20,0,20,0" Padding="0,5,0,5" Content="ME1: Not Backed Up" Click="Button_ME1Backup_Click">
                         <!--<Button.Template>
                             <ControlTemplate TargetType="{x:Type Button}">
                                 <ContentPresenter />
                             </ControlTemplate>
                         </Button.Template>-->
                     </Button>
-                    <Button x:Name="Button_ME2Backup" Margin="20,0,0,0" Content="ME2: Not Backed Up" Click="Button_ME2Backup_Click">
+                    <Button x:Name="Button_ME2Backup" Margin="20,0,20,0" Padding="0,5,0,5" Content="ME2: Not Backed Up" Click="Button_ME2Backup_Click">
                         <!--<Button.Template>
                             <ControlTemplate TargetType="{x:Type Button}">
                                 <ContentPresenter />
                             </ControlTemplate>
                         </Button.Template>-->
                     </Button>
-                    <Button x:Name="Button_ME3Backup" Margin="20,0,0,0" Content="ME3: Not Backed Up" Click="Button_ME3Backup_Click">
+                    <Button x:Name="Button_ME3Backup" Margin="20,0,20,0" Padding="0,5,0,5" Content="ME3: Not Backed Up" Click="Button_ME3Backup_Click">
                         <!--<Button.Template>
                             <ControlTemplate TargetType="{x:Type Button}">
                                 <ContentPresenter />
@@ -198,18 +196,23 @@
                     </Button>
 
                     <Label FontSize="16" Margin="5,0,0,0" Content="ALOT Installation Status"/>
-                    <Label Margin="20,0,0,0" x:Name="Label_ALOTStatus_ME1" Content="ME1: Not Installed"/>
-                    <Label Margin="20,0,0,0" x:Name="Label_ALOTStatus_ME2" Content="ME2: Not Installed"/>
-                    <Label Margin="20,0,0,0" x:Name="Label_ALOTStatus_ME3" Content="ME3: Not Installed"/>
-                    <Label FontSize="16" Margin="5,0,0,0" Content="Internals"/>
-                    <Label Margin="20,0,0,0" x:Name="Label_MEMVersion" Content="MEM Version: TBD"/>
-                    <Button x:Name="Button_ViewLog" Margin="20,0,0,0" Content="View log" Click="Button_ViewLog_Click"/>
-                    <Button x:Name="Button_ReportIssue" Margin="20,0,0,0" Content="Report an issue" Click="Button_ReportIssue_Click"/>
+                    <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME1" Content="ME1: Not Installed"/>
+                    <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME2" Content="ME2: Not Installed"/>
+                    <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME3" Content="ME3: Not Installed"/>
+                    <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="Internals"/>
+                    <Button Margin="20,0,20,0" Padding="0,5,0,5" x:Name="Label_MEMVersion" Content="MEM Version: TBD" Click="Button_MEMVersion_Click"/>
+                    <Button x:Name="Button_ViewLog" Margin="20,0,20,0" Padding="0,5,0,5" Content="View log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click"/>
+                    <Button x:Name="Button_ReportIssue" Margin="20,0,20,0" Padding="0,5,0,5" Content="Report an issue" ToolTip="Go to the ALOT discord" Click="Button_ReportIssue_Click"/>
+                    <Label FontSize="16" Margin="5,0,0,0" Content="Credits" Padding="0,0,0,5"/>
+                    <Label Margin="20,0,0,0" Padding="0,0,0,2" Content="Brought to you by"/>
+                    <Label Margin="20,0,0,0" Padding="10,0,0,2" Content="Aquadran" ToolTip="Developed MEM. One who made this all possible."/>
+                    <Label Margin="20,0,0,0" Padding="10,0,0,2" Content="CreeperLava" ToolTip="Developed ALOT. Glued all the pieces together."/>
+                    <Label Margin="20,0,0,0" Padding="10,0,0,2" Content="Mgamerz" ToolTip="Complained a bunch and then made a suave UI."/>
 
                 </StackPanel>
             </Controls:Flyout>
             <Controls:Flyout x:Name="ImportFailedFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom" Height="30">
-                <Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>
+                <Label x:Name="ImportFailedLabel" FontSize="14" Content="This is the statusbar. You should not see this text."></Label>
             </Controls:Flyout>
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>
