@@ -1,4 +1,5 @@
 ﻿using AlotAddOnGUI.classes;
+using ByteSizeLib;
 using MahApps.Metro;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -78,7 +79,7 @@ namespace AlotAddOnGUI
         private List<string> BACKGROUND_MEM_PROCESS_ERRORS;
         private const string SHOW_DIALOG_YES_NO = "SHOW_DIALOG_YES_NO";
         private bool CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = false;
-
+        private bool ERROR_SHOWING = false;
         public bool USING_BETA { get; private set; }
         public bool SpaceSaving { get; private set; }
         public StringBuilder BACKGROUND_MEM_STDOUT { get; private set; }
@@ -614,6 +615,7 @@ namespace AlotAddOnGUI
             int result = (int)e.Result;
             Installing = false;
             SetupButtons();
+            Button_Settings.IsEnabled = true;
             switch (result)
             {
                 case -1:
@@ -672,6 +674,7 @@ namespace AlotAddOnGUI
                     errorOccured = false;
                     break;
             }
+
         }
 
         private async void InstallProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -692,9 +695,15 @@ namespace AlotAddOnGUI
                         Install_ProgressBar.IsIndeterminate = (bool)tc.Data;
                         break;
                     case ERROR_OCCURED:
+
                         Install_ProgressBar.IsIndeterminate = false;
                         Install_ProgressBar.Value = 0;
-                        await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
+                        if (!ERROR_SHOWING)
+                        {
+                            ERROR_SHOWING = true;
+                            await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
+                            ERROR_SHOWING = false;
+                        }
                         break;
                     case SHOW_DIALOG:
                         KeyValuePair<string, string> messageStr = (KeyValuePair<string, string>)tc.Data;
@@ -892,6 +901,7 @@ namespace AlotAddOnGUI
                             Button_ME1Backup.Content = "ME1: Not Backed Up";
                             Button_ME1Backup.ToolTip = "Click to backup game";
                         }
+                        Button_ME1Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(1);
                         return path != null;
                     }
                 case 2:
@@ -907,6 +917,7 @@ namespace AlotAddOnGUI
                             Button_ME2Backup.Content = "ME2: Not Backed Up";
                             Button_ME2Backup.ToolTip = "Click to backup game";
                         }
+                        Button_ME2Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(2);
                         return path != null;
                     }
                 case 3:
@@ -922,6 +933,7 @@ namespace AlotAddOnGUI
                             Button_ME3Backup.Content = "ME3: Not Backed Up";
                             Button_ME3Backup.ToolTip = "Click to backup game";
                         }
+                        Button_ME3Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(3);
 
                         return path != null;
                     }
@@ -1321,7 +1333,11 @@ namespace AlotAddOnGUI
                 return;
             }
             var dir = openFolder.FileName;
-
+            if (!Directory.Exists(dir))
+            {
+                await this.ShowMessageAsync("Directory does not exist", "The backup destination directory does not exist: " + dir);
+                return;
+            }
             if (!Utilities.IsDirectoryEmpty(dir))
             {
                 await this.ShowMessageAsync("Directory is not empty", "The backup destination directory must be empty.");
@@ -1334,10 +1350,11 @@ namespace AlotAddOnGUI
             BackupWorker.RunWorkerCompleted += BackupCompleted;
             BACKUP_THREAD_GAME = game;
             SettingsFlyout.IsOpen = false;
-            Button_Settings.IsEnabled = false;
             Installing = true;
             HeaderLabel.Text = "Backing up Mass Effect" + (game == 1 ? "" : " " + game) + "...\nDo not close the application until this process completes.";
             BackupWorker.RunWorkerAsync(dir);
+            Button_InstallME1.IsEnabled = Button_InstallME2.IsEnabled = Button_InstallME3.IsEnabled = Button_Settings.IsEnabled = false;
+            ShowStatus("Verifying game data before backup", 6000);
             // get all the directories in selected dirctory
         }
 
@@ -1365,6 +1382,7 @@ namespace AlotAddOnGUI
                 AddonFilesLabel.Text = "Backup failed! Check the logs.";
             }
             Button_Settings.IsEnabled = true;
+            SetupButtons();
             Installing = false;
 
             BACKUP_THREAD_GAME = -1;
@@ -1423,6 +1441,7 @@ namespace AlotAddOnGUI
 
         private void BackupGame(object sender, DoWorkEventArgs e)
         {
+
             //verify vanilla
             Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
@@ -1471,6 +1490,12 @@ namespace AlotAddOnGUI
             {
                 CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, -1, 0);
             }
+            if (BACKUP_THREAD_GAME == 3)
+            {
+                //Create Mod Manaager vanilla backup marker
+                string file = backupPath + "cmm_vanilla";
+                File.Create(file);
+            }
             e.Result = backupPath;
         }
 
@@ -1493,6 +1518,15 @@ namespace AlotAddOnGUI
             {
                 CopyDir.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(gamePath), BackupWorker, -1, 0);
             }
+            if (BACKUP_THREAD_GAME == 3)
+            {
+                //Check for cmmvanilla file and remove it present
+                string file = gamePath + "cmm_vanilla";
+                if (File.Exists(file))
+                {
+                    File.Delete(file);
+                }
+            }
             e.Result = true;
         }
 
@@ -1503,6 +1537,9 @@ namespace AlotAddOnGUI
             string prefix = "[" + Path.GetFileNameWithoutExtension(af.Filename) + "] ";
             Log.Information(prefix + "Processing extraction on " + af.Filename);
             string fileextension = System.IO.Path.GetExtension(af.Filename);
+            ulong freeBytes;
+            ulong diskSize;
+            ulong totalFreeBytes;
             try
             {
                 switch (fileextension)
@@ -1517,32 +1554,39 @@ namespace AlotAddOnGUI
                             string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
                             string args = "x \"" + EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename + "\" -aoa -r -o\"" + extractpath + "\"";
                             runProcess(exe, args);
-                            if (Directory.GetFiles(extractpath, "*.tpf").Length > 0)
+
+                            //get free space for debug purposes
+                            Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
+                            Log.Information("[SIZE] ADDONEXTRACTFINISH Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
+                            var moveableFiles = Directory.EnumerateFiles(extractpath) //<--- .NET 4.5
+                                .Where(file => file.ToLower().EndsWith("tpf") || file.ToLower().EndsWith("mem"))
+                                .ToList();
+                            if (moveableFiles.Count() > 0)
                             {
                                 //check for copy directly items first, and move them.
-                                string[] tpffiles = Directory.GetFiles(extractpath, "*.tpf");
-                                foreach (string tpf in tpffiles)
+
+                                foreach (string tpf in moveableFiles)
                                 {
                                     string name = Path.GetFileName(tpf);
                                     foreach (PackageFile pf in af.PackageFiles)
                                     {
                                         if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
                                         {
-                                            Log.Information("MoveDirectly specified - moving TPF to staging: " + name);
+                                            Log.Information("MoveDirectly specified - moving TPF/MEM to staging: " + name);
                                             File.Move(tpf, STAGING_DIRECTORY + name);
                                             pf.Processed = true; //no more ops on this package file.
                                             break;
                                         }
                                         if (pf.CopyDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
                                         {
-                                            Log.Information("CopyDirectly specified - copy TPF to staging: " + name);
+                                            Log.Information("CopyDirectly specified - copy TPF/MEM to staging: " + name);
                                             File.Copy(tpf, STAGING_DIRECTORY + name, true);
                                             pf.Processed = true; //We will still extract this as it is a copy step.
                                             break;
                                         }
                                         if (pf.Delete && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
                                         {
-                                            Log.Information("Delete specified - deleting unused TPF: " + name);
+                                            Log.Information("Delete specified - deleting unused TPF/MEM: " + name);
                                             File.Delete(tpf);
                                             pf.Processed = true; //no more ops on this package file.
                                             break;
@@ -1600,6 +1644,10 @@ namespace AlotAddOnGUI
                                     }
                                 }
                             }
+
+                            //get free space for debug purposes
+                            Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
+                            Log.Information("[SIZE] ADDONFULLEXTRACT Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
 
                             List<string> files = new List<string>();
                             foreach (string file in Directory.EnumerateFiles(extractpath, "*.dds", SearchOption.AllDirectories))
@@ -1664,6 +1712,8 @@ namespace AlotAddOnGUI
                 InstallWorker.ReportProgress(0, new ThreadCommand("ERROR_OCCURED", e.Message));
                 return false;
             }
+            Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
+            Log.Information("[SIZE] ADDON EXTRACTADDON COMPLETED Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
             return true;
         }
 
@@ -1717,15 +1767,17 @@ namespace AlotAddOnGUI
 
         private bool ExtractAddons(int game)
         {
-
             string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + MEM_STAGING_DIR + "\\";
-
-
             Log.Information("Extracting Addons for Mass Effect " + game);
+            ulong freeBytes;
+            ulong diskSize;
+            ulong totalFreeBytes;
+            bool gotFreeSpace = Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
+            Log.Information("[SIZE] PREBUILD Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
 
             string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
             string destinationpath = EXE_DIRECTORY + @"Extracted_Mods\";
-            Log.Information("Created Destination Path");
+            Log.Information("Created Extracted_Mods folder");
 
             Directory.CreateDirectory(destinationpath);
 
@@ -1734,7 +1786,7 @@ namespace AlotAddOnGUI
             {
                 if (af.Ready && (game == 1 && af.Game_ME1 || game == 2 && af.Game_ME2 || game == 3 && af.Game_ME3))
                 {
-                    Log.Information("Adding Addon to installation list: " + af.FriendlyName);
+                    Log.Information("Adding AddonFile to installation list: " + af.FriendlyName);
                     addonstoinstall.Add(af);
                 }
             }
@@ -1814,13 +1866,17 @@ namespace AlotAddOnGUI
                         if ((game == 1 && pf.ME1 || game == 2 && pf.ME2 || game == 3 && pf.ME3) && !pf.Processed)
                         {
                             string extractedpath = basepath + Path.GetFileNameWithoutExtension(af.Filename) + "\\" + pf.SourceName;
-                            if (File.Exists(extractedpath))
+                            if (File.Exists(extractedpath) && pf.DestinationName != null)
                             {
                                 Log.Information("Copying Package File: " + pf.SourceName + "->" + pf.DestinationName);
                                 string destination = stagingdirectory + pf.DestinationName;
                                 File.Copy(extractedpath, destination, true);
                             }
-                            else
+                            else if (pf.DestinationName == null)
+                            {
+                                Log.Error("File destination in null. This means there is a problem in the manifest or manifest parser. File: "+pf.SourceName);
+                                errorOccured = true;
+                            } else 
                             {
                                 Log.Error("File specified by manifest doesn't exist after extraction: " + extractedpath);
                                 errorOccured = true;
@@ -1834,12 +1890,31 @@ namespace AlotAddOnGUI
                     }
                 }
             }
-            Log.Information("Completed staging.");
 
-            InstallWorker.ReportProgress(0);
+            Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
+            Log.Information("[SIZE] POSTEXTRACT_PRESTAGING Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
 
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Building Addon MEM Package..."));
+            //COLEANUP EXTRACTION DIR
+            Log.Information("Completed staging. Now cleaning up extraction directory");
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up extraction directory"));
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+            InstallWorker.ReportProgress(100);
+            try
+            {
+                Directory.Delete("Extracted_Mods", true);
+                Log.Information("Deleted Extracted_Mods directory");
+            }
+            catch (IOException e)
+            {
+                Log.Error("Unable to delete extraction directory.");
+            }
+
+            Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
+            Log.Information("[SIZE] AFTER_EXTRACTION_CLEANUP Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
+
+            //BUILD MEM PACKAGE
+            InstallWorker.ReportProgress(0);
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Building Addon MEM Package..."));
             int buildresult = -2;
             {
                 Log.Information("Building MEM Package.");
@@ -1852,6 +1927,9 @@ namespace AlotAddOnGUI
                 {
                     Thread.Sleep(250);
                 }
+
+                Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
+                Log.Information("[SIZE] POST_MEM_BUILD Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
 
                 buildresult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 BACKGROUND_MEM_PROCESS = null;
@@ -1871,18 +1949,21 @@ namespace AlotAddOnGUI
                     buildresult = -1;
                 }
             }
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up staging directories"));
+            //cleanup staging
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up staging directory"));
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
             InstallWorker.ReportProgress(100);
             try
             {
-                //Directory.Delete(MEM_STAGING_DIR, true);
-                Directory.Delete("Extracted_Mods", true);
+                Directory.Delete(MEM_STAGING_DIR, true);
+                Log.Information("Deleted " + MEM_STAGING_DIR);
             }
             catch (IOException e)
             {
-                Log.Error("Unable to delete staging and target directories. Addon should have been built however.\n" + e.ToString());
+                Log.Error("Unable to delete staging directory. Addon should have been built however.\n" + e.ToString());
             }
+            Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
+            Log.Information("[SIZE] FINAL Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
             CURRENT_GAME_BUILD = 0; //reset
             return buildresult == 0;
@@ -2117,7 +2198,7 @@ namespace AlotAddOnGUI
             //this.WindowState = System.Windows.WindowState.Minimized;
             this.nIcon.Icon = Properties.Resources.tooltiptrayicon;
             string fname = (string)((Hyperlink)e.Source).Tag;
-            this.nIcon.ShowBalloonTip(14000, "Downloading ALOT Addon File", "Download the file titled \"" + fname + "\"", ToolTipIcon.Info);
+            this.nIcon.ShowBalloonTip(14000, "Directions", "Download the file with filename: \"" + fname + "\"", ToolTipIcon.Info);
         }
 
         private async Task<bool> InitInstall(int game)
@@ -2147,12 +2228,13 @@ namespace AlotAddOnGUI
             Button_InstallME1.IsEnabled = false;
             Button_InstallME2.IsEnabled = false;
             Button_InstallME3.IsEnabled = false;
+            Button_Settings.IsEnabled = false;
 
             Directory.CreateDirectory(getOutputDir(game));
             Directory.CreateDirectory(MEM_STAGING_DIR);
 
             AddonFilesLabel.Text = "Preparing to install...";
-            HeaderLabel.Text = "Now building the ALOT Addon for Mass Effect " + game + ".\nDon't close this window until the process completes.";
+            HeaderLabel.Text = "Building ALOT Addon for Mass Effect " + game + ".\nDon't close this window until the process completes.";
             // Install_ProgressBar.IsIndeterminate = true;
             return true;
         }
@@ -2461,6 +2543,12 @@ namespace AlotAddOnGUI
         {
             ShowStatus("Starting MassEffectModder.exe", 3000);
             SettingsFlyout.IsOpen = false;
+            string ini = BINARY_DIRECTORY + "Installer.ini";
+            if (File.Exists(ini))
+            {
+                File.Delete(ini);
+            }
+
             string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
             string args = "";// "-install-addon-file \""+path+"\" -game "+result;
             runProcess(exe, args, true);

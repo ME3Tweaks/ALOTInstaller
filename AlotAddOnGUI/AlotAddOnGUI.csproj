@@ -58,6 +58,9 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ByteSize, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ByteSize.1.3.0\lib\net45\ByteSize.dll</HintPath>
+    </Reference>
     <Reference Include="CommandLine, Version=2.0.275.0, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
       <HintPath>..\packages\CommandLineParser.2.1.1-beta\lib\net45\CommandLine.dll</HintPath>
     </Reference>
@@ -68,8 +71,8 @@
       <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.1\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
@@ -78,7 +81,7 @@
       <HintPath>..\packages\Octokit.0.28.0\lib\net45\Octokit.dll</HintPath>
     </Reference>
     <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
-      <HintPath>..\packages\Serilog.2.5.0\lib\net45\Serilog.dll</HintPath>
+      <HintPath>..\packages\Serilog.2.6.0\lib\net45\Serilog.dll</HintPath>
     </Reference>
     <Reference Include="Serilog.Sinks.File, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
       <HintPath>..\packages\Serilog.Sinks.File.4.0.0\lib\net45\Serilog.Sinks.File.dll</HintPath>
@@ -221,6 +224,8 @@ copy /y "$(TargetDir)7z\7z.exe" "$(TargetDir)bin\7z.exe"
 copy /y "$(TargetDir)7z\7z.dll" "$(TargetDir)bin\7z.dll"
 
 copy /y "$(TargetDir)memodder\MassEffectModder.exe" "$(TargetDir)bin\MassEffectModder.exe"
+
+copy /y "$(TargetDir)memodder\MassEffectModderNoGui.exe" "$(TargetDir)bin\MassEffectModderNoGui.exe"
 
 if exist "$(TargetDir)lib"  del /s "$(TargetDir)lib\*.pdb"&gt;NUL
 if exist "$(TargetDir)lib" del /s "$(TargetDir)lib\manifest*.xml"&gt;NUL
