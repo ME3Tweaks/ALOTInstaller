@@ -1,4 +1,5 @@
 ﻿using AlotAddOnGUI.classes;
+using MahApps.Metro;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
@@ -55,6 +56,7 @@ namespace AlotAddOnGUI
         public static readonly string REGISTRY_KEY = @"SOFTWARE\ALOTAddon";
         private BackgroundWorker InstallWorker = new BackgroundWorker();
         private BackgroundWorker BackupWorker = new BackgroundWorker();
+        private const string MEM_EXE_NAME = "MassEffectModderNoGui.exe";
 
         private BindingList<AddonFile> addonfiles;
         NotifyIcon nIcon = new NotifyIcon();
@@ -376,7 +378,7 @@ namespace AlotAddOnGUI
                     catch (Exception) { }
                 });
                 Thread.Sleep(2000);
-                var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
+                var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
                 int fileVersion = versInfo.FileMajorPart;
                 Log.Information("Local Mass Effect Modder version: " + fileVersion);
                 pipe.SendText("START_UPDATE_CHECK MassEffectModder MassEffectModder " + fileVersion);
@@ -397,54 +399,74 @@ namespace AlotAddOnGUI
             if (user.Count > 0)
             {
                 //The release we want to check is always the latest, so [0]
-                Release latest = user[0];
-                Version releaseName = new Version(latest.TagName);
-                if (versInfo < releaseName && latest.Assets.Count > 0)
+                Release latest = null;
+                foreach (Release r in user)
                 {
-                    MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available. Install the update?", MessageDialogStyle.AffirmativeAndNegative);
-                    if (result == MessageDialogResult.Affirmative)
+                    if (!USING_BETA && r.Prerelease)
                     {
-
-                        //there's an update
-                        updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "ALOT Addon Installer is updating. Please wait...", true);
-                        updateprogresscontroller.SetIndeterminate();
-                        WebClient downloadClient = new WebClient();
-
-                        downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
-                        downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
-                        string temppath = Path.GetTempPath();
-                        downloadClient.DownloadProgressChanged += (s, e) =>
+                        continue;
+                    }
+                    latest = r;
+                }
+                if (latest != null)
+                {
+                    Version releaseName = new Version(latest.TagName);
+                    if (versInfo < releaseName && latest.Assets.Count > 0)
+                    {
+                        string versionInfo = "Release date: " + latest.PublishedAt.Value.ToLocalTime().ToString();
+                        if (latest.Prerelease)
                         {
-                            updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
-                        };
-                        downloadClient.DownloadFileCompleted += UnzipSelfUpdate;
-                        string downloadPath = temppath + "ALOTAddonGUI_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
-                        //DEBUG ONLY
-                        Uri downloadUri = new Uri(latest.Assets[0].BrowserDownloadUrl);
-                        downloadClient.DownloadFileAsync(downloadUri, downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
+                            versionInfo += "\nThis is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
+                        }
+                        MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available.\n" + versionInfo + "\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative);
+                        if (result == MessageDialogResult.Affirmative)
+                        {
+
+                            //there's an update
+                            updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "ALOT Addon Installer is updating. Please wait...", true);
+                            updateprogresscontroller.SetIndeterminate();
+                            WebClient downloadClient = new WebClient();
+
+                            downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
+                            downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
+                            string temppath = Path.GetTempPath();
+                            downloadClient.DownloadProgressChanged += (s, e) =>
+                            {
+                                updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
+                            };
+                            downloadClient.DownloadFileCompleted += UnzipSelfUpdate;
+                            string downloadPath = temppath + "ALOTAddonGUI_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
+                            //DEBUG ONLY
+                            Uri downloadUri = new Uri(latest.Assets[0].BrowserDownloadUrl);
+                            downloadClient.DownloadFileAsync(downloadUri, downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
+                        }
+                        else
+                        {
+                            AddonFilesLabel.Text = "Application update declined";
+                            Log.Warning("Application update was declined");
+                            await FetchManifest();
+                        }
                     }
                     else
                     {
-                        AddonFilesLabel.Text = "Application update declined";
-                        Log.Warning("Application update was declined");
+                        //up to date
+                        AddonFilesLabel.Text = "Application up to date";
+                        Log.Information("Application is up to date.");
                         await FetchManifest();
                     }
-                }
-                else
-                {
-                    //up to date
-                    AddonFilesLabel.Text = "Application up to date";
-                    Log.Information("Application is up to date.");
-                    await FetchManifest();
                 }
             }
         }
 
-        private async void RunMEMUpdater2()
+        private async void RunMEMUpdaterGUI()
         {
-            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
-            int fileVersion = versInfo.FileMajorPart;
-            Label_MEMVersion.Content = "MEM Version: " + fileVersion;
+            int fileVersion = 0;
+            if (File.Exists(BINARY_DIRECTORY + "MassEffectModder.exe"))
+            {
+                var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
+                fileVersion = versInfo.FileMajorPart;
+            }
+
             var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
             var user = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModder");
             if (user.Count > 0)
@@ -455,7 +477,49 @@ namespace AlotAddOnGUI
                 if (fileVersion < releaseNameInt && latest.Assets.Count > 0)
                 {
                     //there's an update
-                    updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder is updating. Please wait...", true);
+                    //updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder is updating. Please wait...", true);
+                    //updateprogresscontroller.SetIndeterminate();
+                    WebClient downloadClient = new WebClient();
+
+                    downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
+                    downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
+                    string temppath = Path.GetTempPath();
+                    /*downloadClient.DownloadProgressChanged += (s, e) =>
+                    {
+                        updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
+                    };*/
+                    downloadClient.DownloadFileCompleted += UnzipMEMGUIUpdate;
+                    string downloadPath = temppath + "MEMGUI_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
+                    downloadClient.DownloadFileAsync(new Uri(latest.Assets[0].BrowserDownloadUrl), downloadPath, downloadPath);
+                }
+                else
+                {
+                    //up to date
+                }
+            }
+        }
+
+        private async void RunMEMUpdater2()
+        {
+            int fileVersion = 0;
+            if (File.Exists(BINARY_DIRECTORY + "MassEffectModderNoGui.exe"))
+            {
+                var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModderNoGui.exe");
+                fileVersion = versInfo.FileMajorPart;
+            }
+
+            Label_MEMVersion.Content = "MEM (No GUI) Version: " + fileVersion;
+            var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
+            var user = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModderNoGui");
+            if (user.Count > 0)
+            {
+                //The release we want to check is always the latest, so [0]
+                Release latest = user[0];
+                int releaseNameInt = Convert.ToInt32(latest.TagName);
+                if (fileVersion < releaseNameInt && latest.Assets.Count > 0)
+                {
+                    //there's an update
+                    updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder (No GUI) is updating. Please wait...", true);
                     updateprogresscontroller.SetIndeterminate();
                     WebClient downloadClient = new WebClient();
 
@@ -522,9 +586,26 @@ namespace AlotAddOnGUI
             File.Delete((string)kp.Value);
             kp.Key.CloseAsync();
 
-            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
+            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
             int fileVersion = versInfo.FileMajorPart;
             Label_MEMVersion.Content = "MEM Version: " + fileVersion;
+        }
+
+        private void UnzipMEMGUIUpdate(object sender, AsyncCompletedEventArgs e)
+        {
+
+            //Extract 7z
+            string path = BINARY_DIRECTORY + "7z.exe";
+
+            string args = "x \"" + e.UserState + "\" -aoa -r -o\"" + System.AppDomain.CurrentDomain.BaseDirectory + "bin\"";
+            Log.Information("Extracting MEMGUI update...");
+            runProcess(path, args);
+            Log.Information("Extraction complete.");
+
+            File.Delete((string)e.UserState);
+            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
+            int fileVersion = versInfo.FileMajorPart;
+            ShowStatus("Updated Mass Effect Modder (GUI version) to v" + fileVersion, 3000);
         }
 
         private async void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -564,14 +645,8 @@ namespace AlotAddOnGUI
                         HeaderLabel.Text = "Addon Created.\nThe MEM package for the addon have been placed into the " + MEM_OUTPUT_DISPLAY_DIR + " directory.";
                         AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
                         MetroDialogSettings mds = new MetroDialogSettings();
-                        if (USING_BETA)
-                        {
-                            mds.AffirmativeButtonText = "Install";
-                        }
-                        else
-                        {
-                            mds.AffirmativeButtonText = "Open MEM";
-                        }
+                        mds.AffirmativeButtonText = "Open MEM";
+
                         mds.NegativeButtonText = "OK";
                         mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
                         var buildResult = await this.ShowMessageAsync("ALOT Addon for Mass Effect " + result + " has been built", "You can install this file by opening MEM and applying it after you have installed ALOT.", MessageDialogStyle.AffirmativeAndNegative, mds);
@@ -712,14 +787,18 @@ namespace AlotAddOnGUI
 
         private async void SetupButtons()
         {
-            string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+            /*string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "-get-installed-games";
-            int installedGames = runProcess(exe, args);
+            int installedGames = runProcess(exe, args);*/
+
+            string me1Path = Utilities.GetGamePath(1);
+            string me2Path = Utilities.GetGamePath(2);
+            string me3Path = Utilities.GetGamePath(3);
+
             //int installedGames = 5;
-            Log.Information("Get-Installed-Games bitmask returned " + installedGames);
-            me1Installed = (installedGames & 1) != 0;
-            me2Installed = (installedGames & 2) != 0;
-            me3Installed = (installedGames & 4) != 0;
+            me1Installed = (me1Path != null);
+            me2Installed = (me2Path != null);
+            me3Installed = (me3Path != null);
             Log.Information("ME1 Installed: " + me1Installed);
             Log.Information("ME2 Installed: " + me2Installed);
             Log.Information("ME3 Installed: " + me3Installed);
@@ -914,6 +993,8 @@ namespace AlotAddOnGUI
                     Label_ALOTStatus_ME1.Content = message1;
                     Label_ALOTStatus_ME2.Content = message2;
                     Label_ALOTStatus_ME3.Content = message3;
+
+                    RunMEMUpdaterGUI();
                 }
             }
         }
@@ -1344,7 +1425,7 @@ namespace AlotAddOnGUI
         {
             //verify vanilla
             Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
-            string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+            string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "-check-game-data-only-vanilla " + BACKUP_THREAD_GAME + " -ipc";
             List<string> acceptedIPC = new List<string>();
             acceptedIPC.Add("OVERALL_PROGRESS");
@@ -1378,7 +1459,8 @@ namespace AlotAddOnGUI
                 {
                     e.Result = null;
                     return;
-                } else
+                }
+                else
                 {
                     CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = false; //reset
                 }
@@ -1469,7 +1551,7 @@ namespace AlotAddOnGUI
                                 }
 
                                 //Extract the TPFs
-                                exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+                                exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                                 args = "-extract-tpf \"" + extractpath + "\" \"" + extractpath + "\"";
                                 runProcess(exe, args);
                             }
@@ -1492,7 +1574,7 @@ namespace AlotAddOnGUI
                                     //Extract the MOD
                                     Log.Information("Extracting modfiles in directory: " + extractpath);
 
-                                    exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+                                    exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                                     args = "-extract-mod " + CURRENT_GAME_BUILD + " \"" + extractpath + "\" \"" + extractpath + "\"";
                                     runProcess(exe, args);
                                 }
@@ -1689,7 +1771,7 @@ namespace AlotAddOnGUI
                 InstallWorker.ReportProgress(0);
 
                 Log.Information("Extracting TPF files.");
-                string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+                string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                 string args = "-extract-tpf \"" + EXE_DIRECTORY + "Extracted_Mods\" \"" + EXE_DIRECTORY + "Extracted_Mods\"";
                 runProcess(exe, args);
             }
@@ -1702,7 +1784,7 @@ namespace AlotAddOnGUI
                 InstallWorker.ReportProgress(0);
 
                 Log.Information("Extracting MOD files.");
-                string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+                string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                 string args = "-extract-mod " + game + " \"" + EXE_DIRECTORY + "Downloaded_Mods\" \"" + EXE_DIRECTORY + "Extracted_Mods\"";
                 runProcess(exe, args);
             }
@@ -1761,7 +1843,7 @@ namespace AlotAddOnGUI
             int buildresult = -2;
             {
                 Log.Information("Building MEM Package.");
-                string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
+                string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                 string filename = "ALOT_ME" + game + "_Addon.mem";
                 string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + MEM_STAGING_DIR + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
 
@@ -2171,7 +2253,7 @@ namespace AlotAddOnGUI
         private async void Button_About_Click(object sender, RoutedEventArgs e)
         {
             string title = "ALOT Addon Builder " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version + "\n";
-            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
+            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
             int fileVersion = versInfo.FileMajorPart;
 
             string credits = "MEM Version: " + fileVersion + "\n" + "\n\nBrought to you by:\n - Mgamerz\n - CreeperLava\n - aquadran\n\nSource code: https://github.com/Mgamerz/AlotAddOnGUI\nLicensed under GPLv3";
@@ -2307,6 +2389,13 @@ namespace AlotAddOnGUI
 
             Checkbox_BetaMode.IsChecked = USING_BETA;
             Checkbox_HideFiles.IsChecked = HIDENONRELEVANTFILES;
+
+            if (USING_BETA)
+            {
+                ThemeManager.ChangeAppStyle(System.Windows.Application.Current,
+                                                    ThemeManager.GetAccent("Crimson"),
+                                                    ThemeManager.GetAppTheme("BaseDark")); // or appStyle.Item1
+            }
         }
 
         private void Button_ReportIssue_Click(object sender, RoutedEventArgs e)
@@ -2348,15 +2437,29 @@ namespace AlotAddOnGUI
             HeaderLabel.Text = PRIMARY_HEADER;
         }
 
-        private void Checkbox_BetaMode_Click(object sender, RoutedEventArgs e)
+        private async void Checkbox_BetaMode_Click(object sender, RoutedEventArgs e)
         {
+            bool isEnabling = (bool)Checkbox_BetaMode.IsChecked;
+            if (isEnabling)
+            {
+                MessageDialogResult result = await this.ShowMessageAsync("Enabling BETA mode", "Enabling BETA mode will enable the beta manifest as well as beta features and beta updates. These builds are for testing, and may not be stable (and will sometimes outright crash). Unless you're OK with this you should stay in normal mode.\nEnable BETA mode?", MessageDialogStyle.AffirmativeAndNegative);
+                if (result == MessageDialogResult.Negative)
+                {
+                    Checkbox_BetaMode.IsChecked = false;
+                }
+            }
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_BETAMODE, ((bool)Checkbox_BetaMode.IsChecked ? 1 : 0));
             USING_BETA = (bool)Checkbox_BetaMode.IsChecked;
+            if (isEnabling && Checkbox_BetaMode.IsChecked.Value)
+            {
+                System.Windows.Forms.Application.Restart();
+                Environment.Exit(0);
+            }
         }
 
         private void Button_MEMVersion_Click(object sender, RoutedEventArgs e)
         {
-            ShowStatus("Starting MassEffectModder.exe",3000);
+            ShowStatus("Starting MassEffectModder.exe", 3000);
             SettingsFlyout.IsOpen = false;
             string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
             string args = "";// "-install-addon-file \""+path+"\" -game "+result;
