@@ -7,6 +7,7 @@ using Microsoft.Win32;     //This namespace is used to work with Registry editor
 using System.IO;
 using AlotAddOnGUI.classes;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace AlotAddOnGUI
 {
@@ -224,6 +225,23 @@ namespace AlotAddOnGUI
             {
                 return false;
             }
+        }
+
+
+        public static void DeleteFilesAndFoldersRecursively(string target_dir)
+        {
+            foreach (string file in Directory.GetFiles(target_dir))
+            {
+                File.Delete(file);
+            }
+
+            foreach (string subDir in Directory.GetDirectories(target_dir))
+            {
+                DeleteFilesAndFoldersRecursively(subDir);
+            }
+
+            Thread.Sleep(1); // This makes the difference between whether it works or not. Sleep(0) is not enough.
+            Directory.Delete(target_dir);
         }
     }
 }

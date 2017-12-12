@@ -644,7 +644,7 @@ namespace AlotAddOnGUI
                         // colored until user focuses the main window
                         helper.FlashApplicationWindow();
 
-                        HeaderLabel.Text = "Addon Created.\nThe MEM package for the addon have been placed into the " + MEM_OUTPUT_DISPLAY_DIR + " directory.";
+                        HeaderLabel.Text = "Addon created.\nThe MEM packages for the addon have been placed into the " + MEM_OUTPUT_DISPLAY_DIR + " directory.";
                         AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
                         MetroDialogSettings mds = new MetroDialogSettings();
                         mds.AffirmativeButtonText = "Open MEM";
@@ -1510,7 +1510,17 @@ namespace AlotAddOnGUI
             string backupPath = Utilities.GetGameBackupPath(BACKUP_THREAD_GAME);
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Deleting exist game installation"));
-            Directory.Delete(gamePath, true);
+            if (Directory.Exists(gamePath))
+            {
+                Log.Information("Deleting existing game directory: " + gamePath);
+                try
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(gamePath);
+                } catch (Exception ex)
+                {
+                    Log.Error("Exception deleting game directory: " + gamePath+ ": "+ex.Message);
+                }
+            }
             Directory.CreateDirectory(gamePath);
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Restoring game from backup "));
