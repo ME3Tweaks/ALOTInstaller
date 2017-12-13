@@ -396,18 +396,24 @@ namespace AlotAddOnGUI
             AddonFilesLabel.Text = "Checking for application updates";
             var versInfo = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
-            var user = await client.Repository.Release.GetAll("Mgamerz", "ALOTAddonGUI");
-            if (user.Count > 0)
+            var releases = await client.Repository.Release.GetAll("Mgamerz", "ALOTAddonGUI");
+            if (releases.Count > 0)
             {
                 //The release we want to check is always the latest, so [0]
                 Release latest = null;
-                foreach (Release r in user)
+                Version latestVer = new Version("0.0.0.0");
+                foreach (Release r in releases)
                 {
                     if (!USING_BETA && r.Prerelease)
                     {
                         continue;
                     }
-                    latest = r;
+                    Version releaseVersion = new Version(r.TagName);
+                    if (releaseVersion > latestVer)
+                    {
+                        latest = r;
+                        latestVer = releaseVersion;
+                    }
                 }
                 if (latest != null)
                 {
@@ -419,7 +425,12 @@ namespace AlotAddOnGUI
                         {
                             versionInfo += "\nThis is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
                         }
-                        MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available.\n" + versionInfo + "\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative);
+                        MetroDialogSettings mds = new MetroDialogSettings();
+                        mds.AffirmativeButtonText = "Update";
+                        mds.NegativeButtonText = "Later";
+                        mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
+
+                        MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available.\n========================\n" + versionInfo + "\n"+latest.Body+ "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative,mds);
                         if (result == MessageDialogResult.Affirmative)
                         {
 
