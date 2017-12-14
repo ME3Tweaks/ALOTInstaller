@@ -1508,7 +1508,7 @@ namespace AlotAddOnGUI
             if (BACKUP_THREAD_GAME == 3)
             {
                 //Create Mod Manaager vanilla backup marker
-                string file = backupPath + "cmm_vanilla";
+                string file = backupPath + "\\cmm_vanilla";
                 File.Create(file);
             }
             e.Result = backupPath;
