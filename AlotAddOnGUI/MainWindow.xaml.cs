@@ -55,6 +55,8 @@ namespace AlotAddOnGUI
         private int ADDONSTOINSTALL_COUNT = 0;
         private bool Installing = false;
         public static readonly string REGISTRY_KEY = @"SOFTWARE\ALOTAddon";
+        public static readonly string ME3_BACKUP_REGISTRY_KEY = @"SOFTWARE\Mass Effect 3 Mod Manager";
+
         private BackgroundWorker InstallWorker = new BackgroundWorker();
         private BackgroundWorker BackupWorker = new BackgroundWorker();
         private const string MEM_EXE_NAME = "MassEffectModderNoGui.exe";
@@ -420,17 +422,18 @@ namespace AlotAddOnGUI
                     Version releaseName = new Version(latest.TagName);
                     if (versInfo < releaseName && latest.Assets.Count > 0)
                     {
-                        string versionInfo = "Release date: " + latest.PublishedAt.Value.ToLocalTime().ToString();
+                        string versionInfo = "";
                         if (latest.Prerelease)
                         {
-                            versionInfo += "\nThis is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
+                            versionInfo += "This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.\n\n";
                         }
+                        versionInfo += "Release date: " + latest.PublishedAt.Value.ToLocalTime().ToString();
                         MetroDialogSettings mds = new MetroDialogSettings();
                         mds.AffirmativeButtonText = "Update";
                         mds.NegativeButtonText = "Later";
                         mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
 
-                        MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available.\n========================\n" + versionInfo + "\n"+latest.Body+ "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative,mds);
+                        MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available. You are currently using version " + versInfo.ToString() + ".\n========================\n" + versionInfo + "\n" + latest.Body + "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative, mds);
                         if (result == MessageDialogResult.Affirmative)
                         {
 
@@ -1382,8 +1385,8 @@ namespace AlotAddOnGUI
                         Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "ME" + BACKUP_THREAD_GAME + "VanillaBackupLocation", destPath);
                         break;
                     case 3:
+                        Utilities.WriteRegistryKey(Registry.CurrentUser, ME3_BACKUP_REGISTRY_KEY, "VanillaCopyLocation", destPath);
                         break;
-
                 }
                 ValidateGameBackup(BACKUP_THREAD_GAME);
                 AddonFilesLabel.Text = "Backup completed.";
@@ -1395,7 +1398,7 @@ namespace AlotAddOnGUI
             Button_Settings.IsEnabled = true;
             SetupButtons();
             Installing = false;
-
+            ValidateGameBackup(BACKUP_THREAD_GAME);
             BACKUP_THREAD_GAME = -1;
             HeaderLabel.Text = PRIMARY_HEADER;
         }
@@ -1497,9 +1500,10 @@ namespace AlotAddOnGUI
             }
             string gamePath = Utilities.GetGamePath(BACKUP_THREAD_GAME);
             string backupPath = (string)e.Argument;
+            string[] ignoredExtensions = { ".wav", ".pdf" };
             if (gamePath != null)
             {
-                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, -1, 0);
+                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, -1, 0, ignoredExtensions);
             }
             if (BACKUP_THREAD_GAME == 3)
             {
@@ -1527,9 +1531,10 @@ namespace AlotAddOnGUI
                 try
                 {
                     Utilities.DeleteFilesAndFoldersRecursively(gamePath);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
-                    Log.Error("Exception deleting game directory: " + gamePath+ ": "+ex.Message);
+                    Log.Error("Exception deleting game directory: " + gamePath + ": " + ex.Message);
                 }
             }
             Directory.CreateDirectory(gamePath);
@@ -1895,9 +1900,10 @@ namespace AlotAddOnGUI
                             }
                             else if (pf.DestinationName == null)
                             {
-                                Log.Error("File destination in null. This means there is a problem in the manifest or manifest parser. File: "+pf.SourceName);
+                                Log.Error("File destination in null. This means there is a problem in the manifest or manifest parser. File: " + pf.SourceName);
                                 errorOccured = true;
-                            } else 
+                            }
+                            else
                             {
                                 Log.Error("File specified by manifest doesn't exist after extraction: " + extractedpath);
                                 errorOccured = true;
