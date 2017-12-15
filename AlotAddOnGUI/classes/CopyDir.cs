@@ -45,7 +45,7 @@ namespace AlotAddOnGUI.classes
             }
         }
 
-        public static int CopyAll_ProgressBar(DirectoryInfo source, DirectoryInfo target, BackgroundWorker worker, int total, int done)
+        public static int CopyAll_ProgressBar(DirectoryInfo source, DirectoryInfo target, BackgroundWorker worker, int total, int done, string[] ignoredExtensions = null)
         {
             if (total == -1)
             {
@@ -54,18 +54,34 @@ namespace AlotAddOnGUI.classes
             }
 
             int numdone = done;
-
             Directory.CreateDirectory(target.FullName);
 
             // Copy each file into the new directory.
             foreach (FileInfo fi in source.GetFiles())
             {
+                if (ignoredExtensions != null)
+                {
+                    bool skip = false;
+                    foreach (string str in ignoredExtensions)
+                    {
+                        if (fi.Name.ToLower().EndsWith(str))
+                        {
+                            skip = true;
+                            break;
+                        }
+                    }
+                    if (skip)
+                    {
+                        numdone++;
+                        worker.ReportProgress((int)((numdone * 1.0 / total) * 100.0));
+                        continue;
+                    }
+                }
                 worker.ReportProgress(done, new ThreadCommand(UPDATE_OPERATION_LABEL, fi.Name));
                 Log.Information(@"Copying {0}\{1}", target.FullName, fi.Name);
                 fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
                 numdone++;
-                worker.ReportProgress((int)((numdone * 1.0/ total) * 100.0));
-                Debug.WriteLine(fi.Name +" "+numdone+" / "+total+" PERCENT: " + (int)((done * 1.0 / total) * 100.0));
+                worker.ReportProgress((int)((numdone * 1.0 / total) * 100.0));
             }
 
             // Copy each subdirectory using recursion.

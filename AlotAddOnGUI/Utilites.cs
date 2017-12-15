@@ -190,6 +190,10 @@ namespace AlotAddOnGUI
             {
                 return null;
             }
+            if (!Directory.Exists(path + @"\BIOGame") || !Directory.Exists(path + @"\Binaries"))
+            {
+                return null;
+            }
             return path;
         }
 

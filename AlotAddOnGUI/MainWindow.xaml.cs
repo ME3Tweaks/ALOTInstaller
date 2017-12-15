@@ -55,6 +55,8 @@ namespace AlotAddOnGUI
         private int ADDONSTOINSTALL_COUNT = 0;
         private bool Installing = false;
         public static readonly string REGISTRY_KEY = @"SOFTWARE\ALOTAddon";
+        public static readonly string ME3_BACKUP_REGISTRY_KEY = @"SOFTWARE\Mass Effect 3 Mod Manager";
+
         private BackgroundWorker InstallWorker = new BackgroundWorker();
         private BackgroundWorker BackupWorker = new BackgroundWorker();
         private const string MEM_EXE_NAME = "MassEffectModderNoGui.exe";
@@ -420,17 +422,18 @@ namespace AlotAddOnGUI
                     Version releaseName = new Version(latest.TagName);
                     if (versInfo < releaseName && latest.Assets.Count > 0)
                     {
-                        string versionInfo = "Release date: " + latest.PublishedAt.Value.ToLocalTime().ToString();
+                        string versionInfo = "";
                         if (latest.Prerelease)
                         {
-                            versionInfo += "\nThis is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
+                            versionInfo += "This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.\n\n";
                         }
+                        versionInfo += "Release date: " + latest.PublishedAt.Value.ToLocalTime().ToString();
                         MetroDialogSettings mds = new MetroDialogSettings();
                         mds.AffirmativeButtonText = "Update";
                         mds.NegativeButtonText = "Later";
                         mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
 
-                        MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available.\n========================\n" + versionInfo + "\n"+latest.Body+ "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative,mds);
+                        MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available. You are currently using version " + versInfo.ToString() + ".\n========================\n" + versionInfo + "\n" + latest.Body + "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative, mds);
                         if (result == MessageDialogResult.Affirmative)
                         {
 
@@ -1049,12 +1052,12 @@ namespace AlotAddOnGUI
                                 Filename = (string)e.Element("file").Attribute("filename"),
                                 Tooltipname = e.Attribute("tooltipname") != null ? (string)e.Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
                                 DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
+                                ALOTVersion = e.Attribute("alotversion") != null ? Convert.ToInt32((string)e.Attribute("alotversion")) : 0,
+                                ALOTUpdate = e.Attribute("alotupdate") != null ? true : false,
                                 Ready = false,
                                 PackageFiles = e.Elements("packagefile")
                                     .Select(r => new PackageFile
                                     {
-                                        ALOTVersion = r.Attribute("alotversion") != null ? (int)r.Attribute("destinationname") : 0,
-                                        ALOTUpdate = r.Attribute("alotupdate") != null ? true : false,
                                         SourceName = (string)r.Attribute("sourcename"),
                                         DestinationName = (string)r.Attribute("destinationname"),
                                         TPFSource = (string)r.Attribute("tpfsource"),
@@ -1137,6 +1140,9 @@ namespace AlotAddOnGUI
             public bool Showing { get; set; }
             public event PropertyChangedEventHandler PropertyChanged;
             private bool m_ready;
+            internal int ALOTVersion;
+            internal bool ALOTUpdate;
+
             public bool ProcessAsModFile { get; set; }
             public string Author { get; set; }
             public string FriendlyName { get; set; }
@@ -1175,8 +1181,6 @@ namespace AlotAddOnGUI
 
         public class PackageFile
         {
-            public int ALOTVersion { get; set; }
-            public bool ALOTUpdate { get; set; }
             public string SourceName { get; set; }
             public string DestinationName { get; set; }
             public bool MoveDirectly { get; set; }
@@ -1382,8 +1386,8 @@ namespace AlotAddOnGUI
                         Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "ME" + BACKUP_THREAD_GAME + "VanillaBackupLocation", destPath);
                         break;
                     case 3:
+                        Utilities.WriteRegistryKey(Registry.CurrentUser, ME3_BACKUP_REGISTRY_KEY, "VanillaCopyLocation", destPath);
                         break;
-
                 }
                 ValidateGameBackup(BACKUP_THREAD_GAME);
                 AddonFilesLabel.Text = "Backup completed.";
@@ -1395,7 +1399,7 @@ namespace AlotAddOnGUI
             Button_Settings.IsEnabled = true;
             SetupButtons();
             Installing = false;
-
+            ValidateGameBackup(BACKUP_THREAD_GAME);
             BACKUP_THREAD_GAME = -1;
             HeaderLabel.Text = PRIMARY_HEADER;
         }
@@ -1497,14 +1501,15 @@ namespace AlotAddOnGUI
             }
             string gamePath = Utilities.GetGamePath(BACKUP_THREAD_GAME);
             string backupPath = (string)e.Argument;
+            string[] ignoredExtensions = { ".wav", ".pdf" };
             if (gamePath != null)
             {
-                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, -1, 0);
+                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, -1, 0, ignoredExtensions);
             }
             if (BACKUP_THREAD_GAME == 3)
             {
                 //Create Mod Manaager vanilla backup marker
-                string file = backupPath + "cmm_vanilla";
+                string file = backupPath + "\\cmm_vanilla";
                 File.Create(file);
             }
             e.Result = backupPath;
@@ -1527,9 +1532,10 @@ namespace AlotAddOnGUI
                 try
                 {
                     Utilities.DeleteFilesAndFoldersRecursively(gamePath);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
-                    Log.Error("Exception deleting game directory: " + gamePath+ ": "+ex.Message);
+                    Log.Error("Exception deleting game directory: " + gamePath + ": " + ex.Message);
                 }
             }
             Directory.CreateDirectory(gamePath);
@@ -1569,6 +1575,7 @@ namespace AlotAddOnGUI
                     case ".zip":
                     case ".rar":
                         {
+                            //Extract file
                             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Processing " + af.FriendlyName));
                             Log.Information(prefix + "Extracting file: " + af.Filename);
                             string exe = BINARY_DIRECTORY + "7z.exe";
@@ -1586,29 +1593,54 @@ namespace AlotAddOnGUI
                             {
                                 //check for copy directly items first, and move them.
 
-                                foreach (string tpf in moveableFiles)
+                                foreach (string movableFile in moveableFiles)
                                 {
-                                    string name = Path.GetFileName(tpf);
+                                    string name = Path.GetFileName(movableFile);
                                     foreach (PackageFile pf in af.PackageFiles)
                                     {
+                                        if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTVersion > 0)
+                                        {
+                                            //It's an ALOT file. We will move this directly to the output directory.
+                                            Log.Information("ALOT MAIN FILE - moving to output: " + name);
+                                            string movename = getOutputDir(CURRENT_GAME_BUILD) + "000_" + name;
+                                            if (File.Exists(movename))
+                                            {
+                                                File.Delete(movename);
+                                            }
+                                            File.Move(movableFile, movename);
+                                            pf.Processed = true; //no more ops on this package file.
+                                            break;
+                                        }
+                                        if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTUpdate)
+                                        {
+                                            //It's an ALOT update file. We will move this directly to the output directory.
+                                            Log.Information("ALOT UPDATE FILE - moving to output: " + name);
+                                            string movename = getOutputDir(CURRENT_GAME_BUILD) + "001_" + name;
+                                            if (File.Exists(movename))
+                                            {
+                                                File.Delete(movename);
+                                            }
+                                            File.Move(movableFile, movename); pf.Processed = true; //no more ops on this package file.
+                                            break;
+                                        }
                                         if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
                                         {
                                             Log.Information("MoveDirectly specified - moving TPF/MEM to staging: " + name);
-                                            File.Move(tpf, STAGING_DIRECTORY + name);
+                                            File.Move(movableFile, STAGING_DIRECTORY + name);
                                             pf.Processed = true; //no more ops on this package file.
                                             break;
                                         }
                                         if (pf.CopyDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
                                         {
                                             Log.Information("CopyDirectly specified - copy TPF/MEM to staging: " + name);
-                                            File.Copy(tpf, STAGING_DIRECTORY + name, true);
+                                            File.Copy(movableFile, STAGING_DIRECTORY + name, true);
                                             pf.Processed = true; //We will still extract this as it is a copy step.
                                             break;
                                         }
                                         if (pf.Delete && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
                                         {
                                             Log.Information("Delete specified - deleting unused TPF/MEM: " + name);
-                                            File.Delete(tpf);
+                                            File.Delete(movableFile);
                                             pf.Processed = true; //no more ops on this package file.
                                             break;
                                         }
@@ -1895,9 +1927,10 @@ namespace AlotAddOnGUI
                             }
                             else if (pf.DestinationName == null)
                             {
-                                Log.Error("File destination in null. This means there is a problem in the manifest or manifest parser. File: "+pf.SourceName);
+                                Log.Error("File destination in null. This means there is a problem in the manifest or manifest parser. File: " + pf.SourceName);
                                 errorOccured = true;
-                            } else 
+                            }
+                            else
                             {
                                 Log.Error("File specified by manifest doesn't exist after extraction: " + extractedpath);
                                 errorOccured = true;
@@ -1940,7 +1973,7 @@ namespace AlotAddOnGUI
             {
                 Log.Information("Building MEM Package.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string filename = "ALOT_ME" + game + "_Addon.mem";
+                string filename = "002_ALOT_ME" + game + "_Addon.mem";
                 string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + MEM_STAGING_DIR + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
 
                 runMEM2(exe, args, InstallWorker);
