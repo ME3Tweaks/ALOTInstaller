@@ -120,6 +120,87 @@ Asari.tpf-->
 		<packagefile me1="true" sourcename="Sov_Diff_Stack.dds" destinationname="0xB8E9A16C.dds"/>
 		<packagefile me1="true" sourcename="Sov_Diff_Stack.dds" destinationname="Sov_Diff_Stack_0xF6AA0402.dds"/>
 	</addonfile>
+	<addonfile friendlyname="Allers Complexion Tweak" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_AllersComplexionTweak.7z-580-1-0.7z"/>
+		<packagefile me3="true" sourcename="el_AllersComplexionTweak.tpf" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="Brooks Complexion Tweak" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_BrooksComplexionTweak.7z-580-1-0.7z"/>
+		<packagefile me3="true" sourcename="el_BrooksComplexionTweak.tpf" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="Illusive Man Complexion Tweak" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_IllusiveManComplexionTweak.7z-580-1-0.7z"/>
+		<packagefile me2="true" sourcename="HMM_HED_PRO_WKL_BLK_0xF3AFF836.dds" destinationname="0x3D10B5B5.dds"/>
+		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x91B1C512.dds"/>
+		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x44390218.dds"/>
+		<packagefile me2="true" me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0xA567A7D5.dds"/>
+		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x9C0D9E90.dds"/>
+		<packagefile me2="true" me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Spec_0x056BFB1F.dds" destinationname="0x056BFB1F.dds"/>
+		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Face_Diff_0xD818CC82.dds" destinationname="0x77C06CBF.dds"/>
+		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Face_Norm_0xF815F202.dds" destinationname="0x9EDE1459.dds"/>
+		<packagefile me3="true" sourcename="HMM_HED_PRO_WKL_BLK_0xF3AFF836.dds" destinationname="0xF3AFF836.dds"/>
+		<packagefile me3="true" sourcename="HMM_HED_PROIllusiveman_Face_Diff_0xD818CC82.dds" destinationname="0xD818CC82.dds"/>
+		<packagefile me3="true" sourcename="HMM_HED_PROIllusiveman_Face_Norm_0xF815F202.dds" destinationname="0xF815F202.dds"/>
+		<packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Diff_0xCB14400D.dds" destinationname="0xCB14400D.dds"/>
+		<packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Norm_0x413007EA.dds" destinationname="0x413007EA.dds"/>
+		<packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Spec_0x3B912C80.dds" destinationname="0x3B912C80.dds"/>
+	</addonfile>
+	<addonfile friendlyname="Ashley Complexion Tweak" tooltipname="Ash Complexion Tweak - .MEM" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" filename="el_Ashley Complexion Tweak.7z-569-1-0.7z"/>
+		<packagefile me3="true" sourcename="el_Ashley Complexion Tweak.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="Jacob Complexion Tweak" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/578/?" filename="el_JacobComplexionTweak.7z-578-1-0.7z"/>
+		<packagefile me2="true" sourcename="el_JacobComplexionTweak.tpf" copydirectly="true"/>
+		<packagefile me2="true" sourcename="HMM_HED_PROJacob_Face_Diff_Stack_0xEE83865A.dds" destinationname="0xEE83865A.dds"/>
+		<packagefile me2="true" sourcename="HMM_HED_PROJacob_Face_Norm_Stack_0x92D843C2.dds" destinationname="0x7EB5A028.dds"/>
+		<packagefile me3="true" sourcename="el_JacobComplexionTweak.tpf" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="Kaidan Complexion Tweak" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/571/?" filename="el_KaidanComplexionTweak.7z-571-1-0.7z"/>
+		<packagefile me3="true" sourcename="el_KaidanComplexionTweak.tpf" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="FemShep Complexion Tweak" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/562/?" filename="el_DefaultFemshepRetexture.7z-562-1-0.7z"/>
+		<packagefile me3="true" sourcename="el_DefaultFemshepRetexture.tpf" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="Sheploo Complexion Tweak" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/574/?" filename="el_SheplooComplexionTweak_1.7z-574-1-0.7z"/>
+		<packagefile me3="true" sourcename="el_SheplooComplexionTweak_1.tpf" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="James Complexion Tweak" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/576/?" filename="James Complexion Tweak_1.0-576-1-0.7z"/>
+		<packagefile me3="true" sourcename="el_JamesComplexionTweak_1.tpf" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="Zaeed Complexion Tweak" author="Ellise">
+		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/579/?" filename="Zaeed Complexion Tweak 1.0-579-1-0.7z"/>
+		<packagefile me3="true" sourcename="el_ZaeedComplexionTweak_1.tpf" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="FemShep High Quality textures" author="heleuss">
+		<file downloadlink="http://www.mediafire.com/file/v151vbhh7d28kgb/%5BME3%5D+femShep+High+Quality+textures.7z" filename="[ME3] femShep High Quality textures.7z"/>
+		<packagefile me3="true" sourcename="[ME3] KH_eyes.tpf" delete="true"/>
+		<packagefile me3="true" sourcename="[ME3] KH_femShep_brows.tpf" movedirectly="true"/>
+		<packagefile me3="true" sourcename="[ME3] KH_femShep_eyelashes.tpf" movedirectly="true"/>
+		<packagefile me3="true" sourcename="[ME3] KH_femShep_face_textures.tpf" movedirectly="true"/>
+		<packagefile me3="true" sourcename="[ME3] KH_femShep_masks.tpf" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="BroShep High Quality textures" author="heleuss">
+		<file downloadlink="http://www.mediafire.com/file/nv78t12776lpitf/%5BME3%5D+broShep+High+Quality+textures.7z" filename="[ME3] broShep High Quality textures.7z"/>
+		<packagefile me3="true" sourcename="[ME3] KH_broShep_face_textures.tpf" delete="true"/>
+		<packagefile me3="true" sourcename="[ME3] KH_broShep_wrinkle_fix.tpf" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="FemShep High Quality textures" author="heleuss">
+		<file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z"/>
+		<packagefile me2="true" sourcename="[ME2] KH_femShep_eyes.tpf" movedirectly="true"/>
+		<packagefile me2="true" sourcename="[ME2] KH_femShep_eyebrows.tpf" movedirectly="true"/>
+		<packagefile me2="true" sourcename="[ME2] KH_femShep_eyelashes.tpf" movedirectly="true"/>
+		<packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true"/>
+		<packagefile me2="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" movedirectly="true"/>
+	</addonfile>
+	<addonfile friendlyname="BroShep High Quality textures" author="heleuss">
+		<file downloadlink="https://www.dropbox.com/s/g6wg6v7uy8y7x15/%5BME2%5D%20broShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] broShep High Quality textures.7z"/>
+		<packagefile me2="true" sourcename="[ME2] KH_broShep_face_textures.tpf" movedirectly="true"/>
+	</addonfile>
 	<addonfile friendlyname="HR Phoenix Armor" author="Ottemis">
 		<file downloadlink="https://www.nexusmods.com/masseffect/mods/9" filename="Medium Phoenix Female-9-1-0.rar"/>
 		<packagefile me1="true" sourcename="ME1_Med_Phoe_Fem.tpf" movedirectly="true"/>
