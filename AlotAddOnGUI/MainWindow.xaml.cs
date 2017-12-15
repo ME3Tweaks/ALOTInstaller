@@ -1052,12 +1052,12 @@ namespace AlotAddOnGUI
                                 Filename = (string)e.Element("file").Attribute("filename"),
                                 Tooltipname = e.Attribute("tooltipname") != null ? (string)e.Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
                                 DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
+                                ALOTVersion = e.Attribute("alotversion") != null ? Convert.ToInt32((string)e.Attribute("alotversion")) : 0,
+                                ALOTUpdate = e.Attribute("alotupdate") != null ? true : false,
                                 Ready = false,
                                 PackageFiles = e.Elements("packagefile")
                                     .Select(r => new PackageFile
                                     {
-                                        ALOTVersion = r.Attribute("alotversion") != null ? (int)r.Attribute("destinationname") : 0,
-                                        ALOTUpdate = r.Attribute("alotupdate") != null ? true : false,
                                         SourceName = (string)r.Attribute("sourcename"),
                                         DestinationName = (string)r.Attribute("destinationname"),
                                         TPFSource = (string)r.Attribute("tpfsource"),
@@ -1140,6 +1140,9 @@ namespace AlotAddOnGUI
             public bool Showing { get; set; }
             public event PropertyChangedEventHandler PropertyChanged;
             private bool m_ready;
+            internal int ALOTVersion;
+            internal bool ALOTUpdate;
+
             public bool ProcessAsModFile { get; set; }
             public string Author { get; set; }
             public string FriendlyName { get; set; }
@@ -1178,8 +1181,6 @@ namespace AlotAddOnGUI
 
         public class PackageFile
         {
-            public int ALOTVersion { get; set; }
-            public bool ALOTUpdate { get; set; }
             public string SourceName { get; set; }
             public string DestinationName { get; set; }
             public bool MoveDirectly { get; set; }
@@ -1574,6 +1575,7 @@ namespace AlotAddOnGUI
                     case ".zip":
                     case ".rar":
                         {
+                            //Extract file
                             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Processing " + af.FriendlyName));
                             Log.Information(prefix + "Extracting file: " + af.Filename);
                             string exe = BINARY_DIRECTORY + "7z.exe";
@@ -1591,29 +1593,54 @@ namespace AlotAddOnGUI
                             {
                                 //check for copy directly items first, and move them.
 
-                                foreach (string tpf in moveableFiles)
+                                foreach (string movableFile in moveableFiles)
                                 {
-                                    string name = Path.GetFileName(tpf);
+                                    string name = Path.GetFileName(movableFile);
                                     foreach (PackageFile pf in af.PackageFiles)
                                     {
+                                        if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTVersion > 0)
+                                        {
+                                            //It's an ALOT file. We will move this directly to the output directory.
+                                            Log.Information("ALOT MAIN FILE - moving to output: " + name);
+                                            string movename = getOutputDir(CURRENT_GAME_BUILD) + "000_" + name;
+                                            if (File.Exists(movename))
+                                            {
+                                                File.Delete(movename);
+                                            }
+                                            File.Move(movableFile, movename);
+                                            pf.Processed = true; //no more ops on this package file.
+                                            break;
+                                        }
+                                        if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTUpdate)
+                                        {
+                                            //It's an ALOT update file. We will move this directly to the output directory.
+                                            Log.Information("ALOT UPDATE FILE - moving to output: " + name);
+                                            string movename = getOutputDir(CURRENT_GAME_BUILD) + "001_" + name;
+                                            if (File.Exists(movename))
+                                            {
+                                                File.Delete(movename);
+                                            }
+                                            File.Move(movableFile, movename); pf.Processed = true; //no more ops on this package file.
+                                            break;
+                                        }
                                         if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
                                         {
                                             Log.Information("MoveDirectly specified - moving TPF/MEM to staging: " + name);
-                                            File.Move(tpf, STAGING_DIRECTORY + name);
+                                            File.Move(movableFile, STAGING_DIRECTORY + name);
                                             pf.Processed = true; //no more ops on this package file.
                                             break;
                                         }
                                         if (pf.CopyDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
                                         {
                                             Log.Information("CopyDirectly specified - copy TPF/MEM to staging: " + name);
-                                            File.Copy(tpf, STAGING_DIRECTORY + name, true);
+                                            File.Copy(movableFile, STAGING_DIRECTORY + name, true);
                                             pf.Processed = true; //We will still extract this as it is a copy step.
                                             break;
                                         }
                                         if (pf.Delete && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
                                         {
                                             Log.Information("Delete specified - deleting unused TPF/MEM: " + name);
-                                            File.Delete(tpf);
+                                            File.Delete(movableFile);
                                             pf.Processed = true; //no more ops on this package file.
                                             break;
                                         }
@@ -1946,7 +1973,7 @@ namespace AlotAddOnGUI
             {
                 Log.Information("Building MEM Package.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string filename = "ALOT_ME" + game + "_Addon.mem";
+                string filename = "002_ALOT_ME" + game + "_Addon.mem";
                 string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + MEM_STAGING_DIR + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
 
                 runMEM2(exe, args, InstallWorker);
