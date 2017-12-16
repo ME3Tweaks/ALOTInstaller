@@ -8,6 +8,7 @@ using System.IO;
 using AlotAddOnGUI.classes;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Serilog;
 
 namespace AlotAddOnGUI
 {
@@ -246,6 +247,31 @@ namespace AlotAddOnGUI
 
             Thread.Sleep(1); // This makes the difference between whether it works or not. Sleep(0) is not enough.
             Directory.Delete(target_dir);
+        }
+
+        public static bool InstallBinkw32Bypass(int game)
+        {
+            if (game == 1)
+            {
+                return false;
+            }
+            Log.Information("Installing binkw32 for Mass Effect " + game);
+            string gamePath = GetGamePath(game);
+            switch (game)
+            {
+                case 2:
+                    gamePath += "\\Binaries\\";
+                    System.IO.File.WriteAllBytes(gamePath+"binkw23.dll", AlotAddOnGUI.Properties.Resources.me2_binkw23);
+                    System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me2_binkw32);
+                    break;
+                case 3:
+                    gamePath += "\\Binaries\\Win32\\";
+                    System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me3_binkw23);
+                    System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me3_binkw32);
+                    break;
+            }
+            Log.Information("Installed binkw32 for Mass Effect " + game);
+            return true;
         }
     }
 }

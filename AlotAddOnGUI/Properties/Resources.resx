@@ -118,6 +118,18 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="me2_binkw23" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\binkw32\me2\binkw23.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="me2_binkw32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\binkw32\me2\binkw32.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="me3_binkw23" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\binkw32\me3\binkw23.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="me3_binkw32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\binkw32\me3\binkw32.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="tooltiptrayicon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\info.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

@@ -57,7 +57,7 @@ namespace AlotAddOnGUI
         public static readonly string REGISTRY_KEY = @"SOFTWARE\ALOTAddon";
         public static readonly string ME3_BACKUP_REGISTRY_KEY = @"SOFTWARE\Mass Effect 3 Mod Manager";
 
-        private BackgroundWorker InstallWorker = new BackgroundWorker();
+        private BackgroundWorker BuildWorker = new BackgroundWorker();
         private BackgroundWorker BackupWorker = new BackgroundWorker();
         private const string MEM_EXE_NAME = "MassEffectModderNoGui.exe";
 
@@ -95,144 +95,7 @@ namespace AlotAddOnGUI
             Title = "ALOT Addon Builder " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             HeaderLabel.Text = "Preparing application...";
             AddonFilesLabel.Text = "Please wait";
-
         }
-
-        /*private async void RunUpdater()
-        {
-            Log.Information("Running GHUpdater.");
-            AddonFilesLabel.Text = "Checking for application updates";
-                                await FetchManifest();
-
-            string updaterpath = EXE_DIRECTORY + BINARY_DIRECTORY + "GHUpdater.exe";
-            string temppath = Path.GetTempPath() + "GHUpdater.exe";
-            var versInfo = FileVersionInfo.GetVersionInfo(updaterpath);
-            String fileVersion = versInfo.FileVersion;
-            Log.Information("GHUpdater.exe version: " + fileVersion);
-
-            File.Copy(updaterpath, temppath, true);
-            bool stillChecking = true;
-            pipe = new AnonymousPipes("GHUPDATE_SERVER", temppath, "", delegate (String msg)
-            {
-                Dispatcher.Invoke((MethodInvoker)async delegate ()
-                {
-                    //UI THREAD
-                    string[] clientmessage = msg.Split();
-                    Debug.WriteLine(clientmessage[0]);
-                    switch (clientmessage[0].Trim())
-                    {
-                        case "UPDATE_DOWNLOAD_COMPLETE":
-                            if (updateprogresscontroller != null)
-                            {
-                                //updateprogresscontroller.SetTitle("Update ready to install");
-                                //updateprogresscontroller.SetMessage("Update will install in 5 seconds.");
-                                await this.ShowMessageAsync("ALOT Addon Builder update ready", "The program will close and update in the background, then reopen. It should only take a few seconds.");
-                                string updatemessage = "EXECUTE_UPDATE_AND_START_PROCESS \"" + System.AppDomain.CurrentDomain.FriendlyName + "\" \"" + EXE_DIRECTORY + "\"";
-                                Log.Information("Executing update: " + updatemessage);
-                                pipe.SendText(updatemessage);
-                                Environment.Exit(0);
-                            }
-                            break;
-                        case "UPDATE_DOWNLOAD_PROGRESS":
-                            if (clientmessage.Length != 2)
-                            {
-                                Log.Warning("UPDATE_DOWNLOAD_PROGRESS message was not length 2 - ignoring message");
-                                return;
-                            }
-                            if (updateprogresscontroller != null)
-                            {
-                                double value = Double.Parse(clientmessage[1]);
-                                updateprogresscontroller.SetProgress(value);
-                            }
-                            break;
-                        case "UP_TO_DATE":
-                            stillChecking = false;
-                            Log.Information("GHUpdater reporting app is up to date");
-                            Thread.Sleep(250);
-                            try
-                            {
-                                File.Delete(temppath);
-                            }
-                            catch (Exception e)
-                            {
-                                Log.Error("Error deleting TEMP GHUpdater.exe: " + e.ToString());
-                            }
-                            await FetchManifest();
-                            break;
-                        case "ERROR_CHECKING_FOR_UPDATES":
-                            stillChecking = false;
-                            AddonFilesLabel.Text = "Error occured checking for updates";
-                            await FetchManifest();
-                            break;
-                        case "UPDATE_AVAILABLE":
-                            stillChecking = false;
-                            if (clientmessage.Length != 2)
-                            {
-                                Log.Warning("UPDATE_AVAILABLE message was not length 2 - ignoring message");
-                                return;
-                            }
-                            Log.Information("Github Updater reports program update: " + clientmessage[1] + " is available.");
-                            MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + clientmessage[1] + " is available. Install the update?", MessageDialogStyle.AffirmativeAndNegative);
-                            if (result == MessageDialogResult.Affirmative)
-                            {
-                                pipe.SendText("INITIATE_DOWNLOAD");
-                                updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "ALOT Addon Builder is updating. Please wait...", true);
-                                updateprogresscontroller.SetIndeterminate();
-                            }
-                            else
-                            {
-                                pipe.SendText("KILL_UPDATER");
-                                pipe.Close();
-                                try
-                                {
-                                    File.Delete(temppath);
-                                }
-                                catch (Exception e)
-                                {
-                                    Log.Error("Error deleting TEMP GHUpdater.exe: " + e.ToString());
-                                }
-
-                                await FetchManifest();
-                            }
-                            break;
-                        default:
-                            Log.Error("Unknown message from updater client: " + msg);
-                            break;
-                    }
-                });
-            }, delegate ()
-            {
-                // We're disconnected!
-                try
-                {
-
-                    Dispatcher.Invoke((MethodInvoker)delegate ()
-                    {
-                        //UITHREAD
-                        var source = PresentationSource.FromVisual(this);
-                        if (source == null || source.IsDisposed)
-                        {
-                            AddonFilesLabel.Text = "Lost connection to update client";
-                        }
-                    });
-                }
-                catch (Exception) { }
-            });
-            //pipe.SendText("START_UPDATE_CHECK Mgamerz AlotAddOnGUI 1.0.0.0");
-            Action killBgThread = new Action(async delegate ()
-            {
-                if (stillChecking)
-                {
-                    Log.Error("GHUpdater took too long to respond. Killing application updater and continuing.");
-                    pipe.SendText("KILL_UPDATER");
-                    pipe.Close();
-                    await FetchManifest();
-                }
-            });
-
-            pipe.SendText("START_UPDATE_CHECK Mgamerz AlotAddOnGUI " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
-            await Execute(killBgThread, 10000);
-        }*/
 
         /// <summary>
         /// Executes a task in the future
@@ -245,153 +108,6 @@ namespace AlotAddOnGUI
             await Task.Delay(timeoutInMilliseconds);
             action();
         }
-
-        /*private void RunMEMUpdater()
-        {
-            Log.Information("Running GHUpdater for MEM.");
-            AddonFilesLabel.Text = "Checking for Mass Effect Modder updates";
-            string updaterpath = EXE_DIRECTORY + BINARY_DIRECTORY + "GHUpdater.exe";
-            string temppath = Path.GetTempPath() + "GHUpdater-MEM.exe";
-            try
-            {
-                File.Copy(updaterpath, temppath, true);
-            }
-            catch (Exception e)
-            {
-                //MEM updater file copy failed it seems.
-                Log.Error("Error copying MEM updater: " + e.ToString());
-                temppath = EXE_DIRECTORY + BINARY_DIRECTORY + "GHUpdater-MEM.exe";
-                try
-                {
-                    File.Copy(updaterpath, temppath, true);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error("Can't copy failsafe MEM updater: " + e.ToString());
-                }
-            }
-            if (File.Exists(temppath))
-            {
-                pipe = new AnonymousPipes("GHUPDATE_SERVER_MEM", temppath, "", delegate (String msg)
-                {
-                    Dispatcher.Invoke((MethodInvoker)async delegate ()
-                    {
-                        //UI THREAD
-                        string[] clientmessage = msg.Split();
-                        switch (clientmessage[0])
-                        {
-                            case "UPDATE_DOWNLOAD_COMPLETE":
-                                if (updateprogresscontroller != null)
-                                {
-                                    //updateprogresscontroller.SetTitle("Update ready to install");
-                                    //updateprogresscontroller.SetMessage("Update will install in 5 seconds.");
-                                    //await this.ShowMessageAsync("ALOT Addon Builder update ready", "The program will close and update in the background, then reopen. It should only take a few seconds.");
-                                    string updatemessage = "EXECUTE_UPDATE \"" + EXE_DIRECTORY + "bin\\\"";
-                                    Log.Information("Executing update: " + updatemessage);
-                                    pipe.SendText(updatemessage);
-                                    //Environment.Exit(0);
-                                }
-                                break;
-                            case "UPDATE_DOWNLOAD_PROGRESS":
-                                if (clientmessage.Length != 2)
-                                {
-                                    Log.Warning("UPDATE_DOWNLOAD_PROGRESS message was not length 2 - ignoring message");
-                                    return;
-                                }
-                                if (updateprogresscontroller != null)
-                                {
-                                    double value = Double.Parse(clientmessage[1]);
-                                    updateprogresscontroller.SetProgress(value);
-                                }
-                                break;
-                            case "UP_TO_DATE":
-                                Log.Information("GHUpdater reporting MEM is up to date");
-                                Thread.Sleep(250);
-                                try
-                                {
-                                    File.Delete(temppath);
-                                }
-                                catch (Exception e)
-                                {
-                                    Log.Error("Error deleting TEMP GHUpdater-MEM.exe: " + e.ToString());
-                                }
-                                //await FetchManifest();
-                                break;
-                            case "ERROR_CHECKING_FOR_UPDATES":
-                                AddonFilesLabel.Text = "Error occured checking for MEM updates";
-                                break;
-                            case "UPDATE_AVAILABLE":
-                                if (clientmessage.Length != 2)
-                                {
-                                    Log.Warning("UPDATE_AVAILABLE message was not length 2 - ignoring message");
-                                    return;
-                                }
-                                Log.Information("Github Updater reports program update: " + clientmessage[1] + " is available.");
-                                //MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + clientmessage[1] + " is available. Install the update?", MessageDialogStyle.AffirmativeAndNegative);
-                                //if (result == MessageDialogResult.Affirmative)
-                                //{
-                                pipe.SendText("INITIATE_DOWNLOAD");
-                                updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder is updating. Please wait...", true);
-                                updateprogresscontroller.SetIndeterminate();
-                                //}
-                                //else
-                                //{
-                                //    pipe.SendText("KILL_UPDATER");
-                                //    pipe.Close();
-                                //    Log.Information("User declined update, shutting down updater");
-                                //    await FetchManifest();
-                                //}
-                                break;
-                            case "UPDATE_COMPLETED":
-                                AddonFilesLabel.Text = "MassEffectModder has been updated.";
-                                if (updateprogresscontroller != null)
-                                {
-                                    await updateprogresscontroller.CloseAsync();
-                                }
-                                try
-                                {
-                                    File.Delete(temppath);
-                                }
-                                catch (Exception e)
-                                {
-                                    Log.Error("Error deleting TEMP GHUpdater-MEM.exe: " + e.ToString());
-                                }
-                                break;
-                            default:
-                                Log.Error("Unknown message from updater client: " + msg);
-                                break;
-                        }
-                    });
-                }, delegate ()
-                {
-                    // We're disconnected!
-                    try
-                    {
-
-                        Dispatcher.Invoke((MethodInvoker)delegate ()
-                        {
-                            //UITHREAD
-                            var source = PresentationSource.FromVisual(this);
-                            if (source == null || source.IsDisposed)
-                            {
-                                AddonFilesLabel.Text = "Lost connection to update client";
-                            }
-                        });
-                    }
-                    catch (Exception) { }
-                });
-                Thread.Sleep(2000);
-                var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
-                int fileVersion = versInfo.FileMajorPart;
-                Log.Information("Local Mass Effect Modder version: " + fileVersion);
-                pipe.SendText("START_UPDATE_CHECK MassEffectModder MassEffectModder " + fileVersion);
-            }
-            else
-            {
-                Log.Error("MEM updater was not able to be extracted! Skipping for now.");
-                AddonFilesLabel.Text = "Unable to check for MEM updates (see logs)";
-            }
-        }*/
 
         private async void RunApplicationUpdater2()
         {
@@ -836,10 +552,10 @@ namespace AlotAddOnGUI
                     backgroundticker.Interval = new TimeSpan(0, 0, 5); // execute every 5s
                     backgroundticker.Start();
 
-                    InstallWorker.DoWork += BuildAddon;
-                    InstallWorker.ProgressChanged += InstallProgressChanged;
-                    InstallWorker.RunWorkerCompleted += InstallCompleted;
-                    InstallWorker.WorkerReportsProgress = true;
+                    BuildWorker.DoWork += BuildAddon;
+                    BuildWorker.ProgressChanged += InstallProgressChanged;
+                    BuildWorker.RunWorkerCompleted += InstallCompleted;
+                    BuildWorker.WorkerReportsProgress = true;
                 }
 
                 if (!me1Installed)
@@ -1117,6 +833,7 @@ namespace AlotAddOnGUI
 
         private void ApplyFiltering()
         {
+
             BindingList<AddonFile> newList = new BindingList<AddonFile>();
             foreach (AddonFile af in alladdonfiles)
             {
@@ -1140,8 +857,13 @@ namespace AlotAddOnGUI
             public bool Showing { get; set; }
             public event PropertyChangedEventHandler PropertyChanged;
             private bool m_ready;
-            internal int ALOTVersion;
-            internal bool ALOTUpdate;
+            public int ALOTVersion { get; set; }
+            public bool ALOTUpdate { get; set; }
+            public bool IsALOTMainFile
+            {
+                get { return ALOTVersion > 0; }
+                set { }
+            }
 
             public bool ProcessAsModFile { get; set; }
             public string Author { get; set; }
@@ -1235,7 +957,7 @@ namespace AlotAddOnGUI
                 {
                     Button_InstallME2.Content = "Building...";
                     CURRENT_GAME_BUILD = 2;
-                    InstallWorker.RunWorkerAsync(2);
+                    BuildWorker.RunWorkerAsync(2);
                 }
             }
         }
@@ -1538,6 +1260,8 @@ namespace AlotAddOnGUI
                     Log.Error("Exception deleting game directory: " + gamePath + ": " + ex.Message);
                 }
             }
+            Log.Information("Reverting lod settings");
+            IniSettingsHandler.removeLOD(BACKUP_THREAD_GAME);
             Directory.CreateDirectory(gamePath);
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Restoring game from backup "));
@@ -1576,7 +1300,7 @@ namespace AlotAddOnGUI
                     case ".rar":
                         {
                             //Extract file
-                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Processing " + af.FriendlyName));
+                            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Processing " + af.FriendlyName));
                             Log.Information(prefix + "Extracting file: " + af.Filename);
                             string exe = BINARY_DIRECTORY + "7z.exe";
                             string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
@@ -1724,17 +1448,17 @@ namespace AlotAddOnGUI
                                     Log.Information("File is already in correct place, no further processing necessary: " + extractpath + "\\" + Path.GetFileName(file));
                                 }
                             }
-                            InstallWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
+                            BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                             break;
                         }
                     case ".tpf":
                         {
-                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
+                            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
 
                             string source = EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename;
                             string destination = EXE_DIRECTORY + "Extracted_Mods\\" + Path.GetFileName(af.Filename);
                             File.Copy(source, destination, true);
-                            InstallWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
+                            BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                             break;
                         }
                     case ".mod":
@@ -1748,21 +1472,21 @@ namespace AlotAddOnGUI
                         }
                     case ".mem":
                         {
-                            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
+                            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
 
                             //Copy to output folder
                             File.Copy(EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename, getOutputDir(CURRENT_GAME_BUILD) + af.Filename, true);
-                            InstallWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
+                            BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                             break;
                         }
                 }
-                InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
             }
             catch (Exception e)
             {
                 Log.Error("ERROR EXTRACTING AND PROCESSING FILE!");
                 Log.Error(e.ToString());
-                InstallWorker.ReportProgress(0, new ThreadCommand("ERROR_OCCURED", e.Message));
+                BuildWorker.ReportProgress(0, new ThreadCommand("ERROR_OCCURED", e.Message));
                 return false;
             }
             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
@@ -1778,7 +1502,7 @@ namespace AlotAddOnGUI
                 {
                     Button_InstallME3.Content = "Building...";
                     CURRENT_GAME_BUILD = 3;
-                    InstallWorker.RunWorkerAsync(3);
+                    BuildWorker.RunWorkerAsync(3);
                 }
             }
         }
@@ -1845,10 +1569,10 @@ namespace AlotAddOnGUI
             }
             ADDONSTOINSTALL_COUNT = addonstoinstall.Count;
             int completed = 0;
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting Mods..."));
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting Mods..."));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
 
-            InstallWorker.ReportProgress(0);
+            BuildWorker.ReportProgress(0);
 
             bool modextractrequired = false; //not used currently.
 
@@ -1863,17 +1587,17 @@ namespace AlotAddOnGUI
                 if (!result)
                 {
                     Log.Error("Failed to extract a file! Check previous entries in this log");
-                    InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
-                    InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Failed to extract a file - check logs"));
+                    BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+                    BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Failed to extract a file - check logs"));
                     CURRENT_GAME_BUILD = 0; //reset
                     return false;
                 }
             }
             //if (tpfextractrequired)
             {
-                InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
-                InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting TPFs..."));
-                InstallWorker.ReportProgress(0);
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting TPFs..."));
+                BuildWorker.ReportProgress(0);
 
                 Log.Information("Extracting TPF files.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
@@ -1881,12 +1605,12 @@ namespace AlotAddOnGUI
                 runProcess(exe, args);
             }
 
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting MOD files..."));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting MOD files..."));
             if (modextractrequired)
             {
-                InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
-                InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting MOD files..."));
-                InstallWorker.ReportProgress(0);
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting MOD files..."));
+                BuildWorker.ReportProgress(0);
 
                 Log.Information("Extracting MOD files.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
@@ -1897,8 +1621,8 @@ namespace AlotAddOnGUI
             //InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Removing Duplicates..."));
             //Thread.Sleep(7000);
 
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing to create MEM package..."));
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing to create MEM package..."));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
 
             //Calculate how many files to install...
             int totalfiles = 0;
@@ -1938,7 +1662,7 @@ namespace AlotAddOnGUI
 
                             numcompleted++;
                             int progress = (int)((float)numcompleted / (float)totalfiles * 100);
-                            InstallWorker.ReportProgress(progress);
+                            BuildWorker.ReportProgress(progress);
                         }
                         //  Thread.Sleep(1000);
                     }
@@ -1950,9 +1674,9 @@ namespace AlotAddOnGUI
 
             //COLEANUP EXTRACTION DIR
             Log.Information("Completed staging. Now cleaning up extraction directory");
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up extraction directory"));
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
-            InstallWorker.ReportProgress(100);
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up extraction directory"));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+            BuildWorker.ReportProgress(100);
             try
             {
                 Directory.Delete("Extracted_Mods", true);
@@ -1967,8 +1691,8 @@ namespace AlotAddOnGUI
             Log.Information("[SIZE] AFTER_EXTRACTION_CLEANUP Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
 
             //BUILD MEM PACKAGE
-            InstallWorker.ReportProgress(0);
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Building Addon MEM Package..."));
+            BuildWorker.ReportProgress(0);
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Building Addon MEM Package..."));
             int buildresult = -2;
             {
                 Log.Information("Building MEM Package.");
@@ -1976,7 +1700,7 @@ namespace AlotAddOnGUI
                 string filename = "002_ALOT_ME" + game + "_Addon.mem";
                 string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + MEM_STAGING_DIR + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
 
-                runMEM2(exe, args, InstallWorker);
+                runMEM2(exe, args, BuildWorker);
                 while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
                 {
                     Thread.Sleep(250);
@@ -1990,7 +1714,7 @@ namespace AlotAddOnGUI
                 BACKGROUND_MEM_PROCESS_ERRORS = null;
                 if (buildresult != 1)
                 {
-                    InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up staging directories"));
+                    BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up staging directories"));
                 }
 
                 if (buildresult != 0)
@@ -2004,9 +1728,9 @@ namespace AlotAddOnGUI
                 }
             }
             //cleanup staging
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up staging directory"));
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
-            InstallWorker.ReportProgress(100);
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up staging directory"));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+            BuildWorker.ReportProgress(100);
             try
             {
                 Directory.Delete(MEM_STAGING_DIR, true);
@@ -2018,7 +1742,7 @@ namespace AlotAddOnGUI
             }
             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
             Log.Information("[SIZE] FINAL Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
             CURRENT_GAME_BUILD = 0; //reset
             return buildresult == 0;
         }
@@ -2441,7 +2165,7 @@ namespace AlotAddOnGUI
                 {
                     Button_InstallME1.Content = "Building...";
                     CURRENT_GAME_BUILD = 1;
-                    InstallWorker.RunWorkerAsync(1);
+                    BuildWorker.RunWorkerAsync(1);
                 }
             }
         }
@@ -2502,6 +2226,7 @@ namespace AlotAddOnGUI
 
         private void Checkbox_HideFiles_Click(object sender, RoutedEventArgs e)
         {
+            HIDENONRELEVANTFILES = (bool)Checkbox_HideFiles.IsChecked;
             ApplyFiltering();
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_HIDENONRELEVANTFILES, ((bool)Checkbox_HideFiles.IsChecked ? 1 : 0));
         }
