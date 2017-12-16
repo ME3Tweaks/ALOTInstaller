@@ -10,7 +10,7 @@
 	</addonfile>
 	<addonfile alotversion="5" friendlyname="ALOT for ME2 - Main" tooltipname="Main file of ALOT for ME2" author="CreeperLava">
 		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/" filename="ALOT_ME2_BUNDLETEST.7z"/>
-		<packagefile me2="true" sourcename="DownloadedMods\ALOT_ME2.mem" movedirectly="true"/>
+		<packagefile me2="true" sourcename="Downloaded_Mods\ALOT_ME2_v5.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile alotupdate="true" friendlyname="ALOT for ME2 - Update" tooltipname="Update file of ALOT for ME2" author="CreeperLava">
 		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/" filename="ALOT_ME2_5.3_UPDATE.7z"/>
