@@ -388,7 +388,7 @@ namespace AlotAddOnGUI
 
                         mds.NegativeButtonText = "OK";
                         mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                        var buildResult = await this.ShowMessageAsync("ALOT Addon for Mass Effect " + result + " has been built", "You can install this file by opening MEM and applying it after you have installed ALOT.", MessageDialogStyle.AffirmativeAndNegative, mds);
+                        var buildResult = await this.ShowMessageAsync("ALOT Addon for Mass Effect " + result + " has been built", "You can install ALOT and these files right now, or you can wait until later to install them manually via MEM.", MessageDialogStyle.AffirmativeAndNegative, mds);
                         if (buildResult == MessageDialogResult.Affirmative)
                         {
                             InstallALOT(result);
@@ -446,6 +446,12 @@ namespace AlotAddOnGUI
 
         private void BuildAddon(object sender, DoWorkEventArgs e)
         {
+            string outDir = getOutputDir((int)e.Argument);
+            if (Directory.Exists(outDir))
+            {
+                Utilities.DeleteFilesAndFoldersRecursively(outDir);
+            }
+            Directory.CreateDirectory(outDir);
             bool result = ExtractAddons((int)e.Argument); //arg is game id.
             e.Result = result ? (int)e.Argument : -1; //1 = Error
         }
@@ -717,21 +723,26 @@ namespace AlotAddOnGUI
                     AddonFilesLabel.Text = "Scanning...";
                     timer_Tick(null, null);
                     RunMEMUpdater2();
-                    int alotme1ver = detectInstalledALOTVersion(1);
-                    int alotme2ver = detectInstalledALOTVersion(2);
-                    int alotme3ver = detectInstalledALOTVersion(3);
-
-                    string message1 = "ME1: " + (alotme1ver != 0 ? "Installed, " + alotme1ver + ".x" : "Not installed");
-                    string message2 = "ME2: " + (alotme2ver != 0 ? "Installed, " + alotme2ver + ".x" : "Not installed");
-                    string message3 = "ME3: " + (alotme3ver != 0 ? "Installed, " + alotme3ver + ".x" : "Not installed");
-
-                    Label_ALOTStatus_ME1.Content = message1;
-                    Label_ALOTStatus_ME2.Content = message2;
-                    Label_ALOTStatus_ME3.Content = message3;
+                    UpdateALOTStatus();
 
                     RunMEMUpdaterGUI();
                 }
             }
+        }
+
+        private void UpdateALOTStatus()
+        {
+            int alotme1ver = detectInstalledALOTVersion(1);
+            int alotme2ver = detectInstalledALOTVersion(2);
+            int alotme3ver = detectInstalledALOTVersion(3);
+
+            string message1 = "ME1: " + (alotme1ver != 0 ? "Installed, " + alotme1ver + ".x" : "Not installed");
+            string message2 = "ME2: " + (alotme2ver != 0 ? "Installed, " + alotme2ver + ".x" : "Not installed");
+            string message3 = "ME3: " + (alotme3ver != 0 ? "Installed, " + alotme3ver + ".x" : "Not installed");
+
+            Label_ALOTStatus_ME1.Content = message1;
+            Label_ALOTStatus_ME2.Content = message2;
+            Label_ALOTStatus_ME3.Content = message3;
         }
 
         private async void readManifest()
@@ -1118,17 +1129,11 @@ namespace AlotAddOnGUI
             BACKUP_THREAD_GAME = -1;
             HeaderLabel.Text = PRIMARY_HEADER;
         }
-
-
-
+        
         private string getGameNumberSuffix(int gameNumber)
         {
             return gameNumber == 1 ? "" : " " + gameNumber;
         }
-
-        
-
-
 
         private async void Button_InstallME3_Click(object sender, RoutedEventArgs e)
         {
@@ -1402,7 +1407,6 @@ namespace AlotAddOnGUI
             Button_InstallME3.IsEnabled = false;
             Button_Settings.IsEnabled = false;
 
-            Directory.CreateDirectory(getOutputDir(game));
             Directory.CreateDirectory(MEM_STAGING_DIR);
 
             AddonFilesLabel.Text = "Preparing to install...";
@@ -1600,7 +1604,7 @@ namespace AlotAddOnGUI
                             fs.Position = endPos - 8;
                             int memVersionUsed = fs.ReadInt32();
 
-                            if (memVersionUsed >= 178 && memVersionUsed != 16777472) //default bytes before 178 MEMI Format
+                            if (memVersionUsed >= 10 && memVersionUsed != 16777472) //default bytes before 178 MEMI Format
                             {
                                 fs.Position = endPos - 12;
                                 int ALOTVER = fs.ReadInt32();
@@ -1734,6 +1738,12 @@ namespace AlotAddOnGUI
             //Allow installing UI overlay to be window drag
             if (e.ChangedButton == MouseButton.Left)
                 this.DragMove();
+        }
+
+        private void Button_InstallDone_Click(object sender, RoutedEventArgs e)
+        {
+            InstallingOverlayFlyout.IsOpen = false;
+            SettingsFlyout.IsOpen = true;
         }
     }
 }

@@ -10,9 +10,13 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 
 namespace AlotAddOnGUI
 {
@@ -25,11 +29,19 @@ namespace AlotAddOnGUI
         private readonly int INSTALL_OK = 1;
         public string CurrentTask;
         public int CurrentTaskPercent;
+        public const string UPDATE_SUBTASK = "UPDATE_SUBTASK";
 
         private bool ExtractAddon(AddonFile af)
         {
+            if (af.ALOTVersion > 0)
+            {
+                int installedVer = detectInstalledALOTVersion(CURRENT_GAME_BUILD);
+                if (installedVer != 0)
+                {
+                    return true; //SKIP
+                }
+            }
             string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + MEM_STAGING_DIR + "\\";
-
             string prefix = "[" + Path.GetFileNameWithoutExtension(af.Filename) + "] ";
             Log.Information(prefix + "Processing extraction on " + af.Filename);
             string fileextension = System.IO.Path.GetExtension(af.Filename);
@@ -181,14 +193,7 @@ namespace AlotAddOnGUI
 
                                     string name = Path.GetFileNameWithoutExtension(memfile);
                                     string ext = Path.GetExtension(memfile);
-                                    if (SpaceSaving)
-                                    {
-                                        File.Move(memfile, stagingdirectory + "\\" + name + " - ME" + CURRENT_GAME_BUILD + ext);
-                                    }
-                                    else
-                                    {
-                                        File.Copy(memfile, stagingdirectory + "\\" + name + " - ME" + CURRENT_GAME_BUILD + ext, true);
-                                    }
+                                    File.Move(memfile, stagingdirectory + "\\" + name + " - ME" + CURRENT_GAME_BUILD + ext);
                                 }
                             }
 
@@ -603,10 +608,24 @@ namespace AlotAddOnGUI
             INSTALLING_THREAD_GAME = game;
             WindowButtonCommandsOverlayBehavior = WindowCommandsOverlayBehavior.Flyouts;
             InstallingOverlayFlyout.Theme = FlyoutTheme.Dark;
+
+            //Set BG for this game
+            string bgPath = "images/me" + game + "_bg.jpg";
+            ImageBrush background = new ImageBrush(new BitmapImage(new Uri(BaseUriHelper.GetBaseUri(this), bgPath)));
+            background.Stretch = Stretch.UniformToFill;
+            InstallingOverlayFlyout.Background = background;
             InstallingOverlayFlyout.IsOpen = true;
+            Button_InstallDone.Visibility = System.Windows.Visibility.Hidden;
+            Installing_Spinner.Visibility = System.Windows.Visibility.Visible;
+            Installing_Checkmark.Visibility = System.Windows.Visibility.Hidden;
             Installing = true;
             HeaderLabel.Text = "Installing MEMs";
             InstallWorker.RunWorkerAsync(getOutputDir(INSTALLING_THREAD_GAME));
+        }
+
+        private string GetMusicDirectorry()
+        {
+            return EXE_DIRECTORY + "music\\";
         }
 
         private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -614,7 +633,10 @@ namespace AlotAddOnGUI
             INSTALLING_THREAD_GAME = 0;
             ADDONFILES_TO_BUILD = null;
             Installing = false;
-            InstallingOverlayFlyout.IsOpen = false;
+            UpdateALOTStatus();
+            Installing_Spinner.Visibility = System.Windows.Visibility.Collapsed;
+            Installing_Checkmark.Visibility = System.Windows.Visibility.Visible;
+            Button_InstallDone.Visibility = System.Windows.Visibility.Visible;
         }
 
         private void InstallALOT(object sender, DoWorkEventArgs e)
@@ -665,11 +687,12 @@ namespace AlotAddOnGUI
                 Thread.Sleep(250);
             }
 
+            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
+
             //Apply LOD
             CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
-            CurrentTaskPercent = 0;
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, CurrentTask));
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_TASK_PROGRESS, CurrentTaskPercent));
+            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, CurrentTask));
+
 
             args = "-apply-me1-laa";
             runMEM_Install(exe, args, InstallWorker);
@@ -682,9 +705,7 @@ namespace AlotAddOnGUI
             {
                 //Apply ME1 LAA
                 CurrentTask = "Making Mass Effect Large Address Aware";
-                CurrentTaskPercent = 0;
-                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, CurrentTask));
-                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_TASK_PROGRESS, CurrentTaskPercent));
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, CurrentTask));
 
                 args = "-apply-me1-laa";
                 runMEM_Install(exe, args, InstallWorker);
@@ -699,9 +720,7 @@ namespace AlotAddOnGUI
                 if (af.ALOTVersion > 0)
                 {
                     CurrentTask = "Setting installation marker";
-                    CurrentTaskPercent = 0;
-                    InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, CurrentTask));
-                    InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_TASK_PROGRESS, CurrentTaskPercent));
+                    InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, CurrentTask));
 
                     args = "-apply-mod-tag " + INSTALLING_THREAD_GAME + " " + af.ALOTVersion + " 0";
                     runMEM_Install(exe, args, InstallWorker);
@@ -719,6 +738,9 @@ namespace AlotAddOnGUI
                 Utilities.InstallBinkw32Bypass(INSTALLING_THREAD_GAME);
             }
 
+            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Installation of ALOT for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME)));
+            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, "has completed"));
+
             e.Result = INSTALL_OK;
         }
 
@@ -730,6 +752,9 @@ namespace AlotAddOnGUI
             {
                 case UPDATE_OVERALL_TASK:
                     InstallingOverlay_TopLabel.Text = (string)tc.Data;
+                    break;
+                case UPDATE_SUBTASK:
+                    InstallingOverlay_BottomLabel.Text = (string)tc.Data;
                     break;
                 case UPDATE_OPERATION_LABEL:
                     CurrentTask = (string)tc.Data;

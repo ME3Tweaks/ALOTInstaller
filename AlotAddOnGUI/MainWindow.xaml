@@ -221,13 +221,23 @@
             <Controls:Flyout x:Name="ImportFailedFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom" Height="30">
                 <Label x:Name="ImportFailedLabel" FontSize="14" Content="This is the statusbar. You should not see this text."></Label>
             </Controls:Flyout>
-            <Controls:Flyout x:Name="InstallingOverlayFlyout" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=Height}" MouseDown="InstallingOverlayFlyout_MouseDown">
-                <StackPanel VerticalAlignment="Center" Orientation="Vertical">
-                    <Controls:ProgressRing IsActive="True" />
-                    <TextBlock x:Name="InstallingOverlay_TopLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Overall Task">
+            <Controls:Flyout x:Name="InstallingOverlayFlyout" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDown="InstallingOverlayFlyout_MouseDown">
+                <StackPanel VerticalAlignment="Center" Orientation="Vertical" x:Name="InstallingOverlayFlyout_Panel">
+                    <Image x:Name="Installing_Checkmark" Width="84" Height="84" Source="images/greencheck_large.png" Visibility="Collapsed"/>
+
+                    <Controls:ProgressRing x:Name="Installing_Spinner"  IsActive="True" Margin="10"/>
+                    <TextBlock x:Name="InstallingOverlay_TopLabel" UseLayoutRounding="True" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Overall Task">
+                        <TextBlock.Effect>
+                            <DropShadowEffect ShadowDepth="3" RenderingBias="Quality"/>
+                        </TextBlock.Effect>
                     </TextBlock>
-                    <TextBlock x:Name="InstallingOverlay_BottomLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Getting Ready">
+                    <TextBlock x:Name="InstallingOverlay_BottomLabel" UseLayoutRounding="True" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Getting Ready">
+                        <TextBlock.Effect>
+                            <DropShadowEffect ShadowDepth="3" RenderingBias="Quality"/>
+                        </TextBlock.Effect>
                     </TextBlock>
+                    <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallDone" Visibility="Hidden"  Margin="0,15,0,0" HorizontalAlignment="Center"  Content="And we're done!" ToolTip="Click to dismiss dialog" Click="Button_InstallDone_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+
                 </StackPanel>
             </Controls:Flyout>
         </Controls:FlyoutsControl>

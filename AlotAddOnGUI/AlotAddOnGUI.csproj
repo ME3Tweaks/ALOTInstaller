@@ -190,6 +190,10 @@
     <Content Include="binkw32\me2\binkw32.dll" />
     <Content Include="binkw32\me3\binkw23.dll" />
     <Content Include="binkw32\me3\binkw32.dll" />
+    <Resource Include="images\me2_bg.jpg" />
+    <Resource Include="images\me3_bg.jpg" />
+    <Resource Include="images\me1_bg.jpg" />
+    <Resource Include="images\greencheck_large.png" />
     <Content Include="memodder\MassEffectModder.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -258,7 +262,7 @@ if $(ConfigurationName) == Release (copy /Y "$(SolutionDir)manifest.xml" "$(Proj
       <Output TaskParameter="Assemblies" ItemName="Targets" />
     </GetAssemblyIdentity>
     <ItemGroup>
-      <VersionNumber Include="@(Targets-&gt;'%(Version)')" />
+      <VersionNumber Include="@(Targets->'%(Version)')" />
     </ItemGroup>
   </Target>
 </Project>

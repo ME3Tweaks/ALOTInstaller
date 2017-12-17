@@ -57,8 +57,8 @@ namespace AlotAddOnGUI
             //Read config file.
             string path = null;
             string inipath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                        "MassEffectModder");
-            inipath = Path.Combine(inipath, "MassEffectModder.ini");
+                        "MassEffectModderNoGui");
+            inipath = Path.Combine(inipath, "MassEffectModderNoGui.ini");
 
             if (File.Exists(inipath))
             {
@@ -109,7 +109,28 @@ namespace AlotAddOnGUI
             {
                 path = (string)Registry.GetValue(softwareKey + key64 + gameKey, entry, null);
             }
-            return path;
+            if (path != null)
+            {
+                path = path.TrimEnd(Path.DirectorySeparatorChar);
+
+                string GameEXEPath = "";
+                switch (gameID)
+                {
+                    case 1:
+                        GameEXEPath = Path.Combine(path, @"Binaries\MassEffect.exe");
+                        break;
+                    case 2:
+                        GameEXEPath = Path.Combine(path, @"Binaries\MassEffect2.exe");
+                        break;
+                    case 3:
+                        GameEXEPath = Path.Combine(path, @"Binaries\Win32\MassEffect3.exe");
+                        break;
+                }
+
+                if (File.Exists(GameEXEPath))
+                    return path; //we have path now
+            }
+            return null;
         }
 
         public static bool IsDirectoryEmpty(string path)
