@@ -8,11 +8,16 @@
                       xmlns:AlotAddOnGUI.classes="clr-namespace:AlotAddOnGUI.classes"
                       mc:Ignorable="d"
         BorderBrush="{DynamicResource AccentColorBrush}"
-        BorderThickness="1"
-        Title="ALOT Addon Builder" MinHeight="600" MinWidth="800" Height="600" Width="800"
+        BorderThickness="0"
+        Title="ALOT Installer" MinHeight="600" MinWidth="800" Height="600" Width="800"
         Loaded="Window_Loaded"
         WindowButtonCommandsOverlayBehavior="Never"
         Drop="File_Drop" AllowDrop="true">
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo x:Name="taskBarItemInfo1" >
+    
+        </TaskbarItemInfo>
+    </Window.TaskbarItemInfo>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -35,7 +40,7 @@
                 </ToolTip>
             </Label.ToolTip>
         </Label>
-        <ProgressBar Minimum="0" Maximum="100" x:Name="Install_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true"/>
+        <ProgressBar Minimum="0" Maximum="100" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true"/>
 
         <ListView Grid.Column="0" Grid.Row="3" Name="lvUsers">
             <!-- This is what each list item looks like-->
@@ -222,23 +227,21 @@
                 <Label x:Name="ImportFailedLabel" FontSize="14" Content="This is the statusbar. You should not see this text."></Label>
             </Controls:Flyout>
             <Controls:Flyout x:Name="InstallingOverlayFlyout" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDown="InstallingOverlayFlyout_MouseDown">
-                <StackPanel VerticalAlignment="Center" Orientation="Vertical" x:Name="InstallingOverlayFlyout_Panel">
-                    <Image x:Name="Installing_Checkmark" Width="84" Height="84" Source="images/greencheck_large.png" Visibility="Collapsed"/>
+                <Border x:Name="InstallingOverlayFlyout_Border" Padding="10" Background="#55000000" >
+                    <StackPanel VerticalAlignment="Center" Orientation="Vertical" x:Name="InstallingOverlayFlyout_Panel">
+                        <Image x:Name="Installing_Checkmark" Width="84" Height="84" Source="images/greencheck_large.png" Visibility="Collapsed"/>
 
-                    <Controls:ProgressRing x:Name="Installing_Spinner"  IsActive="True" Margin="10"/>
-                    <TextBlock x:Name="InstallingOverlay_TopLabel" UseLayoutRounding="True" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Overall Task">
-                        <TextBlock.Effect>
-                            <DropShadowEffect ShadowDepth="3" RenderingBias="Quality"/>
-                        </TextBlock.Effect>
-                    </TextBlock>
-                    <TextBlock x:Name="InstallingOverlay_BottomLabel" UseLayoutRounding="True" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Getting Ready">
-                        <TextBlock.Effect>
-                            <DropShadowEffect ShadowDepth="3" RenderingBias="Quality"/>
-                        </TextBlock.Effect>
-                    </TextBlock>
-                    <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallDone" Visibility="Hidden"  Margin="0,15,0,0" HorizontalAlignment="Center"  Content="And we're done!" ToolTip="Click to dismiss dialog" Click="Button_InstallDone_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                        <Controls:ProgressRing x:Name="Installing_Spinner"  IsActive="True" Margin="0,0,0,10"/>
+                        <TextBlock x:Name="InstallingOverlay_TopLabel" UseLayoutRounding="True" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Overall Task">
+                        </TextBlock>
+                        <TextBlock x:Name="InstallingOverlay_StageLabel" UseLayoutRounding="True" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Stage 3 of 7">
+                        </TextBlock>
+                        <TextBlock x:Name="InstallingOverlay_BottomLabel" UseLayoutRounding="True" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Getting Ready">
+                        </TextBlock>
+                        <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallDone" Visibility="Hidden"  Margin="0,15,0,0" HorizontalAlignment="Center"  Content="And we're done!" ToolTip="Click to dismiss dialog" Click="Button_InstallDone_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
 
-                </StackPanel>
+                    </StackPanel>
+                </Border>
             </Controls:Flyout>
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>

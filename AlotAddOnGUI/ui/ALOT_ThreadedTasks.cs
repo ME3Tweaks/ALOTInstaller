@@ -30,6 +30,10 @@ namespace AlotAddOnGUI
         public string CurrentTask;
         public int CurrentTaskPercent;
         public const string UPDATE_SUBTASK = "UPDATE_SUBTASK";
+        private int INSTALL_STAGE = 0;
+        public const string UPDATE_STAGE_LABEL = "UPDATE_STAGE_LABEL";
+        private int STAGE_COUNT;
+        public const string HIDE_STAGE_LABEL = "HIDE_STAGE_LABEL";
 
         private bool ExtractAddon(AddonFile af)
         {
@@ -63,7 +67,6 @@ namespace AlotAddOnGUI
                     case ".rar":
                         {
                             //Extract file
-
                             Log.Information(prefix + "Extracting file: " + af.Filename);
                             string exe = BINARY_DIRECTORY + "7z.exe";
                             string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
@@ -490,7 +493,9 @@ namespace AlotAddOnGUI
         {
             if (e.UserState is null)
             {
-                Install_ProgressBar.Value = e.ProgressPercentage;
+                Build_ProgressBar.Value = e.ProgressPercentage;
+                TaskbarItemInfo.ProgressValue = e.ProgressPercentage / 100.0;
+
             }
             else
             {
@@ -501,11 +506,11 @@ namespace AlotAddOnGUI
                         AddonFilesLabel.Text = (string)tc.Data;
                         break;
                     case UPDATE_PROGRESSBAR_INDETERMINATE:
-                        Install_ProgressBar.IsIndeterminate = (bool)tc.Data;
+                        Build_ProgressBar.IsIndeterminate = (bool)tc.Data;
                         break;
                     case ERROR_OCCURED:
-                        Install_ProgressBar.IsIndeterminate = false;
-                        Install_ProgressBar.Value = 0;
+                        Build_ProgressBar.IsIndeterminate = false;
+                        Build_ProgressBar.Value = 0;
                         //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                         break;
                     case SHOW_DIALOG:
@@ -530,7 +535,8 @@ namespace AlotAddOnGUI
                         break;
                     case INCREMENT_COMPLETION_EXTRACTION:
                         Interlocked.Increment(ref completed);
-                        Install_ProgressBar.Value = (completed / (double)ADDONSTOINSTALL_COUNT) * 100;
+                        Build_ProgressBar.Value = (completed / (double)ADDONSTOINSTALL_COUNT) * 100;
+
                         break;
                 }
             }
@@ -614,13 +620,33 @@ namespace AlotAddOnGUI
             ImageBrush background = new ImageBrush(new BitmapImage(new Uri(BaseUriHelper.GetBaseUri(this), bgPath)));
             background.Stretch = Stretch.UniformToFill;
             InstallingOverlayFlyout.Background = background;
-            InstallingOverlayFlyout.IsOpen = true;
             Button_InstallDone.Visibility = System.Windows.Visibility.Hidden;
             Installing_Spinner.Visibility = System.Windows.Visibility.Visible;
             Installing_Checkmark.Visibility = System.Windows.Visibility.Hidden;
             Installing = true;
             HeaderLabel.Text = "Installing MEMs";
+            InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Visible;
+            InstallingOverlay_StageLabel.Text = "Getting ready";
+            InstallingOverlay_BottomLabel.Text = "Please wait";
+
+            SolidColorBrush backgroundShadeBrush = null;
+            switch (INSTALLING_THREAD_GAME)
+            {
+                case 1:
+                    backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x44, 0, 0, 0));
+                    break;
+                case 2:
+                    backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x55, 0, 0, 0));
+                    break;
+                case 3:
+                    backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x33, 0, 0, 0));
+                    break;
+            }
+            InstallingOverlayFlyout_Border.Background = backgroundShadeBrush;
+            TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
             InstallWorker.RunWorkerAsync(getOutputDir(INSTALLING_THREAD_GAME));
+            InstallingOverlayFlyout.IsOpen = true;
+
         }
 
         private string GetMusicDirectorry()
@@ -632,16 +658,34 @@ namespace AlotAddOnGUI
         {
             INSTALLING_THREAD_GAME = 0;
             ADDONFILES_TO_BUILD = null;
+            INSTALL_STAGE = 0;
             Installing = false;
             UpdateALOTStatus();
             Installing_Spinner.Visibility = System.Windows.Visibility.Collapsed;
             Installing_Checkmark.Visibility = System.Windows.Visibility.Visible;
             Button_InstallDone.Visibility = System.Windows.Visibility.Visible;
+            TaskbarItemInfo.ProgressValue = 0;
+            TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
+            var helper = new FlashWindowHelper(System.Windows.Application.Current);
+            helper.FlashApplicationWindow();
         }
 
         private void InstallALOT(object sender, DoWorkEventArgs e)
         {
             Log.Information("Installing ALOT...");
+            if (INSTALLING_THREAD_GAME == 1)
+            {
+                STAGE_COUNT = 4;
+            }
+            else if (INSTALLING_THREAD_GAME == 2)
+            {
+                STAGE_COUNT = 4;
+            }
+            else
+            {
+                STAGE_COUNT = 5;
+            }
+            INSTALL_STAGE = 0;
 
             List<string> acceptedIPC = new List<string>();
             acceptedIPC.Add("TASK_PROGRESS");
@@ -676,7 +720,10 @@ namespace AlotAddOnGUI
 
             //Install Textures
             string outputDir = getOutputDir(INSTALLING_THREAD_GAME, false);
-            CurrentTask = "Installing Textures";
+            Interlocked.Increment(ref INSTALL_STAGE);
+            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
+
+            CurrentTask = "Installing textures";
             CurrentTaskPercent = 0;
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, CurrentTask));
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_TASK_PROGRESS, CurrentTaskPercent));
@@ -688,6 +735,9 @@ namespace AlotAddOnGUI
             }
 
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
+            Interlocked.Increment(ref INSTALL_STAGE);
+            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
+
 
             //Apply LOD
             CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
@@ -738,6 +788,8 @@ namespace AlotAddOnGUI
                 Utilities.InstallBinkw32Bypass(INSTALLING_THREAD_GAME);
             }
 
+            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
+
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Installation of ALOT for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME)));
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, "has completed"));
 
@@ -750,6 +802,12 @@ namespace AlotAddOnGUI
             ThreadCommand tc = (ThreadCommand)e.UserState;
             switch (tc.Command)
             {
+                case UPDATE_STAGE_LABEL:
+                    InstallingOverlay_StageLabel.Text = "Stage " + INSTALL_STAGE + " of " + STAGE_COUNT;
+                    break;
+                case HIDE_STAGE_LABEL:
+                    InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Collapsed;
+                    break;
                 case UPDATE_OVERALL_TASK:
                     InstallingOverlay_TopLabel.Text = (string)tc.Data;
                     break;
@@ -770,13 +828,15 @@ namespace AlotAddOnGUI
                         CurrentTaskPercent = (int)tc.Data;
                     }
                     InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
+                    TaskbarItemInfo.ProgressValue = (double)CurrentTaskPercent / 100;
+
                     break;
                 case UPDATE_PROGRESSBAR_INDETERMINATE:
                     //Install_ProgressBar.IsIndeterminate = (bool)tc.Data;
                     break;
                 case ERROR_OCCURED:
-                    Install_ProgressBar.IsIndeterminate = false;
-                    Install_ProgressBar.Value = 0;
+                    Build_ProgressBar.IsIndeterminate = false;
+                    Build_ProgressBar.Value = 0;
                     //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                     break;
                 case SHOW_DIALOG:
@@ -887,6 +947,8 @@ namespace AlotAddOnGUI
                                 break;
                             case "PHASE":
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
+                                Interlocked.Increment(ref INSTALL_STAGE);
+                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_STAGE_LABEL));
                                 break;
                             case "ERROR":
                                 Log.Information("[ERROR] Realtime Process Output: " + param);

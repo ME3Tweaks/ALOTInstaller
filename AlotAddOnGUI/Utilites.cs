@@ -57,8 +57,8 @@ namespace AlotAddOnGUI
             //Read config file.
             string path = null;
             string inipath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                        "MassEffectModderNoGui");
-            inipath = Path.Combine(inipath, "MassEffectModderNoGui.ini");
+                        "MassEffectModder");
+            inipath = Path.Combine(inipath, "MassEffectModder.ini");
 
             if (File.Exists(inipath))
             {
@@ -269,6 +269,7 @@ namespace AlotAddOnGUI
         {
             foreach (string file in Directory.GetFiles(target_dir))
             {
+                File.SetAttributes(file, FileAttributes.Normal); //remove read only
                 File.Delete(file);
             }
 

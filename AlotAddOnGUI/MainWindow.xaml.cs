@@ -404,11 +404,11 @@ namespace AlotAddOnGUI
 
         }
 
-        private async void InstallProgressChanged(object sender, ProgressChangedEventArgs e)
+        private async void BuildProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             if (e.UserState is null)
             {
-                Install_ProgressBar.Value = e.ProgressPercentage;
+                Build_ProgressBar.Value = e.ProgressPercentage;
             }
             else
             {
@@ -419,12 +419,12 @@ namespace AlotAddOnGUI
                         AddonFilesLabel.Text = (string)tc.Data;
                         break;
                     case UPDATE_PROGRESSBAR_INDETERMINATE:
-                        Install_ProgressBar.IsIndeterminate = (bool)tc.Data;
+                        Build_ProgressBar.IsIndeterminate = (bool)tc.Data;
                         break;
                     case ERROR_OCCURED:
 
-                        Install_ProgressBar.IsIndeterminate = false;
-                        Install_ProgressBar.Value = 0;
+                        Build_ProgressBar.IsIndeterminate = false;
+                        Build_ProgressBar.Value = 0;
                         if (!ERROR_SHOWING)
                         {
                             ERROR_SHOWING = true;
@@ -438,7 +438,7 @@ namespace AlotAddOnGUI
                         break;
                     case INCREMENT_COMPLETION_EXTRACTION:
                         Interlocked.Increment(ref completed);
-                        Install_ProgressBar.Value = (completed / (double)ADDONSTOINSTALL_COUNT) * 100;
+                        Build_ProgressBar.Value = (completed / (double)ADDONSTOINSTALL_COUNT) * 100;
                         break;
                 }
             }
@@ -499,7 +499,7 @@ namespace AlotAddOnGUI
                     () =>
                     {
                         // Code to run on the GUI thread.
-                        Install_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
+                        Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
                         AddonFilesLabel.Text = "ME1: " + numME1FilesReady + "/" + numME1Files + " - ME2: " + numME2FilesReady + "/" + numME2Files + " - ME3: " + numME3FilesReady + "/" + numME3Files;
                     });
                     //Check for file existence
@@ -550,9 +550,9 @@ namespace AlotAddOnGUI
                     backgroundticker.Tick += new EventHandler(timer_Tick);
                     backgroundticker.Interval = new TimeSpan(0, 0, 5); // execute every 5s
                     backgroundticker.Start();
-
+                    BuildWorker = new BackgroundWorker();
                     BuildWorker.DoWork += BuildAddon;
-                    BuildWorker.ProgressChanged += InstallProgressChanged;
+                    BuildWorker.ProgressChanged += BuildProgressChanged;
                     BuildWorker.RunWorkerCompleted += BuildCompleted;
                     BuildWorker.WorkerReportsProgress = true;
                 }
@@ -678,7 +678,7 @@ namespace AlotAddOnGUI
                 {
                     webClient.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
                     Log.Information("Fetching latest manifest from github");
-                    Install_ProgressBar.IsIndeterminate = true;
+                    Build_ProgressBar.IsIndeterminate = true;
                     AddonFilesLabel.Text = "Downloading latest addon manifest";
                     try
                     {
@@ -718,7 +718,7 @@ namespace AlotAddOnGUI
 
                     Log.Information("readManifest() has completed. Switching over to user control");
 
-                    Install_ProgressBar.IsIndeterminate = false;
+                    Build_ProgressBar.IsIndeterminate = false;
                     HeaderLabel.Text = PRIMARY_HEADER;
                     AddonFilesLabel.Text = "Scanning...";
                     timer_Tick(null, null);
@@ -1129,7 +1129,7 @@ namespace AlotAddOnGUI
             BACKUP_THREAD_GAME = -1;
             HeaderLabel.Text = PRIMARY_HEADER;
         }
-        
+
         private string getGameNumberSuffix(int gameNumber)
         {
             return gameNumber == 1 ? "" : " " + gameNumber;
@@ -1200,7 +1200,7 @@ namespace AlotAddOnGUI
             return ret;
         }
 
-        
+
 
         /*  private int runMEM(string exe, string args)
           {
@@ -1368,14 +1368,26 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        private async void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            System.Diagnostics.Process.Start(e.Uri.ToString());
-            this.nIcon.Visible = true;
-            //this.WindowState = System.Windows.WindowState.Minimized;
-            this.nIcon.Icon = Properties.Resources.tooltiptrayicon;
             string fname = (string)((Hyperlink)e.Source).Tag;
-            this.nIcon.ShowBalloonTip(14000, "Directions", "Download the file with filename: \"" + fname + "\"", ToolTipIcon.Info);
+
+            try
+            {
+                Log.Information("Opening URL: " + e.Uri.ToString());
+                throw new Exception("test");
+                System.Diagnostics.Process.Start(e.Uri.ToString());
+                this.nIcon.Visible = true;
+                //this.WindowState = System.Windows.WindowState.Minimized;
+                this.nIcon.Icon = Properties.Resources.tooltiptrayicon;
+                this.nIcon.ShowBalloonTip(14000, "Directions", "Download the file with filename: \"" + fname + "\"", ToolTipIcon.Info);
+            }
+            catch (Exception other)
+            {
+                Log.Error("Exception opening browser - handled. The error was " + other.Message);
+                System.Windows.Clipboard.SetText(e.Uri.ToString());
+                await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar. Download the file named "+fname+", then drag and drop it onto this program's interface.");
+            }
         }
 
         private async Task<bool> InitInstall(int game)
@@ -1676,11 +1688,14 @@ namespace AlotAddOnGUI
             Installing = true;
             HeaderLabel.Text = "Restoring Mass Effect" + (game == 1 ? "" : " " + game) + "...\nDo not close the application until this process completes.";
             Button_InstallME1.IsEnabled = Button_InstallME2.IsEnabled = Button_InstallME3.IsEnabled = Button_Settings.IsEnabled = false;
+            TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
             BackupWorker.RunWorkerAsync();
         }
 
         private void RestoreCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
+
             bool result = (bool)e.Result;
             if (result)
             {
@@ -1691,6 +1706,7 @@ namespace AlotAddOnGUI
                 AddonFilesLabel.Text = "Restore failed! Check the logs.";
             }
             SetupButtons();
+            detectInstalledALOTVersion(BACKUP_THREAD_GAME);
             Button_Settings.IsEnabled = true;
             Installing = false;
 
