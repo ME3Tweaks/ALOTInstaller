@@ -28,7 +28,7 @@ namespace AlotAddOnGUI
             Parsed<Options> parsedItems = null;
             string loggingBasePath = System.AppDomain.CurrentDomain.BaseDirectory;
             string updateDestinationPath = null;
-            if (args.Length > 0)
+            if (args.Length > 1)
             {
                 var result = Parser.Default.ParseArguments<Options>(args);
                 if (result.GetType() == typeof(Parsed<Options>))

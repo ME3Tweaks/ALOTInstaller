@@ -1,4 +1,5 @@
-﻿<Controls:MetroWindow x:Class="AlotAddOnGUI.MainWindow"
+﻿<Controls:MetroWindow 
+        x:Class="AlotAddOnGUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -219,6 +220,15 @@
             </Controls:Flyout>
             <Controls:Flyout x:Name="ImportFailedFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom" Height="30">
                 <Label x:Name="ImportFailedLabel" FontSize="14" Content="This is the statusbar. You should not see this text."></Label>
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="InstallingOverlayFlyout" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=Height}" MouseDown="InstallingOverlayFlyout_MouseDown">
+                <StackPanel VerticalAlignment="Center" Orientation="Vertical">
+                    <Controls:ProgressRing IsActive="True" />
+                    <TextBlock x:Name="InstallingOverlay_TopLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Overall Task">
+                    </TextBlock>
+                    <TextBlock x:Name="InstallingOverlay_BottomLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Getting Ready">
+                    </TextBlock>
+                </StackPanel>
             </Controls:Flyout>
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>
