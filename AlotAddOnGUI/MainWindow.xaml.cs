@@ -657,7 +657,7 @@ namespace AlotAddOnGUI
                 {
                     Button_InstallME2.IsEnabled = true;
                     Button_InstallME2.ToolTip = "Click to build ALOT Addon and install ALOT for Mass Effect 2";
-                    Button_InstallME2.Content = "Install ALOT for for ME2";
+                    Button_InstallME2.Content = "Install ALOT for ME2";
                 }
 
                 if (!me3Installed)
