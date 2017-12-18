@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using ByteSizeLib;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -77,9 +78,16 @@ namespace AlotAddOnGUI.classes
                         continue;
                     }
                 }
-                worker.ReportProgress(done, new ThreadCommand(UPDATE_OPERATION_LABEL, fi.Name));
+                string displayName = fi.Name;
+                string path = Path.Combine(target.FullName, fi.Name);
+                if (path.ToLower().EndsWith(".sfar") || path.ToLower().EndsWith(".tfc"))
+                {
+                    long length = new System.IO.FileInfo(fi.FullName).Length;
+                    displayName += " (" + ByteSize.FromBytes(length) + ")";
+                }
+                worker.ReportProgress(done, new ThreadCommand(UPDATE_OPERATION_LABEL, displayName));
                 Log.Information(@"Copying {0}\{1}", target.FullName, fi.Name);
-                fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
+                fi.CopyTo(path, true);
                 numdone++;
                 worker.ReportProgress((int)((numdone * 1.0 / total) * 100.0));
             }

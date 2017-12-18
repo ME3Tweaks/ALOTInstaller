@@ -2,6 +2,7 @@
 using ByteSizeLib;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.WindowsAPICodePack.Taskbar;
 using Serilog;
 using SlavaGu.ConsoleAppLauncher;
 using System;
@@ -27,6 +28,7 @@ namespace AlotAddOnGUI
         public const string UPDATE_TASK_PROGRESS = "UPDATE_TASK_PROGRESS";
         public const string UPDATE_OVERALL_TASK = "UPDATE_OVERALL_TASK";
         private readonly int INSTALL_OK = 1;
+        public const string RESTORE_FAILED_COULD_NOT_DELETE_FOLDER = "RESTORE_FAILED_COULD_NOT_DELETE_FOLDER";
         public string CurrentTask;
         public int CurrentTaskPercent;
         public const string UPDATE_SUBTASK = "UPDATE_SUBTASK";
@@ -34,17 +36,11 @@ namespace AlotAddOnGUI
         public const string UPDATE_STAGE_LABEL = "UPDATE_STAGE_LABEL";
         private int STAGE_COUNT;
         public const string HIDE_STAGE_LABEL = "HIDE_STAGE_LABEL";
+        private ALOTVersionInfo PREINSTALL_VERSION_INFO;
 
         private bool ExtractAddon(AddonFile af)
         {
-            if (af.ALOTVersion > 0)
-            {
-                int installedVer = detectInstalledALOTVersion(CURRENT_GAME_BUILD);
-                if (installedVer != 0)
-                {
-                    return true; //SKIP
-                }
-            }
+
             string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + MEM_STAGING_DIR + "\\";
             string prefix = "[" + Path.GetFileNameWithoutExtension(af.Filename) + "] ";
             Log.Information(prefix + "Processing extraction on " + af.Filename);
@@ -106,7 +102,7 @@ namespace AlotAddOnGUI
                                             pf.Processed = true; //no more ops on this package file.
                                             break;
                                         }
-                                        if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTUpdate)
+                                        if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTUpdateVersion > 0)
                                         {
                                             //It's an ALOT update file. We will move this directly to the output directory.
                                             Log.Information("ALOT UPDATE FILE - moving to output: " + fname);
@@ -274,7 +270,7 @@ namespace AlotAddOnGUI
             string newText = TasksDisplayEngine.ReleaseTask(processingStr);
             if (newText != null)
             {
-                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Processing " + newText));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, newText));
             }
             return true;
         }
@@ -302,12 +298,36 @@ namespace AlotAddOnGUI
             {
                 if (af.Ready && (game == 1 && af.Game_ME1 || game == 2 && af.Game_ME2 || game == 3 && af.Game_ME3))
                 {
+
+                    if (PREINSTALL_VERSION_INFO != null)
+                    {
+                        //Detected MEMI tag
+                        //Check if ALOT main file is installed. If it is and this is ALOT file, skip
+                        if (af.ALOTVersion > 0 && PREINSTALL_VERSION_INFO.ALOTVER > 0)
+                        {
+                            Log.Information("ALOT File in queue for processing but ALOT is already installed. Skipping...");
+                            continue;
+                            return true; //SKIP
+                        }
+
+                        //Check if ALOT update file of this version or higher is installed. If it is and this is ALOT update file, skip
+                        if (af.ALOTUpdateVersion > 0)
+                        {
+                            Debug.WriteLine("OK");
+                        }
+                        if (af.ALOTUpdateVersion > 0 && PREINSTALL_VERSION_INFO.ALOTUPDATEVER >= af.ALOTUpdateVersion)
+                        {
+                            Log.Information("ALOT Update File in queue for processing, but ALOT update of this version or greater is already installed. Skipping...");
+                            continue;
+                        }
+                    }
+
                     Log.Information("Adding AddonFile to installation list: " + af.FriendlyName);
                     ADDONFILES_TO_BUILD.Add(af);
                 }
             }
             ADDONSTOINSTALL_COUNT = ADDONFILES_TO_BUILD.Count;
-            int completed = 0;
+            completed = 0;
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting Mods..."));
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
 
@@ -494,14 +514,17 @@ namespace AlotAddOnGUI
             if (e.UserState is null)
             {
                 Build_ProgressBar.Value = e.ProgressPercentage;
-                TaskbarItemInfo.ProgressValue = e.ProgressPercentage / 100.0;
-
+                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
+                TaskbarManager.Instance.SetProgressValue(e.ProgressPercentage, 100);
             }
             else
             {
                 ThreadCommand tc = (ThreadCommand)e.UserState;
                 switch (tc.Command)
                 {
+                    case RESTORE_FAILED_COULD_NOT_DELETE_FOLDER:
+                        await this.ShowMessageAsync("Restore failed", "Could not delete the existing game directory. This is usually due to something open or running from within the game folder. Close other programs and try again.");
+                        return;
                     case UPDATE_OPERATION_LABEL:
                         AddonFilesLabel.Text = (string)tc.Data;
                         break;
@@ -605,7 +628,7 @@ namespace AlotAddOnGUI
 
         private void InstallALOT(int game)
         {
-            InstallingOverlay_TopLabel.Text = "Installing ALOT for Mass Effect" + getGameNumberSuffix(game);
+            InstallingOverlay_TopLabel.Text = "Preparing installer";
             InstallWorker = new BackgroundWorker();
             InstallWorker.DoWork += InstallALOT;
             InstallWorker.WorkerReportsProgress = true;
@@ -624,7 +647,9 @@ namespace AlotAddOnGUI
             Installing_Spinner.Visibility = System.Windows.Visibility.Visible;
             Installing_Checkmark.Visibility = System.Windows.Visibility.Hidden;
             Installing = true;
-            HeaderLabel.Text = "Installing MEMs";
+            HeaderLabel.Text = "Installing MEMs...";
+            AddonFilesLabel.Text = "Running in installer mode.";
+
             InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Visible;
             InstallingOverlay_StageLabel.Text = "Getting ready";
             InstallingOverlay_BottomLabel.Text = "Please wait";
@@ -633,20 +658,19 @@ namespace AlotAddOnGUI
             switch (INSTALLING_THREAD_GAME)
             {
                 case 1:
-                    backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x44, 0, 0, 0));
+                    backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x77, 0, 0, 0));
                     break;
                 case 2:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x55, 0, 0, 0));
                     break;
                 case 3:
-                    backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x33, 0, 0, 0));
+                    backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x55, 0, 0, 0));
                     break;
             }
             InstallingOverlayFlyout_Border.Background = backgroundShadeBrush;
-            TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
             InstallWorker.RunWorkerAsync(getOutputDir(INSTALLING_THREAD_GAME));
-            InstallingOverlayFlyout.IsOpen = true;
-
+            SetInstallFlyoutState(true);
         }
 
         private string GetMusicDirectorry()
@@ -656,6 +680,22 @@ namespace AlotAddOnGUI
 
         private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            Log.Information("InstallWorker: We are installing ALOT in this pass.");
+
+            if (e.Result != null)
+            {
+                if ((int)e.Result == INSTALL_OK)
+                {
+                    HeaderLabel.Text = "Installation has completed";
+                    AddonFilesLabel.Text = "Thanks for using ALOT Installer.";
+
+                }
+                else
+                {
+                    HeaderLabel.Text = "Installation failed! Check the logs for more detailed information";
+                    AddonFilesLabel.Text = "Check the logs for more detailed information.";
+                }
+            }
             INSTALLING_THREAD_GAME = 0;
             ADDONFILES_TO_BUILD = null;
             INSTALL_STAGE = 0;
@@ -664,15 +704,17 @@ namespace AlotAddOnGUI
             Installing_Spinner.Visibility = System.Windows.Visibility.Collapsed;
             Installing_Checkmark.Visibility = System.Windows.Visibility.Visible;
             Button_InstallDone.Visibility = System.Windows.Visibility.Visible;
-            TaskbarItemInfo.ProgressValue = 0;
-            TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
+            TaskbarManager.Instance.SetProgressValue(0, 0);
             var helper = new FlashWindowHelper(System.Windows.Application.Current);
             helper.FlashApplicationWindow();
         }
 
         private void InstallALOT(object sender, DoWorkEventArgs e)
         {
-            Log.Information("Installing ALOT...");
+            Log.Information("InstallWorker Thread starting for ME" + INSTALLING_THREAD_GAME);
+            ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
+            bool RemoveMipMaps = (versionInfo == null || versionInfo.ALOTVER == 0); //remove mipmaps only if alot is not installed
             if (INSTALLING_THREAD_GAME == 1)
             {
                 STAGE_COUNT = 4;
@@ -685,7 +727,47 @@ namespace AlotAddOnGUI
             {
                 STAGE_COUNT = 5;
             }
+
+            if (!RemoveMipMaps)
+            {
+                STAGE_COUNT -= 2; //Scanning, Removing
+            }
+
             INSTALL_STAGE = 0;
+            //Checking files for title
+
+            bool installedALOT = false;
+            byte justInstalledUpdate = 0;
+            //Check if ALOT is in files that were installed
+            foreach (AddonFile af in ADDONFILES_TO_BUILD)
+            {
+                if (af.ALOTVersion > 0)
+                {
+                    Log.Information("InstallWorker: We are installing ALOT v" + af.ALOTVersion + " in this pass.");
+                    installedALOT = true;
+                }
+                if (af.ALOTUpdateVersion > 0)
+                {
+                    Log.Information("InstallWorker: We are installing ALOT Update v" + af.ALOTUpdateVersion + " in this pass.");
+
+                    justInstalledUpdate = af.ALOTUpdateVersion;
+
+                }
+            }
+
+            string topText = "Installing ALOT for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+            if (!installedALOT)
+            {
+                if (justInstalledUpdate > 0)
+                {
+                    topText = "Installing ALOT Update for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+                } else
+                {
+                    topText = "Installing texture mods for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+                }
+            }
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OVERALL_TASK, topText));
+
 
             List<string> acceptedIPC = new List<string>();
             acceptedIPC.Add("TASK_PROGRESS");
@@ -697,32 +779,40 @@ namespace AlotAddOnGUI
             if (INSTALLING_THREAD_GAME == 3)
             {
                 //Unpack DLC
+                Log.Information("InstallWorker(): ME3 -> Unpacking DLC.");
                 CurrentTask = "Unpacking DLC";
                 CurrentTaskPercent = 0;
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, CurrentTask));
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_TASK_PROGRESS, CurrentTaskPercent));
-
+                Interlocked.Increment(ref INSTALL_STAGE);
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
                 args = "-unpack-dlcs -ipc";
                 runMEM_Install(exe, args, InstallWorker);
                 while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
                 {
                     Thread.Sleep(250);
                 }
+                Interlocked.Increment(ref INSTALL_STAGE);
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
             }
 
             //Scan and remove empty MipMaps
-            args = "-scan-with-remove " + INSTALLING_THREAD_GAME + " -ipc";
-            runMEM_Install(exe, args, InstallWorker);
-            while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+            if (RemoveMipMaps)
             {
-                Thread.Sleep(250);
+                Log.Information("InstallWorker(): Removing Empty MipMaps");
+
+                args = "-scan-with-remove " + INSTALLING_THREAD_GAME + " -ipc";
+                runMEM_Install(exe, args, InstallWorker);
+                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+                {
+                    Thread.Sleep(250);
+                }
+                Interlocked.Increment(ref INSTALL_STAGE);
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
             }
 
             //Install Textures
             string outputDir = getOutputDir(INSTALLING_THREAD_GAME, false);
-            Interlocked.Increment(ref INSTALL_STAGE);
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
-
             CurrentTask = "Installing textures";
             CurrentTaskPercent = 0;
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, CurrentTask));
@@ -735,8 +825,7 @@ namespace AlotAddOnGUI
             }
 
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
-            Interlocked.Increment(ref INSTALL_STAGE);
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
+            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
 
 
             //Apply LOD
@@ -765,22 +854,40 @@ namespace AlotAddOnGUI
                 }
             }
 
-            foreach (AddonFile af in ADDONFILES_TO_BUILD)
+            //Create/Update Marker File
+            short ALOTVersion = 0;
+            if (versionInfo == null)
             {
-                if (af.ALOTVersion > 0)
+                //Check if ALOT is in files that were installed
+                foreach (AddonFile af in ADDONFILES_TO_BUILD)
                 {
-                    CurrentTask = "Setting installation marker";
-                    InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, CurrentTask));
-
-                    args = "-apply-mod-tag " + INSTALLING_THREAD_GAME + " " + af.ALOTVersion + " 0";
-                    runMEM_Install(exe, args, InstallWorker);
-                    while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+                    if (af.ALOTVersion > 0)
                     {
-                        Thread.Sleep(250);
+                        ALOTVersion = af.ALOTVersion;
+                        installedALOT = true;
+                        break;
                     }
-                    break;
                 }
             }
+            else
+            {
+                ALOTVersion = versionInfo.ALOTVER;
+            }
+
+            //Update Marker
+            byte updateVersion = 0;
+            if (justInstalledUpdate > 0)
+            {
+                updateVersion = justInstalledUpdate;
+            }
+            else
+            {
+                updateVersion = versionInfo.ALOTUPDATEVER;
+            }
+
+            //Write Marker
+            ALOTVersionInfo newVersion = new ALOTVersionInfo(ALOTVersion, updateVersion, 0, 0);
+            Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
 
             //Install Binkw32
             if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
@@ -790,7 +897,23 @@ namespace AlotAddOnGUI
 
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
 
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Installation of ALOT for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME)));
+            string taskString = "Installation of ALOT for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+            if (!installedALOT)
+            {
+                //use different end string
+
+                if (justInstalledUpdate > 0)
+                {
+                    //installed update
+                    taskString = "Installation of ALOT Update for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+                }
+                else
+                {
+                    //addon or other files
+                    taskString = "Installation of texture mods for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+                }
+            }
+            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, taskString));
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, "has completed"));
 
             e.Result = INSTALL_OK;
@@ -828,8 +951,7 @@ namespace AlotAddOnGUI
                         CurrentTaskPercent = (int)tc.Data;
                     }
                     InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
-                    TaskbarItemInfo.ProgressValue = (double)CurrentTaskPercent / 100;
-
+                    TaskbarManager.Instance.SetProgressValue(CurrentTaskPercent, 100);
                     break;
                 case UPDATE_PROGRESSBAR_INDETERMINATE:
                     //Install_ProgressBar.IsIndeterminate = (bool)tc.Data;
@@ -968,9 +1090,50 @@ namespace AlotAddOnGUI
             BACKGROUND_MEM_PROCESS.Run();
         }
 
+        private void runMEM_DetectBadMods(string exe, string args, BackgroundWorker worker, List<string> acceptedIPC = null)
+        {
+            Debug.WriteLine("Running process: " + exe + " " + args);
+            Log.Information("Running process: " + exe + " " + args);
+
+
+            BACKGROUND_MEM_PROCESS = new ConsoleApp(exe, args);
+            BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
+
+            BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
+            {
+                string str = args2.Line;
+                if (str.StartsWith("[IPC]"))
+                {
+                    string command = str.Substring(5);
+                    int endOfCommand = command.IndexOf(' ');
+                    command = command.Substring(0, endOfCommand);
+                    if (acceptedIPC == null || acceptedIPC.Contains(command))
+                    {
+                        string param = str.Substring(endOfCommand + 5).Trim();
+                        switch (command)
+                        {
+                            case "ERROR":
+                                Log.Information("[ERROR] Realtime Process Output: " + param);
+                                BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
+                                break;
+                            default:
+                                Log.Information("Unknown IPC command: " + command);
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    Log.Information("Realtime Process Output: " + str);
+                }
+            };
+            BACKGROUND_MEM_PROCESS.Run();
+        }
+
+
         private void RestoreGame(object sender, DoWorkEventArgs e)
         {
-            string gamePath = Utilities.GetGamePath(BACKUP_THREAD_GAME);
+            string gamePath = Utilities.GetGamePath(BACKUP_THREAD_GAME, true);
             string backupPath = Utilities.GetGameBackupPath(BACKUP_THREAD_GAME);
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Deleting existing game installation"));
@@ -979,7 +1142,12 @@ namespace AlotAddOnGUI
                 Log.Information("Deleting existing game directory: " + gamePath);
                 try
                 {
-                    Utilities.DeleteFilesAndFoldersRecursively(gamePath);
+                    bool deletedDirectory = Utilities.DeleteFilesAndFoldersRecursively(gamePath);
+                    if (deletedDirectory != true)
+                    {
+                        BackupWorker.ReportProgress(completed, new ThreadCommand(RESTORE_FAILED_COULD_NOT_DELETE_FOLDER));
+                        return;
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -117,12 +117,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="classes\ALOTVersionInfo.cs" />
+    <Compile Include="classes\AddonFile.cs" />
     <Compile Include="classes\CopyDir.cs" />
     <Compile Include="classes\DataConverters.cs" />
     <Compile Include="classes\FlashWindowHelper.cs" />
     <Compile Include="classes\IniFile.cs" />
     <Compile Include="classes\IniSettingsHandler.cs" />
     <Compile Include="classes\ME3Constants.cs" />
+    <Compile Include="classes\PackageFile.cs" />
     <Compile Include="classes\StreamIO.cs" />
     <Compile Include="classes\TasksDisplayEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -262,7 +265,7 @@ if $(ConfigurationName) == Release (copy /Y "$(SolutionDir)manifest.xml" "$(Proj
       <Output TaskParameter="Assemblies" ItemName="Targets" />
     </GetAssemblyIdentity>
     <ItemGroup>
-      <VersionNumber Include="@(Targets-&gt;'%(Version)')" />
+      <VersionNumber Include="@(Targets->'%(Version)')" />
     </ItemGroup>
   </Target>
   <Target Name="AfterBuild">

@@ -5,6 +5,7 @@ using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.WindowsAPICodePack.Taskbar;
 using Octokit;
 using Serilog;
 using SlavaGu.ConsoleAppLauncher;
@@ -48,6 +49,7 @@ namespace AlotAddOnGUI
         public const string BINARY_DIRECTORY = "bin\\";
         private bool errorOccured = false;
         private bool UsingBundledManifest = false;
+        private List<string> BlockingMods;
 
         private DispatcherTimer backgroundticker;
         private int completed = 0;
@@ -98,7 +100,7 @@ namespace AlotAddOnGUI
             Log.Information("MainWindow() is starting");
             InitializeComponent();
             LoadSettings();
-            Title = "ALOT Addon Builder " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
+            Title = "ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             HeaderLabel.Text = "Preparing application...";
             AddonFilesLabel.Text = "Please wait";
         }
@@ -121,77 +123,84 @@ namespace AlotAddOnGUI
             var versInfo = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
             var releases = await client.Repository.Release.GetAll("Mgamerz", "ALOTAddonGUI");
-            if (releases.Count > 0)
+            try
             {
-                //The release we want to check is always the latest, so [0]
-                Release latest = null;
-                Version latestVer = new Version("0.0.0.0");
-                foreach (Release r in releases)
+                if (releases.Count > 0)
                 {
-                    if (!USING_BETA && r.Prerelease)
+                    //The release we want to check is always the latest, so [0]
+                    Release latest = null;
+                    Version latestVer = new Version("0.0.0.0");
+                    foreach (Release r in releases)
                     {
-                        continue;
-                    }
-                    Version releaseVersion = new Version(r.TagName);
-                    if (releaseVersion > latestVer)
-                    {
-                        latest = r;
-                        latestVer = releaseVersion;
-                    }
-                }
-                if (latest != null)
-                {
-                    Version releaseName = new Version(latest.TagName);
-                    if (versInfo < releaseName && latest.Assets.Count > 0)
-                    {
-                        string versionInfo = "";
-                        if (latest.Prerelease)
+                        if (!USING_BETA && r.Prerelease)
                         {
-                            versionInfo += "This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.\n\n";
+                            continue;
                         }
-                        versionInfo += "Release date: " + latest.PublishedAt.Value.ToLocalTime().ToString();
-                        MetroDialogSettings mds = new MetroDialogSettings();
-                        mds.AffirmativeButtonText = "Update";
-                        mds.NegativeButtonText = "Later";
-                        mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-
-                        MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available. You are currently using version " + versInfo.ToString() + ".\n========================\n" + versionInfo + "\n" + latest.Body + "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative, mds);
-                        if (result == MessageDialogResult.Affirmative)
+                        Version releaseVersion = new Version(r.TagName);
+                        if (releaseVersion > latestVer)
                         {
-
-                            //there's an update
-                            updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "ALOT Addon Installer is updating. Please wait...", true);
-                            updateprogresscontroller.SetIndeterminate();
-                            WebClient downloadClient = new WebClient();
-
-                            downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
-                            downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
-                            string temppath = Path.GetTempPath();
-                            downloadClient.DownloadProgressChanged += (s, e) =>
+                            latest = r;
+                            latestVer = releaseVersion;
+                        }
+                    }
+                    if (latest != null)
+                    {
+                        Version releaseName = new Version(latest.TagName);
+                        if (versInfo < releaseName && latest.Assets.Count > 0)
+                        {
+                            string versionInfo = "";
+                            if (latest.Prerelease)
                             {
-                                updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
-                            };
-                            downloadClient.DownloadFileCompleted += UnzipSelfUpdate;
-                            string downloadPath = temppath + "ALOTAddonGUI_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
-                            //DEBUG ONLY
-                            Uri downloadUri = new Uri(latest.Assets[0].BrowserDownloadUrl);
-                            downloadClient.DownloadFileAsync(downloadUri, downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
+                                versionInfo += "This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.\n\n";
+                            }
+                            versionInfo += "Release date: " + latest.PublishedAt.Value.ToLocalTime().ToString();
+                            MetroDialogSettings mds = new MetroDialogSettings();
+                            mds.AffirmativeButtonText = "Update";
+                            mds.NegativeButtonText = "Later";
+                            mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
+
+                            MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available. You are currently using version " + versInfo.ToString() + ".\n========================\n" + versionInfo + "\n" + latest.Body + "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative, mds);
+                            if (result == MessageDialogResult.Affirmative)
+                            {
+
+                                //there's an update
+                                updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "ALOT Addon Installer is updating. Please wait...", true);
+                                updateprogresscontroller.SetIndeterminate();
+                                WebClient downloadClient = new WebClient();
+
+                                downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
+                                downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
+                                string temppath = Path.GetTempPath();
+                                downloadClient.DownloadProgressChanged += (s, e) =>
+                                {
+                                    updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
+                                };
+                                downloadClient.DownloadFileCompleted += UnzipSelfUpdate;
+                                string downloadPath = temppath + "ALOTAddonGUI_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
+                                //DEBUG ONLY
+                                Uri downloadUri = new Uri(latest.Assets[0].BrowserDownloadUrl);
+                                downloadClient.DownloadFileAsync(downloadUri, downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
+                            }
+                            else
+                            {
+                                AddonFilesLabel.Text = "Application update declined";
+                                Log.Warning("Application update was declined");
+                                await FetchManifest();
+                            }
                         }
                         else
                         {
-                            AddonFilesLabel.Text = "Application update declined";
-                            Log.Warning("Application update was declined");
+                            //up to date
+                            AddonFilesLabel.Text = "Application up to date";
+                            Log.Information("Application is up to date.");
                             await FetchManifest();
                         }
                     }
-                    else
-                    {
-                        //up to date
-                        AddonFilesLabel.Text = "Application up to date";
-                        Log.Information("Application is up to date.");
-                        await FetchManifest();
-                    }
                 }
+            } catch (Exception e)
+            {
+                Log.Error("Error checking for update: " + e);
+                await FetchManifest();
             }
         }
 
@@ -347,6 +356,7 @@ namespace AlotAddOnGUI
 
         private async void BuildCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
             Log.Information("Background thread has exited - starting InstallCompleted()");
             int result = (int)e.Result;
             Installing = false;
@@ -354,6 +364,23 @@ namespace AlotAddOnGUI
             Button_Settings.IsEnabled = true;
             switch (result)
             {
+                case -2:
+                    HeaderLabel.Text = "Installation blocked due to incompatible mods detected in Mass Effect"+getGameNumberSuffix(CURRENT_GAME_BUILD)+".\nRestore your game to a compatible state and do not install these mods.";
+                    AddonFilesLabel.Text = "Installation aborted";
+                    string badModsStr = "";
+                    foreach (string str in BlockingMods)
+                    {
+                        badModsStr += "\n - " + str;
+                    }
+                    string prefix = "The following mods appear to be installed and are";
+                    if (BlockingMods.Count != 1)
+                    {
+                        prefix = "The following mod appears to be installed and is";
+                    }
+                    await this.ShowMessageAsync("Incompatible mods detected", prefix+ "known to be incompatible with ALOT for Mass Effect"+ getGameNumberSuffix(CURRENT_GAME_BUILD)+". Restore your game to an unmodified state, and then install compatible versions of these mods (or do not install them at all)."+badModsStr);
+                    ADDONFILES_TO_BUILD = null;
+                    Installing = false;
+                    break;
                 case -1:
                 default:
                     HeaderLabel.Text = "An error occured building the Addon. The logs directory will have more information on what happened.";
@@ -368,7 +395,7 @@ namespace AlotAddOnGUI
                     {
                         HeaderLabel.Text = "Addon built with errors.\nThe Addon was built but some files did not process correctly and were skipped.\nThe MEM packages for the addon have been placed into the " + MEM_OUTPUT_DISPLAY_DIR + " directory.";
                         AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
-                        await this.ShowMessageAsync("ALOT Addon for Mass Effect " + result + " was built, but had errors", "Some files had errors occured during the build process. These files were skipped. Your game may look strange in some parts if you use the built Addon. You should report this to the developers on Discord.\nYou can install the Addon MEM files with Mass Effect Modder after you've installed the main ALOT MEM file.");
+                        await this.ShowMessageAsync("ALOT Addon for Mass Effect " + result + " was built, but had errors", "Some files had errors occured during the build process. These files were skipped. Your game may look strange in some parts if you use the built Addon. You should report this to the developers on Discord.");
                         ADDONFILES_TO_BUILD = null;
 
                     }
@@ -404,11 +431,26 @@ namespace AlotAddOnGUI
 
         }
 
+        private void SetInstallFlyoutState(bool open)
+        {
+            InstallingOverlayFlyout.IsOpen = open;
+            if (open)
+            {
+                BorderThickness = new Thickness(0, 0, 0, 0);
+            }
+            else
+            {
+                BorderThickness = new Thickness(1, 1, 1, 1);
+
+            }
+        }
+
         private async void BuildProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             if (e.UserState is null)
             {
                 Build_ProgressBar.Value = e.ProgressPercentage;
+                TaskbarManager.Instance.SetProgressValue(e.ProgressPercentage, 100);
             }
             else
             {
@@ -446,14 +488,44 @@ namespace AlotAddOnGUI
 
         private void BuildAddon(object sender, DoWorkEventArgs e)
         {
-            string outDir = getOutputDir((int)e.Argument);
-            if (Directory.Exists(outDir))
+            BlockingMods = new List<string>();
+            if (CURRENT_GAME_BUILD < 3)
             {
-                Utilities.DeleteFilesAndFoldersRecursively(outDir);
+                string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
+                string args = "-detect-bad-mods " + CURRENT_GAME_BUILD+" -ipc";
+                runMEM_DetectBadMods(exe, args, null);
+                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+                {
+                    Thread.Sleep(250);
+                }
+                if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+                {
+                    BlockingMods = BACKGROUND_MEM_PROCESS_ERRORS;
+                    e.Result = -2;
+                    return;
+                } else
+                {
+                    Log.Information("No blocking mods were found.");
+                }
+            }
+
+            PREINSTALL_VERSION_INFO = Utilities.GetInstalledALOTInfo(CURRENT_GAME_BUILD);
+            string outDir = getOutputDir((int)e.Argument);
+            if (Directory.Exists(outDir)) //Prompt for reinstall or rebuild
+            {
+                bool deletedOutput = Utilities.DeleteFilesAndFoldersRecursively(outDir);
+                if (!deletedOutput)
+                {
+                    KeyValuePair<string, string> messageStr = new KeyValuePair<string, string>("Unable to cleanup existing output directory", "An error occured deleting the existing output directory. Something may still be accessing it. Close other programs and try again.");
+                    BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, messageStr));
+                    e.Result = -1; //1 = Error
+                    return;
+                }
             }
             Directory.CreateDirectory(outDir);
             bool result = ExtractAddons((int)e.Argument); //arg is game id.
-            e.Result = result ? (int)e.Argument : -1; //1 = Error
+
+            e.Result = result ? (int)e.Argument : -1; //-1 = Build Error
         }
 
         // Tick handler    
@@ -519,7 +591,7 @@ namespace AlotAddOnGUI
             if (EXE_DIRECTORY.Length > 95)
             {
                 Log.Fatal("EXE is nested too deep for Addon to build properly (" + EXE_DIRECTORY.Length + " chars) due to Windows API limitations.");
-                await this.ShowMessageAsync("ALOTAddonBuilder is too deep in the filesystem", "ALOT Addon Builder can have issues extracting and building the Addon if nested too deeply in the filesystem. This is an issue with Windows file path limitations. Move the Addon directory up a few folders on your filesystem. A good place to put the Addon is in Documents.");
+                await this.ShowMessageAsync("ALOTAddonBuilder is too deep in the filesystem", "ALOT Installer can have issues extracting and building the Addon if nested too deeply in the filesystem. This is an issue with Windows file path limitations. Move the Addon directory up a few folders on your filesystem. A good place to put the Addon is in Documents.");
                 Environment.Exit(1);
             }
 
@@ -541,6 +613,9 @@ namespace AlotAddOnGUI
             Log.Information("ME2 Installed: " + me2Installed);
             Log.Information("ME3 Installed: " + me3Installed);
 
+            ValidateGameBackup(1);
+            ValidateGameBackup(2);
+            ValidateGameBackup(3);
 
             if (me1Installed || me2Installed || me3Installed)
             {
@@ -563,14 +638,12 @@ namespace AlotAddOnGUI
                     Button_InstallME1.IsEnabled = false;
                     Button_InstallME1.ToolTip = "Mass Effect is not installed. To build the addon for ME1 the game must already be installed";
                     Button_InstallME1.Content = "ME1 Not Installed";
-                    Button_ME1Backup.IsEnabled = false;
                 }
                 else
                 {
                     Button_InstallME1.IsEnabled = true;
-                    Button_InstallME1.ToolTip = "Click to build ALOT Addon for Mass Effect";
-                    Button_InstallME1.Content = "Build Addon for ME1";
-                    ValidateGameBackup(1);
+                    Button_InstallME1.ToolTip = "Click to build ALOT Addon and install ALOT for Mass Effect";
+                    Button_InstallME1.Content = "Install ALOT for ME1";
                 }
 
                 if (!me2Installed)
@@ -579,14 +652,12 @@ namespace AlotAddOnGUI
                     Button_InstallME2.IsEnabled = false;
                     Button_InstallME2.ToolTip = "Mass Effect 2 is not installed. To build the addon for ME2 the game must already be installed";
                     Button_InstallME2.Content = "ME2 Not Installed";
-                    Button_ME2Backup.IsEnabled = false;
                 }
                 else
                 {
                     Button_InstallME2.IsEnabled = true;
-                    Button_InstallME2.ToolTip = "Click to build ALOT Addon for Mass Effect 2";
-                    Button_InstallME2.Content = "Build Addon for ME2";
-                    ValidateGameBackup(2);
+                    Button_InstallME2.ToolTip = "Click to build ALOT Addon and install ALOT for Mass Effect 2";
+                    Button_InstallME2.Content = "Install ALOT for for ME2";
                 }
 
                 if (!me3Installed)
@@ -595,14 +666,12 @@ namespace AlotAddOnGUI
                     Button_InstallME3.IsEnabled = false;
                     Button_InstallME3.ToolTip = "Mass Effect 3 is not installed. To build the addon for ME3 the game must already be installed";
                     Button_InstallME3.Content = "ME3 Not Installed";
-                    Button_ME3Backup.IsEnabled = false;
                 }
                 else
                 {
                     Button_InstallME3.IsEnabled = true;
-                    Button_InstallME3.ToolTip = "Click to build ALOT Addon for Mass Effect 3";
-                    Button_InstallME3.Content = "Build Addon for ME3";
-                    ValidateGameBackup(3);
+                    Button_InstallME3.ToolTip = "Click to build ALOT Addon and install ALOT for Mass Effect 3";
+                    Button_InstallME3.Content = "Install ALOT for ME3";
                 }
             }
             else
@@ -630,7 +699,7 @@ namespace AlotAddOnGUI
                             Button_ME1Backup.Content = "ME1: Not Backed Up";
                             Button_ME1Backup.ToolTip = "Click to backup game";
                         }
-                        Button_ME1Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(1);
+                        Button_ME1Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(1,true);
                         return path != null;
                     }
                 case 2:
@@ -646,7 +715,7 @@ namespace AlotAddOnGUI
                             Button_ME2Backup.Content = "ME2: Not Backed Up";
                             Button_ME2Backup.ToolTip = "Click to backup game";
                         }
-                        Button_ME2Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(2);
+                        Button_ME2Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(2, true);
                         return path != null;
                     }
                 case 3:
@@ -662,7 +731,7 @@ namespace AlotAddOnGUI
                             Button_ME3Backup.Content = "ME3: Not Backed Up";
                             Button_ME3Backup.ToolTip = "Click to backup game";
                         }
-                        Button_ME3Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(3);
+                        Button_ME3Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(3, true);
 
                         return path != null;
                     }
@@ -732,17 +801,29 @@ namespace AlotAddOnGUI
 
         private void UpdateALOTStatus()
         {
-            int alotme1ver = detectInstalledALOTVersion(1);
-            int alotme2ver = detectInstalledALOTVersion(2);
-            int alotme3ver = detectInstalledALOTVersion(3);
+            ALOTVersionInfo alotme1verinfo = Utilities.GetInstalledALOTInfo(1);
+            ALOTVersionInfo alotme2verinfo = Utilities.GetInstalledALOTInfo(2);
+            ALOTVersionInfo alotme3verinfo = Utilities.GetInstalledALOTInfo(3);
 
-            string message1 = "ME1: " + (alotme1ver != 0 ? "Installed, " + alotme1ver + ".x" : "Not installed");
-            string message2 = "ME2: " + (alotme2ver != 0 ? "Installed, " + alotme2ver + ".x" : "Not installed");
-            string message3 = "ME3: " + (alotme3ver != 0 ? "Installed, " + alotme3ver + ".x" : "Not installed");
+            string me1ver = alotme1verinfo != null ? alotme1verinfo.ALOTVER + "." + alotme1verinfo.ALOTUPDATEVER : "Not Installed";
+            string me2ver = alotme2verinfo != null ? alotme2verinfo.ALOTVER + "." + alotme2verinfo.ALOTUPDATEVER : "Not Installed";
+            string me3ver = alotme3verinfo != null ? alotme3verinfo.ALOTVER + "." + alotme3verinfo.ALOTUPDATEVER : "Not Installed";
+
+            string me1ToolTip = alotme1verinfo != null ? "ALOT detected as installed" : "ALOT not detected as installed";
+            string me2ToolTip = alotme2verinfo != null ? "ALOT detected as installed" : "ALOT not detected as installed";
+            string me3ToolTip = alotme3verinfo != null ? "ALOT detected as installed" : "ALOT not detected as installed";
+
+            string message1 = "ME1: " + me1ver;
+            string message2 = "ME2: " + me2ver;
+            string message3 = "ME3: " + me3ver;
 
             Label_ALOTStatus_ME1.Content = message1;
             Label_ALOTStatus_ME2.Content = message2;
             Label_ALOTStatus_ME3.Content = message3;
+
+            Label_ALOTStatus_ME1.ToolTip = me1ToolTip;
+            Label_ALOTStatus_ME2.ToolTip = me2ToolTip;
+            Label_ALOTStatus_ME3.ToolTip = me3ToolTip;
         }
 
         private async void readManifest()
@@ -772,8 +853,8 @@ namespace AlotAddOnGUI
                                 Filename = (string)e.Element("file").Attribute("filename"),
                                 Tooltipname = e.Attribute("tooltipname") != null ? (string)e.Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
                                 DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
-                                ALOTVersion = e.Attribute("alotversion") != null ? Convert.ToInt32((string)e.Attribute("alotversion")) : 0,
-                                ALOTUpdate = e.Attribute("alotupdate") != null ? true : false,
+                                ALOTVersion = e.Attribute("alotversion") != null ? Convert.ToInt16((string)e.Attribute("alotversion")) : (short)0,
+                                ALOTUpdateVersion = e.Attribute("alotupdateversion") != null ? Convert.ToByte((string)e.Attribute("alotupdateversion")) : (byte)0,
                                 Ready = false,
                                 PackageFiles = e.Elements("packagefile")
                                     .Select(r => new PackageFile
@@ -856,85 +937,9 @@ namespace AlotAddOnGUI
             timer_Tick(null, null);
         }
 
-        public sealed class AddonFile : INotifyPropertyChanged
-        {
-            public bool Showing { get; set; }
-            public event PropertyChangedEventHandler PropertyChanged;
-            private bool m_ready;
-            public int ALOTVersion { get; set; }
-            public bool ALOTUpdate { get; set; }
-            public bool IsALOTMainFile
-            {
-                get { return ALOTVersion > 0; }
-                set { }
-            }
 
-            public bool ProcessAsModFile { get; set; }
-            public string Author { get; set; }
-            public string FriendlyName { get; set; }
-            public bool Game_ME1 { get; set; }
-            public bool Game_ME2 { get; set; }
-            public bool Game_ME3 { get; set; }
-            public string Filename { get; set; }
-            public string Tooltipname { get; set; }
-            public string DownloadLink { get; set; }
-            public List<String> Duplicates { get; set; }
-            public List<PackageFile> PackageFiles { get; set; }
 
-            public bool Ready
-            {
 
-                get { return m_ready; }
-                set
-                {
-                    m_ready = value;
-                    OnPropertyChanged(string.Empty);
-                }
-            }
-
-            private void OnPropertyChanged(string propertyName)
-            {
-                var handler = PropertyChanged;
-                if (handler != null)
-                    handler(this, new PropertyChangedEventArgs(propertyName));
-            }
-
-            public override string ToString()
-            {
-                return FriendlyName;
-            }
-        }
-
-        public class PackageFile
-        {
-            public string SourceName { get; set; }
-            public string DestinationName { get; set; }
-            public bool MoveDirectly { get; set; }
-            public bool CopyDirectly { get; set; }
-            public bool Delete { get; set; }
-            public string TPFSource { get; set; }
-            public bool ME1 { get; set; }
-            public bool ME2 { get; set; }
-            public bool ME3 { get; set; }
-            public bool Processed { get; set; }
-
-            internal bool AppliesToGame(int game)
-            {
-                if (game == 1)
-                {
-                    return ME1;
-                }
-                if (game == 2)
-                {
-                    return ME2;
-                }
-                if (game == 3)
-                {
-                    return ME3;
-                }
-                return false;
-            }
-        }
 
         public class ThreadCommand
         {
@@ -961,6 +966,7 @@ namespace AlotAddOnGUI
                 {
                     Button_InstallME2.Content = "Building...";
                     CURRENT_GAME_BUILD = 2;
+                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
                     BuildWorker.RunWorkerAsync(2);
                 }
             }
@@ -1057,7 +1063,7 @@ namespace AlotAddOnGUI
 
         private async void BackupGame(int game)
         {
-            if (detectInstalledALOTVersion(game) != 0)
+            if (Utilities.GetInstalledALOTInfo(game) != null)
             {
                 //Game is modified via ALOT flag
                 await this.ShowMessageAsync("ALOT is installed", "You cannot backup an installation that has ALOT already installed. If you have a backup, you can restore it by clicking the game backup button in the Settings menu. Otherwise, delete your game folder and redownload it.");
@@ -1143,6 +1149,8 @@ namespace AlotAddOnGUI
                 {
                     Button_InstallME3.Content = "Building...";
                     CURRENT_GAME_BUILD = 3;
+                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
+
                     BuildWorker.RunWorkerAsync(3);
                 }
             }
@@ -1175,11 +1183,11 @@ namespace AlotAddOnGUI
 
             if (!oneisready)
             {
-                await this.ShowMessageAsync("No files available for building", "There are no files available in the Downloaded_Mods folder to build an addon for Mass Effect " + game + ".");
+                await this.ShowMessageAsync("No files available for building", "There are no files available in the Downloaded_Mods folder to build an addon for Mass Effect"+getGameNumberSuffix(game)+".");
                 return false;
             }
 
-            MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect " + game + " addon are missing - do you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
+            MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " addon are missing - do you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
             return result == MessageDialogResult.Affirmative;
         }
 
@@ -1386,7 +1394,7 @@ namespace AlotAddOnGUI
             {
                 Log.Error("Exception opening browser - handled. The error was " + other.Message);
                 System.Windows.Clipboard.SetText(e.Uri.ToString());
-                await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar. Download the file named "+fname+", then drag and drop it onto this program's interface.");
+                await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar. Download the file named " + fname + ", then drag and drop it onto this program's interface.");
             }
         }
 
@@ -1409,7 +1417,7 @@ namespace AlotAddOnGUI
             catch (System.IO.IOException e)
             {
                 Log.Error("Unable to delete staging and target directories.\n" + e.ToString());
-                await this.ShowMessageAsync("Error occured while preparing directories", "ALOT Addon Builder was unable to cleanup some directories. Make sure all file explorer windows are closed that may be open in the working directories.");
+                await this.ShowMessageAsync("Error occured while preparing directories", "ALOT Installer was unable to cleanup some directories. Make sure all file explorer windows are closed that may be open in the working directories.");
                 return false;
             }
 
@@ -1496,7 +1504,7 @@ namespace AlotAddOnGUI
 
                 if (filesimported.Count > 0)
                 {
-                    string message = "The following files have been imported to ALOT Addon Builder:";
+                    string message = "The following files have been imported to ALOT Installer:";
                     foreach (AddonFile af in filesimported)
                     {
                         message += "\n - " + af.FriendlyName;
@@ -1522,7 +1530,7 @@ namespace AlotAddOnGUI
 
         private async void Button_About_Click(object sender, RoutedEventArgs e)
         {
-            string title = "ALOT Addon Builder " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version + "\n";
+            string title = "ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version + "\n";
             var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
             int fileVersion = versInfo.FileMajorPart;
 
@@ -1575,64 +1583,12 @@ namespace AlotAddOnGUI
                 {
                     Button_InstallME1.Content = "Building...";
                     CURRENT_GAME_BUILD = 1;
+                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
                     BuildWorker.RunWorkerAsync(1);
                 }
             }
         }
 
-        private int detectInstalledALOTVersion(int gameID)
-        {
-            const uint MEMI_TAG = 0x494D454D;
-
-            string gamePath = Utilities.GetGamePath(gameID);
-            if (gamePath != null)
-            {
-
-                if (gameID == 1)
-                {
-                    gamePath += @"\BioGame\CookedPC\testVolumeLight_VFX.upk";
-                }
-                if (gameID == 2)
-                {
-                    gamePath += @"\BioGame\CookedPC\BIOC_Materials.pcc";
-                }
-                if (gameID == 3)
-                {
-                    gamePath += @"\BIOGame\CookedPCConsole\adv_combat_tutorial_xbox_D_Int.afc";
-                }
-
-                if (File.Exists(gamePath))
-                {
-                    using (FileStream fs = new FileStream(gamePath, System.IO.FileMode.Open, FileAccess.Read))
-                    {
-                        fs.SeekEnd();
-                        long endPos = fs.Position;
-                        fs.Position = endPos - 4;
-                        uint memi = fs.ReadUInt32();
-
-                        if (memi == MEMI_TAG)
-                        {
-                            //ALOT has been installed
-                            fs.Position = endPos - 8;
-                            int memVersionUsed = fs.ReadInt32();
-
-                            if (memVersionUsed >= 10 && memVersionUsed != 16777472) //default bytes before 178 MEMI Format
-                            {
-                                fs.Position = endPos - 12;
-                                int ALOTVER = fs.ReadInt32();
-
-                                //unused for now
-                                fs.Position = endPos - 16;
-                                int MEUITMVER = fs.ReadInt32();
-
-                                return ALOTVER;
-                            }
-                        }
-                    }
-                }
-            }
-            return 0;
-        }
 
         private void Checkbox_HideFiles_Click(object sender, RoutedEventArgs e)
         {
@@ -1688,13 +1644,14 @@ namespace AlotAddOnGUI
             Installing = true;
             HeaderLabel.Text = "Restoring Mass Effect" + (game == 1 ? "" : " " + game) + "...\nDo not close the application until this process completes.";
             Button_InstallME1.IsEnabled = Button_InstallME2.IsEnabled = Button_InstallME3.IsEnabled = Button_Settings.IsEnabled = false;
-            TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
+            TaskbarManager.Instance.SetProgressValue(0, 0);
             BackupWorker.RunWorkerAsync();
         }
 
         private void RestoreCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
 
             bool result = (bool)e.Result;
             if (result)
@@ -1706,7 +1663,7 @@ namespace AlotAddOnGUI
                 AddonFilesLabel.Text = "Restore failed! Check the logs.";
             }
             SetupButtons();
-            detectInstalledALOTVersion(BACKUP_THREAD_GAME);
+            UpdateALOTStatus();
             Button_Settings.IsEnabled = true;
             Installing = false;
 
@@ -1758,8 +1715,13 @@ namespace AlotAddOnGUI
 
         private void Button_InstallDone_Click(object sender, RoutedEventArgs e)
         {
-            InstallingOverlayFlyout.IsOpen = false;
-            SettingsFlyout.IsOpen = true;
+            SetInstallFlyoutState(false);
+        }
+
+        private void AppClosing(object sender, CancelEventArgs e)
+        {
+            runProcess("cmd.exe", "/c taskkill /F /IM MassEffectModderNoGui.exe /T",true);
+            Log.Information("Closing application via AppClosing()");
         }
     }
 }

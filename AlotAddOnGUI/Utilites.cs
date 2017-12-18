@@ -9,11 +9,14 @@ using AlotAddOnGUI.classes;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Serilog;
+using System.Diagnostics;
 
 namespace AlotAddOnGUI
 {
     public class Utilities
     {
+        public const uint MEMI_TAG = 0x494D454D;
+
         public static string GetOperatingSystemInfo()
         {
             StringBuilder sb = new StringBuilder();
@@ -52,10 +55,11 @@ namespace AlotAddOnGUI
         /// </summary>
         /// <param name="gameID"></param>
         /// <returns></returns>
-        public static String GetGamePath(int gameID)
+        public static String GetGamePath(int gameID, bool allowMissingEXE = false)
         {
             //Read config file.
             string path = null;
+            string mempath = null;
             string inipath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                         "MassEffectModder");
             inipath = Path.Combine(inipath, "MassEffectModder.ini");
@@ -68,7 +72,7 @@ namespace AlotAddOnGUI
                 if (path != null && path != "")
                 {
                     path = path.TrimEnd(Path.DirectorySeparatorChar);
-
+                    mempath = path;
                     string GameEXEPath = "";
                     switch (gameID)
                     {
@@ -83,10 +87,10 @@ namespace AlotAddOnGUI
                             break;
                     }
 
-                    if (File.Exists(GameEXEPath))
-                        return path; //we have path now
+                    if (!File.Exists(GameEXEPath))
+                        path = null; //mem path is not valid. might still be able to return later.
                     else
-                        path = null; //use registry key
+                        return path;
                 }
             }
 
@@ -129,6 +133,10 @@ namespace AlotAddOnGUI
 
                 if (File.Exists(GameEXEPath))
                     return path; //we have path now
+            }
+            if (mempath != null && allowMissingEXE)
+            {
+                return mempath;
             }
             return null;
         }
@@ -265,21 +273,42 @@ namespace AlotAddOnGUI
             return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
         }
 
-        public static void DeleteFilesAndFoldersRecursively(string target_dir)
+        public static bool DeleteFilesAndFoldersRecursively(string target_dir)
         {
+            bool result = true;
             foreach (string file in Directory.GetFiles(target_dir))
             {
                 File.SetAttributes(file, FileAttributes.Normal); //remove read only
-                File.Delete(file);
+                try
+                {
+                    Debug.WriteLine("Deleting file: " + file);
+                    File.Delete(file);
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Unable to delete file: " + file + ". It may be open still");
+                    return false;
+                }
             }
 
             foreach (string subDir in Directory.GetDirectories(target_dir))
             {
-                DeleteFilesAndFoldersRecursively(subDir);
+                result &= DeleteFilesAndFoldersRecursively(subDir);
             }
 
-            Thread.Sleep(1); // This makes the difference between whether it works or not. Sleep(0) is not enough.
-            Directory.Delete(target_dir);
+            Thread.Sleep(4); // This makes the difference between whether it works or not. Sleep(0) is not enough.
+            try
+            {
+                Debug.WriteLine("Deleting directory: " + target_dir);
+
+                Directory.Delete(target_dir);
+            }
+            catch (Exception e)
+            {
+                Log.Error("Unable to delete directory: " + target_dir + ". It may be open still");
+                return false;
+            }
+            return result;
         }
 
         public static bool InstallBinkw32Bypass(int game)
@@ -294,7 +323,7 @@ namespace AlotAddOnGUI
             {
                 case 2:
                     gamePath += "\\Binaries\\";
-                    System.IO.File.WriteAllBytes(gamePath+"binkw23.dll", AlotAddOnGUI.Properties.Resources.me2_binkw23);
+                    System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me2_binkw23);
                     System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me2_binkw32);
                     break;
                 case 3:
@@ -305,6 +334,95 @@ namespace AlotAddOnGUI
             }
             Log.Information("Installed binkw32 for Mass Effect " + game);
             return true;
+        }
+
+        /// <summary>
+        /// Creates a marker file using the specified information as well as the current MEM (no GUI) and Installer release version
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="alotVersionInfo"></param>
+        public static void CreateMarkerFile(int game, ALOTVersionInfo alotVersionInfo)
+        {
+            using (FileStream fs = new FileStream(GetALOTMarkerFilePath(game), FileMode.Open, FileAccess.Write))
+            {
+                fs.SeekEnd();
+                fs.WriteInt32(0); //MEUITM version. Not used for now //-16
+                fs.WriteInt16(alotVersionInfo.ALOTVER); //-12
+                fs.WriteByte(alotVersionInfo.ALOTUPDATEVER); //-10
+                fs.WriteByte(alotVersionInfo.ALOTHOTFIXVER); //-9
+
+                //Get versions
+                var versInfo = FileVersionInfo.GetVersionInfo(MainWindow.BINARY_DIRECTORY + "MassEffectModderNoGui.exe");
+                short memVersionUsed = (short)versInfo.FileMajorPart;
+
+                //Get current installer release version
+                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                short installerVersionUsed = Convert.ToInt16(fvi.FileBuildPart);
+
+                fs.WriteInt16(memVersionUsed); // -8
+                fs.WriteInt16(installerVersionUsed); // -6
+                fs.WriteUInt32(MEMI_TAG); // -4
+            }
+        }
+
+        internal static string GetALOTMarkerFilePath(int gameID)
+        {
+            string gamePath = Utilities.GetGamePath(gameID);
+            if (gamePath != null)
+            {
+
+                if (gameID == 1)
+                {
+                    gamePath += @"\BioGame\CookedPC\testVolumeLight_VFX.upk";
+                }
+                if (gameID == 2)
+                {
+                    gamePath += @"\BioGame\CookedPC\BIOC_Materials.pcc";
+                }
+                if (gameID == 3)
+                {
+                    gamePath += @"\BIOGame\CookedPCConsole\adv_combat_tutorial_xbox_D_Int.afc";
+                }
+                return gamePath;
+            }
+            return null;
+        }
+
+        public static ALOTVersionInfo GetInstalledALOTInfo(int gameID)
+        {
+            string gamePath = Utilities.GetALOTMarkerFilePath(gameID);
+            if (gamePath != null && File.Exists(gamePath))
+            {
+                using (FileStream fs = new FileStream(gamePath, System.IO.FileMode.Open, FileAccess.Read))
+                {
+                    fs.SeekEnd();
+                    long endPos = fs.Position;
+                    fs.Position = endPos - 4;
+                    uint memi = fs.ReadUInt32();
+
+                    if (memi == MEMI_TAG)
+                    {
+                        //ALOT has been installed
+                        fs.Position = endPos - 8;
+                        int memVersionUsed = fs.ReadInt32();
+
+                        if (memVersionUsed >= 10 && memVersionUsed != 16777472) //default bytes before 178 MEMI Format
+                        {
+                            fs.Position = endPos - 12;
+                            short ALOTVER = fs.ReadInt16();
+                            byte ALOTUPDATEVER = (byte)fs.ReadByte();
+                            byte ALOTHOTFIXVER = (byte)fs.ReadByte();
+
+                            //unused for now
+                            fs.Position = endPos - 16;
+                            int MEUITMVER = fs.ReadInt32();
+
+                            return new ALOTVersionInfo(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER);
+                        }
+                    }
+                }
+            }
+            return null;
         }
     }
 }
