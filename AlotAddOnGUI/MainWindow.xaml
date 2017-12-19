@@ -15,6 +15,14 @@
         Closing="Window_Closing"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Drop="File_Drop_BackgroundThread" AllowDrop="true">
+    <Window.Resources>
+        <ContextMenu x:Key="ListItemContextMenu" ContextMenuOpening="ContextMenu_ContextMenuOpening">
+            <MenuItem x:Name="ContextMenu_Site" Header="Go to download site" />
+            <MenuItem x:Name="ContextMenu_EnableDisable" Header="File is enabled" IsChecked="True" />
+
+        </ContextMenu>
+    </Window.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -31,11 +39,6 @@
         </Label>
         <Label Grid.Column="0" Grid.Row="1"  HorizontalContentAlignment="Center">
             <TextBlock x:Name="AddonFilesLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
-            <Label.ToolTip>
-                <ToolTip>
-                    <TextBlock>The number of addon files that are ready for each specific game.</TextBlock>
-                </ToolTip>
-            </Label.ToolTip>
         </Label>
         <ProgressBar Minimum="0" Maximum="100" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true"/>
 
@@ -43,8 +46,8 @@
             <!-- This is what each list item looks like-->
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid x:Name="ListItemElement" Background="Transparent">
-                        
+                    <Grid x:Name="ListItemElement" Background="Transparent" ContextMenu="{StaticResource ListItemContextMenu}">
+
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -89,7 +92,7 @@
 
                             <StackPanel x:Name="Downloaded_Indicator" Visibility="Collapsed" Orientation="Horizontal">
                                 <Image Height="15" Width="15"  Source="images/greencheckmark.png"/>
-                                <Label Padding="5,0">File is ready</Label>
+                                <Label Padding="5,0" Content="{Binding ReadyStatusText}"/>
                             </StackPanel>
                         </StackPanel>
 
@@ -187,10 +190,8 @@
                 </Controls:Flyout.Resources>
                 <!--<Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>-->
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
-
                     <StackPanel Margin="5">
-                        <CheckBox Margin="5" x:Name="Checkbox_MoveFilesAsImport" Content="Import via Move instead of Copy" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied."/>
-                        <CheckBox Margin="5" x:Name="Checkbox_HideFiles" Content="Hide files for games not installed" Click="Checkbox_HideFiles_Click" ToolTip="Hide files that don't apply to games you don't have installed."/>
+                        <CheckBox Margin="5" Visibility="Collapsed" x:Name="Checkbox_MoveFilesAsImport" Content="Import via Move instead of Copy" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied."/>
                         <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
 
                         <Expander IsExpanded="True">
@@ -250,13 +251,13 @@
             <Controls:Flyout x:Name="ImportFailedFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom" Height="30">
                 <Label x:Name="ImportFailedLabel" FontSize="14" Content="This is the statusbar. You should not see this text."></Label>
             </Controls:Flyout>
-            <Controls:Flyout x:Name="InstallingOverlayFlyout" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDown="InstallingOverlayFlyout_MouseDown">
+            <Controls:Flyout x:Name="InstallingOverlayFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDown="InstallingOverlayFlyout_MouseDown">
                 <Border x:Name="InstallingOverlayFlyout_Border" Padding="10" Background="#77000000" >
-                    <StackPanel VerticalAlignment="Center" Orientation="Vertical" x:Name="InstallingOverlayFlyout_Panel">
-                        <Image x:Name="Installing_Checkmark" Width="84" Height="84" Source="images/greencheck_large.png" Visibility="Collapsed"/>
+                    <StackPanel VerticalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True" x:Name="InstallingOverlayFlyout_Panel">
+                        <Image x:Name="Installing_Checkmark" Width="84" Height="84" Visibility="Collapsed"/>
 
                         <Controls:ProgressRing x:Name="Installing_Spinner"  IsActive="True" Margin="0,0,0,10" Foreground="Snow"/>
-                        <TextBlock x:Name="InstallingOverlay_TopLabel" UseLayoutRounding="True" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Overall Task">
+                        <TextBlock x:Name="InstallingOverlay_TopLabel"  FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Overall Task">
                             <TextBlock.Effect>
                                 <DropShadowEffect
                                   ShadowDepth="4"
@@ -266,7 +267,7 @@
                                  BlurRadius="4"/>
                              </TextBlock.Effect>
                         </TextBlock>
-                        <TextBlock x:Name="InstallingOverlay_StageLabel" UseLayoutRounding="True" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Stage 3 of 7">
+                        <TextBlock x:Name="InstallingOverlay_StageLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Stage 3 of 7">
                             <TextBlock.Effect>
                                 <DropShadowEffect
                                   ShadowDepth="4"
@@ -276,7 +277,7 @@
                                  BlurRadius="4"/>
                             </TextBlock.Effect>
                         </TextBlock>
-                        <TextBlock x:Name="InstallingOverlay_BottomLabel" UseLayoutRounding="True" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Getting Ready">
+                        <TextBlock x:Name="InstallingOverlay_BottomLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Getting Ready">
                             <TextBlock.Effect>
                                 <DropShadowEffect
                                   ShadowDepth="4"
@@ -286,7 +287,10 @@
                                  BlurRadius="4"/>
                             </TextBlock.Effect>
                         </TextBlock>
-                        <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallDone" Visibility="Hidden"  Margin="0,15,0,0" HorizontalAlignment="Center"  Content="Continue" ToolTip="Click to dismiss dialog" Click="Button_InstallDone_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+                            <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallViewLogs" Visibility="Collapsed" Margin="0,0,5,0"  HorizontalAlignment="Center"  Content="View Logs" ToolTip="Click to view logs" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                            <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallDone" Visibility="Visible" HorizontalAlignment="Center"  Content="Continue" ToolTip="Click to dismiss dialog" Click="Button_InstallDone_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                        </StackPanel>
 
                     </StackPanel>
                 </Border>

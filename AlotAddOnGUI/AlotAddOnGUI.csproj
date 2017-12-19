@@ -197,6 +197,7 @@
     <Resource Include="images\me3_bg.jpg" />
     <Resource Include="images\me1_bg.jpg" />
     <Resource Include="images\greencheck_large.png" />
+    <Resource Include="images\redx_large.png" />
     <Content Include="memodder\MassEffectModder.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

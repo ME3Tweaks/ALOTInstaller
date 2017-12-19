@@ -23,6 +23,44 @@ namespace AlotAddOnGUI.classes
         {
             get { return ALOTUpdateVersion > 0; }
         }
+
+        public string ReadyStatusText
+        {
+            get
+            {
+                if (ALOTUpdateVersion > 0)
+                {
+                    //Checking for update
+                    if (Game_ME1 && (MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO == null || ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER))
+                    {
+                        return "Update is ready";
+                    }
+                    if (Game_ME2 && (MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO == null || ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTUPDATEVER))
+                    {
+                        return "Update is ready";
+                    }
+                    if (Game_ME3 && (MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO == null || ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTUPDATEVER))
+                    {
+                        return "Update is ready";
+                    }
+
+                    //Check if file is not applicable
+                    if (Game_ME1 && ALOTUpdateVersion <= MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER)
+                    {
+                        return "Update is already applied";
+                    }
+                    if (Game_ME2 && ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTUPDATEVER)
+                    {
+                        return "Update is already applied";
+                    }
+                    if (Game_ME3 && ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTUPDATEVER)
+                    {
+                        return "Update is already applied";
+                    }
+                }
+                return "File is ready for install";
+            }
+        }
         public bool ProcessAsModFile { get; set; }
         public string Author { get; set; }
         public string FriendlyName { get; set; }

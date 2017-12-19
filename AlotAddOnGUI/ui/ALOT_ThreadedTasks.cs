@@ -27,7 +27,11 @@ namespace AlotAddOnGUI
         private List<AddonFile> ADDONFILES_TO_BUILD;
         public const string UPDATE_TASK_PROGRESS = "UPDATE_TASK_PROGRESS";
         public const string UPDATE_OVERALL_TASK = "UPDATE_OVERALL_TASK";
-        private readonly int INSTALL_OK = 1;
+        private const int INSTALL_OK = 1;
+        private const int RESULT_ME1LAA_FAILED = -43;
+        private const int RESULT_TEXTUREINSTALL_FAILED = -42;
+        private const int RESULT_SCAN_REMOVE_FAILED = -41;
+        private const int RESULT_UNPACK_FAILED = -40;
         public const string RESTORE_FAILED_COULD_NOT_DELETE_FOLDER = "RESTORE_FAILED_COULD_NOT_DELETE_FOLDER";
         public string CurrentTask;
         public int CurrentTaskPercent;
@@ -37,7 +41,10 @@ namespace AlotAddOnGUI
         private int STAGE_COUNT;
         public const string HIDE_STAGE_LABEL = "HIDE_STAGE_LABEL";
         public const string UPDATE_HEADER_LABEL = "UPDATE_HEADER_LABEL";
-        private ALOTVersionInfo PREINSTALL_VERSION_INFO;
+        public static ALOTVersionInfo CURRENTLY_INSTALLED_ME1_ALOT_INFO;
+        public static ALOTVersionInfo CURRENTLY_INSTALLED_ME2_ALOT_INFO;
+        public static ALOTVersionInfo CURRENTLY_INSTALLED_ME3_ALOT_INFO;
+
         private bool WARN_USER_OF_EXIT = false;
         private bool ExtractAddon(AddonFile af)
         {
@@ -295,16 +302,33 @@ namespace AlotAddOnGUI
             Directory.CreateDirectory(destinationpath);
 
             ADDONFILES_TO_BUILD = new List<AddonFile>();
+
+
+            ALOTVersionInfo CurrentGameALOTInfo = null;
+            switch (game)
+            {
+                case 1:
+                    CurrentGameALOTInfo = CURRENTLY_INSTALLED_ME1_ALOT_INFO;
+                    break;
+                case 2:
+                    CurrentGameALOTInfo = CURRENTLY_INSTALLED_ME2_ALOT_INFO;
+                    break;
+                case 3:
+                    CurrentGameALOTInfo = CURRENTLY_INSTALLED_ME3_ALOT_INFO;
+                    break;
+            }
+
+
             foreach (AddonFile af in addonfiles)
             {
                 if (af.Ready && (game == 1 && af.Game_ME1 || game == 2 && af.Game_ME2 || game == 3 && af.Game_ME3))
                 {
 
-                    if (PREINSTALL_VERSION_INFO != null)
+                    if (CurrentGameALOTInfo != null)
                     {
                         //Detected MEMI tag
                         //Check if ALOT main file is installed. If it is and this is ALOT file, skip
-                        if (af.ALOTVersion > 0 && PREINSTALL_VERSION_INFO.ALOTVER > 0)
+                        if (af.ALOTVersion > 0 && CurrentGameALOTInfo.ALOTVER > 0)
                         {
                             Log.Information("ALOT File in queue for processing but ALOT is already installed. Skipping...");
                             continue; //skip
@@ -315,7 +339,7 @@ namespace AlotAddOnGUI
                         {
                             Debug.WriteLine("OK");
                         }
-                        if (af.ALOTUpdateVersion > 0 && PREINSTALL_VERSION_INFO.ALOTUPDATEVER >= af.ALOTUpdateVersion)
+                        if (af.ALOTUpdateVersion > 0 && CurrentGameALOTInfo.ALOTUPDATEVER >= af.ALOTUpdateVersion)
                         {
                             Log.Information("ALOT Update File in queue for processing, but ALOT update of this version or greater is already installed. Skipping...");
                             continue;
@@ -451,7 +475,7 @@ namespace AlotAddOnGUI
 
             //BUILD MEM PACKAGE
             BuildWorker.ReportProgress(0);
-            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building Addon for Mass Effect"+getGameNumberSuffix(CURRENT_GAME_BUILD)+".\nDon't close the window until this operation completes."));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building Addon for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nDon't close the window until this operation completes."));
 
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Building Addon MEM Package..."));
             int buildresult = -2;
@@ -686,23 +710,86 @@ namespace AlotAddOnGUI
         {
             WARN_USER_OF_EXIT = false;
             Log.Information("InstallCompleted()");
+            InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Collapsed;
+            Button_InstallViewLogs.Visibility = System.Windows.Visibility.Collapsed;
+            switch(INSTALLING_THREAD_GAME)
+            {
+                case 1:
+                    CURRENTLY_INSTALLED_ME1_ALOT_INFO = Utilities.GetInstalledALOTInfo(1);
+                    break;
+                case 2:
+                    CURRENTLY_INSTALLED_ME1_ALOT_INFO = Utilities.GetInstalledALOTInfo(2);
+                    break;
+                case 3:
+                    CURRENTLY_INSTALLED_ME1_ALOT_INFO = Utilities.GetInstalledALOTInfo(3);
+                    break;
+            }
+            CURRENTLY_INSTALLED_ME1_ALOT_INFO = Utilities.GetInstalledALOTInfo(1);
 
             if (e.Result != null)
             {
-                if ((int)e.Result == INSTALL_OK)
-                {
-                    Log.Information("Installation result: OK");
-
-                    HeaderLabel.Text = "Installation has completed";
-                    AddonFilesLabel.Text = "Thanks for using ALOT Installer.";
-
+                int result = (int)e.Result;
+                string gameName = "Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+                switch (result) {
+                    case INSTALL_OK:
+                        {
+                            var uriSource = new Uri(@"images/greencheck_large.png", UriKind.Relative);
+                            Installing_Checkmark.Source = new BitmapImage(uriSource);
+                            Log.Information("Installation result: OK");
+                            HeaderLabel.Text = "Installation has completed";
+                            AddonFilesLabel.Text = "Thanks for using ALOT Installer.";
+                            break;
+                        }
+                    case RESULT_ME1LAA_FAILED:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Failed to set Mass Effect to LAA";
+                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                            HeaderLabel.Text = "ME1 LAA fix failed. ME1 may be unstable.";
+                            break;
+                        }
+                    case RESULT_SCAN_REMOVE_FAILED:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Failed to remove empty mipmaps";
+                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                            HeaderLabel.Text = "Error occured removing mipmaps from "+gameName;
+                            break;
+                        }
+                    case RESULT_TEXTUREINSTALL_FAILED:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Failed to install textures";
+                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                            HeaderLabel.Text = "Error occured removing mipmaps from " + gameName;
+                            break;
+                        }
+                    case RESULT_UNPACK_FAILED:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Failed to unpack DLCs";
+                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                            HeaderLabel.Text = "Error occured removing mipmaps from " + gameName;
+                            break;
+                        }
                 }
-                else
+                if (result != INSTALL_OK)
                 {
+                    Button_InstallViewLogs.Visibility = System.Windows.Visibility.Visible;
                     Log.Error("Installation result: Error occured");
-                    HeaderLabel.Text = "Installation failed! Check the logs for more detailed information";
+                    var uriSource = new Uri(@"images/redx_large.png", UriKind.Relative);
+                    Installing_Checkmark.Source = new BitmapImage(uriSource);
                     AddonFilesLabel.Text = "Check the logs for more detailed information.";
                 }
+            }
+            else
+            {
+                //Null or not OK
+                Button_InstallViewLogs.Visibility = System.Windows.Visibility.Visible;
+                InstallingOverlay_TopLabel.Text = "Unknown installation error has occured";
+                InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+
+                var uriSource = new Uri(@"images/redx_large.png", UriKind.Relative);
+                Installing_Checkmark.Source = new BitmapImage(uriSource);
+                Log.Error("Installation result: Error occured");
+                HeaderLabel.Text = "Installation failed! Check the logs for more detailed information";
+                AddonFilesLabel.Text = "Check the logs for more detailed information.";
             }
             INSTALLING_THREAD_GAME = 0;
             ADDONFILES_TO_BUILD = null;
@@ -769,7 +856,8 @@ namespace AlotAddOnGUI
                 if (justInstalledUpdate > 0)
                 {
                     topText = "Installing ALOT Update for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
-                } else
+                }
+                else
                 {
                     topText = "Installing texture mods for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
                 }
@@ -780,12 +868,16 @@ namespace AlotAddOnGUI
             List<string> acceptedIPC = new List<string>();
             acceptedIPC.Add("TASK_PROGRESS");
             acceptedIPC.Add("PHASE");
+            acceptedIPC.Add("ERROR");
 
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "";
+            int processResult = 0;
 
             if (INSTALLING_THREAD_GAME == 3)
             {
+                
+
                 //Unpack DLC
                 Log.Information("InstallWorker(): ME3 -> Unpacking DLC.");
                 CurrentTask = "Unpacking DLC";
@@ -800,6 +892,15 @@ namespace AlotAddOnGUI
                 {
                     Thread.Sleep(250);
                 }
+
+                processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+                if (processResult != 0)
+                {
+                    Log.Error("UNPACK RETURN CODE WAS NOT 0: " + processResult);
+                    e.Result = RESULT_UNPACK_FAILED;
+                    return;
+                }
+
                 Interlocked.Increment(ref INSTALL_STAGE);
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
             }
@@ -814,6 +915,13 @@ namespace AlotAddOnGUI
                 while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
                 {
                     Thread.Sleep(250);
+                }
+                processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+                if (processResult != 0)
+                {
+                    Log.Error("SCAN/REMOVE RETURN CODE WAS NOT 0: " + processResult);
+                    e.Result = RESULT_SCAN_REMOVE_FAILED;
+                    return;
                 }
                 Interlocked.Increment(ref INSTALL_STAGE);
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
@@ -830,6 +938,13 @@ namespace AlotAddOnGUI
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {
                 Thread.Sleep(250);
+            }
+            processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+            if (processResult != 0)
+            {
+                Log.Error("TEXTURE INSTALLATION RETURN CODE WAS NOT 0: " + processResult);
+                e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                return;
             }
 
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
@@ -859,6 +974,13 @@ namespace AlotAddOnGUI
                 while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
                 {
                     Thread.Sleep(250);
+                }
+                processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+                if (processResult != 0)
+                {
+                    Log.Error("Error setting ME1 to large address aware: " + processResult);
+                    e.Result = RESULT_ME1LAA_FAILED;
+                    return;
                 }
             }
 

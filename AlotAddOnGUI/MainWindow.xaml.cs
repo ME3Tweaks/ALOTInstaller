@@ -22,6 +22,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Forms;
@@ -95,7 +96,6 @@ namespace AlotAddOnGUI
         private readonly string PRIMARY_HEADER = "Download the listed files, then drag and drop the files onto this window. Do not extract any of the files.\nOnce all files for your game are ready, you can build the addon.";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
         public const string SETTINGSTR_BETAMODE = "BetaMode";
-        private bool HIDENONRELEVANTFILES = false;
         private List<string> BACKGROUND_MEM_PROCESS_ERRORS;
         private const string SHOW_DIALOG_YES_NO = "SHOW_DIALOG_YES_NO";
         private bool CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = false;
@@ -233,7 +233,18 @@ namespace AlotAddOnGUI
                                 string temppath = Path.GetTempPath();
                                 downloadClient.DownloadProgressChanged += (s, e) =>
                                 {
+                                    Log.Information("Program update download percent: "+ e.ProgressPercentage);
                                     updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
+                                };
+                                updateprogresscontroller.Canceled += async (s, e) =>
+                                {
+                                    if (downloadClient != null)
+                                    {
+                                        downloadClient.CancelAsync();
+                                        await updateprogresscontroller.CloseAsync();
+                                        Log.Information("Application update was in progress but was canceled.");
+                                        await FetchManifest();
+                                    }
                                 };
                                 downloadClient.DownloadFileCompleted += UnzipSelfUpdate;
                                 string downloadPath = temppath + "ALOTAddonGUI_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
@@ -345,6 +356,7 @@ namespace AlotAddOnGUI
                         {
                             updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
                         };
+                        
                         downloadClient.DownloadFileCompleted += UnzipProgramUpdate;
                         string downloadPath = temppath + "MEM_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
                         downloadClient.DownloadFileAsync(new Uri(latest.Assets[0].BrowserDownloadUrl), downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
@@ -364,6 +376,16 @@ namespace AlotAddOnGUI
         private void UnzipSelfUpdate(object sender, AsyncCompletedEventArgs e)
         {
             KeyValuePair<ProgressDialogController, string> kp = (KeyValuePair<ProgressDialogController, string>)e.UserState;
+            if (e.Cancelled)
+            {
+                // delete the partially-downloaded file
+                if (File.Exists(kp.Value))
+                {
+                    File.Delete(kp.Value);
+                }
+                return;
+            }
+            Log.Information("Applying update to program UnzipSelfUpdate()");
             if (File.Exists(kp.Value))
             {
                 kp.Key.SetIndeterminate();
@@ -587,7 +609,6 @@ namespace AlotAddOnGUI
                 }
             }
 
-            PREINSTALL_VERSION_INFO = Utilities.GetInstalledALOTInfo(CURRENT_GAME_BUILD);
             string outDir = getOutputDir((int)e.Argument);
             if (Directory.Exists(outDir)) //Prompt for reinstall or rebuild
             {
@@ -650,8 +671,14 @@ namespace AlotAddOnGUI
                     {
                         // Code to run on the GUI thread.
                         Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
-                        AddonFilesLabel.Text = "ME1: " + numME1FilesReady + "/" + numME1Files + " - ME2: " + numME2FilesReady + "/" + numME2Files + " - ME3: " + numME3FilesReady + "/" + numME3Files;
-                    });
+                        string tickerText = "";
+                        tickerText += ShowME1Files ? "ME1: " + numME1FilesReady + "/" + numME1Files : "ME1: N/A";
+                        tickerText += " - ";
+                        tickerText += ShowME2Files ? "ME2 : " + numME2FilesReady + "/" + numME2Files : "ME2: N/A";
+                        tickerText += " - ";
+                        tickerText += ShowME3Files ? "ME3 : " + numME3FilesReady + "/" + numME3Files : "ME3: N/A";
+                        AddonFilesLabel.Text = tickerText;
+                        });
                     //Check for file existence
                     //Console.WriteLine("Checking for file: " + basepath + af.Filename);
 
@@ -884,17 +911,18 @@ namespace AlotAddOnGUI
 
         private void UpdateALOTStatus()
         {
-            ALOTVersionInfo alotme1verinfo = Utilities.GetInstalledALOTInfo(1);
-            ALOTVersionInfo alotme2verinfo = Utilities.GetInstalledALOTInfo(2);
-            ALOTVersionInfo alotme3verinfo = Utilities.GetInstalledALOTInfo(3);
+            CURRENTLY_INSTALLED_ME1_ALOT_INFO = Utilities.GetInstalledALOTInfo(1);
+            CURRENTLY_INSTALLED_ME2_ALOT_INFO = Utilities.GetInstalledALOTInfo(2);
+            CURRENTLY_INSTALLED_ME3_ALOT_INFO = Utilities.GetInstalledALOTInfo(3);
 
-            string me1ver = alotme1verinfo != null ? alotme1verinfo.ALOTVER + "." + alotme1verinfo.ALOTUPDATEVER : "Not Installed";
-            string me2ver = alotme2verinfo != null ? alotme2verinfo.ALOTVER + "." + alotme2verinfo.ALOTUPDATEVER : "Not Installed";
-            string me3ver = alotme3verinfo != null ? alotme3verinfo.ALOTVER + "." + alotme3verinfo.ALOTUPDATEVER : "Not Installed";
 
-            string me1ToolTip = alotme1verinfo != null ? "ALOT detected as installed" : "ALOT not detected as installed";
-            string me2ToolTip = alotme2verinfo != null ? "ALOT detected as installed" : "ALOT not detected as installed";
-            string me3ToolTip = alotme3verinfo != null ? "ALOT detected as installed" : "ALOT not detected as installed";
+            string me1ver = CURRENTLY_INSTALLED_ME1_ALOT_INFO != null ? CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER : "Not Installed";
+            string me2ver = CURRENTLY_INSTALLED_ME2_ALOT_INFO != null ? CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTUPDATEVER : "Not Installed";
+            string me3ver = CURRENTLY_INSTALLED_ME3_ALOT_INFO != null ? CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTUPDATEVER : "Not Installed";
+
+            string me1ToolTip = CURRENTLY_INSTALLED_ME1_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed";
+            string me2ToolTip = CURRENTLY_INSTALLED_ME2_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed";
+            string me3ToolTip = CURRENTLY_INSTALLED_ME3_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed";
 
             string message1 = "ME1: " + me1ver;
             string message2 = "ME2: " + me2ver;
@@ -995,7 +1023,7 @@ namespace AlotAddOnGUI
                     }
                 }
             }
-
+            UpdateALOTStatus();
             ApplyFiltering(); //sets data source and separators            
         }
 
@@ -1304,7 +1332,7 @@ namespace AlotAddOnGUI
 
             if (blockDueToMissingALOTFile)
             {
-                await this.ShowMessageAsync("ALOT Main file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " requires the ALOT main file. This file must be installed in the first run of the installer.");
+                await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + getGameNumberSuffix(game) + " is not imported. ALOT is not currently installed; in order to use this program you must have ALOT's main file imported for userequires the ALOT main file. This file must be imported to run the installer for the first time.");
                 return false;
             }
 
@@ -1312,11 +1340,11 @@ namespace AlotAddOnGUI
             {
                 if (installedInfo == null)
                 {
-                    await this.ShowMessageAsync("ALOT Update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time.");
+                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation.");
                 }
                 else
                 {
-                    await this.ShowMessageAsync("ALOT Update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to install anything.");
+                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue.");
                 }
                 return false;
             }
@@ -1770,14 +1798,6 @@ namespace AlotAddOnGUI
             }
         }
 
-
-        private void Checkbox_HideFiles_Click(object sender, RoutedEventArgs e)
-        {
-            HIDENONRELEVANTFILES = (bool)Checkbox_HideFiles.IsChecked;
-            ApplyFiltering();
-            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_HIDENONRELEVANTFILES, ((bool)Checkbox_HideFiles.IsChecked ? 1 : 0));
-        }
-
         private void Button_ViewLog_Click(object sender, RoutedEventArgs e)
         {
             var directory = new DirectoryInfo("logs");
@@ -1793,12 +1813,9 @@ namespace AlotAddOnGUI
         private void LoadSettings()
         {
             bool importasmove = Utilities.GetRegistrySettingBool(SETTINGSTR_IMPORTASMOVE) ?? true;
-
             USING_BETA = Utilities.GetRegistrySettingBool(SETTINGSTR_BETAMODE) ?? false;
-            HIDENONRELEVANTFILES = Utilities.GetRegistrySettingBool(SETTINGSTR_HIDENONRELEVANTFILES) ?? true;
 
             Checkbox_BetaMode.IsChecked = USING_BETA;
-            Checkbox_HideFiles.IsChecked = HIDENONRELEVANTFILES;
             Checkbox_MoveFilesAsImport.IsChecked = importasmove;
 
             if (USING_BETA)
@@ -1928,6 +1945,11 @@ namespace AlotAddOnGUI
                     Close();
                 }
             }
+        }
+
+        private void ContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            object source = e.Source;
         }
     }
 }
