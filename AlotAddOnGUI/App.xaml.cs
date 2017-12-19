@@ -104,6 +104,8 @@ namespace AlotAddOnGUI
             string st = FlattenException(e.Exception);
             Log.Error(errorMessage);
             Log.Error(st);
+            Log.Information("Forcing beta mode off");
+            Utilities.WriteRegistryKey(Registry.CurrentUser, AlotAddOnGUI.MainWindow.REGISTRY_KEY, AlotAddOnGUI.MainWindow.SETTINGSTR_BETAMODE , 0);
             //MetroDial.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             //e.Handled = true;
         }

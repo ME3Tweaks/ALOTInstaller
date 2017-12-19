@@ -94,7 +94,7 @@ namespace AlotAddOnGUI
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files, then drag and drop the files onto this window. Do not extract any of the files.\nOnce all files for your game are ready, you can build the addon.";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
-        private string SETTINGSTR_BETAMODE = "BetaMode";
+        public const string SETTINGSTR_BETAMODE = "BetaMode";
         private bool HIDENONRELEVANTFILES = false;
         private List<string> BACKGROUND_MEM_PROCESS_ERRORS;
         private const string SHOW_DIALOG_YES_NO = "SHOW_DIALOG_YES_NO";
