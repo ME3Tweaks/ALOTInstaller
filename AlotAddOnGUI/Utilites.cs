@@ -11,7 +11,6 @@ using System.Threading;
 using Serilog;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using LiteGuard;
 
 namespace AlotAddOnGUI
 {
