@@ -171,10 +171,10 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Button x:Name="Button_InstallME1" Grid.Column="0" Content="Please Wait" IsEnabled="false" Click="Button_InstallME1_Click"/>
-            <Button x:Name="Button_InstallME2" Grid.Column="1" Content="Please Wait" IsEnabled="false" Click="Button_InstallME2_Click"/>
-            <Button x:Name="Button_InstallME3" Grid.Column="2" Content="Please Wait" IsEnabled="false" Click="Button_InstallME3_Click"/>
-            <Button x:Name="Button_Settings" Grid.Column="3" Content="Settings" IsEnabled="false" Click="Button_Settings_Click"/>
+            <Button x:Name="Button_InstallME1" Grid.Column="0" Content="Please Wait" IsEnabled="false" Click="Button_InstallME1_Click" FontWeight="Bold" Style="{StaticResource AccentedSquareButtonStyle}" FontSize="11" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+            <Button x:Name="Button_InstallME2" Grid.Column="1" Content="Please Wait" IsEnabled="false" Click="Button_InstallME2_Click" FontWeight="Bold" Style="{StaticResource AccentedSquareButtonStyle}" FontSize="11" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+            <Button x:Name="Button_InstallME3" Grid.Column="2" Content="Please Wait" IsEnabled="false" Click="Button_InstallME3_Click" FontWeight="Bold" Style="{StaticResource AccentedSquareButtonStyle}" FontSize="11" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+            <Button x:Name="Button_Settings" Grid.Column="3" Content="Settings" IsEnabled="false" FontWeight="Bold" Style="{StaticResource SquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" FontSize="10" Click="Button_Settings_Click"/>
 
         </Grid>
     </Grid>
@@ -214,24 +214,26 @@
                                 <Controls:ToggleSwitch x:Name="Switch_ME3Filter" Margin="0,0,0,5" FontSize="13" OffLabel="Show Mass Effect 3 files" OnLabel="Show Mass Effect 3 files" IsChecked="{Binding ShowME3Files}"/>
                             </StackPanel>
                         </Expander>
-                        <Expander IsExpanded="False">
+                        <Expander IsExpanded="True">
                             <Expander.Header>
-                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="Backup Status"/>
+                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="Backup &amp; Restore"/>
                             </Expander.Header>
                             <StackPanel>
-                                <Button x:Name="Button_ME1Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME1: Not Backed Up" Click="Button_ME1Backup_Click" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                <Button x:Name="Button_ME2Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME2: Not Backed Up" Click="Button_ME2Backup_Click" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                <Button x:Name="Button_ME3Backup" Margin="20,0,20,0" FontSize="12" Padding="0,3,0,3" Content="ME3: Not Backed Up" Click="Button_ME3Backup_Click" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                <Button x:Name="Button_ME1Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME1: Not Backed Up" Click="Button_ME1Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                <Button x:Name="Button_ME2Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME2: Not Backed Up" Click="Button_ME2Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                <Button x:Name="Button_ME3Backup" Margin="20,0,20,0" FontSize="12" Padding="0,3,0,3" Content="ME3: Not Backed Up" Click="Button_ME3Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                             </StackPanel>
                         </Expander>                        
                         <Expander IsExpanded="False">
                             <Expander.Header>
-                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="Diagnostics"/>
+                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="Diagnostics &amp; MEM"/>
                             </Expander.Header>
                             <StackPanel>
-                                <Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" x:Name="Label_MEMVersion" Content="MEM Version: TBD" Click="Button_MEMVersion_Click"/>
-                                <Button x:Name="Button_ViewLog" Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" Content="View log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click"/>
-                                <Button x:Name="Button_ReportIssue" Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" Content="Report an issue" ToolTip="Go to the ALOT discord" Click="Button_ReportIssue_Click"/>
+
+                                <Button x:Name="Button_ViewLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="View log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                <Button x:Name="Button_ReportIssue" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Report an issue" ToolTip="Go to the ALOT discord" Click="Button_ReportIssue_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                <Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" FontWeight="Bold" x:Name="Button_MEM_GUI" Content="Launch MEM GUI" Click="Button_MEMVersion_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal"/>
+                                <Label HorizontalAlignment="Center" Margin="20,0,20,3" Padding="0,3,0,3" FontWeight="Bold" x:Name="Label_MEMVersion" Content="MEM (NoGUI) Version: TBD" FontSize="12"/>
                             </StackPanel>
                         </Expander>
                         <Expander IsExpanded="False">
@@ -248,8 +250,8 @@
                     </StackPanel>
                 </ScrollViewer>
             </Controls:Flyout>
-            <Controls:Flyout x:Name="ImportFailedFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom" Height="30">
-                <Label x:Name="ImportFailedLabel" FontSize="14" Content="This is the statusbar. You should not see this text."></Label>
+            <Controls:Flyout x:Name="StatusFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
+                <TextBlock x:Name="StatusLabel" FontSize="14" Text="This is the statusbar. You should not see this text." Padding="5"></TextBlock>
             </Controls:Flyout>
             <Controls:Flyout x:Name="InstallingOverlayFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDown="InstallingOverlayFlyout_MouseDown">
                 <Border x:Name="InstallingOverlayFlyout_Border" Padding="10" Background="#77000000" >
@@ -291,7 +293,16 @@
                             <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallViewLogs" Visibility="Collapsed" Margin="0,0,5,0"  HorizontalAlignment="Center"  Content="View Logs" ToolTip="Click to view logs" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
                             <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallDone" Visibility="Visible" HorizontalAlignment="Center"  Content="Continue" ToolTip="Click to dismiss dialog" Click="Button_InstallDone_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
                         </StackPanel>
-
+                        <TextBlock x:Name="InstallingOverlay_Tip" Height="60" FontSize="14" FontWeight="Medium" Margin="5,70,0,5" HorizontalAlignment="Center"  TextAlignment="Center" Text="Since the Prothean extinction, numerous species have come to call the Citadel home.&#10;It serves as the political, cultural, and financial capital of the galactic community.">
+                            <TextBlock.Effect>
+                                <DropShadowEffect
+                                  ShadowDepth="4"
+                                  Direction="330"
+                                  Color="Black"
+                                  Opacity="1"
+                                 BlurRadius="4"/>
+                            </TextBlock.Effect>
+                        </TextBlock>
                     </StackPanel>
                 </Border>
             </Controls:Flyout>

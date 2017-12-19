@@ -17,6 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -55,6 +56,7 @@ namespace AlotAddOnGUI
         private List<string> BlockingMods;
 
         private DispatcherTimer backgroundticker;
+        private DispatcherTimer tipticker;
         private int completed = 0;
         //private int addonstoinstall = 0;
         private int CURRENT_GAME_BUILD = 0; //set when extraction is run/finished
@@ -233,7 +235,7 @@ namespace AlotAddOnGUI
                                 string temppath = Path.GetTempPath();
                                 downloadClient.DownloadProgressChanged += (s, e) =>
                                 {
-                                    Log.Information("Program update download percent: "+ e.ProgressPercentage);
+                                    Log.Information("Program update download percent: " + e.ProgressPercentage);
                                     updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
                                 };
                                 updateprogresscontroller.Canceled += async (s, e) =>
@@ -283,6 +285,7 @@ namespace AlotAddOnGUI
             {
                 var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
                 fileVersion = versInfo.FileMajorPart;
+                Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
             }
             try
             {
@@ -316,7 +319,8 @@ namespace AlotAddOnGUI
                         //up to date
                     }
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Log.Error("Error checking for MEM GUI update: " + e.Message);
                 ShowStatus("Error checking for MEM update");
@@ -356,7 +360,7 @@ namespace AlotAddOnGUI
                         {
                             updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
                         };
-                        
+
                         downloadClient.DownloadFileCompleted += UnzipProgramUpdate;
                         string downloadPath = temppath + "MEM_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
                         downloadClient.DownloadFileAsync(new Uri(latest.Assets[0].BrowserDownloadUrl), downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
@@ -366,7 +370,8 @@ namespace AlotAddOnGUI
                         //up to date
                     }
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Log.Error("Error checking for MEM update: " + e.Message);
                 ShowStatus("Error checking for MEM (NOGUI) update");
@@ -628,7 +633,7 @@ namespace AlotAddOnGUI
         }
 
         // Tick handler    
-        private void timer_Tick(object sender, EventArgs e)
+        private void CheckImportLibrary_Tick(object sender, EventArgs e)
         {
             if (PreventFileRefresh)
             {
@@ -653,10 +658,14 @@ namespace AlotAddOnGUI
                     if (af.Game_ME2) numME2Files++;
                     if (af.Game_ME3) numME3Files++;
                     bool ready = File.Exists(basepath + af.Filename);
+                    if (!ready && af.UnpackedSingleFilename != null)
+                    {
+                        //Check for single file
+                        ready = File.Exists(basepath + af.UnpackedSingleFilename);
+                    }
                     if (af.Ready != ready) //ensure the file applies to something
                     {
                         af.Ready = ready;
-
                     }
 
                     if (af.Ready)
@@ -678,7 +687,7 @@ namespace AlotAddOnGUI
                         tickerText += " - ";
                         tickerText += ShowME3Files ? "ME3 : " + numME3FilesReady + "/" + numME3Files : "ME3: N/A";
                         AddonFilesLabel.Text = tickerText;
-                        });
+                    });
                     //Check for file existence
                     //Console.WriteLine("Checking for file: " + basepath + af.Filename);
 
@@ -692,11 +701,11 @@ namespace AlotAddOnGUI
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Log.Information("Window_Loaded()");
+            var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
             if (EXE_DIRECTORY.Length > 95)
             {
                 Log.Fatal("EXE is nested too deep for Addon to build properly (" + EXE_DIRECTORY.Length + " chars) due to Windows API limitations.");
-                await this.ShowMessageAsync("ALOTAddonBuilder is too deep in the filesystem", "ALOT Installer can have issues extracting and building the Addon if nested too deeply in the filesystem. This is an issue with Windows file path limitations. Move the Addon directory up a few folders on your filesystem. A good place to put the Addon is in Documents.");
+                await this.ShowMessageAsync("ALOT Installer is too deep in the filesystem", "ALOT Installer can have issues extracting and building the Addon if nested too deeply in the filesystem. This is an issue with Windows file path limitations. Move the ALOT Installer directory up a few folders on your filesystem. A good place to put ALOT Installer is in Documents.");
                 Environment.Exit(1);
             }
 
@@ -732,7 +741,7 @@ namespace AlotAddOnGUI
                 if (backgroundticker == null)
                 {
                     backgroundticker = new DispatcherTimer();
-                    backgroundticker.Tick += new EventHandler(timer_Tick);
+                    backgroundticker.Tick += new EventHandler(CheckImportLibrary_Tick);
                     backgroundticker.Interval = new TimeSpan(0, 0, 5); // execute every 5s
                     backgroundticker.Start();
                     BuildWorker = new BackgroundWorker();
@@ -801,12 +810,12 @@ namespace AlotAddOnGUI
                         string path = Utilities.GetGameBackupPath(1);
                         if (path != null)
                         {
-                            Button_ME1Backup.Content = "ME1: Backed Up";
+                            Button_ME1Backup.Content = "Restore ME1";
                             Button_ME1Backup.ToolTip = "Click to restore game from " + Environment.NewLine + path;
                         }
                         else
                         {
-                            Button_ME1Backup.Content = "ME1: Not Backed Up";
+                            Button_ME1Backup.Content = "Backup ME1";
                             Button_ME1Backup.ToolTip = "Click to backup game";
                         }
                         Button_ME1Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(1, true);
@@ -817,12 +826,12 @@ namespace AlotAddOnGUI
                         string path = Utilities.GetGameBackupPath(2);
                         if (path != null)
                         {
-                            Button_ME2Backup.Content = "ME2: Backed Up";
+                            Button_ME2Backup.Content = "Restore ME2";
                             Button_ME2Backup.ToolTip = "Click to restore game from " + Environment.NewLine + path;
                         }
                         else
                         {
-                            Button_ME2Backup.Content = "ME2: Not Backed Up";
+                            Button_ME2Backup.Content = "Backup ME2";
                             Button_ME2Backup.ToolTip = "Click to backup game";
                         }
                         Button_ME2Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(2, true);
@@ -833,12 +842,12 @@ namespace AlotAddOnGUI
                         string path = Utilities.GetGameBackupPath(3);
                         if (path != null)
                         {
-                            Button_ME3Backup.Content = "ME3: Backed Up";
+                            Button_ME3Backup.Content = "Restore ME3";
                             Button_ME3Backup.ToolTip = "Click to restore game from " + Environment.NewLine + path;
                         }
                         else
                         {
-                            Button_ME3Backup.Content = "ME3: Not Backed Up";
+                            Button_ME3Backup.Content = "Backup ME3";
                             Button_ME3Backup.ToolTip = "Click to backup game";
                         }
                         Button_ME3Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(3, true);
@@ -900,7 +909,7 @@ namespace AlotAddOnGUI
                     Build_ProgressBar.IsIndeterminate = false;
                     HeaderLabel.Text = PRIMARY_HEADER;
                     AddonFilesLabel.Text = "Scanning...";
-                    timer_Tick(null, null);
+                    CheckImportLibrary_Tick(null, null);
                     RunMEMUpdater2();
                     UpdateALOTStatus();
 
@@ -966,6 +975,7 @@ namespace AlotAddOnGUI
                                 DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
                                 ALOTVersion = e.Attribute("alotversion") != null ? Convert.ToInt16((string)e.Attribute("alotversion")) : (short)0,
                                 ALOTUpdateVersion = e.Attribute("alotupdateversion") != null ? Convert.ToByte((string)e.Attribute("alotupdateversion")) : (byte)0,
+                                UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename") != null ? (string)e.Element("file").Attribute("unpackedsinglefilename") : null,
                                 Ready = false,
                                 PackageFiles = e.Elements("packagefile")
                                     .Select(r => new PackageFile
@@ -1045,7 +1055,7 @@ namespace AlotAddOnGUI
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
             view.GroupDescriptions.Add(groupDescription);
-            timer_Tick(null, null);
+            CheckImportLibrary_Tick(null, null);
         }
 
 
@@ -1281,7 +1291,7 @@ namespace AlotAddOnGUI
 
         private async Task<bool> InstallPrecheck(int game)
         {
-            timer_Tick(null, null);
+            CheckImportLibrary_Tick(null, null);
             int nummissing = 0;
             bool oneisready = false;
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
@@ -1332,7 +1342,7 @@ namespace AlotAddOnGUI
 
             if (blockDueToMissingALOTFile)
             {
-                await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + getGameNumberSuffix(game) + " is not imported. ALOT is not currently installed; in order to use this program you must have ALOT's main file imported for userequires the ALOT main file. This file must be imported to run the installer for the first time.");
+                await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + getGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
                 return false;
             }
 
@@ -1440,86 +1450,7 @@ namespace AlotAddOnGUI
             // Install_ProgressBar.IsIndeterminate = true;
             return true;
         }
-
-        private async void File_Drop(object sender, System.Windows.DragEventArgs e)
-        {
-            if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
-            {
-                // Note that you can have more than one file.
-                string[] files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
-                Log.Information("Files dropped:");
-                foreach (String file in files)
-                {
-                    Log.Information(" -" + file);
-                }
-                List<AddonFile> filesimported = new List<AddonFile>();
-                // Assuming you have one file that you care about, pass it off to whatever
-                // handling code you have defined.
-                List<string> noMatchFiles = new List<string>();
-                foreach (string file in files)
-                {
-                    string fname = Path.GetFileName(file);
-                    //remove (1) and such
-                    string fnameWithoutExtension = Path.GetFileNameWithoutExtension(file);
-                    if (fnameWithoutExtension.EndsWith(")"))
-                    {
-                        if (fnameWithoutExtension.LastIndexOf("(") >= fnameWithoutExtension.Length - 3)
-                        {
-                            //it's probably a copy
-                            fname = fnameWithoutExtension.Remove(fnameWithoutExtension.LastIndexOf("("), fnameWithoutExtension.LastIndexOf(")") - fnameWithoutExtension.LastIndexOf("(") + 1).Trim() + Path.GetExtension(file);
-                            Log.Information("File Drag/Drop corrected to " + fname);
-                        }
-                    }
-
-                    bool hasMatch = false;
-                    foreach (AddonFile af in addonfiles)
-                    {
-                        if (af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            hasMatch = true;
-                            if (af.Ready == false)
-                            {
-                                //Copy file to directory
-                                string basepath = System.AppDomain.CurrentDomain.BaseDirectory + @"Downloaded_Mods\";
-                                string destination = basepath + af.Filename;
-                                Log.Information("Copying dragged file to downloaded mods directory: " + file);
-                                File.Copy(file, destination, true);
-                                filesimported.Add(af);
-                                timer_Tick(null, null);
-                                break;
-                            }
-                        }
-                    }
-                    if (!hasMatch)
-                    {
-                        noMatchFiles.Add(file);
-                        Log.Information("Dragged file does not match any addon manifest file: " + file);
-                    }
-                }
-                if (noMatchFiles.Count > 0)
-                {
-                    if (noMatchFiles.Count == 1)
-                    {
-                        ShowStatus("Not an addon file: " + Path.GetFileName(noMatchFiles[0]));
-                    }
-                    else
-                    {
-                        ShowStatus(noMatchFiles.Count + " files were dropped that aren't Addon files");
-                    }
-                }
-
-                if (filesimported.Count > 0)
-                {
-                    string message = "The following files have been imported to ALOT Installer:";
-                    foreach (AddonFile af in filesimported)
-                    {
-                        message += "\n - " + af.FriendlyName;
-                    }
-                    await this.ShowMessageAsync(filesimported.Count + " file" + (filesimported.Count != 1 ? "s" : "") + " imported", message);
-                }
-            }
-        }
-
+        
         private async void File_Drop_BackgroundThread(object sender, System.Windows.DragEventArgs e)
         {
             if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
@@ -1572,14 +1503,21 @@ namespace AlotAddOnGUI
                     bool hasMatch = false;
                     foreach (AddonFile af in addonfiles)
                     {
-                        if (af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase))
+                        if (af.ALOTVersion > 0 && af.Game_ME3)
+                        {
+                            Debug.WriteLine("BREAK");
+                        }
+
+                        bool isUnpackedSingleFile = af.UnpackedSingleFilename != null && af.UnpackedSingleFilename.Equals(fname, StringComparison.InvariantCultureIgnoreCase);
+
+                        if (isUnpackedSingleFile|| af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase))
                         {
                             hasMatch = true;
                             if (af.Ready == false)
                             {
                                 //Copy file to directory
                                 string basepath = System.AppDomain.CurrentDomain.BaseDirectory + @"Downloaded_Mods\";
-                                string destination = basepath + af.Filename;
+                                string destination = basepath + ((isUnpackedSingleFile) ? af.UnpackedSingleFilename : af.Filename);
                                 //Log.Information("Copying dragged file to downloaded mods directory: " + file);
                                 //File.Copy(file, destination, true);
                                 filesToImport.Add(Tuple.Create(af, file, destination));
@@ -1659,7 +1597,7 @@ namespace AlotAddOnGUI
                     PreventFileRefresh = false; //allow refresh
 
                     string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                    string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " have been moved into the Downloaded_Mods directory.";
+                    string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods directory.";
 
                     ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
                 }
@@ -1717,11 +1655,11 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void ShowStatus(string v, int msOpen = 8000)
+        private void ShowStatus(string v, int msOpen = 160000)
         {
-            ImportFailedFlyout.AutoCloseInterval = msOpen;
-            ImportFailedLabel.Content = v;
-            ImportFailedFlyout.IsOpen = true;
+            StatusFlyout.AutoCloseInterval = msOpen;
+            StatusLabel.Text = v;
+            StatusFlyout.IsOpen = true;
         }
 
         private void Button_Settings_Click(object sender, RoutedEventArgs e)

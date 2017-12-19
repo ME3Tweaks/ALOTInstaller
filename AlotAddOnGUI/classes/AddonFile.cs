@@ -62,6 +62,7 @@ namespace AlotAddOnGUI.classes
             }
         }
         public bool ProcessAsModFile { get; set; }
+        public string UnpackedSingleFilename { get; set; }
         public string Author { get; set; }
         public string FriendlyName { get; set; }
         public bool Game_ME1 { get; set; }

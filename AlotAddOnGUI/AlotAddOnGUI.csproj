@@ -185,6 +185,7 @@
     <Content Include="7z\7z.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="ui\installtips.xml" />
     <Resource Include="images\info.ico" />
     <Resource Include="images\greencheckmark.png" />
     <Resource Include="images\orangedownload.png" />

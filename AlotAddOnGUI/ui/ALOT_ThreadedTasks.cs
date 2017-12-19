@@ -12,17 +12,21 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Media;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace AlotAddOnGUI
 {
     public partial class MainWindow : MetroWindow
     {
+        static Random RANDOM = new Random();
         private int INSTALLING_THREAD_GAME;
         private List<AddonFile> ADDONFILES_TO_BUILD;
         public const string UPDATE_TASK_PROGRESS = "UPDATE_TASK_PROGRESS";
@@ -46,18 +50,29 @@ namespace AlotAddOnGUI
         public static ALOTVersionInfo CURRENTLY_INSTALLED_ME3_ALOT_INFO;
 
         private bool WARN_USER_OF_EXIT = false;
+        private List<string> TIPS_LIST;
+
         private bool ExtractAddon(AddonFile af)
         {
-
             string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + MEM_STAGING_DIR + "\\";
-            string prefix = "[" + Path.GetFileNameWithoutExtension(af.Filename) + "] ";
-            Log.Information(prefix + "Processing extraction on " + af.Filename);
-            string fileextension = System.IO.Path.GetExtension(af.Filename);
+
+            string fileToUse = af.Filename;
+            bool isSingleFileMode = false;
+            if (File.Exists(EXE_DIRECTORY + "Downloaded_Mods\\" + af.UnpackedSingleFilename))
+            {
+                isSingleFileMode = true;
+                fileToUse = af.UnpackedSingleFilename;
+            }
+
+            string prefix = "[" + Path.GetFileNameWithoutExtension(fileToUse) + "] ";
+            Log.Information(prefix + "Processing extraction on " + fileToUse);
+            string fileextension = System.IO.Path.GetExtension(fileToUse);
             ulong freeBytes;
             ulong diskSize;
             ulong totalFreeBytes;
 
-            long length = new System.IO.FileInfo(EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename).Length;
+
+            long length = new System.IO.FileInfo(EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse).Length;
             string processingStr = "Processing " + af.FriendlyName + " (" + ByteSize.FromBytes(length) + ")";
             TasksDisplayEngine.SubmitTask(processingStr);
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, processingStr));
@@ -71,10 +86,10 @@ namespace AlotAddOnGUI
                     case ".rar":
                         {
                             //Extract file
-                            Log.Information(prefix + "Extracting file: " + af.Filename);
+                            Log.Information(prefix + "Extracting file: " + fileToUse);
                             string exe = BINARY_DIRECTORY + "7z.exe";
-                            string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
-                            string args = "x \"" + EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename + "\" -aoa -r -o\"" + extractpath + "\"";
+                            string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(fileToUse);
+                            string args = "x \"" + EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse + "\" -aoa -r -o\"" + extractpath + "\"";
                             Utilities.runProcess(exe, args);
 
                             //get free space for debug purposes
@@ -237,8 +252,8 @@ namespace AlotAddOnGUI
                         {
                             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
 
-                            string source = EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename;
-                            string destination = EXE_DIRECTORY + "Extracted_Mods\\" + Path.GetFileName(af.Filename);
+                            string source = EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse;
+                            string destination = EXE_DIRECTORY + "Extracted_Mods\\" + Path.GetFileName(fileToUse);
                             File.Copy(source, destination, true);
                             BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                             break;
@@ -255,9 +270,30 @@ namespace AlotAddOnGUI
                     case ".mem":
                         {
                             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
-
                             //Copy to output folder
-                            File.Copy(EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename, getOutputDir(CURRENT_GAME_BUILD) + af.Filename, true);
+                            if (!isSingleFileMode)
+                            {
+                                File.Copy(EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + fileToUse, true);
+                            }
+                            else
+                            {
+                                if (af.ALOTVersion > 0)
+                                {
+                                    //It's an ALOT file. We will move this directly to the output directory.
+                                    Log.Information("ALOT MAIN FILE - Unpacked - moving to output: " + fileToUse);
+                                    string movename = getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse;
+                                    if (File.Exists(movename))
+                                    {
+                                        File.Delete(movename);
+                                    }
+                                    File.Move(EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
+                                    foreach (PackageFile p in af.PackageFiles)
+                                    {
+                                        p.Processed = true; //No more processing on this addonfile. It has packagefiles since it could also be zipped still
+                                    }
+                                    break;
+                                }
+                            }
                             BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                             break;
                         }
@@ -434,7 +470,7 @@ namespace AlotAddOnGUI
                             }
                             else if (pf.DestinationName == null)
                             {
-                                Log.Error("File destination in null. This means there is a problem in the manifest or manifest parser. File: " + pf.SourceName);
+                                Log.Error("File destination is null. This means there is a problem in the manifest or manifest parser. File: " + pf.SourceName);
                                 errorOccured = true;
                             }
                             else
@@ -677,7 +713,7 @@ namespace AlotAddOnGUI
             PreventFileRefresh = true;
             HeaderLabel.Text = "Installing MEMs...";
             AddonFilesLabel.Text = "Running in installer mode.";
-
+            InstallingOverlay_Tip.Visibility = System.Windows.Visibility.Visible;
             InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Visible;
             InstallingOverlay_StageLabel.Text = "Getting ready";
             InstallingOverlay_BottomLabel.Text = "Please wait";
@@ -697,8 +733,54 @@ namespace AlotAddOnGUI
             }
             InstallingOverlayFlyout_Border.Background = backgroundShadeBrush;
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
-            InstallWorker.RunWorkerAsync(getOutputDir(INSTALLING_THREAD_GAME));
             SetInstallFlyoutState(true);
+
+            //Load Tips
+            TIPS_LIST = new List<string>();
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("AlotAddOnGUI.ui.installtips.xml"))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                string result = reader.ReadToEnd();
+                try
+                {
+                    XElement rootElement = XElement.Parse(result);
+                    IEnumerable<XElement> xNames;
+
+                    xNames = rootElement.Element("me" + INSTALLING_THREAD_GAME).Descendants("tip");
+
+                    foreach (XElement element in xNames)
+                    {
+                        TIPS_LIST.Add(element.Value);
+                    }
+                }
+                catch
+                {
+                    //no tips.
+                }
+            }
+
+            tipticker = new System.Windows.Threading.DispatcherTimer();
+            tipticker.Tick += newTipTimer_Tick;
+            tipticker.Interval = new TimeSpan(0, 0, 20);
+            tipticker.Start();
+            InstallWorker.RunWorkerAsync(getOutputDir(INSTALLING_THREAD_GAME));
+        }
+
+        private void newTipTimer_Tick(object sender, EventArgs e)
+        {
+            // code goes here
+            if (TIPS_LIST.Count > 1)
+            {
+                string currentTip = InstallingOverlay_Tip.Text;
+                string newTip = InstallingOverlay_Tip.Text;
+
+                while (currentTip == newTip)
+                {
+                    int r = RANDOM.Next(TIPS_LIST.Count);
+                    newTip = TIPS_LIST[r];
+                }
+                InstallingOverlay_Tip.Text = newTip;
+            }
         }
 
         private string GetMusicDirectorry()
@@ -710,9 +792,11 @@ namespace AlotAddOnGUI
         {
             WARN_USER_OF_EXIT = false;
             Log.Information("InstallCompleted()");
+            InstallingOverlay_Tip.Visibility = System.Windows.Visibility.Collapsed;
+            tipticker.Stop();
             InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Collapsed;
             Button_InstallViewLogs.Visibility = System.Windows.Visibility.Collapsed;
-            switch(INSTALLING_THREAD_GAME)
+            switch (INSTALLING_THREAD_GAME)
             {
                 case 1:
                     CURRENTLY_INSTALLED_ME1_ALOT_INFO = Utilities.GetInstalledALOTInfo(1);
@@ -730,7 +814,8 @@ namespace AlotAddOnGUI
             {
                 int result = (int)e.Result;
                 string gameName = "Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
-                switch (result) {
+                switch (result)
+                {
                     case INSTALL_OK:
                         {
                             var uriSource = new Uri(@"images/greencheck_large.png", UriKind.Relative);
@@ -751,7 +836,7 @@ namespace AlotAddOnGUI
                         {
                             InstallingOverlay_TopLabel.Text = "Failed to remove empty mipmaps";
                             InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                            HeaderLabel.Text = "Error occured removing mipmaps from "+gameName;
+                            HeaderLabel.Text = "Error occured removing mipmaps from " + gameName;
                             break;
                         }
                     case RESULT_TEXTUREINSTALL_FAILED:
@@ -831,6 +916,7 @@ namespace AlotAddOnGUI
             INSTALL_STAGE = 0;
             //Checking files for title
 
+            AddonFile alotAddonFile = null;
             bool installedALOT = false;
             byte justInstalledUpdate = 0;
             //Check if ALOT is in files that were installed
@@ -838,6 +924,7 @@ namespace AlotAddOnGUI
             {
                 if (af.ALOTVersion > 0)
                 {
+                    alotAddonFile = af;
                     Log.Information("InstallWorker: We are installing ALOT v" + af.ALOTVersion + " in this pass.");
                     installedALOT = true;
                 }
@@ -876,7 +963,7 @@ namespace AlotAddOnGUI
 
             if (INSTALLING_THREAD_GAME == 3)
             {
-                
+
 
                 //Unpack DLC
                 Log.Information("InstallWorker(): ME3 -> Unpacking DLC.");
@@ -994,7 +1081,6 @@ namespace AlotAddOnGUI
                     if (af.ALOTVersion > 0)
                     {
                         ALOTVersion = af.ALOTVersion;
-                        installedALOT = true;
                         break;
                     }
                 }
@@ -1025,7 +1111,28 @@ namespace AlotAddOnGUI
                 Utilities.InstallBinkw32Bypass(INSTALLING_THREAD_GAME);
             }
 
+            //If MAIN alot file is here, move it back to downloaded_mods
+            if (installedALOT && alotAddonFile.UnpackedSingleFilename != null)
+            {
+                //ALOT was just installed. We are going to move it back to mods folder
+                string extractedName = alotAddonFile.UnpackedSingleFilename;
+
+                Log.Information("ALOT MAIN FILE - Unpacked - moving to downloaded_mods from install dir: " + extractedName);
+                string source = getOutputDir(CURRENT_GAME_BUILD) + "000_" + extractedName;
+                string dest = EXE_DIRECTORY + "Downloaded_Mods\\" + extractedName;
+
+                if (File.Exists(dest))
+                {
+                    File.Delete(dest);
+                }
+                File.Move(source, dest);
+                Log.Information("Moved main alot file back to downloaded_mods");
+            }
+
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
+
+
+
 
             string taskString = "Installation of ALOT for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
             if (!installedALOT)
