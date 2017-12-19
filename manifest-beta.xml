@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotaddonmanifest version="3.0.7">
 	<addonfile alotversion="5" friendlyname="ALOT for ME1 - Main" tooltipname="Main file for ALOT for ME1" author="CreeperLava">
-		<file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1-83-2017-5-0.7z"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1-83-2017-5-0.7z" unpackedsinglefilename="ALOT_ME1.mem"/>
 		<packagefile me1="true" sourcename="00_ALOT\ALOT_ME1.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile alotupdatefor="1" alotupdateversion="2" friendlyname="ALOT for ME1 - Update 2" tooltipname="Update file for ALOT for ME1" author="CreeperLava">
@@ -9,7 +9,7 @@
 		<packagefile me1="true" sourcename="ALOT_ME1_Update.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile alotversion="5" friendlyname="ALOT for ME2 - Main" tooltipname="Main file for ALOT for ME2" author="CreeperLava">
-		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/" filename="ALOT for ME2-68-2017-5-0.7z"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/" filename="ALOT for ME2-68-2017-5-0.7z" unpackedsinglefilename="ALOT_ME2.mem"/>
 		<packagefile me2="true" sourcename="00_ALOT\ALOT_ME2.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile alotupdatefor="2" alotupdateversion="2" friendlyname="ALOT for ME2 - Update 2" tooltipname="Update file for ALOT for ME2" author="CreeperLava">
@@ -17,7 +17,7 @@
 		<packagefile me2="true" sourcename="ALOT_ME2_Update.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile alotversion="5" friendlyname="ALOT for ME3 - Main" tooltipname="Main file of ALOT for ME3" author="CreeperLava">
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT for ME3-363-2017-5-0.7z"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT for ME3-363-2017-5-0.7z" unpackedsinglefilename="ALOT_ME3.mem"/>
 		<packagefile me3="true" sourcename="00_ALOT\ALOT_ME3.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile alotupdatefor="3" alotupdateversion="3" friendlyname="ALOT for ME3 - Update 3" tooltipname="Update file for ALOT for ME3" author="CreeperLava">
