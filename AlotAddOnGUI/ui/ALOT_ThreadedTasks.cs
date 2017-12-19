@@ -36,8 +36,9 @@ namespace AlotAddOnGUI
         public const string UPDATE_STAGE_LABEL = "UPDATE_STAGE_LABEL";
         private int STAGE_COUNT;
         public const string HIDE_STAGE_LABEL = "HIDE_STAGE_LABEL";
+        public const string UPDATE_HEADER_LABEL = "UPDATE_HEADER_LABEL";
         private ALOTVersionInfo PREINSTALL_VERSION_INFO;
-
+        private bool WARN_USER_OF_EXIT = false;
         private bool ExtractAddon(AddonFile af)
         {
 
@@ -67,7 +68,7 @@ namespace AlotAddOnGUI
                             string exe = BINARY_DIRECTORY + "7z.exe";
                             string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(af.Filename);
                             string args = "x \"" + EXE_DIRECTORY + "Downloaded_Mods\\" + af.Filename + "\" -aoa -r -o\"" + extractpath + "\"";
-                            runProcess(exe, args);
+                            Utilities.runProcess(exe, args);
 
                             //get free space for debug purposes
                             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
@@ -155,7 +156,7 @@ namespace AlotAddOnGUI
                                 //Extract the TPFs
                                 exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                                 args = "-extract-tpf \"" + extractpath + "\" \"" + extractpath + "\"";
-                                runProcess(exe, args);
+                                Utilities.runProcess(exe, args);
                             }
 
                             string[] modfiles = Directory.GetFiles(extractpath, "*.mod", SearchOption.AllDirectories);
@@ -178,7 +179,7 @@ namespace AlotAddOnGUI
 
                                     exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                                     args = "-extract-mod " + CURRENT_GAME_BUILD + " \"" + extractpath + "\" \"" + extractpath + "\"";
-                                    runProcess(exe, args);
+                                    Utilities.runProcess(exe, args);
                                 }
                             }
                             string[] memfiles = Directory.GetFiles(extractpath, "*.mem");
@@ -306,8 +307,7 @@ namespace AlotAddOnGUI
                         if (af.ALOTVersion > 0 && PREINSTALL_VERSION_INFO.ALOTVER > 0)
                         {
                             Log.Information("ALOT File in queue for processing but ALOT is already installed. Skipping...");
-                            continue;
-                            return true; //SKIP
+                            continue; //skip
                         }
 
                         //Check if ALOT update file of this version or higher is installed. If it is and this is ALOT update file, skip
@@ -328,6 +328,7 @@ namespace AlotAddOnGUI
             }
             ADDONSTOINSTALL_COUNT = ADDONFILES_TO_BUILD.Count;
             completed = 0;
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Preparing files for installation.\nDon't close the window until this operation completes."));
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting Mods..."));
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
 
@@ -362,7 +363,7 @@ namespace AlotAddOnGUI
                 Log.Information("Extracting TPF files.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                 string args = "-extract-tpf \"" + EXE_DIRECTORY + "Extracted_Mods\" \"" + EXE_DIRECTORY + "Extracted_Mods\"";
-                runProcess(exe, args);
+                Utilities.runProcess(exe, args);
             }
 
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting MOD files..."));
@@ -375,13 +376,10 @@ namespace AlotAddOnGUI
                 Log.Information("Extracting MOD files.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                 string args = "-extract-mod " + game + " \"" + EXE_DIRECTORY + "Downloaded_Mods\" \"" + EXE_DIRECTORY + "Extracted_Mods\"";
-                runProcess(exe, args);
+                Utilities.runProcess(exe, args);
             }
 
-            //InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Removing Duplicates..."));
-            //Thread.Sleep(7000);
-
-            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing to create MEM package..."));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Moving required files for MEM package..."));
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
 
             //Calculate how many files to install...
@@ -453,6 +451,8 @@ namespace AlotAddOnGUI
 
             //BUILD MEM PACKAGE
             BuildWorker.ReportProgress(0);
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building Addon for Mass Effect"+getGameNumberSuffix(CURRENT_GAME_BUILD)+".\nDon't close the window until this operation completes."));
+
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Building Addon MEM Package..."));
             int buildresult = -2;
             {
@@ -527,6 +527,9 @@ namespace AlotAddOnGUI
                         return;
                     case UPDATE_OPERATION_LABEL:
                         AddonFilesLabel.Text = (string)tc.Data;
+                        break;
+                    case UPDATE_HEADER_LABEL:
+                        HeaderLabel.Text = (string)tc.Data;
                         break;
                     case UPDATE_PROGRESSBAR_INDETERMINATE:
                         Build_ProgressBar.IsIndeterminate = (bool)tc.Data;
@@ -628,6 +631,7 @@ namespace AlotAddOnGUI
 
         private void InstallALOT(int game)
         {
+            WARN_USER_OF_EXIT = true;
             InstallingOverlay_TopLabel.Text = "Preparing installer";
             InstallWorker = new BackgroundWorker();
             InstallWorker.DoWork += InstallALOT;
@@ -646,7 +650,7 @@ namespace AlotAddOnGUI
             Button_InstallDone.Visibility = System.Windows.Visibility.Hidden;
             Installing_Spinner.Visibility = System.Windows.Visibility.Visible;
             Installing_Checkmark.Visibility = System.Windows.Visibility.Hidden;
-            Installing = true;
+            PreventFileRefresh = true;
             HeaderLabel.Text = "Installing MEMs...";
             AddonFilesLabel.Text = "Running in installer mode.";
 
@@ -680,18 +684,22 @@ namespace AlotAddOnGUI
 
         private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            Log.Information("InstallWorker: We are installing ALOT in this pass.");
+            WARN_USER_OF_EXIT = false;
+            Log.Information("InstallCompleted()");
 
             if (e.Result != null)
             {
                 if ((int)e.Result == INSTALL_OK)
                 {
+                    Log.Information("Installation result: OK");
+
                     HeaderLabel.Text = "Installation has completed";
                     AddonFilesLabel.Text = "Thanks for using ALOT Installer.";
 
                 }
                 else
                 {
+                    Log.Error("Installation result: Error occured");
                     HeaderLabel.Text = "Installation failed! Check the logs for more detailed information";
                     AddonFilesLabel.Text = "Check the logs for more detailed information.";
                 }
@@ -699,7 +707,7 @@ namespace AlotAddOnGUI
             INSTALLING_THREAD_GAME = 0;
             ADDONFILES_TO_BUILD = null;
             INSTALL_STAGE = 0;
-            Installing = false;
+            PreventFileRefresh = false;
             UpdateALOTStatus();
             Installing_Spinner.Visibility = System.Windows.Visibility.Collapsed;
             Installing_Checkmark.Visibility = System.Windows.Visibility.Visible;

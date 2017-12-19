@@ -15,9 +15,9 @@ namespace AlotAddOnGUI.classes
         public short ALOTVersion { get; set; }
         public byte ALOTUpdateVersion { get; set; }
 
-        public bool IsALOTMainFile
+        public bool IsRequiredFile
         {
-            get { return ALOTVersion > 0; }
+            get { return ALOTVersion > 0 || ALOTUpdateVersion > 0; }
         }
         public bool IsALOTUpdate
         {

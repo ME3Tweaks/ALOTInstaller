@@ -73,6 +73,7 @@ namespace AlotAddOnGUI
             //Update Mode
             if (updateDestinationPath != null)
             {
+                Thread.Sleep(2000); //SLEEP WHILE WE WAIT FOR PARENT PROCESS TO STOP.
                 Log.Information("In update mode. Update destination: " + updateDestinationPath);
                 Log.Information("Applying update");
                 CopyDir.CopyAll(new DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory), new DirectoryInfo(updateDestinationPath));
@@ -120,6 +121,12 @@ namespace AlotAddOnGUI
             }
 
             return stringBuilder.ToString();
+        }
+
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+            Utilities.runProcess("cmd.exe", "/c taskkill /F /IM MassEffectModderNoGui.exe /T", true);
+            Log.Information("Closing application via AppClosing()");
         }
     }
 

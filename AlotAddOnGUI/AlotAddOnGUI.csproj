@@ -67,6 +67,9 @@
     <Reference Include="ConsoleAppLauncher, Version=1.0.6354.408, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ConsoleAppLauncher.1.0.6354.408\lib\net40\ConsoleAppLauncher.dll</HintPath>
     </Reference>
+    <Reference Include="LiteGuard, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiteGuard.2.0.1\lib\netstandard1.0\LiteGuard.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
@@ -248,11 +251,14 @@ if exist "$(TargetDir)Updater" rmdir /s /q "$(TargetDir)Updater"
 if $(ConfigurationName) == Debug echo DEBUG MODE
 
 
-if $(ConfigurationName) == Debug (robocopy "$(SolutionDir)BuildCache\Downloaded_Mods" "$(TargetDir)Downloaded_Mods")
+
+::if $(ConfigurationName) == Debug (robocopy "$(SolutionDir)BuildCache\Downloaded_Mods" "$(TargetDir)Downloaded_Mods")
 
 if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.cmd" "$(TargetDir)..\ReleaseBuilder.bat" /y)
 
+
 if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.ps1" "$(TargetDir)..\ReleaseBuilder.ps1" /y)
+
 if $(ConfigurationName) == Release rmdir /s /q "$(TargetDir)logs
 if $(ConfigurationName) == Debug (exit 0)</PostBuildEvent>
   </PropertyGroup>

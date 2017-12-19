@@ -10,6 +10,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Serilog;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using LiteGuard;
 
 namespace AlotAddOnGUI
 {
@@ -423,6 +425,116 @@ namespace AlotAddOnGUI
                 }
             }
             return null;
+        }
+
+        public static int runProcess(string exe, string args, bool standAlone = false)
+        {
+            Log.Information("Running process: " + exe + " " + args);
+            using (Process p = new Process())
+            {
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.FileName = exe;
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.Arguments = args;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.RedirectStandardError = true;
+
+                StringBuilder output = new StringBuilder();
+                StringBuilder error = new StringBuilder();
+
+                using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
+                using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
+                {
+                    p.OutputDataReceived += (sender, e) =>
+                    {
+                        if (e.Data == null)
+                        {
+                            outputWaitHandle.Set();
+                        }
+                        else
+                        {
+                            output.AppendLine(e.Data);
+                        }
+                    };
+                    p.ErrorDataReceived += (sender, e) =>
+                    {
+                        if (e.Data == null)
+                        {
+                            errorWaitHandle.Set();
+                        }
+                        else
+                        {
+                            error.AppendLine(e.Data);
+                        }
+                    };
+
+                    p.Start();
+                    if (!standAlone)
+                    {
+                        int timeout = 600000;
+                        p.BeginOutputReadLine();
+                        p.BeginErrorReadLine();
+
+                        if (p.WaitForExit(timeout) &&
+                            outputWaitHandle.WaitOne(timeout) &&
+                            errorWaitHandle.WaitOne(timeout))
+                        {
+                            // Process completed. Check process.ExitCode here.
+                            string outputmsg = "Process output of " + exe + " " + args + ":";
+                            if (output.ToString().Length > 0)
+                            {
+                                outputmsg += "\nStandard:\n" + output.ToString();
+                            }
+                            if (error.ToString().Length > 0)
+                            {
+                                outputmsg += "\nError:\n" + error.ToString();
+                            }
+                            Log.Information(outputmsg);
+                            return p.ExitCode;
+                        }
+                        else
+                        {
+                            // Timed out.
+                            Log.Error("Process timed out: " + exe + " " + args);
+                            return -1;
+                        }
+                    }
+                    else
+                    {
+                        return 0; //standalone
+                    }
+                }
+            }
+        }
+        public static Task DeleteAsync(string path)
+        {
+            if (!File.Exists(path))
+            {
+                return Task.FromResult(0);
+            }
+            return Task.Run(() => { File.Delete(path); });
+        }
+
+        public static Task<FileStream> CreateAsync(string path)
+        {
+            if (path == null || path == "")
+            {
+                return null;
+            }
+            return Task.Run(() => File.Create(path));
+        }
+
+        public static Task MoveAsync(string sourceFileName, string destFileName)
+        {
+            if (sourceFileName == null || sourceFileName == "")
+            {
+                return null;
+            }
+            if (!File.Exists(sourceFileName))
+            {
+                return null;
+            }
+            return Task.Run(() => { File.Move(sourceFileName, destFileName); });
         }
     }
 }
