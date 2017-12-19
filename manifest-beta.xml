@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="3.0.6">
+<alotaddonmanifest version="3.0.7">
 	<addonfile alotversion="5" friendlyname="ALOT for ME1 - Main" tooltipname="Main file for ALOT for ME1" author="CreeperLava">
 		<file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1-83-2017-5-0.7z"/>
 		<packagefile me1="true" sourcename="00_ALOT\ALOT_ME1.mem" movedirectly="true"/>
@@ -105,10 +105,7 @@
 	<addonfile friendlyname="Illusive Man Complexion Tweak" author="Ellise">
 		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_IllusiveManComplexionTweak.7z-580-1-0.7z"/>
 		<packagefile me2="true" sourcename="HMM_HED_PRO_WKL_BLK_0xF3AFF836.dds" destinationname="0x3D10B5B5.dds"/>
-		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x91B1C512.dds"/>
-		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x44390218.dds"/>
 		<packagefile me2="true" me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0xA567A7D5.dds"/>
-		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0x9C0D9E90.dds"/>
 		<packagefile me2="true" me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Spec_0x056BFB1F.dds" destinationname="0x056BFB1F.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Face_Diff_0xD818CC82.dds" destinationname="0x77C06CBF.dds"/>
 		<packagefile me2="true" sourcename="HMM_HED_PROIllusiveman_Face_Norm_0xF815F202.dds" destinationname="0x9EDE1459.dds"/>
