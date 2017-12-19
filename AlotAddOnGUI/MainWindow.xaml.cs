@@ -273,36 +273,42 @@ namespace AlotAddOnGUI
                 var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
                 fileVersion = versInfo.FileMajorPart;
             }
-
-            var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
-            var user = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModder");
-            if (user.Count > 0)
+            try
             {
-                //The release we want to check is always the latest, so [0]
-                Release latest = user[0];
-                int releaseNameInt = Convert.ToInt32(latest.TagName);
-                if (fileVersion < releaseNameInt && latest.Assets.Count > 0)
+                var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
+                var user = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModder");
+                if (user.Count > 0)
                 {
-                    //there's an update
-                    //updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder is updating. Please wait...", true);
-                    //updateprogresscontroller.SetIndeterminate();
-                    WebClient downloadClient = new WebClient();
-
-                    downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
-                    downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
-                    string temppath = Path.GetTempPath();
-                    /*downloadClient.DownloadProgressChanged += (s, e) =>
+                    //The release we want to check is always the latest, so [0]
+                    Release latest = user[0];
+                    int releaseNameInt = Convert.ToInt32(latest.TagName);
+                    if (fileVersion < releaseNameInt && latest.Assets.Count > 0)
                     {
-                        updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
-                    };*/
-                    downloadClient.DownloadFileCompleted += UnzipMEMGUIUpdate;
-                    string downloadPath = temppath + "MEMGUI_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
-                    downloadClient.DownloadFileAsync(new Uri(latest.Assets[0].BrowserDownloadUrl), downloadPath, downloadPath);
+                        //there's an update
+                        //updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder is updating. Please wait...", true);
+                        //updateprogresscontroller.SetIndeterminate();
+                        WebClient downloadClient = new WebClient();
+
+                        downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
+                        downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
+                        string temppath = Path.GetTempPath();
+                        /*downloadClient.DownloadProgressChanged += (s, e) =>
+                        {
+                            updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
+                        };*/
+                        downloadClient.DownloadFileCompleted += UnzipMEMGUIUpdate;
+                        string downloadPath = temppath + "MEMGUI_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
+                        downloadClient.DownloadFileAsync(new Uri(latest.Assets[0].BrowserDownloadUrl), downloadPath, downloadPath);
+                    }
+                    else
+                    {
+                        //up to date
+                    }
                 }
-                else
-                {
-                    //up to date
-                }
+            } catch (Exception e)
+            {
+                Log.Error("Error checking for MEM GUI update: " + e.Message);
+                ShowStatus("Error checking for MEM update");
             }
         }
 
@@ -316,35 +322,42 @@ namespace AlotAddOnGUI
             }
 
             Label_MEMVersion.Content = "MEM (No GUI) Version: " + fileVersion;
-            var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
-            var user = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModderNoGui");
-            if (user.Count > 0)
+            try
             {
-                //The release we want to check is always the latest, so [0]
-                Release latest = user[0];
-                int releaseNameInt = Convert.ToInt32(latest.TagName);
-                if (fileVersion < releaseNameInt && latest.Assets.Count > 0)
+                var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
+                var user = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModderNoGui");
+                if (user.Count > 0)
                 {
-                    //there's an update
-                    updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder (No GUI) is updating. Please wait...", true);
-                    updateprogresscontroller.SetIndeterminate();
-                    WebClient downloadClient = new WebClient();
-
-                    downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
-                    downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
-                    string temppath = Path.GetTempPath();
-                    downloadClient.DownloadProgressChanged += (s, e) =>
+                    //The release we want to check is always the latest, so [0]
+                    Release latest = user[0];
+                    int releaseNameInt = Convert.ToInt32(latest.TagName);
+                    if (fileVersion < releaseNameInt && latest.Assets.Count > 0)
                     {
-                        updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
-                    };
-                    downloadClient.DownloadFileCompleted += UnzipProgramUpdate;
-                    string downloadPath = temppath + "MEM_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
-                    downloadClient.DownloadFileAsync(new Uri(latest.Assets[0].BrowserDownloadUrl), downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
+                        //there's an update
+                        updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder (No GUI) is updating. Please wait...", true);
+                        updateprogresscontroller.SetIndeterminate();
+                        WebClient downloadClient = new WebClient();
+
+                        downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
+                        downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
+                        string temppath = Path.GetTempPath();
+                        downloadClient.DownloadProgressChanged += (s, e) =>
+                        {
+                            updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
+                        };
+                        downloadClient.DownloadFileCompleted += UnzipProgramUpdate;
+                        string downloadPath = temppath + "MEM_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
+                        downloadClient.DownloadFileAsync(new Uri(latest.Assets[0].BrowserDownloadUrl), downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
+                    }
+                    else
+                    {
+                        //up to date
+                    }
                 }
-                else
-                {
-                    //up to date
-                }
+            } catch (Exception e)
+            {
+                Log.Error("Error checking for MEM update: " + e.Message);
+                ShowStatus("Error checking for MEM (NOGUI) update");
             }
         }
 
