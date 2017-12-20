@@ -113,8 +113,7 @@ namespace AlotAddOnGUI
         private bool _showME2Files = true;
         private bool _showME3Files = true;
         private bool Loading = true;
-
-
+        private int LODLIMIT = 0;
 
         public bool ShowME1Files
         {
@@ -509,7 +508,7 @@ namespace AlotAddOnGUI
                         // colored until user focuses the main window
                         helper.FlashApplicationWindow();
 
-                        HeaderLabel.Text = "Addon created.\nYou can install these files right now by pressing Install Now.";
+                        HeaderLabel.Text = "Ready to install new textures";
                         AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
                         MetroDialogSettings mds = new MetroDialogSettings();
                         mds.AffirmativeButtonText = "Install Now";
@@ -944,6 +943,8 @@ namespace AlotAddOnGUI
             Label_ALOTStatus_ME1.ToolTip = me1ToolTip;
             Label_ALOTStatus_ME2.ToolTip = me2ToolTip;
             Label_ALOTStatus_ME3.ToolTip = me3ToolTip;
+
+            Button_ME1_ShowLODOptions.Visibility = CURRENTLY_INSTALLED_ME1_ALOT_INFO != null ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private async void readManifest()
@@ -1450,7 +1451,7 @@ namespace AlotAddOnGUI
             // Install_ProgressBar.IsIndeterminate = true;
             return true;
         }
-        
+
         private async void File_Drop_BackgroundThread(object sender, System.Windows.DragEventArgs e)
         {
             if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
@@ -1510,7 +1511,7 @@ namespace AlotAddOnGUI
 
                         bool isUnpackedSingleFile = af.UnpackedSingleFilename != null && af.UnpackedSingleFilename.Equals(fname, StringComparison.InvariantCultureIgnoreCase);
 
-                        if (isUnpackedSingleFile|| af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase))
+                        if (isUnpackedSingleFile || af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase))
                         {
                             hasMatch = true;
                             if (af.Ready == false)
@@ -1888,6 +1889,50 @@ namespace AlotAddOnGUI
         private void ContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             object source = e.Source;
+        }
+
+        private void Button_InstallerLOD4k_Click(object sender, RoutedEventArgs e)
+        {
+            LODLIMIT = 4;
+            Panel_ME1LODLimit.Visibility = Visibility.Collapsed;
+        }
+
+        private void Button_InstallerLOD2k_Click(object sender, RoutedEventArgs e)
+        {
+            LODLIMIT = 2;
+            Panel_ME1LODLimit.Visibility = Visibility.Collapsed;
+        }
+
+        private void Button_ME12K_Click(object sender, RoutedEventArgs e)
+        {
+            Log.Information("Using 2K textures for ME1 (button click)");
+            Panel_SettingsME1LOD.Visibility = Visibility.Collapsed;
+            Button_ME1_ShowLODOptions.Content = "Using 2K Textures";
+            string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
+            string args = "-apply-lods-gfx 1 -limit2k";
+            Utilities.runProcess(exe, args, true);
+        }
+
+        private void Button_ME14K_Click(object sender, RoutedEventArgs e)
+        {
+            Panel_SettingsME1LOD.Visibility = Visibility.Collapsed;
+            Button_ME1_ShowLODOptions.Content = "Using 4K Textures";
+            Log.Information("Using 4K textures for ME1 (button click)");
+            string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
+            string args = "-apply-lods-gfx 1";
+            Utilities.runProcess(exe, args, true);
+        }
+
+        private void Button_ToggleME1LODPanel(object sender, RoutedEventArgs e)
+        {
+            if (Panel_SettingsME1LOD.Visibility == Visibility.Visible)
+            {
+                Panel_SettingsME1LOD.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                Panel_SettingsME1LOD.Visibility = Visibility.Visible;
+            }
         }
     }
 }

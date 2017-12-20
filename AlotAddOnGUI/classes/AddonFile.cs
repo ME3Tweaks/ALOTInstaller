@@ -28,37 +28,84 @@ namespace AlotAddOnGUI.classes
         {
             get
             {
+                if (ALOTVersion > 0)
+                {
+                    //Major Upgrade
+                    if (Game_ME1 && (MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && ALOTVersion > MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER))
+                    {
+                        return "Restore to unmodified to install upgrade";
+                    }
+                    if (Game_ME2 && (MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO != null && ALOTVersion > MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTVER))
+                    {
+                        return "Restore to unmodified to install upgrade";
+                    }
+                    if (Game_ME3 && (MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO != null && ALOTVersion > MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTVER))
+                    {
+                        return "Restore to unmodified to install upgrade";
+                    }
+
+                    //Alrady applied Upgrade
+                    if (Game_ME1 && (MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && ALOTVersion == MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER))
+                    {
+                        return "Already installed";
+                    }
+                    if (Game_ME2 && (MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO != null && ALOTVersion == MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTVER))
+                    {
+                        return "Already installed";
+                    }
+                    if (Game_ME3 && (MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO != null && ALOTVersion == MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTVER))
+                    {
+                        return "Already installed";
+                    }
+
+                    //Check if file is not applicable
+                    if (Game_ME1 && MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO != null  && ALOTUpdateVersion <= MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER)
+                    {
+                        return "Already installed";
+                    }
+                    if (Game_ME2 && MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO != null  && ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTUPDATEVER)
+                    {
+                        return "Already installed";
+                    }
+                    if (Game_ME3 && MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO != null  && ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTUPDATEVER)
+                    {
+                        return "Already installed";
+                    }
+
+                    return "ALOT file ready to install";
+
+                }
                 if (ALOTUpdateVersion > 0)
                 {
                     //Checking for update
                     if (Game_ME1 && (MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO == null || ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER))
                     {
-                        return "Update is ready";
+                        return "Update is ready to install";
                     }
                     if (Game_ME2 && (MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO == null || ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTUPDATEVER))
                     {
-                        return "Update is ready";
+                        return "Update is ready to install";
                     }
                     if (Game_ME3 && (MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO == null || ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTUPDATEVER))
                     {
-                        return "Update is ready";
+                        return "Update is ready to install";
                     }
 
                     //Check if file is not applicable
                     if (Game_ME1 && ALOTUpdateVersion <= MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER)
                     {
-                        return "Update is already applied";
+                        return "Update is already installed";
                     }
                     if (Game_ME2 && ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTUPDATEVER)
                     {
-                        return "Update is already applied";
+                        return "Update is already installed";
                     }
                     if (Game_ME3 && ALOTUpdateVersion > MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTUPDATEVER)
                     {
-                        return "Update is already applied";
+                        return "Update is already installed";
                     }
                 }
-                return "File is ready for install";
+                return "Addon file is ready to install";
             }
         }
         public bool ProcessAsModFile { get; set; }

@@ -51,6 +51,7 @@ namespace AlotAddOnGUI
 
         private bool WARN_USER_OF_EXIT = false;
         private List<string> TIPS_LIST;
+        private const string HIDE_LOD_LIMIT = "HIDE_LOD_LIMIT";
 
         private bool ExtractAddon(AddonFile af)
         {
@@ -723,6 +724,8 @@ namespace AlotAddOnGUI
             {
                 case 1:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x77, 0, 0, 0));
+                    Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Visible;
+                    LODLIMIT = 0;
                     break;
                 case 2:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x55, 0, 0, 0));
@@ -1042,8 +1045,13 @@ namespace AlotAddOnGUI
             CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, CurrentTask));
 
+            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT, CurrentTask));
 
-            args = "-apply-me1-laa";
+            args = "-apply-lods-gfx "+INSTALLING_THREAD_GAME;
+            if (LODLIMIT == 2)
+            {
+                args += " -limit2k";
+            }
             runMEM_Install(exe, args, InstallWorker);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {
@@ -1118,7 +1126,7 @@ namespace AlotAddOnGUI
                 string extractedName = alotAddonFile.UnpackedSingleFilename;
 
                 Log.Information("ALOT MAIN FILE - Unpacked - moving to downloaded_mods from install dir: " + extractedName);
-                string source = getOutputDir(CURRENT_GAME_BUILD) + "000_" + extractedName;
+                string source = getOutputDir(INSTALLING_THREAD_GAME) + "000_" + extractedName;
                 string dest = EXE_DIRECTORY + "Downloaded_Mods\\" + extractedName;
 
                 if (File.Exists(dest))
@@ -1164,6 +1172,9 @@ namespace AlotAddOnGUI
             {
                 case UPDATE_STAGE_LABEL:
                     InstallingOverlay_StageLabel.Text = "Stage " + INSTALL_STAGE + " of " + STAGE_COUNT;
+                    break;
+                case HIDE_LOD_LIMIT:
+                    Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Collapsed;
                     break;
                 case HIDE_STAGE_LABEL:
                     InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Collapsed;
