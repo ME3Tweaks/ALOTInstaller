@@ -434,7 +434,7 @@ namespace AlotAddOnGUI
 
             var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
             int fileVersion = versInfo.FileMajorPart;
-            Label_MEMVersion.Content = "MEM Version: " + fileVersion;
+            Label_MEMVersion.Content = "MEM Cmd Version: " + fileVersion;
         }
 
         private void UnzipMEMGUIUpdate(object sender, AsyncCompletedEventArgs e)
@@ -626,6 +626,8 @@ namespace AlotAddOnGUI
                 }
             }
             Directory.CreateDirectory(outDir);
+
+
             bool result = ExtractAddons((int)e.Argument); //arg is game id.
 
             e.Result = result ? (int)e.Argument : -1; //-1 = Build Error
@@ -924,9 +926,58 @@ namespace AlotAddOnGUI
             CURRENTLY_INSTALLED_ME3_ALOT_INFO = Utilities.GetInstalledALOTInfo(3);
 
 
-            string me1ver = CURRENTLY_INSTALLED_ME1_ALOT_INFO != null ? CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER : "Not Installed";
-            string me2ver = CURRENTLY_INSTALLED_ME2_ALOT_INFO != null ? CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTUPDATEVER : "Not Installed";
-            string me3ver = CURRENTLY_INSTALLED_ME3_ALOT_INFO != null ? CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTUPDATEVER : "Not Installed";
+            string me1ver = "";
+            string me2ver = "";
+            string me3ver = "";
+
+
+            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null)
+            {
+                if (CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER > 0)
+                {
+                    me1ver =CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER;
+                }
+                else
+                {
+                    me1ver = "Installed, unable to detect version";
+                }
+            }
+            else
+            {
+                me1ver = "Not Installed";
+            }
+
+            if (CURRENTLY_INSTALLED_ME2_ALOT_INFO != null)
+            {
+                if (CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTVER > 0)
+                {
+                    me2ver = CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTUPDATEVER;
+                }
+                else
+                {
+                    me2ver = "Installed, unable to detect version";
+                }
+            }
+            else
+            {
+                me2ver = "Not Installed";
+            }
+
+            if (CURRENTLY_INSTALLED_ME3_ALOT_INFO != null)
+            {
+                if (CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTVER > 0)
+                {
+                    me3ver = CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTUPDATEVER;
+                }
+                else
+                {
+                    me3ver = "Installed, unable to detect version";
+                }
+            }
+            else
+            {
+                me3ver = "Not Installed";
+            }
 
             string me1ToolTip = CURRENTLY_INSTALLED_ME1_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed";
             string me2ToolTip = CURRENTLY_INSTALLED_ME2_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed";
@@ -945,6 +996,10 @@ namespace AlotAddOnGUI
             Label_ALOTStatus_ME3.ToolTip = me3ToolTip;
 
             Button_ME1_ShowLODOptions.Visibility = CURRENTLY_INSTALLED_ME1_ALOT_INFO != null ? Visibility.Visible : Visibility.Collapsed;
+            foreach (AddonFile af in addonfiles)
+            {
+                af.ReadyStatusText = af.ReadyStatusText; //update description
+            }
         }
 
         private async void readManifest()
@@ -977,6 +1032,7 @@ namespace AlotAddOnGUI
                                 ALOTVersion = e.Attribute("alotversion") != null ? Convert.ToInt16((string)e.Attribute("alotversion")) : (short)0,
                                 ALOTUpdateVersion = e.Attribute("alotupdateversion") != null ? Convert.ToByte((string)e.Attribute("alotupdateversion")) : (byte)0,
                                 UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename") != null ? (string)e.Element("file").Attribute("unpackedsinglefilename") : null,
+                                ALOTMainVersionRequired = e.Attribute("appliestomainversion") != null ? Convert.ToInt16((string)e.Attribute("appliestomainversion")) : (short)0,
                                 Ready = false,
                                 PackageFiles = e.Elements("packagefile")
                                     .Select(r => new PackageFile
@@ -1656,7 +1712,7 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void ShowStatus(string v, int msOpen = 160000)
+        private void ShowStatus(string v, int msOpen = 6000)
         {
             StatusFlyout.AutoCloseInterval = msOpen;
             StatusLabel.Text = v;
@@ -1666,33 +1722,6 @@ namespace AlotAddOnGUI
         private void Button_Settings_Click(object sender, RoutedEventArgs e)
         {
             SettingsFlyout.IsOpen = true;
-        }
-
-
-
-        private async void Button_About_Click(object sender, RoutedEventArgs e)
-        {
-            string title = "ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version + "\n";
-            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
-            int fileVersion = versInfo.FileMajorPart;
-
-            string credits = "MEM Version: " + fileVersion + "\n" + "\n\nBrought to you by:\n - Mgamerz\n - CreeperLava\n - aquadran\n\nSource code: https://github.com/Mgamerz/AlotAddOnGUI\nLicensed under GPLv3";
-
-            MetroDialogSettings settings = new MetroDialogSettings();
-            settings.NegativeButtonText = "OK";
-            settings.AffirmativeButtonText = "View log";
-            MessageDialogResult result = await this.ShowMessageAsync(title, credits, MessageDialogStyle.AffirmativeAndNegative, settings);
-            if (result == MessageDialogResult.Negative)
-            {
-                var directory = new DirectoryInfo("logs");
-                FileInfo latestlogfile = directory.GetFiles().OrderByDescending(f => f.LastWriteTime).First();
-                if (latestlogfile != null)
-                {
-                    ProcessStartInfo psi = new ProcessStartInfo(EXE_DIRECTORY + "logs\\" + latestlogfile.ToString());
-                    psi.UseShellExecute = true;
-                    Process.Start(psi);
-                }
-            }
         }
 
         private async Task<bool> testWriteAccess()
@@ -1789,7 +1818,7 @@ namespace AlotAddOnGUI
             BackupWorker.RunWorkerAsync();
         }
 
-        private void RestoreCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private async void RestoreCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
 
@@ -1797,6 +1826,7 @@ namespace AlotAddOnGUI
             if (result)
             {
                 AddonFilesLabel.Text = "Restore completed.";
+                await this.ShowMessageAsync("Restore completed", "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has been restored back to an unmodified state from backup.");
             }
             else
             {
@@ -1888,7 +1918,10 @@ namespace AlotAddOnGUI
 
         private void ContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            object source = e.Source;
+            System.Windows.Controls.ListView source = e.Source as System.Windows.Controls.ListView;
+            var selectedItem = source.SelectedItem;
+            var originalSource = e.OriginalSource;
+            var items = source.Items;
         }
 
         private void Button_InstallerLOD4k_Click(object sender, RoutedEventArgs e)
@@ -1932,6 +1965,18 @@ namespace AlotAddOnGUI
             else
             {
                 Panel_SettingsME1LOD.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void InstallingOverlayoutFlyout_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (this.WindowState == System.Windows.WindowState.Normal)
+            {
+                this.WindowState = System.Windows.WindowState.Maximized;
+            }
+            else
+            {
+                this.WindowState = System.Windows.WindowState.Normal;
             }
         }
     }

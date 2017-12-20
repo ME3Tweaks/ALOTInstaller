@@ -128,6 +128,7 @@ namespace AlotAddOnGUI
         private void Application_Exit(object sender, ExitEventArgs e)
         {
             Utilities.runProcess("cmd.exe", "/c taskkill /F /IM MassEffectModderNoGui.exe /T", true);
+            Utilities.runProcess("cmd.exe", "/c taskkill /F /IM 7z.exe /T", true);
             Log.Information("Closing application via AppClosing()");
         }
     }

@@ -135,6 +135,7 @@
     </Compile>
     <Compile Include="ThreadCommandDialogOptions.cs" />
     <Compile Include="ui\ALOT_ThreadedTasks.cs" />
+    <Compile Include="ui\ProgressWeightPercentages.cs" />
     <Compile Include="Utilites.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -199,6 +200,7 @@
     <Resource Include="images\me1_bg.jpg" />
     <Resource Include="images\greencheck_large.png" />
     <Resource Include="images\redx_large.png" />
+    <Resource Include="images\workingicon.png" />
     <Content Include="memodder\MassEffectModder.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

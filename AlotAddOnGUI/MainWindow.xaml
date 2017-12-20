@@ -16,7 +16,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Drop="File_Drop_BackgroundThread" AllowDrop="true">
     <Window.Resources>
-        <ContextMenu x:Key="ListItemContextMenu" ContextMenuOpening="ContextMenu_ContextMenuOpening">
+        <ContextMenu x:Key="ListItemContextMenu">
             <MenuItem x:Name="ContextMenu_Site" Header="Go to download site" />
             <MenuItem x:Name="ContextMenu_EnableDisable" Header="File is enabled" IsChecked="True" />
         </ContextMenu>
@@ -41,6 +41,9 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style TargetType="{x:Type ContentPresenter}">
+            <Setter Property="Margin" Value="0,0,0,0" />
+        </Style>
     </Window.Resources>
     
     <Grid>
@@ -62,61 +65,57 @@
         </Label>
         <ProgressBar Minimum="0" Maximum="100" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true"/>
 
-        <ListView Grid.Column="0" Grid.Row="3" Name="lvUsers">
+        <ListView Grid.Column="0" Grid.Row="3" Name="lvUsers" ContextMenuOpening="ContextMenu_ContextMenuOpening" BorderThickness="0">
             <!-- This is what each list item looks like-->
-            <ListView.ItemTemplate>
+            <ListView.ItemTemplate >
                 <DataTemplate>
                     <Grid x:Name="ListItemElement" Background="Transparent" ContextMenu="{StaticResource ListItemContextMenu}">
-
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="25" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="7" />
+                            <ColumnDefinition Width="5" />
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="1*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding FriendlyName}" FontWeight="Bold" VerticalAlignment="Center" />
+                        <Border x:Name="ListItemLeftBlock" Grid.Column="0" Grid.RowSpan="2" Grid.Row="0" Background="#d92244" Padding="0" Margin="0"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding FriendlyName}" FontWeight="Bold" VerticalAlignment="Center" />
+                        <StackPanel FlowDirection="RightToLeft"  Grid.Row="0" Grid.Column="3"  Orientation="Horizontal">
 
-                        <StackPanel FlowDirection="RightToLeft"  Grid.Row="0" Grid.Column="1"  Orientation="Horizontal">
-
-                            <Border x:Name="GameIcon_ME3" ToolTip="This file applies to Mass Effect 3" Padding="2" BorderThickness="1" BorderBrush="Chartreuse" Background="CadetBlue" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ME3" ToolTip="This file applies to Mass Effect 3" Padding="1" BorderThickness="1" BorderBrush="Chartreuse" Background="CadetBlue" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME3_Text" FontSize="10"  Text="ME3" VerticalAlignment="Center"/>
                             </Border>
-                            <Border x:Name="GameIcon_ME2" ToolTip="This file applies to Mass Effect 2" Margin="5" Padding="2" BorderThickness="1" BorderBrush="Red" Background="DarkMagenta" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ME2" ToolTip="This file applies to Mass Effect 2" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="Red" Background="DarkMagenta" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME2_Text" FontSize="10"  Text="ME2" VerticalAlignment="Center"/>
                             </Border>
-                            <Border x:Name="GameIcon_ME1" ToolTip="This file applies to Mass Effect" Padding="2" BorderThickness="1" BorderBrush="AliceBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ME1" ToolTip="This file applies to Mass Effect" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="AliceBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME1_Text" FontSize="10"  Text="ME1" VerticalAlignment="Center"/>
                             </Border>
-                            <Border x:Name="GameIcon_ALOT" Visibility="Hidden" ToolTip="This is a main ALOT file" Padding="2" Margin="5" BorderThickness="1" BorderBrush="LightGray" Background="DarkOrchid" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ALOT" Visibility="Hidden" ToolTip="This is a main ALOT file" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="DarkOrchid" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ALOT_Text" FontSize="10"  Text="Required" VerticalAlignment="Center"/>
                             </Border>
                         </StackPanel>
 
-                        <StackPanel  HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0" >
-                            <StackPanel x:Name="Download_Hyperlink" Orientation="Horizontal">
-                                <Image Height="15" Width="15"  Source="images/orangedownload.png"/>
-                                <TextBlock Margin="5,0">
-                                    <Hyperlink ToolTip="{Binding DownloadLink}" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
-                                        <Hyperlink.Style >
-                                            <Style TargetType="Hyperlink"
-                                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
-                                                <Setter Property="Foreground" Value="#0C0"/>
-                                            </Style>
-                                        </Hyperlink.Style>
-                                        Download Link
-                                    </Hyperlink>
-                                </TextBlock>
-                            </StackPanel>
+                        <StackPanel  HorizontalAlignment="Left" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal">
+                            <Image x:Name="ReadyImageIcon" Height="15" Width="15" Source="{Binding ReadyIconPath}"/>
+                            <TextBlock x:Name="Download_Hyperlink"  Margin="5,0">
+                                <Hyperlink ToolTip="{Binding DownloadLink}" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
+                                    <Hyperlink.Style >
+                                        <Style TargetType="Hyperlink"
+                                                BasedOn="{StaticResource {x:Type Hyperlink}}">
+                                            <Setter Property="Foreground" Value="#31ae90"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
 
-                            <StackPanel x:Name="Downloaded_Indicator" Visibility="Collapsed" Orientation="Horizontal">
-                                <Image Height="15" Width="15"  Source="images/greencheckmark.png"/>
-                                <Label Padding="5,0" Content="{Binding ReadyStatusText}"/>
-                            </StackPanel>
+                                        </Style>
+                                    </Hyperlink.Style>
+                                    Download Link
+                                </Hyperlink>
+                            </TextBlock>
+                            <TextBlock x:Name="ReadyStatusText" Visibility="Collapsed" Padding="5,0" Text="{Binding ReadyStatusText}" VerticalAlignment="Bottom"/>
                         </StackPanel>
-
-                        <TextBlock HorizontalAlignment="Right" Grid.Row="1" Grid.Column="1" Text="{Binding Filename}" FontWeight="Bold" VerticalAlignment="Center" />
+                        <TextBlock HorizontalAlignment="Right" Grid.Row="1" Grid.Column="3" Text="{Binding Filename}" FontWeight="Bold" VerticalAlignment="Center" />
                     </Grid>
 
                     <DataTemplate.Triggers>
@@ -143,12 +142,13 @@
                         </DataTrigger>
                         <DataTrigger Binding="{Binding Ready}" Value="True">
                             <Setter TargetName="Download_Hyperlink" Property="Visibility" Value="Collapsed"/>
-                            <Setter TargetName="Downloaded_Indicator" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="ListItemElement" Property="Background" Value="#22006600"/>
+                            <Setter TargetName="ReadyStatusText" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="ListItemLeftBlock" Property="Background" Value="#31ae90"/>
                         </DataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>
             </ListView.ItemTemplate>
+            
 
             <!-- This is what each group looks like -->
             <ListView.GroupStyle>
@@ -158,7 +158,7 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
-                                        <Expander IsExpanded="True">
+                                        <Expander IsExpanded="True" BorderThickness="0"  Margin="0" Padding="0">
                                             <Expander.Header>
                                                 <StackPanel>
                                                     <TextBlock FontWeight="Light" FontSize="16" VerticalAlignment="Bottom">
@@ -169,7 +169,7 @@
                                                     </TextBlock>
                                                 </StackPanel>
                                             </Expander.Header>
-                                            <ItemsPresenter />
+                                            <ItemsPresenter/>
                                         </Expander>
                                     </ControlTemplate>
                                 </Setter.Value>
@@ -178,9 +178,18 @@
                     </GroupStyle.ContainerStyle>
                 </GroupStyle>
             </ListView.GroupStyle>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
 
-        <!--<UniformGrid Grid.Column="0" Grid.Row="2" x:Name="AddonFilesGrid" Columns="3" Rows="5" Background="Olive"/>-->
+        <!--Bottom Buttons-->
         <Grid Grid.Row="4" Grid.Column="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.30*" />
@@ -281,13 +290,12 @@
             <Controls:Flyout x:Name="StatusFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
                 <TextBlock x:Name="StatusLabel" FontSize="14" Text="This is the statusbar. You should not see this text." Padding="5"></TextBlock>
             </Controls:Flyout>
-            <Controls:Flyout x:Name="InstallingOverlayFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDown="InstallingOverlayFlyout_MouseDown">
+            <Controls:Flyout x:Name="InstallingOverlayFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
                 <Border x:Name="InstallingOverlayFlyout_Border" Padding="10" Background="#77000000" >
                     <StackPanel VerticalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True" x:Name="InstallingOverlayFlyout_Panel">
                         <Image x:Name="Installing_Checkmark" Width="84" Height="84" Visibility="Collapsed"/>
-
                         <Controls:ProgressRing x:Name="Installing_Spinner"  IsActive="True" Margin="0,0,0,10" Foreground="Snow"/>
-                        <TextBlock x:Name="InstallingOverlay_TopLabel"  FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Overall Task">
+                        <TextBlock x:Name="InstallingOverlay_TopLabel" VerticalAlignment="Stretch" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Overall Task">
                             <TextBlock.Effect>
                                 <DropShadowEffect
                                   ShadowDepth="4"
@@ -297,7 +305,8 @@
                                  BlurRadius="4"/>
                              </TextBlock.Effect>
                         </TextBlock>
-                        <TextBlock x:Name="InstallingOverlay_StageLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Stage 3 of 7">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock x:Name="InstallingOverlay_StageLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Stage 3 of 7 (66%)">
                             <TextBlock.Effect>
                                 <DropShadowEffect
                                   ShadowDepth="4"
@@ -307,6 +316,17 @@
                                  BlurRadius="4"/>
                             </TextBlock.Effect>
                         </TextBlock>
+                            <TextBlock x:Name="InstallingOverlay_OverallLabel" Margin="5,0,0,0" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="(0%)">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect
+                                  ShadowDepth="4"
+                                  Direction="330"
+                                  Color="Black"
+                                  Opacity="1"
+                                 BlurRadius="4"/>
+                                </TextBlock.Effect>
+                            </TextBlock>
+                        </StackPanel>
                         <TextBlock x:Name="InstallingOverlay_BottomLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Getting Ready">
                             <TextBlock.Effect>
                                 <DropShadowEffect
@@ -317,6 +337,7 @@
                                  BlurRadius="4"/>
                             </TextBlock.Effect>
                         </TextBlock>
+                        
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
                             <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallViewLogs" Visibility="Collapsed" Margin="0,0,5,0"  HorizontalAlignment="Center"  Content="View Logs" ToolTip="Click to view logs" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
                             <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallDone" Visibility="Visible" HorizontalAlignment="Center"  Content="Continue" ToolTip="Click to dismiss dialog" Click="Button_InstallDone_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>

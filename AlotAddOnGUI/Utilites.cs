@@ -405,9 +405,9 @@ namespace AlotAddOnGUI
                     {
                         //ALOT has been installed
                         fs.Position = endPos - 8;
-                        int memVersionUsed = fs.ReadInt32();
+                        int installerVersionUsed = fs.ReadInt32();
 
-                        if (memVersionUsed >= 10 && memVersionUsed != 16777472) //default bytes before 178 MEMI Format
+                        if (installerVersionUsed >= 10 && installerVersionUsed != 16777472) //default bytes before 178 MEMI Format
                         {
                             fs.Position = endPos - 12;
                             short ALOTVER = fs.ReadInt16();
@@ -419,6 +419,9 @@ namespace AlotAddOnGUI
                             int MEUITMVER = fs.ReadInt32();
 
                             return new ALOTVersionInfo(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER);
+                        } else
+                        {
+                            return new ALOTVersionInfo(0, 0, 0, 0); //MEMI tag but no info we know of
                         }
                     }
                 }

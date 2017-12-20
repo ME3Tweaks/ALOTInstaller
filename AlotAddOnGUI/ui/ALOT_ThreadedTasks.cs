@@ -1,4 +1,5 @@
 ﻿using AlotAddOnGUI.classes;
+using AlotAddOnGUI.ui;
 using ByteSizeLib;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -51,7 +52,10 @@ namespace AlotAddOnGUI
 
         private bool WARN_USER_OF_EXIT = false;
         private List<string> TIPS_LIST;
+        private const string SET_OVERALL_PROGRESS = "SET_OVERALL_PROGRESS";
         private const string HIDE_LOD_LIMIT = "HIDE_LOD_LIMIT";
+        Stopwatch stopwatch;
+        private string MAINTASK_TEXT;
 
         private bool ExtractAddon(AddonFile af)
         {
@@ -86,6 +90,8 @@ namespace AlotAddOnGUI
                     case ".zip":
                     case ".rar":
                         {
+                            af.ReadyStatusText = "Extracting";
+                            af.SetWorking();
                             //Extract file
                             Log.Information(prefix + "Extracting file: " + fileToUse);
                             string exe = BINARY_DIRECTORY + "7z.exe";
@@ -236,8 +242,12 @@ namespace AlotAddOnGUI
                                 string destination = extractpath + "\\" + Path.GetFileName(file);
                                 if (!destination.ToLower().Equals(file.ToLower()))
                                 {
-                                    Log.Information("Deleting existing file (if any): " + extractpath + "\\" + Path.GetFileName(file));
-                                    File.Delete(destination);
+                                    //Log.Information("Deleting existing file (if any): " + extractpath + "\\" + Path.GetFileName(file));
+                                    if (File.Exists(destination))
+                                    {
+                                        Log.Information("Deleted existing file " + extractpath + "\\"+Path.GetFileName(file));
+                                        File.Delete(destination);
+                                    }
                                     Log.Information(file + " -> " + destination);
                                     File.Move(file, destination);
                                 }
@@ -307,6 +317,8 @@ namespace AlotAddOnGUI
                 Log.Error(e.ToString());
                 BuildWorker.ReportProgress(0, new ThreadCommand("ERROR_OCCURED", e.Message));
                 TasksDisplayEngine.ReleaseTask(af.FriendlyName);
+                af.ReadyStatusText = "Error occured during extraction";
+                af.SetError();
                 return false;
             }
             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
@@ -317,6 +329,8 @@ namespace AlotAddOnGUI
             {
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, newText));
             }
+            af.ReadyStatusText = "Queued for staging";
+            af.SetIdle();
             return true;
         }
 
@@ -365,20 +379,34 @@ namespace AlotAddOnGUI
                     {
                         //Detected MEMI tag
                         //Check if ALOT main file is installed. If it is and this is ALOT file, skip
-                        if (af.ALOTVersion > 0 && CurrentGameALOTInfo.ALOTVER > 0)
+                        if (af.ALOTVersion > 0 && CurrentGameALOTInfo.ALOTVER >= 0)
                         {
                             Log.Information("ALOT File in queue for processing but ALOT is already installed. Skipping...");
+                            af.ReadyStatusText = "ALOT already installed";
+                            continue; //skip
+                        }
+
+                        if (af.ALOTUpdateVersion > 0 && CurrentGameALOTInfo.ALOTVER == 0)
+                        {
+                            Log.Information("ALOT update file in queue but unknown if it applies due to unknown ALOT version. Skipping...");
+                            af.ReadyStatusText = "Restore to unmodified to install this file";
+                            af.SetError();
                             continue; //skip
                         }
 
                         //Check if ALOT update file of this version or higher is installed. If it is and this is ALOT update file, skip
-                        if (af.ALOTUpdateVersion > 0)
-                        {
-                            Debug.WriteLine("OK");
-                        }
                         if (af.ALOTUpdateVersion > 0 && CurrentGameALOTInfo.ALOTUPDATEVER >= af.ALOTUpdateVersion)
                         {
                             Log.Information("ALOT Update File in queue for processing, but ALOT update of this version or greater is already installed. Skipping...");
+                            af.ReadyStatusText = "Update already applied";
+                            continue;
+                        }
+
+                        //Check if ALOT update file applies to this version of ALOT main
+                        if (af.ALOTUpdateVersion > 0 && CurrentGameALOTInfo.ALOTUPDATEVER != af.ALOTMainVersionRequired)
+                        {
+                            Log.Information("ALOT Update available but currently installed ALOT version does not match. Skipping...");
+                            af.ReadyStatusText = "Update not applicable";
                             continue;
                         }
                     }
@@ -387,6 +415,13 @@ namespace AlotAddOnGUI
                     ADDONFILES_TO_BUILD.Add(af);
                 }
             }
+
+            foreach (AddonFile af in ADDONFILES_TO_BUILD)
+            {
+                af.ReadyStatusText = "Queued for processing";
+                af.SetWorking();
+            }
+
             ADDONSTOINSTALL_COUNT = ADDONFILES_TO_BUILD.Count;
             completed = 0;
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Preparing files for installation.\nDon't close the window until this operation completes."));
@@ -402,7 +437,7 @@ namespace AlotAddOnGUI
             {
                 threads--; //cores - 1
             }
-            bool[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).Select(ExtractAddon).ToArray();
+            bool[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
             foreach (bool result in results)
             {
                 if (!result)
@@ -440,7 +475,7 @@ namespace AlotAddOnGUI
                 Utilities.runProcess(exe, args);
             }
 
-            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Moving required files for MEM package..."));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Staging Addon texture files for building..."));
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
 
             //Calculate how many files to install...
@@ -455,8 +490,15 @@ namespace AlotAddOnGUI
             int numcompleted = 0;
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
+                af.SetWorking();
+            }
+
+            foreach (AddonFile af in ADDONFILES_TO_BUILD)
+            {
                 if (af.PackageFiles.Count > 0)
                 {
+                    af.SetWorking();
+                    af.ReadyStatusText = "Staging files for build";
                     foreach (PackageFile pf in af.PackageFiles)
                     {
                         if ((game == 1 && pf.ME1 || game == 2 && pf.ME2 || game == 3 && pf.ME3) && !pf.Processed)
@@ -464,7 +506,7 @@ namespace AlotAddOnGUI
                             string extractedpath = basepath + Path.GetFileNameWithoutExtension(af.Filename) + "\\" + pf.SourceName;
                             if (File.Exists(extractedpath) && pf.DestinationName != null)
                             {
-                                Log.Information("Copying Package File: " + pf.SourceName + "->" + pf.DestinationName);
+                                //Log.Information("Copying Package File: " + pf.SourceName + "->" + pf.DestinationName);
                                 string destination = stagingdirectory + pf.DestinationName;
                                 File.Copy(extractedpath, destination, true);
                                 SHOULD_HAVE_OUTPUT_FILE = true;
@@ -487,7 +529,22 @@ namespace AlotAddOnGUI
                         //  Thread.Sleep(1000);
                     }
                 }
+                af.SetIdle();
+                af.ReadyStatusText = "Waiting for other files to finish staging";
             }
+
+            foreach (AddonFile af in ADDONFILES_TO_BUILD)
+            {
+                if (af.ALOTUpdateVersion > 0 || af.ALOTVersion > 0)
+                {
+                    af.ReadyStatusText = "Waiting for Addon to complete build";
+                    af.SetIdle();
+                    continue;
+                }
+                af.ReadyStatusText = "Building into Addon MEM file";
+                af.SetWorking();
+            }
+
 
             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
             Log.Information("[SIZE] POSTEXTRACT_PRESTAGING Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
@@ -526,6 +583,12 @@ namespace AlotAddOnGUI
                 while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
                 {
                     Thread.Sleep(250);
+                }
+
+                foreach (AddonFile af in ADDONFILES_TO_BUILD)
+                {
+                    af.ReadyStatusText = null;
+                    af.SetIdle();
                 }
 
                 Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
@@ -729,9 +792,11 @@ namespace AlotAddOnGUI
                     break;
                 case 2:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x55, 0, 0, 0));
+                    Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Collapsed;
                     break;
                 case 3:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x55, 0, 0, 0));
+                    Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Collapsed;
                     break;
             }
             InstallingOverlayFlyout_Border.Background = backgroundShadeBrush;
@@ -761,7 +826,8 @@ namespace AlotAddOnGUI
                     //no tips.
                 }
             }
-
+            InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Visible;
+            InstallingOverlay_Tip.Text = "This may take a while. You can maximize this window\nfor a better view. Enjoy some codex entries while you wait.";
             tipticker = new System.Windows.Threading.DispatcherTimer();
             tipticker.Tick += newTipTimer_Tick;
             tipticker.Interval = new TimeSpan(0, 0, 20);
@@ -796,6 +862,8 @@ namespace AlotAddOnGUI
             WARN_USER_OF_EXIT = false;
             Log.Information("InstallCompleted()");
             InstallingOverlay_Tip.Visibility = System.Windows.Visibility.Collapsed;
+            InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Collapsed;
+
             tipticker.Stop();
             InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Collapsed;
             Button_InstallViewLogs.Visibility = System.Windows.Visibility.Collapsed;
@@ -896,6 +964,7 @@ namespace AlotAddOnGUI
         private void InstallALOT(object sender, DoWorkEventArgs e)
         {
             Log.Information("InstallWorker Thread starting for ME" + INSTALLING_THREAD_GAME);
+            ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
             bool RemoveMipMaps = (versionInfo == null || versionInfo.ALOTVER == 0); //remove mipmaps only if alot is not installed
             if (INSTALLING_THREAD_GAME == 1)
@@ -908,6 +977,8 @@ namespace AlotAddOnGUI
             }
             else
             {
+                //me3
+                ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_UNPACK);
                 STAGE_COUNT = 5;
             }
 
@@ -915,7 +986,14 @@ namespace AlotAddOnGUI
             {
                 STAGE_COUNT -= 2; //Scanning, Removing
             }
-
+            else
+            {
+                ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_SCAN);
+                ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_REMOVE);
+            }
+            ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_INSTALL);
+            ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_SAVE);
+            ProgressWeightPercentages.ScaleWeights();
             INSTALL_STAGE = 0;
             //Checking files for title
 
@@ -940,41 +1018,44 @@ namespace AlotAddOnGUI
                 }
             }
 
-            string topText = "Installing ALOT for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+            MAINTASK_TEXT = "Installing ALOT for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
             if (!installedALOT)
             {
                 if (justInstalledUpdate > 0)
                 {
-                    topText = "Installing ALOT Update for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+                    MAINTASK_TEXT = "Installing ALOT Update for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
                 }
                 else
                 {
-                    topText = "Installing texture mods for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+                    MAINTASK_TEXT = "Installing texture mods for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
                 }
             }
-            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OVERALL_TASK, topText));
+
+
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OVERALL_TASK, MAINTASK_TEXT));
 
 
             List<string> acceptedIPC = new List<string>();
             acceptedIPC.Add("TASK_PROGRESS");
             acceptedIPC.Add("PHASE");
             acceptedIPC.Add("ERROR");
+            acceptedIPC.Add("PROCESSING_MOD");
+            acceptedIPC.Add("PROCESSING_FILE");
 
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "";
             int processResult = 0;
-
+            int overallProgress = 0;
+            stopwatch = Stopwatch.StartNew();
             if (INSTALLING_THREAD_GAME == 3)
             {
-
-
                 //Unpack DLC
                 Log.Information("InstallWorker(): ME3 -> Unpacking DLC.");
                 CurrentTask = "Unpacking DLC";
                 CurrentTaskPercent = 0;
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, CurrentTask));
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_TASK_PROGRESS, CurrentTaskPercent));
-                Interlocked.Increment(ref INSTALL_STAGE);
+                Interlocked.Increment(ref INSTALL_STAGE); //unpack-dlcs does not output phase 
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
                 args = "-unpack-dlcs -ipc";
                 runMEM_Install(exe, args, InstallWorker);
@@ -990,9 +1071,11 @@ namespace AlotAddOnGUI
                     e.Result = RESULT_UNPACK_FAILED;
                     return;
                 }
-
-                Interlocked.Increment(ref INSTALL_STAGE);
-                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
+                Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
+                overallProgress = ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
+                InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
+                //Interlocked.Increment(ref INSTALL_STAGE);
+                //InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
             }
 
             //Scan and remove empty MipMaps
@@ -1001,7 +1084,7 @@ namespace AlotAddOnGUI
                 Log.Information("InstallWorker(): Removing Empty MipMaps");
 
                 args = "-scan-with-remove " + INSTALLING_THREAD_GAME + " -ipc";
-                runMEM_Install(exe, args, InstallWorker);
+                runMEM_Install(exe, args, InstallWorker); //output's 2 phase's
                 while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
                 {
                     Thread.Sleep(250);
@@ -1013,11 +1096,16 @@ namespace AlotAddOnGUI
                     e.Result = RESULT_SCAN_REMOVE_FAILED;
                     return;
                 }
-                Interlocked.Increment(ref INSTALL_STAGE);
-                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
+                Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
+                overallProgress = ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
+                InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
+                //scan with remove or install textures will increment this
+
             }
 
             //Install Textures
+            Interlocked.Increment(ref INSTALL_STAGE);
+            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
             string outputDir = getOutputDir(INSTALLING_THREAD_GAME, false);
             CurrentTask = "Installing textures";
             CurrentTaskPercent = 0;
@@ -1036,6 +1124,9 @@ namespace AlotAddOnGUI
                 e.Result = RESULT_TEXTUREINSTALL_FAILED;
                 return;
             }
+            Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
+            ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
+            InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
 
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
@@ -1047,7 +1138,7 @@ namespace AlotAddOnGUI
 
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT, CurrentTask));
 
-            args = "-apply-lods-gfx "+INSTALLING_THREAD_GAME;
+            args = "-apply-lods-gfx " + INSTALLING_THREAD_GAME;
             if (LODLIMIT == 2)
             {
                 args += " -limit2k";
@@ -1135,12 +1226,17 @@ namespace AlotAddOnGUI
                 }
                 File.Move(source, dest);
                 Log.Information("Moved main alot file back to downloaded_mods");
+
+                //Delete original
+                dest = EXE_DIRECTORY + "Downloaded_Mods\\" + alotAddonFile.Filename;
+                if (File.Exists(dest))
+                {
+                    Log.Information("Deleted original alot archive file from downloaded_mods");
+                    File.Delete(dest);
+                }
             }
 
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
-
-
-
 
             string taskString = "Installation of ALOT for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
             if (!installedALOT)
@@ -1190,6 +1286,7 @@ namespace AlotAddOnGUI
                     InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
                     break;
                 case UPDATE_TASK_PROGRESS:
+                    int oldTaskProgress = CurrentTaskPercent;
                     if (tc.Data is string)
                     {
                         CurrentTaskPercent = Convert.ToInt32((string)tc.Data);
@@ -1198,8 +1295,21 @@ namespace AlotAddOnGUI
                     {
                         CurrentTaskPercent = (int)tc.Data;
                     }
-                    InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
-                    TaskbarManager.Instance.SetProgressValue(CurrentTaskPercent, 100);
+
+                    if (CurrentTaskPercent != oldTaskProgress)
+                    {
+                        int progressval = ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, CurrentTaskPercent);
+                        InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
+                        InstallingOverlay_OverallLabel.Text = "(" + progressval.ToString() +"%)";
+                        TaskbarManager.Instance.SetProgressValue(progressval, 100);
+                    }
+                    break;
+                case SET_OVERALL_PROGRESS:
+                    //InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
+                    //TaskbarManager.Instance.SetProgressValue((int)tc.Data, 100);
+                    int progress = ProgressWeightPercentages.GetOverallProgress();
+                    InstallingOverlay_OverallLabel.Text = "(" + progress.ToString() + "%)";
+                    TaskbarManager.Instance.SetProgressValue(progress, 100);
                     break;
                 case UPDATE_PROGRESSBAR_INDETERMINATE:
                     //Install_ProgressBar.IsIndeterminate = (bool)tc.Data;
@@ -1308,6 +1418,8 @@ namespace AlotAddOnGUI
                             //int percentInt = Convert.ToInt32(param);
                             //worker.ReportProgress(percentInt);
                             case "PROCESSING_FILE":
+                            case "PROCESSING_MOD":
+                                Log.Information("MEM Reports processing file: " + param);
                                 //worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
                                 break;
                             case "OVERALL_PROGRESS":
@@ -1316,7 +1428,10 @@ namespace AlotAddOnGUI
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_TASK_PROGRESS, param));
                                 break;
                             case "PHASE":
+                                Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
+                                int overallProgress = ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
+                                worker.ReportProgress(completed, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
                                 Interlocked.Increment(ref INSTALL_STAGE);
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_STAGE_LABEL));
                                 break;
