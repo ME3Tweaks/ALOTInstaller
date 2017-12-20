@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="3.0.7">
+<alotaddonmanifest version="3.0.8">
 	<addonfile alotversion="5" friendlyname="ALOT for ME1 - Main" tooltipname="Main file for ALOT for ME1" author="CreeperLava">
 		<file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1-83-2017-5-0.7z" unpackedsinglefilename="ALOT_ME1.mem"/>
 		<packagefile me1="true" sourcename="00_ALOT\ALOT_ME1.mem" movedirectly="true"/>
