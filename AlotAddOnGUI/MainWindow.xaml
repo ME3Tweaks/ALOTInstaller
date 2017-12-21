@@ -220,6 +220,7 @@
                 <!--<Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>-->
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="5">
+                        <Button Click="ShowFirstTime" Content="Show First Time"/>
                         <CheckBox Margin="5" Visibility="Collapsed" x:Name="Checkbox_MoveFilesAsImport" Content="Import via Move instead of Copy" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied."/>
                         <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
 
@@ -368,6 +369,34 @@
                                  BlurRadius="4"/>
                             </TextBlock.Effect>
                         </TextBlock>
+                    </StackPanel>
+                </Border>
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="FirstRunFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
+                <Border x:Name="FirstRunOverlayFlyout_Border" Padding="10">
+                    <Border.Background>
+                        <ImageBrush ImageSource="images/firstrunbg.jpg" AlignmentY="Center" Stretch="UniformToFill"/>
+                    </Border.Background>
+                    <StackPanel x:Name="panel" VerticalAlignment="Top" HorizontalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
+                        <TextBlock Text="Welcome to the ALOT Installer" FontSize="30" FontWeight="Light"></TextBlock>
+                        <TextBlock Text="This program will assist facilitate the installation of ALOT, updates, and the addon package" FontSize="13"></TextBlock>
+                        <TextBlock Text="What is the addon?" Margin="0,10,0,0" FontSize="20"></TextBlock>
+                        <TextBlock  FontSize="13" Width="400" TextWrapping="Wrap" HorizontalAlignment="Left">The ALOT Addon are textures provided by users who do not want their content in the main ALOT file.
+This installer allows you add those texture mods and put them all into an addon, which is installed along side ALOT.
+The ALOT team has cherry picked the best vanilla style textures from within those mods.
+For the true ALOT experience, you should download all of the listed files for your game and import them.
+Import files by dragging and dropping them onto the interface - do not extract or modify anything you download.</TextBlock>
+
+
+
+                        <TextBlock Text="What are the recommended steps for using this?" FontSize="20" Margin="0,10,0,0"></TextBlock>
+                        <TextBlock FontSize="13" Width="400"  TextWrapping="Wrap" HorizontalAlignment="Left">Ensure you have installed all content mods (mods that modify pcc or upk files) then download the files as shown in this interface.
+Installing pcc or upk mods AFTER installation of ALOT is NOT SUPPORTED and will almost always break the game.
+                        </TextBlock>
+
+                        <TextBlock Text="This installer is in beta" FontSize="20" Margin="0,10,0,0"></TextBlock>
+                        <TextBlock Text="That means you may find bugs or errors, and we need your help to find them." FontSize="13"></TextBlock>
+                        <Button Content="Got it" HorizontalAlignment="Left" Margin="0,10,0,0" Click="Button_FirstTimeRun_Click"/>
                     </StackPanel>
                 </Border>
             </Controls:Flyout>

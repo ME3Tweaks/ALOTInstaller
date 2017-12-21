@@ -779,6 +779,8 @@ namespace AlotAddOnGUI
             AddonFilesLabel.Text = "Running in installer mode.";
             InstallingOverlay_Tip.Visibility = System.Windows.Visibility.Visible;
             InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Visible;
+            InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Visible;
+            InstallingOverlay_OverallLabel.Text = "";
             InstallingOverlay_StageLabel.Text = "Getting ready";
             InstallingOverlay_BottomLabel.Text = "Please wait";
 
@@ -1274,6 +1276,7 @@ namespace AlotAddOnGUI
                     break;
                 case HIDE_STAGE_LABEL:
                     InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Collapsed;
+                    InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Collapsed;
                     break;
                 case UPDATE_OVERALL_TASK:
                     InstallingOverlay_TopLabel.Text = (string)tc.Data;

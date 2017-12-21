@@ -906,6 +906,7 @@ namespace AlotAddOnGUI
                     readManifest();
 
                     Log.Information("readManifest() has completed. Switching over to user control");
+                    FirstRunFlyout.IsOpen = true;
                     Loading = false;
                     Build_ProgressBar.IsIndeterminate = false;
                     HeaderLabel.Text = PRIMARY_HEADER;
@@ -1978,6 +1979,16 @@ namespace AlotAddOnGUI
             {
                 this.WindowState = System.Windows.WindowState.Normal;
             }
+        }
+
+        private void ShowFirstTime(object sender, RoutedEventArgs e)
+        {
+            FirstRunFlyout.IsOpen = true;
+        }
+
+        private void Button_FirstTimeRun_Click(object sender, RoutedEventArgs e)
+        {
+            FirstRunFlyout.IsOpen = false;
         }
     }
 }

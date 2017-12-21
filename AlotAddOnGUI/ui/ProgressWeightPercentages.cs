@@ -10,11 +10,11 @@ namespace AlotAddOnGUI.ui
 {
     class ProgressWeightPercentages
     {
-        private const double WEIGHT_UNPACKED = 1.35;
-        private const double WEIGHT_SCAN = 2;
-        private const double WEIGHT_REMOVE = 2.1;
-        private const double WEIGHT_INSTALL = 2.5;
-        private const double WEIGHT_SAVE = 3;
+        private const double WEIGHT_UNPACKED = 0.11004021318;
+        private const double WEIGHT_SCAN = 0.12055272684;
+        private const double WEIGHT_REMOVE = 0.19155062326;
+        private const double WEIGHT_INSTALL = 0.31997680866;
+        private const double WEIGHT_SAVE = 0.25787962804;
 
         public const int JOB_UNPACK = 0;
         public const int JOB_SCAN = 1;
