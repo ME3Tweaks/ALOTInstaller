@@ -28,6 +28,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using System.Xml.Linq;
@@ -114,7 +115,8 @@ namespace AlotAddOnGUI
         private bool _showME3Files = true;
         private bool Loading = true;
         private int LODLIMIT = 0;
-
+        private TextBlock[] fadeInItems;
+        private List<TextBlock> currentFadeInItems = new List<TextBlock>();
         public bool ShowME1Files
         {
             get { return _showME1Files; }
@@ -702,7 +704,8 @@ namespace AlotAddOnGUI
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+            fadeInItems = new TextBlock[] { FirstRunText_Title, FirstRunText_Summary, FirstRunText_TitleAddon, FirstRunText_AddonSummary, FirstRunText_TitleImport, FirstRunText_ImportSummary, FirstRunText_TitleOKMods, FirstRunText_OKModsSummary, FirstRunText_TitleBeta, FirstRunText_BetaSummary };
+
             if (EXE_DIRECTORY.Length > 95)
             {
                 Log.Fatal("EXE is nested too deep for Addon to build properly (" + EXE_DIRECTORY.Length + " chars) due to Windows API limitations.");
@@ -906,7 +909,6 @@ namespace AlotAddOnGUI
                     readManifest();
 
                     Log.Information("readManifest() has completed. Switching over to user control");
-                    FirstRunFlyout.IsOpen = true;
                     Loading = false;
                     Build_ProgressBar.IsIndeterminate = false;
                     HeaderLabel.Text = PRIMARY_HEADER;
@@ -914,8 +916,12 @@ namespace AlotAddOnGUI
                     CheckImportLibrary_Tick(null, null);
                     RunMEMUpdater2();
                     UpdateALOTStatus();
-
                     RunMEMUpdaterGUI();
+                    bool? hasShownFirstRun = Utilities.GetRegistrySettingBool("HasRunFirstRun");
+                    if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
+                    {
+                        playFirstTimeAnimation();
+                    }
                 }
             }
         }
@@ -936,7 +942,7 @@ namespace AlotAddOnGUI
             {
                 if (CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER > 0)
                 {
-                    me1ver =CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER;
+                    me1ver = CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER;
                 }
                 else
                 {
@@ -996,11 +1002,81 @@ namespace AlotAddOnGUI
             Label_ALOTStatus_ME2.ToolTip = me2ToolTip;
             Label_ALOTStatus_ME3.ToolTip = me3ToolTip;
 
-            Button_ME1_ShowLODOptions.Visibility = CURRENTLY_INSTALLED_ME1_ALOT_INFO != null ? Visibility.Visible : Visibility.Collapsed;
+            Button_ME1_ShowLODOptions.Visibility = (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER > 0) ? Visibility.Visible : Visibility.Collapsed;
             foreach (AddonFile af in addonfiles)
             {
                 af.ReadyStatusText = af.ReadyStatusText; //update description
             }
+        }
+
+        private void playFirstTimeAnimation()
+        {
+            foreach (TextBlock tb in fadeInItems)
+            {
+                tb.Opacity = 0;
+            }
+            Button_FirstRun_Dismiss.Opacity = 0;
+            FirstRunFlyout.IsOpen = true;
+            currentFadeInItems = fadeInItems.ToList();
+            #region Fade in
+            // Create a storyboard to contain the animations.
+            Storyboard storyboard = new Storyboard();
+            TimeSpan duration = new TimeSpan(0, 0, 1);
+
+            // Create a DoubleAnimation to fade the not selected option control
+            DoubleAnimation animation = new DoubleAnimation();
+
+            animation.From = 0.0;
+            animation.To = 1.0;
+            animation.Duration = new Duration(duration);
+            animation.Completed += new EventHandler(ItemFadeInComplete_Chain);
+
+            TextBlock item = currentFadeInItems[0];
+            currentFadeInItems.RemoveAt(0);
+            // Configure the animation to target de property Opacity
+            Storyboard.SetTargetName(animation, item.Name);
+            Storyboard.SetTargetProperty(animation, new PropertyPath(OpacityProperty));
+            // Add the animation to the storyboard
+            storyboard.Children.Add(animation);
+
+            // Begin the storyboard
+            storyboard.Begin(this);
+
+            #endregion
+        }
+
+        private void ItemFadeInComplete_Chain(object sender, EventArgs e)
+        {
+            Storyboard storyboard = new Storyboard();
+            TimeSpan duration = new TimeSpan(0, 0, 0, 0, 700);
+
+            // Create a DoubleAnimation to fade the not selected option control
+            DoubleAnimation animation = new DoubleAnimation();
+
+            animation.From = 0.0;
+            animation.To = 1.0;
+            animation.Duration = new Duration(duration);
+
+            System.Windows.FrameworkElement item;
+            if (currentFadeInItems.Count > 0)
+            {
+                item = currentFadeInItems[0];
+                animation.Completed += new EventHandler(ItemFadeInComplete_Chain);
+                currentFadeInItems.RemoveAt(0);
+            }
+            else
+            {
+                item = Button_FirstRun_Dismiss;
+            }
+
+            // Configure the animation to target de property Opacity
+            Storyboard.SetTargetName(animation, item.Name);
+            Storyboard.SetTargetProperty(animation, new PropertyPath(OpacityProperty));
+            // Add the animation to the storyboard
+            storyboard.Children.Add(animation);
+
+            // Begin the storyboard
+            storyboard.Begin(this);
         }
 
         private async void readManifest()
@@ -1292,6 +1368,7 @@ namespace AlotAddOnGUI
 
         private void BackupCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
             string destPath = (string)e.Result;
             if (destPath != null)
             {
@@ -1561,14 +1638,9 @@ namespace AlotAddOnGUI
                     bool hasMatch = false;
                     foreach (AddonFile af in addonfiles)
                     {
-                        if (af.ALOTVersion > 0 && af.Game_ME3)
-                        {
-                            Debug.WriteLine("BREAK");
-                        }
+                        bool isUnpackedSingleFile = af.UnpackedSingleFilename != null && af.UnpackedSingleFilename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file); //make sure not folder with same name.
 
-                        bool isUnpackedSingleFile = af.UnpackedSingleFilename != null && af.UnpackedSingleFilename.Equals(fname, StringComparison.InvariantCultureIgnoreCase);
-
-                        if (isUnpackedSingleFile || af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase))
+                        if (isUnpackedSingleFile || af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file)) //make sure folder not with same name
                         {
                             hasMatch = true;
                             if (af.Ready == false)
@@ -1986,8 +2058,9 @@ namespace AlotAddOnGUI
             FirstRunFlyout.IsOpen = true;
         }
 
-        private void Button_FirstTimeRun_Click(object sender, RoutedEventArgs e)
+        private void Button_FirstTimeRunDismiss_Click(object sender, RoutedEventArgs e)
         {
+            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "HasRunFirstRun", true);
             FirstRunFlyout.IsOpen = false;
         }
     }

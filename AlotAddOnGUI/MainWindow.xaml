@@ -1,12 +1,11 @@
 ﻿<Controls:MetroWindow 
         x:Class="AlotAddOnGUI.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                      xmlns:AlotAddOnGUI.classes="clr-namespace:AlotAddOnGUI.classes"
-                      mc:Ignorable="d"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+    mc:Ignorable="d"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
         Title="ALOT Installer" MinHeight="600" MinWidth="800" Height="600" Width="800"
@@ -45,7 +44,7 @@
             <Setter Property="Margin" Value="0,0,0,0" />
         </Style>
     </Window.Resources>
-    
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -79,6 +78,8 @@
                             <ColumnDefinition Width="5" />
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="5" />
+
                         </Grid.ColumnDefinitions>
                         <Border x:Name="ListItemLeftBlock" Grid.Column="0" Grid.RowSpan="2" Grid.Row="0" Background="#d92244" Padding="0" Margin="0"/>
                         <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding FriendlyName}" FontWeight="Bold" VerticalAlignment="Center" />
@@ -148,7 +149,7 @@
                     </DataTemplate.Triggers>
                 </DataTemplate>
             </ListView.ItemTemplate>
-            
+
 
             <!-- This is what each group looks like -->
             <ListView.GroupStyle>
@@ -209,7 +210,7 @@
     </Grid>
     <Controls:MetroWindow.Flyouts>
         <Controls:FlyoutsControl>
-            <Controls:Flyout x:Name="SettingsFlyout" Header="Settings" IsPinned="False" Theme="Accent" Position="Right" Width="300">
+            <Controls:Flyout x:Name="SettingsFlyout" Header="Settings" IsPinned="False" Theme="Accent" Position="Right">
                 <Controls:Flyout.Resources>
                     <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
                         <Style.Resources>
@@ -219,12 +220,8 @@
                 </Controls:Flyout.Resources>
                 <!--<Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>-->
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="5">
-                        <Button Click="ShowFirstTime" Content="Show First Time"/>
-                        <CheckBox Margin="5" Visibility="Collapsed" x:Name="Checkbox_MoveFilesAsImport" Content="Import via Move instead of Copy" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied."/>
-                        <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
-
-                        <Expander IsExpanded="True">
+                    <StackPanel>
+                        <Expander IsExpanded="True" HorizontalAlignment="Stretch">
                             <Expander.Header>
                                 <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="ALOT Installation Status"/>
                             </Expander.Header>
@@ -261,7 +258,7 @@
                                 <Button x:Name="Button_ME2Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME2: Not Backed Up" Click="Button_ME2Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 <Button x:Name="Button_ME3Backup" Margin="20,0,20,0" FontSize="12" Padding="0,3,0,3" Content="ME3: Not Backed Up" Click="Button_ME3Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                             </StackPanel>
-                        </Expander>                        
+                        </Expander>
                         <Expander IsExpanded="False">
                             <Expander.Header>
                                 <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="Diagnostics &amp; MEM"/>
@@ -283,6 +280,9 @@
                                 <Label Margin="20,0,0,0" Padding="10,0,0,2" Content="Aquadran" ToolTip="Developed MEM. One who made this all possible."/>
                                 <Label Margin="20,0,0,0" Padding="10,0,0,2" Content="CreeperLava" ToolTip="Developed ALOT. Glued all the pieces together."/>
                                 <Label Margin="20,0,0,0" Padding="10,0,0,2" Content="Mgamerz" ToolTip="Complained a bunch and then made a suave UI."/>
+                                <Button Click="ShowFirstTime" Content="Show First Time Dialog" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                <CheckBox Margin="5" Visibility="Collapsed" x:Name="Checkbox_MoveFilesAsImport" Content="Import via Move instead of Copy" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied." />
+                                <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
                             </StackPanel>
                         </Expander>
                     </StackPanel>
@@ -304,19 +304,19 @@
                                   Color="Black"
                                   Opacity="1"
                                  BlurRadius="4"/>
-                             </TextBlock.Effect>
+                            </TextBlock.Effect>
                         </TextBlock>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock x:Name="InstallingOverlay_StageLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Stage 3 of 7 (66%)">
-                            <TextBlock.Effect>
-                                <DropShadowEffect
+                            <TextBlock x:Name="InstallingOverlay_StageLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Stage 3 of 7 (66%)">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect
                                   ShadowDepth="4"
                                   Direction="330"
                                   Color="Black"
                                   Opacity="1"
                                  BlurRadius="4"/>
-                            </TextBlock.Effect>
-                        </TextBlock>
+                                </TextBlock.Effect>
+                            </TextBlock>
                             <TextBlock x:Name="InstallingOverlay_OverallLabel" Margin="5,0,0,0" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="(0%)">
                                 <TextBlock.Effect>
                                     <DropShadowEffect
@@ -338,7 +338,7 @@
                                  BlurRadius="4"/>
                             </TextBlock.Effect>
                         </TextBlock>
-                        
+
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
                             <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallViewLogs" Visibility="Collapsed" Margin="0,0,5,0"  HorizontalAlignment="Center"  Content="View Logs" ToolTip="Click to view logs" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
                             <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallDone" Visibility="Visible" HorizontalAlignment="Center"  Content="Continue" ToolTip="Click to dismiss dialog" Click="Button_InstallDone_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
@@ -359,7 +359,7 @@
                                 <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_LOD4k" Visibility="Visible" HorizontalAlignment="Center"  Content="Use 4K textures when available" ToolTip="4K has more detail, but will have less performance in some cutscenes." Click="Button_InstallerLOD4k_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
                             </StackPanel>
                         </StackPanel>
-                        <TextBlock x:Name="InstallingOverlay_Tip" Height="60" FontSize="14" FontWeight="Medium" Margin="5,40,0,5" HorizontalAlignment="Center"  TextAlignment="Center" Text="This may take a while.&#10;Enjoy some codex entries while you wait.">
+                        <TextBlock x:Name="InstallingOverlay_Tip" MaxWidth="700" TextWrapping="Wrap" MinHeight="90" FontSize="16" FontWeight="Medium" Margin="5,40,0,5" HorizontalAlignment="Center"  TextAlignment="Center" Text="This may take a while.&#10;Enjoy some codex entries while you wait.">
                             <TextBlock.Effect>
                                 <DropShadowEffect
                                   ShadowDepth="4"
@@ -377,28 +377,34 @@
                     <Border.Background>
                         <ImageBrush ImageSource="images/firstrunbg.jpg" AlignmentY="Center" Stretch="UniformToFill"/>
                     </Border.Background>
-                    <StackPanel x:Name="panel" VerticalAlignment="Top" HorizontalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
-                        <TextBlock Text="Welcome to the ALOT Installer" FontSize="30" FontWeight="Light"></TextBlock>
-                        <TextBlock Text="This program will assist facilitate the installation of ALOT, updates, and the addon package" FontSize="13"></TextBlock>
-                        <TextBlock Text="What is the addon?" Margin="0,10,0,0" FontSize="20"></TextBlock>
-                        <TextBlock  FontSize="13" Width="400" TextWrapping="Wrap" HorizontalAlignment="Left">The ALOT Addon are textures provided by users who do not want their content in the main ALOT file.
-This installer allows you add those texture mods and put them all into an addon, which is installed along side ALOT.
-The ALOT team has cherry picked the best vanilla style textures from within those mods.
-For the true ALOT experience, you should download all of the listed files for your game and import them.
-Import files by dragging and dropping them onto the interface - do not extract or modify anything you download.</TextBlock>
+                    <StackPanel x:Name="panel" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" UseLayoutRounding="True" Margin="35,20,0,0">
+                        <TextBlock x:Name="FirstRunText_Title" Text="Welcome to the ALOT Installer" FontSize="30" FontWeight="Light"></TextBlock>
+                        <TextBlock x:Name="FirstRunText_Summary" Text="This program is used to facilitate the installation of ALOT, updates, and the ALOT Addon." FontSize="13"></TextBlock>
+                        <TextBlock  x:Name="FirstRunText_TitleAddon" Text="What is the ALOT Addon?" Margin="0,10,0,0" FontSize="20"></TextBlock>
+                        <TextBlock   x:Name="FirstRunText_AddonSummary" FontSize="13" Width="400" TextWrapping="Wrap" HorizontalAlignment="Left">The ALOT Addon adds more textures provided by users who do not want their content in the main ALOT file.
+                                                This installer allows you to add those texture mods, which is installed alongside ALOT in a file called the Addon.
+                                                The ALOT team has cherry picked the best vanilla style textures from within those mods.
+                                                For the true ALOT experience, you should download all of the listed files for your game and import them.</TextBlock>
+                        <TextBlock  x:Name="FirstRunText_TitleImport" Margin="0,10,0,0" FontSize="20">How do I import files?</TextBlock>
 
-
-
-                        <TextBlock Text="What are the recommended steps for using this?" FontSize="20" Margin="0,10,0,0"></TextBlock>
-                        <TextBlock FontSize="13" Width="400"  TextWrapping="Wrap" HorizontalAlignment="Left">Ensure you have installed all content mods (mods that modify pcc or upk files) then download the files as shown in this interface.
-Installing pcc or upk mods AFTER installation of ALOT is NOT SUPPORTED and will almost always break the game.
+                        <TextBlock  x:Name="FirstRunText_ImportSummary" FontSize="13" Width="400" TextWrapping="Wrap" HorizontalAlignment="Left">
+                            Import files by dragging and dropping them onto the interface - do not extract or modify anything you download. Alternatively move the files into the Downloaded_Mods folder.</TextBlock>
+                        <TextBlock  x:Name="FirstRunText_TitleOKMods" Text="What mods are OK to use with ALOT?" FontSize="20" Margin="0,10,0,0"></TextBlock>
+                        <TextBlock  x:Name="FirstRunText_OKModsSummary" FontSize="13" Width="400"  TextWrapping="Wrap" HorizontalAlignment="Left">Almost all pcc or upk mods (DLC or file replacement mods) are compatible with ALOT as long as you install them before ALOT. 
+                            Once ALOT is installed, the only mods that can be installed are other texture mods that do not replace upk or pcc files.  
+                            Installing pcc or upk files after ALOT is installed is unsupported and will almost always break the game.
                         </TextBlock>
 
-                        <TextBlock Text="This installer is in beta" FontSize="20" Margin="0,10,0,0"></TextBlock>
-                        <TextBlock Text="That means you may find bugs or errors, and we need your help to find them." FontSize="13"></TextBlock>
-                        <Button Content="Got it" HorizontalAlignment="Left" Margin="0,10,0,0" Click="Button_FirstTimeRun_Click"/>
+                        <TextBlock  x:Name="FirstRunText_TitleBeta" Text="This installer is in beta" FontSize="20" Margin="0,10,0,0"></TextBlock>
+                        <TextBlock  x:Name="FirstRunText_BetaSummary" Text="That means you may find bugs or errors, and we need your help to find them." FontSize="13"></TextBlock>
+                        <Button  x:Name="Button_FirstRun_Dismiss" Content="Got it" HorizontalAlignment="Left" Margin="0,10,0,0" Click="Button_FirstTimeRunDismiss_Click"/>
                     </StackPanel>
                 </Border>
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="UserTextures_Flyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
+                <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" UseLayoutRounding="True" Margin="35,20,0,0">
+                    <TextBlock x:Name="UserTextures_Title" Text="Select which game this file applies to" FontSize="30" FontWeight="Light" HorizontalAlignment="Center"></TextBlock>
+                </StackPanel>
             </Controls:Flyout>
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>

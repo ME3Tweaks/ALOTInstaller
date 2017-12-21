@@ -46,13 +46,28 @@ namespace AlotAddOnGUI
                             preLogMessages += "Directory doesn't exist for update: " + parsedItems.Value.UpdateDest;
                         }
                     }
+                    if (parsedItems.Value.BootingNewUpdate)
+                    {
+                        if (File.Exists("ALOTAddonBuilder.exe"))
+                        {
+                            File.Delete("ALOTAddonBuilder.exe");
+                        }
+                        if (File.Exists("ALOTAddonBuilder.pdb"))
+                        {
+                            File.Delete("ALOTAddonBuilder.pdb");
+                        }
+                        if (File.Exists("AlotAddonBuilder.exe.config"))
+                        {
+                            File.Delete("AlotAddonBuilder.exe.config");
+                        }
+                    }
                 }
             }
 
             Directory.CreateDirectory(loggingBasePath + "\\logs");
             Log.Logger = new LoggerConfiguration()
                    .MinimumLevel.Debug()
-                .WriteTo.RollingFile(loggingBasePath + "\\logs\\alotaddoninstaller-{Date}.txt", flushToDiskInterval: new TimeSpan(0, 0, 15))
+                .WriteTo.RollingFile(loggingBasePath + "\\logs\\alotinstaller-{Date}.txt", flushToDiskInterval: new TimeSpan(0, 0, 15))
               .CreateLogger();
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
             Log.Information("=====================================================");
@@ -80,6 +95,7 @@ namespace AlotAddOnGUI
                 Log.Information("Files copied - rebooting into normal mode");
                 ProcessStartInfo psi = new ProcessStartInfo(updateDestinationPath + "\\" + System.AppDomain.CurrentDomain.FriendlyName);
                 psi.WorkingDirectory = updateDestinationPath;
+                psi.Arguments = "--completing-update";
                 Process.Start(psi);
                 Environment.Exit(0);
                 System.Windows.Application.Current.Shutdown();
@@ -139,6 +155,9 @@ namespace AlotAddOnGUI
           HelpText = "Copies AddonBuilder and everything in the current directory (and subdirectories) into the listed directory, then reboots using the new EXE.")]
         public string UpdateDest { get; set; }
 
+        [Option('c', "completing-update",
+            HelpText = "Indicates that we are booting a new copy of ALOTInstaller that has just been upgraded")]
+        public bool BootingNewUpdate { get; set; }
     }
 
 }

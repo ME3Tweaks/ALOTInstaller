@@ -7,17 +7,17 @@ using System.Resources;
 
 // General Information
 
-[assembly: AssemblyTitle("ALOT Addon Builder")]
+[assembly: AssemblyTitle("ALOT Installer")]
 [assembly: AssemblyDescription("Installs ALOT for the Mass Effect Trilogy")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ME3Tweaks")]
-[assembly: AssemblyProduct("ALOT Addon Builder")]
-[assembly: AssemblyCopyright("Copyright © 2017 ME3Tweaks")]
+[assembly: AssemblyProduct("ALOT Installer")]
+[assembly: AssemblyCopyright("Copyright © 2017 ME3Tweaks & ALOT Team")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
 // Version informationr(
-[assembly: AssemblyVersion("2.0.99.1040")]
-[assembly: AssemblyFileVersion("2.0.99.1040")]
+[assembly: AssemblyVersion("2.0.102.1104")]
+[assembly: AssemblyFileVersion("2.0.102.1104")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 

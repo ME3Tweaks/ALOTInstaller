@@ -829,11 +829,12 @@ namespace AlotAddOnGUI
                 }
             }
             InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Visible;
-            InstallingOverlay_Tip.Text = "This may take a while. You can maximize this window\nfor a better view. Enjoy some codex entries while you wait.";
+            InstallingOverlay_Tip.Text = "";
             tipticker = new System.Windows.Threading.DispatcherTimer();
             tipticker.Tick += newTipTimer_Tick;
             tipticker.Interval = new TimeSpan(0, 0, 20);
             tipticker.Start();
+            newTipTimer_Tick(null, null);
             InstallWorker.RunWorkerAsync(getOutputDir(INSTALLING_THREAD_GAME));
         }
 
@@ -1205,7 +1206,27 @@ namespace AlotAddOnGUI
             //Write Marker
             ALOTVersionInfo newVersion = new ALOTVersionInfo(ALOTVersion, updateVersion, 0, 0);
             Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
-
+            ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
+            if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
+            {
+                //Marker file written was bad
+                Log.Error("Marker file was not properly written!");
+                if (test == null)
+                {
+                    Log.Error("Marker file does not indicate anything was installed.");
+                }
+                else
+                {
+                    if (test.ALOTVER != newVersion.ALOTVER)
+                    {
+                        Log.Error("Marker file does not show that ALOT was installed, but we detect some version was installed.");
+                    }
+                    if (test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
+                    {
+                        Log.Error("Marker file does not show that ALOT Update was applied or installed to our current version");
+                    }
+                }
+            }
             //Install Binkw32
             if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
             {

@@ -159,6 +159,11 @@ namespace AlotAddOnGUI
             subkey.SetValue(value, data);
         }
 
+        internal static void WriteRegistryKey(RegistryKey subkey, string subpath, string value, bool data)
+        {
+            WriteRegistryKey(subkey, subpath, value, data ? 1 : 0);
+        }
+
         internal static void WriteRegistryKey(RegistryKey subkey, string subpath, string value, int data)
         {
             int i = 0;

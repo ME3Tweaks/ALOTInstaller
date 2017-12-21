@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AlotAddOnGUI</RootNamespace>
-    <AssemblyName>AlotAddonBuilder</AssemblyName>
+    <AssemblyName>ALOTInstaller</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -31,7 +31,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>ALOTADDON.ico</ApplicationIcon>
+    <ApplicationIcon>ALOTInstallerIcon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
@@ -191,6 +191,7 @@
     <Resource Include="images\greencheckmark.png" />
     <Resource Include="images\orangedownload.png" />
     <Resource Include="ALOTADDON.ico" />
+    <Resource Include="ALOTInstallerIcon.ico" />
     <Content Include="binkw32\me2\binkw23.dll" />
     <Content Include="binkw32\me2\binkw32.dll" />
     <Content Include="binkw32\me3\binkw23.dll" />
