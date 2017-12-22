@@ -234,7 +234,7 @@ namespace AlotAddOnGUI
                             {
 
                                 //there's an update
-                                updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "ALOT Addon Installer is updating. Please wait...", true);
+                                updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "ALOT Installer is updating. Please wait...", true);
                                 updateprogresscontroller.SetIndeterminate();
                                 WebClient downloadClient = new WebClient();
 
@@ -402,7 +402,7 @@ namespace AlotAddOnGUI
             if (File.Exists(kp.Value))
             {
                 kp.Key.SetIndeterminate();
-                kp.Key.SetTitle("Extracting ALOT Addon Installer Update");
+                kp.Key.SetTitle("Extracting ALOT Installer update");
                 string path = BINARY_DIRECTORY + "7z.exe";
                 string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + System.AppDomain.CurrentDomain.BaseDirectory + "Update\"";
                 Log.Information("Extracting update...");
@@ -760,7 +760,7 @@ namespace AlotAddOnGUI
             else
             {
                 Log.Error("No trilogy games are installed. Can't build an addon. Shutting down...");
-                await this.ShowMessageAsync("None of the Mass Effect Trilogy games are installed", "ALOT Addon Builder requires at least one of the trilogy games to be installed before you can use it.");
+                await this.ShowMessageAsync("None of the Mass Effect Trilogy games are installed", "ALOT Installer requires at least one of the trilogy games to be installed before you can use it.");
                 Environment.Exit(1);
             }
         }
@@ -771,6 +771,7 @@ namespace AlotAddOnGUI
             {
                 case 1:
                     {
+                        string me1path = Utilities.GetGamePath(1, true);
                         string path = Utilities.GetGameBackupPath(1);
                         if (path != null)
                         {
@@ -779,8 +780,15 @@ namespace AlotAddOnGUI
                         }
                         else
                         {
-                            Button_ME1Backup.Content = "Backup ME1";
-                            Button_ME1Backup.ToolTip = "Click to backup game";
+                            if (Directory.Exists(me1path))
+                            {
+                                Button_ME1Backup.Content = "Backup ME1";
+                                Button_ME1Backup.ToolTip = "Click to backup game";
+                            } else
+                            {
+                                Button_ME1Backup.Content = "ME1 NOT INSTALLED";
+                                Button_ME1Backup.IsEnabled = false;
+                            }
                         }
                         Button_ME1Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(1, true);
                         return path != null;
@@ -788,6 +796,8 @@ namespace AlotAddOnGUI
                 case 2:
                     {
                         string path = Utilities.GetGameBackupPath(2);
+                        string me2path = Utilities.GetGamePath(2, true);
+
                         if (path != null)
                         {
                             Button_ME2Backup.Content = "Restore ME2";
@@ -795,14 +805,25 @@ namespace AlotAddOnGUI
                         }
                         else
                         {
-                            Button_ME2Backup.Content = "Backup ME2";
-                            Button_ME2Backup.ToolTip = "Click to backup game";
+                            if (Directory.Exists(me2path))
+                            {
+                                Button_ME2Backup.Content = "Backup ME2";
+                                Button_ME2Backup.ToolTip = "Click to backup game";
+                            }
+                            else
+                            {
+                                Button_ME2Backup.Content = "ME2 NOT INSTALLED";
+                                Button_ME2Backup.IsEnabled = false;
+                            }
+                            
                         }
                         Button_ME2Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(2, true);
                         return path != null;
                     }
                 case 3:
                     {
+                        string me3path = Utilities.GetGamePath(3, true);
+
                         string path = Utilities.GetGameBackupPath(3);
                         if (path != null)
                         {
@@ -811,8 +832,16 @@ namespace AlotAddOnGUI
                         }
                         else
                         {
-                            Button_ME3Backup.Content = "Backup ME3";
-                            Button_ME3Backup.ToolTip = "Click to backup game";
+                            if (Directory.Exists(me3path))
+                            {
+                                Button_ME3Backup.Content = "Backup ME3";
+                                Button_ME3Backup.ToolTip = "Click to backup game";
+                            }
+                            else
+                            {
+                                Button_ME3Backup.Content = "ME3 NOT INSTALLED";
+                                Button_ME3Backup.IsEnabled = false;
+                            }
                         }
                         Button_ME3Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(3, true);
 
@@ -1799,7 +1828,7 @@ namespace AlotAddOnGUI
             }
             catch (UnauthorizedAccessException)
             {
-                await this.ShowMessageAsync("Running from write-protected directory", "Your user account doesn't have write permissions to the current directory. Move ALOT Addon Builder to somewhere where yours does, like the Documents folder.");
+                await this.ShowMessageAsync("Running from write-protected directory", "Your user account doesn't have write permissions to the current directory. Move ALOT Installer to somewhere where yours does, like the Documents folder.");
                 Environment.Exit(1);
                 return false;
             }

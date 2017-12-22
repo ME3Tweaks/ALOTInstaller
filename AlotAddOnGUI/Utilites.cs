@@ -11,6 +11,8 @@ using System.Threading;
 using Serilog;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 namespace AlotAddOnGUI
 {
@@ -542,6 +544,14 @@ namespace AlotAddOnGUI
                 return null;
             }
             return Task.Run(() => { File.Move(sourceFileName, destFileName); });
+        }
+
+        public static void GrantAccess(string fullPath)
+        {
+            DirectoryInfo dInfo = new DirectoryInfo(fullPath);
+            DirectorySecurity dSecurity = dInfo.GetAccessControl();
+            dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+            dInfo.SetAccessControl(dSecurity);
         }
     }
 }

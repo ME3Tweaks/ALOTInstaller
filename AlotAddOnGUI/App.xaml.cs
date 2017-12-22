@@ -116,7 +116,7 @@ namespace AlotAddOnGUI
 
         void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            string errorMessage = string.Format("ALOT Addon GUI has encountered an uncaught error! This exception is not being handled, only logged for debugging:");
+            string errorMessage = string.Format("ALOT Installer has encountered an uncaught error! This exception is not being handled, only logged for debugging:");
             string st = FlattenException(e.Exception);
             Log.Error(errorMessage);
             Log.Error(st);
