@@ -124,6 +124,7 @@
     <Compile Include="classes\FlashWindowHelper.cs" />
     <Compile Include="classes\IniFile.cs" />
     <Compile Include="classes\IniSettingsHandler.cs" />
+    <Compile Include="classes\KnownFolders.cs" />
     <Compile Include="classes\ME3Constants.cs" />
     <Compile Include="classes\PackageFile.cs" />
     <Compile Include="classes\StreamIO.cs" />

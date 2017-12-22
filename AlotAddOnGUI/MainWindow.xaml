@@ -223,6 +223,7 @@
                 <!--<Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>-->
                 <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
+                        <Button Content="Auto Import from Downloads"  Click="Button_AutoImportFromDownloads_Click"/>
                         <Expander IsExpanded="True" HorizontalAlignment="Stretch">
                             <Expander.Header>
                                 <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="ALOT Installation Status"/>

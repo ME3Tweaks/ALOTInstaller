@@ -61,7 +61,7 @@ namespace AlotAddOnGUI
         private int completed = 0;
         //private int addonstoinstall = 0;
         private int CURRENT_GAME_BUILD = 0; //set when extraction is run/finished
-        private int ADDONSTOINSTALL_COUNT = 0;
+        private int ADDONSTOBUILD_COUNT = 0;
         private bool PreventFileRefresh = false;
         public static readonly string REGISTRY_KEY = @"SOFTWARE\ALOTAddon";
         public static readonly string ME3_BACKUP_REGISTRY_KEY = @"SOFTWARE\Mass Effect 3 Mod Manager";
@@ -523,9 +523,9 @@ namespace AlotAddOnGUI
                         var buildResult = await this.ShowMessageAsync("ALOT Addon for Mass Effect" + getGameNumberSuffix(result) + " has been built", "You can install ALOT and these files right now, or you can wait until later to install them manually via MEM.", MessageDialogStyle.AffirmativeAndNegative, mds);
                         if (buildResult == MessageDialogResult.Affirmative)
                         {
-                            InstallALOT(result);
+                            InstallALOT(result, ADDONFILES_TO_BUILD);
                         }
-                        
+
                     }
                     errorOccured = false;
                     break;
@@ -534,7 +534,6 @@ namespace AlotAddOnGUI
             {
                 af.ReadyStatusText = null;
             }
-            ADDONFILES_TO_BUILD = null;
         }
 
         private void SetInstallFlyoutState(bool open)
@@ -784,7 +783,8 @@ namespace AlotAddOnGUI
                             {
                                 Button_ME1Backup.Content = "Backup ME1";
                                 Button_ME1Backup.ToolTip = "Click to backup game";
-                            } else
+                            }
+                            else
                             {
                                 Button_ME1Backup.Content = "ME1 NOT INSTALLED";
                                 Button_ME1Backup.IsEnabled = false;
@@ -815,7 +815,7 @@ namespace AlotAddOnGUI
                                 Button_ME2Backup.Content = "ME2 NOT INSTALLED";
                                 Button_ME2Backup.IsEnabled = false;
                             }
-                            
+
                         }
                         Button_ME2Backup.ToolTip += Environment.NewLine + "Game is installed at " + Environment.NewLine + Utilities.GetGamePath(2, true);
                         return path != null;
@@ -1422,11 +1422,16 @@ namespace AlotAddOnGUI
             bool blockDueToMissingALOTFile = installedInfo == null; //default value
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
             bool blockDueToMissingALOTUpdateFile = false; //default value
-
+            bool manifestHasALOTMainFile = false;
+            bool manifestHasUpdateAvailable = false;
             foreach (AddonFile af in addonfiles)
             {
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
+                    if (af.ALOTVersion > 0)
+                    {
+                        manifestHasALOTMainFile = true;
+                    }
                     if (blockDueToMissingALOTFile)
                     {
                         if (af.ALOTVersion > 0 && af.Ready)
@@ -1444,7 +1449,7 @@ namespace AlotAddOnGUI
 
                     if (af.ALOTUpdateVersion > installedALOTUpdateVersion)
                     {
-
+                        manifestHasUpdateAvailable = true;
                         if (!af.Ready)
                         {
                             blockDueToMissingALOTUpdateFile = true;
@@ -1464,13 +1469,13 @@ namespace AlotAddOnGUI
                 }
             }
 
-            if (blockDueToMissingALOTFile)
+            if (blockDueToMissingALOTFile && manifestHasALOTMainFile)
             {
                 await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + getGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
                 return false;
             }
 
-            if (blockDueToMissingALOTUpdateFile)
+            if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable)
             {
                 if (installedInfo == null)
                 {
@@ -1579,7 +1584,7 @@ namespace AlotAddOnGUI
             return true;
         }
 
-        private async void File_Drop_BackgroundThread(object sender, System.Windows.DragEventArgs e)
+        private void File_Drop_BackgroundThread(object sender, System.Windows.DragEventArgs e)
         {
             if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
             {
@@ -1590,130 +1595,143 @@ namespace AlotAddOnGUI
                 }
                 // Note that you can have more than one file.
                 string[] files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
-                if (files.Count() > 0)
-                {
-                    //don't know how you can drop less than 1 files but whatever
-                    //This code is for failsafe in case somehow library file exists but is not detect properly, like user moved file but something is running
-                    string file = files[0];
-                    string basepath = System.AppDomain.CurrentDomain.BaseDirectory + @"Downloaded_Mods\";
 
-                    if (file.ToLower().StartsWith(basepath))
-                    {
-                        ShowStatus("Can't import files from Downloaded_Mods", 5000);
-                        return;
-                    }
-                }
-                Log.Information("Files dropped:");
-                foreach (String file in files)
-                {
-                    Log.Information(" -" + file);
-                }
-                List<Tuple<AddonFile, string, string>> filesToImport = new List<Tuple<AddonFile, string, string>>();
-                // Assuming you have one file that you care about, pass it off to whatever
-                // handling code you have defined.
-                List<string> noMatchFiles = new List<string>();
-                long totalBytes = 0;
-                List<string> acceptableUserFiles = new List<string>();
-                List<string> alreadyImportedFiles = new List<string>();
-
-                foreach (string file in files)
-                {
-                    string fname = Path.GetFileName(file);
-                    //remove (1) and such
-                    string fnameWithoutExtension = Path.GetFileNameWithoutExtension(file);
-                    if (fnameWithoutExtension.EndsWith(")"))
-                    {
-                        if (fnameWithoutExtension.LastIndexOf("(") >= fnameWithoutExtension.Length - 3)
-                        {
-                            //it's probably a copy
-                            fname = fnameWithoutExtension.Remove(fnameWithoutExtension.LastIndexOf("("), fnameWithoutExtension.LastIndexOf(")") - fnameWithoutExtension.LastIndexOf("(") + 1).Trim() + Path.GetExtension(file);
-                            Log.Information("File Drag/Drop corrected to " + fname);
-                        }
-                    }
-
-                    bool hasMatch = false;
-                    foreach (AddonFile af in addonfiles)
-                    {
-                        if (af.UserFile)
-                        {
-                            if (af.UserFilePath == file && af.Ready)
-                            {
-                                alreadyImportedFiles.Add(file);
-                                hasMatch = true;
-                                break;
-                            }
-                            continue; //don't check these
-                        }
-                        bool isUnpackedSingleFile = af.UnpackedSingleFilename != null && af.UnpackedSingleFilename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file); //make sure not folder with same name.
-
-                        if (isUnpackedSingleFile || af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file)) //make sure folder not with same name
-                        {
-                            hasMatch = true;
-                            if (af.Ready == false)
-                            {
-                                //Copy file to directory
-                                string basepath = System.AppDomain.CurrentDomain.BaseDirectory + @"Downloaded_Mods\";
-                                string destination = basepath + ((isUnpackedSingleFile) ? af.UnpackedSingleFilename : af.Filename);
-                                //Log.Information("Copying dragged file to downloaded mods directory: " + file);
-                                //File.Copy(file, destination, true);
-                                filesToImport.Add(Tuple.Create(af, file, destination));
-                                totalBytes += new System.IO.FileInfo(file).Length;
-                                //filesimported.Add(af);
-                                //timer_Tick(null, null);
-                                break;
-                            }
-                        }
-                    }
-                    if (!hasMatch)
-                    {
-                        string extension = Path.GetExtension(file);
-                        switch (extension)
-                        {
-                            case ".7z":
-                            case ".rar":
-                            case ".zip":
-                            case ".tpf":
-                            case ".mem":
-                                acceptableUserFiles.Add(file);
-                                break;
-                            default:
-                                Log.Information("Dragged file does not match any addon manifest file and is not acceptable extension: " + file);
-                                noMatchFiles.Add(file);
-                                break;
-                        }
-                    }
-                } //END LOOP
-                if (filesToImport.Count == 0 && acceptableUserFiles.Count > 0)
-                {
-                    PendingUserFiles = acceptableUserFiles;
-                    LoadUserFileSelection(PendingUserFiles[0]);
-                    UserTextures_Flyout.IsOpen = true;
-                }
-
-                string statusMessage = "";
-                statusMessage += "Already imported: " + alreadyImportedFiles.Count;
-                statusMessage += " | ";
-                statusMessage += "Not supported: " + noMatchFiles.Count;
-                if (noMatchFiles.Count > 0 || alreadyImportedFiles.Count > 0)
-                {
-                    ShowStatus(statusMessage);
-                }
-
-                //if (noMatchFiles.Count == 0 && filesToImport.Count == 0 && acceptableUserFiles.Count == 0)
-                //{
-                //    ShowStatus("All dropped files are already imported");
-                //}
-
-                if (filesToImport.Count > 0)
-                {
-                    MetroDialogSettings settings = new MetroDialogSettings();
-                    ProgressDialogController updateprogresscontroller = await this.ShowProgressAsync("Importing files", "ALOT Installer is importing files, please wait...", false, settings);
-                    updateprogresscontroller.SetIndeterminate();
-                    ImportFiles(filesToImport, new List<string>(), updateprogresscontroller, 0, totalBytes);
-                }
+                PerformImportOperation(files);
             }
         }
 
+        private async void PerformImportOperation(string[] files, bool acceptUserFiles = true)
+        {
+            if (files.Count() > 0)
+            {
+                //don't know how you can drop less than 1 files but whatever
+                //This code is for failsafe in case somehow library file exists but is not detect properly, like user moved file but something is running
+                string file = files[0];
+                string basepath = System.AppDomain.CurrentDomain.BaseDirectory + @"Downloaded_Mods\";
+
+                if (file.ToLower().StartsWith(basepath))
+                {
+                    ShowStatus("Can't import files from Downloaded_Mods", 5000);
+                    return;
+                }
+            }
+            Log.Information("Files queued for import checks:");
+            foreach (String file in files)
+            {
+                Log.Information(" -" + file);
+            }
+            List<Tuple<AddonFile, string, string>> filesToImport = new List<Tuple<AddonFile, string, string>>();
+            // Assuming you have one file that you care about, pass it off to whatever
+            // handling code you have defined.
+            List<string> noMatchFiles = new List<string>();
+            long totalBytes = 0;
+            List<string> acceptableUserFiles = new List<string>();
+            List<string> alreadyImportedFiles = new List<string>();
+
+            foreach (string file in files)
+            {
+                string fname = Path.GetFileName(file);
+                //remove (1) and such
+                string fnameWithoutExtension = Path.GetFileNameWithoutExtension(file);
+                if (fnameWithoutExtension.EndsWith(")"))
+                {
+                    if (fnameWithoutExtension.LastIndexOf("(") >= fnameWithoutExtension.Length - 3)
+                    {
+                        //it's probably a copy
+                        fname = fnameWithoutExtension.Remove(fnameWithoutExtension.LastIndexOf("("), fnameWithoutExtension.LastIndexOf(")") - fnameWithoutExtension.LastIndexOf("(") + 1).Trim() + Path.GetExtension(file);
+                        Log.Information("File Drag/Drop corrected to " + fname);
+                    }
+                }
+
+                bool hasMatch = false;
+                foreach (AddonFile af in alladdonfiles)
+                {
+                    if (af.UserFile)
+                    {
+                        if (af.UserFilePath == file && af.Ready)
+                        {
+                            alreadyImportedFiles.Add(file);
+                            hasMatch = true;
+                            break;
+                        }
+                        continue; //don't check these
+                    }
+                    if (af.ALOTVersion > 0 && af.Game_ME1)
+                    {
+                        Debug.WriteLine("B");
+                    }
+                    bool isUnpackedSingleFile = af.UnpackedSingleFilename != null && af.UnpackedSingleFilename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file); //make sure not folder with same name.
+
+                    if (isUnpackedSingleFile || af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file)) //make sure folder not with same name
+                    {
+                        hasMatch = true;
+                        if (af.Ready == false)
+                        {
+                            //Copy file to directory
+                            string basepath = System.AppDomain.CurrentDomain.BaseDirectory + @"Downloaded_Mods\";
+                            string destination = basepath + ((isUnpackedSingleFile) ? af.UnpackedSingleFilename : af.Filename);
+                            //Log.Information("Copying dragged file to downloaded mods directory: " + file);
+                            //File.Copy(file, destination, true);
+                            filesToImport.Add(Tuple.Create(af, file, destination));
+                            totalBytes += new System.IO.FileInfo(file).Length;
+                            //filesimported.Add(af);
+                            //timer_Tick(null, null);
+                            break;
+                        }
+                    }
+                }
+                if (!hasMatch)
+                {
+                    string extension = Path.GetExtension(file);
+                    switch (extension)
+                    {
+                        case ".7z":
+                        case ".rar":
+                        case ".zip":
+                        case ".tpf":
+                        case ".mem":
+                            if (acceptUserFiles)
+                            {
+                                acceptableUserFiles.Add(file);
+                            }
+                            break;
+                        default:
+                            Log.Information("Dragged file does not match any addon manifest file and is not acceptable extension: " + file);
+                            noMatchFiles.Add(file);
+                            break;
+                    }
+                }
+            } //END LOOP
+            if (filesToImport.Count == 0 && acceptableUserFiles.Count > 0)
+            {
+                PendingUserFiles = acceptableUserFiles;
+                LoadUserFileSelection(PendingUserFiles[0]);
+                UserTextures_Flyout.IsOpen = true;
+            }
+
+            string statusMessage = "";
+            statusMessage += "Already imported: " + alreadyImportedFiles.Count;
+            statusMessage += " | ";
+            statusMessage += "Not supported: " + noMatchFiles.Count;
+            if (noMatchFiles.Count > 0 || alreadyImportedFiles.Count > 0)
+            {
+                ShowStatus(statusMessage);
+            }
+
+            //if (noMatchFiles.Count == 0 && filesToImport.Count == 0 && acceptableUserFiles.Count == 0)
+            //{
+            //    ShowStatus("All dropped files are already imported");
+            //}
+
+            if (filesToImport.Count > 0)
+            {
+                MetroDialogSettings settings = new MetroDialogSettings();
+                ProgressDialogController updateprogresscontroller = await this.ShowProgressAsync("Importing files", "ALOT Installer is importing files, please wait...", false, settings);
+                updateprogresscontroller.SetIndeterminate();
+                updateprogresscontroller.SetCancelable(true);
+                ImportFiles(filesToImport, new List<string>(), updateprogresscontroller, 0, totalBytes);
+            }
+        }
 
         private async void ImportFiles(List<Tuple<AddonFile, string, string>> filesToImport, List<string> importedFiles, ProgressDialogController progressController, long processedBytes, long totalBytes)
         {
@@ -2158,6 +2176,40 @@ namespace AlotAddOnGUI
         private void Button_ManualFileME2_Click(object sender, RoutedEventArgs e)
         {
             AddUserFileAndQueue(2);
+        }
+
+        private void Button_AutoImportFromDownloads_Click(object sender, RoutedEventArgs e)
+        {
+            List<string> filelist = new List<string>();
+            string downloadsFolder = KnownFolders.GetPath(KnownFolder.Downloads);
+            List<AddonFile> addonFilesNotReady = new List<AddonFile>();
+            foreach (AddonFile af in alladdonfiles)
+            {
+                if (!af.Ready)
+                {
+                    addonFilesNotReady.Add(af);
+                }
+            }
+            if (Directory.Exists(downloadsFolder))
+            {
+                string[] files = Directory.GetFiles(downloadsFolder);
+                foreach (string file in files)
+                {
+                    string fname = Path.GetFileName(file); //we do not check duplicates with (1) etc
+                    foreach (AddonFile af in addonFilesNotReady)
+                    {
+                        if (fname == af.Filename)
+                        {
+                            filelist.Add(file);
+                            break;
+                        }
+                    }
+                }
+                if (filelist.Count > 0)
+                {
+                    PerformImportOperation(filelist.ToArray(), false);
+                }
+            }
         }
     }
 }

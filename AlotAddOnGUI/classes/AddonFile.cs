@@ -98,7 +98,7 @@ namespace AlotAddOnGUI.classes
                         }
                         else
                         {
-                            return "ALOT will be installed";
+                            return "ALOT main file imported, will be installed";
                         }
                     }
 
@@ -110,7 +110,7 @@ namespace AlotAddOnGUI.classes
                             {
                                 if (ALOTUpdateVersion > info.ALOTUPDATEVER)
                                 {
-                                    return "Update will be applied";
+                                    return "ALOT Update imported, will be applied";
                                 }
                                 else
                                 {
@@ -125,13 +125,13 @@ namespace AlotAddOnGUI.classes
                         }
                         else
                         {
-                            return "Update will be installed";
+                            return "ALOT Update imported, will be installed";
                         }
                     }
                 }
                 if (UserFile)
                 {
-                    return "User file is ready";
+                    return "User file is ready for processing";
                 }
                 else
                 {

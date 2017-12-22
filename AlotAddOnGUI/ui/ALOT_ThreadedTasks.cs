@@ -30,6 +30,7 @@ namespace AlotAddOnGUI
         static Random RANDOM = new Random();
         private int INSTALLING_THREAD_GAME;
         private List<AddonFile> ADDONFILES_TO_BUILD;
+        private List<AddonFile> ADDONFILES_TO_INSTALL;
         public const string UPDATE_TASK_PROGRESS = "UPDATE_TASK_PROGRESS";
         public const string UPDATE_OVERALL_TASK = "UPDATE_OVERALL_TASK";
         private const int INSTALL_OK = 1;
@@ -447,7 +448,7 @@ namespace AlotAddOnGUI
                         }
                     }
 
-                    Log.Information("Adding AddonFile to installation list: " + af.FriendlyName);
+                    Log.Information("Adding AddonFile to build list: " + af.FriendlyName);
                     ADDONFILES_TO_BUILD.Add(af);
                 }
             }
@@ -458,7 +459,7 @@ namespace AlotAddOnGUI
                 af.SetWorking();
             }
 
-            ADDONSTOINSTALL_COUNT = ADDONFILES_TO_BUILD.Count;
+            ADDONSTOBUILD_COUNT = ADDONFILES_TO_BUILD.Count;
             completed = 0;
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Preparing files for installation.\nDon't close the window until this operation completes."));
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting Mods..."));
@@ -846,7 +847,7 @@ namespace AlotAddOnGUI
                         break;
                     case INCREMENT_COMPLETION_EXTRACTION:
                         Interlocked.Increment(ref completed);
-                        Build_ProgressBar.Value = (completed / (double)ADDONSTOINSTALL_COUNT) * 100;
+                        Build_ProgressBar.Value = (completed / (double)ADDONSTOBUILD_COUNT) * 100;
 
                         break;
                 }
@@ -914,8 +915,9 @@ namespace AlotAddOnGUI
             e.Result = backupPath;
         }
 
-        private void InstallALOT(int game)
+        private void InstallALOT(int game, List<AddonFile> filesToInstall)
         {
+            ADDONFILES_TO_INSTALL = filesToInstall;
             WARN_USER_OF_EXIT = true;
             InstallingOverlay_TopLabel.Text = "Preparing installer";
             InstallWorker = new BackgroundWorker();
@@ -1112,7 +1114,7 @@ namespace AlotAddOnGUI
                 AddonFilesLabel.Text = "Check the logs for more detailed information.";
             }
             INSTALLING_THREAD_GAME = 0;
-            ADDONFILES_TO_BUILD = null;
+            ADDONFILES_TO_INSTALL = null;
             INSTALL_STAGE = 0;
             PreventFileRefresh = false;
             UpdateALOTStatus();
@@ -1164,8 +1166,8 @@ namespace AlotAddOnGUI
             AddonFile alotAddonFile = null;
             bool installedALOT = false;
             byte justInstalledUpdate = 0;
-            //Check if ALOT is in files that were installed
-            foreach (AddonFile af in ADDONFILES_TO_BUILD)
+            //Check if ALOT is in files that will be installed
+            foreach (AddonFile af in ADDONFILES_TO_INSTALL)
             {
                 if (af.ALOTVersion > 0)
                 {
@@ -1339,7 +1341,7 @@ namespace AlotAddOnGUI
             if (versionInfo == null)
             {
                 //Check if ALOT is in files that were installed
-                foreach (AddonFile af in ADDONFILES_TO_BUILD)
+                foreach (AddonFile af in ADDONFILES_TO_INSTALL)
                 {
                     if (af.ALOTVersion > 0)
                     {
@@ -1482,7 +1484,7 @@ namespace AlotAddOnGUI
                         break;
                     case INCREMENT_COMPLETION_EXTRACTION:
                         Interlocked.Increment(ref completed);
-                        Build_ProgressBar.Value = (completed / (double)ADDONSTOINSTALL_COUNT) * 100;
+                        Build_ProgressBar.Value = (completed / (double)ADDONSTOBUILD_COUNT) * 100;
                         break;
                 }
             }
