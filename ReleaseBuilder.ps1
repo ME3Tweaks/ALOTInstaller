@@ -4,13 +4,23 @@ if (Test-Path "$($PSScriptRoot)\Release\logs") {
     Remove-Item "$($PSScriptRoot)\Release\logs" -Force -Recurse
 }
 
-if (Test-Path "$($PSScriptRoot)\Release\lib\AlotAddonBuilder.pdb") {
+if (Test-Path "$($PSScriptRoot)\Release\lib\ALOTinstaller.pdb") {
     Write-Host Moving PDB...
-    Move-Item "$($PSScriptRoot)\Release\lib\AlotAddonBuilder.pdb"  -Destination "$($PSScriptRoot)\Release\AlotAddonBuilder.pdb" -Force
+    Move-Item "$($PSScriptRoot)\Release\lib\ALOTinstaller.pdb"  -Destination "$($PSScriptRoot)\Release\ALOTinstaller.pdb" -Force
 }
 
-$fileversion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo("Release\AlotAddonBuilder.exe").FileVersion
-$outputfile = "$($PSScriptRoot)\ALOTAddonBuilder_$($fileversion).7z"
+if (Test-Path "$($PSScriptRoot)\Release\ALOTAddonBuilder.exe") {
+    Write-Host Removing current ALOTAddonBuilder...
+    Remove-Item "$($PSScriptRoot)\Release\logs" -Force
+}
+
+if (Test-Path "$($PSScriptRoot)\..\..\update-backcompat\ALOTAddonBuilder.exe") {
+    Write-Host Adding ALOTAddonBuilder.exe for update backwards compatibility...
+    Copy-Item "$($PSScriptRoot)\..\..\update-backcompat\ALOTAddonBuilder.exe" "$($PSScriptRoot)\Release\ALOTAddonBuilder.exe" -Force
+}
+
+$fileversion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo("Release\ALOTinstaller.exe").FileVersion
+$outputfile = "$($PSScriptRoot)\ALOTinstaller_$($fileversion).7z"
 $exe = "$($PSScriptRoot)\Release\bin\7z.exe"
 $arguments = "a", "`"$($outputfile)`"", "`"$($PSScriptRoot)\Release\*`"", "-mmt6"
 Write-Host "Running: $($exe) $($arguments)"
