@@ -17,7 +17,7 @@
 		<packagefile me2="true" sourcename="ALOT_ME2_Update.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile alotversion="5" friendlyname="ALOT for ME3 - Main" tooltipname="Main file of ALOT for ME3" author="CreeperLava">
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT ME3-363-2017-5-0.7z" unpackedsinglefilename="ALOT_ME3.mem"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT for ME3-363-2017-5-0.7z" unpackedsinglefilename="ALOT_ME3.mem"/>
 		<packagefile me3="true" sourcename="00_ALOT\ALOT_ME3.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile appliestomainversion="5" alotupdateversion="3" friendlyname="ALOT for ME3 - Update 3" tooltipname="Update file for ALOT for ME3" author="CreeperLava">
