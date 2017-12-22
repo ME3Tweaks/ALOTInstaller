@@ -49,6 +49,8 @@ namespace AlotAddOnGUI
         public static ALOTVersionInfo CURRENTLY_INSTALLED_ME1_ALOT_INFO;
         public static ALOTVersionInfo CURRENTLY_INSTALLED_ME2_ALOT_INFO;
         public static ALOTVersionInfo CURRENTLY_INSTALLED_ME3_ALOT_INFO;
+        int USERFILE_INDEX = 100;
+
 
         private bool WARN_USER_OF_EXIT = false;
         private List<string> TIPS_LIST;
@@ -56,10 +58,11 @@ namespace AlotAddOnGUI
         private const string HIDE_LOD_LIMIT = "HIDE_LOD_LIMIT";
         Stopwatch stopwatch;
         private string MAINTASK_TEXT;
+        private string CURRENT_USER_BUILD_FILE = "";
 
         private bool ExtractAddon(AddonFile af)
         {
-            string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + MEM_STAGING_DIR + "\\";
+            string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + ADDON_STAGING_DIR + "\\";
 
             string fileToUse = af.Filename;
             bool isSingleFileMode = false;
@@ -76,11 +79,29 @@ namespace AlotAddOnGUI
             ulong diskSize;
             ulong totalFreeBytes;
 
+            string processingStr = "Processing " + af.FriendlyName;
+            long length = 0L;
+            if (af.UserFile)
+            {
+                length = new System.IO.FileInfo(af.UserFilePath).Length;
 
-            long length = new System.IO.FileInfo(EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse).Length;
-            string processingStr = "Processing " + af.FriendlyName + " (" + ByteSize.FromBytes(length) + ")";
+            }
+            else
+            {
+                length = new System.IO.FileInfo(EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse).Length;
+            }
+            processingStr += " (" + ByteSize.FromBytes(length) + ")";
+
             TasksDisplayEngine.SubmitTask(processingStr);
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, processingStr));
+            string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(fileToUse);
+            string extractSource = EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse;
+            if (af.UserFile)
+            {
+                extractSource = af.UserFilePath;
+                extractpath = USER_FULL_STAGING_DIRECTORY + System.IO.Path.GetFileNameWithoutExtension(fileToUse);
+                Directory.CreateDirectory(extractpath);
+            }
 
             try
             {
@@ -93,22 +114,24 @@ namespace AlotAddOnGUI
                             af.ReadyStatusText = "Extracting";
                             af.SetWorking();
                             //Extract file
-                            Log.Information(prefix + "Extracting file: " + fileToUse);
-                            string exe = BINARY_DIRECTORY + "7z.exe";
-                            string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(fileToUse);
-                            string args = "x \"" + EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse + "\" -aoa -r -o\"" + extractpath + "\"";
-                            Utilities.runProcess(exe, args);
 
+
+                            Log.Information(prefix + "Extracting file: " + extractSource);
+                            string exe = BINARY_DIRECTORY + "7z.exe";
+                            string args = "x \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
+                            Utilities.runProcess(exe, args);
+                            if (af.UserFile)
+                            {
+                                af.ReadyStatusText = "Waiting for Addon to complete build";
+                                af.SetIdle();
+                                return true;
+                            }
                             //get free space for debug purposes
                             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
                             Log.Information("[SIZE] ADDONEXTRACTFINISH Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
                             var moveableFiles = Directory.EnumerateFiles(extractpath, "*.*", SearchOption.AllDirectories) //<--- .NET 4.5
                                 .Where(file => file.ToLower().EndsWith("tpf") || file.ToLower().EndsWith("mem"))
                                 .ToList();
-                            if (af.ALOTVersion > 0)
-                            {
-                                Debug.WriteLine("BREAK");
-                            }
                             if (moveableFiles.Count() > 0)
                             {
                                 //check for copy directly items first, and move them.
@@ -161,14 +184,14 @@ namespace AlotAddOnGUI
                                         if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
                                         {
                                             Log.Information("MoveDirectly specified - moving TPF/MEM to staging: " + fname);
-                                            File.Move(moveableFile, STAGING_DIRECTORY + fname);
+                                            File.Move(moveableFile, ADDON_FULL_STAGING_DIRECTORY + fname);
                                             pf.Processed = true; //no more ops on this package file.
                                             break;
                                         }
                                         if (pf.CopyDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
                                         {
                                             Log.Information("CopyDirectly specified - copy TPF/MEM to staging: " + fname);
-                                            File.Copy(moveableFile, STAGING_DIRECTORY + fname, true);
+                                            File.Copy(moveableFile, ADDON_FULL_STAGING_DIRECTORY + fname, true);
                                             pf.Processed = true; //We will still extract this as it is a copy step.
                                             break;
                                         }
@@ -198,7 +221,7 @@ namespace AlotAddOnGUI
                                     foreach (string modfile in modfiles)
                                     {
                                         Log.Information(prefix + "Copying modfile to staging directory (ProcessAsModFile=true): " + modfile);
-                                        File.Copy(modfile, STAGING_DIRECTORY + Path.GetFileName(modfile), true);
+                                        File.Copy(modfile, ADDON_FULL_STAGING_DIRECTORY + Path.GetFileName(modfile), true);
                                     }
                                 }
                                 else
@@ -245,7 +268,7 @@ namespace AlotAddOnGUI
                                     //Log.Information("Deleting existing file (if any): " + extractpath + "\\" + Path.GetFileName(file));
                                     if (File.Exists(destination))
                                     {
-                                        Log.Information("Deleted existing file " + extractpath + "\\"+Path.GetFileName(file));
+                                        Log.Information("Deleted existing file " + extractpath + "\\" + Path.GetFileName(file));
                                         File.Delete(destination);
                                     }
                                     Log.Information(file + " -> " + destination);
@@ -262,10 +285,12 @@ namespace AlotAddOnGUI
                     case ".tpf":
                         {
                             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
-
-                            string source = EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse;
                             string destination = EXE_DIRECTORY + "Extracted_Mods\\" + Path.GetFileName(fileToUse);
-                            File.Copy(source, destination, true);
+                            if (af.UserFile)
+                            {
+                                destination = extractpath + "\\" + Path.GetFileName(fileToUse);
+                            }
+                            File.Copy(extractSource, destination, true);
                             BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                             break;
                         }
@@ -284,7 +309,18 @@ namespace AlotAddOnGUI
                             //Copy to output folder
                             if (!isSingleFileMode)
                             {
-                                File.Copy(EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + fileToUse, true);
+                                if (af.UserFile)
+                                {
+                                    //we will move this later in user build step. STage everything here
+                                    File.Copy(af.UserFilePath, extractpath + "\\" + fileToUse, true);
+                                    af.ReadyStatusText = "Waiting for Addon to complete build";
+                                    af.SetIdle();
+                                    return true;
+                                }
+                                else
+                                {
+                                    File.Copy(EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + fileToUse, true);
+                                }
                             }
                             else
                             {
@@ -336,7 +372,7 @@ namespace AlotAddOnGUI
 
         private bool ExtractAddons(int game)
         {
-            string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + MEM_STAGING_DIR + "\\";
+            string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + ADDON_STAGING_DIR + "\\";
             PREBUILT_MEM_INDEX = 9;
             SHOULD_HAVE_OUTPUT_FILE = false; //will set to true later
             Log.Information("Extracting Addons for Mass Effect " + game);
@@ -482,6 +518,10 @@ namespace AlotAddOnGUI
             int totalfiles = 0;
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
+                if (af.UserFile)
+                {
+                    continue;
+                }
                 totalfiles += af.PackageFiles.Count;
             }
 
@@ -490,15 +530,23 @@ namespace AlotAddOnGUI
             int numcompleted = 0;
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
+                if (af.UserFile)
+                {
+                    continue;
+                }
                 af.SetWorking();
             }
 
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
+                if (af.UserFile)
+                {
+                    continue;
+                }
                 if (af.PackageFiles.Count > 0)
                 {
                     af.SetWorking();
-                    af.ReadyStatusText = "Staging files for build";
+                    af.ReadyStatusText = "Staging files for ALOT Addon";
                     foreach (PackageFile pf in af.PackageFiles)
                     {
                         if ((game == 1 && pf.ME1 || game == 2 && pf.ME2 || game == 3 && pf.ME3) && !pf.Processed)
@@ -532,11 +580,15 @@ namespace AlotAddOnGUI
                 af.SetIdle();
                 af.ReadyStatusText = "Waiting for other files to finish staging";
             }
-
+            bool hasUserFiles = false;
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
-                if (af.ALOTUpdateVersion > 0 || af.ALOTVersion > 0)
+                if (af.ALOTUpdateVersion > 0 || af.ALOTVersion > 0 || af.UserFile)
                 {
+                    if (af.UserFile)
+                    {
+                        hasUserFiles = true;
+                    }
                     af.ReadyStatusText = "Waiting for Addon to complete build";
                     af.SetIdle();
                     continue;
@@ -556,7 +608,7 @@ namespace AlotAddOnGUI
             BuildWorker.ReportProgress(100);
             try
             {
-                Directory.Delete("Extracted_Mods", true);
+                //Directory.Delete("Extracted_Mods", true);
                 Log.Information("Deleted Extracted_Mods directory");
             }
             catch (IOException e)
@@ -569,17 +621,17 @@ namespace AlotAddOnGUI
 
             //BUILD MEM PACKAGE
             BuildWorker.ReportProgress(0);
-            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building Addon for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nDon't close the window until this operation completes."));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building ALOT Addon for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nDon't close the window until this operation completes."));
 
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Building Addon MEM Package..."));
-            int buildresult = -2;
+            int mainBuildResult = -2;
             {
                 Log.Information("Building MEM Package.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                 string filename = "002_ALOT_ME" + game + "_Addon.mem";
-                string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + MEM_STAGING_DIR + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
+                string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + ADDON_STAGING_DIR + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
 
-                runMEM_Backup(exe, args, BuildWorker);
+                runMEM_BackupAndBuild(exe, args, BuildWorker);
                 while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
                 {
                     Thread.Sleep(250);
@@ -587,50 +639,159 @@ namespace AlotAddOnGUI
 
                 foreach (AddonFile af in ADDONFILES_TO_BUILD)
                 {
-                    af.ReadyStatusText = null;
-                    af.SetIdle();
+                    if (!af.UserFile)
+                    {
+                        af.ReadyStatusText = "Built into ALOT Addon file";
+                        af.SetIdle();
+                    }
+                    else
+                    {
+                        af.SetWorking();
+                        af.ReadyStatusText = "Queued for user file build";
+                    }
                 }
 
                 Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
                 Log.Information("[SIZE] POST_MEM_BUILD Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
 
-                buildresult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+                mainBuildResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
                 BACKGROUND_MEM_PROCESS = null;
                 BACKGROUND_MEM_PROCESS_ERRORS = null;
-                if (buildresult != 1)
-                {
-                    BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up staging directories"));
-                }
-
-                if (buildresult != 0)
+                BACKGROUND_MEM_PROCESS_PARSED_ERRORS = null;
+                if (mainBuildResult != 0)
                 {
                     Log.Error("Non-Zero return code! Something probably went wrong.");
                 }
-                if (buildresult == 0 && !File.Exists(getOutputDir(game) + filename) && SHOULD_HAVE_OUTPUT_FILE)
+                if (mainBuildResult == 0 && !File.Exists(getOutputDir(game) + filename) && SHOULD_HAVE_OUTPUT_FILE)
                 {
 
                     Log.Error("Process went OK but no outputfile... Something probably went wrong.");
-                    buildresult = -1;
+                    mainBuildResult = -1;
                 }
             }
             //cleanup staging
-            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up staging directory"));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up addon staging directory"));
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
             BuildWorker.ReportProgress(100);
             try
             {
-                Directory.Delete(MEM_STAGING_DIR, true);
-                Log.Information("Deleted " + MEM_STAGING_DIR);
+                Utilities.DeleteFilesAndFoldersRecursively(ADDON_STAGING_DIR);
+                Log.Information("Deleted " + ADDON_STAGING_DIR);
             }
             catch (IOException e)
             {
                 Log.Error("Unable to delete staging directory. Addon should have been built however.\n" + e.ToString());
             }
+
+            //build each user file
+            int userBuildResult = 0;
+            USERFILE_INDEX = 100;
+            bool hadUserErrors = false;
+            string userBuildErrors = "The following user supplied files did not compile into usable MEM packages:";
+            //BUILD USER FILES
+            foreach (AddonFile af in ADDONFILES_TO_BUILD)
+            {
+                if (!af.UserFile)
+                {
+                    continue;
+                }
+                string userFileExtractedPath = USER_FULL_STAGING_DIRECTORY + System.IO.Path.GetFileNameWithoutExtension(af.UserFilePath);
+                if (!Directory.Exists(userFileExtractedPath))
+                {
+                    continue;
+                }
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+                BuildWorker.ReportProgress(0);
+
+                var mems = Directory.GetFiles(userFileExtractedPath, "*.mem", SearchOption.AllDirectories);
+                bool hasMems = mems.Count() > 0;
+                foreach (string mem in mems)
+                {
+                    string memdest = getOutputDir(game) + USERFILE_INDEX.ToString("000") + "_UserAddon_" + Path.GetFileNameWithoutExtension(af.UserFilePath) + ".mem";
+                    File.Move(mem, memdest);
+                    USERFILE_INDEX++;
+                }
+
+                if (hasMems)
+                {
+                    //check if any files remain
+                    var remainingFiles = Directory.GetFiles(userFileExtractedPath, "*", SearchOption.AllDirectories);
+                    if (remainingFiles.Count() == 0)
+                    {
+                        af.SetIdle();
+                        af.ReadyStatusText = "User file is ready for install";
+                        continue;
+                    }
+                }
+
+
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building User Addons for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nDon't close the window until this operation completes."));
+                af.ReadyStatusText = "Building user MEM file from mod files";
+                Log.Information("Building User MEM file from staging directory: " + userFileExtractedPath);
+                string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
+                string filename = USERFILE_INDEX.ToString("000") + "_UserAddon_" + Path.GetFileNameWithoutExtension(af.UserFilePath) + ".mem";
+                string args = "-convert-to-mem " + game + " \"" + userFileExtractedPath + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
+                CURRENT_USER_BUILD_FILE = af.FriendlyName;
+                runMEM_BackupAndBuild(exe, args, BuildWorker);
+                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+                {
+                    Thread.Sleep(250);
+                }
+
+                userBuildResult |= BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
+
+                if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count() == 0)
+                {
+                    af.SetIdle();
+                    af.ReadyStatusText = "User file is ready for install";
+                }
+                else
+                {
+                    hadUserErrors = true;
+                    af.SetError();
+                    af.ReadyStatusText = "Error building MEM file";
+                    foreach (string str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                    {
+                        userBuildErrors += "\n - " + str;
+                    }
+                }
+                if (BACKGROUND_MEM_PROCESS.ExitCode != 0)
+                {
+                    Log.Error("Non-Zero return code for user file! Something probably went wrong.");
+                }
+                if (BACKGROUND_MEM_PROCESS.ExitCode == 0 && !File.Exists(getOutputDir(game) + filename) && SHOULD_HAVE_OUTPUT_FILE)
+                {
+                    Log.Error("Process went OK but no outputfile... Something probably went wrong with userfile.");
+                }
+
+                USERFILE_INDEX++;
+                BACKGROUND_MEM_PROCESS = null;
+                BACKGROUND_MEM_PROCESS_ERRORS = null;
+                CURRENT_USER_BUILD_FILE = null;
+            }
+            //cleanup staging
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up user files staging directory"));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+            BuildWorker.ReportProgress(100);
+            try
+            {
+                Utilities.DeleteFilesAndFoldersRecursively(USER_FULL_STAGING_DIRECTORY);
+                Log.Information("Deleted " + USER_FULL_STAGING_DIRECTORY);
+            }
+            catch (IOException e)
+            {
+                Log.Error("Unable to delete user staging directory. User addon's have (attempted) build however.\n" + e.ToString());
+            }
+            if (hadUserErrors)
+            {
+                BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Some user files did not successfully build", userBuildErrors)));
+            }
+
             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
             Log.Information("[SIZE] FINAL Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
             CURRENT_GAME_BUILD = 0; //reset
-            return buildresult == 0;
+            return mainBuildResult == 0 && !hadUserErrors;
         }
 
         private async void BackupWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -704,7 +865,7 @@ namespace AlotAddOnGUI
             acceptedIPC.Add("ERROR");
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Verifying game data..."));
 
-            runMEM_Backup(exe, args, BackupWorker, acceptedIPC);
+            runMEM_BackupAndBuild(exe, args, BackupWorker, acceptedIPC);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {
                 Thread.Sleep(250);
@@ -1283,6 +1444,49 @@ namespace AlotAddOnGUI
             e.Result = INSTALL_OK;
         }
 
+        private async void BuildWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            if (e.UserState is null)
+            {
+                Build_ProgressBar.Value = e.ProgressPercentage;
+                TaskbarManager.Instance.SetProgressValue(e.ProgressPercentage, 100);
+            }
+            else
+            {
+                ThreadCommand tc = (ThreadCommand)e.UserState;
+                switch (tc.Command)
+                {
+                    case UPDATE_OPERATION_LABEL:
+                        AddonFilesLabel.Text = (string)tc.Data;
+                        break;
+                    case UPDATE_HEADER_LABEL:
+                        HeaderLabel.Text = (string)tc.Data;
+                        break;
+                    case UPDATE_PROGRESSBAR_INDETERMINATE:
+                        Build_ProgressBar.IsIndeterminate = (bool)tc.Data;
+                        break;
+                    case ERROR_OCCURED:
+
+                        Build_ProgressBar.IsIndeterminate = false;
+                        Build_ProgressBar.Value = 0;
+                        if (!ERROR_SHOWING)
+                        {
+                            ERROR_SHOWING = true;
+                            await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
+                            ERROR_SHOWING = false;
+                        }
+                        break;
+                    case SHOW_DIALOG:
+                        KeyValuePair<string, string> messageStr = (KeyValuePair<string, string>)tc.Data;
+                        await this.ShowMessageAsync(messageStr.Key, messageStr.Value);
+                        break;
+                    case INCREMENT_COMPLETION_EXTRACTION:
+                        Interlocked.Increment(ref completed);
+                        Build_ProgressBar.Value = (completed / (double)ADDONSTOINSTALL_COUNT) * 100;
+                        break;
+                }
+            }
+        }
 
         private async void InstallWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
@@ -1324,7 +1528,7 @@ namespace AlotAddOnGUI
                     {
                         int progressval = ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, CurrentTaskPercent);
                         InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
-                        InstallingOverlay_OverallLabel.Text = "(" + progressval.ToString() +"%)";
+                        InstallingOverlay_OverallLabel.Text = "(" + progressval.ToString() + "%)";
                         TaskbarManager.Instance.SetProgressValue(progressval, 100);
                     }
                     break;
@@ -1370,13 +1574,13 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void runMEM_Backup(string exe, string args, BackgroundWorker worker, List<string> acceptedIPC = null)
+        private void runMEM_BackupAndBuild(string exe, string args, BackgroundWorker worker, List<string> acceptedIPC = null)
         {
             Debug.WriteLine("Running process: " + exe + " " + args);
             Log.Information("Running process: " + exe + " " + args);
             BACKGROUND_MEM_PROCESS = new ConsoleApp(exe, args);
             BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
-
+            BACKGROUND_MEM_PROCESS_PARSED_ERRORS = new List<string>();
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
@@ -1384,7 +1588,10 @@ namespace AlotAddOnGUI
                 {
                     string command = str.Substring(5);
                     int endOfCommand = command.IndexOf(' ');
-                    command = command.Substring(0, endOfCommand);
+                    if (endOfCommand >= 0)
+                    {
+                        command = command.Substring(0, endOfCommand);
+                    }
                     if (acceptedIPC == null || acceptedIPC.Contains(command))
                     {
                         string param = str.Substring(endOfCommand + 5).Trim();
@@ -1401,6 +1608,10 @@ namespace AlotAddOnGUI
                             case "ERROR":
                                 Log.Information("[ERROR] Realtime Process Output: " + param);
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
+                                break;
+                            case "ERROR_NO_BUILDABLE_FILES":
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(CURRENT_USER_BUILD_FILE + " has no files that can be used for building");
+                                Log.Error("User buildable file has no files that can be converted to MEM format.");
                                 break;
                             default:
                                 Log.Information("Unknown IPC command: " + command);

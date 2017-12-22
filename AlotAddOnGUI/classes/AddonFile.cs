@@ -129,7 +129,14 @@ namespace AlotAddOnGUI.classes
                         }
                     }
                 }
-                return "Addon file is ready to install";
+                if (UserFile)
+                {
+                    return "User file is ready";
+                }
+                else
+                {
+                    return "Addon file is imported";
+                }
             }
             set
             {
@@ -161,6 +168,9 @@ namespace AlotAddOnGUI.classes
                 OnPropertyChanged("Ready");
             }
         }
+
+        public bool UserFile { get; internal set; }
+        public string UserFilePath { get; internal set; }
 
         private void OnPropertyChanged(string propertyName)
         {

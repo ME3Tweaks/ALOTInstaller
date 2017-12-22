@@ -203,6 +203,9 @@
     <Resource Include="images\redx_large.png" />
     <Resource Include="images\workingicon.png" />
     <Resource Include="images\firstrunbg.jpg" />
+    <Resource Include="images\logo_me1.png" />
+    <Resource Include="images\logo_me2.png" />
+    <Resource Include="images\logo_me3.png" />
     <Content Include="memodder\MassEffectModder.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

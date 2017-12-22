@@ -287,7 +287,7 @@ namespace AlotAddOnGUI
                 File.SetAttributes(file, FileAttributes.Normal); //remove read only
                 try
                 {
-                    Debug.WriteLine("Deleting file: " + file);
+                    //Debug.WriteLine("Deleting file: " + file);
                     File.Delete(file);
                 }
                 catch (Exception e)
@@ -305,7 +305,7 @@ namespace AlotAddOnGUI
             Thread.Sleep(4); // This makes the difference between whether it works or not. Sleep(0) is not enough.
             try
             {
-                Debug.WriteLine("Deleting directory: " + target_dir);
+                //Debug.WriteLine("Deleting directory: " + target_dir);
 
                 Directory.Delete(target_dir);
             }

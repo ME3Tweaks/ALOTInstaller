@@ -13,6 +13,8 @@
         WindowButtonCommandsOverlayBehavior="Never"  
         Closing="Window_Closing"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Icon="ALOTInstallerIcon.ico"
+        ShowIconOnTitleBar="False"
         Drop="File_Drop_BackgroundThread" AllowDrop="true">
     <Window.Resources>
         <ContextMenu x:Key="ListItemContextMenu">
@@ -85,10 +87,10 @@
                         <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding FriendlyName}" FontWeight="Bold" VerticalAlignment="Center" />
                         <StackPanel FlowDirection="RightToLeft"  Grid.Row="0" Grid.Column="3"  Orientation="Horizontal">
 
-                            <Border x:Name="GameIcon_ME3" ToolTip="This file applies to Mass Effect 3" Padding="1" BorderThickness="1" BorderBrush="Chartreuse" Background="CadetBlue" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ME3" ToolTip="This file applies to Mass Effect 3" Padding="1" BorderThickness="1" BorderBrush="Chartreuse" Background="#0f4e60" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME3_Text" FontSize="10"  Text="ME3" VerticalAlignment="Center"/>
                             </Border>
-                            <Border x:Name="GameIcon_ME2" ToolTip="This file applies to Mass Effect 2" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="Red" Background="DarkMagenta" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ME2" ToolTip="This file applies to Mass Effect 2" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME2_Text" FontSize="10"  Text="ME2" VerticalAlignment="Center"/>
                             </Border>
                             <Border x:Name="GameIcon_ME1" ToolTip="This file applies to Mass Effect" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="AliceBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
@@ -401,9 +403,20 @@
                     </StackPanel>
                 </Border>
             </Controls:Flyout>
-            <Controls:Flyout x:Name="UserTextures_Flyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
-                <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" UseLayoutRounding="True" Margin="35,20,0,0">
-                    <TextBlock x:Name="UserTextures_Title" Text="Select which game this file applies to" FontSize="30" FontWeight="Light" HorizontalAlignment="Center"></TextBlock>
+            <Controls:Flyout x:Name="UserTextures_Flyout" IsOpenChanged="UserTextures_Flyout_IsOpenChanged" IsPinned="False" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
+                <StackPanel VerticalAlignment="Top"  HorizontalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
+                    <TextBlock x:Name="UserTextures_Title" Text="Select which game this file applies to" FontSize="20" FontWeight="Light" HorizontalAlignment="Center"></TextBlock>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button x:Name="Button_ManualFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME1_Click">
+                            <Image Source="images/logo_me1.png" Height="40" Margin="10"></Image>
+                        </Button>
+                        <Button x:Name="Button_ManualFileME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME2_Click">
+                            <Image Source="images/logo_me2.png" Height="40" Margin="10"></Image>
+                        </Button>
+                        <Button x:Name="Button_ManualFileME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME3_Click">
+                            <Image Source="images/logo_me3.png" Height="40" Margin="10"></Image>
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
             </Controls:Flyout>
         </Controls:FlyoutsControl>
