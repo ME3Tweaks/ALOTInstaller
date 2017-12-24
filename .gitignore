@@ -244,3 +244,4 @@ ModelManifest.xml
 /AlotAddOnGUI/BuildCache/Downloaded_Mods
 /TempCache/Downloaded_Mods
 /AlotAddOnGUI/aloticon.png
+/AlotAddOnGUI/bin/x64/ReleaseBuilder.ps1

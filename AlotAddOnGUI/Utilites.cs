@@ -13,13 +13,17 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Xml;
+using System.Windows;
 
 namespace AlotAddOnGUI
 {
     public class Utilities
     {
         public const uint MEMI_TAG = 0x494D454D;
-
+        [DllImport("kernel32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool GetPhysicallyInstalledSystemMemory(out long TotalMemoryInKilobytes);
         public static string GetOperatingSystemInfo()
         {
             StringBuilder sb = new StringBuilder();
@@ -426,7 +430,8 @@ namespace AlotAddOnGUI
                             int MEUITMVER = fs.ReadInt32();
 
                             return new ALOTVersionInfo(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER);
-                        } else
+                        }
+                        else
                         {
                             return new ALOTVersionInfo(0, 0, 0, 0); //MEMI tag but no info we know of
                         }
@@ -552,6 +557,104 @@ namespace AlotAddOnGUI
             DirectorySecurity dSecurity = dInfo.GetAccessControl();
             dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
             dInfo.SetAccessControl(dSecurity);
+        }
+
+        public static void TurnOffOriginAutoUpdateForGame(int game)
+        {
+            string gamePath = GetGamePath(game);
+            if (gamePath != null && Directory.Exists(gamePath))
+            {
+                gamePath += @"\__Installer\installerdata.xml";
+                if (File.Exists(gamePath))
+                {
+                    //Origin installer file
+                    string newValue = string.Empty;
+                    XmlDocument xmlDoc = new XmlDocument();
+
+                    xmlDoc.Load(gamePath);
+
+                    XmlNode node = xmlDoc.SelectSingleNode("game/metadata/featureFlags");
+                    if (node != null)
+                    {
+                        //set settings same as me3
+                        XmlAttribute attr = xmlDoc.CreateAttribute("autoUpdateEnabled");
+                        attr.Value = 0.ToString();
+                        SetAttrSafe(node, attr);
+
+                        attr = xmlDoc.CreateAttribute("useGameVersionFromManifestEnabled");
+                        attr.Value = 1.ToString();
+                        SetAttrSafe(node, attr);
+
+                        attr = xmlDoc.CreateAttribute("treatUpdatesAsMandatory");
+                        attr.Value = 0.ToString();
+                        SetAttrSafe(node, attr);
+
+                        attr = xmlDoc.CreateAttribute("forceTouchupInstallerAfterUpdate");
+                        attr.Value = 0.ToString();
+                        SetAttrSafe(node, attr);
+
+                        attr = xmlDoc.CreateAttribute("useGameVersionFromManifestEnabled");
+                        attr.Value = 1.ToString();
+                        SetAttrSafe(node, attr);
+
+                        attr = xmlDoc.CreateAttribute("enableDifferentialUpdate");
+                        attr.Value = 1.ToString();
+                        SetAttrSafe(node, attr);
+
+                        xmlDoc.Save(gamePath);
+                    }
+                }
+            }
+        }
+
+        private static void SetAttrSafe(XmlNode node, params XmlAttribute[] attrList)
+        {
+            foreach (var attr in attrList)
+            {
+                if (node.Attributes[attr.Name] != null)
+                {
+                    node.Attributes[attr.Name].Value = attr.Value;
+                }
+                else
+                {
+                    node.Attributes.Append(attr);
+                }
+            }
+        }
+
+        public static long GetInstalledRamAmount()
+        {
+            long memKb;
+            GetPhysicallyInstalledSystemMemory(out memKb);
+            return memKb;
+        }
+
+        public static bool isRunningOnAMD()
+        {
+            var processorIdentifier = System.Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER");
+            return processorIdentifier != null && processorIdentifier.Contains("AuthenticAMD");
+        }
+
+        public static void OpenAndSelectFileInExplorer(string filePath)
+        {
+            // suppose that we have a test.txt at E:\
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
+            // combine the arguments together
+            // it doesn't matter if there is a space after ','
+            string argument = "/select, \"" + filePath + "\"";
+
+            System.Diagnostics.Process.Start("explorer.exe", argument);
+        }
+
+        public static bool IsWindowOpen<T>(string name = "") where T : Window
+        {
+            return string.IsNullOrEmpty(name)
+               ? Application.Current.Windows.OfType<T>().Any()
+               : Application.Current.Windows.OfType<T>().Any(w => w.Name.Equals(name));
         }
     }
 }

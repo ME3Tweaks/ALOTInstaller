@@ -41,7 +41,8 @@ namespace AlotAddOnGUI
                         {
                             updateDestinationPath = parsedItems.Value.UpdateDest;
                             loggingBasePath = updateDestinationPath;
-                        } else
+                        }
+                        else
                         {
                             preLogMessages += "Directory doesn't exist for update: " + parsedItems.Value.UpdateDest;
                         }
@@ -121,7 +122,7 @@ namespace AlotAddOnGUI
             Log.Error(errorMessage);
             Log.Error(st);
             Log.Information("Forcing beta mode off");
-            Utilities.WriteRegistryKey(Registry.CurrentUser, AlotAddOnGUI.MainWindow.REGISTRY_KEY, AlotAddOnGUI.MainWindow.SETTINGSTR_BETAMODE , 0);
+            Utilities.WriteRegistryKey(Registry.CurrentUser, AlotAddOnGUI.MainWindow.REGISTRY_KEY, AlotAddOnGUI.MainWindow.SETTINGSTR_BETAMODE, 0);
             //MetroDial.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             //e.Handled = true;
         }
@@ -143,8 +144,13 @@ namespace AlotAddOnGUI
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            Utilities.runProcess("cmd.exe", "/c taskkill /F /IM MassEffectModderNoGui.exe /T", true);
-            Utilities.runProcess("cmd.exe", "/c taskkill /F /IM 7z.exe /T", true);
+            var exists = System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1;
+            if (!exists)
+            {
+                Log.Information("Only instance running, killing other apps...");
+                Utilities.runProcess("cmd.exe", "/c taskkill /F /IM MassEffectModderNoGui.exe /T", true);
+                Utilities.runProcess("cmd.exe", "/c taskkill /F /IM 7z.exe /T", true);
+            }
             Log.Information("Closing application via AppClosing()");
         }
     }

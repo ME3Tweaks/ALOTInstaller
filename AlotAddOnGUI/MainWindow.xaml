@@ -17,10 +17,11 @@
         ShowIconOnTitleBar="False"
         Drop="File_Drop_BackgroundThread" AllowDrop="true">
     <Window.Resources>
-        <ContextMenu x:Key="ListItemContextMenu">
-            <MenuItem x:Name="ContextMenu_Site" Header="Go to download site" />
-            <MenuItem x:Name="ContextMenu_EnableDisable" Header="File is enabled" IsChecked="True" />
-        </ContextMenu>
+        <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
+            <Style.Resources>
+                <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource IdealForegroundColor}" />
+            </Style.Resources>
+        </Style>
         <Style x:Key="LinkLabel" TargetType="Button">
             <Setter Property="VerticalAlignment" Value="Top"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -66,11 +67,11 @@
         </Label>
         <ProgressBar Minimum="0" Maximum="100" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true"/>
 
-        <ListView Grid.Column="0" Grid.Row="3" Name="lvUsers" ContextMenuOpening="ContextMenu_ContextMenuOpening" BorderThickness="0">
+        <ListView Grid.Column="0" Grid.Row="3" Name="lvUsers" BorderThickness="0">
             <!-- This is what each list item looks like-->
             <ListView.ItemTemplate >
                 <DataTemplate>
-                    <Grid x:Name="ListItemElement" Background="Transparent" ContextMenu="{StaticResource ListItemContextMenu}">
+                    <Grid x:Name="ListItemElement" Background="Transparent">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20" />
                             <RowDefinition Height="25" />
@@ -96,7 +97,7 @@
                             <Border x:Name="GameIcon_ME1" ToolTip="This file applies to Mass Effect" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="AliceBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME1_Text" FontSize="10"  Text="ME1" VerticalAlignment="Center"/>
                             </Border>
-                            <Border x:Name="GameIcon_ALOT" Visibility="Hidden" ToolTip="This is a main ALOT file" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="DarkOrchid" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ALOT" Visibility="Hidden" ToolTip="This file is required on first install" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#991244" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ALOT_Text" FontSize="10"  Text="Required" VerticalAlignment="Center"/>
                             </Border>
                         </StackPanel>
@@ -113,7 +114,7 @@
 
                                         </Style>
                                     </Hyperlink.Style>
-                                    Download Link
+                                    Download
                                 </Hyperlink>
                             </TextBlock>
                             <TextBlock x:Name="ReadyStatusText" Visibility="Collapsed" Padding="5,0" Text="{Binding ReadyStatusText}" VerticalAlignment="Bottom"/>
@@ -195,10 +196,11 @@
         <!--Bottom Buttons-->
         <Grid Grid.Row="4" Grid.Column="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.30*" />
-                <ColumnDefinition Width="0.30*" />
-                <ColumnDefinition Width="0.30*" />
-                <ColumnDefinition Width="0.1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -206,27 +208,23 @@
             <Button x:Name="Button_InstallME1" Grid.Column="0" Content="Please Wait" IsEnabled="false" Click="Button_InstallME1_Click" FontWeight="Bold" Style="{StaticResource AccentedSquareButtonStyle}" FontSize="11" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
             <Button x:Name="Button_InstallME2" Grid.Column="1" Content="Please Wait" IsEnabled="false" Click="Button_InstallME2_Click" FontWeight="Bold" Style="{StaticResource AccentedSquareButtonStyle}" FontSize="11" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
             <Button x:Name="Button_InstallME3" Grid.Column="2" Content="Please Wait" IsEnabled="false" Click="Button_InstallME3_Click" FontWeight="Bold" Style="{StaticResource AccentedSquareButtonStyle}" FontSize="11" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-            <Button x:Name="Button_Settings" Grid.Column="3" Content="Settings" IsEnabled="false" FontWeight="Bold" Style="{StaticResource SquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" FontSize="10" Click="Button_Settings_Click"/>
+            <Button x:Name="Button_DownloadAssistant" Content="Download Assistant" IsEnabled="false" FontSize="10" Grid.Column="3" ToolTip="Opens floating window that makes it easier to download Addon files" Click="Button_OpenAddonAssistantWindow_Click" Style="{StaticResource SquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+            <Button x:Name="Button_Settings" Grid.Column="4" Content="Settings" IsEnabled="false" FontWeight="Bold" Style="{StaticResource SquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" FontSize="10" Click="Button_Settings_Click" ToolTip="Opens the settings and status panel"/>
 
         </Grid>
     </Grid>
     <Controls:MetroWindow.Flyouts>
         <Controls:FlyoutsControl>
             <Controls:Flyout x:Name="SettingsFlyout" Header="Settings" IsPinned="False" Theme="Accent" Position="Right">
-                <Controls:Flyout.Resources>
-                    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
-                        <Style.Resources>
-                            <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource IdealForegroundColor}" />
-                        </Style.Resources>
-                    </Style>
-                </Controls:Flyout.Resources>
+
                 <!--<Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>-->
-                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
                     <StackPanel>
-                        <Button Content="Auto Import from Downloads"  Click="Button_AutoImportFromDownloads_Click"/>
-                        <Expander IsExpanded="True" HorizontalAlignment="Stretch">
+                        <Button Content="Auto Import from Downloads" Visibility="Collapsed" ToolTip="Scans your account's Downloads folder and will import any matching Addon files" Click="Button_AutoImportFromDownloads_Click" Style="{StaticResource AccentedSquareButtonStyle}" Margin="5" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+
+                        <Expander IsExpanded="True" HorizontalAlignment="Stretch" Expanded="Expander_Expanded">
                             <Expander.Header>
-                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="ALOT Installation Status"/>
+                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="ALOT Installation Status"/>
                             </Expander.Header>
                             <StackPanel HorizontalAlignment="Left">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
@@ -242,9 +240,9 @@
 
                             </StackPanel>
                         </Expander>
-                        <Expander IsExpanded="True">
+                        <Expander IsExpanded="True" Expanded="Expander_Expanded">
                             <Expander.Header>
-                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="Filtering"/>
+                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Filtering"/>
                             </Expander.Header>
                             <StackPanel>
                                 <Controls:ToggleSwitch x:Name="Switch_ME1Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect files" OnLabel="Show Mass Effect files" IsChecked="{Binding ShowME1Files}"/>
@@ -252,9 +250,9 @@
                                 <Controls:ToggleSwitch x:Name="Switch_ME3Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 3 files" OnLabel="Show Mass Effect 3 files" IsChecked="{Binding ShowME3Files}"/>
                             </StackPanel>
                         </Expander>
-                        <Expander IsExpanded="True">
+                        <Expander IsExpanded="True" Expanded="Expander_Expanded">
                             <Expander.Header>
-                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="Backup &amp; Restore"/>
+                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Backup &amp; Restore"/>
                             </Expander.Header>
                             <StackPanel>
                                 <Button x:Name="Button_ME1Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME1: Not Backed Up" Click="Button_ME1Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
@@ -262,30 +260,38 @@
                                 <Button x:Name="Button_ME3Backup" Margin="20,0,20,0" FontSize="12" Padding="0,3,0,3" Content="ME3: Not Backed Up" Click="Button_ME3Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                             </StackPanel>
                         </Expander>
-                        <Expander IsExpanded="False">
+                        <Expander IsExpanded="True" Expanded="Expander_Expanded">
                             <Expander.Header>
-                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,5" Content="Diagnostics &amp; MEM"/>
+                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Diagnostics &amp; MEM"/>
                             </Expander.Header>
                             <StackPanel>
 
                                 <Button x:Name="Button_ViewLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="View log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 <Button x:Name="Button_ReportIssue" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Report an issue" ToolTip="Go to the ALOT discord" Click="Button_ReportIssue_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                <Button x:Name="Button_ZipLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Zip log for uploading" ToolTip="Zips up log for uploading" Click="Button_ZipLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 <Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" FontWeight="Bold" x:Name="Button_MEM_GUI" Content="Launch MEM GUI" Click="Button_MEMVersion_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal"/>
                                 <Label HorizontalAlignment="Center" Margin="20,0,20,3" Padding="0,3,0,3" FontWeight="Bold" x:Name="Label_MEMVersion" Content="MEM (NoGUI) Version: TBD" FontSize="12"/>
                             </StackPanel>
                         </Expander>
-                        <Expander IsExpanded="False">
+                        <Expander IsExpanded="False" Expanded="Expander_Expanded">
                             <Expander.Header>
-                                <Label FontSize="16" Margin="5,0,0,0" Content="Credits" Padding="0,0,0,5"/>
+                                <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Misc. Settings" Padding="0,0,0,0"/>
                             </Expander.Header>
                             <StackPanel>
-                                <Label Margin="20,0,0,0" Padding="0,0,0,2" Content="Brought to you by"/>
-                                <Label Margin="20,0,0,0" Padding="10,0,0,2" Content="Aquadran" ToolTip="Developed MEM. One who made this all possible."/>
-                                <Label Margin="20,0,0,0" Padding="10,0,0,2" Content="CreeperLava" ToolTip="Developed ALOT. Glued all the pieces together."/>
-                                <Label Margin="20,0,0,0" Padding="10,0,0,2" Content="Mgamerz" ToolTip="Complained a bunch and then made a suave UI."/>
-                                <Button Click="ShowFirstTime" Content="Show First Time Dialog" Style="{StaticResource AccentedSquareButtonStyle}"/>
-                                <CheckBox Margin="5" Visibility="Collapsed" x:Name="Checkbox_MoveFilesAsImport" Content="Import via Move instead of Copy" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied." />
+                                <Button Click="ShowFirstTime" Controls:ControlsHelper.ContentCharacterCasing="Upper" Content="Show First Time Dialog" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                <CheckBox Margin="5" x:Name="Checkbox_MoveFilesAsImport" Content="Import via move (not copy)" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied." />
                                 <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
+                            </StackPanel>
+                        </Expander>
+                        <Expander IsExpanded="False" Expanded="Expander_Expanded">
+                            <Expander.Header>
+                                <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Credits" Padding="0,0,0,0"/>
+                            </Expander.Header>
+                            <StackPanel>
+                                <TextBlock Margin="20,0,0,0" Padding="0,0,0,2" Text="Brought to you by" HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Aquadran" ToolTip="Developed MEM. One who made this all possible." HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="CreeperLava" ToolTip="Developed ALOT. Glued all the pieces together." HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mgamerz" ToolTip="Complained a bunch and then made a suave UI." HorizontalAlignment="Left"/>
                             </StackPanel>
                         </Expander>
                     </StackPanel>
@@ -293,6 +299,27 @@
             </Controls:Flyout>
             <Controls:Flyout x:Name="StatusFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
                 <TextBlock x:Name="StatusLabel" FontSize="14" Text="This is the statusbar. You should not see this text." Padding="5"></TextBlock>
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="WhatToBuildFlyout" TitleVisibility="Hidden" IsPinned="true" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
+                <StackPanel Margin="10">
+                    <TextBlock x:Name="Label_WhatToBuildAndInstall" Text="Choose what to build and install for Mass Effect." TextAlignment="Center" FontSize="16" Padding="5"></TextBlock>
+                    <TextBlock Text="To add user files, drop an archive containing TPF, MEM, or DDS files onto the interface and choose the game they apply to. You can also drop TPF and MEM files directly." TextWrapping="Wrap" MaxWidth="500" TextAlignment="Center" FontSize="12" Padding="5"></TextBlock>
+
+
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                        <CheckBox x:Name="Checkbox_BuildOptionALOT" Content="ALOT" Margin="5" IsChecked="True" IsEnabled="False"></CheckBox>
+                        <CheckBox x:Name="Checkbox_BuildOptionAddon" Content="Addon" Margin="5" IsChecked="True"></CheckBox>
+                        <CheckBox x:Name="Checkbox_BuildOptionUser" Content="User Files" Margin="5"></CheckBox>
+
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+
+                        <Button Content="Build &amp; Install" HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Click="Button_BuildAndInstall_Click"/>
+                        <Button Content="Cancel Install" Margin="5,0,0,0" HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Click="Button_BuildAndInstallCancel_Click"/>
+
+                    </StackPanel>
+                </StackPanel>
             </Controls:Flyout>
             <Controls:Flyout x:Name="InstallingOverlayFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
                 <Border x:Name="InstallingOverlayFlyout_Border" Padding="10" Background="#77000000" >

@@ -1,4 +1,5 @@
 ﻿using AlotAddOnGUI.classes;
+using AlotAddOnGUI.ui;
 using ByteSizeLib;
 using MahApps.Metro;
 using MahApps.Metro.Controls;
@@ -14,6 +15,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -40,9 +42,8 @@ namespace AlotAddOnGUI
     /// </summary>
     public partial class MainWindow : MetroWindow, INotifyPropertyChanged
     {
-        private AutoResetEvent _outputWaitHandle;
-        private AutoResetEvent _errorWaitHandle;
 
+        private System.Windows.Controls.CheckBox[] buildOptionCheckboxes;
         public ConsoleApp BACKGROUND_MEM_PROCESS = null;
         public bool BACKGROUND_MEM_RUNNING = false;
         ProgressDialogController updateprogresscontroller;
@@ -81,7 +82,7 @@ namespace AlotAddOnGUI
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-        private const string MEM_EXE_NAME = "MassEffectModderNoGui.exe";
+        public const string MEM_EXE_NAME = "MassEffectModderNoGui.exe";
 
         private BindingList<AddonFile> addonfiles;
         NotifyIcon nIcon = new NotifyIcon();
@@ -102,7 +103,7 @@ namespace AlotAddOnGUI
 
         private static readonly string SETTINGSTR_HIDENONRELEVANTFILES = "HideNonRelevantFiles";
         private BindingList<AddonFile> alladdonfiles;
-        private readonly string PRIMARY_HEADER = "Download the listed files, then drag and drop the files onto this window. Do not extract any of the files.\nOnce all files for your game are ready, you can build the addon.";
+        private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
         public const string SETTINGSTR_BETAMODE = "BetaMode";
         private List<string> BACKGROUND_MEM_PROCESS_ERRORS;
@@ -124,6 +125,9 @@ namespace AlotAddOnGUI
         private int LODLIMIT = 0;
         private TextBlock[] fadeInItems;
         private List<TextBlock> currentFadeInItems = new List<TextBlock>();
+        private bool ShowReadyFilesOnly = false;
+        internal AddonDownloadAssistant DOWNLOAD_ASSISTANT_WINDOW;
+
         public bool ShowME1Files
         {
             get { return _showME1Files; }
@@ -465,12 +469,16 @@ namespace AlotAddOnGUI
 
         private async void BuildCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            ShowReadyFilesOnly = false;
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
             Log.Information("BuildCompleted()");
             int result = (int)e.Result;
             PreventFileRefresh = false;
             SetupButtons();
             Button_Settings.IsEnabled = true;
+            Button_DownloadAssistant.IsEnabled = true;
+
+
             switch (result)
             {
                 case -2:
@@ -491,7 +499,7 @@ namespace AlotAddOnGUI
                     break;
                 case -1:
                 default:
-                    HeaderLabel.Text = "An error occured building the Addon. View the log (Settings -> Diagnostics -> View Log) for more information.";
+                    HeaderLabel.Text = "An error occured building the Addon.\nView the log (Settings -> Diagnostics -> View Log) for more information.";
                     AddonFilesLabel.Text = "Addon not successfully built";
                     PreventFileRefresh = true; //don't udpate the ticker
                     break;
@@ -513,19 +521,41 @@ namespace AlotAddOnGUI
                         // colored until user focuses the main window
                         helper.FlashApplicationWindow();
 
-                        HeaderLabel.Text = "Ready to install new textures";
-                        AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
-                        MetroDialogSettings mds = new MetroDialogSettings();
-                        mds.AffirmativeButtonText = "Install Now";
-
-                        mds.NegativeButtonText = "OK";
-                        mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                        var buildResult = await this.ShowMessageAsync("ALOT Addon for Mass Effect" + getGameNumberSuffix(result) + " has been built", "You can install ALOT and these files right now, or you can wait until later to install them manually via MEM.", MessageDialogStyle.AffirmativeAndNegative, mds);
-                        if (buildResult == MessageDialogResult.Affirmative)
+                        //Is Alot Installed?
+                        ALOTVersionInfo currentAlotInfo = GetCurrentALOTInfo(CURRENT_GAME_BUILD);
+                        bool readyToInstallALOT = false;
+                        foreach (AddonFile af in ADDONFILES_TO_BUILD)
                         {
-                            InstallALOT(result, ADDONFILES_TO_BUILD);
+                            if (af.ALOTVersion > 0)
+                            {
+                                readyToInstallALOT = true;
+                            }
                         }
+                        if (readyToInstallALOT || currentAlotInfo != null) //not installed
+                        {
 
+
+                            HeaderLabel.Text = "Ready to install new textures";
+                            AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
+                            MetroDialogSettings mds = new MetroDialogSettings();
+                            mds.AffirmativeButtonText = "Install Now";
+
+                            mds.NegativeButtonText = "Install Later";
+                            mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                            var buildResult = await this.ShowMessageAsync("Ready to install textures", "You can install these textures now, or you can manually install them with MEM. The files have been placed into the MEM_Packages subdirectory.", MessageDialogStyle.AffirmativeAndNegative, mds);
+                            if (buildResult == MessageDialogResult.Affirmative)
+                            {
+                                InstallALOT(result, ADDONFILES_TO_BUILD);
+                            }
+                            else
+                            {
+                                HeaderLabel.Text = PRIMARY_HEADER;
+                            }
+                        }
+                        else
+                        {
+                            await this.ShowMessageAsync("Addon(s) have been built", "Your textures have been built into MEM files, ready for installation. Due to ALOT not being installed, you will have to install these manually. The files have been placed into the MEM_Packages subdirectory.");
+                        }
                     }
                     errorOccured = false;
                     break;
@@ -534,8 +564,23 @@ namespace AlotAddOnGUI
             {
                 af.ReadyStatusText = null;
             }
+            CURRENT_GAME_BUILD = 0; //reset
         }
 
+        private ALOTVersionInfo GetCurrentALOTInfo(int game)
+        {
+            switch (game)
+            {
+                case 1:
+                    return CURRENTLY_INSTALLED_ME1_ALOT_INFO;
+                case 2:
+                    return CURRENTLY_INSTALLED_ME2_ALOT_INFO;
+                case 3:
+                    return CURRENTLY_INSTALLED_ME3_ALOT_INFO;
+                default:
+                    return null; // could be bad.
+            }
+        }
         private void SetInstallFlyoutState(bool open)
         {
             InstallingOverlayFlyout.IsOpen = open;
@@ -549,8 +594,6 @@ namespace AlotAddOnGUI
 
             }
         }
-
-
 
         private void BuildAddon(object sender, DoWorkEventArgs e)
         {
@@ -649,11 +692,11 @@ namespace AlotAddOnGUI
                         // Code to run on the GUI thread.
                         Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
                         string tickerText = "";
-                        tickerText += ShowME1Files ? "ME1: " + numME1FilesReady + "/" + numME1Files : "ME1: N/A";
+                        tickerText += ShowME1Files ? "ME1: " + numME1FilesReady + "/" + numME1Files + " imported" : "ME1: N/A";
                         tickerText += " - ";
-                        tickerText += ShowME2Files ? "ME2 : " + numME2FilesReady + "/" + numME2Files : "ME2: N/A";
+                        tickerText += ShowME2Files ? "ME2: " + numME2FilesReady + "/" + numME2Files + " imported" : "ME2: N/A";
                         tickerText += " - ";
-                        tickerText += ShowME3Files ? "ME3 : " + numME3FilesReady + "/" + numME3Files : "ME3: N/A";
+                        tickerText += ShowME3Files ? "ME3: " + numME3FilesReady + "/" + numME3Files + " imported" : "ME3: N/A";
                         AddonFilesLabel.Text = tickerText;
                     });
                 }
@@ -664,10 +707,10 @@ namespace AlotAddOnGUI
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             fadeInItems = new TextBlock[] { FirstRunText_Title, FirstRunText_Summary, FirstRunText_TitleAddon, FirstRunText_AddonSummary, FirstRunText_TitleImport, FirstRunText_ImportSummary, FirstRunText_TitleOKMods, FirstRunText_OKModsSummary, FirstRunText_TitleBeta, FirstRunText_BetaSummary };
-
+            buildOptionCheckboxes = new System.Windows.Controls.CheckBox[] { Checkbox_BuildOptionUser, Checkbox_BuildOptionAddon };
             if (EXE_DIRECTORY.Length > 95)
             {
-                Log.Fatal("EXE is nested too deep for Addon to build properly (" + EXE_DIRECTORY.Length + " chars) due to Windows API limitations.");
+                Log.Fatal("ALOT Installer is nested too deep for Addon to build properly (" + EXE_DIRECTORY.Length + " chars) due to Windows API limitations.");
                 await this.ShowMessageAsync("ALOT Installer is too deep in the filesystem", "ALOT Installer can have issues extracting and building the Addon if nested too deeply in the filesystem. This is an issue with Windows file path limitations. Move the ALOT Installer directory up a few folders on your filesystem. A good place to put ALOT Installer is in Documents.");
                 Environment.Exit(1);
             }
@@ -714,46 +757,48 @@ namespace AlotAddOnGUI
                     BuildWorker.WorkerReportsProgress = true;
                 }
 
+                Button_DownloadAssistant.IsEnabled = true;
+
                 if (!me1Installed)
                 {
                     Log.Information("ME1 not installed - disabling ME1 install");
                     Button_InstallME1.IsEnabled = false;
-                    Button_InstallME1.ToolTip = "Mass Effect is not installed. To build the addon for ME1 the game must already be installed";
+                    Button_InstallME1.ToolTip = "Mass Effect is not installed. To install textures for ME1 the game must already be installed";
                     Button_InstallME1.Content = "ME1 Not Installed";
                 }
                 else
                 {
                     Button_InstallME1.IsEnabled = true;
-                    Button_InstallME1.ToolTip = "Click to build ALOT Addon and install ALOT for Mass Effect";
-                    Button_InstallME1.Content = "Install ALOT for ME1";
+                    Button_InstallME1.ToolTip = "Click to install build and install textures for Mass Effect";
+                    Button_InstallME1.Content = "Install for ME1";
                 }
 
                 if (!me2Installed)
                 {
                     Log.Information("ME2 not installed - disabling ME2 install");
                     Button_InstallME2.IsEnabled = false;
-                    Button_InstallME2.ToolTip = "Mass Effect 2 is not installed. To build the addon for ME2 the game must already be installed";
+                    Button_InstallME2.ToolTip = "Mass Effect 2 is not installed. To install textures for ME2 the game must already be installed";
                     Button_InstallME2.Content = "ME2 Not Installed";
                 }
                 else
                 {
                     Button_InstallME2.IsEnabled = true;
-                    Button_InstallME2.ToolTip = "Click to build ALOT Addon and install ALOT for Mass Effect 2";
-                    Button_InstallME2.Content = "Install ALOT for ME2";
+                    Button_InstallME2.ToolTip = "Click to install build and install textures for Mass Effect 2";
+                    Button_InstallME2.Content = "Install for ME2";
                 }
 
                 if (!me3Installed)
                 {
                     Log.Information("ME3 not installed - disabling ME3 install");
                     Button_InstallME3.IsEnabled = false;
-                    Button_InstallME3.ToolTip = "Mass Effect 3 is not installed. To build the addon for ME3 the game must already be installed";
+                    Button_InstallME3.ToolTip = "Mass Effect 3 is not installed. To install texturesn for ME3 the game must already be installed";
                     Button_InstallME3.Content = "ME3 Not Installed";
                 }
                 else
                 {
                     Button_InstallME3.IsEnabled = true;
-                    Button_InstallME3.ToolTip = "Click to build ALOT Addon and install ALOT for Mass Effect 3";
-                    Button_InstallME3.Content = "Install ALOT for ME3";
+                    Button_InstallME3.ToolTip = "Click to install build and install textures for Mass Effect 3";
+                    Button_InstallME3.Content = "Install for ME3";
                 }
             }
             else
@@ -898,6 +943,12 @@ namespace AlotAddOnGUI
                     readManifest();
 
                     Log.Information("readManifest() has completed. Switching over to user control");
+                    bool? CheckOutputDirectories = Utilities.GetRegistrySettingBool("CheckOutputDirectoriesOnManifestLoad");
+                    if (CheckOutputDirectories != null && CheckOutputDirectories.Value)
+                    {
+                        CheckOutputDirectoriesForUnpackedSingleFiles();
+                    }
+
                     Loading = false;
                     Build_ProgressBar.IsIndeterminate = false;
                     HeaderLabel.Text = PRIMARY_HEADER;
@@ -906,13 +957,81 @@ namespace AlotAddOnGUI
                     RunMEMUpdater2();
                     UpdateALOTStatus();
                     RunMEMUpdaterGUI();
-                    bool? hasShownFirstRun = Utilities.GetRegistrySettingBool("HasRunFirstRun");
-                    if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
+                    if (USING_BETA)
                     {
-                        playFirstTimeAnimation();
+                        //beta only for now.
+                        bool? hasShownFirstRun = Utilities.GetRegistrySettingBool("HasRunFirstRun");
+                        if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
+                        {
+                            playFirstTimeAnimation();
+                        }
+                        else
+                        {
+                            PerformRAMCheck();
+                        }
+                    }
+                    else
+                    {
+                        PerformRAMCheck();
                     }
                 }
             }
+        }
+
+        private void CheckOutputDirectoriesForUnpackedSingleFiles()
+        {
+            bool ReImportedFiles = false;
+            foreach (AddonFile af in alladdonfiles)
+            {
+                if (af.Ready)
+                {
+                    continue;
+                }
+
+                //File is not ready. Might be missing single file...
+                if (af.UnpackedSingleFilename != null)
+                {
+                    int i = 0;
+                    if (af.Game_ME1) i = 1;
+                    if (af.Game_ME2) i = 2;
+                    if (af.Game_ME3) i = 3;
+                    string outputPath = getOutputDir(i);
+
+                    string importedFilePath = EXE_DIRECTORY + @"Downloaded_Mods\" + af.UnpackedSingleFilename;
+                    string outputFilename = outputPath + "000_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
+                    if (File.Exists(outputFilename))
+                    {
+
+                        Log.Information("Re-importing extracted single file: " + outputFilename);
+                        try
+                        {
+                            File.Move(outputFilename, importedFilePath);
+                            ReImportedFiles = true;
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error("Failed to reimport file! " + e.Message);
+                        }
+                    }
+                }
+            }
+            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "CheckOutputDirectoriesOnManifestLoad", false);
+
+            if (ReImportedFiles)
+            {
+                ShowStatus("Re-imported files due to shutdown during build or install");
+            }
+        }
+
+        private async void PerformRAMCheck()
+        {
+            long ramAmountKb = Utilities.GetInstalledRamAmount();
+            long installedRamGB = ramAmountKb / 1048576L;
+            if (installedRamGB < 7.98)
+            {
+                await this.ShowMessageAsync("System memory is less than 8 GB", "Building and installing textures uses considerable amounts of memory. Installation will be significantly slower on systems with less than 8 GB for Mass Effect 3, or 6 GB for Mass Effect and Mass Effect 2.");
+            }
+            Debug.WriteLine("Ram Amount, KB: " + ramAmountKb);
         }
 
         private void UpdateALOTStatus()
@@ -1166,8 +1285,9 @@ namespace AlotAddOnGUI
             BindingList<AddonFile> newList = new BindingList<AddonFile>();
             foreach (AddonFile af in alladdonfiles)
             {
+                if (!af.Ready && ShowReadyFilesOnly)
+                { continue; }
                 bool shouldDisplay = ((af.Game_ME1 && ShowME1Files) || (af.Game_ME2 && ShowME2Files) || (af.Game_ME3 && ShowME3Files));
-
                 if (shouldDisplay)
                 {
                     newList.Add(af);
@@ -1206,19 +1326,69 @@ namespace AlotAddOnGUI
         {
             if (await InstallPrecheck(2))
             {
-                if (await InitInstall(2))
+                ShowBuildOptions(2);
+            }
+        }
+
+        private void ShowBuildOptions(int game)
+        {
+            CURRENT_GAME_BUILD = game;
+
+            ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
+            bool alotInstalled = installedInfo != null; //default value
+            int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
+            if (!alotInstalled)
+            {
+                Checkbox_BuildOptionAddon.IsChecked = true;
+                Checkbox_BuildOptionAddon.IsEnabled = false;
+            }
+            else
+            {
+                Checkbox_BuildOptionAddon.IsChecked = false;
+                Checkbox_BuildOptionAddon.IsEnabled = true;
+            }
+
+            bool hasApplicableUserFile = false;
+            bool checkAlotBox = false;
+            foreach (AddonFile af in addonfiles)
+            {
+                if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
-                    Loading = true; //prevent refresh when filtering
-                    ShowME1Files = false;
-                    ShowME2Files = true;
-                    ShowME3Files = false;
-                    Loading = false;
-                    ApplyFiltering();
-                    Button_InstallME2.Content = "Building...";
-                    CURRENT_GAME_BUILD = 2;
-                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
-                    BuildWorker.RunWorkerAsync(2);
+                    if (af.UserFile && af.Ready)
+                    {
+                        hasApplicableUserFile = true;
+                    }
+                    if (af.ALOTVersion > 0 && !alotInstalled)
+                    {
+                        checkAlotBox = true;
+                    }
                 }
+            }
+            Checkbox_BuildOptionALOT.IsChecked = checkAlotBox;
+
+            Checkbox_BuildOptionUser.IsChecked = hasApplicableUserFile;
+            Checkbox_BuildOptionUser.IsEnabled = hasApplicableUserFile;
+
+            bool hasOneOption = false;
+            foreach (System.Windows.Controls.CheckBox cb in buildOptionCheckboxes)
+            {
+                if (cb.IsEnabled)
+                {
+                    hasOneOption = true;
+                    break;
+                }
+            }
+
+            if (hasOneOption)
+            {
+                Label_WhatToBuildAndInstall.Text = "ALOT is already installed. Choose what to install for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
+
+                WhatToBuildFlyout.IsOpen = true;
+            }
+            else
+            {
+                //Run button 
+                Button_BuildAndInstall_Click(null, null);
             }
         }
 
@@ -1350,7 +1520,7 @@ namespace AlotAddOnGUI
             PreventFileRefresh = true;
             HeaderLabel.Text = "Backing up Mass Effect" + (game == 1 ? "" : " " + game) + "...\nDo not close the application until this process completes.";
             BackupWorker.RunWorkerAsync(dir);
-            Button_InstallME1.IsEnabled = Button_InstallME2.IsEnabled = Button_InstallME3.IsEnabled = Button_Settings.IsEnabled = false;
+            Button_InstallME1.IsEnabled = Button_InstallME2.IsEnabled = Button_InstallME3.IsEnabled = Button_Settings.IsEnabled = Button_DownloadAssistant.IsEnabled = false;
             ShowStatus("Verifying game data before backup", 6000);
             // get all the directories in selected dirctory
         }
@@ -1380,6 +1550,7 @@ namespace AlotAddOnGUI
                 AddonFilesLabel.Text = "Backup failed! Check the logs.";
             }
             Button_Settings.IsEnabled = true;
+            Button_DownloadAssistant.IsEnabled = true;
             SetupButtons();
             PreventFileRefresh = false;
             ValidateGameBackup(BACKUP_THREAD_GAME);
@@ -1396,26 +1567,23 @@ namespace AlotAddOnGUI
         {
             if (await InstallPrecheck(3))
             {
-                if (await InitInstall(3))
-                {
-                    Loading = true; //prevent refresh when filtering
-                    ShowME1Files = false;
-                    ShowME2Files = false;
-                    ShowME3Files = true;
-                    Loading = false;
-                    ApplyFiltering();
-                    Button_InstallME3.Content = "Building...";
-                    CURRENT_GAME_BUILD = 3;
-                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
-
-                    BuildWorker.RunWorkerAsync(3);
-                }
+                ShowBuildOptions(3);
             }
         }
 
         private async Task<bool> InstallPrecheck(int game)
         {
-            CheckImportLibrary_Tick(null, null);
+            CheckImportLibrary_Tick(null, null); //get all ready files
+
+            //Check game has been run at least once
+            string configFile = IniSettingsHandler.GetConfigIniPath(game);
+            if (!File.Exists(configFile))
+            {
+                //game has not been run yet.
+                Log.Error("Config file missing for Mass Effect " + game + ". Blocking install");
+                await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " has not been run yet", "Mass Effect" + getGameNumberSuffix(game) + " must be run at least once in order for the game to generate default configuration files for this installer to edit. Start the game, and exit at the main menu to generate them.");
+                return false;
+            }
             int nummissing = 0;
             bool oneisready = false;
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
@@ -1498,9 +1666,16 @@ namespace AlotAddOnGUI
                 await this.ShowMessageAsync("No files available for building", "There are no files available or relevant in the Downloaded_Mods folder to install for Mass Effect" + getGameNumberSuffix(game) + ".");
                 return false;
             }
-
-            MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " addon are missing - do you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
-            return result == MessageDialogResult.Affirmative;
+            //if alot is already installed we don't need to show missing message
+            if (installedInfo == null)
+            {
+                MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " Addon are missing - do you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
+                return result == MessageDialogResult.Affirmative;
+            }
+            else
+            {
+                return true;
+            }
         }
 
 
@@ -1541,9 +1716,9 @@ namespace AlotAddOnGUI
             }
         }
 
-        private async Task<bool> InitInstall(int game)
+        private async Task<bool> InitBuild(int game)
         {
-            AddonFilesLabel.Text = "Preparing to install...";
+            AddonFilesLabel.Text = "Preparing to build texture packages...";
             Build_ProgressBar.IsIndeterminate = true;
             Log.Information("Deleting any pre-existing Extracted_Mods folder.");
             string destinationpath = System.AppDomain.CurrentDomain.BaseDirectory + @"Extracted_Mods\";
@@ -1574,6 +1749,7 @@ namespace AlotAddOnGUI
             Button_InstallME1.IsEnabled = false;
             Button_InstallME2.IsEnabled = false;
             Button_InstallME3.IsEnabled = false;
+            Button_DownloadAssistant.IsEnabled = false;
             Button_Settings.IsEnabled = false;
 
             Directory.CreateDirectory(ADDON_STAGING_DIR);
@@ -1740,7 +1916,6 @@ namespace AlotAddOnGUI
             progressController.SetMessage("ALOT Installer is importing files, please wait...\nImporting " + fileToImport.Item1.FriendlyName);
             filesToImport.RemoveAt(0);
 
-
             if ((bool)Checkbox_MoveFilesAsImport.IsChecked)
             {
                 //MOVE
@@ -1763,12 +1938,18 @@ namespace AlotAddOnGUI
                     {
                         detailsMessage += "\n - " + af;
                     }
+
+                    if (DOWNLOAD_ASSISTANT_WINDOW != null)
+                    {
+                        DOWNLOAD_ASSISTANT_WINDOW.ShowStatus(importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s were" : " was") + " imported");
+                    }
                     PreventFileRefresh = false; //allow refresh
 
                     string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
                     string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods directory.";
-
+                    CheckImportLibrary_Tick(null, null);
                     ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
+
                 }
             }
             else
@@ -1862,19 +2043,7 @@ namespace AlotAddOnGUI
         {
             if (await InstallPrecheck(1))
             {
-                if (await InitInstall(1))
-                {
-                    Loading = true; //prevent refresh when filtering
-                    ShowME1Files = true;
-                    ShowME2Files = false;
-                    ShowME3Files = false;
-                    Loading = false;
-                    ApplyFiltering();
-                    Button_InstallME1.Content = "Building...";
-                    CURRENT_GAME_BUILD = 1;
-                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
-                    BuildWorker.RunWorkerAsync(1);
-                }
+                ShowBuildOptions(1);
             }
         }
 
@@ -1922,6 +2091,7 @@ namespace AlotAddOnGUI
             BACKUP_THREAD_GAME = game;
             SettingsFlyout.IsOpen = false;
             Button_Settings.IsEnabled = false;
+            Button_DownloadAssistant.IsEnabled = false;
             PreventFileRefresh = true;
             HeaderLabel.Text = "Restoring Mass Effect" + (game == 1 ? "" : " " + game) + "...\nDo not close the application until this process completes.";
             Button_InstallME1.IsEnabled = Button_InstallME2.IsEnabled = Button_InstallME3.IsEnabled = Button_Settings.IsEnabled = false;
@@ -1947,6 +2117,7 @@ namespace AlotAddOnGUI
             SetupButtons();
             UpdateALOTStatus();
             Button_Settings.IsEnabled = true;
+            Button_DownloadAssistant.IsEnabled = true;
             PreventFileRefresh = false;
 
             BACKUP_THREAD_GAME = -1;
@@ -1956,17 +2127,19 @@ namespace AlotAddOnGUI
         private async void Checkbox_BetaMode_Click(object sender, RoutedEventArgs e)
         {
             bool isEnabling = (bool)Checkbox_BetaMode.IsChecked;
+            bool restart = true;
             if (isEnabling)
             {
                 MessageDialogResult result = await this.ShowMessageAsync("Enabling BETA mode", "Enabling BETA mode will enable the beta manifest as well as beta features and beta updates. These builds are for testing, and may not be stable (and will sometimes outright crash). Unless you're OK with this you should stay in normal mode.\nEnable BETA mode?", MessageDialogStyle.AffirmativeAndNegative);
                 if (result == MessageDialogResult.Negative)
                 {
                     Checkbox_BetaMode.IsChecked = false;
+                    restart = false;
                 }
             }
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_BETAMODE, ((bool)Checkbox_BetaMode.IsChecked ? 1 : 0));
             USING_BETA = (bool)Checkbox_BetaMode.IsChecked;
-            if (isEnabling && Checkbox_BetaMode.IsChecked.Value)
+            if (restart)
             {
                 System.Windows.Forms.Application.Restart();
                 Environment.Exit(0);
@@ -2008,6 +2181,7 @@ namespace AlotAddOnGUI
 
         private async void Window_Closing(object sender, CancelEventArgs e)
         {
+            bool isClosing = true;
             if (WARN_USER_OF_EXIT)
             {
                 Log.Information("User is attempting to close program while installer is running.");
@@ -2023,9 +2197,30 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("User has chosen to kill MEM and close program. Game will likely be broken.");
                     WARN_USER_OF_EXIT = false;
+
                     Close();
                 }
+                else
+                {
+                    isClosing = false;
+                }
             }
+
+            if (isClosing)
+            {
+                if (DOWNLOAD_ASSISTANT_WINDOW != null)
+                {
+                    DOWNLOAD_ASSISTANT_WINDOW.SHUTTING_DOWN = true;
+                    DOWNLOAD_ASSISTANT_WINDOW.Close();
+                }
+
+                if (BuildWorker.IsBusy || InstallWorker.IsBusy)
+                {
+                    //We should add indicator that we closed while busy
+                    Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "CheckOutputDirectoriesOnManifestLoad", true);
+                }
+            }
+
         }
 
         private void ContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
@@ -2178,7 +2373,7 @@ namespace AlotAddOnGUI
             AddUserFileAndQueue(2);
         }
 
-        private void Button_AutoImportFromDownloads_Click(object sender, RoutedEventArgs e)
+        public void Button_AutoImportFromDownloads_Click(object sender, RoutedEventArgs e)
         {
             List<string> filelist = new List<string>();
             string downloadsFolder = KnownFolders.GetPath(KnownFolder.Downloads);
@@ -2205,10 +2400,131 @@ namespace AlotAddOnGUI
                         }
                     }
                 }
+                SettingsFlyout.IsOpen = false;
                 if (filelist.Count > 0)
                 {
                     PerformImportOperation(filelist.ToArray(), false);
                 }
+                else
+                {
+                    if (DOWNLOAD_ASSISTANT_WINDOW != null)
+                    {
+                        DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("No files found for importing");
+                    }
+                    ShowStatus("No files found for importing in " + downloadsFolder);
+                }
+            }
+        }
+
+        private async void Button_BuildAndInstall_Click(object sender, RoutedEventArgs e)
+        {
+
+            bool oneOptionChecked = false;
+            foreach (System.Windows.Controls.CheckBox cb in buildOptionCheckboxes)
+            {
+                if ((bool)cb.IsChecked)
+                {
+                    oneOptionChecked = true;
+                    break;
+                }
+            }
+            WhatToBuildFlyout.IsOpen = false;
+            if (oneOptionChecked)
+            {
+                if (CURRENT_GAME_BUILD > 0 && CURRENT_GAME_BUILD < 4)
+                {
+                    if (await InitBuild(CURRENT_GAME_BUILD))
+                    {
+                        Loading = true; //prevent refresh when filtering
+                        ShowME1Files = CURRENT_GAME_BUILD == 1;
+                        ShowME2Files = CURRENT_GAME_BUILD == 2;
+                        ShowME3Files = CURRENT_GAME_BUILD == 3;
+                        Loading = false;
+                        ShowReadyFilesOnly = true;
+                        ApplyFiltering();
+                        switch (CURRENT_GAME_BUILD)
+                        {
+                            case 1:
+                                Button_InstallME1.Content = "Building...";
+                                break;
+                            case 2:
+                                Button_InstallME2.Content = "Building...";
+                                break;
+                            case 3:
+                                Button_InstallME3.Content = "Building...";
+                                break;
+                        }
+
+                        BUiLD_ADDON_FILES = Checkbox_BuildOptionAddon.IsChecked.Value;
+                        BUILD_USER_FILES = Checkbox_BuildOptionUser.IsChecked.Value;
+
+                        TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
+                        BuildWorker.RunWorkerAsync(CURRENT_GAME_BUILD);
+                    }
+                    else
+                    {
+                        CURRENT_GAME_BUILD = 0;
+                        Log.Warning("Install was aborted due to initinstall returning false");
+                    }
+                }
+                else
+                {
+                    CURRENT_GAME_BUILD = 0;
+                }
+            }
+        }
+
+        private void Button_BuildAndInstallCancel_Click(object sender, RoutedEventArgs e)
+        {
+            WhatToBuildFlyout.IsOpen = false;
+            CURRENT_GAME_BUILD = 0;
+        }
+
+        private void Expander_Expanded(object sender, RoutedEventArgs e)
+        {
+            ((Expander)sender).BringIntoView();
+        }
+
+        private void Button_ZipLog_Click(object sender, RoutedEventArgs e)
+        {
+            var directory = new DirectoryInfo("logs");
+            FileInfo latestlogfile = directory.GetFiles("*.txt").OrderByDescending(f => f.LastWriteTime).First();
+            if (latestlogfile != null)
+            {
+                string zipPath = "logs\\" + Path.GetFileNameWithoutExtension(latestlogfile.FullName) + ".zip";
+                if (File.Exists(zipPath))
+                {
+                    File.Delete(zipPath);
+                }
+
+                string zipStaged = latestlogfile.FullName + "_forZip";
+                File.Copy(latestlogfile.FullName, zipStaged, true);
+                string copyPath = zipPath;
+
+                using (ZipArchive zip = ZipFile.Open(zipPath, ZipArchiveMode.Create))
+                {
+                    zip.CreateEntryFromFile(zipStaged, "logs\\" + Path.GetFileName(latestlogfile.FullName), CompressionLevel.Optimal);
+                }
+                File.Delete(zipStaged);
+                Utilities.OpenAndSelectFileInExplorer(zipPath);
+                ShowStatus("If uploading log to ALOT Discord, drag and drop the .zip file onto the Discord interface.");
+            }
+        }
+
+        private void Button_OpenAddonAssistantWindow_Click(object sender, RoutedEventArgs e)
+        {
+            if (!Utilities.IsWindowOpen<AddonDownloadAssistant>())
+            {
+                List<AddonFile> notReadyAddonFile = new List<AddonFile>();
+                foreach (AddonFile af in alladdonfiles)
+                {
+                    if (!af.Ready && !af.UserFile)
+                    {
+                        notReadyAddonFile.Add(af);
+                    }
+                }
+                DOWNLOAD_ASSISTANT_WINDOW = new AddonDownloadAssistant(this, notReadyAddonFile);
+                DOWNLOAD_ASSISTANT_WINDOW.Show();
             }
         }
     }

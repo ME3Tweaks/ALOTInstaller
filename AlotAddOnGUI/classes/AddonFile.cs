@@ -156,6 +156,14 @@ namespace AlotAddOnGUI.classes
         public string DownloadLink { get; set; }
         public List<String> Duplicates { get; set; }
         public List<PackageFile> PackageFiles { get; set; }
+        public string DownloadAssistantString
+        {
+            get
+            {
+
+                return " - File title: " + Tooltipname;
+            }
+        }
 
         public bool Ready
         {
