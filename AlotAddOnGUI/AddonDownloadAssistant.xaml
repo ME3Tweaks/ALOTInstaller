@@ -13,6 +13,8 @@
         Closing="Window_Closing"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Icon="ALOTInstallerIcon.ico"
+        Loaded="Window_Loaded"
+        WindowStartupLocation="CenterOwner"
         ShowIconOnTitleBar="False">
     <Window.Resources>
         <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">

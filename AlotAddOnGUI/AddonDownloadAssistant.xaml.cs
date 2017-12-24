@@ -30,12 +30,13 @@ namespace AlotAddOnGUI
 
         public AddonDownloadAssistant(MainWindow windowRef,List<AddonFile> missingAddonFiles)
         {
+            Owner = windowRef;
             InitializeComponent();
             this.windowRef = windowRef;
-            windowRef.WindowState = WindowState.Minimized;
             this.missingAddonFiles = missingAddonFiles;
             lvUsers.ItemsSource = missingAddonFiles;
         }
+
 
 
         private async void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
@@ -93,6 +94,11 @@ namespace AlotAddOnGUI
             StatusFlyout.AutoCloseInterval = msOpen;
             StatusLabel.Text = v;
             StatusFlyout.IsOpen = true;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            windowRef.WindowState = WindowState.Minimized;
         }
     }
 }
