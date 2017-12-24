@@ -106,6 +106,7 @@ namespace AlotAddOnGUI
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
         public const string SETTINGSTR_BETAMODE = "BetaMode";
+        public const string SETTINGSTR_DOWNLOADSFOLDER = "DownloadsFolder";
         private List<string> BACKGROUND_MEM_PROCESS_ERRORS;
         private List<string> BACKGROUND_MEM_PROCESS_PARSED_ERRORS;
         private const string SHOW_DIALOG_YES_NO = "SHOW_DIALOG_YES_NO";
@@ -127,6 +128,7 @@ namespace AlotAddOnGUI
         private List<TextBlock> currentFadeInItems = new List<TextBlock>();
         private bool ShowReadyFilesOnly = false;
         internal AddonDownloadAssistant DOWNLOAD_ASSISTANT_WINDOW;
+        public string DOWNLOADS_FOLDER;
 
         public bool ShowME1Files
         {
@@ -1901,60 +1903,41 @@ namespace AlotAddOnGUI
 
             if (filesToImport.Count > 0)
             {
-                MetroDialogSettings settings = new MetroDialogSettings();
-                ProgressDialogController updateprogresscontroller = await this.ShowProgressAsync("Importing files", "ALOT Installer is importing files, please wait...", false, settings);
-                updateprogresscontroller.SetIndeterminate();
-                updateprogresscontroller.SetCancelable(true);
-                ImportFiles(filesToImport, new List<string>(), updateprogresscontroller, 0, totalBytes);
+                ImportFiles(filesToImport, new List<string>(), null, 0, totalBytes);
             }
         }
 
         private async void ImportFiles(List<Tuple<AddonFile, string, string>> filesToImport, List<string> importedFiles, ProgressDialogController progressController, long processedBytes, long totalBytes)
         {
             PreventFileRefresh = true;
-            Tuple<AddonFile, string, string> fileToImport = filesToImport[0];
-            progressController.SetMessage("ALOT Installer is importing files, please wait...\nImporting " + fileToImport.Item1.FriendlyName);
-            filesToImport.RemoveAt(0);
-
             if ((bool)Checkbox_MoveFilesAsImport.IsChecked)
             {
-                //MOVE
-                await Utilities.MoveAsync(fileToImport.Item2, fileToImport.Item3);
-                //Update progressbar
-                processedBytes += new System.IO.FileInfo(fileToImport.Item3).Length;
-                double progress = (((double)processedBytes / totalBytes));
-                progressController.SetProgress(progress);
-                importedFiles.Add(fileToImport.Item1.FriendlyName);
-                if (filesToImport.Count > 0)
+                if (DOWNLOAD_ASSISTANT_WINDOW != null)
                 {
-                    ImportFiles(filesToImport, importedFiles, progressController, processedBytes, totalBytes);
+                    DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("Importing...");
                 }
-                else
-                {
-                    //imports finished
-                    await progressController.CloseAsync();
-                    string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods folder.";
-                    foreach (string af in importedFiles)
-                    {
-                        detailsMessage += "\n - " + af;
-                    }
+                ImportWorker = new BackgroundWorker();
+                ImportWorker.DoWork += ImportFilesAsMove;
+                ImportWorker.RunWorkerCompleted += ImportCompleted;
+                ImportWorker.RunWorkerAsync(filesToImport);
 
-                    if (DOWNLOAD_ASSISTANT_WINDOW != null)
-                    {
-                        DOWNLOAD_ASSISTANT_WINDOW.ShowStatus(importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s were" : " was") + " imported");
-                    }
-                    PreventFileRefresh = false; //allow refresh
-
-                    string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                    string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods directory.";
-                    CheckImportLibrary_Tick(null, null);
-                    ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
-
-                }
             }
             else
             {
+                Tuple<AddonFile, string, string> fileToImport = filesToImport[0];
+                filesToImport.RemoveAt(0);
                 //COPY
+                if (progressController == null)
+                {
+                    MetroDialogSettings settings = new MetroDialogSettings();
+                    progressController = await this.ShowProgressAsync("Importing files", "ALOT Installer is importing files, please wait...\nImporting " + fileToImport.Item1.FriendlyName, false, settings);
+                    progressController.SetIndeterminate();
+                    progressController.SetCancelable(true);
+                }
+                else
+                {
+                    progressController.SetMessage("ALOT Installer is importing files, please wait...\nImporting " + fileToImport.Item1.FriendlyName);
+                }
                 WebClient downloadClient = new WebClient();
                 long preDownloadStartBytes = processedBytes;
                 downloadClient.DownloadProgressChanged += (s, e) =>
@@ -1991,6 +1974,52 @@ namespace AlotAddOnGUI
                 };
                 downloadClient.DownloadFileAsync(new Uri(fileToImport.Item2), fileToImport.Item3);
             }
+        }
+
+        private void ImportFilesAsMove(object sender, DoWorkEventArgs e)
+        {
+            List<Tuple<AddonFile, string, string>> filesToImport = (List<Tuple<AddonFile, string, string>>)e.Argument;
+            List<string> completedItems = new List<string>();
+            while (filesToImport.Count > 0)
+            {
+                Tuple<AddonFile, string, string> fileToImport = filesToImport[0];
+                filesToImport.RemoveAt(0);
+                Log.Information("Importing via move: " + fileToImport.Item2);
+                if (File.Exists(fileToImport.Item3))
+                {
+                    File.Delete(fileToImport.Item3);
+                }
+                File.Move(fileToImport.Item2, fileToImport.Item3);
+                Log.Information("Imported via move: " + fileToImport.Item2);
+                completedItems.Add(fileToImport.Item1.FriendlyName);
+            }
+            e.Result = completedItems;
+        }
+
+        private void ImportCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e != null && e.Result != null)
+            {
+                List<string> importedFiles = (List<string>)e.Result;
+                //imports finished
+                string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods folder.";
+                foreach (string af in importedFiles)
+                {
+                    detailsMessage += "\n - " + af;
+                }
+
+                if (DOWNLOAD_ASSISTANT_WINDOW != null)
+                {
+                    DOWNLOAD_ASSISTANT_WINDOW.ShowStatus(importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s were" : " was") + " imported");
+                }
+                PreventFileRefresh = false; //allow refresh
+
+                string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
+                string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods directory.";
+                CheckImportLibrary_Tick(null, null);
+                ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
+            }
+            PreventFileRefresh = false;
         }
 
         private async void ShowImportFinishedMessage(string originalTitle, string originalMessage, string detailsMessage)
@@ -2063,7 +2092,11 @@ namespace AlotAddOnGUI
         {
             bool importasmove = Utilities.GetRegistrySettingBool(SETTINGSTR_IMPORTASMOVE) ?? true;
             USING_BETA = Utilities.GetRegistrySettingBool(SETTINGSTR_BETAMODE) ?? false;
-
+            DOWNLOADS_FOLDER = Utilities.GetRegistrySettingString(SETTINGSTR_DOWNLOADSFOLDER);
+            if (DOWNLOADS_FOLDER == null)
+            {
+                DOWNLOADS_FOLDER = KnownFolders.GetPath(KnownFolder.Downloads);
+            }
             Checkbox_BetaMode.IsChecked = USING_BETA;
             Checkbox_MoveFilesAsImport.IsChecked = importasmove;
 
@@ -2073,6 +2106,8 @@ namespace AlotAddOnGUI
                                                     ThemeManager.GetAccent("Crimson"),
                                                     ThemeManager.GetAppTheme("BaseDark")); // or appStyle.Item1
             }
+            Button_ChangeDownloadFolder.ToolTip = "Changes folder where download assistant will import from.\nThis should be your browser's download folder.\nThe current directory is\n" + DOWNLOADS_FOLDER;
+
         }
 
         private void Button_ReportIssue_Click(object sender, RoutedEventArgs e)
@@ -2373,45 +2408,51 @@ namespace AlotAddOnGUI
             AddUserFileAndQueue(2);
         }
 
-        public void Button_AutoImportFromDownloads_Click(object sender, RoutedEventArgs e)
+        public void ImportFromDownloadsFolder()
         {
-            List<string> filelist = new List<string>();
-            string downloadsFolder = KnownFolders.GetPath(KnownFolder.Downloads);
-            List<AddonFile> addonFilesNotReady = new List<AddonFile>();
-            foreach (AddonFile af in alladdonfiles)
+            if (Directory.Exists(DOWNLOADS_FOLDER))
             {
-                if (!af.Ready)
+                List<string> filelist = new List<string>();
+                List<AddonFile> addonFilesNotReady = new List<AddonFile>();
+                foreach (AddonFile af in alladdonfiles)
                 {
-                    addonFilesNotReady.Add(af);
-                }
-            }
-            if (Directory.Exists(downloadsFolder))
-            {
-                string[] files = Directory.GetFiles(downloadsFolder);
-                foreach (string file in files)
-                {
-                    string fname = Path.GetFileName(file); //we do not check duplicates with (1) etc
-                    foreach (AddonFile af in addonFilesNotReady)
+                    if (!af.Ready)
                     {
-                        if (fname == af.Filename)
-                        {
-                            filelist.Add(file);
-                            break;
-                        }
+                        addonFilesNotReady.Add(af);
                     }
                 }
-                SettingsFlyout.IsOpen = false;
-                if (filelist.Count > 0)
+                if (Directory.Exists(DOWNLOADS_FOLDER))
                 {
-                    PerformImportOperation(filelist.ToArray(), false);
+                    string[] files = Directory.GetFiles(DOWNLOADS_FOLDER);
+                    foreach (string file in files)
+                    {
+                        string fname = Path.GetFileName(file); //we do not check duplicates with (1) etc
+                        foreach (AddonFile af in addonFilesNotReady)
+                        {
+                            if (fname == af.Filename)
+                            {
+                                filelist.Add(file);
+                                break;
+                            }
+                        }
+                    }
+                    SettingsFlyout.IsOpen = false;
+                    if (filelist.Count > 0)
+                    {
+                        PerformImportOperation(filelist.ToArray(), false);
+                    }
+                    else
+                    {
+                        if (DOWNLOAD_ASSISTANT_WINDOW != null)
+                        {
+                            DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("No files found for importing");
+                        }
+                        ShowStatus("No files found for importing in " + DOWNLOADS_FOLDER);
+                    }
                 }
                 else
                 {
-                    if (DOWNLOAD_ASSISTANT_WINDOW != null)
-                    {
-                        DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("No files found for importing");
-                    }
-                    ShowStatus("No files found for importing in " + downloadsFolder);
+                    Log.Information("Downloads folder does not exist: " + DOWNLOADS_FOLDER);
                 }
             }
         }
@@ -2513,19 +2554,53 @@ namespace AlotAddOnGUI
 
         private void Button_OpenAddonAssistantWindow_Click(object sender, RoutedEventArgs e)
         {
-            if (!Utilities.IsWindowOpen<AddonDownloadAssistant>())
+            if (Directory.Exists(DOWNLOADS_FOLDER))
             {
-                List<AddonFile> notReadyAddonFile = new List<AddonFile>();
-                foreach (AddonFile af in alladdonfiles)
+
+                if (!Utilities.IsWindowOpen<AddonDownloadAssistant>())
                 {
-                    if (!af.Ready && !af.UserFile)
+                    List<AddonFile> notReadyAddonFile = new List<AddonFile>();
+                    foreach (AddonFile af in alladdonfiles)
                     {
-                        notReadyAddonFile.Add(af);
+                        if (!af.Ready && !af.UserFile)
+                        {
+                            notReadyAddonFile.Add(af);
+                        }
                     }
+                    DOWNLOAD_ASSISTANT_WINDOW = new AddonDownloadAssistant(this, notReadyAddonFile);
+                    DOWNLOAD_ASSISTANT_WINDOW.Show();
                 }
-                DOWNLOAD_ASSISTANT_WINDOW = new AddonDownloadAssistant(this, notReadyAddonFile);
-                DOWNLOAD_ASSISTANT_WINDOW.Show();
             }
+            else
+            {
+                ShowStatus("Download directory is not set to valid folder. Set a valid one in settings.");
+            }
+        }
+
+        private void Button_ChangeDownloadFolder_Click(object sender, RoutedEventArgs e)
+        {
+            var openFolder = new CommonOpenFileDialog();
+            openFolder.IsFolderPicker = true;
+            openFolder.Title = "Select Downloads Folder where files from your browser are downloaded to";
+            openFolder.AllowNonFileSystemItems = false;
+            openFolder.EnsurePathExists = true;
+            if (Directory.Exists(DOWNLOADS_FOLDER))
+            {
+                openFolder.InitialDirectory = DOWNLOADS_FOLDER;
+            }
+            if (openFolder.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                return;
+            }
+            var dir = openFolder.FileName;
+            if (!Directory.Exists(dir))
+            {
+                //await this.ShowMessageAsync("Directory does not exist", "The backup destination directory does not exist: " + dir);
+                return;
+            }
+            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_DOWNLOADSFOLDER, dir);
+            DOWNLOADS_FOLDER = dir;
+            Button_ChangeDownloadFolder.ToolTip = "Changes folder where download assistant will import from.\nThis should be your browser's download folder.\nThe current directory is\n" + DOWNLOADS_FOLDER;
         }
     }
 }

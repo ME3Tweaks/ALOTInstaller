@@ -57,8 +57,7 @@ namespace AlotAddOnGUI
 
         private void Button_ImportFromDownloads_Click(object sender, RoutedEventArgs e)
         {
-            windowRef.Button_AutoImportFromDownloads_Click(null, null);
-
+            windowRef.ImportFromDownloadsFolder();
         }
 
         private void Button_ClearImport_Click(object sender, RoutedEventArgs e)

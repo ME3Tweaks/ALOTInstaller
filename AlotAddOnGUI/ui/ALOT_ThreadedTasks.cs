@@ -460,6 +460,11 @@ namespace AlotAddOnGUI
                         ADDONFILES_TO_BUILD.Add(af);
                     }
 
+                    if (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0)
+                    {
+                        ADDONFILES_TO_BUILD.Add(af);
+                    }
+
                 }
             }
 
@@ -657,6 +662,15 @@ namespace AlotAddOnGUI
 
                     foreach (AddonFile af in ADDONFILES_TO_BUILD)
                     {
+                        if (af.ALOTVersion > 0)
+                        {
+                            af.ReadyStatusText = "ALOT ready to install";
+                            af.SetIdle();
+                        } else if (af.ALOTUpdateVersion > 0)
+                        {
+                            af.ReadyStatusText = "ALOT update ready to install";
+                            af.SetIdle();
+                        }
                         if (!af.UserFile)
                         {
                             af.ReadyStatusText = "Built into ALOT Addon file";

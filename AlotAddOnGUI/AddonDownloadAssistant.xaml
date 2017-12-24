@@ -138,8 +138,8 @@
             </ListView.ItemContainerStyle>
         </ListView>
         <DockPanel LastChildFill="True" Grid.Row="3" HorizontalAlignment="Stretch">
-            <Button Content="Clear imported"  DockPanel.Dock="Left" Click="Button_ClearImport_Click"></Button>
-            <Button Content="Import from Downloads folder" DockPanel.Dock="Right" Click="Button_ImportFromDownloads_Click"></Button>
+            <Button Content="Clear imported"  DockPanel.Dock="Left" Click="Button_ClearImport_Click" ToolTip="Clears imported items from this list"/>
+            <Button Content="Import from Downloads folder" DockPanel.Dock="Right" Click="Button_ImportFromDownloads_Click" ToolTip="Checks download folder for missing files and will import any if found"/>
         </DockPanel>
     </Grid>
     <Controls:MetroWindow.Flyouts>
