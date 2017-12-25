@@ -101,7 +101,6 @@ namespace AlotAddOnGUI
         private bool me3Installed;
         private bool RefreshListOnUserImportClose = false;
 
-        private static readonly string SETTINGSTR_HIDENONRELEVANTFILES = "HideNonRelevantFiles";
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
@@ -527,23 +526,19 @@ namespace AlotAddOnGUI
                         //Is Alot Installed?
                         ALOTVersionInfo currentAlotInfo = GetCurrentALOTInfo(CURRENT_GAME_BUILD);
                         bool readyToInstallALOT = false;
-                        ulong fullsize = 0;
                         foreach (AddonFile af in ADDONFILES_TO_BUILD)
                         {
                             if (af.ALOTVersion > 0)
                             {
                                 readyToInstallALOT = true;
                             }
-                            string file = af.GetFile();
-                            ulong size = (ulong)((new FileInfo(file).Length) * 2.1);
-                            fullsize += size;
                         }
-
+                        long fullsize = Utilities.DirSize(new DirectoryInfo(getOutputDir(CURRENT_GAME_BUILD)));
                         ulong freeBytes, diskSize, totalFreeBytes;
                         Utilities.GetDiskFreeSpaceEx(Utilities.GetGamePath(CURRENT_GAME_BUILD), out freeBytes, out diskSize, out totalFreeBytes);
                         Log.Information("We will need around " + ByteSize.FromBytes(fullsize) + " to install this texture set. The free space is " + ByteSize.FromBytes(freeBytes));
 
-                        if (freeBytes < fullsize)
+                        if (freeBytes < (ulong)fullsize)
                         {
                             //not enough disk space for build
                             HeaderLabel.Text = "Not enough free space to install textures for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
@@ -557,8 +552,6 @@ namespace AlotAddOnGUI
 
                         if (readyToInstallALOT || currentAlotInfo != null) //not installed
                         {
-
-
                             HeaderLabel.Text = "Ready to install new textures";
                             AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
                             MetroDialogSettings mds = new MetroDialogSettings();
@@ -1799,6 +1792,7 @@ namespace AlotAddOnGUI
 
             HeaderLabel.Text = "Preparing to build ALOT Addon for Mass Effect " + game + ".\nDon't close this window until the process completes.";
             // Install_ProgressBar.IsIndeterminate = true;
+            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "CheckOutputDirectoriesOnManifestLoad", true);
             return true;
         }
 
@@ -2191,6 +2185,15 @@ namespace AlotAddOnGUI
             }
             SetupButtons();
             UpdateALOTStatus();
+
+            foreach (AddonFile af in alladdonfiles)
+            {
+                if (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0)
+                {
+                    af.ReadyStatusText = null; //fire property reset
+                }
+            }
+
             Button_Settings.IsEnabled = true;
             Button_DownloadAssistant.IsEnabled = true;
             PreventFileRefresh = false;
