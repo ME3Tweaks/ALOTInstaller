@@ -1361,7 +1361,7 @@ namespace AlotAddOnGUI
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
             bool alotInstalled = installedInfo != null; //default value
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
-            if (installedInfo != null || installedInfo.ALOTVER == 0) //not installed or mem installed
+            if (installedInfo == null || installedInfo.ALOTVER == 0) //not installed or mem installed
             {
                 Checkbox_BuildOptionAddon.IsChecked = true;
                 Checkbox_BuildOptionAddon.IsEnabled = false;
