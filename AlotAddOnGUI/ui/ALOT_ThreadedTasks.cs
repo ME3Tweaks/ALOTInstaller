@@ -387,8 +387,7 @@ namespace AlotAddOnGUI
 
             string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
             string destinationpath = EXE_DIRECTORY + @"Extracted_Mods\";
-            Log.Information("Created Extracted_Mods folder");
-
+            Log.Information("Creating Extracted_Mods folder");
             Directory.CreateDirectory(destinationpath);
 
             ADDONFILES_TO_BUILD = new List<AddonFile>();
@@ -407,7 +406,7 @@ namespace AlotAddOnGUI
             }
 
 
-            foreach (AddonFile af in addonfiles)
+            foreach (AddonFile af in alladdonfiles)
             {
                 if (af.Ready && (game == 1 && af.Game_ME1 || game == 2 && af.Game_ME2 || game == 3 && af.Game_ME3))
                 {
@@ -464,10 +463,31 @@ namespace AlotAddOnGUI
                     {
                         ADDONFILES_TO_BUILD.Add(af);
                     }
-
                 }
             }
 
+            //DISK SPACE CHECK
+            ulong fullsize = 0;
+            foreach (AddonFile af in ADDONFILES_TO_BUILD)
+            {
+                string file = af.GetFile();
+                ulong size = (ulong)((new FileInfo(file).Length) * 2.5);
+                fullsize += size;
+            }
+
+            Utilities.GetDiskFreeSpaceEx(".", out freeBytes, out diskSize, out totalFreeBytes);
+            Log.Information("We will need around " + ByteSize.FromBytes(fullsize) + " to build this set. The free space is "+ByteSize.FromBytes(freeBytes));
+            if (freeBytes < fullsize)
+            {
+                //not enough disk space for build
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Not enough free space to build textures.\nYou will need around " + ByteSize.FromKiloBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD) + " to build the installation packages.")));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Build aborted"));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string,string>("Not enough free space to build textures","You will need around " + ByteSize.FromKiloBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to build the installation packages.")));
+
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+                return false;
+            }
+            
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
                 af.ReadyStatusText = "Queued for processing";
@@ -666,7 +686,8 @@ namespace AlotAddOnGUI
                         {
                             af.ReadyStatusText = "ALOT ready to install";
                             af.SetIdle();
-                        } else if (af.ALOTUpdateVersion > 0)
+                        }
+                        else if (af.ALOTUpdateVersion > 0)
                         {
                             af.ReadyStatusText = "ALOT update ready to install";
                             af.SetIdle();
@@ -1180,7 +1201,7 @@ namespace AlotAddOnGUI
             Log.Information("InstallWorker Thread starting for ME" + INSTALLING_THREAD_GAME);
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
-            bool RemoveMipMaps = (versionInfo == null || versionInfo.ALOTVER == 0); //remove mipmaps only if alot is not installed
+            bool RemoveMipMaps = (versionInfo == null); //remove mipmaps only if alot is not installed
             if (INSTALLING_THREAD_GAME == 1)
             {
                 STAGE_COUNT = 4;
@@ -1707,17 +1728,17 @@ namespace AlotAddOnGUI
                         string param = str.Substring(endOfCommand + 5).Trim();
                         switch (command)
                         {
-                                //worker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
-                                //int percentInt = Convert.ToInt32(param);
-                                //worker.ReportProgress(percentInt);
-                                case "PROCESSING_FILE":
+                            //worker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+                            //int percentInt = Convert.ToInt32(param);
+                            //worker.ReportProgress(percentInt);
+                            case "PROCESSING_FILE":
                             case "PROCESSING_MOD":
                                 Log.Information("MEM Reports processing file: " + param);
-                                    //worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
-                                    break;
+                                //worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
+                                break;
                             case "OVERALL_PROGRESS":
-                                //This will be changed later
-                                case "TASK_PROGRESS":
+                            //This will be changed later
+                            case "TASK_PROGRESS":
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_TASK_PROGRESS, param));
                                 break;
                             case "PHASE":

@@ -92,7 +92,7 @@ namespace AlotAddOnGUI
         private const string ADDON_STAGING_DIR = "ADDON_STAGING";
         private const string USER_STAGING_DIR = "USER_STAGING";
 
-        private string EXE_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory;
+        public static string EXE_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory;
         private string ADDON_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + ADDON_STAGING_DIR + "\\";
         private string USER_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + USER_STAGING_DIR + "\\";
 
@@ -466,6 +466,7 @@ namespace AlotAddOnGUI
             File.Delete((string)e.UserState);
             var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
             int fileVersion = versInfo.FileMajorPart;
+            Button_MEM_GUI.Content = "Launch MEM v" + fileVersion;
             ShowStatus("Updated Mass Effect Modder (GUI version) to v" + fileVersion, 3000);
         }
 
@@ -526,13 +527,34 @@ namespace AlotAddOnGUI
                         //Is Alot Installed?
                         ALOTVersionInfo currentAlotInfo = GetCurrentALOTInfo(CURRENT_GAME_BUILD);
                         bool readyToInstallALOT = false;
+                        ulong fullsize = 0;
                         foreach (AddonFile af in ADDONFILES_TO_BUILD)
                         {
                             if (af.ALOTVersion > 0)
                             {
                                 readyToInstallALOT = true;
                             }
+                            string file = af.GetFile();
+                            ulong size = (ulong)((new FileInfo(file).Length) * 2.1);
+                            fullsize += size;
                         }
+
+                        ulong freeBytes, diskSize, totalFreeBytes;
+                        Utilities.GetDiskFreeSpaceEx(Utilities.GetGamePath(CURRENT_GAME_BUILD), out freeBytes, out diskSize, out totalFreeBytes);
+                        Log.Information("We will need around " + ByteSize.FromBytes(fullsize) + " to install this texture set. The free space is " + ByteSize.FromBytes(freeBytes));
+
+                        if (freeBytes < fullsize)
+                        {
+                            //not enough disk space for build
+                            HeaderLabel.Text = "Not enough free space to install textures for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
+                            AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
+                            await this.ShowMessageAsync("Not enough free space for install", "There is not enough disk space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to install. You will need " + ByteSize.FromBytes(fullsize) + " of free space to install.");
+                            errorOccured = false;
+                            break;
+                        }
+
+
+
                         if (readyToInstallALOT || currentAlotInfo != null) //not installed
                         {
 
@@ -1339,7 +1361,7 @@ namespace AlotAddOnGUI
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
             bool alotInstalled = installedInfo != null; //default value
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
-            if (!alotInstalled)
+            if (installedInfo != null || installedInfo.ALOTVER == 0) //not installed or mem installed
             {
                 Checkbox_BuildOptionAddon.IsChecked = true;
                 Checkbox_BuildOptionAddon.IsEnabled = false;
@@ -1589,12 +1611,31 @@ namespace AlotAddOnGUI
             int nummissing = 0;
             bool oneisready = false;
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
+            if (installedInfo == null)
+            {
+                //Check for backup
+                string backupPath = Utilities.GetGameBackupPath(game);
+                if (backupPath == null)
+                {
+                    //No backup
+                    MetroDialogSettings mds = new MetroDialogSettings();
+                    mds.AffirmativeButtonText = "Backup";
+                    mds.NegativeButtonText = "Continue";
+                    mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                    MessageDialogResult result = await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " not backed up", "You should create a backup of your game before installing ALOT. In the event something goes wrong, you can quickly restore back to an unmodified state. Backups only work if you game is unmodified. Create a backup before install?", MessageDialogStyle.AffirmativeAndNegative, mds);
+                    if (result == MessageDialogResult.Affirmative)
+                    {
+                        BackupGame(game);
+                        return false;
+                    }
+                }
+            }
             bool blockDueToMissingALOTFile = installedInfo == null; //default value
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
             bool blockDueToMissingALOTUpdateFile = false; //default value
             bool manifestHasALOTMainFile = false;
             bool manifestHasUpdateAvailable = false;
-            foreach (AddonFile af in addonfiles)
+            foreach (AddonFile af in alladdonfiles)
             {
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
@@ -1608,7 +1649,6 @@ namespace AlotAddOnGUI
                         {
                             //Do not block as ALOT file is ready and will be installed
                             blockDueToMissingALOTFile = false;
-
                         }
                         else if (af.ALOTVersion > 0 && !af.Ready)
                         {
@@ -1668,8 +1708,8 @@ namespace AlotAddOnGUI
                 await this.ShowMessageAsync("No files available for building", "There are no files available or relevant in the Downloaded_Mods folder to install for Mass Effect" + getGameNumberSuffix(game) + ".");
                 return false;
             }
-            //if alot is already installed we don't need to show missing message
-            if (installedInfo == null)
+            //if alot is already installed we don't need to show missing message, unless installed via MEM directly
+            if (installedInfo == null || installedInfo.ALOTVER == 0)
             {
                 MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " Addon are missing - do you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
                 return result == MessageDialogResult.Affirmative;
@@ -2601,6 +2641,18 @@ namespace AlotAddOnGUI
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_DOWNLOADSFOLDER, dir);
             DOWNLOADS_FOLDER = dir;
             Button_ChangeDownloadFolder.ToolTip = "Changes folder where download assistant will import from.\nThis should be your browser's download folder.\nThe current directory is\n" + DOWNLOADS_FOLDER;
+        }
+
+        private void DownloadAssisant_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (!Button_DownloadAssistant.IsEnabled)
+            {
+                if (DOWNLOAD_ASSISTANT_WINDOW != null)
+                {
+                    DOWNLOAD_ASSISTANT_WINDOW.SHUTTING_DOWN = false;
+                    DOWNLOAD_ASSISTANT_WINDOW.Close();
+                }
+            }
         }
     }
 }

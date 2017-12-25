@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,7 +35,8 @@ namespace AlotAddOnGUI.classes
                 if (_readyiconpath != null)
                 {
                     return _readyiconpath;
-                } else
+                }
+                else
                 {
                     if (Ready)
                     {
@@ -203,6 +205,33 @@ namespace AlotAddOnGUI.classes
         internal void SetIdle()
         {
             ReadyIconPath = null;
+        }
+
+        internal string GetFile()
+        {
+            if (Ready)
+            {
+                if (!UserFile)
+                {
+                    if (UnpackedSingleFilename != null && File.Exists(MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + UnpackedSingleFilename))
+                    {
+                        return MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + UnpackedSingleFilename;
+                    }
+
+                    if (File.Exists(MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + Filename))
+                    {
+                        return MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + Filename;
+                    }
+                } else
+                {
+                    if (File.Exists(UserFilePath))
+                    {
+                        return UserFilePath;
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }
