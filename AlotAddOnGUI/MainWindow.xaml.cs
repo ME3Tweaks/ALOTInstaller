@@ -52,7 +52,8 @@ namespace AlotAddOnGUI
         public const string INCREMENT_COMPLETION_EXTRACTION = "INCREMENT_COMPLETION_EXTRACTION";
         public const string SHOW_DIALOG = "SHOW_DIALOG";
         public const string ERROR_OCCURED = "ERROR_OCCURED";
-        public const string BINARY_DIRECTORY = "bin\\";
+        public static string EXE_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory;
+        public static string BINARY_DIRECTORY = EXE_DIRECTORY + "bin\\";
         private bool errorOccured = false;
         private bool UsingBundledManifest = false;
         private List<string> BlockingMods;
@@ -92,7 +93,6 @@ namespace AlotAddOnGUI
         private const string ADDON_STAGING_DIR = "ADDON_STAGING";
         private const string USER_STAGING_DIR = "USER_STAGING";
 
-        public static string EXE_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory;
         private string ADDON_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + ADDON_STAGING_DIR + "\\";
         private string USER_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + USER_STAGING_DIR + "\\";
 
@@ -409,7 +409,7 @@ namespace AlotAddOnGUI
                 kp.Key.SetIndeterminate();
                 kp.Key.SetTitle("Extracting ALOT Installer update");
                 string path = BINARY_DIRECTORY + "7z.exe";
-                string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + System.AppDomain.CurrentDomain.BaseDirectory + "Update\"";
+                string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + EXE_DIRECTORY + "Update\"";
                 Log.Information("Extracting update...");
                 Utilities.runProcess(path, args);
 
@@ -417,9 +417,8 @@ namespace AlotAddOnGUI
                 kp.Key.CloseAsync();
 
                 Log.Information("Update Extracted - rebooting to update mode");
-                string exe = System.AppDomain.CurrentDomain.BaseDirectory + "Update\\" + System.AppDomain.CurrentDomain.FriendlyName;
-                string currentDirNoSlash = System.AppDomain.CurrentDomain.BaseDirectory;
-                currentDirNoSlash = currentDirNoSlash.Substring(0, currentDirNoSlash.Length - 1);
+                string exe = EXE_DIRECTORY + "Update\\" + System.AppDomain.CurrentDomain.FriendlyName;
+                string currentDirNoSlash = EXE_DIRECTORY.Substring(0, EXE_DIRECTORY.Length - 1);
                 args = "--update-dest \"" + currentDirNoSlash + "\"";
                 Utilities.runProcess(exe, args, true);
                 Environment.Exit(0);
@@ -438,7 +437,7 @@ namespace AlotAddOnGUI
             //Extract 7z
             string path = BINARY_DIRECTORY + "7z.exe";
 
-            string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + System.AppDomain.CurrentDomain.BaseDirectory + "bin\"";
+            string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + EXE_DIRECTORY + "bin\"";
             Log.Information("Extracting Tool update...");
             Utilities.runProcess(path, args);
             Log.Information("Extraction complete.");
@@ -457,7 +456,7 @@ namespace AlotAddOnGUI
             //Extract 7z
             string path = BINARY_DIRECTORY + "7z.exe";
 
-            string args = "x \"" + e.UserState + "\" -aoa -r -o\"" + System.AppDomain.CurrentDomain.BaseDirectory + "bin\"";
+            string args = "x \"" + e.UserState + "\" -aoa -r -o\"" + EXE_DIRECTORY + "bin\"";
             Log.Information("Extracting MEMGUI update...");
             Utilities.runProcess(path, args);
             Log.Information("Extraction complete.");
@@ -933,10 +932,29 @@ namespace AlotAddOnGUI
                             url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
                             Title += " BETA MODE ";
                         }
-                        await webClient.DownloadFileTaskAsync(url, @"manifest-new.xml");
-                        File.Delete(EXE_DIRECTORY + @"manifest.xml");
-                        File.Move(EXE_DIRECTORY + @"manifest-new.xml", EXE_DIRECTORY + @"manifest.xml");
-                        Log.Information("Manifest fetched.");
+                        await webClient.DownloadFileTaskAsync(url, EXE_DIRECTORY + @"manifest-new.xml");
+                        if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
+                        {
+                            File.Delete(EXE_DIRECTORY + @"manifest.xml");
+                            File.Move(EXE_DIRECTORY + @"manifest-new.xml", EXE_DIRECTORY + @"manifest.xml");
+                            Log.Information("Manifest fetched.");
+                        }
+                        else
+                        {
+                            File.Delete(EXE_DIRECTORY + @"manifest-new.xml");
+                            Log.Error("manifest-new.xml does not exist. Using local bundled version instead...");
+                            if (!File.Exists(EXE_DIRECTORY + @"manifest.xml") && File.Exists(EXE_DIRECTORY + @"manifest-bundled.xml"))
+                            {
+                                Log.Information("Reading bundled manifest instead.");
+                                File.Delete(EXE_DIRECTORY + @"manifest.xml");
+                                File.Copy(EXE_DIRECTORY + @"manifest-bundled.xml", EXE_DIRECTORY + @"manifest.xml");
+                                UsingBundledManifest = true;
+                            }
+                            else
+                            {
+                                Log.Error("Local manifest also doesn't exist! No manifest is available.");
+                            }
+                        }
                     }
                     catch (WebException e)
                     {
@@ -1215,7 +1233,7 @@ namespace AlotAddOnGUI
             List<AddonFile> linqlist = null;
             try
             {
-                XElement rootElement = XElement.Load(@"manifest.xml");
+                XElement rootElement = XElement.Load(EXE_DIRECTORY + @"manifest.xml");
                 string version = (string)rootElement.Attribute("version") ?? "";
                 var elemn1 = rootElement.Elements();
                 linqlist = (from e in rootElement.Elements("addonfile")
@@ -1756,7 +1774,7 @@ namespace AlotAddOnGUI
             AddonFilesLabel.Text = "Preparing to build texture packages...";
             Build_ProgressBar.IsIndeterminate = true;
             Log.Information("Deleting any pre-existing Extracted_Mods folder.");
-            string destinationpath = System.AppDomain.CurrentDomain.BaseDirectory + @"Extracted_Mods\";
+            string destinationpath = EXE_DIRECTORY + @"Extracted_Mods\";
             try
             {
                 if (Directory.Exists(destinationpath))
@@ -1812,14 +1830,14 @@ namespace AlotAddOnGUI
             }
         }
 
-        private async void PerformImportOperation(string[] files, bool acceptUserFiles = true)
+        private void PerformImportOperation(string[] files, bool acceptUserFiles = true)
         {
             if (files.Count() > 0)
             {
                 //don't know how you can drop less than 1 files but whatever
                 //This code is for failsafe in case somehow library file exists but is not detect properly, like user moved file but something is running
                 string file = files[0];
-                string basepath = System.AppDomain.CurrentDomain.BaseDirectory + @"Downloaded_Mods\";
+                string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
 
                 if (file.ToLower().StartsWith(basepath))
                 {
@@ -1880,7 +1898,7 @@ namespace AlotAddOnGUI
                         if (af.Ready == false)
                         {
                             //Copy file to directory
-                            string basepath = System.AppDomain.CurrentDomain.BaseDirectory + @"Downloaded_Mods\";
+                            string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
                             string destination = basepath + ((isUnpackedSingleFile) ? af.UnpackedSingleFilename : af.Filename);
                             //Log.Information("Copying dragged file to downloaded mods directory: " + file);
                             //File.Copy(file, destination, true);

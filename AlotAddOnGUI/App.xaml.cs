@@ -86,6 +86,8 @@ namespace AlotAddOnGUI
                 }
                 Log.Information("Command line arguments: " + commandlineargs);
             }
+            Log.Information("Working directory: " + Directory.GetCurrentDirectory());
+
             //Update Mode
             if (updateDestinationPath != null)
             {

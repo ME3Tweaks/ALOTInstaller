@@ -65,7 +65,7 @@ namespace AlotAddOnGUI
 
         private bool ExtractAddon(AddonFile af)
         {
-            string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + ADDON_STAGING_DIR + "\\";
+            string stagingdirectory = EXE_DIRECTORY + ADDON_STAGING_DIR + "\\";
 
             string fileToUse = af.Filename;
             bool isSingleFileMode = false;
@@ -375,7 +375,7 @@ namespace AlotAddOnGUI
 
         private bool ExtractAddons(int game)
         {
-            string stagingdirectory = System.AppDomain.CurrentDomain.BaseDirectory + ADDON_STAGING_DIR + "\\";
+            string stagingdirectory = EXE_DIRECTORY + ADDON_STAGING_DIR + "\\";
             PREBUILT_MEM_INDEX = 9;
             SHOULD_HAVE_OUTPUT_FILE = false; //will set to true later
             Log.Information("Extracting Addons for Mass Effect " + game);
