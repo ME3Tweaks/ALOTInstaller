@@ -295,7 +295,7 @@
                             <StackPanel>
                                 <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowFirstTime" Controls:ControlsHelper.ContentCharacterCasing="Upper" Content="Show Intro Dialog" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Shows the initial instructions screen"/>
                                 <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Controls:ControlsHelper.ContentCharacterCasing="Upper" x:Name="Button_ChangeDownloadFolder" Content="Change Download Folder" Click="Button_ChangeDownloadFolder_Click" ToolTip="Changes the folder used when importing from downloads" Style="{StaticResource AccentedSquareButtonStyle}" />
-                                <CheckBox Margin="5" x:Name="Checkbox_MoveFilesAsImport" Content="Import via move (not copy)" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied." />
+                                <CheckBox Margin="5" x:Name="Checkbox_MoveFilesAsImport" Content="Import via move (not copy)" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied.&#10;This only is used if files are on same drive - if files are on different drives then they are copied." />
                                 <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
                             </StackPanel>
                         </Expander>

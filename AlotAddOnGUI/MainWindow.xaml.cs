@@ -1962,7 +1962,9 @@ namespace AlotAddOnGUI
         private async void ImportFiles(List<Tuple<AddonFile, string, string>> filesToImport, List<string> importedFiles, ProgressDialogController progressController, long processedBytes, long totalBytes)
         {
             PreventFileRefresh = true;
-            if ((bool)Checkbox_MoveFilesAsImport.IsChecked)
+            string importingfrom = Path.GetPathRoot(filesToImport[0].Item2);
+            string importingto = Path.GetPathRoot(EXE_DIRECTORY);
+            if ((bool)Checkbox_MoveFilesAsImport.IsChecked && importingfrom == importingto)
             {
                 if (DOWNLOAD_ASSISTANT_WINDOW != null)
                 {
