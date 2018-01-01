@@ -1,78 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="2.0.4">
-	<addonfile friendlyname="MEUITM" tooltipname="MEUITM tpfs compilation Advanced users only-1-1-2.zip" author="CDAMJC">
-		<file downloadlink="http://www.nexusmods.com/masseffect/download/30" filename="MEUITM tpfs compilation Advanced users only-1-1-2.zip"/>
-		<packagefile me1="true" sourcename="Rachni and Queen.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="ASHarmor.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="CoucilandUdina.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Elcor.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="volus.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Kaiden_new.tpf" movedirectly="true"/>
-
-		<packagefile me1="true" sourcename="Husks.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="LightandShadowMaps.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Garrus Face.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Turian Tattoos.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="sheploo.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="HumanNPCClothing.tpf" movedirectly="true"/>
-
-		<packagefile me1="true" sourcename="Thorian.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Gethtransportsmaller.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Tali.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="N7Armors.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Benezia.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Anderson.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="ASH.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Salarian NPC.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Scientists.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Avina.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Normandy.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Geth Trooper.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Liara Body.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="GethHopper.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Mako.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Liara Face.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Femshep.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Normandy Uniforms.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Filmgrain.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Turian Armors.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Reporter robot.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Joker_New.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Keepers.tpf" movedirectly="true"/>
-
-
-
-
-		<packagefile me1="true" sourcename="Saren.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="MaleShep.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Wrex.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Hanar.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Chakwas.tpf" movedirectly="true"/>
-		<packagefile me1="true" sourcename="Asari.tpf" movedirectly="true"/>
-
-
-		<!-- special processing -->
-		<packagefile me1="true" sourcename="Kaiden.tpf" delete="true"/>
-		<packagefile me1="true" sourcename="Joker.tpf" delete="true"/>
-		<packagefile me1="true" sourcename="FemShepNoShine.tpf" delete="true"/>
-		<packagefile me1="true" sourcename="Sovereign.tpf" copydirectly="true"/> <!-- copy not move. -->
-
-		<!-- Must extract specific .dds files from the tpf. Do not use all of them. tpfsource="Sovereign.tpf"  -->
-
-		<!-- Maybe MEM bug, missing hash on extract 
-		<packagefile me1="true" sourcename="Sov_Diff_Stack_0xF6AA0402.dds" destinationname="Sov_Diff_Stack_0xF6AA0402.dds"/>
-		<packagefile me1="true" sourcename="Sov_Spec_Stack_0x5F42DC3A.dds" destinationname="Sov_Spec_Stack_0x5F42DC3A.dds"/>
-		<packagefile me1="true" sourcename="SOV_Norm_Stack_0xEFE31493.dds" destinationname="SOV_Norm_Stack_0xEFE31493.dds"/>
-		<packagefile me1="true" sourcename="SOV_Norm_Stack_0xEFE31493.dds" destinationname="0xA3E8FC46.dds"/>
-		<packagefile me1="true" sourcename="Sov_Diff_Stack_0xF6AA0402.dds" destinationname="0xB8E9A16C.dds"/>
-		<packagefile me1="true" sourcename="Sov_Diff_Stack_0xF6AA0402.dds" destinationname="0xD79EDCAD.dds"/> -->
-
-		<packagefile me1="true" sourcename="Sov_Spec_Stack.dds" destinationname="Sov_Spec_Stack_0x5F42DC3A.dds"/>
-		<packagefile me1="true" sourcename="SOV_Norm_Stack.dds" destinationname="SOV_Norm_Stack_0xEFE31493.dds"/>
-		<packagefile me1="true" sourcename="SOV_Norm_Stack.dds" destinationname="0xA3E8FC46.dds"/>
-		<packagefile me1="true" sourcename="Sov_Diff_Stack.dds" destinationname="0xB8E9A16C.dds"/>
-		<packagefile me1="true" sourcename="Sov_Diff_Stack.dds" destinationname="Sov_Diff_Stack_0xF6AA0402.dds"/>
-	</addonfile>
+<alotaddonmanifest version="2.0.5">
 	<addonfile friendlyname="Allers Complexion Tweak" author="Ellise">
 		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_AllersComplexionTweak.7z-580-1-0.7z"/>
 		<packagefile me3="true" sourcename="el_AllersComplexionTweak.tpf" movedirectly="true"/>
@@ -694,13 +621,5 @@
 		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E247C12_bulk_spec_s.dds" destinationname="HMM_ARM_SANf_Spec_0x6E247C12.dds"/>
 		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E443315_bulk_vega_s.dds" destinationname="HMM_ARM_SANf_Diff_0x6E443315.dds"/>
 		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds"/>
-	</addonfile>
-	<addonfile friendlyname="Holograms HD (MEM) - For ME2" author="JimbobJeffers">
-		<games me1="false" me2="true" me3="false"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/134" filename="Holograms HD (MEM)-134-1-0.zip"/>
-	</addonfile>
-	<addonfile friendlyname="Holograms HD (MEM) - For ME3" author="JimbobJeffers">
-		<games me1="false" me2="false" me3="true"/>
-		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/527" filename="Holograms HD (MEM)-527-1-0.zip"/>
 	</addonfile>
 </alotaddonmanifest>
