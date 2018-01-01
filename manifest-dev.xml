@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotaddonmanifest version="3.0.10">
 	<addonfile meuitm="true" friendlyname="MEUITM Anniversary Edition" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
-		<file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2-0.zip">
+		<file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2-0.zip"/>
 		<packagefile me1="true" sourcename="mods\Anderson.mem" movedirectly="true"/>
 		<packagefile me1="true" sourcename="mods\Asari.mem" movedirectly="true"/>
 		<packagefile me1="true" sourcename="mods\Ash Face.mem" movedirectly="true"/>
