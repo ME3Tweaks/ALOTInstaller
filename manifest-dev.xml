@@ -2,59 +2,59 @@
 <alotaddonmanifest version="3.0.10">
 	<addonfile meuitm="true" friendlyname="MEUITM Anniversary Edition" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
 		<file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2-0.zip"/>
-		<packagefile me1="true" sourcename="mods\Anderson.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Asari.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Ash Face.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\AshandLiaraRomanceBodies.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\AshArmor.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Avina Console.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Avina.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Batarians.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\benezia.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\BroShep.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\browsandfacialhair.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Chakwas.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\CitadelEnvironment.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\councilandudina.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Elcor.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\eyes.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\femshep.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Feros.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Filmgrain.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Garrus_Face.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Geth Trooper.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\GethHopper.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Gethtransportsmaller.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Hanar.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\HumanNPCClothing.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Husks.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Joker.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Kaiden.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Keepers.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Liaraface.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\LiaraGreenOutfit.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\lightandshadowmapsdxt.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Mako.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\N7Armors.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\N7ArmorsNoCF.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Normandy Uniforms.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Normandy.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Normandyadditional.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Rachni and Queen.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Reporter robot.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Salarians.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Saren.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Scientists.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Sheploo.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Sovereign.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\TaliClassic.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\TaliVisFace.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Thorian.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Turian Tattoos.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\TurianArmors.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Virmire.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\volus.mem" movedirectly="true"/>
-		<packagefile me1="true" sourcename="mods\Wrex.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Asari.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Ash Face.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\AshandLiaraRomanceBodies.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\AshArmor.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Avina Console.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Avina.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Batarians.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\benezia.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\BroShep.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\browsandfacialhair.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Chakwas.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\CitadelEnvironment.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\councilandudina.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Elcor.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\eyes.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\femshep.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Feros.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Filmgrain.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Garrus_Face.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Geth Trooper.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\GethHopper.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Gethtransportsmaller.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Hanar.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\HumanNPCClothing.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Husks.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Joker.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Kaiden.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Keepers.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Liaraface.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\LiaraGreenOutfit.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\lightandshadowmapsdxt.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Mako.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\N7Armors.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\N7ArmorsNoCF.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Normandy Uniforms.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Normandy.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Normandyadditional.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Rachni and Queen.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Reporter robot.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Salarians.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Saren.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Scientists.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Sheploo.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Sovereign.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\TaliClassic.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\TaliVisFace.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Thorian.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Turian Tattoos.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\TurianArmors.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Virmire.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\volus.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Wrex.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile alotversion="5" friendlyname="ALOT for ME1 - Main" tooltipname="Main file for ALOT for ME1" author="CreeperLava">
 		<file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1-83-2017-5-0.7z" unpackedsinglefilename="ALOT_ME1.mem"/>
