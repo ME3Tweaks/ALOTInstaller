@@ -722,7 +722,7 @@ namespace AlotAddOnGUI
                             game = 3;
                         }
                         //Check for staged file
-                        ready = File.Exists(getOutputDir(3) + "000_" + af.UnpackedSingleFilename);
+                        ready = File.Exists(getOutputDir(game) + "000_" + af.UnpackedSingleFilename);
                         if (ready)
                         {
                             af.Staged = true;
@@ -771,8 +771,6 @@ namespace AlotAddOnGUI
                 await this.ShowMessageAsync("ALOT Installer is too deep in the filesystem", "ALOT Installer can have issues extracting and building the Addon if nested too deeply in the filesystem. This is an issue with Windows file path limitations. Move the ALOT Installer directory up a few folders on your filesystem. A good place to put ALOT Installer is in Documents.");
                 Environment.Exit(1);
             }
-
-            Utilities.CreateMarkerFile(1, new ALOTVersionInfo(0, 0, 0, 1));
 
             bool hasWriteAccess = await testWriteAccess();
             if (hasWriteAccess) RunApplicationUpdater2();
@@ -2319,6 +2317,7 @@ namespace AlotAddOnGUI
                     if (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0)
                     {
                         af.ReadyStatusText = null; //fire property reset
+                        af.SetIdle();
                     }
                 }
             }
