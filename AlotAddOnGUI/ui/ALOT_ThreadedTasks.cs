@@ -419,7 +419,7 @@ namespace AlotAddOnGUI
                     {
                         //Detected MEMI tag
                         //Check if ALOT main file is installed. If it is and this is ALOT file, skip
-                        if (af.ALOTVersion > 0 && CurrentGameALOTInfo.ALOTVER >= 0)
+                        if (af.ALOTVersion > 0 && CurrentGameALOTInfo.ALOTVER >= 0 && INSTALL_ALOT_EVEN_IF_ALREADY_INSTALLED == false)
                         {
                             Log.Information("ALOT File in queue for processing but ALOT is already installed. Skipping...");
                             af.ReadyStatusText = "ALOT already installed";

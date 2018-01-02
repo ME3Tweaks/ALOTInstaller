@@ -42,7 +42,7 @@ namespace AlotAddOnGUI
     /// </summary>
     public partial class MainWindow : MetroWindow, INotifyPropertyChanged
     {
-
+        private bool INSTALL_ALOT_EVEN_IF_ALREADY_INSTALLED = false;
         private System.Windows.Controls.CheckBox[] buildOptionCheckboxes;
         public ConsoleApp BACKGROUND_MEM_PROCESS = null;
         public bool BACKGROUND_MEM_RUNNING = false;
@@ -698,11 +698,35 @@ namespace AlotAddOnGUI
                     if (af.UserFile)
                     {
                         ready = File.Exists(af.UserFilePath);
+                        af.Staged = false;
                     }
                     else if (!ready && af.UnpackedSingleFilename != null)
                     {
                         //Check for single file
                         ready = File.Exists(basepath + af.UnpackedSingleFilename);
+                        af.Staged = false;
+                    }
+                    else if (!ready && af.UnpackedSingleFilename != null && af.ALOTVersion > 0)
+                    {
+                        int game = 0;
+                        if (af.Game_ME1)
+                        {
+                            game = 1;
+                        }
+                        else if (af.Game_ME2)
+                        {
+                            game = 2;
+                        }
+                        else if (af.Game_ME3)
+                        {
+                            game = 3;
+                        }
+                        //Check for staged file
+                        ready = File.Exists(getOutputDir(3) + "000_" + af.UnpackedSingleFilename);
+                        if (ready)
+                        {
+                            af.Staged = true;
+                        }
                     }
                     if (af.Ready != ready) //ensure the file applies to something
                     {
@@ -714,6 +738,9 @@ namespace AlotAddOnGUI
                         if (af.Game_ME1) numME1FilesReady++;
                         if (af.Game_ME2) numME2FilesReady++;
                         if (af.Game_ME3) numME3FilesReady++;
+                    } else
+                    {
+                        af.Staged = false;
                     }
                     numdone += ready ? 1 : 0;
                     System.Windows.Application.Current.Dispatcher.Invoke(
@@ -744,6 +771,8 @@ namespace AlotAddOnGUI
                 await this.ShowMessageAsync("ALOT Installer is too deep in the filesystem", "ALOT Installer can have issues extracting and building the Addon if nested too deeply in the filesystem. This is an issue with Windows file path limitations. Move the ALOT Installer directory up a few folders on your filesystem. A good place to put ALOT Installer is in Documents.");
                 Environment.Exit(1);
             }
+
+            Utilities.CreateMarkerFile(1, new ALOTVersionInfo(0, 0, 0, 1));
 
             bool hasWriteAccess = await testWriteAccess();
             if (hasWriteAccess) RunApplicationUpdater2();
@@ -1026,7 +1055,7 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void CheckOutputDirectoriesForUnpackedSingleFiles()
+        private void CheckOutputDirectoriesForUnpackedSingleFiles(int game = 0)
         {
             bool ReImportedFiles = false;
             foreach (AddonFile af in alladdonfiles)
@@ -1047,7 +1076,7 @@ namespace AlotAddOnGUI
 
                     string importedFilePath = EXE_DIRECTORY + @"Downloaded_Mods\" + af.UnpackedSingleFilename;
                     string outputFilename = outputPath + "000_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
-                    if (File.Exists(outputFilename))
+                    if (File.Exists(outputFilename) && (game == 0 || game == i))
                     {
 
                         Log.Information("Re-importing extracted single file: " + outputFilename);
@@ -1323,7 +1352,7 @@ namespace AlotAddOnGUI
             addonfiles = alladdonfiles;
             //get list of installed games
             SetupButtons();
-
+            int meuitmindex = -1;
             foreach (AddonFile af in addonfiles)
             {
                 //Set Game
@@ -1337,23 +1366,14 @@ namespace AlotAddOnGUI
                     {
                         af.Game_ME1 = af.Game_ME2 = af.Game_ME3 = true; //if none is set, then its set to all
                     }
-                }
-            }
-            UpdateALOTStatus();
-            int meuitmindex = -1;
-            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER > 0)
-            {
-                //remove MEUITM
-                foreach (AddonFile af in alladdonfiles)
-                {
                     if (af.MEUITM)
                     {
                         meuitmindex = alladdonfiles.IndexOf(af);
                         meuitmFile = af;
-                        break;
                     }
                 }
             }
+            UpdateALOTStatus();
             if (meuitmindex >= 0)
             {
                 alladdonfiles.RemoveAt(meuitmindex);
@@ -1366,7 +1386,7 @@ namespace AlotAddOnGUI
         {
 
             BindingList<AddonFile> newList = new BindingList<AddonFile>();
-            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER == 0)
+            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO == null ||  CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER == 0)
             {
                 //show MEUITM
                 if (meuitmFile != null && alladdonfiles.IndexOf(meuitmFile) < 0)
@@ -1858,6 +1878,7 @@ namespace AlotAddOnGUI
         private async Task<bool> InitBuild(int game)
         {
             AddonFilesLabel.Text = "Preparing to build texture packages...";
+            CheckOutputDirectoriesForUnpackedSingleFiles(game);
             Build_ProgressBar.IsIndeterminate = true;
             Log.Information("Deleting any pre-existing Extracted_Mods folder.");
             string destinationpath = EXE_DIRECTORY + @"Extracted_Mods\";
@@ -2280,8 +2301,6 @@ namespace AlotAddOnGUI
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
             if (e.Result != null)
             {
-
-
                 bool result = (bool)e.Result;
                 if (result)
                 {
@@ -2316,6 +2335,21 @@ namespace AlotAddOnGUI
 
             BACKUP_THREAD_GAME = -1;
             HeaderLabel.Text = PRIMARY_HEADER;
+
+            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO!= null && CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER == 0)
+            {
+                if (meuitmFile != null)
+                {
+                    int index = alladdonfiles.IndexOf(meuitmFile);
+                    if (index < 0)
+                    {
+                        //add back in
+                        alladdonfiles.Add(meuitmFile);
+                        alladdonfiles = new BindingList<AddonFile>(alladdonfiles.OrderBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList());
+                    }
+                }
+            }
+
             ApplyFiltering();
         }
 

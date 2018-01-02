@@ -63,6 +63,10 @@ namespace AlotAddOnGUI.classes
                 {
                     return _readystatustext;
                 }
+                if (Staged)
+                {
+                    return "File staged for installation";
+                }
                 if (ALOTUpdateVersion > 0 || ALOTVersion > 0)
                 {
                     //Get current info
@@ -185,6 +189,7 @@ namespace AlotAddOnGUI.classes
         public bool UserFile { get; internal set; }
         public string UserFilePath { get; internal set; }
         public bool MEUITM { get; internal set; }
+        public bool Staged { get; internal set; }
 
         private void OnPropertyChanged(string propertyName)
         {
