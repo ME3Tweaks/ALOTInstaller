@@ -57,7 +57,7 @@ namespace AlotAddOnGUI
         private bool errorOccured = false;
         private bool UsingBundledManifest = false;
         private List<string> BlockingMods;
-
+        private AddonFile meuitmFile;
         private DispatcherTimer backgroundticker;
         private DispatcherTimer tipticker;
         private int completed = 0;
@@ -561,7 +561,21 @@ namespace AlotAddOnGUI
                             var buildResult = await this.ShowMessageAsync("Ready to install textures", "You can install these textures now, or you can manually install them with MEM. The files have been placed into the MEM_Packages subdirectory.", MessageDialogStyle.AffirmativeAndNegative, mds);
                             if (buildResult == MessageDialogResult.Affirmative)
                             {
-                                InstallALOT(result, ADDONFILES_TO_BUILD);
+                                bool run = true;
+                                while (Utilities.isGameRunning(CURRENT_GAME_BUILD))
+                                {
+                                    run = false;
+                                    await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + " is running", "Please close Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + " to continue.");
+                                    if (!Utilities.isGameRunning(CURRENT_GAME_BUILD))
+                                    {
+                                        run = true;
+                                        break;
+                                    }
+                                }
+                                if (run)
+                                {
+                                    InstallALOT(result, ADDONFILES_TO_BUILD);
+                                }
                             }
                             else
                             {
@@ -930,7 +944,13 @@ namespace AlotAddOnGUI
                         {
                             Log.Information("In BETA mode.");
                             url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
-                            Title += " BETA MODE ";
+                            Title += " BETA MODE";
+                        }
+                        if (false)
+                        {
+                            Log.Information("In DEV mode.");
+                            url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-dev.xml";
+                            Title += " DEV MODE";
                         }
                         await webClient.DownloadFileTaskAsync(url, EXE_DIRECTORY + @"manifest-new.xml");
                         if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
@@ -992,18 +1012,11 @@ namespace AlotAddOnGUI
                     RunMEMUpdater2();
                     UpdateALOTStatus();
                     RunMEMUpdaterGUI();
-                    if (USING_BETA)
+                    //beta only for now.
+                    bool? hasShownFirstRun = Utilities.GetRegistrySettingBool("HasRunFirstRun");
+                    if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
                     {
-                        //beta only for now.
-                        bool? hasShownFirstRun = Utilities.GetRegistrySettingBool("HasRunFirstRun");
-                        if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
-                        {
-                            playFirstTimeAnimation();
-                        }
-                        else
-                        {
-                            PerformRAMCheck();
-                        }
+                        playFirstTimeAnimation();
                     }
                     else
                     {
@@ -1085,11 +1098,20 @@ namespace AlotAddOnGUI
             {
                 if (CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER > 0)
                 {
-                    me1ver = CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER;
+                    bool meuitminstalled = CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER > 0;
+                    me1ver = CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER + (meuitminstalled ? ", MEUITM" : "");
                 }
                 else
                 {
-                    me1ver = "Installed, unable to detect version";
+                    if (CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER > 0)
+                    {
+                        me1ver = "Not Installed, MEUITM Installed";
+
+                    }
+                    else
+                    {
+                        me1ver = "Installed, unable to detect version";
+                    }
                 }
             }
             else
@@ -1146,9 +1168,10 @@ namespace AlotAddOnGUI
             Label_ALOTStatus_ME3.ToolTip = me3ToolTip;
 
             Button_ME1_ShowLODOptions.Visibility = (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER > 0) ? Visibility.Visible : Visibility.Collapsed;
-            foreach (AddonFile af in addonfiles)
+
+            foreach (AddonFile af in alladdonfiles)
             {
-                af.ReadyStatusText = af.ReadyStatusText; //update description
+                af.ReadyStatusText = null; //update description
             }
         }
 
@@ -1231,6 +1254,7 @@ namespace AlotAddOnGUI
             //}
             Log.Information("Reading manifest...");
             List<AddonFile> linqlist = null;
+            alladdonfiles = new BindingList<AddonFile>(); //prevents crashes
             try
             {
                 XElement rootElement = XElement.Load(EXE_DIRECTORY + @"manifest.xml");
@@ -1240,6 +1264,7 @@ namespace AlotAddOnGUI
                             select new AddonFile
                             {
                                 Showing = false,
+                                MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
                                 ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
                                 Author = (string)e.Attribute("author"),
                                 FriendlyName = (string)e.Attribute("friendlyname"),
@@ -1285,11 +1310,14 @@ namespace AlotAddOnGUI
             {
                 Log.Error("Error has occured parsing the XML!");
                 Log.Error(e.Message);
-                MessageDialogResult result = await this.ShowMessageAsync("Error reading Addon manifest", "An error occured while reading the manifest file for buildable addons. This may indicate a network failure or a packaging failure by Mgamerz - Please submit an issue to github (http://github.com/mgamerz/alotaddongui/issues) and include the most recent log file from the logs directory.\n\n" + e.Message, MessageDialogStyle.Affirmative);
+                MessageDialogResult result = await this.ShowMessageAsync("Error reading file manifest", "An error occured while reading the manifest file for installation. This may indicate a network failure or a packaging failure by Mgamerz - Please submit an issue to github (http://github.com/mgamerz/alotaddongui/issues) and include the most recent log file from the logs directory.\n\n" + e.Message, MessageDialogStyle.Affirmative);
                 AddonFilesLabel.Text = "Error parsing manifest XML! Check the logs.";
                 return;
             }
             linqlist = linqlist.OrderBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList();
+
+
+
             alladdonfiles = new BindingList<AddonFile>(linqlist);
             addonfiles = alladdonfiles;
             //get list of installed games
@@ -1311,6 +1339,25 @@ namespace AlotAddOnGUI
                 }
             }
             UpdateALOTStatus();
+            int meuitmindex = -1;
+            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER > 0)
+            {
+                //remove MEUITM
+                foreach (AddonFile af in alladdonfiles)
+                {
+                    if (af.MEUITM)
+                    {
+                        meuitmindex = alladdonfiles.IndexOf(af);
+                        meuitmFile = af;
+                        break;
+                    }
+                }
+            }
+            if (meuitmindex >= 0)
+            {
+                alladdonfiles.RemoveAt(meuitmindex);
+            }
+
             ApplyFiltering(); //sets data source and separators            
         }
 
@@ -1318,6 +1365,14 @@ namespace AlotAddOnGUI
         {
 
             BindingList<AddonFile> newList = new BindingList<AddonFile>();
+            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER == 0)
+            {
+                //show MEUITM
+                if (meuitmFile != null && alladdonfiles.IndexOf(meuitmFile) < 0)
+                {
+                    alladdonfiles.Add(meuitmFile);
+                }
+            }
             foreach (AddonFile af in alladdonfiles)
             {
                 if (!af.Ready && ShowReadyFilesOnly)
@@ -1383,6 +1438,13 @@ namespace AlotAddOnGUI
                 Checkbox_BuildOptionAddon.IsEnabled = true;
             }
 
+            //installedInfo = null -> MEUITM, ALOT not installed
+            //installedInfo = X ver = 0, meuitmver = 0 -> ALOT Installed via MEM Installer
+            //installedInfo = X ver > 0, mueitmver = 0 -> ALOT installed with ALOT installer
+            //installedInfo = X, ver = 0, meuitmver > 0 -> MEUITM installed via MEM Installer, no alot (or maybe old one.)
+            //installedInfo = X, ver > 0, meuitmver > 0-> MEUITM installed, alot  installed via alot installer
+            //
+
             bool hasApplicableUserFile = false;
             bool checkAlotBox = false;
             foreach (AddonFile af in addonfiles)
@@ -1399,7 +1461,9 @@ namespace AlotAddOnGUI
                     }
                 }
             }
+
             Checkbox_BuildOptionALOT.IsChecked = checkAlotBox;
+            Checkbox_BuildOptionALOT.IsEnabled = !checkAlotBox;
 
             Checkbox_BuildOptionUser.IsChecked = hasApplicableUserFile;
             Checkbox_BuildOptionUser.IsEnabled = hasApplicableUserFile;
@@ -1416,8 +1480,11 @@ namespace AlotAddOnGUI
 
             if (hasOneOption)
             {
-                Label_WhatToBuildAndInstall.Text = "ALOT is already installed. Choose what to install for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
-
+                Label_WhatToBuildAndInstall.Text = "Choose what to install for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
+                if (alotInstalled && installedInfo.ALOTVER > 0)
+                {
+                    Label_WhatToBuildAndInstall.Text = "ALOT is already installed. " + Label_WhatToBuildAndInstall.Text;
+                }
                 WhatToBuildFlyout.IsOpen = true;
             }
             else
@@ -1431,6 +1498,12 @@ namespace AlotAddOnGUI
         {
             if (ValidateGameBackup(1))
             {
+                if (Utilities.isGameRunning(1))
+                {
+                    await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(1) + " is running", "Please close Mass Effect" + getGameNumberSuffix(1) + " before attempting restore.");
+                    return;
+                }
+
                 //Game is backed up
                 MetroDialogSettings settings = new MetroDialogSettings();
                 settings.NegativeButtonText = "Cancel";
@@ -1452,6 +1525,12 @@ namespace AlotAddOnGUI
         {
             if (ValidateGameBackup(2))
             {
+                if (Utilities.isGameRunning(2))
+                {
+                    await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(2) + " is running", "Please close Mass Effect" + getGameNumberSuffix(2) + " before attempting restore.");
+                    return;
+                }
+
                 //Game is backed up
                 MetroDialogSettings settings = new MetroDialogSettings();
                 settings.NegativeButtonText = "Cancel";
@@ -1474,6 +1553,12 @@ namespace AlotAddOnGUI
         {
             if (ValidateGameBackup(3))
             {
+
+                if (Utilities.isGameRunning(3))
+                {
+                    await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(3) + " is running", "Please close Mass Effect" + getGameNumberSuffix(3) + " before attempting restore.");
+                    return;
+                }
                 //Game is backed up
                 MetroDialogSettings settings = new MetroDialogSettings();
                 settings.NegativeButtonText = "Cancel";
@@ -2190,26 +2275,36 @@ namespace AlotAddOnGUI
         private async void RestoreCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
-
-            bool result = (bool)e.Result;
-            if (result)
+            if (e.Result != null)
             {
-                AddonFilesLabel.Text = "Restore completed.";
-                await this.ShowMessageAsync("Restore completed", "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has been restored back to an unmodified state from backup.");
+
+
+                bool result = (bool)e.Result;
+                if (result)
+                {
+                    AddonFilesLabel.Text = "Restore completed.";
+                    await this.ShowMessageAsync("Restore completed", "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has been restored back to an unmodified state from backup.");
+                }
+                else
+                {
+                    AddonFilesLabel.Text = "Restore failed! Check the logs.";
+                }
+                SetupButtons();
+                UpdateALOTStatus();
+
+                foreach (AddonFile af in alladdonfiles)
+                {
+                    if (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0)
+                    {
+                        af.ReadyStatusText = null; //fire property reset
+                    }
+                }
             }
             else
             {
                 AddonFilesLabel.Text = "Restore failed! Check the logs.";
-            }
-            SetupButtons();
-            UpdateALOTStatus();
-
-            foreach (AddonFile af in alladdonfiles)
-            {
-                if (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0)
-                {
-                    af.ReadyStatusText = null; //fire property reset
-                }
+                SetupButtons();
+                UpdateALOTStatus();
             }
 
             Button_Settings.IsEnabled = true;
@@ -2218,6 +2313,7 @@ namespace AlotAddOnGUI
 
             BACKUP_THREAD_GAME = -1;
             HeaderLabel.Text = PRIMARY_HEADER;
+            ApplyFiltering();
         }
 
         private async void Checkbox_BetaMode_Click(object sender, RoutedEventArgs e)
@@ -2675,5 +2771,6 @@ namespace AlotAddOnGUI
                 }
             }
         }
+
     }
 }

@@ -358,7 +358,7 @@ namespace AlotAddOnGUI
             using (FileStream fs = new FileStream(GetALOTMarkerFilePath(game), FileMode.Open, FileAccess.Write))
             {
                 fs.SeekEnd();
-                fs.WriteInt32(0); //MEUITM version. Not used for now //-16
+                fs.WriteInt32(alotVersionInfo.MEUITMVER); //MEUITM version. Not used for now //-16
                 fs.WriteInt16(alotVersionInfo.ALOTVER); //-12
                 fs.WriteByte(alotVersionInfo.ALOTUPDATEVER); //-10
                 fs.WriteByte(alotVersionInfo.ALOTHOTFIXVER); //-9
@@ -417,8 +417,21 @@ namespace AlotAddOnGUI
                         //ALOT has been installed
                         fs.Position = endPos - 8;
                         int installerVersionUsed = fs.ReadInt32();
+                        int perGameFinal4Bytes = -20;
+                        switch (gameID)
+                        {
+                            case 1:
+                                perGameFinal4Bytes = 0;
+                                break;
+                            case 2:
+                                perGameFinal4Bytes = 4352;
+                                break;
+                            case 3:
+                                perGameFinal4Bytes = 16777472;
+                                break;
+                        }
 
-                        if (installerVersionUsed >= 10 && installerVersionUsed != 16777472) //default bytes before 178 MEMI Format
+                        if (installerVersionUsed >= 10 && installerVersionUsed != perGameFinal4Bytes) //default bytes before 178 MEMI Format
                         {
                             fs.Position = endPos - 12;
                             short ALOTVER = fs.ReadInt16();
@@ -673,6 +686,47 @@ namespace AlotAddOnGUI
                 size += DirSize(di);
             }
             return size;
+        }
+
+        public static void GetAntivirusInfo()
+        {
+            ManagementObjectSearcher wmiData = new ManagementObjectSearcher(@"root\SecurityCenter2", "SELECT * FROM AntivirusProduct");
+            ManagementObjectCollection data = wmiData.Get();
+
+            foreach (ManagementObject virusChecker in data)
+            {
+                var virusCheckerName = virusChecker["displayName"];
+                var productState = virusChecker["productState"];
+                uint productVal = (uint) productState;
+                var bytes = BitConverter.GetBytes(productVal);
+                Log.Information("Antivirus info: " + virusCheckerName + " with state " + bytes[1].ToString("X2")+" "+ bytes[2].ToString("X2") + " " + bytes[3].ToString("X2"));
+            }
+        }
+
+        public static bool isAntivirusRunning()
+        {
+            return true;
+        }
+
+
+        public static bool isGameRunning(int gameID)
+        {
+            if (gameID == 1)
+            {
+                Process[] pname = Process.GetProcessesByName("MassEffect");
+                return pname.Length > 0;
+            }
+            if (gameID == 2)
+            {
+                Process[] pname = Process.GetProcessesByName("MassEffect2");
+                Process[] pname2 = Process.GetProcessesByName("ME2Game");
+                return pname.Length > 0 || pname2.Length > 0;
+            } else
+            {
+                Process[] pname = Process.GetProcessesByName("MassEffect3");
+                return pname.Length > 0;
+            }
+
         }
     }
 }

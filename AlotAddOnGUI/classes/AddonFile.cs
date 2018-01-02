@@ -136,10 +136,12 @@ namespace AlotAddOnGUI.classes
                 {
                     return "User file is ready for processing";
                 }
-                else
+
+                if (MEUITM)
                 {
-                    return "Addon file is imported";
+                    return "MEUITM is imported";
                 }
+                return "Addon file is imported";
             }
             set
             {
@@ -182,6 +184,7 @@ namespace AlotAddOnGUI.classes
 
         public bool UserFile { get; internal set; }
         public string UserFilePath { get; internal set; }
+        public bool MEUITM { get; internal set; }
 
         private void OnPropertyChanged(string propertyName)
         {
@@ -223,7 +226,8 @@ namespace AlotAddOnGUI.classes
                     {
                         return MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + Filename;
                     }
-                } else
+                }
+                else
                 {
                     if (File.Exists(UserFilePath))
                     {

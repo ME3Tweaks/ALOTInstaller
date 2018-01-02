@@ -115,6 +115,7 @@ namespace AlotAddOnGUI
             Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
             string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
             Log.Information("Running Windows " + releaseId);
+            Utilities.GetAntivirusInfo();
         }
 
         void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

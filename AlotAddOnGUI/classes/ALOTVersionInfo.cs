@@ -7,12 +7,12 @@
         public byte ALOTHOTFIXVER;
         public int MEUITMVER;
 
-        public ALOTVersionInfo(short aLOTVER, byte aLOTUPDATEVER, byte aLOTHOTFIXVER, int mEUITMVER)
+        public ALOTVersionInfo(short ALOTVersion, byte ALOTUpdaterVersion, byte ALOTHotfixVersion, int MEUITMVersion)
         {
-            this.ALOTVER = aLOTVER;
-            this.ALOTUPDATEVER = aLOTUPDATEVER;
-            this.ALOTHOTFIXVER = aLOTHOTFIXVER;
-            this.MEUITMVER = mEUITMVER;
+            this.ALOTVER = ALOTVersion;
+            this.ALOTUPDATEVER = ALOTUpdaterVersion;
+            this.ALOTHOTFIXVER = ALOTHotfixVersion;
+            this.MEUITMVER = MEUITMVersion;
         }
     }
 }

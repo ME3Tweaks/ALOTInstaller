@@ -142,6 +142,10 @@ namespace AlotAddOnGUI
                                 foreach (string moveableFile in moveableFiles)
                                 {
                                     string name = Utilities.GetRelativePath(moveableFile, extractpath);
+                                    if (af.MEUITM)
+                                    {
+                                        Debug.WriteLine("BUST");
+                                    }
                                     foreach (PackageFile pf in af.PackageFiles)
                                     {
                                         string fname = Path.GetFileName(name);
@@ -760,10 +764,12 @@ namespace AlotAddOnGUI
                     BuildWorker.ReportProgress(0);
 
                     var mems = Directory.GetFiles(userFileExtractedPath, "*.mem", SearchOption.AllDirectories);
+                    var installerinis = Directory.GetFiles(userFileExtractedPath, "*.mem", SearchOption.AllDirectories);
+
                     bool hasMems = mems.Count() > 0;
                     foreach (string mem in mems)
                     {
-                        string memdest = getOutputDir(game) + USERFILE_INDEX.ToString("000") + "_UserAddon_" + Path.GetFileNameWithoutExtension(af.UserFilePath) + ".mem";
+                        string memdest = getOutputDir(game) + USERFILE_INDEX.ToString("000") + "_UserAddon_" + Path.GetFileNameWithoutExtension(mem) + ".mem";
                         File.Move(mem, memdest);
                         USERFILE_INDEX++;
                     }
@@ -795,27 +801,33 @@ namespace AlotAddOnGUI
                     }
 
                     userBuildResult |= BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
-
-                    if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count() == 0)
+                    if (hasMems)
+                    {
+                        userBuildResult = 0; //if it has mems we don't care
+                    }
+                    if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count() == 0 || hasMems)
                     {
                         af.SetIdle();
                         af.ReadyStatusText = "User file is ready for install";
                     }
                     else
                     {
-                        hadUserErrors = true;
-                        af.SetError();
-                        af.ReadyStatusText = "Error building MEM file";
-                        foreach (string str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                        if (!hasMems)
                         {
-                            userBuildErrors += "\n - " + str;
+                            hadUserErrors = true;
+                            af.SetError();
+                            af.ReadyStatusText = "Error building MEM file";
+                            foreach (string str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                            {
+                                userBuildErrors += "\n - " + str;
+                            }
                         }
                     }
-                    if (BACKGROUND_MEM_PROCESS.ExitCode != 0)
+                    if (BACKGROUND_MEM_PROCESS.ExitCode != 0 && !hasMems)
                     {
                         Log.Error("Non-Zero return code for user file! Something probably went wrong.");
                     }
-                    if (BACKGROUND_MEM_PROCESS.ExitCode == 0 && !File.Exists(getOutputDir(game) + filename) && SHOULD_HAVE_OUTPUT_FILE)
+                    if (BACKGROUND_MEM_PROCESS.ExitCode == 0 && !File.Exists(getOutputDir(game) + filename) && SHOULD_HAVE_OUTPUT_FILE && !hasMems)
                     {
                         Log.Error("Process went OK but no outputfile... Something probably went wrong with userfile.");
                     }
@@ -1235,9 +1247,15 @@ namespace AlotAddOnGUI
             AddonFile alotAddonFile = null;
             bool installedALOT = false;
             byte justInstalledUpdate = 0;
+            bool installingMEUITM = false;
             //Check if ALOT is in files that will be installed
             foreach (AddonFile af in ADDONFILES_TO_INSTALL)
             {
+                if (af.MEUITM)
+                {
+                    Log.Information("InstallWorker: We are installing MEUITM in this pass.");
+                    installingMEUITM = true;
+                }
                 if (af.ALOTVersion > 0)
                 {
                     alotAddonFile = af;
@@ -1252,8 +1270,12 @@ namespace AlotAddOnGUI
 
                 }
             }
-
-            MAINTASK_TEXT = "Installing ALOT for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+            string primary = "ALOT";
+            if (installingMEUITM)
+            {
+                primary += " & MEUITM";
+            }
+            MAINTASK_TEXT = "Installing "+primary+" for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
             if (!installedALOT)
             {
                 if (justInstalledUpdate > 0)
@@ -1413,6 +1435,7 @@ namespace AlotAddOnGUI
 
             //Create/Update Marker File
             short ALOTVersion = 0;
+            int meuitmFlag = (installingMEUITM) ? 1 : 0; //if 0 we can or it with existing info
             if (versionInfo == null)
             {
                 //Check if ALOT is in files that were installed
@@ -1428,6 +1451,7 @@ namespace AlotAddOnGUI
             else
             {
                 ALOTVersion = versionInfo.ALOTVER;
+                meuitmFlag |= versionInfo.MEUITMVER;
             }
 
             //Update Marker
@@ -1441,8 +1465,10 @@ namespace AlotAddOnGUI
                 updateVersion = versionInfo.ALOTUPDATEVER;
             }
 
+
+
             //Write Marker
-            ALOTVersionInfo newVersion = new ALOTVersionInfo(ALOTVersion, updateVersion, 0, 0);
+            ALOTVersionInfo newVersion = new ALOTVersionInfo(ALOTVersion, updateVersion, 0, meuitmFlag);
             Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
             ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
             if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
@@ -1691,6 +1717,9 @@ namespace AlotAddOnGUI
                             case "ERROR_NO_BUILDABLE_FILES":
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(CURRENT_USER_BUILD_FILE + " has no files that can be used for building");
                                 Log.Error("User buildable file has no files that can be converted to MEM format.");
+                                break;
+                            case "ERROR_FILE_NOT_COMPATIBLE":
+                                Log.Error("MEM reporting file is not compatible: "+param);
                                 break;
                             default:
                                 Log.Information("Unknown IPC command: " + command);
