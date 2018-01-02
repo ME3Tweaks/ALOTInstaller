@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace AlotAddOnGUI
 {
@@ -105,6 +106,8 @@ namespace AlotAddOnGUI
             }
 
             //Normal Mode
+            ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(UIElement),
+            new FrameworkPropertyMetadata(15000));
             if (Directory.Exists(loggingBasePath + "Update"))
             {
                 Thread.Sleep(1000);

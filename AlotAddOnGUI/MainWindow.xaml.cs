@@ -123,8 +123,8 @@ namespace AlotAddOnGUI
         private bool _showME3Files = true;
         private bool Loading = true;
         private int LODLIMIT = 0;
-        private TextBlock[] fadeInItems;
-        private List<TextBlock> currentFadeInItems = new List<TextBlock>();
+        private FrameworkElement[] fadeInItems;
+        private List<FrameworkElement> currentFadeInItems = new List<FrameworkElement>();
         private bool ShowReadyFilesOnly = false;
         internal AddonDownloadAssistant DOWNLOAD_ASSISTANT_WINDOW;
         public string DOWNLOADS_FOLDER;
@@ -736,7 +736,7 @@ namespace AlotAddOnGUI
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            fadeInItems = new TextBlock[] { FirstRunText_Title, FirstRunText_Summary, FirstRunText_TitleAddon, FirstRunText_AddonSummary, FirstRunText_TitleImport, FirstRunText_ImportSummary, FirstRunText_TitleOKMods, FirstRunText_OKModsSummary, FirstRunText_TitleBeta, FirstRunText_BetaSummary };
+            fadeInItems = new FrameworkElement[] { FirstRun_MainContent, FirstRunText_TitleBeta, FirstRunText_BetaSummary };
             buildOptionCheckboxes = new System.Windows.Controls.CheckBox[] { Checkbox_BuildOptionUser, Checkbox_BuildOptionAddon };
             if (EXE_DIRECTORY.Length > 95)
             {
@@ -940,7 +940,7 @@ namespace AlotAddOnGUI
                     {
                         //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", EXE_DIRECTORY + @"manifest.xml");
                         string url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml";
-                        if (USING_BETA)
+                        if (USING_BETA || true)
                         {
                             Log.Information("In BETA mode.");
                             url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
@@ -1177,7 +1177,7 @@ namespace AlotAddOnGUI
 
         private void playFirstTimeAnimation()
         {
-            foreach (TextBlock tb in fadeInItems)
+            foreach (FrameworkElement tb in fadeInItems)
             {
                 tb.Opacity = 0;
             }
@@ -1187,17 +1187,18 @@ namespace AlotAddOnGUI
             #region Fade in
             // Create a storyboard to contain the animations.
             Storyboard storyboard = new Storyboard();
-            TimeSpan duration = new TimeSpan(0, 0, 1);
+            TimeSpan duration = new TimeSpan(0, 0, 2);
 
             // Create a DoubleAnimation to fade the not selected option control
             DoubleAnimation animation = new DoubleAnimation();
 
             animation.From = 0.0;
             animation.To = 1.0;
+            animation.BeginTime = new TimeSpan(0, 0, 2);
             animation.Duration = new Duration(duration);
             animation.Completed += new EventHandler(ItemFadeInComplete_Chain);
 
-            TextBlock item = currentFadeInItems[0];
+            FrameworkElement item = currentFadeInItems[0];
             currentFadeInItems.RemoveAt(0);
             // Configure the animation to target de property Opacity
             Storyboard.SetTargetName(animation, item.Name);
@@ -2047,7 +2048,9 @@ namespace AlotAddOnGUI
         private async void ImportFiles(List<Tuple<AddonFile, string, string>> filesToImport, List<string> importedFiles, ProgressDialogController progressController, long processedBytes, long totalBytes)
         {
             PreventFileRefresh = true;
-            if ((bool)Checkbox_MoveFilesAsImport.IsChecked)
+            string importingfrom = Path.GetPathRoot(filesToImport[0].Item2);
+            string importingto = Path.GetPathRoot(EXE_DIRECTORY);
+            if ((bool)Checkbox_MoveFilesAsImport.IsChecked && importingfrom == importingto)
             {
                 if (DOWNLOAD_ASSISTANT_WINDOW != null)
                 {
@@ -2237,7 +2240,7 @@ namespace AlotAddOnGUI
             Checkbox_BetaMode.IsChecked = USING_BETA;
             Checkbox_MoveFilesAsImport.IsChecked = importasmove;
 
-            if (USING_BETA)
+            if (USING_BETA && false) //this build only!
             {
                 ThemeManager.ChangeAppStyle(System.Windows.Application.Current,
                                                     ThemeManager.GetAccent("Crimson"),

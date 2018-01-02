@@ -37,8 +37,8 @@
             <Setter Property="Padding" Value="10,5,10,5" />
 
         </Style>
-        
-        
+
+
         <Style x:Key="LinkLabel" TargetType="Button">
             <Setter Property="VerticalAlignment" Value="Top"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -295,7 +295,7 @@
                             <StackPanel>
                                 <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowFirstTime" Controls:ControlsHelper.ContentCharacterCasing="Upper" Content="Show Intro Dialog" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Shows the initial instructions screen"/>
                                 <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Controls:ControlsHelper.ContentCharacterCasing="Upper" x:Name="Button_ChangeDownloadFolder" Content="Change Download Folder" Click="Button_ChangeDownloadFolder_Click" ToolTip="Changes the folder used when importing from downloads" Style="{StaticResource AccentedSquareButtonStyle}" />
-                                <CheckBox Margin="5" x:Name="Checkbox_MoveFilesAsImport" Content="Import via move (not copy)" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied." />
+                                <CheckBox Margin="5" x:Name="Checkbox_MoveFilesAsImport" Content="Import via move (not copy)" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied.&#10;This only is used if files are on same drive - if files are on different drives then they are copied." />
                                 <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
                             </StackPanel>
                         </Expander>
@@ -426,20 +426,22 @@
                     <StackPanel x:Name="panel" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" UseLayoutRounding="True" Width="460"  Margin="35,20,0,0">
                         <TextBlock x:Name="FirstRunText_Title" Text="Welcome to the ALOT Installer" FontSize="30" FontWeight="Light"></TextBlock>
                         <TextBlock x:Name="FirstRunText_Summary" TextWrapping="Wrap" Text="This program is used to install ALOT, ALOT updates, and the ALOT Addon." FontSize="13"/>
-                        <TextBlock  x:Name="FirstRunText_TitleAddon" FontWeight="Light" Text="What is the ALOT Addon?" Margin="0,10,0,0" FontSize="24"/>
-                        <TextBlock  x:Name="FirstRunText_AddonSummary" FontSize="13"  TextWrapping="Wrap" HorizontalAlignment="Left">The ALOT Addon adds more textures provided by users who do not want their content in the main ALOT file.
+                        <StackPanel x:Name="FirstRun_MainContent">
+                            <TextBlock  x:Name="FirstRunText_TitleAddon" FontWeight="Light" Text="What is the ALOT Addon?" Margin="0,10,0,0" FontSize="24"/>
+                            <TextBlock  x:Name="FirstRunText_AddonSummary" FontSize="13"  TextWrapping="Wrap" HorizontalAlignment="Left">The ALOT Addon adds more textures provided by users who do not want their content in the main ALOT file.
                                                 This installer allows you to add those texture mods, which is installed alongside ALOT in a file called the Addon.
                                                 The ALOT team has cherry picked the best vanilla style textures from within those mods.
                                                 For the true ALOT experience, you should download all of the listed files for your game and import them.</TextBlock>
-                        <TextBlock  x:Name="FirstRunText_TitleImport" FontWeight="Light" Margin="0,10,0,0" FontSize="24">How do I import files?</TextBlock>
+                            <TextBlock  x:Name="FirstRunText_TitleImport" FontWeight="Light" Margin="0,10,0,0" FontSize="24">How do I import files?</TextBlock>
 
-                        <TextBlock  x:Name="FirstRunText_ImportSummary" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Left">
+                            <TextBlock  x:Name="FirstRunText_ImportSummary" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Left">
                             Import files by downloading them, and then using Download Assistant to import them from your downloads folder. You can also drag/drop them onto the main interface, or put them into the Downloaded_Mods directory.</TextBlock>
-                        <TextBlock  x:Name="FirstRunText_TitleOKMods" FontWeight="Light" Text="When do I install ALOT or other mods?" FontSize="24" Margin="0,10,0,0"></TextBlock>
-                        <TextBlock  x:Name="FirstRunText_OKModsSummary" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Left">Almost all pcc or upk mods (DLC or file replacement mods) are compatible with ALOT as long as you install them before ALOT. 
+                            <TextBlock  x:Name="FirstRunText_TitleOKMods" FontWeight="Light" Text="When do I install ALOT or other mods?" FontSize="24" Margin="0,10,0,0"></TextBlock>
+                            <TextBlock  x:Name="FirstRunText_OKModsSummary" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Left">Almost all pcc or upk mods (DLC or file replacement mods) are compatible with ALOT as long as you install them before ALOT. 
                             Once ALOT is installed, the only mods that can be installed are other texture mods that do not replace upk or pcc files.  
                             Installing pcc or upk files after ALOT is installed is unsupported and will almost always break the game.
-                        </TextBlock>
+                            </TextBlock>
+                        </StackPanel>
 
                         <TextBlock  x:Name="FirstRunText_TitleBeta" FontWeight="Light" Text="This installer is in beta" FontSize="24" Margin="0,10,0,0"></TextBlock>
                         <TextBlock  x:Name="FirstRunText_BetaSummary" Text="That means you may find bugs or errors, and we need your help to find them. Report issues to the Discord, by going into the settings menu." TextWrapping="Wrap" FontSize="13"></TextBlock>
