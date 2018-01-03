@@ -14,6 +14,11 @@ if (Test-Path "$($PSScriptRoot)\Release\ALOTAddonBuilder.exe") {
     Remove-Item "$($PSScriptRoot)\Release\ALOTAddonBuilder.exe" -Force
 }
 
+if (Test-Path "$($PSScriptRoot)\Release\music") {
+    Write-Host Removing music directory...
+    Remove-Item "$($PSScriptRoot)\Release\music" -Recurse -Force
+}
+
 if (Test-Path "$($PSScriptRoot)\Release\manifest-bundled.xml") {
     Write-Host Removing current manifest bundle...
     Remove-Item "$($PSScriptRoot)\Release\manifest-bundled.xml" -Force

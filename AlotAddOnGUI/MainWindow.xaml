@@ -321,9 +321,6 @@
                 <StackPanel Margin="10">
                     <TextBlock x:Name="Label_WhatToBuildAndInstall" Text="Choose what to build and install for Mass Effect." TextAlignment="Center" FontSize="16" Padding="5"></TextBlock>
                     <TextBlock Text="To add user files, drop an archive containing TPF, MEM, or DDS files onto the interface and choose the game they apply to. You can also drop TPF and MEM files directly." TextWrapping="Wrap" MaxWidth="500" TextAlignment="Center" FontSize="12" Padding="5"></TextBlock>
-
-
-
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                         <CheckBox x:Name="Checkbox_BuildOptionALOT" Content="ALOT" Margin="5" IsChecked="True" IsEnabled="False"></CheckBox>
                         <CheckBox x:Name="Checkbox_BuildOptionAddon" Content="Addon" Margin="5" IsChecked="True"></CheckBox>

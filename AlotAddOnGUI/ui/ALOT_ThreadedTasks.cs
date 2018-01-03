@@ -66,10 +66,14 @@ namespace AlotAddOnGUI
         Stopwatch stopwatch;
         private string MAINTASK_TEXT;
         private string CURRENT_USER_BUILD_FILE = "";
-        private bool BUiLD_ADDON_FILES = false;
+
+        public bool BUILD_ALOT { get; private set; }
+
+        private bool BUILD_ADDON_FILES = false;
         private bool BUILD_USER_FILES = false;
         private FadeInOutSampleProvider fadeoutProvider;
         private bool MusicPaused;
+        private const string SET_VISIBILE_ITEMS_LIST = "SET_VISIBILE_ITEMS_LIST";
 
         public bool MusicIsPlaying { get; private set; }
 
@@ -390,7 +394,7 @@ namespace AlotAddOnGUI
             string stagingdirectory = EXE_DIRECTORY + ADDON_STAGING_DIR + "\\";
             PREBUILT_MEM_INDEX = 9;
             SHOULD_HAVE_OUTPUT_FILE = false; //will set to true later
-            Log.Information("Extracting Addons for Mass Effect " + game);
+            Log.Information("Extracting Addons and files for Mass Effect " + game);
             ulong freeBytes;
             ulong diskSize;
             ulong totalFreeBytes;
@@ -427,7 +431,7 @@ namespace AlotAddOnGUI
                     {
                         //Detected MEMI tag
                         //Check if ALOT main file is installed. If it is and this is ALOT file, skip
-                        if (af.ALOTVersion > 0 && CurrentGameALOTInfo.ALOTVER >= 0 && INSTALL_ALOT_EVEN_IF_ALREADY_INSTALLED == false)
+                        if (af.ALOTVersion > 0 && CurrentGameALOTInfo.ALOTVER >= 0 && BUILD_ALOT == false)
                         {
                             Log.Information("ALOT File in queue for processing but ALOT is already installed. Skipping...");
                             af.ReadyStatusText = "ALOT already installed";
@@ -462,21 +466,26 @@ namespace AlotAddOnGUI
                     if (af.UserFile && BUILD_USER_FILES)
                     {
                         Log.Information("Adding User to build list: " + af.FriendlyName);
+                        af.Building = true;
                         ADDONFILES_TO_BUILD.Add(af);
                     }
 
-                    if (af.ALOTUpdateVersion == 0 && af.ALOTVersion == 0 && !af.UserFile && BUiLD_ADDON_FILES)
+                    if (af.ALOTUpdateVersion == 0 && af.ALOTVersion == 0 && !af.UserFile && BUILD_ADDON_FILES)
                     {
                         Log.Information("Adding AddonFile to build list: " + af.FriendlyName);
+                        af.Building = true;
                         ADDONFILES_TO_BUILD.Add(af);
                     }
 
-                    if (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0)
+                    if ((af.ALOTVersion > 0 && BUILD_ALOT) || af.ALOTUpdateVersion > 0)
                     {
                         ADDONFILES_TO_BUILD.Add(af);
+                        af.Building = true;
                     }
                 }
             }
+
+            BuildWorker.ReportProgress(completed, new ThreadCommand(SET_VISIBILE_ITEMS_LIST, ADDONFILES_TO_BUILD));
 
             //DISK SPACE CHECK
             ulong fullsize = 0;
@@ -1077,7 +1086,7 @@ namespace AlotAddOnGUI
             bool playMusic = false;
             foreach (AddonFile af in ADDONFILES_TO_INSTALL)
             {
-                if (af.ALOTVersion > 0)
+                if (af.ALOTVersion > 0 || af.MEUITM)
                 {
                     playMusic = true;
                     break;
@@ -1642,6 +1651,11 @@ namespace AlotAddOnGUI
                 ThreadCommand tc = (ThreadCommand)e.UserState;
                 switch (tc.Command)
                 {
+                    case SET_VISIBILE_ITEMS_LIST:
+                        List<AddonFile> afs = (List<AddonFile>)tc.Data;
+                        ShowBuildingOnly = true;
+                        ApplyFiltering();
+                        break;
                     case UPDATE_OPERATION_LABEL:
                         AddonFilesLabel.Text = (string)tc.Data;
                         break;

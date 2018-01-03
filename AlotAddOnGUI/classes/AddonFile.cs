@@ -190,6 +190,7 @@ namespace AlotAddOnGUI.classes
         public string UserFilePath { get; internal set; }
         public bool MEUITM { get; internal set; }
         public bool Staged { get; internal set; }
+        public bool Building { get; internal set; }
 
         private void OnPropertyChanged(string propertyName)
         {
