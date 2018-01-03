@@ -112,9 +112,8 @@ namespace AlotAddOnGUI
         private bool ERROR_SHOWING = false;
         private int PREBUILT_MEM_INDEX; //will increment to 10 when run
         private bool SHOULD_HAVE_OUTPUT_FILE;
-
         public bool USING_BETA { get; private set; }
-        public bool SpaceSaving { get; private set; }
+        public bool SOUND_SETTING { get; private set; }
         public StringBuilder BACKGROUND_MEM_STDOUT { get; private set; }
         public int BACKUP_THREAD_GAME { get; private set; }
         private bool _showME1Files = true;
@@ -2212,6 +2211,10 @@ namespace AlotAddOnGUI
                 else
                 {
                     progressController.SetMessage("ALOT Installer is importing files, please wait...\nImporting " + fileToImport.Item1.FriendlyName);
+                    if (DOWNLOAD_ASSISTANT_WINDOW != null)
+                    {
+                        DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("Importing "+importedFiles.Count +" file"+(importedFiles.Count == 1 ? "s" : ""));
+                    }
                 }
                 WebClient downloadClient = new WebClient();
                 long preDownloadStartBytes = processedBytes;
@@ -2232,8 +2235,8 @@ namespace AlotAddOnGUI
                     }
                     else
                     {
-                            //imports finished
-                            await progressController.CloseAsync();
+                        //imports finished
+                        await progressController.CloseAsync();
                         string detailsMessage = "The following files were just imported to ALOT Installer:";
                         foreach (string af in importedFiles)
                         {
@@ -2245,6 +2248,10 @@ namespace AlotAddOnGUI
                         string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " have been copied into the Downloaded_Mods directory.";
 
                         ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
+                        if (DOWNLOAD_ASSISTANT_WINDOW != null)
+                        {
+                            DOWNLOAD_ASSISTANT_WINDOW.ShowStatus(importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s were" : " was") + " imported");
+                        }
                     }
                 };
                 downloadClient.DownloadFileAsync(new Uri(fileToImport.Item2), fileToImport.Item3);

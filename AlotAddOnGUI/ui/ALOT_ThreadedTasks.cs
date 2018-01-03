@@ -4,6 +4,7 @@ using AlotAddOnGUI.ui;
 using ByteSizeLib;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
@@ -73,6 +74,7 @@ namespace AlotAddOnGUI
         private bool BUILD_USER_FILES = false;
         private FadeInOutSampleProvider fadeoutProvider;
         private bool MusicPaused;
+        private const string SETTINGSTR_SOUND = "PlayMusic";
         private const string SET_VISIBILE_ITEMS_LIST = "SET_VISIBILE_ITEMS_LIST";
 
         public bool MusicIsPlaying { get; private set; }
@@ -895,6 +897,7 @@ namespace AlotAddOnGUI
             if (MusicIsPlaying)
             {
                 MusicPaused = !MusicPaused;
+                Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_SOUND, MusicPaused);
                 if (MusicPaused)
                 {
                     waveOut.Pause();
@@ -1106,10 +1109,17 @@ namespace AlotAddOnGUI
                     LoopStream ls = new LoopStream(vorbisStream);
                     fadeoutProvider = new FadeInOutSampleProvider(ls.ToSampleProvider());
                     waveOut.Init(fadeoutProvider);
-                    fadeoutProvider.BeginFadeIn(2000);
                     InstallingOverlay_MusicButton.Visibility = Visibility.Visible;
-                    MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.Sound3;
-                    waveOut.Play();
+                    if (Utilities.GetRegistrySettingBool(SETTINGSTR_SOUND) ?? true)
+                    {
+                        MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.Sound3;
+                        fadeoutProvider.BeginFadeIn(2000);
+                        waveOut.Play();
+                    } else
+                    {
+                        MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.SoundMute;
+                        waveOut.Pause();
+                    }
                 }
             }
             SetInstallFlyoutState(true);
