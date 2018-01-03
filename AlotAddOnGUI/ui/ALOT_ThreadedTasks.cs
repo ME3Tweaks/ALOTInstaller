@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -68,6 +69,7 @@ namespace AlotAddOnGUI
         private bool BUiLD_ADDON_FILES = false;
         private bool BUILD_USER_FILES = false;
         private FadeInOutSampleProvider fadeoutProvider;
+        private bool MusicPaused;
 
         public bool MusicIsPlaying { get; private set; }
 
@@ -135,6 +137,7 @@ namespace AlotAddOnGUI
                             {
                                 af.ReadyStatusText = "Waiting for Addon to complete build";
                                 af.SetIdle();
+                                BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                                 return true;
                             }
                             //get free space for debug purposes
@@ -326,6 +329,7 @@ namespace AlotAddOnGUI
                                     File.Copy(af.UserFilePath, extractpath + "\\" + fileToUse, true);
                                     af.ReadyStatusText = "Waiting for Addon to complete build";
                                     af.SetIdle();
+                                    BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                                     return true;
                                 }
                                 else
@@ -877,6 +881,24 @@ namespace AlotAddOnGUI
             return addonResult && userResult;
         }
 
+        private void MusicIcon_Click(object sender, RoutedEventArgs e)
+        {
+            if (MusicIsPlaying)
+            {
+                MusicPaused = !MusicPaused;
+                if (MusicPaused)
+                {
+                    waveOut.Pause();
+                    MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.SoundMute;
+                }
+                else
+                {
+                    MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.Sound3;
+                    waveOut.Play();
+                }
+            }
+        }
+
         private async void BackupWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             if (e.UserState is null)
@@ -1052,18 +1074,34 @@ namespace AlotAddOnGUI
             InstallingOverlayFlyout_Border.Background = backgroundShadeBrush;
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
 
-            //Set music
-            string musfile = GetMusicDirectory() + "me" + game + ".ogg";
-            if (File.Exists(musfile))
+            bool playMusic = false;
+            foreach (AddonFile af in ADDONFILES_TO_INSTALL)
             {
-                MusicIsPlaying = true;
-                waveOut = new WaveOut();
-                vorbisStream = new NAudio.Vorbis.VorbisWaveReader(musfile);
-                LoopStream ls = new LoopStream(vorbisStream);
-                fadeoutProvider = new FadeInOutSampleProvider(ls.ToSampleProvider());
-                waveOut.Init(fadeoutProvider);
-                fadeoutProvider.BeginFadeIn(2000);
-                waveOut.Play();
+                if (af.ALOTVersion > 0)
+                {
+                    playMusic = true;
+                    break;
+                }
+            }
+
+            //Set music
+            if (playMusic)
+            {
+                string musfile = GetMusicDirectory() + "me" + game + ".ogg";
+                if (File.Exists(musfile))
+                {
+                    MusicIsPlaying = true;
+                    MusicPaused = false;
+                    waveOut = new WaveOut();
+                    vorbisStream = new NAudio.Vorbis.VorbisWaveReader(musfile);
+                    LoopStream ls = new LoopStream(vorbisStream);
+                    fadeoutProvider = new FadeInOutSampleProvider(ls.ToSampleProvider());
+                    waveOut.Init(fadeoutProvider);
+                    fadeoutProvider.BeginFadeIn(2000);
+                    InstallingOverlay_MusicButton.Visibility = Visibility.Visible;
+                    MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.Sound3;
+                    waveOut.Play();
+                }
             }
             SetInstallFlyoutState(true);
 
@@ -1137,10 +1175,19 @@ namespace AlotAddOnGUI
 
         private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
             if (MusicIsPlaying)
             {
                 MusicIsPlaying = false;
-                fadeoutProvider.BeginFadeOut(3000);
+                if (MusicPaused)
+                {
+                    waveOut.Stop();
+                    waveOut.Dispose();
+                }
+                else
+                {
+                    fadeoutProvider.BeginFadeOut(3000);
+                }
             }
             
             WARN_USER_OF_EXIT = false;
@@ -1302,9 +1349,7 @@ namespace AlotAddOnGUI
                 if (af.ALOTUpdateVersion > 0)
                 {
                     Log.Information("InstallWorker: We are installing ALOT Update v" + af.ALOTUpdateVersion + " in this pass.");
-
                     justInstalledUpdate = af.ALOTUpdateVersion;
-
                 }
             }
             string primary = "ALOT";

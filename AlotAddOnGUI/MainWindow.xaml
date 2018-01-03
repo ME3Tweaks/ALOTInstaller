@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         mc:Ignorable="d"
         BorderBrush="{DynamicResource AccentColorBrush}"
@@ -111,7 +112,7 @@
                             <Border x:Name="GameIcon_ME2" ToolTip="This file applies to Mass Effect 2" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME2_Text" FontSize="10"  Text="ME2" VerticalAlignment="Center"/>
                             </Border>
-                            <Border x:Name="GameIcon_ME1" ToolTip="This file applies to Mass Effect" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="BlueViolet" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ME1" ToolTip="This file applies to Mass Effect" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME1_Text" FontSize="10"  Text="ME1" VerticalAlignment="Center"/>
                             </Border>
                             <Border x:Name="GameIcon_ALOT" Visibility="Hidden" ToolTip="This file is required on first install" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#991244" CornerRadius="2" VerticalAlignment="Center">
@@ -337,8 +338,8 @@
                     </StackPanel>
                 </StackPanel>
             </Controls:Flyout>
-            <Controls:Flyout x:Name="InstallingOverlayFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
-                <Border x:Name="InstallingOverlayFlyout_Border" Padding="10" Background="#77000000" >
+            <Controls:Flyout x:Name="InstallingOverlayFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
+                <Border x:Name="InstallingOverlayFlyout_Border" Background="#77000000" >
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*" />
@@ -425,7 +426,9 @@
                                 </TextBlock.Effect>
                             </TextBlock>
                         </StackPanel>
-                        <Button Content="Music" Grid.Column="0" Grid.Row="1" Height="60" Width="60" Style="{DynamicResource MetroCircleButtonStyle}"/>
+                        <Button x:Name="InstallingOverlay_MusicButton" Margin="10" Grid.Column="0" Grid.Row="1" Height="40" Width="40" Style="{StaticResource MetroCircleButtonStyle}" Click="MusicIcon_Click">
+                            <iconPacks:PackIconModern x:Name="MusicButtonIcon" Kind="Sound3" />
+                        </Button>
                     </Grid>
                 </Border>
             </Controls:Flyout>
