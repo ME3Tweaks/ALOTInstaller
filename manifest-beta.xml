@@ -78,7 +78,7 @@
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT for ME3-363-2017-5-0.7z" unpackedsinglefilename="ALOT_ME3.mem"/>
 		<packagefile me3="true" sourcename="00_ALOT\ALOT_ME3.mem" movedirectly="true"/>
 	</addonfile>
-	<addonfile appliestomainversion="5" alotupdateversion="3" friendlyname="ALOT for ME3 - Update 3" tooltipname="Update file for ALOT for ME3" author="CreeperLava">
+	<addonfile appliestomainversion="5" alotupdateversion="3" friendlyname="ALOT for ME3 - Update 3" tooltipname="ALOT for ME3 - Update" author="CreeperLava">
 		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT for ME3 - Update-363-2017-5-3.7z"/>
 		<packagefile me3="true" sourcename="ALOT_ME3_Update.mem" movedirectly="true"/>
 	</addonfile>
