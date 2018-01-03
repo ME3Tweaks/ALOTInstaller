@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotaddonmanifest version="3.0.11">
+	<musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
 	<musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
 	<addonfile meuitm="true" friendlyname="MEUITM Anniversary Edition" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
 		<file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2-0.zip"/>
