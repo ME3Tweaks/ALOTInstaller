@@ -1,9 +1,12 @@
 ﻿using AlotAddOnGUI.classes;
+using AlotAddOnGUI.music;
 using AlotAddOnGUI.ui;
 using ByteSizeLib;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using Serilog;
 using SlavaGu.ConsoleAppLauncher;
 using System;
@@ -36,6 +39,8 @@ namespace AlotAddOnGUI
         private const int INSTALL_OK = 1;
         private const int RESULT_ME1LAA_FAILED = -43;
         private const int RESULT_TEXTUREINSTALL_FAILED = -42;
+        private WaveOut waveOut;
+        private NAudio.Vorbis.VorbisWaveReader vorbisStream;
         private const int RESULT_SCAN_REMOVE_FAILED = -41;
         private const int RESULT_UNPACK_FAILED = -40;
         public const string RESTORE_FAILED_COULD_NOT_DELETE_FOLDER = "RESTORE_FAILED_COULD_NOT_DELETE_FOLDER";
@@ -62,6 +67,9 @@ namespace AlotAddOnGUI
         private string CURRENT_USER_BUILD_FILE = "";
         private bool BUiLD_ADDON_FILES = false;
         private bool BUILD_USER_FILES = false;
+        private FadeInOutSampleProvider fadeoutProvider;
+
+        public bool MusicIsPlaying { get; private set; }
 
         private bool ExtractAddon(AddonFile af)
         {
@@ -142,10 +150,6 @@ namespace AlotAddOnGUI
                                 foreach (string moveableFile in moveableFiles)
                                 {
                                     string name = Utilities.GetRelativePath(moveableFile, extractpath);
-                                    if (af.MEUITM)
-                                    {
-                                        Debug.WriteLine("BUST");
-                                    }
                                     foreach (PackageFile pf in af.PackageFiles)
                                     {
                                         string fname = Path.GetFileName(name);
@@ -480,18 +484,18 @@ namespace AlotAddOnGUI
             }
 
             Utilities.GetDiskFreeSpaceEx(".", out freeBytes, out diskSize, out totalFreeBytes);
-            Log.Information("We will need around " + ByteSize.FromBytes(fullsize) + " to build this set. The free space is "+ByteSize.FromBytes(freeBytes));
+            Log.Information("We will need around " + ByteSize.FromBytes(fullsize) + " to build this set. The free space is " + ByteSize.FromBytes(freeBytes));
             if (freeBytes < fullsize)
             {
                 //not enough disk space for build
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Not enough free space to build textures.\nYou will need around " + ByteSize.FromKiloBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD) + " to build the installation packages.")));
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Build aborted"));
-                BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string,string>("Not enough free space to build textures","You will need around " + ByteSize.FromKiloBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to build the installation packages.")));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Not enough free space to build textures", "You will need around " + ByteSize.FromKiloBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to build the installation packages.")));
 
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
                 return false;
             }
-            
+
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
                 af.ReadyStatusText = "Queued for processing";
@@ -624,11 +628,11 @@ namespace AlotAddOnGUI
             bool hasAddonFiles = false;
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
-                if (af.ALOTUpdateVersion == 0 && af.ALOTVersion == 0 && !af.UserFile)
+                if (af.ALOTUpdateVersion == 0 && af.ALOTVersion == 0 && !af.UserFile && !af.MEUITM)
                 {
                     hasAddonFiles = true;
                 }
-                if (af.ALOTUpdateVersion > 0 || af.ALOTVersion > 0 || af.UserFile)
+                if (af.ALOTUpdateVersion > 0 || af.ALOTVersion > 0 || af.UserFile || af.MEUITM)
                 {
                     if (af.UserFile)
                     {
@@ -665,7 +669,7 @@ namespace AlotAddOnGUI
             Log.Information("[SIZE] AFTER_EXTRACTION_CLEANUP Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
 
             //BUILD MEM PACKAGE
-            int mainBuildResult = -2;
+            int mainBuildResult = hasAddonFiles ? -2 : 0; //if we have no files just set return code for addon to 0
             if (hasAddonFiles)
             {
                 BuildWorker.ReportProgress(0);
@@ -1047,6 +1051,20 @@ namespace AlotAddOnGUI
             }
             InstallingOverlayFlyout_Border.Background = backgroundShadeBrush;
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
+
+            //Set music
+            string musfile = GetMusicDirectory() + "me" + game + ".ogg";
+            if (File.Exists(musfile))
+            {
+                MusicIsPlaying = true;
+                waveOut = new WaveOut();
+                vorbisStream = new NAudio.Vorbis.VorbisWaveReader(musfile);
+                LoopStream ls = new LoopStream(vorbisStream);
+                fadeoutProvider = new FadeInOutSampleProvider(ls.ToSampleProvider());
+                waveOut.Init(fadeoutProvider);
+                fadeoutProvider.BeginFadeIn(2000);
+                waveOut.Play();
+            }
             SetInstallFlyoutState(true);
 
             //Load Tips
@@ -1082,6 +1100,19 @@ namespace AlotAddOnGUI
             InstallWorker.RunWorkerAsync(getOutputDir(INSTALLING_THREAD_GAME));
         }
 
+        private void MusicPlaybackStopped(object sender, StoppedEventArgs e)
+        {
+            if (MusicIsPlaying)
+            {
+                vorbisStream.Position = 0;
+            } else
+            {
+                waveOut.Stop();
+                waveOut.Dispose();
+                waveOut = null;
+            }
+        }
+
         private void newTipTimer_Tick(object sender, EventArgs e)
         {
             // code goes here
@@ -1099,13 +1130,19 @@ namespace AlotAddOnGUI
             }
         }
 
-        private string GetMusicDirectorry()
+        private string GetMusicDirectory()
         {
             return EXE_DIRECTORY + "music\\";
         }
 
         private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            if (MusicIsPlaying)
+            {
+                MusicIsPlaying = false;
+                fadeoutProvider.BeginFadeOut(3000);
+            }
+            
             WARN_USER_OF_EXIT = false;
             Log.Information("InstallCompleted()");
             InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Collapsed;
@@ -1275,7 +1312,7 @@ namespace AlotAddOnGUI
             {
                 primary += " & MEUITM";
             }
-            MAINTASK_TEXT = "Installing "+primary+" for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+            MAINTASK_TEXT = "Installing " + primary + " for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
             if (!installedALOT)
             {
                 if (justInstalledUpdate > 0)
@@ -1719,7 +1756,7 @@ namespace AlotAddOnGUI
                                 Log.Error("User buildable file has no files that can be converted to MEM format.");
                                 break;
                             case "ERROR_FILE_NOT_COMPATIBLE":
-                                Log.Error("MEM reporting file is not compatible: "+param);
+                                Log.Error("MEM reporting file is not compatible: " + param);
                                 break;
                             default:
                                 Log.Information("Unknown IPC command: " + command);

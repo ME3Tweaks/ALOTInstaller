@@ -111,7 +111,7 @@
                             <Border x:Name="GameIcon_ME2" ToolTip="This file applies to Mass Effect 2" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME2_Text" FontSize="10"  Text="ME2" VerticalAlignment="Center"/>
                             </Border>
-                            <Border x:Name="GameIcon_ME1" ToolTip="This file applies to Mass Effect" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="AliceBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ME1" ToolTip="This file applies to Mass Effect" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="BlueViolet" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME1_Text" FontSize="10"  Text="ME1" VerticalAlignment="Center"/>
                             </Border>
                             <Border x:Name="GameIcon_ALOT" Visibility="Hidden" ToolTip="This file is required on first install" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#991244" CornerRadius="2" VerticalAlignment="Center">
@@ -339,21 +339,19 @@
             </Controls:Flyout>
             <Controls:Flyout x:Name="InstallingOverlayFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
                 <Border x:Name="InstallingOverlayFlyout_Border" Padding="10" Background="#77000000" >
-                    <StackPanel VerticalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True" x:Name="InstallingOverlayFlyout_Panel">
-                        <Image x:Name="Installing_Checkmark" Width="84" Height="84" Visibility="Collapsed"/>
-                        <Controls:ProgressRing x:Name="Installing_Spinner"  IsActive="True" Margin="0,0,0,10" Foreground="Snow"/>
-                        <TextBlock x:Name="InstallingOverlay_TopLabel" VerticalAlignment="Stretch" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Overall Task">
-                            <TextBlock.Effect>
-                                <DropShadowEffect
-                                  ShadowDepth="4"
-                                  Direction="330"
-                                  Color="Black"
-                                  Opacity="1"
-                                 BlurRadius="4"/>
-                            </TextBlock.Effect>
-                        </TextBlock>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock x:Name="InstallingOverlay_StageLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Stage 3 of 7 (66%)">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True" x:Name="InstallingOverlayFlyout_Panel">
+                            <Image x:Name="Installing_Checkmark" Width="84" Height="84" Visibility="Collapsed"/>
+                            <Controls:ProgressRing x:Name="Installing_Spinner"  IsActive="True" Margin="0,0,0,10" Foreground="Snow"/>
+                            <TextBlock x:Name="InstallingOverlay_TopLabel" VerticalAlignment="Stretch" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Overall Task">
                                 <TextBlock.Effect>
                                     <DropShadowEffect
                                   ShadowDepth="4"
@@ -363,59 +361,72 @@
                                  BlurRadius="4"/>
                                 </TextBlock.Effect>
                             </TextBlock>
-                            <TextBlock x:Name="InstallingOverlay_OverallLabel" Margin="5,0,0,0" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="(0%)">
-                                <TextBlock.Effect>
-                                    <DropShadowEffect
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock x:Name="InstallingOverlay_StageLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Stage 3 of 7 (66%)">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect
                                   ShadowDepth="4"
                                   Direction="330"
                                   Color="Black"
                                   Opacity="1"
                                  BlurRadius="4"/>
-                                </TextBlock.Effect>
-                            </TextBlock>
-                        </StackPanel>
-                        <TextBlock x:Name="InstallingOverlay_BottomLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Getting Ready">
-                            <TextBlock.Effect>
-                                <DropShadowEffect
+                                    </TextBlock.Effect>
+                                </TextBlock>
+                                <TextBlock x:Name="InstallingOverlay_OverallLabel" Margin="5,0,0,0" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="(0%)">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect
                                   ShadowDepth="4"
                                   Direction="330"
                                   Color="Black"
                                   Opacity="1"
                                  BlurRadius="4"/>
-                            </TextBlock.Effect>
-                        </TextBlock>
-
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
-                            <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallViewLogs" Visibility="Collapsed" Margin="0,0,5,0"  HorizontalAlignment="Center"  Content="View Logs" ToolTip="Click to view logs" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
-                            <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallDone" Visibility="Visible" HorizontalAlignment="Center"  Content="Continue" ToolTip="Click to dismiss dialog" Click="Button_InstallDone_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
-                        </StackPanel>
-                        <StackPanel x:Name="Panel_ME1LODLimit" Orientation="Vertical" Visibility="Visible" HorizontalAlignment="Center" Margin="0,0,0,0">
-                            <TextBlock FontSize="14" FontWeight="Medium" HorizontalAlignment="Center" TextAlignment="Center" Text="Choose a graphics setting for Mass Effect.&#10;4K provides better quality, but you may get performance hiccups in some cutscenes due to engine limits.">
-                                <TextBlock.Effect>
-                                    <DropShadowEffect
-                                  ShadowDepth="4"
-                                  Direction="330"
-                                  Color="Black"
-                                  Opacity="1"
-                                 BlurRadius="4"/>
-                                </TextBlock.Effect>
-                            </TextBlock>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
-                                <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_LOD2k" Visibility="Visible" Margin="0,0,5,0"  HorizontalAlignment="Center"  Content="Use 2K textures when available" ToolTip="2K has less detail, but better performance." Click="Button_InstallerLOD2k_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
-                                <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_LOD4k" Visibility="Visible" HorizontalAlignment="Center"  Content="Use 4K textures when available" ToolTip="4K has more detail, but will have less performance in some cutscenes." Click="Button_InstallerLOD4k_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                    </TextBlock.Effect>
+                                </TextBlock>
                             </StackPanel>
-                        </StackPanel>
-                        <TextBlock x:Name="InstallingOverlay_Tip" MaxWidth="700" TextWrapping="Wrap" MinHeight="90" FontSize="16" FontWeight="Medium" Margin="5,40,0,5" HorizontalAlignment="Center"  TextAlignment="Center" Text="This may take a while.&#10;Enjoy some codex entries while you wait.">
-                            <TextBlock.Effect>
-                                <DropShadowEffect
+                            <TextBlock x:Name="InstallingOverlay_BottomLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="Getting Ready">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect
                                   ShadowDepth="4"
                                   Direction="330"
                                   Color="Black"
                                   Opacity="1"
                                  BlurRadius="4"/>
-                            </TextBlock.Effect>
-                        </TextBlock>
-                    </StackPanel>
+                                </TextBlock.Effect>
+                            </TextBlock>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+                                <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallViewLogs" Visibility="Collapsed" Margin="0,0,5,0"  HorizontalAlignment="Center"  Content="View Logs" ToolTip="Click to view logs" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallDone" Visibility="Visible" HorizontalAlignment="Center"  Content="Continue" ToolTip="Click to dismiss dialog" Click="Button_InstallDone_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                            </StackPanel>
+                            <StackPanel x:Name="Panel_ME1LODLimit" Orientation="Vertical" Visibility="Visible" HorizontalAlignment="Center" Margin="0,0,0,0">
+                                <TextBlock FontSize="14" FontWeight="Medium" HorizontalAlignment="Center" TextAlignment="Center" Text="Choose a graphics setting for Mass Effect.&#10;4K provides better quality, but you may get performance hiccups in some cutscenes due to engine limits.">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect
+                                  ShadowDepth="4"
+                                  Direction="330"
+                                  Color="Black"
+                                  Opacity="1"
+                                 BlurRadius="4"/>
+                                    </TextBlock.Effect>
+                                </TextBlock>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+                                    <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_LOD2k" Visibility="Visible" Margin="0,0,5,0"  HorizontalAlignment="Center"  Content="Use 2K textures when available" ToolTip="2K has less detail, but better performance." Click="Button_InstallerLOD2k_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                    <Button Controls:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_LOD4k" Visibility="Visible" HorizontalAlignment="Center"  Content="Use 4K textures when available" ToolTip="4K has more detail, but will have less performance in some cutscenes." Click="Button_InstallerLOD4k_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                </StackPanel>
+                            </StackPanel>
+                            <TextBlock x:Name="InstallingOverlay_Tip" MaxWidth="700" TextWrapping="Wrap" MinHeight="90" FontSize="16" FontWeight="Medium" Margin="5,40,0,5" HorizontalAlignment="Center"  TextAlignment="Center" Text="This may take a while.&#10;Enjoy some codex entries while you wait.">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect
+                                  ShadowDepth="4"
+                                  Direction="330"
+                                  Color="Black"
+                                  Opacity="1"
+                                 BlurRadius="4"/>
+                                </TextBlock.Effect>
+                            </TextBlock>
+                        </StackPanel>
+                        <Button Content="Music" Grid.Column="0" Grid.Row="1" Height="60" Width="60" Style="{DynamicResource MetroCircleButtonStyle}"/>
+                    </Grid>
                 </Border>
             </Controls:Flyout>
             <Controls:Flyout x:Name="FirstRunFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">

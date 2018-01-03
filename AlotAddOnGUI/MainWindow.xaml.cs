@@ -128,6 +128,7 @@ namespace AlotAddOnGUI
         private bool ShowReadyFilesOnly = false;
         internal AddonDownloadAssistant DOWNLOAD_ASSISTANT_WINDOW;
         public string DOWNLOADS_FOLDER;
+        private int RefreshesUntilRealRefresh;
 
         public bool ShowME1Files
         {
@@ -500,9 +501,10 @@ namespace AlotAddOnGUI
                     break;
                 case -1:
                 default:
+                    Log.Error("BuildCompleted() got -1 (or default catch all) result.");
                     HeaderLabel.Text = "An error occured building the Addon.\nView the log (Settings -> Diagnostics -> View Log) for more information.";
                     AddonFilesLabel.Text = "Addon not successfully built";
-                    PreventFileRefresh = true; //don't udpate the ticker
+                    RefreshesUntilRealRefresh = 4;
                     break;
                 case 1:
                 case 2:
@@ -593,6 +595,7 @@ namespace AlotAddOnGUI
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
                 af.ReadyStatusText = null;
+                af.SetIdle();
             }
             CURRENT_GAME_BUILD = 0; //reset
         }
@@ -676,6 +679,11 @@ namespace AlotAddOnGUI
             {
                 return;
             }
+            if (RefreshesUntilRealRefresh > 0)
+            {
+                RefreshesUntilRealRefresh--;
+                return;
+            }
             // code to execute periodically
             if (addonfiles != null)
             {
@@ -706,7 +714,8 @@ namespace AlotAddOnGUI
                         ready = File.Exists(basepath + af.UnpackedSingleFilename);
                         af.Staged = false;
                     }
-                    else if (!ready && af.UnpackedSingleFilename != null && af.ALOTVersion > 0)
+
+                    if (!ready && af.UnpackedSingleFilename != null && af.ALOTVersion > 0)
                     {
                         int game = 0;
                         if (af.Game_ME1)
@@ -967,7 +976,7 @@ namespace AlotAddOnGUI
                     {
                         //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", EXE_DIRECTORY + @"manifest.xml");
                         string url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml";
-                        if (USING_BETA || true)
+                        if (USING_BETA)
                         {
                             Log.Information("In BETA mode.");
                             url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
@@ -1026,10 +1035,10 @@ namespace AlotAddOnGUI
 
                     Log.Information("readManifest() has completed. Switching over to user control");
                     bool? CheckOutputDirectories = Utilities.GetRegistrySettingBool("CheckOutputDirectoriesOnManifestLoad");
-                    if (CheckOutputDirectories != null && CheckOutputDirectories.Value)
-                    {
+                    //if (CheckOutputDirectories != null && CheckOutputDirectories.Value)
+                    //{
                         CheckOutputDirectoriesForUnpackedSingleFiles();
-                    }
+                    //}
 
                     Loading = false;
                     Build_ProgressBar.IsIndeterminate = false;
@@ -1058,7 +1067,7 @@ namespace AlotAddOnGUI
             bool ReImportedFiles = false;
             foreach (AddonFile af in alladdonfiles)
             {
-                if (af.Ready)
+                if (af.Ready && !af.Staged)
                 {
                     continue;
                 }
@@ -1082,6 +1091,8 @@ namespace AlotAddOnGUI
                         {
                             File.Move(outputFilename, importedFilePath);
                             ReImportedFiles = true;
+                            af.Staged = false;
+                            af.ReadyStatusText = null;
                         }
                         catch (Exception e)
                         {
@@ -1390,6 +1401,7 @@ namespace AlotAddOnGUI
                 if (meuitmFile != null && alladdonfiles.IndexOf(meuitmFile) < 0)
                 {
                     alladdonfiles.Add(meuitmFile);
+                    alladdonfiles = new BindingList<AddonFile>(alladdonfiles.OrderBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList());
                 }
             }
             foreach (AddonFile af in alladdonfiles)
@@ -1712,6 +1724,7 @@ namespace AlotAddOnGUI
 
         private async Task<bool> InstallPrecheck(int game)
         {
+            CheckOutputDirectoriesForUnpackedSingleFiles();
             CheckImportLibrary_Tick(null, null); //get all ready files
 
             //Check game has been run at least once
@@ -1721,8 +1734,16 @@ namespace AlotAddOnGUI
                 //game has not been run yet.
                 Log.Error("Config file missing for Mass Effect " + game + ". Blocking install");
                 await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " has not been run yet", "Mass Effect" + getGameNumberSuffix(game) + " must be run at least once in order for the game to generate default configuration files for this installer to edit. Start the game, and exit at the main menu to generate them.");
-                return false;
+               // return false;
             }
+
+            Loading = true; //preven 1;
+            ShowME1Files = game == 1;
+            ShowME2Files = game == 2;
+            ShowME3Files = game == 3;
+            Loading = false;
+            ApplyFiltering();
+
             int nummissing = 0;
             bool oneisready = false;
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
@@ -2259,7 +2280,7 @@ namespace AlotAddOnGUI
             Checkbox_BetaMode.IsChecked = USING_BETA;
             Checkbox_MoveFilesAsImport.IsChecked = importasmove;
 
-            if (USING_BETA && false) //this build only!
+            if (USING_BETA)
             {
                 ThemeManager.ChangeAppStyle(System.Windows.Application.Current,
                                                     ThemeManager.GetAccent("Crimson"),

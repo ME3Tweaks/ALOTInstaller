@@ -117,7 +117,7 @@ namespace AlotAddOnGUI.classes
                             {
                                 if (ALOTUpdateVersion > info.ALOTUPDATEVER)
                                 {
-                                    return "ALOT Update imported, will be applied";
+                                    return "ALOT update imported, will be applied";
                                 }
                                 else
                                 {
@@ -132,7 +132,7 @@ namespace AlotAddOnGUI.classes
                         }
                         else
                         {
-                            return "ALOT Update imported, will be installed";
+                            return "ALOT update imported, will be installed";
                         }
                     }
                 }
