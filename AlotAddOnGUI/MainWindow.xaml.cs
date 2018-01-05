@@ -194,6 +194,7 @@ namespace AlotAddOnGUI
 
         private async void RunApplicationUpdater2()
         {
+            Log.Information("Checking for application updates from gitub");
             AddonFilesLabel.Text = "Checking for application updates";
             var versInfo = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
@@ -202,6 +203,8 @@ namespace AlotAddOnGUI
                 var releases = await client.Repository.Release.GetAll("Mgamerz", "ALOTAddonGUI");
                 if (releases.Count > 0)
                 {
+                    Log.Information("Fetched application releases from github");
+
                     //The release we want to check is always the latest, so [0]
                     Release latest = null;
                     Version latestVer = new Version("0.0.0.0");
@@ -212,17 +215,22 @@ namespace AlotAddOnGUI
                             continue;
                         }
                         Version releaseVersion = new Version(r.TagName);
+
                         if (releaseVersion > latestVer)
                         {
                             latest = r;
                             latestVer = releaseVersion;
                         }
                     }
+
                     if (latest != null)
                     {
+                        Log.Information("Latest available: " + latest.TagName);
+
                         Version releaseName = new Version(latest.TagName);
                         if (versInfo < releaseName && latest.Assets.Count > 0)
                         {
+                            Log.Information("Latest release is applicable to us.");
                             string versionInfo = "";
                             if (latest.Prerelease)
                             {
@@ -237,6 +245,7 @@ namespace AlotAddOnGUI
                             MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available. You are currently using version " + versInfo.ToString() + ".\n========================\n" + versionInfo + "\n" + latest.Body + "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative, mds);
                             if (result == MessageDialogResult.Affirmative)
                             {
+                                Log.Information("Downloading update for application");
 
                                 //there's an update
                                 updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "ALOT Installer is updating. Please wait...", true);
@@ -246,18 +255,23 @@ namespace AlotAddOnGUI
                                 downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
                                 downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
                                 string temppath = Path.GetTempPath();
+                                int downloadProgress = 0;
                                 downloadClient.DownloadProgressChanged += (s, e) =>
                                 {
-                                    Log.Information("Program update download percent: " + e.ProgressPercentage);
+                                    if (downloadProgress != e.ProgressPercentage)
+                                    {
+                                        Log.Information("Program update download percent: " + e.ProgressPercentage);
+                                    }
+                                    downloadProgress = e.ProgressPercentage;
                                     updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
                                 };
                                 updateprogresscontroller.Canceled += async (s, e) =>
                                 {
                                     if (downloadClient != null)
                                     {
+                                        Log.Information("Application update was in progress but was canceled.");
                                         downloadClient.CancelAsync();
                                         await updateprogresscontroller.CloseAsync();
-                                        Log.Information("Application update was in progress but was canceled.");
                                         await FetchManifest();
                                     }
                                 };
@@ -405,15 +419,20 @@ namespace AlotAddOnGUI
             Label_MEMVersion.Content = "MEM (No GUI) Version: " + fileVersion;
             try
             {
+                Log.Information("Checking for updates to MEMNOGUI...");
+
                 var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
-                var user = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModderNoGui");
-                if (user.Count > 0)
+                var releases = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModderNoGui");
+                Log.Information("Fetched MEMNOGui releases from github...");
+                if (releases.Count > 0)
                 {
                     //The release we want to check is always the latest, so [0]
-                    Release latest = user[0];
+                    Release latest = releases[0];
                     int releaseNameInt = Convert.ToInt32(latest.TagName);
                     if (fileVersion < releaseNameInt && latest.Assets.Count > 0)
                     {
+                        Log.Information("MEMNOGUI update available: " + releaseNameInt);
+
                         //there's an update
                         updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder (No GUI) is updating. Please wait...", true);
                         updateprogresscontroller.SetIndeterminate();
@@ -434,12 +453,13 @@ namespace AlotAddOnGUI
                     else
                     {
                         //up to date
+                        Log.Information("No updates for MEM NO Gui are available");
                     }
                 }
             }
             catch (Exception e)
             {
-                Log.Error("Error checking for MEM update: " + e.Message);
+                Log.Error("Error checking for MEMNOGUI update: " + e.Message);
                 ShowStatus("Error checking for MEM (NOGUI) update");
             }
         }
@@ -449,6 +469,8 @@ namespace AlotAddOnGUI
             KeyValuePair<ProgressDialogController, string> kp = (KeyValuePair<ProgressDialogController, string>)e.UserState;
             if (e.Cancelled)
             {
+                Log.Warning("SelfUpdate was canceled, deleting partial file...");
+
                 // delete the partially-downloaded file
                 if (File.Exists(kp.Value))
                 {
@@ -2213,7 +2235,7 @@ namespace AlotAddOnGUI
                     progressController.SetMessage("ALOT Installer is importing files, please wait...\nImporting " + fileToImport.Item1.FriendlyName);
                     if (DOWNLOAD_ASSISTANT_WINDOW != null)
                     {
-                        DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("Importing "+importedFiles.Count +" file"+(importedFiles.Count == 1 ? "s" : ""));
+                        DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("Importing " + importedFiles.Count + " file" + (importedFiles.Count == 1 ? "s" : ""));
                     }
                 }
                 WebClient downloadClient = new WebClient();
