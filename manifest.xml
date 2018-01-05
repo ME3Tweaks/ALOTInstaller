@@ -1,5 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="2.0.5">
+<alotaddonmanifest version="3.0.11">
+	<musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
+	<musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
+	<addonfile meuitm="true" friendlyname="MEUITM Anniversary Edition" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
+		<file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2-0.zip"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Asari.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Ash Face.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\AshandLiaraRomanceBodies.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\AshArmor.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Avina Console.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Avina.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Batarians.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\benezia.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\BroShep.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\browsandfacialhair.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Chakwas.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\CitadelEnvironment.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\councilandudina.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Elcor.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\eyes.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\femshep.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Feros.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Filmgrain.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Garrus_Face.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Geth Trooper.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\GethHopper.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Gethtransportsmaller.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Hanar.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\HumanNPCClothing.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Husks.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Joker.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Kaiden.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Keepers.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Liaraface.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\LiaraGreenOutfit.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\lightandshadowmapsdxt.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Mako.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\N7ArmorsNoCF.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Normandy Uniforms.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Normandy.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Normandyadditional.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Rachni and Queen.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Reporter robot.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Salarians.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Saren.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Scientists.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Sheploo.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Sovereign.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\TaliClassic.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Thorian.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Turian Tattoos.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\TurianArmors.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Virmire.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\volus.mem" movedirectly="true"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Wrex.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile alotversion="5" friendlyname="ALOT for ME1 - Main" tooltipname="Main file for ALOT for ME1" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1-83-2017-5-0.7z" unpackedsinglefilename="ALOT_ME1.mem"/>
+		<packagefile me1="true" sourcename="00_ALOT\ALOT_ME1.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile appliestomainversion="5" alotupdateversion="2" friendlyname="ALOT for ME1 - Update 2" tooltipname="Update file for ALOT for ME1" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1 - Update-83-2017-5-2.7z"/>
+		<packagefile me1="true" sourcename="ALOT_ME1_Update.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile alotversion="5" friendlyname="ALOT for ME2 - Main" tooltipname="Main file for ALOT for ME2" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/" filename="ALOT for ME2-68-2017-5-0.7z" unpackedsinglefilename="ALOT_ME2.mem"/>
+		<packagefile me2="true" sourcename="00_ALOT\ALOT_ME2.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile appliestomainversion="5" alotupdateversion="2" friendlyname="ALOT for ME2 - Update 2" tooltipname="Update file for ALOT for ME2" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/" filename="ALOT for ME2 - Update-68-2017-5-2.7z"/>
+		<packagefile me2="true" sourcename="ALOT_ME2_Update.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile alotversion="5" friendlyname="ALOT for ME3 - Main" tooltipname="Main file of ALOT for ME3" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT for ME3-363-2017-5-0.7z" unpackedsinglefilename="ALOT_ME3.mem"/>
+		<packagefile me3="true" sourcename="00_ALOT\ALOT_ME3.mem" movedirectly="true"/>
+	</addonfile>
+	<addonfile appliestomainversion="5" alotupdateversion="3" friendlyname="ALOT for ME3 - Update 3" tooltipname="ALOT for ME3 - Update" author="CreeperLava">
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT for ME3 - Update-363-2017-5-3.7z"/>
+		<packagefile me3="true" sourcename="ALOT_ME3_Update.mem" movedirectly="true"/>
+	</addonfile>
 	<addonfile friendlyname="Allers Complexion Tweak" author="Ellise">
 		<file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_AllersComplexionTweak.7z-580-1-0.7z"/>
 		<packagefile me3="true" sourcename="el_AllersComplexionTweak.tpf" movedirectly="true"/>
@@ -84,17 +164,17 @@
 	</addonfile>
 	<addonfile friendlyname="Weapon Norms" author="CreeperLava">
 		<file downloadlink="https://onedrive.live.com/download?cid=DBE0E01C958EBA9F&amp;resid=DBE0E01C958EBA9F%21394&amp;authkey=AFUczvJaSfxmE3s" filename="Norms-CreeperLava.7z"/>
-		<packagefile me2="true" sourcename="0xB9AB2301.dds" destinationname="_0xB9AB2301.dds"/>
-		<packagefile me2="true" sourcename="0xD111E01F.dds" destinationname="_0xD111E01F.dds"/>
-		<packagefile me2="true" sourcename="0xFA1F9E55.dds" destinationname="_0xFA1F9E55.dds"/>
-		<packagefile me2="true" sourcename="0x524A8E10.dds" destinationname="_0x524A8E10.dds"/>
-		<packagefile me2="true" sourcename="0xBF5485DF.dds" destinationname="_0xBF5485DF.dds"/>
-		<packagefile me3="true" sourcename="0x6B2720E6.dds" destinationname="_0x6B2720E6.dds"/>
-		<packagefile me3="true" sourcename="0x7DF368A4.dds" destinationname="_0x7DF368A4.dds"/>
-		<packagefile me3="true" sourcename="0x10471125.dds" destinationname="_0x10471125.dds"/>
-		<packagefile me3="true" sourcename="0xB6E94663.dds" destinationname="_0xB6E94663.dds"/>
-		<packagefile me3="true" sourcename="0x4466892A.dds" destinationname="_0x4466892A.dds"/>
-		<packagefile me3="true" sourcename="0xE023CF45.dds" destinationname="_0xE023CF45.dds"/>
+		<packagefile me2="true" sourcename="0xB9AB2301.dds" destinationname="0xB9AB2301.dds"/>
+		<packagefile me2="true" sourcename="0xD111E01F.dds" destinationname="0xD111E01F.dds"/>
+		<packagefile me2="true" sourcename="0xFA1F9E55.dds" destinationname="0xFA1F9E55.dds"/>
+		<packagefile me2="true" sourcename="0x524A8E10.dds" destinationname="0x524A8E10.dds"/>
+		<packagefile me2="true" sourcename="0xBF5485DF.dds" destinationname="0xBF5485DF.dds"/>
+		<packagefile me3="true" sourcename="0x6B2720E6.dds" destinationname="0x6B2720E6.dds"/>
+		<packagefile me3="true" sourcename="0x7DF368A4.dds" destinationname="0x7DF368A4.dds"/>
+		<packagefile me3="true" sourcename="0x10471125.dds" destinationname="0x10471125.dds"/>
+		<packagefile me3="true" sourcename="0xB6E94663.dds" destinationname="0xB6E94663.dds"/>
+		<packagefile me3="true" sourcename="0x4466892A.dds" destinationname="0x4466892A.dds"/>
+		<packagefile me3="true" sourcename="0xE023CF45.dds" destinationname="0xE023CF45.dds"/>
 	</addonfile>	
 	<addonfile friendlyname="HR Predator Texture" tooltipname="WpnPredator_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="WpnPredator_HRv1.5.zip"/>
@@ -621,5 +701,13 @@
 		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E247C12_bulk_spec_s.dds" destinationname="HMM_ARM_SANf_Spec_0x6E247C12.dds"/>
 		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E443315_bulk_vega_s.dds" destinationname="HMM_ARM_SANf_Diff_0x6E443315.dds"/>
 		<packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds"/>
+	</addonfile>
+	<addonfile friendlyname="Holograms HD (MEM) - For ME2" author="JimbobJeffers">
+		<games me1="false" me2="true" me3="false"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect2/mods/134" filename="Holograms HD (MEM)-134-1-0.zip"/>
+	</addonfile>
+	<addonfile friendlyname="Holograms HD (MEM) - For ME3" author="JimbobJeffers">
+		<games me1="false" me2="false" me3="true"/>
+		<file downloadlink="http://www.nexusmods.com/masseffect3/mods/527" filename="Holograms HD (MEM)-527-1-0.zip"/>
 	</addonfile>
 </alotaddonmanifest>
