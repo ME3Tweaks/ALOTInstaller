@@ -496,12 +496,13 @@ namespace AlotAddOnGUI
                 fullsize += size;
             }
 
-            Utilities.GetDiskFreeSpaceEx(".", out freeBytes, out diskSize, out totalFreeBytes);
+            Utilities.GetDiskFreeSpaceEx(EXE_DIRECTORY, out freeBytes, out diskSize, out totalFreeBytes);
             Log.Information("We will need around " + ByteSize.FromBytes(fullsize) + " to build this set. The free space is " + ByteSize.FromBytes(freeBytes));
             if (freeBytes < fullsize)
             {
+                Log.Error("Not enough space to build textures locally. We only have " + ByteSize.FromBytes(freeBytes) + " available");
                 //not enough disk space for build
-                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Not enough free space to build textures.\nYou will need around " + ByteSize.FromKiloBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD) + " to build the installation packages.")));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Not enough free space to build textures.\nYou will need around " + ByteSize.FromBytes(fullsize) + " of free space on " + Path.GetPathRoot(EXE_DIRECTORY) + " to build the installation packages."));
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Build aborted"));
                 BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Not enough free space to build textures", "You will need around " + ByteSize.FromKiloBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to build the installation packages.")));
 
