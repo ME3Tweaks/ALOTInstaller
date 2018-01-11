@@ -148,6 +148,22 @@ namespace AlotAddOnGUI
             return null;
         }
 
+        public static string GetGameEXEPath(int game)
+        {
+            string path = GetGamePath(game);
+            if (path == null) { return null; }
+            switch (game)
+            {
+                case 1:
+                    return Path.Combine(path, @"Binaries\MassEffect.exe");
+                case 2:
+                    return Path.Combine(path, @"Binaries\MassEffect2.exe");
+                case 3:
+                    return Path.Combine(path, @"Binaries\Win32\MassEffect3.exe");
+            }
+            return null;
+        }
+
         public static bool IsDirectoryEmpty(string path)
         {
             return !Directory.EnumerateFileSystemEntries(path).Any();
@@ -648,6 +664,18 @@ namespace AlotAddOnGUI
             return processorIdentifier != null && processorIdentifier.Contains("AuthenticAMD");
         }
 
+        public static string sha256(string randomString)
+        {
+            System.Security.Cryptography.SHA256Managed crypt = new System.Security.Cryptography.SHA256Managed();
+            System.Text.StringBuilder hash = new System.Text.StringBuilder();
+            byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(randomString), 0, Encoding.UTF8.GetByteCount(randomString));
+            foreach (byte theByte in crypto)
+            {
+                hash.Append(theByte.ToString("x2"));
+            }
+            return hash.ToString();
+        }
+
         public static void OpenAndSelectFileInExplorer(string filePath)
         {
             // suppose that we have a test.txt at E:\
@@ -697,9 +725,9 @@ namespace AlotAddOnGUI
             {
                 var virusCheckerName = virusChecker["displayName"];
                 var productState = virusChecker["productState"];
-                uint productVal = (uint) productState;
+                uint productVal = (uint)productState;
                 var bytes = BitConverter.GetBytes(productVal);
-                Log.Information("Antivirus info: " + virusCheckerName + " with state " + bytes[1].ToString("X2")+" "+ bytes[2].ToString("X2") + " " + bytes[3].ToString("X2"));
+                Log.Information("Antivirus info: " + virusCheckerName + " with state " + bytes[1].ToString("X2") + " " + bytes[2].ToString("X2") + " " + bytes[3].ToString("X2"));
             }
         }
 
@@ -721,7 +749,8 @@ namespace AlotAddOnGUI
                 Process[] pname = Process.GetProcessesByName("MassEffect2");
                 Process[] pname2 = Process.GetProcessesByName("ME2Game");
                 return pname.Length > 0 || pname2.Length > 0;
-            } else
+            }
+            else
             {
                 Process[] pname = Process.GetProcessesByName("MassEffect3");
                 return pname.Length > 0;

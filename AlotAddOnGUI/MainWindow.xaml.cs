@@ -2957,6 +2957,10 @@ namespace AlotAddOnGUI
             }
         }
 
-
+        private void Button_GenerateDiagnostics_Click(object sender, RoutedEventArgs e)
+        {
+            DiagnosticsWindow dw = new DiagnosticsWindow();
+            dw.ShowDialog();
+        }
     }
 }
