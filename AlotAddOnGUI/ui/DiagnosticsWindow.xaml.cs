@@ -25,6 +25,7 @@ namespace AlotAddOnGUI.ui
     /// </summary>
     public partial class DiagnosticsWindow : MetroWindow
     {
+        private const string SET_DIAG_TEXT = "SET_DIAG_TEXT";
         private const string SET_DIAGTASK_ICON_WORKING = "SET_DIAGTASK_ICON_WORKING";
         private const string SET_DIAGTASK_ICON_GREEN = "SET_DIAGTASK_ICON_GREEN";
         private const string SET_DIAGTASK_ICON_RED = "SET_DIAGTASK_ICON_RED";
@@ -49,16 +50,26 @@ namespace AlotAddOnGUI.ui
 
         private void Button_DiagnosticsME3_Click(object sender, RoutedEventArgs e)
         {
+            Button_ManualFileME1.Visibility = Visibility.Collapsed;
+            Button_ManualFileME2.Visibility = Visibility.Collapsed;
+            Button_ManualFileME3.Click -= Button_DiagnosticsME3_Click;
+
             RunDiagnostics(3);
         }
 
         private void Button_DiagnosticsME1_Click(object sender, RoutedEventArgs e)
         {
+            Button_ManualFileME2.Visibility = Visibility.Collapsed;
+            Button_ManualFileME3.Visibility = Visibility.Collapsed;
+            Button_ManualFileME1.Click -= Button_DiagnosticsME1_Click;
             RunDiagnostics(1);
         }
 
         private void Button_DiagnosticsME2_Click(object sender, RoutedEventArgs e)
         {
+            Button_ManualFileME1.Visibility = Visibility.Collapsed;
+            Button_ManualFileME3.Visibility = Visibility.Collapsed;
+            Button_ManualFileME2.Click -= Button_DiagnosticsME2_Click;
             RunDiagnostics(2);
         }
 
@@ -67,7 +78,6 @@ namespace AlotAddOnGUI.ui
             Debug.WriteLine("running diags...");
             DiagnosticHeader.Text = "Performing diagnostics...";
 
-            Button_ManualFileME1.IsEnabled = Button_ManualFileME2.IsEnabled = Button_ManualFileME3.IsEnabled = false;
             DIAGNOSTICS_GAME = game;
             diagnosticsWorker = new BackgroundWorker();
             diagnosticsWorker.WorkerReportsProgress = true;
@@ -87,6 +97,9 @@ namespace AlotAddOnGUI.ui
                     break;
                 case SET_DIAGTASK_ICON_WORKING:
                     ((Image)tc.Data).Source = new BitmapImage(new Uri(@"../images/workingicon.png", UriKind.Relative));
+                    break;
+                case SET_DIAG_TEXT:
+                    DiagnosticHeader.Text = (string) tc.Data;
                     break;
                 case SET_DIAGTASK_ICON_RED:
                     ((Image)tc.Data).Source = new BitmapImage(new Uri(@"../images/redx_large.png", UriKind.Relative));
@@ -158,8 +171,9 @@ namespace AlotAddOnGUI.ui
             }
             else
             {
-                DiagnosticHeader.Text = "Diagnostic completed but no response from the server was given. Check the logs directory for the file.";
+                //DiagnosticHeader.Text = "Diagnostic completed but no response from the server was given. Check the logs directory for the file.";
                 Image_Upload.Source = new BitmapImage(new Uri(@"../images/redx_large.png", UriKind.Relative));
+                Image_Upload2.Source = new BitmapImage(new Uri(@"../images/redx_large.png", UriKind.Relative));
 
             }
         }
@@ -204,6 +218,7 @@ namespace AlotAddOnGUI.ui
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "-check-game-data-mismatch " + DIAGNOSTICS_GAME + " -ipc";
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataMismatch));
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataMismatch2));
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
             WaitForMEM();
             addDiagLine("");
@@ -222,9 +237,11 @@ namespace AlotAddOnGUI.ui
                 addDiagLine("Diagnostic reports no errors from -check-game-data-mismatch.");
             }
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataMismatch));
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataMismatch2));
 
             args = "-check-game-data-after " + DIAGNOSTICS_GAME + " -ipc";
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter2));
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
             WaitForMEM();
             addDiagLine("\n===Vanilla textures scan (after textures were installed)===");
@@ -239,27 +256,80 @@ namespace AlotAddOnGUI.ui
             }
             else
             {
-                addDiagLine("Diagnostic reports no errors from -check-game-data-after.");
+                if (BACKGROUND_MEM_PROCESS.ExitCode != null && BACKGROUND_MEM_PROCESS.ExitCode == 0)
+                {
+                    addDiagLine("Diagnostic reports no errors from -check-game-data-after.");
+                } else
+                {
+                    addDiagLine("MEM returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                }
             }
 
-
-            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
-
-            args = "-detect-empty-mipmaps " + DIAGNOSTICS_GAME + " -ipc";
-            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_EmptyMipmaps));
+            args = "-quick-detect-empty-mipmaps " + DIAGNOSTICS_GAME + " -ipc";
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
             WaitForMEM();
-            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_EmptyMipmaps));
+            if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
+            {
+                addDiagLine("Quick detect empty mipmaps reported errors:");
+                foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                {
+                    addDiagLine(" - " + str);
+                }
+            }
+            else
+            {
+                if (BACKGROUND_MEM_PROCESS.ExitCode != null && BACKGROUND_MEM_PROCESS.ExitCode == 0)
+                {
+                    addDiagLine("Diagnostics empty mipmap check (quick) did not find any empty mipmaps. This test is not thorough and is meant for quickly accessing a game folder rather than each file.");
+                }
+                else
+                {
+                    addDiagLine("MEM returned non zero exit code, or null (crash) during -quick-detect-empty-mipmaps: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                }
+            }
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter2));
 
 
             args = "-detect-mods " + DIAGNOSTICS_GAME + " -ipc";
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataBasegamemods));
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataBasegamemods2));
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
             WaitForMEM();
+            if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
+            {
+                addDiagLine("The following mods were detected:");
+                foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                {
+                    addDiagLine(" - " + str);
+                }
+            }
+            else
+            {
+                addDiagLine("Diagnostics did not detect any mods (-detect-mods). ");
+            }
+
+            args = "-detect-bad-mods " + DIAGNOSTICS_GAME + " -ipc";
+            runMEM_Diagnostics(exe, args, diagnosticsWorker);
+            WaitForMEM();
+            if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
+            {
+                addDiagLine("Diagnostic reports the following incompatible mods are installed:");
+                foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                {
+                    addDiagLine(" - " + str);
+                }
+            }
+            else
+            {
+                addDiagLine("Diagnostic did not find any bad mods installed - if the files were updated already this detection may not be accurate");
+            }
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataBasegamemods));
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataBasegamemods2));
 
 
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_Upload));
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_Upload2));
 
             string diag = diagStringBuilder.ToString();
             string hash = Utilities.sha256(diag);
@@ -279,7 +349,15 @@ namespace AlotAddOnGUI.ui
             {
                 //should be valid URL.
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload2));
                 e.Result = responseString;
+                Log.Information("Result from server for log upload: " + responseString);
+            } else
+            {
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from relay: "+responseString));
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload2));
+                Log.Error("Error uploading log. The server responded with: " + responseString);
             }
         }
 
@@ -324,13 +402,16 @@ namespace AlotAddOnGUI.ui
                         switch (command)
                         {
                             case "ERROR_REMOVED_FILE":
-                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was removed after mipmaps were removed: " + param);
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was removed after textures scan: " + param);
                                 break;
                             case "ERROR_ADDED_FILE":
-                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was added after mipmaps were removed: " + param);
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was added after textures scan: " + param);
                                 break;
                             case "ERROR_VANILLA_MOD_FILE":
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: Vanilla-based file was found after textures were installed: " + param);
+                                break;
+                            case "MOD":
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("Detected mod: " + param);
                                 break;
                             case "OVERALL_PROGRESS":
                                 worker.ReportProgress(0, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
@@ -342,7 +423,7 @@ namespace AlotAddOnGUI.ui
                                 break;
                             case "ERROR":
                                 Log.Information("[ERROR] Realtime Process Output: " + param);
-                                BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
                                 break;
                             case "ERROR_NO_BUILDABLE_FILES":
                                 //BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(CURRENT_USER_BUILD_FILE + " has no files that can be used for building");
@@ -363,6 +444,11 @@ namespace AlotAddOnGUI.ui
                 }
             };
             BACKGROUND_MEM_PROCESS.Run();
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

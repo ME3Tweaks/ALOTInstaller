@@ -7,39 +7,49 @@
         mc:Ignorable="d"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
-        Title="Diagnostics" Height="320" Width="580">
+        Title="Diagnostics" Height="262.642" Width="580">
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
         <TextBlock x:Name="DiagnosticHeader" Text="Select which game you are generating diagnostics for." HorizontalAlignment="Center"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="Button_ManualFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_DiagnosticsME1_Click">
-                <Image Source="../images/logo_me1.png" Height="30" Margin="10"></Image>
+                <Image Source="../images/logo_me1.png" Height="30" Margin="10"/>
             </Button>
             <Button x:Name="Button_ManualFileME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_DiagnosticsME2_Click">
-                <Image Source="../images/logo_me2.png" Height="30" Margin="10"></Image>
+                <Image Source="../images/logo_me2.png" Height="30" Margin="10"/>
             </Button>
             <Button x:Name="Button_ManualFileME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_DiagnosticsME3_Click">
-                <Image Source="../images/logo_me3.png" Height="30" Margin="10"></Image>
+                <Image Source="../images/logo_me3.png" Height="30" Margin="10"/>
             </Button>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <Image x:Name="Image_DataMismatch" Source="../images/waiting.png" Height="15"></Image>
-            <TextBlock x:Name="TextBlock_DataMismatch" Text="Check for added or removed files"></TextBlock>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <Image x:Name="Image_DataAfter" Source="../images/waiting.png" Height="15"></Image>
-            <TextBlock x:Name="TextBlock_DataAfter" Text="Check for replaced files"></TextBlock>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <Image x:Name="Image_EmptyMipmaps" Source="../images/waiting.png" Height="15"></Image>
-            <TextBlock x:Name="TextBlock_EmptyMipmaps" Text="Check for vanilla-based files"></TextBlock>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <Image x:Name="Image_DataBasegamemods" Source="../images/waiting.png" Height="15"></Image>
-            <TextBlock x:Name="TextBlock_Basegamemods" Text="Inventory game modifications"></TextBlock>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <Image x:Name="Image_Upload" Source="../images/waiting.png" Height="15"></Image>
-            <TextBlock x:Name="TextBlock_Upload" Text="Upload diagnostic for analysis"></TextBlock>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Image x:Name="Image_DataMismatch" Source="../images/waiting.png" Height="15"/>
+                <TextBlock x:Name="TextBlock_DataMismatch" Text="Check for added or removed files" Margin="3"/>
+                <Image x:Name="Image_DataMismatch2" Source="../images/waiting.png" Height="15"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Image x:Name="Image_DataAfter" Source="../images/waiting.png" Height="15"/>
+                <TextBlock x:Name="TextBlock_DataAfter" Text="Check for replaced files" Margin="3"/>
+                <Image x:Name="Image_DataAfter2" Source="../images/waiting.png" Height="15"/>
+            </StackPanel>
+            <!-- <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Image x:Name="Image_EmptyMipmaps" Source="../images/waiting.png" Height="15"/>
+                <TextBlock x:Name="TextBlock_EmptyMipmaps" Text="Check for vanilla-based files" Margin="3"/>
+                <Image x:Name="Image_EmptyMipmaps2" Source="../images/waiting.png" Height="15"/>
+
+            </StackPanel>-->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Image x:Name="Image_DataBasegamemods" Source="../images/waiting.png" Height="15"/>
+                <TextBlock x:Name="TextBlock_Basegamemods" Text="Inventory game modifications" Margin="3"/>
+                <Image x:Name="Image_DataBasegamemods2" Source="../images/waiting.png" Height="15"/>
+
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Image x:Name="Image_Upload" Source="../images/waiting.png" Height="15"/>
+                <TextBlock x:Name="TextBlock_Upload" Text="Upload diagnostic for analysis" Margin="3"/>
+                <Image x:Name="Image_Upload2" Source="../images/waiting.png" Height="15"/>
+            </StackPanel>
+            <Button Content="Close" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Margin="8" Click="CloseButton_Click"/>
         </StackPanel>
     </StackPanel>
 </Controls:MetroWindow>

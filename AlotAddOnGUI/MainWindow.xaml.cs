@@ -128,6 +128,7 @@ namespace AlotAddOnGUI
         public string DOWNLOADS_FOLDER;
         private int RefreshesUntilRealRefresh;
         private bool ShowBuildingOnly;
+        private WebClient downloadClient;
 
         public bool ShowME1Files
         {
@@ -416,7 +417,7 @@ namespace AlotAddOnGUI
                 fileVersion = versInfo.FileMajorPart;
             }
 
-            Label_MEMVersion.Content = "MEM (No GUI) Version: " + fileVersion;
+            Label_MEMVersion.Content = "MEM Cmd Version: " + fileVersion;
             try
             {
                 Log.Information("Checking for updates to MEMNOGUI...");
@@ -434,9 +435,10 @@ namespace AlotAddOnGUI
                         Log.Information("MEMNOGUI update available: " + releaseNameInt);
 
                         //there's an update
-                        updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder (No GUI) is updating. Please wait...", true);
+                        updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder (Cmd Version) is updating (to v" + releaseNameInt + "). Please wait...", true);
                         updateprogresscontroller.SetIndeterminate();
-                        WebClient downloadClient = new WebClient();
+                        updateprogresscontroller.Canceled += MEMNoGuiUpdateCanceled;
+                        downloadClient = new WebClient();
 
                         downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
                         downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
@@ -461,6 +463,19 @@ namespace AlotAddOnGUI
             {
                 Log.Error("Error checking for MEMNOGUI update: " + e.Message);
                 ShowStatus("Error checking for MEM (NOGUI) update");
+            }
+        }
+
+        private void MEMNoGuiUpdateCanceled(object sender, EventArgs e)
+        {
+            Log.Warning("MEM NO GUI Update has been canceled.");
+            if (downloadClient != null && downloadClient.IsBusy)
+            {
+                downloadClient.CancelAsync();
+            }
+            if (updateprogresscontroller != null && updateprogresscontroller.IsOpen)
+            {
+                updateprogresscontroller.CloseAsync();
             }
         }
 
@@ -506,6 +521,10 @@ namespace AlotAddOnGUI
 
         private void UnzipProgramUpdate(object sender, AsyncCompletedEventArgs e)
         {
+            if (e.Cancelled)
+            {
+                return; //handled by cancel
+            }
             KeyValuePair<ProgressDialogController, string> kp = (KeyValuePair<ProgressDialogController, string>)e.UserState;
             kp.Key.SetIndeterminate();
             kp.Key.SetTitle("Extracting Tool Update");
@@ -539,7 +558,7 @@ namespace AlotAddOnGUI
             File.Delete((string)e.UserState);
             var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
             int fileVersion = versInfo.FileMajorPart;
-            Button_MEM_GUI.Content = "Launch MEM v" + fileVersion;
+            Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
             ShowStatus("Updated Mass Effect Modder (GUI version) to v" + fileVersion, 3000);
             RunMusicDownloadCheck();
         }
@@ -835,8 +854,8 @@ namespace AlotAddOnGUI
                     System.Windows.Application.Current.Dispatcher.Invoke(
                     () =>
                     {
-                        // Code to run on the GUI thread.
-                        Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
+                            // Code to run on the GUI thread.
+                            Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
                         string tickerText = "";
                         tickerText += ShowME1Files ? "ME1: " + numME1FilesReady + "/" + numME1Files + " imported" : "ME1: N/A";
                         tickerText += " - ";
@@ -2383,7 +2402,7 @@ namespace AlotAddOnGUI
         private void Button_ViewLog_Click(object sender, RoutedEventArgs e)
         {
             var directory = new DirectoryInfo("logs");
-            FileInfo latestlogfile = directory.GetFiles().OrderByDescending(f => f.LastWriteTime).First();
+            FileInfo latestlogfile = directory.GetFiles("alotinstaller*.txt").OrderByDescending(f => f.LastWriteTime).First();
             if (latestlogfile != null)
             {
                 ProcessStartInfo psi = new ProcessStartInfo(EXE_DIRECTORY + "logs\\" + latestlogfile.ToString());
@@ -2871,7 +2890,7 @@ namespace AlotAddOnGUI
         private void Button_ZipLog_Click(object sender, RoutedEventArgs e)
         {
             var directory = new DirectoryInfo("logs");
-            FileInfo latestlogfile = directory.GetFiles("*.txt").OrderByDescending(f => f.LastWriteTime).First();
+            FileInfo latestlogfile = directory.GetFiles("alotinstaller*.txt").OrderByDescending(f => f.LastWriteTime).First();
             if (latestlogfile != null)
             {
                 string zipPath = "logs\\" + Path.GetFileNameWithoutExtension(latestlogfile.FullName) + ".zip";
