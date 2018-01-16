@@ -19,6 +19,17 @@ if (Test-Path "$($PSScriptRoot)\Release\music") {
     Remove-Item "$($PSScriptRoot)\Release\music" -Recurse -Force
 }
 
+if (Test-Path "$($PSScriptRoot)\Release\MEM_Packages") {
+    Write-Host Removing output directory...
+    Remove-Item "$($PSScriptRoot)\Release\MEM_Packages" -Recurse -Force
+}
+
+
+if (Test-Path "$($PSScriptRoot)\Release\Extracted_Mods") {
+    Write-Host Removing extraction directory...
+    Remove-Item "$($PSScriptRoot)\Release\Extracted_Mods" -Recurse -Force
+}
+
 if (Test-Path "$($PSScriptRoot)\Release\manifest-bundled.xml") {
     Write-Host Removing current manifest bundle...
     Remove-Item "$($PSScriptRoot)\Release\manifest-bundled.xml" -Force
