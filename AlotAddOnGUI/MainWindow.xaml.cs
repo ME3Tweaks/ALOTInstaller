@@ -786,7 +786,7 @@ namespace AlotAddOnGUI
             if (addonfiles != null)
             {
                 //Console.WriteLine("Checking for files existence...");
-                string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
+                string basepath = DOWNLOADED_MODS_DIRECTORY + "\\";
                 int numdone = 0;
 
                 int numME1Files = 0;
@@ -854,8 +854,8 @@ namespace AlotAddOnGUI
                     System.Windows.Application.Current.Dispatcher.Invoke(
                     () =>
                     {
-                            // Code to run on the GUI thread.
-                            Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
+                        // Code to run on the GUI thread.
+                        Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
                         string tickerText = "";
                         tickerText += ShowME1Files ? "ME1: " + numME1FilesReady + "/" + numME1Files + " imported" : "ME1: N/A";
                         tickerText += " - ";
@@ -1194,7 +1194,7 @@ namespace AlotAddOnGUI
                     if (af.Game_ME3) i = 3;
                     string outputPath = getOutputDir(i);
 
-                    string importedFilePath = EXE_DIRECTORY + @"Downloaded_Mods\" + af.UnpackedSingleFilename;
+                    string importedFilePath = DOWNLOADED_MODS_DIRECTORY + "\\" + af.UnpackedSingleFilename;
                     string outputFilename = outputPath + "000_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
                     if (File.Exists(outputFilename) && (game == 0 || game == i))
                     {
@@ -1418,6 +1418,7 @@ namespace AlotAddOnGUI
                             select new AddonFile
                             {
                                 Showing = false,
+                                FileSize = e.Attribute("size") != null ? (long)e.Attribute("size") : 0L,
                                 MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
                                 ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
                                 Author = (string)e.Attribute("author"),
@@ -2111,7 +2112,7 @@ namespace AlotAddOnGUI
                 //don't know how you can drop less than 1 files but whatever
                 //This code is for failsafe in case somehow library file exists but is not detect properly, like user moved file but something is running
                 string file = files[0];
-                string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
+                string basepath = DOWNLOADED_MODS_DIRECTORY+"\\";
 
                 if (file.ToLower().StartsWith(basepath))
                 {
@@ -2160,10 +2161,6 @@ namespace AlotAddOnGUI
                         }
                         continue; //don't check these
                     }
-                    if (af.ALOTVersion > 0 && af.Game_ME1)
-                    {
-                        Debug.WriteLine("B");
-                    }
                     bool isUnpackedSingleFile = af.UnpackedSingleFilename != null && af.UnpackedSingleFilename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file); //make sure not folder with same name.
 
                     if (isUnpackedSingleFile || af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file)) //make sure folder not with same name
@@ -2172,7 +2169,7 @@ namespace AlotAddOnGUI
                         if (af.Ready == false)
                         {
                             //Copy file to directory
-                            string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
+                            string basepath = DOWNLOADED_MODS_DIRECTORY + "\\";
                             string destination = basepath + ((isUnpackedSingleFile) ? af.UnpackedSingleFilename : af.Filename);
                             //Log.Information("Copying dragged file to downloaded mods directory: " + file);
                             //File.Copy(file, destination, true);
@@ -2186,7 +2183,7 @@ namespace AlotAddOnGUI
                 }
                 if (!hasMatch)
                 {
-                    string extension = Path.GetExtension(file);
+                    string extension = Path.GetExtension(file).ToLower();
                     switch (extension)
                     {
                         case ".7z":
@@ -2194,10 +2191,41 @@ namespace AlotAddOnGUI
                         case ".zip":
                         case ".tpf":
                         case ".mem":
+                        case ".mod":
                             if (acceptUserFiles)
                             {
                                 acceptableUserFiles.Add(file);
                             }
+                            break;
+                        case ".dds":
+                        case ".png":
+                        case ".jpg":
+                        case ".jpeg":
+                        case ".tga":
+                            string filename = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
+                            if (!filename.Contains("0x"))
+                            {
+                                continue;
+                            }
+                            int idx = filename.IndexOf("0x");
+                            if (filename.Length - idx < 10)
+                            {
+                                Log.Error("Texture filename not valid: " + Path.GetFileName(file) + " Texture filename must include texture CRC (0xhhhhhhhh)");
+                                continue;
+                            }
+                            uint crc;
+                            string crcStr = filename.Substring(idx + 2, 8);
+                            try
+                            {
+                                crc = uint.Parse(crcStr, System.Globalization.NumberStyles.HexNumber);
+                            }
+                            catch
+                            {
+                                Log.Error("Texture filename not valid: " + Path.GetFileName(file) + " Texture filename must include texture CRC (0xhhhhhhhh)");
+                                continue;
+                            }
+                            //File has hash
+                            acceptableUserFiles.Add(file);
                             break;
                         default:
                             Log.Information("Dragged file does not match any addon manifest file and is not acceptable extension: " + file);
