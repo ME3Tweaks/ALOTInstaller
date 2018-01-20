@@ -1544,6 +1544,19 @@ namespace AlotAddOnGUI
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
             view.GroupDescriptions.Add(groupDescription);
             CheckImportLibrary_Tick(null, null);
+
+            if (DOWNLOAD_ASSISTANT_WINDOW != null)
+            {
+                List<AddonFile> notReadyAddonFiles = new List<AddonFile>();
+                foreach (AddonFile af in addonfiles)
+                {
+                    if (!af.Ready && !af.UserFile)
+                    {
+                        notReadyAddonFiles.Add(af);
+                    }
+                }
+                DOWNLOAD_ASSISTANT_WINDOW.setNewMissingAddonfiles(notReadyAddonFiles);
+            }
         }
 
 
@@ -2920,15 +2933,15 @@ namespace AlotAddOnGUI
 
                 if (!Utilities.IsWindowOpen<AddonDownloadAssistant>())
                 {
-                    List<AddonFile> notReadyAddonFile = new List<AddonFile>();
-                    foreach (AddonFile af in alladdonfiles)
+                    List<AddonFile> notReadyAddonFiles = new List<AddonFile>();
+                    foreach (AddonFile af in addonfiles)
                     {
                         if (!af.Ready && !af.UserFile)
                         {
-                            notReadyAddonFile.Add(af);
+                            notReadyAddonFiles.Add(af);
                         }
                     }
-                    DOWNLOAD_ASSISTANT_WINDOW = new AddonDownloadAssistant(this, notReadyAddonFile);
+                    DOWNLOAD_ASSISTANT_WINDOW = new AddonDownloadAssistant(this, notReadyAddonFiles);
                     DOWNLOAD_ASSISTANT_WINDOW.Show();
                 }
             }
