@@ -15,6 +15,7 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Xml;
 using System.Windows;
+using System.Xml.Linq;
 
 namespace AlotAddOnGUI
 {
@@ -590,6 +591,7 @@ namespace AlotAddOnGUI
 
         public static void TurnOffOriginAutoUpdateForGame(int game)
         {
+            Log.Information("Attempting to disable auto update support for game: " + game);
             string gamePath = GetGamePath(game);
             if (gamePath != null && Directory.Exists(gamePath))
             {
@@ -633,6 +635,10 @@ namespace AlotAddOnGUI
                         xmlDoc.Save(gamePath);
                     }
                 }
+                else
+                {
+                    Log.Information("Installer manifest does not exist. This does not appear to be an origin installation. Skipping this step");
+                }
             }
         }
 
@@ -662,6 +668,19 @@ namespace AlotAddOnGUI
         {
             var processorIdentifier = System.Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER");
             return processorIdentifier != null && processorIdentifier.Contains("AuthenticAMD");
+        }
+
+        public static bool TestXMLIsValid(string inputXML)
+        {
+            try
+            {
+                XDocument.Parse(inputXML);
+                return true;
+            }
+            catch (XmlException e)
+            {
+                return false;
+            }
         }
 
         public static string sha256(string randomString)

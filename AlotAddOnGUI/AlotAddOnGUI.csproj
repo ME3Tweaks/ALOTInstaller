@@ -204,9 +204,15 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="music\me1.ogg" />
-    <None Include="music\me2.ogg" />
-    <None Include="music\me3.ogg" />
+    <None Include="Data\music\me1.ogg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\music\me2.ogg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\music\me3.ogg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\AssemblyInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -228,6 +234,12 @@
     <Content Include="7z\7z.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Data\bin\7z.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\bin\7z.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <EmbeddedResource Include="ui\installtips.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -251,9 +263,18 @@
     <Resource Include="images\logo_me2.png" />
     <Resource Include="images\logo_me3.png" />
     <Resource Include="images\waiting.png" />
-    <Content Include="memodder\MassEffectModder.exe">
+    <None Include="Data\bin\MassEffectModder.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
+    <None Include="Data\bin\MassEffectModder.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\bin\MassEffectModderNoGui.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\bin\MassEffectModderNoGui.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -280,16 +301,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>if not exist "$(TargetDir)bin" mkdir "$(TargetDir)bin"
-
-if not exist "$(TargetDir)Downloaded_Mods" mkdir "$(TargetDir)Downloaded_Mods"
-
-copy /y "$(TargetDir)7z\7z.exe" "$(TargetDir)bin\7z.exe"
-copy /y "$(TargetDir)7z\7z.dll" "$(TargetDir)bin\7z.dll"
-
-copy /y "$(TargetDir)memodder\MassEffectModder.exe" "$(TargetDir)bin\MassEffectModder.exe"
-
-copy /y "$(TargetDir)memodder\MassEffectModderNoGui.exe" "$(TargetDir)bin\MassEffectModderNoGui.exe"
+    <PostBuildEvent>if not exist "$(TargetDir)Downloaded_Mods" mkdir "$(TargetDir)Downloaded_Mods"
 
 if exist "$(TargetDir)lib"  del /s "$(TargetDir)lib\*.pdb"&gt;NUL
 if exist "$(TargetDir)lib" del /s "$(TargetDir)lib\manifest*.xml"&gt;NUL
@@ -329,6 +341,6 @@ if $(ConfigurationName) == Release (copy /Y "$(SolutionDir)manifest.xml" "$(Proj
     <ItemGroup>
       <MoveToLibFolder Include="$(OutputPath)*.dll ; $(OutputPath)*.pdb ; $(OutputPath)*.xml" />
     </ItemGroup>
-    <Move SourceFiles="@(MoveToLibFolder)" DestinationFolder="$(OutputPath)lib" OverwriteReadOnlyFiles="true" />
+    <Move SourceFiles="@(MoveToLibFolder)" DestinationFolder="$(OutputPath)Data\lib" OverwriteReadOnlyFiles="true" />
   </Target>
 </Project>

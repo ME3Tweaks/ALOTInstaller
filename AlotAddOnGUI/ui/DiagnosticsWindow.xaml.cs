@@ -17,6 +17,7 @@ using Flurl;
 using Flurl.Http;
 using System.Diagnostics;
 using ByteSizeLib;
+using Microsoft.WindowsAPICodePack.Taskbar;
 
 namespace AlotAddOnGUI.ui
 {
@@ -30,6 +31,8 @@ namespace AlotAddOnGUI.ui
         private const string SET_DIAGTASK_ICON_GREEN = "SET_DIAGTASK_ICON_GREEN";
         private const string SET_DIAGTASK_ICON_RED = "SET_DIAGTASK_ICON_RED";
         private const string SET_FULLSCAN_PROGRESS = "SET_STEP_PROGRESS";
+        private const string TURN_OFF_TASKBAR_PROGRESS = "TURN_OFF_TASKBAR_PROGRESS";
+        private const string TURN_ON_TASKBAR_PROGRESS = "TURN_ON_TASKBAR_PROGRESS";
         private const int CONTEXT_NORMAL = 0;
         private const int CONTEXT_FULLMIPMAP_SCAN = 1;
         private bool TextureCheck = false;
@@ -58,8 +61,8 @@ namespace AlotAddOnGUI.ui
             Button_ManualFileME1.Visibility = Visibility.Collapsed;
             Button_ManualFileME2.Visibility = Visibility.Collapsed;
             Button_ManualFileME3.Click -= Button_DiagnosticsME3_Click;
-
-            RunDiagnostics(3);
+            DIAGNOSTICS_GAME = 3;
+            ShowDiagnosticTypes();
         }
 
         private void Button_DiagnosticsME1_Click(object sender, RoutedEventArgs e)
@@ -67,7 +70,8 @@ namespace AlotAddOnGUI.ui
             Button_ManualFileME2.Visibility = Visibility.Collapsed;
             Button_ManualFileME3.Visibility = Visibility.Collapsed;
             Button_ManualFileME1.Click -= Button_DiagnosticsME1_Click;
-            RunDiagnostics(1);
+            DIAGNOSTICS_GAME = 1;
+            ShowDiagnosticTypes();
         }
 
         private void Button_DiagnosticsME2_Click(object sender, RoutedEventArgs e)
@@ -75,21 +79,28 @@ namespace AlotAddOnGUI.ui
             Button_ManualFileME1.Visibility = Visibility.Collapsed;
             Button_ManualFileME3.Visibility = Visibility.Collapsed;
             Button_ManualFileME2.Click -= Button_DiagnosticsME2_Click;
-            RunDiagnostics(2);
+            DIAGNOSTICS_GAME = 2;
+            ShowDiagnosticTypes();
         }
 
-        private void RunDiagnostics(int game)
+        private void ShowDiagnosticTypes()
+        {
+            DiagnosticHeader.Text = "Select type of diagnostic.";
+            Panel_DiagnosticsTypes.Visibility = Visibility.Visible;
+        }
+
+        private void RunDiagnostics(int game, bool full)
         {
             Debug.WriteLine("running diags...");
             DiagnosticHeader.Text = "Performing diagnostics...";
-            TextureCheck = Checkbox_Fullcheck.IsChecked.Value;
-            Checkbox_Fullcheck.IsEnabled = false;
+            TextureCheck = full;
             if (TextureCheck)
             {
                 QuickCheckPanel.Visibility = Visibility.Collapsed;
                 FullCheckPanel.Visibility = Visibility.Visible;
             }
-            DIAGNOSTICS_GAME = game;
+            Panel_Progress.Visibility = Visibility.Visible;
+
             diagnosticsWorker = new BackgroundWorker();
             diagnosticsWorker.WorkerReportsProgress = true;
             diagnosticsWorker.ProgressChanged += DiagnosticsProgressChanged;
@@ -122,7 +133,17 @@ namespace AlotAddOnGUI.ui
                     //AddonFilesLabel.Text = (string)tc.Data;
                     break;
                 case SET_FULLSCAN_PROGRESS:
-                    TextBlock_FullCheck.Text = "Scanning textures "+(int)tc.Data+"%";
+                    int progress = (int)tc.Data;
+                    TaskbarManager.Instance.SetProgressValue(progress, 100);
+                    TextBlock_FullCheck.Text = "Scanning textures " + progress + "%";
+                    break;
+                case TURN_OFF_TASKBAR_PROGRESS:
+                    TaskbarManager.Instance.SetProgressValue(0, 100);
+                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress);
+                    break;
+                case TURN_ON_TASKBAR_PROGRESS:
+                    TaskbarManager.Instance.SetProgressValue(0, 100);
+                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
                     break;
                 case UPDATE_HEADER_LABEL:
                     //HeaderLabel.Text = (string)tc.Data;
@@ -168,6 +189,7 @@ namespace AlotAddOnGUI.ui
 
         private void FinishedDiagnostics(object sender, RunWorkerCompletedEventArgs e)
         {
+            Button_Close.Visibility = Visibility.Visible;
             if (e.Error != null)
             {
                 Log.Error("Error performing diagnostics: " + e);
@@ -178,7 +200,7 @@ namespace AlotAddOnGUI.ui
             else if (e.Result != null)
             {
                 Clipboard.SetText((string)e.Result);
-                DiagnosticHeader.Text = "Diagnostic completed. Link to the result has been copied to the clipboard.";
+                DiagnosticHeader.Text = "Diagnostic completed.&#10;Link to the result has been copied to the clipboard.";
                 System.Diagnostics.Process.Start((string)e.Result);
                 Image_Upload.Source = new BitmapImage(new Uri(@"../images/greencheckmark.png", UriKind.Relative));
 
@@ -279,6 +301,7 @@ namespace AlotAddOnGUI.ui
             if (TextureCheck)
             {
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_FullCheck));
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_ON_TASKBAR_PROGRESS));
                 args = "-check-game-data-textures " + DIAGNOSTICS_GAME + " -ipc";
                 Context = CONTEXT_FULLMIPMAP_SCAN;
                 runMEM_Diagnostics(exe, args, diagnosticsWorker);
@@ -304,6 +327,7 @@ namespace AlotAddOnGUI.ui
                         addDiagLine("MEM returned non zero exit code, or null (crash) during -check-game-data-textures: " + BACKGROUND_MEM_PROCESS.ExitCode);
                     }
                 }
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_OFF_TASKBAR_PROGRESS));
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_FullCheck));
             }
             else
@@ -376,27 +400,37 @@ namespace AlotAddOnGUI.ui
             diag += hash;
 
             string date = DateTime.Now.ToString("yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture);
-
-            System.IO.File.WriteAllText(EXE_DIRECTORY + "\\logs\\diagnostic_me" + DIAGNOSTICS_GAME + "_" + date + ".txt", diag);
+            string diagfilename = EXE_DIRECTORY + "\\logs\\diagnostic_me" + DIAGNOSTICS_GAME + "_" + date + ".txt";
+            System.IO.File.WriteAllText(diagfilename, diag);
 
             //upload
-            string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
-            var responseString = "https://me3tweaks.com/alotinstaller/loguploader".PostUrlEncodedAsync(new { LogData = diag, ALOTInstallerVersion = alotInstallerVer }).ReceiveString().Result;
-            Uri uriResult;
-            bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
-                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-            if (result)
+            if (diag.Length < 512000)
             {
-                //should be valid URL.
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
-                e.Result = responseString;
-                Log.Information("Result from server for log upload: " + responseString);
+
+                string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+                var responseString = "https://me3tweaks.com/alotinstaller/loguploader".PostUrlEncodedAsync(new { LogData = diag, ALOTInstallerVersion = alotInstallerVer }).ReceiveString().Result;
+                Uri uriResult;
+                bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
+                    && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                if (result)
+                {
+                    //should be valid URL.
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
+                    e.Result = responseString;
+                    Log.Information("Result from server for log upload: " + responseString);
+                }
+                else
+                {
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from relay: " + responseString));
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
+                    Log.Error("Error uploading log. The server responded with: " + responseString);
+                }
             }
             else
             {
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from relay: " + responseString));
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
-                Log.Error("Error uploading log. The server responded with: " + responseString);
+                e.Result = "Diagnostic complete.";
+                Log.Warning("Log is too big to upload to pastebin");
+                Utilities.OpenAndSelectFileInExplorer(diagfilename);
             }
         }
 
@@ -464,18 +498,16 @@ namespace AlotAddOnGUI.ui
                                 worker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
                                 break;
                             case "ERROR":
-                                if (Context == CONTEXT_FULLMIPMAP_SCAN)
-                                {
-                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
-                                }
-                                else
-                                {
-                                    Log.Information("[ERROR] Realtime Process Output: " + param);
-                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
-                                }
+                                Log.Information("[ERROR] Realtime Process Output: " + param);
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
+                                break;
+                            case "ERROR_TEXTURE_SCAN_DIAGNOSTIC":
+                            case "ERROR_MIPMAPS_NOT_REMOVED":
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
                                 break;
                             case "ERROR_FILE_NOT_COMPATIBLE":
                                 Log.Error("MEM reporting file is not compatible: " + param);
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
                                 break;
                             default:
                                 Log.Information("Unknown IPC command: " + command);
@@ -494,6 +526,20 @@ namespace AlotAddOnGUI.ui
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        private void FullDiagnostic_Click(object sender, RoutedEventArgs e)
+        {
+            Button_QuickDiagnostic.Visibility = Visibility.Collapsed;
+            Button_FullDiagnostic.Click -= FullDiagnostic_Click;
+            RunDiagnostics(DIAGNOSTICS_GAME, true);
+        }
+
+        private void QuickDiagnostic_Click(object sender, RoutedEventArgs e)
+        {
+            Button_FullDiagnostic.Visibility = Visibility.Collapsed;
+            Button_QuickDiagnostic.Click -= QuickDiagnostic_Click;
+            RunDiagnostics(DIAGNOSTICS_GAME, false);
         }
     }
 }

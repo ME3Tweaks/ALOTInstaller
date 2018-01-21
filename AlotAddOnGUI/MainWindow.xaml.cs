@@ -52,7 +52,7 @@ namespace AlotAddOnGUI
         public const string SHOW_DIALOG = "SHOW_DIALOG";
         public const string ERROR_OCCURED = "ERROR_OCCURED";
         public static string EXE_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory;
-        public static string BINARY_DIRECTORY = EXE_DIRECTORY + "bin\\";
+        public static string BINARY_DIRECTORY = EXE_DIRECTORY + "Data\\bin\\";
         private bool errorOccured = false;
         private bool UsingBundledManifest = false;
         private List<string> BlockingMods;
@@ -92,8 +92,8 @@ namespace AlotAddOnGUI
         private const string ADDON_STAGING_DIR = "ADDON_STAGING";
         private const string USER_STAGING_DIR = "USER_STAGING";
 
-        private string ADDON_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + ADDON_STAGING_DIR + "\\";
-        private string USER_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + USER_STAGING_DIR + "\\";
+        private string ADDON_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\" + ADDON_STAGING_DIR + "\\";
+        private string USER_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\" + USER_STAGING_DIR + "\\";
 
         private bool me1Installed;
         private bool me2Installed;
@@ -129,6 +129,8 @@ namespace AlotAddOnGUI
         private int RefreshesUntilRealRefresh;
         private bool ShowBuildingOnly;
         private WebClient downloadClient;
+        private string MANIFEST_LOC = EXE_DIRECTORY + @"Data\\manifest.xml";
+        private string MANIFEST_BUNDLED_LOC = EXE_DIRECTORY + @"Data\\manifest-bundled.xml";
 
         public bool ShowME1Files
         {
@@ -527,12 +529,12 @@ namespace AlotAddOnGUI
             }
             KeyValuePair<ProgressDialogController, string> kp = (KeyValuePair<ProgressDialogController, string>)e.UserState;
             kp.Key.SetIndeterminate();
-            kp.Key.SetTitle("Extracting Tool Update");
+            kp.Key.SetTitle("Extracting MassEffectModderNoGUI Update");
             //Extract 7z
             string path = BINARY_DIRECTORY + "7z.exe";
+            string args = "x \"" + e.UserState + "\" -aoa -r -o\"" + BINARY_DIRECTORY + "\"";
 
-            string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + EXE_DIRECTORY + "bin\"";
-            Log.Information("Extracting Tool update...");
+            Log.Information("Extracting MassEffectModderNoGUI update...");
             Utilities.runProcess(path, args);
             Log.Information("Extraction complete.");
 
@@ -549,8 +551,8 @@ namespace AlotAddOnGUI
 
             //Extract 7z
             string path = BINARY_DIRECTORY + "7z.exe";
-
-            string args = "x \"" + e.UserState + "\" -aoa -r -o\"" + EXE_DIRECTORY + "bin\"";
+            string pathWithoutTrailingSlash = BINARY_DIRECTORY.Substring(0, BINARY_DIRECTORY.Length - 1);
+            string args = "x \"" + e.UserState + "\" -aoa -r -o\"" + BINARY_DIRECTORY+"\"";
             Log.Information("Extracting MEMGUI update...");
             Utilities.runProcess(path, args);
             Log.Information("Extraction complete.");
@@ -1085,59 +1087,80 @@ namespace AlotAddOnGUI
                     Log.Information("Fetching latest manifest from github");
                     Build_ProgressBar.IsIndeterminate = true;
                     AddonFilesLabel.Text = "Downloading latest addon manifest";
-                    try
+                    if (!File.Exists("DEV_MODE"))
                     {
-                        //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", EXE_DIRECTORY + @"manifest.xml");
-                        string url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml";
-                        if (USING_BETA)
+                        try
                         {
-                            Log.Information("In BETA mode.");
-                            url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
-                            Title += " BETA MODE";
-                        }
-                        if (false)
-                        {
-                            Log.Information("In DEV mode.");
-                            url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-dev.xml";
-                            Title += " DEV MODE";
-                        }
-                        await webClient.DownloadFileTaskAsync(url, EXE_DIRECTORY + @"manifest-new.xml");
-                        if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
-                        {
-                            File.Delete(EXE_DIRECTORY + @"manifest.xml");
-                            File.Move(EXE_DIRECTORY + @"manifest-new.xml", EXE_DIRECTORY + @"manifest.xml");
-                            Log.Information("Manifest fetched.");
-                        }
-                        else
-                        {
-                            File.Delete(EXE_DIRECTORY + @"manifest-new.xml");
-                            Log.Error("manifest-new.xml does not exist. Using local bundled version instead...");
-                            if (!File.Exists(EXE_DIRECTORY + @"manifest.xml") && File.Exists(EXE_DIRECTORY + @"manifest-bundled.xml"))
+                            //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", MANIFEST_LOC);
+                            string url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml";
+                            if (USING_BETA)
                             {
-                                Log.Information("Reading bundled manifest instead.");
-                                File.Delete(EXE_DIRECTORY + @"manifest.xml");
-                                File.Copy(EXE_DIRECTORY + @"manifest-bundled.xml", EXE_DIRECTORY + @"manifest.xml");
-                                UsingBundledManifest = true;
+                                Log.Information("In BETA mode.");
+                                url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
+                                Title += " BETA MODE";
+                            }
+                            webClient.DownloadStringCompleted += (sender, e) =>
+                            {
+                                string pageSourceCode = e.Result;
+                                //do something with results 
+                            };
+                            string result = webClient.DownloadString(new Uri(url));
+                            if (Utilities.TestXMLIsValid(result))
+                            {
+                                Log.Information("Manifest fetched.");
+                                File.WriteAllText(MANIFEST_LOC, result);
+                                //Legacy stuff
+                                if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
+                                {
+                                    File.Delete(MANIFEST_LOC);
+                                }
                             }
                             else
                             {
-                                Log.Error("Local manifest also doesn't exist! No manifest is available.");
+                                Log.Error("Response from server was not valid XML! " + result);
+                                if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                                {
+                                    Log.Information("Reading bundled manifest instead.");
+                                    File.Delete(MANIFEST_LOC);
+                                    File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                                    UsingBundledManifest = true;
+                                }
+                                else
+                                {
+                                    Log.Error("Local manifest also doesn't exist! No manifest is available.");
+                                }
+                            }
+                        }
+                        catch (WebException e)
+                        {
+                            Log.Error("WebException occured getting manifest from server: " + e.ToString());
+                            if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                            {
+                                Log.Information("Reading bundled manifest instead.");
+                                File.Delete(MANIFEST_LOC);
+                                File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                                UsingBundledManifest = true;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error("Other Exception occured getting manifest from server/reading manifest: " + e.ToString());
+                            if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                            {
+                                Log.Information("Reading bundled manifest instead.");
+                                File.Delete(MANIFEST_LOC);
+                                File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                                UsingBundledManifest = true;
                             }
                         }
                     }
-                    catch (WebException e)
+                    else
                     {
-                        File.Delete(EXE_DIRECTORY + @"manifest-new.xml");
-                        Log.Error("Exception occured getting manifest from server: " + e.ToString());
-                        if (!File.Exists(EXE_DIRECTORY + @"manifest.xml") && File.Exists(EXE_DIRECTORY + @"manifest-bundled.xml"))
-                        {
-                            Log.Information("Reading bundled manifest instead.");
-                            File.Delete(EXE_DIRECTORY + @"manifest.xml");
-                            File.Copy(EXE_DIRECTORY + @"manifest-bundled.xml", EXE_DIRECTORY + @"manifest.xml");
-                            UsingBundledManifest = true;
-                        }
+                        Log.Information("DEV_MODE file found. Not using online manifest.");
+                        UsingBundledManifest = true;
+                        Title += " DEV MODE";
                     }
-                    if (!File.Exists(EXE_DIRECTORY + @"manifest.xml"))
+                    if (!File.Exists(MANIFEST_LOC))
                     {
                         Log.Fatal("No local manifest exists to use, exiting...");
                         await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for addon. Information that is required to build the addon is not available. Check the program logs.");
@@ -1411,7 +1434,7 @@ namespace AlotAddOnGUI
             alladdonfiles = new BindingList<AddonFile>(); //prevents crashes
             try
             {
-                XElement rootElement = XElement.Load(EXE_DIRECTORY + @"manifest.xml");
+                XElement rootElement = XElement.Load(MANIFEST_LOC);
                 string version = (string)rootElement.Attribute("version") ?? "";
                 musicpackmirrors = rootElement.Elements("musicpackmirror").Select(xe => xe.Value).ToList();
                 linqlist = (from e in rootElement.Elements("addonfile")
@@ -2112,7 +2135,7 @@ namespace AlotAddOnGUI
                 //don't know how you can drop less than 1 files but whatever
                 //This code is for failsafe in case somehow library file exists but is not detect properly, like user moved file but something is running
                 string file = files[0];
-                string basepath = DOWNLOADED_MODS_DIRECTORY+"\\";
+                string basepath = DOWNLOADED_MODS_DIRECTORY + "\\";
 
                 if (file.ToLower().StartsWith(basepath))
                 {
@@ -2202,9 +2225,11 @@ namespace AlotAddOnGUI
                         case ".jpg":
                         case ".jpeg":
                         case ".tga":
+                        case ".bmp":
                             string filename = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
                             if (!filename.Contains("0x"))
                             {
+                                Log.Error("Texture filename not valid: " + Path.GetFileName(file) + " Texture filename must include texture CRC (0xhhhhhhhh)");
                                 continue;
                             }
                             int idx = filename.IndexOf("0x");
@@ -2327,7 +2352,7 @@ namespace AlotAddOnGUI
                         PreventFileRefresh = false; //allow refresh
 
                         string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                        string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " have been copied into the Downloaded_Mods directory.";
+                        string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods directory.";
 
                         ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
                         if (DOWNLOAD_ASSISTANT_WINDOW != null)

@@ -192,6 +192,7 @@ namespace AlotAddOnGUI.classes
         public bool Staged { get; internal set; }
         public bool Building { get; internal set; }
         public long FileSize { get; internal set; }
+        public string BuildID { get; internal set; }
 
         private void OnPropertyChanged(string propertyName)
         {

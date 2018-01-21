@@ -67,6 +67,7 @@ namespace AlotAddOnGUI
         private FadeInOutSampleProvider fadeoutProvider;
         private bool MusicPaused;
         private string DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods";
+        private string EXTRACTED_MODS_DIRECTORY = EXE_DIRECTORY + "Extracted_Mods";
         private const string SETTINGSTR_SOUND = "PlayMusic";
         private const string SET_VISIBILE_ITEMS_LIST = "SET_VISIBILE_ITEMS_LIST";
 
@@ -106,12 +107,12 @@ namespace AlotAddOnGUI
 
             TasksDisplayEngine.SubmitTask(processingStr);
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, processingStr));
-            string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(fileToUse);
+            string extractpath = EXTRACTED_MODS_DIRECTORY + "\\" + System.IO.Path.GetFileNameWithoutExtension(fileToUse);
             string extractSource = DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse;
             if (af.UserFile)
             {
                 extractSource = af.UserFilePath;
-                extractpath = USER_FULL_STAGING_DIRECTORY + System.IO.Path.GetFileNameWithoutExtension(fileToUse);
+                extractpath = USER_FULL_STAGING_DIRECTORY + af.BuildID;
                 Directory.CreateDirectory(extractpath);
             }
 
@@ -119,6 +120,20 @@ namespace AlotAddOnGUI
             {
                 switch (fileextension)
                 {
+                    case ".dds":
+                    case ".png":
+                    case ".jpg":
+                    case ".jpeg":
+                    case ".tga":
+                    case ".bmp":
+                    case ".mod":
+                        af.ReadyStatusText = "Copying";
+                        af.SetWorking();
+                        File.Copy(extractSource, extractpath + "\\" + Path.GetFileName(extractSource), true);
+                        af.ReadyStatusText = "Waiting for Addon to complete build";
+                        af.SetIdle();
+                        break;
+
                     case ".7z":
                     case ".zip":
                     case ".rar":
@@ -298,7 +313,7 @@ namespace AlotAddOnGUI
                     case ".tpf":
                         {
                             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
-                            string destination = EXE_DIRECTORY + "Extracted_Mods\\" + Path.GetFileName(fileToUse);
+                            string destination = EXTRACTED_MODS_DIRECTORY + "\\" + Path.GetFileName(fileToUse);
                             if (af.UserFile)
                             {
                                 destination = extractpath + "\\" + Path.GetFileName(fileToUse);
@@ -307,7 +322,6 @@ namespace AlotAddOnGUI
                             BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                             break;
                         }
-                    case ".mod":
                     case ".mem":
                         {
                             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
@@ -389,7 +403,7 @@ namespace AlotAddOnGUI
             Log.Information("[SIZE] PREBUILD Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
 
             string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
-            string destinationpath = EXE_DIRECTORY + @"Extracted_Mods\";
+            string destinationpath = EXTRACTED_MODS_DIRECTORY + "\\";
             Log.Information("Creating Extracted_Mods folder");
             Directory.CreateDirectory(destinationpath);
 
@@ -473,7 +487,11 @@ namespace AlotAddOnGUI
             }
 
             BuildWorker.ReportProgress(completed, new ThreadCommand(SET_VISIBILE_ITEMS_LIST, ADDONFILES_TO_BUILD));
-
+            int id = 0;
+            foreach (AddonFile af in ADDONFILES_TO_BUILD) {
+                af.BuildID = (++id).ToString().PadLeft(3, '0');
+                Log.Information("Build ID for " + af.FriendlyName + ": " + af.BuildID);
+            }
             //DISK SPACE CHECK
             ulong fullsize = 0;
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
@@ -491,7 +509,7 @@ namespace AlotAddOnGUI
                 //not enough disk space for build
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Not enough free space to build textures.\nYou will need around " + ByteSize.FromBytes(fullsize) + " of free space on " + Path.GetPathRoot(EXE_DIRECTORY) + " to build the installation packages."));
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Build aborted"));
-                BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Not enough free space to build textures", "You will need around " + ByteSize.FromKiloBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to build the installation packages.")));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Not enough free space to build textures", "You will need around " + ByteSize.FromBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to build the installation packages.")));
 
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
                 return false;
@@ -539,7 +557,7 @@ namespace AlotAddOnGUI
 
                 Log.Information("Extracting TPF files.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-extract-tpf \"" + EXE_DIRECTORY + "Extracted_Mods\" \"" + EXE_DIRECTORY + "Extracted_Mods\"";
+                string args = "-extract-tpf \"" + EXTRACTED_MODS_DIRECTORY + "\" \"" + EXTRACTED_MODS_DIRECTORY + "\"";
                 Utilities.runProcess(exe, args);
             }
 
@@ -552,7 +570,7 @@ namespace AlotAddOnGUI
 
                 Log.Information("Extracting MOD files.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-extract-mod " + game + " \"" + DOWNLOADED_MODS_DIRECTORY + "\" \"" + EXE_DIRECTORY + "Extracted_Mods\"";
+                string args = "-extract-mod " + game + " \"" + DOWNLOADED_MODS_DIRECTORY + "\" \"" + EXTRACTED_MODS_DIRECTORY + "\"";
                 Utilities.runProcess(exe, args);
             }
 
@@ -1177,7 +1195,7 @@ namespace AlotAddOnGUI
 
         private string GetMusicDirectory()
         {
-            return EXE_DIRECTORY + "music\\";
+            return EXE_DIRECTORY + "Data\\music\\";
         }
 
         private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -1551,7 +1569,7 @@ namespace AlotAddOnGUI
             }
             else
             {
-                updateVersion = versionInfo.ALOTUPDATEVER;
+                updateVersion = versionInfo != null ? versionInfo.ALOTUPDATEVER : (byte)0;
             }
 
 
