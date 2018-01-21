@@ -854,8 +854,8 @@ namespace AlotAddOnGUI
                     System.Windows.Application.Current.Dispatcher.Invoke(
                     () =>
                     {
-                            // Code to run on the GUI thread.
-                            Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
+                        // Code to run on the GUI thread.
+                        Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
                         string tickerText = "";
                         tickerText += ShowME1Files ? "ME1: " + numME1FilesReady + "/" + numME1Files + " imported" : "ME1: N/A";
                         tickerText += " - ";
@@ -2109,7 +2109,7 @@ namespace AlotAddOnGUI
             Log.Information("Files queued for import checks:");
             foreach (String file in files)
             {
-                Log.Information(" -" + file);
+                Log.Information(" - " + file);
             }
             List<Tuple<AddonFile, string, string>> filesToImport = new List<Tuple<AddonFile, string, string>>();
             // Assuming you have one file that you care about, pass it off to whatever
@@ -2147,10 +2147,6 @@ namespace AlotAddOnGUI
                         }
                         continue; //don't check these
                     }
-                    if (af.ALOTVersion > 0 && af.Game_ME1)
-                    {
-                        Debug.WriteLine("B");
-                    }
                     bool isUnpackedSingleFile = af.UnpackedSingleFilename != null && af.UnpackedSingleFilename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file); //make sure not folder with same name.
 
                     if (isUnpackedSingleFile || af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file)) //make sure folder not with same name
@@ -2159,7 +2155,7 @@ namespace AlotAddOnGUI
                         if (af.Ready == false)
                         {
                             //Copy file to directory
-                            string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
+                            string basepath = DOWNL + @"Downloaded_Mods\";
                             string destination = basepath + ((isUnpackedSingleFile) ? af.UnpackedSingleFilename : af.Filename);
                             //Log.Information("Copying dragged file to downloaded mods directory: " + file);
                             //File.Copy(file, destination, true);
@@ -2321,28 +2317,37 @@ namespace AlotAddOnGUI
 
         private void ImportCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (e != null && e.Result != null)
+            if (e != null)
             {
-                List<string> importedFiles = (List<string>)e.Result;
-                //imports finished
-                string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods folder.";
-                foreach (string af in importedFiles)
+                if (e.Error != null)
                 {
-                    detailsMessage += "\n - " + af;
-                }
+                    //An error has occured
 
-                if (DOWNLOAD_ASSISTANT_WINDOW != null)
+                }
+                else
+                if (e.Result != null)
                 {
-                    DOWNLOAD_ASSISTANT_WINDOW.ShowStatus(importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s were" : " was") + " imported");
-                }
-                PreventFileRefresh = false; //allow refresh
+                    List<string> importedFiles = (List<string>)e.Result;
+                    //imports finished
+                    string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods folder.";
+                    foreach (string af in importedFiles)
+                    {
+                        detailsMessage += "\n - " + af;
+                    }
 
-                string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods directory.";
-                CheckImportLibrary_Tick(null, null);
-                ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
+                    if (DOWNLOAD_ASSISTANT_WINDOW != null)
+                    {
+                        DOWNLOAD_ASSISTANT_WINDOW.ShowStatus(importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s were" : " was") + " imported");
+                    }
+                    PreventFileRefresh = false; //allow refresh
+
+                    string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
+                    string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods directory.";
+                    CheckImportLibrary_Tick(null, null);
+                    ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
+                }
+                PreventFileRefresh = false;
             }
-            PreventFileRefresh = false;
         }
 
         private async void ShowImportFinishedMessage(string originalTitle, string originalMessage, string detailsMessage)
