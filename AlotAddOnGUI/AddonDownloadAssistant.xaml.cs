@@ -34,7 +34,13 @@ namespace AlotAddOnGUI
             InitializeComponent();
             this.windowRef = windowRef;
             this.missingAddonFiles = missingAddonFiles;
-            lvUsers.ItemsSource = missingAddonFiles;
+            filesList.ItemsSource = missingAddonFiles;
+        }
+
+        public void setNewMissingAddonfiles(List<AddonFile> missingAddonFiles)
+        {
+            this.missingAddonFiles = missingAddonFiles;
+            filesList.ItemsSource = missingAddonFiles;
         }
 
 
@@ -74,7 +80,7 @@ namespace AlotAddOnGUI
             if (readyFiles.Count() > 0)
             {
                 missingAddonFiles = missingAddonFiles.Except(readyFiles).ToList();
-                lvUsers.ItemsSource = missingAddonFiles;
+                filesList.ItemsSource = missingAddonFiles;
             }
         }
 

@@ -16,17 +16,13 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Media;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Xml.Linq;
-using System.Xml.XPath;
 
 namespace AlotAddOnGUI
 {
@@ -58,8 +54,6 @@ namespace AlotAddOnGUI
         public static ALOTVersionInfo CURRENTLY_INSTALLED_ME2_ALOT_INFO;
         public static ALOTVersionInfo CURRENTLY_INSTALLED_ME3_ALOT_INFO;
         int USERFILE_INDEX = 100;
-
-
         private bool WARN_USER_OF_EXIT = false;
         private List<string> TIPS_LIST;
         private const string SET_OVERALL_PROGRESS = "SET_OVERALL_PROGRESS";
@@ -67,13 +61,12 @@ namespace AlotAddOnGUI
         Stopwatch stopwatch;
         private string MAINTASK_TEXT;
         private string CURRENT_USER_BUILD_FILE = "";
-
         public bool BUILD_ALOT { get; private set; }
-
         private bool BUILD_ADDON_FILES = false;
         private bool BUILD_USER_FILES = false;
         private FadeInOutSampleProvider fadeoutProvider;
         private bool MusicPaused;
+        private string DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods";
         private const string SETTINGSTR_SOUND = "PlayMusic";
         private const string SET_VISIBILE_ITEMS_LIST = "SET_VISIBILE_ITEMS_LIST";
 
@@ -85,7 +78,7 @@ namespace AlotAddOnGUI
 
             string fileToUse = af.Filename;
             bool isSingleFileMode = false;
-            if (File.Exists(EXE_DIRECTORY + "Downloaded_Mods\\" + af.UnpackedSingleFilename))
+            if (File.Exists(DOWNLOADED_MODS_DIRECTORY + "\\" + af.UnpackedSingleFilename))
             {
                 isSingleFileMode = true;
                 fileToUse = af.UnpackedSingleFilename;
@@ -107,14 +100,14 @@ namespace AlotAddOnGUI
             }
             else
             {
-                length = new System.IO.FileInfo(EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse).Length;
+                length = new System.IO.FileInfo(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse).Length;
             }
             processingStr += " (" + ByteSize.FromBytes(length) + ")";
 
             TasksDisplayEngine.SubmitTask(processingStr);
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, processingStr));
             string extractpath = EXE_DIRECTORY + "Extracted_Mods\\" + System.IO.Path.GetFileNameWithoutExtension(fileToUse);
-            string extractSource = EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse;
+            string extractSource = DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse;
             if (af.UserFile)
             {
                 extractSource = af.UserFilePath;
@@ -315,14 +308,6 @@ namespace AlotAddOnGUI
                             break;
                         }
                     case ".mod":
-                        {
-                            //Currently not used
-                            //InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
-                            //completed++;
-                            //int progress = (int)((float)completed / (float)addonstoinstall.Count * 100);
-                            //InstallWorker.ReportProgress(progress);
-                            break;
-                        }
                     case ".mem":
                         {
                             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Preparing " + af.FriendlyName));
@@ -340,7 +325,7 @@ namespace AlotAddOnGUI
                                 }
                                 else
                                 {
-                                    File.Copy(EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + fileToUse, true);
+                                    File.Copy(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + fileToUse, true);
                                 }
                             }
                             else
@@ -354,7 +339,7 @@ namespace AlotAddOnGUI
                                     {
                                         File.Delete(movename);
                                     }
-                                    File.Move(EXE_DIRECTORY + "Downloaded_Mods\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
+                                    File.Move(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
                                     foreach (PackageFile p in af.PackageFiles)
                                     {
                                         p.Processed = true; //No more processing on this addonfile. It has packagefiles since it could also be zipped still
@@ -567,7 +552,7 @@ namespace AlotAddOnGUI
 
                 Log.Information("Extracting MOD files.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-extract-mod " + game + " \"" + EXE_DIRECTORY + "Downloaded_Mods\" \"" + EXE_DIRECTORY + "Extracted_Mods\"";
+                string args = "-extract-mod " + game + " \"" + DOWNLOADED_MODS_DIRECTORY + "\" \"" + EXE_DIRECTORY + "Extracted_Mods\"";
                 Utilities.runProcess(exe, args);
             }
 
@@ -1116,7 +1101,8 @@ namespace AlotAddOnGUI
                         MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.Sound3;
                         fadeoutProvider.BeginFadeIn(2000);
                         waveOut.Play();
-                    } else
+                    }
+                    else
                     {
                         MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.SoundMute;
                         waveOut.Pause();
@@ -1163,7 +1149,8 @@ namespace AlotAddOnGUI
             if (MusicIsPlaying)
             {
                 vorbisStream.Position = 0;
-            } else
+            }
+            else
             {
                 waveOut.Stop();
                 waveOut.Dispose();
@@ -1209,7 +1196,7 @@ namespace AlotAddOnGUI
                     fadeoutProvider.BeginFadeOut(3000);
                 }
             }
-            
+
             WARN_USER_OF_EXIT = false;
             Log.Information("InstallCompleted()");
             InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Collapsed;
@@ -1607,7 +1594,7 @@ namespace AlotAddOnGUI
 
                 Log.Information("ALOT MAIN FILE - Unpacked - moving to downloaded_mods from install dir: " + extractedName);
                 string source = getOutputDir(INSTALLING_THREAD_GAME) + "000_" + extractedName;
-                string dest = EXE_DIRECTORY + "Downloaded_Mods\\" + extractedName;
+                string dest = DOWNLOADED_MODS_DIRECTORY + "\\" + extractedName;
 
                 if (File.Exists(dest))
                 {
@@ -1617,7 +1604,7 @@ namespace AlotAddOnGUI
                 Log.Information("Moved main alot file back to downloaded_mods");
 
                 //Delete original
-                dest = EXE_DIRECTORY + "Downloaded_Mods\\" + alotAddonFile.Filename;
+                dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotAddonFile.Filename;
                 if (File.Exists(dest))
                 {
                     Log.Information("Deleted original alot archive file from downloaded_mods");

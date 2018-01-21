@@ -786,7 +786,7 @@ namespace AlotAddOnGUI
             if (addonfiles != null)
             {
                 //Console.WriteLine("Checking for files existence...");
-                string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
+                string basepath = DOWNLOADED_MODS_DIRECTORY + "\\";
                 int numdone = 0;
 
                 int numME1Files = 0;
@@ -1194,7 +1194,7 @@ namespace AlotAddOnGUI
                     if (af.Game_ME3) i = 3;
                     string outputPath = getOutputDir(i);
 
-                    string importedFilePath = EXE_DIRECTORY + @"Downloaded_Mods\" + af.UnpackedSingleFilename;
+                    string importedFilePath = DOWNLOADED_MODS_DIRECTORY + "\\" + af.UnpackedSingleFilename;
                     string outputFilename = outputPath + "000_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
                     if (File.Exists(outputFilename) && (game == 0 || game == i))
                     {
@@ -1418,6 +1418,7 @@ namespace AlotAddOnGUI
                             select new AddonFile
                             {
                                 Showing = false,
+                                FileSize = e.Attribute("size") != null ? (long)e.Attribute("size") : 0L,
                                 MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
                                 ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
                                 Author = (string)e.Attribute("author"),
@@ -1544,6 +1545,19 @@ namespace AlotAddOnGUI
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
             view.GroupDescriptions.Add(groupDescription);
             CheckImportLibrary_Tick(null, null);
+
+            if (DOWNLOAD_ASSISTANT_WINDOW != null)
+            {
+                List<AddonFile> notReadyAddonFiles = new List<AddonFile>();
+                foreach (AddonFile af in addonfiles)
+                {
+                    if (!af.Ready && !af.UserFile)
+                    {
+                        notReadyAddonFiles.Add(af);
+                    }
+                }
+                DOWNLOAD_ASSISTANT_WINDOW.setNewMissingAddonfiles(notReadyAddonFiles);
+            }
         }
 
 
@@ -2098,7 +2112,7 @@ namespace AlotAddOnGUI
                 //don't know how you can drop less than 1 files but whatever
                 //This code is for failsafe in case somehow library file exists but is not detect properly, like user moved file but something is running
                 string file = files[0];
-                string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
+                string basepath = DOWNLOADED_MODS_DIRECTORY+"\\";
 
                 if (file.ToLower().StartsWith(basepath))
                 {
@@ -2155,7 +2169,7 @@ namespace AlotAddOnGUI
                         if (af.Ready == false)
                         {
                             //Copy file to directory
-                            string basepath = DOWNL + @"Downloaded_Mods\";
+                            string basepath = DOWNLOADED_MODS_DIRECTORY + "\\";
                             string destination = basepath + ((isUnpackedSingleFile) ? af.UnpackedSingleFilename : af.Filename);
                             //Log.Information("Copying dragged file to downloaded mods directory: " + file);
                             //File.Copy(file, destination, true);
@@ -2169,7 +2183,7 @@ namespace AlotAddOnGUI
                 }
                 if (!hasMatch)
                 {
-                    string extension = Path.GetExtension(file);
+                    string extension = Path.GetExtension(file).ToLower();
                     switch (extension)
                     {
                         case ".7z":
@@ -2177,10 +2191,41 @@ namespace AlotAddOnGUI
                         case ".zip":
                         case ".tpf":
                         case ".mem":
+                        case ".mod":
                             if (acceptUserFiles)
                             {
                                 acceptableUserFiles.Add(file);
                             }
+                            break;
+                        case ".dds":
+                        case ".png":
+                        case ".jpg":
+                        case ".jpeg":
+                        case ".tga":
+                            string filename = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
+                            if (!filename.Contains("0x"))
+                            {
+                                continue;
+                            }
+                            int idx = filename.IndexOf("0x");
+                            if (filename.Length - idx < 10)
+                            {
+                                Log.Error("Texture filename not valid: " + Path.GetFileName(file) + " Texture filename must include texture CRC (0xhhhhhhhh)");
+                                continue;
+                            }
+                            uint crc;
+                            string crcStr = filename.Substring(idx + 2, 8);
+                            try
+                            {
+                                crc = uint.Parse(crcStr, System.Globalization.NumberStyles.HexNumber);
+                            }
+                            catch
+                            {
+                                Log.Error("Texture filename not valid: " + Path.GetFileName(file) + " Texture filename must include texture CRC (0xhhhhhhhh)");
+                                continue;
+                            }
+                            //File has hash
+                            acceptableUserFiles.Add(file);
                             break;
                         default:
                             Log.Information("Dragged file does not match any addon manifest file and is not acceptable extension: " + file);
@@ -2925,15 +2970,15 @@ namespace AlotAddOnGUI
 
                 if (!Utilities.IsWindowOpen<AddonDownloadAssistant>())
                 {
-                    List<AddonFile> notReadyAddonFile = new List<AddonFile>();
-                    foreach (AddonFile af in alladdonfiles)
+                    List<AddonFile> notReadyAddonFiles = new List<AddonFile>();
+                    foreach (AddonFile af in addonfiles)
                     {
                         if (!af.Ready && !af.UserFile)
                         {
-                            notReadyAddonFile.Add(af);
+                            notReadyAddonFiles.Add(af);
                         }
                     }
-                    DOWNLOAD_ASSISTANT_WINDOW = new AddonDownloadAssistant(this, notReadyAddonFile);
+                    DOWNLOAD_ASSISTANT_WINDOW = new AddonDownloadAssistant(this, notReadyAddonFiles);
                     DOWNLOAD_ASSISTANT_WINDOW.Show();
                 }
             }

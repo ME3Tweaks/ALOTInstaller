@@ -21,16 +21,19 @@
                 <Image Source="../images/logo_me3.png" Height="30" Margin="10"/>
             </Button>
         </StackPanel>
+        <CheckBox x:Name="Checkbox_Fullcheck" Content="Perform full diagnostic" ToolTip="Performs a full game diagnostic. Will take several minutes to complete." HorizontalAlignment="Center"/>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="8,0,0,0">
                 <Image x:Name="Image_DataMismatch" Source="../images/waiting.png" Height="15"/>
                 <TextBlock x:Name="TextBlock_DataMismatch" Text="Check for added or removed files" Margin="3"/>
-                <Image x:Name="Image_DataMismatch2" Source="../images/waiting.png" Height="15"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel x:Name="QuickCheckPanel" Orientation="Horizontal" HorizontalAlignment="Left" Margin="8,0,0,0">
                 <Image x:Name="Image_DataAfter" Source="../images/waiting.png" Height="15"/>
                 <TextBlock x:Name="TextBlock_DataAfter" Text="Check for replaced files" Margin="3"/>
-                <Image x:Name="Image_DataAfter2" Source="../images/waiting.png" Height="15"/>
+            </StackPanel>
+            <StackPanel x:Name="FullCheckPanel" Visibility="Collapsed" Orientation="Horizontal" HorizontalAlignment="Left" Margin="8,0,0,0">
+                <Image x:Name="Image_FullCheck" Source="../images/waiting.png" Height="15"/>
+                <TextBlock x:Name="TextBlock_FullCheck" Text="Scan textures" Margin="3"/>
             </StackPanel>
             <!-- <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Image x:Name="Image_EmptyMipmaps" Source="../images/waiting.png" Height="15"/>
@@ -38,18 +41,17 @@
                 <Image x:Name="Image_EmptyMipmaps2" Source="../images/waiting.png" Height="15"/>
 
             </StackPanel>-->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="8,0,0,0">
                 <Image x:Name="Image_DataBasegamemods" Source="../images/waiting.png" Height="15"/>
                 <TextBlock x:Name="TextBlock_Basegamemods" Text="Inventory game modifications" Margin="3"/>
-                <Image x:Name="Image_DataBasegamemods2" Source="../images/waiting.png" Height="15"/>
-
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="8,0,0,0">
                 <Image x:Name="Image_Upload" Source="../images/waiting.png" Height="15"/>
                 <TextBlock x:Name="TextBlock_Upload" Text="Upload diagnostic for analysis" Margin="3"/>
-                <Image x:Name="Image_Upload2" Source="../images/waiting.png" Height="15"/>
             </StackPanel>
+            
             <Button Content="Close" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Margin="8" Click="CloseButton_Click"/>
+        
         </StackPanel>
     </StackPanel>
 </Controls:MetroWindow>
