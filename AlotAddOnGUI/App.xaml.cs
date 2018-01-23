@@ -9,6 +9,7 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,6 +23,15 @@ namespace AlotAddOnGUI
     /// </summary>
     public partial class App : Application
     {
+        [STAThread]
+        public static void Main()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            var application = new App();
+            application.InitializeComponent();
+            application.Run();
+        }
+
         public App() : base()
         {
             string[] args = Environment.GetCommandLineArgs();
@@ -113,7 +123,7 @@ namespace AlotAddOnGUI
 
                 if (Directory.Exists(updateDestinationPath + "bin"))
                 {
-                    Log.Information("Deleting old top level bin folder: "+(updateDestinationPath + "bin"));
+                    Log.Information("Deleting old top level bin folder: " + (updateDestinationPath + "bin"));
                     Utilities.DeleteFilesAndFoldersRecursively(updateDestinationPath + "bin");
                 }
 
@@ -133,6 +143,12 @@ namespace AlotAddOnGUI
                 {
                     Log.Information("Deleting leftover manifest.xml file");
                     File.Delete(updateDestinationPath + "manifest.xml");
+                }
+
+                if (File.Exists(updateDestinationPath + "ALOTInstaller.exe.config"))
+                {
+                    Log.Information("Deleting leftover config file");
+                    File.Delete(updateDestinationPath + "ALOTInstaller.exe.config");
                 }
 
                 if (File.Exists(updateDestinationPath + "manifest-bundled.xml"))
@@ -163,10 +179,11 @@ namespace AlotAddOnGUI
                 Thread.Sleep(1000);
                 Log.Information("Removing Update directory");
                 Directory.Delete(loggingBasePath + "Update", true);
-                if (File.Exists(loggingBasePath + "ALOTAddonBuilder.exe")) {
-                    Log.Information("Deleting Update Shim ALOTAddonBuilder.exe");
-                    File.Delete(loggingBasePath + "ALOTAddonBuilder.exe");
-                }
+            }
+            if (File.Exists(loggingBasePath + "ALOTAddonBuilder.exe"))
+            {
+                Log.Information("Deleting Update Shim ALOTAddonBuilder.exe");
+                File.Delete(loggingBasePath + "ALOTAddonBuilder.exe");
             }
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
             Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
@@ -212,6 +229,24 @@ namespace AlotAddOnGUI
                 Utilities.runProcess("cmd.exe", "/c taskkill /F /IM 7z.exe /T", true);
             }
             Log.Information("Closing application via AppClosing()");
+        }
+
+        private static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var probingPath = AppDomain.CurrentDomain.BaseDirectory + @"Data\lib";
+            var assyName = new AssemblyName(args.Name);
+
+            var newPath = Path.Combine(probingPath, assyName.Name);
+            if (!newPath.EndsWith(".dll"))
+            {
+                newPath = newPath + ".dll";
+            }
+            if (File.Exists(newPath))
+            {
+                var assy = Assembly.LoadFile(newPath);
+                return assy;
+            }
+            return null;
         }
     }
 
