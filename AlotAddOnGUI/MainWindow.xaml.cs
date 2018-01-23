@@ -422,7 +422,7 @@ namespace AlotAddOnGUI
             Label_MEMVersion.Content = "MEM Cmd Version: " + fileVersion;
             try
             {
-                Log.Information("Checking for updates to MEMNOGUI...");
+                Log.Information("Checking for updates to MEMNOGUI. The local version is "+fileVersion);
 
                 var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
                 var releases = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModderNoGui");
@@ -532,7 +532,7 @@ namespace AlotAddOnGUI
             kp.Key.SetTitle("Extracting MassEffectModderNoGUI Update");
             //Extract 7z
             string path = BINARY_DIRECTORY + "7z.exe";
-            string args = "x \"" + e.UserState + "\" -aoa -r -o\"" + BINARY_DIRECTORY + "\"";
+            string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + BINARY_DIRECTORY + "\"";
 
             Log.Information("Extracting MassEffectModderNoGUI update...");
             Utilities.runProcess(path, args);
@@ -654,7 +654,7 @@ namespace AlotAddOnGUI
 
                             mds.NegativeButtonText = "Install Later";
                             mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                            var buildResult = await this.ShowMessageAsync("Ready to install textures", "You can install these textures now, or you can manually install them with MEM. The files have been placed into the MEM_Packages subdirectory.", MessageDialogStyle.AffirmativeAndNegative, mds);
+                            var buildResult = await this.ShowMessageAsync("Ready to install textures", "You can install these textures now, or you can manually install them with MEM. The files have been placed into the Data\\MEM_Packages subdirectory.", MessageDialogStyle.AffirmativeAndNegative, mds);
                             if (buildResult == MessageDialogResult.Affirmative)
                             {
                                 bool run = true;

@@ -1,0 +1,1 @@
+powershell -File ReleaseBuilderNexus.ps1 -ExecutionPolicy bypass

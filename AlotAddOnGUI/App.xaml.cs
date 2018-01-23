@@ -97,14 +97,38 @@ namespace AlotAddOnGUI
                 Log.Information("Applying update");
                 CopyDir.CopyAll(new DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory), new DirectoryInfo(updateDestinationPath));
                 Log.Information("Update files have been applied");
+                updateDestinationPath += "\\"; //add slash
+                if (Directory.Exists(updateDestinationPath + "MEM_Packages") && !Directory.Exists(updateDestinationPath + @"Data\MEM_Packages"))
+                {
+                    Log.Information("Migrating MEM_Packages folder into subfolder");
+                    Directory.Move(updateDestinationPath + "MEM_Packages", updateDestinationPath + @"Data\MEM_Packages");
+                }
+
                 if (Directory.Exists(updateDestinationPath + "music") && !Directory.Exists(updateDestinationPath + @"Data\Music"))
                 {
                     Log.Information("Migrating music folder into subfolder");
                     Directory.Move(updateDestinationPath + "music", updateDestinationPath + @"Data\Music");
-                    Directory.Delete(updateDestinationPath + "music");
                 }
 
-                ProcessStartInfo psi = new ProcessStartInfo(updateDestinationPath + "\\" + System.AppDomain.CurrentDomain.FriendlyName);
+                if (Directory.Exists(updateDestinationPath + "bin"))
+                {
+                    Log.Information("Deleting old top level bin folder");
+                    Directory.Delete(updateDestinationPath + "bin");
+                }
+
+                if (Directory.Exists(updateDestinationPath + "lib"))
+                {
+                    Log.Information("Deleting old top level lib folder");
+                    Directory.Delete(updateDestinationPath + "lib");
+                }
+
+                if (Directory.Exists(updateDestinationPath + "Extracted_Mods"))
+                {
+                    Log.Information("Deleting leftover Extracted_Mods folder");
+                    Directory.Delete(updateDestinationPath + "Extracted_Mods");
+                }
+                
+                ProcessStartInfo psi = new ProcessStartInfo(updateDestinationPath + System.AppDomain.CurrentDomain.FriendlyName);
                 psi.WorkingDirectory = updateDestinationPath;
                 psi.Arguments = "--completing-update";
                 Process.Start(psi);

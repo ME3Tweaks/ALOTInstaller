@@ -318,9 +318,9 @@ if $(ConfigurationName) == Debug echo DEBUG MODE
 ::if $(ConfigurationName) == Debug (robocopy "$(SolutionDir)BuildCache\Downloaded_Mods" "$(TargetDir)Downloaded_Mods")
 
 if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.cmd" "$(TargetDir)..\ReleaseBuilder.bat" /y)
-
-
 if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.ps1" "$(TargetDir)..\ReleaseBuilder.ps1" /y)
+if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilderNexus.cmd" "$(TargetDir)..\ReleaseBuilderNexus.bat" /y)
+if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilderNexus.ps1" "$(TargetDir)..\ReleaseBuilderNexus.ps1" /y)
 
 if $(ConfigurationName) == Release rmdir /s /q "$(TargetDir)logs
 if $(ConfigurationName) == Debug (exit 0)</PostBuildEvent>

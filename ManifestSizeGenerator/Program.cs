@@ -28,7 +28,9 @@ namespace ManifestSizeGenerator
             foreach (var file in files)
             {
                 FileInfo info = new FileInfo(file);
-                XmlNode node = root.SelectSingleNode("/alotaddonmanifest/addonfile/file[@filename]");
+                string xpathstr = "/alotaddonmanifest/addonfile/file[@filename='" + Path.GetFileName(file) + "']";
+                //Console.WriteLine(xpathstr);
+                XmlNode node = root.SelectSingleNode(xpathstr);
                 if (node != null)
                 {
                     Console.WriteLine("Calculating info for " + Path.GetFileName(file));
@@ -46,7 +48,7 @@ namespace ManifestSizeGenerator
             }
             doc.Save(manifestfile);
             Console.WriteLine("Press any key to close");
-            Console.Read();
+            Console.ReadKey();
         }
 
         private static void SetAttrSafe(XmlNode node, params XmlAttribute[] attrList)
