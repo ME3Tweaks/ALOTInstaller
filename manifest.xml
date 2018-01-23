@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="3.0.13">
+<alotaddonmanifest version="3.0.14">
 	<musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
 	<musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
 	<addonfile meuitm="true" friendlyname="MEUITM Anniversary Edition" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
@@ -161,11 +161,6 @@
 	<addonfile friendlyname="HR Phoenix Armor" author="Ottemis">
 		<file downloadlink="https://www.nexusmods.com/masseffect/mods/9" filename="Medium Phoenix Female-9-1-0.rar"/>
 		<packagefile me1="true" sourcename="ME1_Med_Phoe_Fem.tpf" movedirectly="true"/>
-	</addonfile>
-	<addonfile friendlyname="HR Weapon Textures (CreeperLava)" tooltipname="Enhanced normal textures (relief) for TheDarkFalkon's weapon textures, by CreeperLava" author="TheDarkFalkon, CreeperLava">
-		<file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="HR Weapon Textures (CreeperLava).zip"/>
-		<packagefile me3="true" sourcename="HR Weapon Textures ME3.mem" movedirectly="true"/>
-		<packagefile me2="true" sourcename="HR Weapon Textures ME2.mem" movedirectly="true"/>
 	</addonfile>
 	<addonfile friendlyname="HR Predator Texture" tooltipname="WpnPredator_HRv1.5.zip" author="TheDarkFalkon">
 		<file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="WpnPredator_HRv1.5.zip"/>
