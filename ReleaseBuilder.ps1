@@ -4,9 +4,9 @@ if (Test-Path "$($PSScriptRoot)\Release\logs") {
     Remove-Item "$($PSScriptRoot)\Release\logs" -Force -Recurse
 }
 
-if (Test-Path "$($PSScriptRoot)\Release\lib\ALOTinstaller.pdb") {
+if (Test-Path "$($PSScriptRoot)\Release\Data\lib\ALOTinstaller.pdb") {
     Write-Host Moving PDB...
-    Move-Item "$($PSScriptRoot)\Release\lib\ALOTinstaller.pdb"  -Destination "$($PSScriptRoot)\Release\ALOTinstaller.pdb" -Force
+    Move-Item "$($PSScriptRoot)\Release\Data\lib\ALOTinstaller.pdb"  -Destination "$($PSScriptRoot)\Release\ALOTinstaller.pdb" -Force
 }
 
 if (Test-Path "$($PSScriptRoot)\Release\ALOTAddonBuilder.exe") {
@@ -14,30 +14,30 @@ if (Test-Path "$($PSScriptRoot)\Release\ALOTAddonBuilder.exe") {
     Remove-Item "$($PSScriptRoot)\Release\ALOTAddonBuilder.exe" -Force
 }
 
-if (Test-Path "$($PSScriptRoot)\Release\music") {
+if (Test-Path "$($PSScriptRoot)\Release\Data\music") {
     Write-Host Removing music directory...
-    Remove-Item "$($PSScriptRoot)\Release\music" -Recurse -Force
+    Remove-Item "$($PSScriptRoot)\Release\Data\music" -Recurse -Force
 }
 
-if (Test-Path "$($PSScriptRoot)\Release\MEM_Packages") {
+if (Test-Path "$($PSScriptRoot)\Release\Data\MEM_Packages") {
     Write-Host Removing output directory...
-    Remove-Item "$($PSScriptRoot)\Release\MEM_Packages" -Recurse -Force
+    Remove-Item "$($PSScriptRoot)\Release\Data\MEM_Packages" -Recurse -Force
 }
 
 
-if (Test-Path "$($PSScriptRoot)\Release\Extracted_Mods") {
+if (Test-Path "$($PSScriptRoot)\Release\Data\Extracted_Mods") {
     Write-Host Removing extraction directory...
-    Remove-Item "$($PSScriptRoot)\Release\Extracted_Mods" -Recurse -Force
+    Remove-Item "$($PSScriptRoot)\Release\Data\Extracted_Mods" -Recurse -Force
 }
 
-if (Test-Path "$($PSScriptRoot)\Release\manifest-bundled.xml") {
+if (Test-Path "$($PSScriptRoot)\Release\Data\manifest-bundled.xml") {
     Write-Host Removing current manifest bundle...
-    Remove-Item "$($PSScriptRoot)\Release\manifest-bundled.xml" -Force
+    Remove-Item "$($PSScriptRoot)\Release\Data\manifest-bundled.xml" -Force
 }
 
-if (Test-Path "$($PSScriptRoot)\Release\manifest.xml") {
+if (Test-Path "$($PSScriptRoot)\Release\Data\manifest.xml") {
     Write-Host Bundling current manifest...
-    Move-Item "$($PSScriptRoot)\Release\manifest.xml" -Destination "$($PSScriptRoot)\Release\manifest-bundled.xml"
+    Move-Item "$($PSScriptRoot)\Release\Data\manifest.xml" -Destination "$($PSScriptRoot)\Release\Data\manifest-bundled.xml"
 }
 
 if (Test-Path "$($PSScriptRoot)\..\..\update-backcompat\ALOTAddonBuilder.exe") {
