@@ -552,7 +552,7 @@ namespace AlotAddOnGUI
             //Extract 7z
             string path = BINARY_DIRECTORY + "7z.exe";
             string pathWithoutTrailingSlash = BINARY_DIRECTORY.Substring(0, BINARY_DIRECTORY.Length - 1);
-            string args = "x \"" + e.UserState + "\" -aoa -r -o\"" + BINARY_DIRECTORY+"\"";
+            string args = "x \"" + e.UserState + "\" -aoa -r -o\"" + BINARY_DIRECTORY + "\"";
             Log.Information("Extracting MEMGUI update...");
             Utilities.runProcess(path, args);
             Log.Information("Extraction complete.");
@@ -2844,6 +2844,7 @@ namespace AlotAddOnGUI
         {
             if (Directory.Exists(DOWNLOADS_FOLDER))
             {
+                Log.Information("Looking for files to import from: " + DOWNLOADS_FOLDER);
                 List<string> filelist = new List<string>();
                 List<AddonFile> addonFilesNotReady = new List<AddonFile>();
                 foreach (AddonFile af in alladdonfiles)
@@ -2853,39 +2854,40 @@ namespace AlotAddOnGUI
                         addonFilesNotReady.Add(af);
                     }
                 }
-                if (Directory.Exists(DOWNLOADS_FOLDER))
+                Log.Information("Number of files not ready: " + addonFilesNotReady.Count);
+                string[] files = Directory.GetFiles(DOWNLOADS_FOLDER);
+                foreach (string file in files)
                 {
-                    string[] files = Directory.GetFiles(DOWNLOADS_FOLDER);
-                    foreach (string file in files)
+                    string fname = Path.GetFileName(file); //we do not check duplicates with (1) etc
+                    foreach (AddonFile af in addonFilesNotReady)
                     {
-                        string fname = Path.GetFileName(file); //we do not check duplicates with (1) etc
-                        foreach (AddonFile af in addonFilesNotReady)
+                        if (fname == af.Filename)
                         {
-                            if (fname == af.Filename)
-                            {
-                                filelist.Add(file);
-                                break;
-                            }
+                            filelist.Add(file);
+                            break;
                         }
                     }
-                    SettingsFlyout.IsOpen = false;
-                    if (filelist.Count > 0)
-                    {
-                        PerformImportOperation(filelist.ToArray(), false);
-                    }
-                    else
-                    {
-                        if (DOWNLOAD_ASSISTANT_WINDOW != null)
-                        {
-                            DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("No files found for importing");
-                        }
-                        ShowStatus("No files found for importing in " + DOWNLOADS_FOLDER);
-                    }
+                }
+                SettingsFlyout.IsOpen = false;
+                if (filelist.Count > 0)
+                {
+                    Log.Information("Found this many files to import from downloads folder:" + filelist.Count);
+
+                    PerformImportOperation(filelist.ToArray(), false);
                 }
                 else
                 {
-                    Log.Information("Downloads folder does not exist: " + DOWNLOADS_FOLDER);
-                }
+                    if (DOWNLOAD_ASSISTANT_WINDOW != null)
+                    {
+                        DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("No files found for importing");
+                    }
+                    Log.Information("Did not find any files for importing in: " + DOWNLOADS_FOLDER);
+                    ShowStatus("No files found for importing in " + DOWNLOADS_FOLDER);
+                }                
+            }
+            else
+            {
+                Log.Information("Downloads folder does not exist: " + DOWNLOADS_FOLDER);
             }
         }
 

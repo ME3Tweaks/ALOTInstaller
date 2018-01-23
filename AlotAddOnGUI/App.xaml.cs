@@ -96,7 +96,14 @@ namespace AlotAddOnGUI
                 Log.Information("In update mode. Update destination: " + updateDestinationPath);
                 Log.Information("Applying update");
                 CopyDir.CopyAll(new DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory), new DirectoryInfo(updateDestinationPath));
-                Log.Information("Files copied - rebooting into normal mode");
+                Log.Information("Update files have been applied");
+                if (Directory.Exists(updateDestinationPath + "music") && !Directory.Exists(updateDestinationPath + @"Data\Music"))
+                {
+                    Log.Information("Migrating music folder into subfolder");
+                    Directory.Move(updateDestinationPath + "music", updateDestinationPath + @"Data\Music");
+                    Directory.Delete(updateDestinationPath + "music");
+                }
+
                 ProcessStartInfo psi = new ProcessStartInfo(updateDestinationPath + "\\" + System.AppDomain.CurrentDomain.FriendlyName);
                 psi.WorkingDirectory = updateDestinationPath;
                 psi.Arguments = "--completing-update";
@@ -113,6 +120,10 @@ namespace AlotAddOnGUI
                 Thread.Sleep(1000);
                 Log.Information("Removing Update directory");
                 Directory.Delete(loggingBasePath + "Update", true);
+                if (File.Exists(loggingBasePath + "ALOTAddonBuilder.exe")) {
+                    Log.Information("Deleting Update Shim ALOTAddonBuilder.exe");
+                    File.Delete(loggingBasePath + "ALOTAddonBuilder.exe");
+                }
             }
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
             Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());

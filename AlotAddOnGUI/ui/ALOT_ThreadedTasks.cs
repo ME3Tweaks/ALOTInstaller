@@ -67,7 +67,7 @@ namespace AlotAddOnGUI
         private FadeInOutSampleProvider fadeoutProvider;
         private bool MusicPaused;
         private string DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods";
-        private string EXTRACTED_MODS_DIRECTORY = EXE_DIRECTORY + "Extracted_Mods";
+        private string EXTRACTED_MODS_DIRECTORY = EXE_DIRECTORY + "Data\\Extracted_Mods";
         private const string SETTINGSTR_SOUND = "PlayMusic";
         private const string SET_VISIBILE_ITEMS_LIST = "SET_VISIBILE_ITEMS_LIST";
 
@@ -75,7 +75,7 @@ namespace AlotAddOnGUI
 
         private bool ExtractAddon(AddonFile af)
         {
-            string stagingdirectory = EXE_DIRECTORY + ADDON_STAGING_DIR + "\\";
+            string stagingdirectory = ADDON_FULL_STAGING_DIRECTORY;
 
             string fileToUse = af.Filename;
             bool isSingleFileMode = false;
@@ -169,66 +169,77 @@ namespace AlotAddOnGUI
                                     string name = Utilities.GetRelativePath(moveableFile, extractpath);
                                     foreach (PackageFile pf in af.PackageFiles)
                                     {
-                                        string fname = Path.GetFileName(name);
-                                        if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTVersion > 0)
+                                        if (pf.SourceName == name)
                                         {
-                                            //It's an ALOT file. We will move this directly to the output directory.
-                                            Log.Information("ALOT MAIN FILE - moving to output: " + fname);
-                                            string movename = getOutputDir(CURRENT_GAME_BUILD) + "000_" + fname;
-                                            if (File.Exists(movename))
+                                            string fname = Path.GetFileName(name);
+                                            if (pf.MoveDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTVersion > 0)
                                             {
-                                                File.Delete(movename);
+                                                //It's an ALOT file. We will move this directly to the output directory.
+                                                Log.Information("ALOT MAIN FILE - moving to output: " + fname);
+                                                string movename = getOutputDir(CURRENT_GAME_BUILD) + "000_" + fname;
+                                                if (File.Exists(movename))
+                                                {
+                                                    File.Delete(movename);
+                                                }
+                                                File.Move(moveableFile, movename);
+                                                pf.Processed = true; //no more ops on this package file.
+                                                break;
                                             }
-                                            File.Move(moveableFile, movename);
-                                            pf.Processed = true; //no more ops on this package file.
-                                            break;
-                                        }
-                                        if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTUpdateVersion > 0)
-                                        {
-                                            //It's an ALOT update file. We will move this directly to the output directory.
-                                            Log.Information("ALOT UPDATE FILE - moving to output: " + fname);
-                                            string movename = getOutputDir(CURRENT_GAME_BUILD) + "001_" + fname;
-                                            if (File.Exists(movename))
+                                            if (pf.MoveDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTUpdateVersion > 0)
                                             {
-                                                File.Delete(movename);
+                                                //It's an ALOT update file. We will move this directly to the output directory.
+                                                Log.Information("ALOT UPDATE FILE - moving to output: " + fname);
+                                                string movename = getOutputDir(CURRENT_GAME_BUILD) + "001_" + fname;
+                                                if (File.Exists(movename))
+                                                {
+                                                    File.Delete(movename);
+                                                }
+                                                File.Move(moveableFile, movename); pf.Processed = true; //no more ops on this package file.
+                                                break;
                                             }
-                                            File.Move(moveableFile, movename); pf.Processed = true; //no more ops on this package file.
-                                            break;
-                                        }
-                                        if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD) && name.ToLower().EndsWith(".mem"))
-                                        {
-                                            //It's a already built MEM file. Move MEM to build folder
-                                            Log.Information("MoveDirectly on MEM file specified - moving MEM to output: " + fname);
-                                            int fileprefix = Interlocked.Increment(ref PREBUILT_MEM_INDEX);
-                                            string paddedVer = fileprefix.ToString("000");
-                                            string movename = getOutputDir(CURRENT_GAME_BUILD) + paddedVer + "_" + fname;
-                                            if (File.Exists(movename))
+                                            if (pf.MoveDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD) && name.ToLower().EndsWith(".mem"))
                                             {
-                                                File.Delete(movename);
+                                                //It's a already built MEM file. Move MEM to build folder
+                                                Log.Information("MoveDirectly on MEM file specified - moving MEM to output: " + fname);
+                                                int fileprefix = Interlocked.Increment(ref PREBUILT_MEM_INDEX);
+                                                string paddedVer = fileprefix.ToString("000");
+                                                string movename = getOutputDir(CURRENT_GAME_BUILD) + paddedVer + "_" + fname;
+                                                if (File.Exists(movename))
+                                                {
+                                                    File.Delete(movename);
+                                                }
+                                                File.Move(moveableFile, movename); pf.Processed = true; //no more ops on this package file.
+                                                break;
                                             }
-                                            File.Move(moveableFile, movename); pf.Processed = true; //no more ops on this package file.
-                                            break;
-                                        }
-                                        if (pf.MoveDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
-                                        {
-                                            Log.Information("MoveDirectly specified - moving TPF/MEM to staging: " + fname);
-                                            File.Move(moveableFile, ADDON_FULL_STAGING_DIRECTORY + fname);
-                                            pf.Processed = true; //no more ops on this package file.
-                                            break;
-                                        }
-                                        if (pf.CopyDirectly && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
-                                        {
-                                            Log.Information("CopyDirectly specified - copy TPF/MEM to staging: " + fname);
-                                            File.Copy(moveableFile, ADDON_FULL_STAGING_DIRECTORY + fname, true);
-                                            pf.Processed = true; //We will still extract this as it is a copy step.
-                                            break;
-                                        }
-                                        if (pf.Delete && pf.SourceName == name && pf.AppliesToGame(CURRENT_GAME_BUILD))
-                                        {
-                                            Log.Information("Delete specified - deleting unused TPF/MEM: " + fname);
-                                            File.Delete(moveableFile);
-                                            pf.Processed = true; //no more ops on this package file.
-                                            break;
+                                            if (pf.MoveDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD))
+                                            {
+                                                Log.Information("MoveDirectly specified - moving TPF/MEM to staging: " + fname);
+                                                File.Move(moveableFile, ADDON_FULL_STAGING_DIRECTORY + fname);
+                                                pf.Processed = true; //no more ops on this package file.
+                                                break;
+                                            }
+                                            if (pf.CopyDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD))
+                                            {
+                                                Log.Information("CopyDirectly specified - copy TPF/MEM to staging: " + fname);
+                                                File.Copy(moveableFile, ADDON_FULL_STAGING_DIRECTORY + fname, true);
+                                                pf.Processed = true; //We will still extract this as it is a copy step.
+                                                break;
+                                            }
+                                            if (pf.Delete && pf.AppliesToGame(CURRENT_GAME_BUILD))
+                                            {
+                                                Log.Information("Delete specified - deleting unused TPF/MEM: " + fname);
+                                                File.Delete(moveableFile);
+                                                pf.Processed = true; //no more ops on this package file.
+                                                break;
+                                            }
+                                            if (!pf.AppliesToGame(CURRENT_GAME_BUILD) && name.ToLower().EndsWith(".mem"))
+                                            {
+                                                //Do not process this file. Mark it as processed.
+                                                Log.Information("Extra MEM found in archive that is part of manifest file for different game than one being built for - deleting unused MEM: " + fname);
+                                                File.Delete(moveableFile);
+                                                pf.Processed = true;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -392,7 +403,7 @@ namespace AlotAddOnGUI
 
         private bool ExtractAddons(int game)
         {
-            string stagingdirectory = EXE_DIRECTORY + ADDON_STAGING_DIR + "\\";
+            string stagingdirectory = ADDON_FULL_STAGING_DIRECTORY;
             PREBUILT_MEM_INDEX = 9;
             SHOULD_HAVE_OUTPUT_FILE = false; //will set to true later
             Log.Information("Extracting Addons and files for Mass Effect " + game);
@@ -488,7 +499,8 @@ namespace AlotAddOnGUI
 
             BuildWorker.ReportProgress(completed, new ThreadCommand(SET_VISIBILE_ITEMS_LIST, ADDONFILES_TO_BUILD));
             int id = 0;
-            foreach (AddonFile af in ADDONFILES_TO_BUILD) {
+            foreach (AddonFile af in ADDONFILES_TO_BUILD)
+            {
                 af.BuildID = (++id).ToString().PadLeft(3, '0');
                 Log.Information("Build ID for " + af.FriendlyName + ": " + af.BuildID);
             }
@@ -688,8 +700,8 @@ namespace AlotAddOnGUI
             Log.Information("[SIZE] AFTER_EXTRACTION_CLEANUP Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
 
             //BUILD MEM PACKAGE
-            int mainBuildResult = hasAddonFiles ? -2 : 0; //if we have no files just set return code for addon to 0
-            if (hasAddonFiles)
+            int mainBuildResult = SHOULD_HAVE_OUTPUT_FILE ? -2 : 0; //if we have no files just set return code for addon to 0
+            if (SHOULD_HAVE_OUTPUT_FILE)
             {
                 BuildWorker.ReportProgress(0);
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building ALOT Addon for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nDon't close the window until this operation completes."));
@@ -699,7 +711,7 @@ namespace AlotAddOnGUI
                     Log.Information("Building MEM Package.");
                     string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                     string filename = "002_ALOT_ME" + game + "_Addon.mem";
-                    string args = "-convert-to-mem " + game + " \"" + EXE_DIRECTORY + ADDON_STAGING_DIR + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
+                    string args = "-convert-to-mem " + game + " \"" + ADDON_FULL_STAGING_DIRECTORY + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
 
                     runMEM_BackupAndBuild(exe, args, BuildWorker);
                     while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
@@ -749,19 +761,25 @@ namespace AlotAddOnGUI
                         mainBuildResult = -1;
                     }
                 }
+            } else
+            {
+                Log.Information("We don't need to build addon mem as all files added were either not true addon files or don't need to be built into mem files.");
             }
             //cleanup staging
-            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up addon staging directory"));
-            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
-            BuildWorker.ReportProgress(100);
-            try
+            if (Directory.Exists(ADDON_FULL_STAGING_DIRECTORY))
             {
-                Utilities.DeleteFilesAndFoldersRecursively(ADDON_STAGING_DIR);
-                Log.Information("Deleted " + ADDON_STAGING_DIR);
-            }
-            catch (IOException e)
-            {
-                Log.Error("Unable to delete staging directory. Addon should have been built however.\n" + e.ToString());
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up addon staging directory"));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+                BuildWorker.ReportProgress(100);
+                try
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(ADDON_FULL_STAGING_DIRECTORY);
+                    Log.Information("Deleted " + ADDON_FULL_STAGING_DIRECTORY);
+                }
+                catch (IOException e)
+                {
+                    Log.Error("Unable to delete staging directory. Addon should have been built however.\n" + e.ToString());
+                }
             }
 
             //build each user file
@@ -861,22 +879,26 @@ namespace AlotAddOnGUI
                     CURRENT_USER_BUILD_FILE = null;
                 }
             }
+
             //cleanup staging
-            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up user files staging directory"));
-            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
-            BuildWorker.ReportProgress(100);
-            try
+            if (hasUserFiles)
             {
-                Utilities.DeleteFilesAndFoldersRecursively(USER_FULL_STAGING_DIRECTORY);
-                Log.Information("Deleted " + USER_FULL_STAGING_DIRECTORY);
-            }
-            catch (IOException e)
-            {
-                Log.Error("Unable to delete user staging directory. User addon's have (attempted) build however.\n" + e.ToString());
-            }
-            if (hadUserErrors)
-            {
-                BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Some user files did not successfully build", userBuildErrors)));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Cleaning up user files staging directory"));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+                BuildWorker.ReportProgress(100);
+                try
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(USER_FULL_STAGING_DIRECTORY);
+                    Log.Information("Deleted " + USER_FULL_STAGING_DIRECTORY);
+                }
+                catch (IOException e)
+                {
+                    Log.Error("Unable to delete user staging directory. User addon's have (attempted) build however.\n" + e.ToString());
+                }
+                if (hadUserErrors)
+                {
+                    BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Some user files did not successfully build", userBuildErrors)));
+                }
             }
 
             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);

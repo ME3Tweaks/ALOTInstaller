@@ -42,9 +42,7 @@ namespace AlotAddOnGUI
             this.missingAddonFiles = missingAddonFiles;
             filesList.ItemsSource = missingAddonFiles;
         }
-
-
-
+        
         private async void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             string fname = (string)((Hyperlink)e.Source).Tag;
