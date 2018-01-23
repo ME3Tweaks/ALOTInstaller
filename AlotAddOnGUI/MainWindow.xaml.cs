@@ -1908,7 +1908,7 @@ namespace AlotAddOnGUI
 
             //Check game has been run at least once
             string configFile = IniSettingsHandler.GetConfigIniPath(game);
-            if (!File.Exists(configFile))
+            if (game == 1 && !File.Exists(configFile))
             {
                 //game has not been run yet.
                 Log.Error("Config file missing for Mass Effect " + game + ". Blocking install");

@@ -96,8 +96,9 @@ namespace AlotAddOnGUI
                 Log.Information("In update mode. Update destination: " + updateDestinationPath);
                 Log.Information("Applying update");
                 CopyDir.CopyAll(new DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory), new DirectoryInfo(updateDestinationPath));
-                Log.Information("Update files have been applied");
+                Log.Information("Update files have been applied.");
                 updateDestinationPath += "\\"; //add slash
+                Log.Information("Performing update migrations...");
                 if (Directory.Exists(updateDestinationPath + "MEM_Packages") && !Directory.Exists(updateDestinationPath + @"Data\MEM_Packages"))
                 {
                     Log.Information("Migrating MEM_Packages folder into subfolder");
@@ -112,22 +113,35 @@ namespace AlotAddOnGUI
 
                 if (Directory.Exists(updateDestinationPath + "bin"))
                 {
-                    Log.Information("Deleting old top level bin folder");
-                    Directory.Delete(updateDestinationPath + "bin");
+                    Log.Information("Deleting old top level bin folder: "+(updateDestinationPath + "bin"));
+                    Utilities.DeleteFilesAndFoldersRecursively(updateDestinationPath + "bin");
                 }
 
                 if (Directory.Exists(updateDestinationPath + "lib"))
                 {
                     Log.Information("Deleting old top level lib folder");
-                    Directory.Delete(updateDestinationPath + "lib");
+                    Utilities.DeleteFilesAndFoldersRecursively(updateDestinationPath + "lib");
                 }
 
                 if (Directory.Exists(updateDestinationPath + "Extracted_Mods"))
                 {
                     Log.Information("Deleting leftover Extracted_Mods folder");
-                    Directory.Delete(updateDestinationPath + "Extracted_Mods");
+                    Utilities.DeleteFilesAndFoldersRecursively(updateDestinationPath + "Extracted_Mods");
                 }
-                
+
+                if (File.Exists(updateDestinationPath + "manifest.xml"))
+                {
+                    Log.Information("Deleting leftover manifest.xml file");
+                    File.Delete(updateDestinationPath + "manifest.xml");
+                }
+
+                if (File.Exists(updateDestinationPath + "manifest-bundled.xml"))
+                {
+                    Log.Information("Deleting leftover manifest-bundled.xml file");
+                    File.Delete(updateDestinationPath + "manifest-bundled.xml");
+                }
+
+                Log.Information("Rebooting into normal mode to complete update: " + updateDestinationPath + System.AppDomain.CurrentDomain.FriendlyName);
                 ProcessStartInfo psi = new ProcessStartInfo(updateDestinationPath + System.AppDomain.CurrentDomain.FriendlyName);
                 psi.WorkingDirectory = updateDestinationPath;
                 psi.Arguments = "--completing-update";
