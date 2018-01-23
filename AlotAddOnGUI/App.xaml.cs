@@ -141,6 +141,11 @@ namespace AlotAddOnGUI
                     File.Delete(updateDestinationPath + "manifest-bundled.xml");
                 }
 
+                if (File.Exists(updateDestinationPath + "DEV_MODE"))
+                {
+                    Log.Information("Pulling application out of developer mode");
+                    File.Delete(updateDestinationPath + "DEV_MODE");
+                }
                 Log.Information("Rebooting into normal mode to complete update: " + updateDestinationPath + System.AppDomain.CurrentDomain.FriendlyName);
                 ProcessStartInfo psi = new ProcessStartInfo(updateDestinationPath + System.AppDomain.CurrentDomain.FriendlyName);
                 psi.WorkingDirectory = updateDestinationPath;
