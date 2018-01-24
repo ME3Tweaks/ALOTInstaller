@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="4.0.1">
+<alotaddonmanifest version="4.0.2">
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <addonfile meuitm="true" friendlyname="MEUITM Anniversary Edition" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
@@ -68,15 +68,15 @@
     <file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/" filename="ALOT for ME3 - Textures.zip" unpackedsinglefilename="ALOT_ME3_v6.mem" size="5780531297" md5="4d4b09c0d76f00141d37861f5e3e4e9a" />
     <packagefile me3="true" sourcename="ALOT_ME3_v6.mem" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="Allers Complexion Tweak" author="Ellise">
+  <addonfile friendlyname="Allers Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_AllersComplexionTweak.7z-580-1-0.7z" md5="d9f3b8f6f63132d86690835a3c766c44" size="8994633" />
     <packagefile me3="true" sourcename="el_AllersComplexionTweak.tpf" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="Brooks Complexion Tweak" author="Ellise">
+  <addonfile friendlyname="Brooks Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_BrooksComplexionTweak.7z-580-1-0.7z" size="9406125" md5="672b98d8dc410c4386250482ff1b2bbf" />
     <packagefile me3="true" sourcename="el_BrooksComplexionTweak.tpf" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="Illusive Man Complexion Tweak" author="Ellise">
+  <addonfile friendlyname="Illusive Man Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_IllusiveManComplexionTweak.7z-580-1-0.7z" md5="db369b300498474d09d7924164d4f39e" size="25822828" />
     <packagefile me2="true" sourcename="HMM_HED_PRO_WKL_BLK_0xF3AFF836.dds" destinationname="0x3D10B5B5.dds" />
     <packagefile me2="true" me3="true" sourcename="HMM_HED_PROIllusiveman_Eye_Diff_0xA567A7D5.dds" destinationname="0xA567A7D5.dds" />
@@ -90,34 +90,34 @@
     <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Norm_0x413007EA.dds" destinationname="0x413007EA.dds" />
     <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Spec_0x3B912C80.dds" destinationname="0x3B912C80.dds" />
   </addonfile>
-  <addonfile friendlyname="Ashley Complexion Tweak" tooltipname="Ash Complexion Tweak - .MEM" author="Ellise">
+  <addonfile friendlyname="Ashley Complexion Tweak" tooltipname="Ash Complexion Tweak - .MEM" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" filename="el_Ashley Complexion Tweak.7z-569-1-0.7z" md5="e8a4283b6242aff68227bfc8bb145899" size="10154183" />
     <packagefile me3="true" sourcename="el_Ashley Complexion Tweak.mem" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="Jacob Complexion Tweak" author="Ellise">
+  <addonfile friendlyname="Jacob Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/578/?" filename="el_JacobComplexionTweak.7z-578-1-0.7z" size="12101697" md5="7432e4bf056a689d648c9e0f71271fd3" />
     <packagefile me2="true" sourcename="el_JacobComplexionTweak.tpf" copydirectly="true" />
     <packagefile me2="true" sourcename="HMM_HED_PROJacob_Face_Diff_Stack_0xEE83865A.dds" destinationname="0xEE83865A.dds" />
     <packagefile me2="true" sourcename="HMM_HED_PROJacob_Face_Norm_Stack_0x92D843C2.dds" destinationname="0x7EB5A028.dds" />
     <packagefile me3="true" sourcename="el_JacobComplexionTweak.tpf" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="Kaidan Complexion Tweak" author="Ellise">
+  <addonfile friendlyname="Kaidan Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/571/?" filename="el_KaidanComplexionTweak.7z-571-1-0.7z" size="11167960" md5="95d33c883fb149a66e9fa3f83c7e1088" />
     <packagefile me3="true" sourcename="el_KaidanComplexionTweak.tpf" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="FemShep Complexion Tweak" author="Ellise">
+  <addonfile friendlyname="FemShep Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/562/?" filename="el_DefaultFemshepRetexture.7z-562-1-0.7z" md5="5e9ebeaf71f30bb64d508e2c4a89ab33" size="15121152" />
     <packagefile me3="true" sourcename="el_DefaultFemshepRetexture.tpf" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="Sheploo Complexion Tweak" author="Ellise">
+  <addonfile friendlyname="Sheploo Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/574/?" filename="el_SheplooComplexionTweak_1.7z-574-1-0.7z" size="16186448" md5="8c131425b32d06984ad4f5b57a6fc19e" />
     <packagefile me3="true" sourcename="el_SheplooComplexionTweak_1.tpf" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="James Complexion Tweak" author="Ellise">
+  <addonfile friendlyname="James Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/576/?" filename="James Complexion Tweak_1.0-576-1-0.7z" size="9620693" md5="efab600ba1c6b6c3dcae3aaa4492ef4e" />
     <packagefile me3="true" sourcename="el_JamesComplexionTweak_1.tpf" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="Zaeed Complexion Tweak" author="Ellise">
+  <addonfile friendlyname="Zaeed Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/579/?" filename="Zaeed Complexion Tweak 1.0-579-1-0.7z" size="13561527" md5="e1ff127784ed88d5a1ef6ad2edaaa11a" />
     <packagefile me3="true" sourcename="el_ZaeedComplexionTweak_1.tpf" movedirectly="true" />
   </addonfile>
