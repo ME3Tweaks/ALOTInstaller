@@ -338,7 +338,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
 
-                        <Button Content="Build &amp; Install" HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Click="Button_BuildAndInstall_Click"/>
+                        <Button x:Name="Button_BuildAndInstall" Content="Build &amp; Install" HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Click="Button_BuildAndInstall_Click"/>
                         <Button Content="Cancel Install" Margin="5,0,0,0" HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Click="Button_BuildAndInstallCancel_Click"/>
 
                     </StackPanel>

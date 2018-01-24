@@ -1698,6 +1698,7 @@ namespace AlotAddOnGUI
                     Label_WhatToBuildAndInstall.Text = "ALOT is already installed. " + Label_WhatToBuildAndInstall.Text;
                 }
                 WhatToBuildFlyout.IsOpen = true;
+                Button_BuildAndInstall.IsEnabled = true;
             }
             else
             {
@@ -1988,7 +1989,7 @@ namespace AlotAddOnGUI
                         if (af.Ready)
                         {
                             FileInfo fi = new FileInfo(af.GetFile());
-                            if (!af.IsCurrentlySingleFile() && af.FileSize != fi.Length)
+                            if (!af.IsCurrentlySingleFile() && af.FileSize > 0 && af.FileSize != fi.Length)
                             {
                                 Log.Error(af.GetFile() + " has wrong size: " + fi.Length + ", manifest specifies " + af.FileSize);
                                 blockDueToBadImportedFile = af.GetFile();
@@ -2945,6 +2946,7 @@ namespace AlotAddOnGUI
                     break;
                 }
             }
+            Button_BuildAndInstall.IsEnabled = false;
             WhatToBuildFlyout.IsOpen = false;
             if (oneOptionChecked)
             {
@@ -2952,6 +2954,7 @@ namespace AlotAddOnGUI
                 {
                     if (await InitBuild(CURRENT_GAME_BUILD))
                     {
+
                         Loading = true; //prevent refresh when filtering
                         ShowME1Files = CURRENT_GAME_BUILD == 1;
                         ShowME2Files = CURRENT_GAME_BUILD == 2;
