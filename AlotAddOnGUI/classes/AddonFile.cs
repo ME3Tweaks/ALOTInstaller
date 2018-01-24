@@ -193,6 +193,8 @@ namespace AlotAddOnGUI.classes
         public bool Building { get; internal set; }
         public long FileSize { get; internal set; }
         public string BuildID { get; internal set; }
+        public string FileMD5 { get; internal set; }
+        public bool Optional { get; internal set; }
 
         private void OnPropertyChanged(string propertyName)
         {
@@ -219,6 +221,21 @@ namespace AlotAddOnGUI.classes
             ReadyIconPath = null;
         }
 
+        internal bool IsCurrentlySingleFile()
+        {
+            if (Ready)
+            {
+                if (!UserFile)
+                {
+                    if (UnpackedSingleFilename != null && File.Exists(MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + UnpackedSingleFilename))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
         internal string GetFile()
         {
             if (Ready)

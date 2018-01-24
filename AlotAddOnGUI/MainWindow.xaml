@@ -115,8 +115,11 @@
                             <Border x:Name="GameIcon_ME1" ToolTip="This file applies to Mass Effect" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ME1_Text" FontSize="10"  Text="ME1" VerticalAlignment="Center"/>
                             </Border>
-                            <Border x:Name="GameIcon_ALOT" Visibility="Hidden" ToolTip="This file is required on first install" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#991244" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ALOT" Visibility="Collapsed" ToolTip="This file is required on first install" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#991244" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ALOT_Text" FontSize="10"  Text="Required" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border x:Name="GameIcon_Optional" Visibility="Collapsed" ToolTip="This file is optional" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#FF156095" CornerRadius="2" VerticalAlignment="Center">
+                                <TextBlock x:Name="GameIcon_Optional_Text" FontSize="10"  Text="Optional" VerticalAlignment="Center"/>
                             </Border>
                         </StackPanel>
 
@@ -143,6 +146,9 @@
                     <DataTemplate.Triggers>
                         <DataTrigger Binding="{Binding IsRequiredFile}" Value="True">
                             <Setter TargetName="GameIcon_ALOT" Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Optional}" Value="True">
+                            <Setter TargetName="GameIcon_Optional" Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding Game_ME1}" Value="False">
                             <Setter TargetName="GameIcon_ME1" Property="Background" Value="Black"/>

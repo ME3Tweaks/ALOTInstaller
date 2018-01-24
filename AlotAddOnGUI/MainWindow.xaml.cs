@@ -422,7 +422,7 @@ namespace AlotAddOnGUI
             Label_MEMVersion.Content = "MEM Cmd Version: " + fileVersion;
             try
             {
-                Log.Information("Checking for updates to MEMNOGUI. The local version is "+fileVersion);
+                Log.Information("Checking for updates to MEMNOGUI. The local version is " + fileVersion);
 
                 var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
                 var releases = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModderNoGui");
@@ -1441,11 +1441,12 @@ namespace AlotAddOnGUI
                             select new AddonFile
                             {
                                 Showing = false,
-                                FileSize = e.Attribute("size") != null ? (long)e.Attribute("size") : 0L,
+                                FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
                                 MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
                                 ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
                                 Author = (string)e.Attribute("author"),
                                 FriendlyName = (string)e.Attribute("friendlyname"),
+                                Optional = e.Attribute("optional") != null ? (bool)e.Attribute("optional") : false,
                                 Game_ME1 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me1") : false,
                                 Game_ME2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me2") : false,
                                 Game_ME3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me3") : false,
@@ -1456,6 +1457,7 @@ namespace AlotAddOnGUI
                                 ALOTUpdateVersion = e.Attribute("alotupdateversion") != null ? Convert.ToByte((string)e.Attribute("alotupdateversion")) : (byte)0,
                                 UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename") != null ? (string)e.Element("file").Attribute("unpackedsinglefilename") : null,
                                 ALOTMainVersionRequired = e.Attribute("appliestomainversion") != null ? Convert.ToInt16((string)e.Attribute("appliestomainversion")) : (short)0,
+                                FileMD5 = (string)e.Element("file").Attribute("md5"),
                                 Ready = false,
                                 PackageFiles = e.Elements("packagefile")
                                     .Select(r => new PackageFile
@@ -1941,6 +1943,7 @@ namespace AlotAddOnGUI
             bool blockDueToMissingALOTFile = installedInfo == null; //default value
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
             bool blockDueToMissingALOTUpdateFile = false; //default value
+            string blockDueToBadImportedFile = null; //default vaule
             bool manifestHasALOTMainFile = false;
             bool manifestHasUpdateAvailable = false;
             foreach (AddonFile af in alladdonfiles)
@@ -1976,13 +1979,23 @@ namespace AlotAddOnGUI
                         }
                     }
 
-                    if (!af.Ready)
+                    if (!af.Ready && !af.Optional)
                     {
                         nummissing++;
                     }
                     else
                     {
-                        oneisready = true;
+                        if (af.Ready)
+                        {
+                            FileInfo fi = new FileInfo(af.GetFile());
+                            if (!af.IsCurrentlySingleFile() && af.FileSize != fi.Length)
+                            {
+                                Log.Error(af.GetFile() + " has wrong size: " + fi.Length + ", manifest specifies " + af.FileSize);
+                                blockDueToBadImportedFile = af.GetFile();
+                                break;
+                            }
+                            oneisready = true;
+                        }
                     }
                 }
             }
@@ -2003,6 +2016,12 @@ namespace AlotAddOnGUI
                 {
                     await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue.");
                 }
+                return false;
+            }
+
+            if (blockDueToBadImportedFile != null)
+            {
+                await this.ShowMessageAsync("Corrupt/Bad file detected", "The file "+blockDueToBadImportedFile+" is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from Download_Mods.");
                 return false;
             }
 
@@ -2155,6 +2174,7 @@ namespace AlotAddOnGUI
             long totalBytes = 0;
             List<string> acceptableUserFiles = new List<string>();
             List<string> alreadyImportedFiles = new List<string>();
+            List<string> badSizeFiles = new List<string>();
 
             foreach (string file in files)
             {
@@ -2191,6 +2211,20 @@ namespace AlotAddOnGUI
                         hasMatch = true;
                         if (af.Ready == false)
                         {
+                            //Check size as validation
+                            if (!isUnpackedSingleFile && af.FileSize > 0)
+                            {
+                                FileInfo fi = new FileInfo(file);
+                                if (fi.Length != af.FileSize)
+                                {
+                                    Log.Error("File to import has the wrong size: " + file + ", it should have size " + af.FileSize + ", but file to import is size " + fi.Length);
+                                    badSizeFiles.Add(file);
+                                    hasMatch = true;
+                                    continue;
+                                }
+                            }
+
+
                             //Copy file to directory
                             string basepath = DOWNLOADED_MODS_DIRECTORY + "\\";
                             string destination = basepath + ((isUnpackedSingleFile) ? af.UnpackedSingleFilename : af.Filename);
@@ -2268,9 +2302,18 @@ namespace AlotAddOnGUI
 
             string statusMessage = "";
             statusMessage += "Already imported: " + alreadyImportedFiles.Count;
-            statusMessage += " | ";
-            statusMessage += "Not supported: " + noMatchFiles.Count;
-            if (noMatchFiles.Count > 0 || alreadyImportedFiles.Count > 0)
+            if (noMatchFiles.Count > 0)
+            {
+                statusMessage += " | ";
+                statusMessage += "Not supported: " + noMatchFiles.Count;
+            }
+
+            if (badSizeFiles.Count > 0)
+            {
+                statusMessage += " | ";
+                statusMessage += "Corrupt/Bad files: " + badSizeFiles.Count;
+            }
+            if (noMatchFiles.Count > 0 || alreadyImportedFiles.Count > 0 || badSizeFiles.Count > 0)
             {
                 ShowStatus(statusMessage);
             }
@@ -2883,7 +2926,7 @@ namespace AlotAddOnGUI
                     }
                     Log.Information("Did not find any files for importing in: " + DOWNLOADS_FOLDER);
                     ShowStatus("No files found for importing in " + DOWNLOADS_FOLDER);
-                }                
+                }
             }
             else
             {
