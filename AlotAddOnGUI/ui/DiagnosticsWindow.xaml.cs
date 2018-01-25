@@ -200,7 +200,7 @@ namespace AlotAddOnGUI.ui
             else if (e.Result != null)
             {
                 Clipboard.SetText((string)e.Result);
-                DiagnosticHeader.Text = "Diagnostic completed.&#10;Link to the result has been copied to the clipboard.";
+                DiagnosticHeader.Text = "Diagnostic completed.\nLink to the result has been copied to the clipboard.";
                 System.Diagnostics.Process.Start((string)e.Result);
                 Image_Upload.Source = new BitmapImage(new Uri(@"../images/greencheckmark.png", UriKind.Relative));
 

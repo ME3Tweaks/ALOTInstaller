@@ -9,7 +9,7 @@
         BorderThickness="1"
         Title="Diagnostics" Height="300" Width="350">
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-        <TextBlock x:Name="DiagnosticHeader" Text="Select which game you are generating diagnostics for." HorizontalAlignment="Center"/>
+        <TextBlock x:Name="DiagnosticHeader" Text="Select which game you are generating diagnostics for." HorizontalAlignment="Center" TextAlignment="Center"/>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
             <Button x:Name="Button_ManualFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="5" Click="Button_DiagnosticsME1_Click">
                 <Image Source="../images/logo_me1.png" Height="40" Margin="4"/>

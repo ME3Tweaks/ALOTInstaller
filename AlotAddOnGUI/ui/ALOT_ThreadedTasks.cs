@@ -590,7 +590,7 @@ namespace AlotAddOnGUI
             {
                 threads--; //cores - 1
             }
-            bool[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(1).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
+            bool[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
             foreach (bool result in results)
             {
                 if (!result)

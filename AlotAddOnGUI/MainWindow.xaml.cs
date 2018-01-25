@@ -89,11 +89,8 @@ namespace AlotAddOnGUI
         private const string MEM_OUTPUT_DIR = "MEM_Packages";
         private const string MEM_OUTPUT_DISPLAY_DIR = "MEM_Packages";
 
-        private const string ADDON_STAGING_DIR = "ADDON_STAGING";
-        private const string USER_STAGING_DIR = "USER_STAGING";
-
-        private string ADDON_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\" + ADDON_STAGING_DIR + "\\";
-        private string USER_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\" + USER_STAGING_DIR + "\\";
+        private string ADDON_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\ADDON_STAGING\\";
+        private string USER_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\USER_STAGING\\";
 
         private bool me1Installed;
         private bool me2Installed;
@@ -1908,6 +1905,13 @@ namespace AlotAddOnGUI
             CheckOutputDirectoriesForUnpackedSingleFiles();
             CheckImportLibrary_Tick(null, null); //get all ready files
 
+            Loading = true; //preven 1;
+            ShowME1Files = game == 1;
+            ShowME2Files = game == 2;
+            ShowME3Files = game == 3;
+            Loading = false;
+            ShowReadyFilesOnly = false;
+            ApplyFiltering();
             //Check game has been run at least once
             string configFile = IniSettingsHandler.GetConfigIniPath(game);
             if (game == 1 && !File.Exists(configFile))
@@ -2021,7 +2025,7 @@ namespace AlotAddOnGUI
 
             if (blockDueToBadImportedFile != null)
             {
-                await this.ShowMessageAsync("Corrupt/Bad file detected", "The file "+blockDueToBadImportedFile+" is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from Download_Mods.");
+                await this.ShowMessageAsync("Corrupt/Bad file detected", "The file " + blockDueToBadImportedFile + " is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from Download_Mods.");
                 return false;
             }
 
