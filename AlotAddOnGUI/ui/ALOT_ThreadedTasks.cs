@@ -68,6 +68,7 @@ namespace AlotAddOnGUI
         private bool MusicPaused;
         private string DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods";
         private string EXTRACTED_MODS_DIRECTORY = EXE_DIRECTORY + "Data\\Extracted_Mods";
+        private bool ERROR_OCCURED_PLEASE_STOP = false;
         private const string SETTINGSTR_SOUND = "PlayMusic";
         private const string SET_VISIBILE_ITEMS_LIST = "SET_VISIBILE_ITEMS_LIST";
 
@@ -75,6 +76,10 @@ namespace AlotAddOnGUI
 
         private bool ExtractAddon(AddonFile af)
         {
+            if (ERROR_OCCURED_PLEASE_STOP)
+            {
+                return true;
+            }
             string stagingdirectory = ADDON_FULL_STAGING_DIRECTORY;
 
             string fileToUse = af.Filename;
@@ -193,7 +198,8 @@ namespace AlotAddOnGUI
                                                 {
                                                     File.Delete(movename);
                                                 }
-                                                File.Move(moveableFile, movename); pf.Processed = true; //no more ops on this package file.
+                                                File.Move(moveableFile, movename);
+                                                pf.Processed = true; //no more ops on this package file.
                                                 break;
                                             }
                                             if (pf.MoveDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD) && name.ToLower().EndsWith(".mem"))
@@ -337,7 +343,7 @@ namespace AlotAddOnGUI
                             }
                             File.Copy(extractSource, destination, true);
 
-                            Log.Information(prefix+" Extracting AddonFile (TPF)");
+                            Log.Information(prefix + " Extracting AddonFile (TPF)");
                             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                             string args = "-extract-tpf \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\" \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\"";
                             Utilities.runProcess(exe, args);
@@ -425,6 +431,7 @@ namespace AlotAddOnGUI
                 TasksDisplayEngine.ReleaseTask(af.FriendlyName);
                 af.ReadyStatusText = "Error occured during extraction";
                 af.SetError();
+                ERROR_OCCURED_PLEASE_STOP = true;
                 return false;
             }
             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
@@ -586,6 +593,7 @@ namespace AlotAddOnGUI
             {
                 threads--; //cores - 1
             }
+            ERROR_OCCURED_PLEASE_STOP = false;
             bool[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
             foreach (bool result in results)
             {
@@ -599,6 +607,11 @@ namespace AlotAddOnGUI
                 }
             }
             TasksDisplayEngine.ClearTasks();
+
+            if (ERROR_OCCURED_PLEASE_STOP)
+            {
+                return false;
+            }
             var tpfFilesList = Directory.EnumerateFiles(EXTRACTED_MODS_DIRECTORY, "*.*", SearchOption.TopDirectoryOnly) //<--- .NET 4.5
                                 .Where(file => file.ToLower().EndsWith("tpf"))
                                 .ToList();
@@ -709,13 +722,32 @@ namespace AlotAddOnGUI
                     if (af.UserFile)
                     {
                         hasUserFiles = true;
+                        af.ReadyStatusText = "Waiting for Addon to complete build";
+                        af.SetIdle();
+                    } else
+                    {
+                        af.ReadyStatusText = "Staged for installation";
+                        af.SetIdle();
                     }
-                    af.ReadyStatusText = "Waiting for Addon to complete build";
-                    af.SetIdle();
+                    
                     continue;
                 }
-                af.ReadyStatusText = "Building into Addon MEM file";
-                af.SetWorking();
+                bool requiresBuild = false;
+                foreach (PackageFile pf in af.PackageFiles)
+                {
+                    if (pf.Processed != true)
+                    {
+                        requiresBuild = true;
+                        af.ReadyStatusText = "Building into Addon MEM file";
+                        af.SetWorking();
+                        break;
+                    }
+                }
+                if (!requiresBuild)
+                {
+                    af.ReadyStatusText = "Staged for installation";
+                    af.SetIdle();
+                }
             }
 
 
@@ -1325,7 +1357,7 @@ namespace AlotAddOnGUI
                             Log.Information("Installation result: OK");
                             HeaderLabel.Text = "Installation has completed.";
                             AddonFilesLabel.Text = "Thanks for using ALOT Installer.";
-                            InstallingOverlay_Tip.Text = "Do not install any new DLC or mods that add/replace pcc or upk files from here on out - doing so will break your game!";
+                            InstallingOverlay_Tip.Text = "Do not install any new DLC or mods that add/replace pcc, sfm, or upk files from here on out - doing so will break your game!";
                             break;
                         }
                     case RESULT_ME1LAA_FAILED:
@@ -1705,11 +1737,12 @@ namespace AlotAddOnGUI
                         Log.Information("Deleted original alot archive file from downloaded_mods");
                         File.Delete(dest);
                     }
-                } else
+                }
+                else
                 {
                     Log.Error("ALOT MAIN FILE - Unpacked - does not match the singlefilename! Not moving back. " + extractedName);
                 }
-                
+
             }
 
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
@@ -2036,6 +2069,7 @@ namespace AlotAddOnGUI
             string gamePath = Utilities.GetGamePath(BACKUP_THREAD_GAME, true);
             string backupPath = Utilities.GetGameBackupPath(BACKUP_THREAD_GAME);
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+            BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_TASK_PROGRESS, 100));
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Deleting existing game installation"));
             if (Directory.Exists(gamePath))
             {
