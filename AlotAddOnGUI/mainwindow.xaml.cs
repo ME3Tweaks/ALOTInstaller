@@ -1099,37 +1099,63 @@ namespace AlotAddOnGUI
                                 url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
                                 Title += " BETA MODE";
                             }
-                            webClient.DownloadStringCompleted += (sender, e) =>
+                            webClient.DownloadStringCompleted += async (sender, e) =>
                             {
-                                string pageSourceCode = e.Result;
-                                //do something with results 
-                            };
-                            string result = webClient.DownloadString(new Uri(url));
-                            if (Utilities.TestXMLIsValid(result))
-                            {
-                                Log.Information("Manifest fetched.");
-                                File.WriteAllText(MANIFEST_LOC, result);
-                                //Legacy stuff
-                                if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
+                                if (e.Error == null)
                                 {
-                                    File.Delete(MANIFEST_LOC);
-                                }
-                            }
-                            else
-                            {
-                                Log.Error("Response from server was not valid XML! " + result);
-                                if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
-                                {
-                                    Log.Information("Reading bundled manifest instead.");
-                                    File.Delete(MANIFEST_LOC);
-                                    File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
-                                    UsingBundledManifest = true;
+                                    string pageSourceCode = e.Result;
+                                    if (Utilities.TestXMLIsValid(pageSourceCode))
+                                    {
+                                        Log.Information("Manifest fetched.");
+                                        File.WriteAllText(MANIFEST_LOC, pageSourceCode);
+                                        //Legacy stuff
+                                        if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
+                                        {
+                                            File.Delete(MANIFEST_LOC);
+                                        }
+                                        ManifestDownloaded();
+                                    }
+                                    else
+                                    {
+                                        Log.Error("Response from server was not valid XML! " + pageSourceCode);
+                                        if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                                        {
+                                            Log.Information("Reading bundled manifest instead.");
+                                            File.Delete(MANIFEST_LOC);
+                                            File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                                            UsingBundledManifest = true;
+                                            ManifestDownloaded();
+                                        }
+                                        else
+                                        {
+                                            Log.Error("Local manifest also doesn't exist! No manifest is available.");
+                                            await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
+                                            Environment.Exit(1);
+                                        }
+                                    }
                                 }
                                 else
                                 {
-                                    Log.Error("Local manifest also doesn't exist! No manifest is available.");
+                                    Log.Error("Exception occured getting manifest from server: " + e.Error.ToString());
+                                    if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                                    {
+                                        Log.Information("Reading bundled manifest instead.");
+                                        File.Delete(MANIFEST_LOC);
+                                        File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                                        UsingBundledManifest = true;
+                                        ManifestDownloaded();
+                                    }
+                                    else
+                                    {
+                                        Log.Fatal("No local manifest exists to use, exiting...");
+                                        await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
+                                        Environment.Exit(1);
+                                    }
                                 }
-                            }
+                                //do something with results 
+                            };
+                            Debug.WriteLine(DateTime.Now);
+                            webClient.DownloadStringAsync(new Uri(url));
                         }
                         catch (WebException e)
                         {
@@ -1140,61 +1166,71 @@ namespace AlotAddOnGUI
                                 File.Delete(MANIFEST_LOC);
                                 File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
                                 UsingBundledManifest = true;
+                                ManifestDownloaded();
                             }
                         }
-                        catch (Exception e)
-                        {
-                            Log.Error("Other Exception occured getting manifest from server/reading manifest: " + e.ToString());
-                            if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
-                            {
-                                Log.Information("Reading bundled manifest instead.");
-                                File.Delete(MANIFEST_LOC);
-                                File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
-                                UsingBundledManifest = true;
-                            }
-                        }
+                        //}
+                        //catch (Exception e)
+                        //{
+                        //    Debug.WriteLine(DateTime.Now);
+                        //    Log.Error("Other Exception occured getting manifest from server/reading manifest: " + e.ToString());
+                        //    if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                        //    {
+                        //        Log.Information("Reading bundled manifest instead.");
+                        //        File.Delete(MANIFEST_LOC);
+                        //        File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                        //        UsingBundledManifest = true;
+                        //    }
+                        //}
                     }
                     else
                     {
                         Log.Information("DEV_MODE file found. Not using online manifest.");
                         UsingBundledManifest = true;
                         Title += " DEV MODE";
+                        ManifestDownloaded();
                     }
-                    if (!File.Exists(MANIFEST_LOC))
-                    {
-                        Log.Fatal("No local manifest exists to use, exiting...");
-                        await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for addon. Information that is required to build the addon is not available. Check the program logs.");
-                        Environment.Exit(1);
-                    }
-                    Button_Settings.IsEnabled = true;
-                    readManifest();
 
-                    Log.Information("readManifest() has completed. Switching over to user control");
-                    bool? CheckOutputDirectories = Utilities.GetRegistrySettingBool("CheckOutputDirectoriesOnManifestLoad");
-                    //if (CheckOutputDirectories != null && CheckOutputDirectories.Value)
+                    //if (!File.Exists(MANIFEST_LOC))
                     //{
-                    CheckOutputDirectoriesForUnpackedSingleFiles();
+                    //    Log.Fatal("No local manifest exists to use, exiting...");
+                    //    await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for addon. Information that is required to build the addon is not available. Check the program logs.");
+                    //    Environment.Exit(1);
                     //}
 
-                    Loading = false;
-                    Build_ProgressBar.IsIndeterminate = false;
-                    HeaderLabel.Text = PRIMARY_HEADER;
-                    AddonFilesLabel.Text = "Scanning...";
-                    CheckImportLibrary_Tick(null, null);
-                    RunMEMUpdater2();
-                    UpdateALOTStatus();
-                    RunMEMUpdaterGUI();
-                    //beta only for now.
-                    bool? hasShownFirstRun = Utilities.GetRegistrySettingBool("HasRunFirstRun");
-                    if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
-                    {
-                        playFirstTimeAnimation();
-                    }
-                    else
-                    {
-                        PerformRAMCheck();
-                    }
                 }
+            }
+        }
+
+        private void ManifestDownloaded()
+        {
+            Button_Settings.IsEnabled = true;
+            readManifest();
+
+            Log.Information("readManifest() has completed. Switching over to user control");
+            bool? CheckOutputDirectories = Utilities.GetRegistrySettingBool("CheckOutputDirectoriesOnManifestLoad");
+            //if (CheckOutputDirectories != null && CheckOutputDirectories.Value)
+            //{
+            CheckOutputDirectoriesForUnpackedSingleFiles();
+            //}
+
+            Loading = false;
+            Build_ProgressBar.IsIndeterminate = false;
+            HeaderLabel.Text = PRIMARY_HEADER;
+            AddonFilesLabel.Text = "Scanning...";
+            CheckImportLibrary_Tick(null, null);
+            RunMEMUpdater2();
+            UpdateALOTStatus();
+            RunMEMUpdaterGUI();
+            //beta only for now.
+            bool? hasShownFirstRun = Utilities.GetRegistrySettingBool("HasRunFirstRun");
+            if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
+            {
+                playFirstTimeAnimation();
+            }
+            else
+            {
+                PerformRAMCheck();
             }
         }
 
@@ -1724,7 +1760,7 @@ namespace AlotAddOnGUI
 
         private async void Button_ME1Backup_Click(object sender, RoutedEventArgs e)
         {
-            if (BACKUP_THREAD_GAME != 0)
+            if (BACKUP_THREAD_GAME > 0)
             {
                 return;
             }
@@ -1755,7 +1791,7 @@ namespace AlotAddOnGUI
         }
         private async void Button_ME2Backup_Click(object sender, RoutedEventArgs e)
         {
-            if (BACKUP_THREAD_GAME != 0)
+            if (BACKUP_THREAD_GAME > 0)
             {
                 return;
             }
@@ -1787,7 +1823,7 @@ namespace AlotAddOnGUI
 
         private async void Button_ME3Backup_Click(object sender, RoutedEventArgs e)
         {
-            if (BACKUP_THREAD_GAME != 0)
+            if (BACKUP_THREAD_GAME > 0)
             {
                 return;
             }

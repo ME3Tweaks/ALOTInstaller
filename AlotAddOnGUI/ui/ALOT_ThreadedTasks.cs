@@ -1690,20 +1690,26 @@ namespace AlotAddOnGUI
                 string source = getOutputDir(INSTALLING_THREAD_GAME) + "000_" + extractedName;
                 string dest = DOWNLOADED_MODS_DIRECTORY + "\\" + extractedName;
 
-                if (File.Exists(dest))
+                if (File.Exists(source))
                 {
-                    File.Delete(dest);
-                }
-                File.Move(source, dest);
-                Log.Information("Moved main alot file back to downloaded_mods");
-
-                //Delete original
-                dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotAddonFile.Filename;
-                if (File.Exists(dest))
+                    if (File.Exists(dest))
+                    {
+                        File.Delete(dest);
+                    }
+                    File.Move(source, dest);
+                    Log.Information("Moved main alot file back to downloaded_mods");
+                    //Delete original
+                    dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotAddonFile.Filename;
+                    if (File.Exists(dest))
+                    {
+                        Log.Information("Deleted original alot archive file from downloaded_mods");
+                        File.Delete(dest);
+                    }
+                } else
                 {
-                    Log.Information("Deleted original alot archive file from downloaded_mods");
-                    File.Delete(dest);
+                    Log.Error("ALOT MAIN FILE - Unpacked - does not match the singlefilename! Not moving back. " + extractedName);
                 }
+                
             }
 
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
