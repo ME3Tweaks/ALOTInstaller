@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="4.0.3">
+<alotaddonmanifest version="4.0.4">
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <addonfile meuitm="true" friendlyname="MEUITM Anniversary Edition" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
@@ -521,7 +521,7 @@
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDIg_Norm_0xE3618AF0.dds" />
   </addonfile>
   <addonfile friendlyname="Fourth Casual Black" author="Ottemis">
-    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/301" filename="HR Fourth Casual Black-301-1-0.rar" md5="49288ba2d85905c4d05ac96cacae968f" size="13134921" />
+    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/301" tooltipname="HR Fourth Casual Black" filename="HR Fourth Casual Black-301-1-0.rar" md5="49288ba2d85905c4d05ac96cacae968f" size="13134921" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x07CE12D3-Male.dds" destinationname="HMM_ARM_CTHi_CLN_DIFF_0x07CE12D3.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x1004C012_Male.dds" destinationname="HMM_ARM_CTHi_CLN_Spec_0x1004C012.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x2A69C435-Female.dds" destinationname="HMM_ARM_CTHi_Diff_0x2A69C435.dds" />
@@ -533,7 +533,7 @@
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF750CD22_Female_Blood.dds" destinationname="HMM_ARM_CTHi_Diff_0xF750CD22.dds" />
   </addonfile>
   <addonfile friendlyname="Garrus Face" author="Ottemis">
-    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/6" filename="ME3 HR Garrus Alternate Armor for Texmod-6-1-0.rar" md5="8307706883e83548e8e6df429b3a95f8" size="50163265" />
+    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/6" tooltipname="ME3 HR Garrus Alternate Armor" filename="ME3 HR Garrus Alternate Armor for Texmod-6-1-0.rar" md5="8307706883e83548e8e6df429b3a95f8" size="50163265" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x00D06559_Gar_alt_norm.dds" destinationname="TUR_ARM_GARb_Norm_0x00D06559.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x06675BBF_Gar_alt_spec.dds" destinationname="TUR_ARM_GARb_Spec_0x06675BBF.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB2650E4C_Gar_alt_diff.dds" destinationname="TUR_ARM_GARb_Diff_0xB2650E4C.dds" />
@@ -582,19 +582,19 @@
     <packagefile me3="true" sourcename="HMM_HGR_SHPd_Visor_0xCAD2B039.dds" destinationname="HMM_HGR_SHPd_Visor_0xCAD2B039.dds" />
   </addonfile>
   <addonfile friendlyname="Liara Alt From Ashes Armor" author="Ottemis">
-    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/8" filename="ME3 HR Liara Alt From Ashes Armor for Texmod-8-1-0.rar" md5="a972254b169047994b0a9a20364a000a" size="24952604" />
+    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/8" tooltipname="ME3 HR Liara Alt From Ashes Armor" filename="ME3 HR Liara Alt From Ashes Armor for Texmod-8-1-0.rar" md5="a972254b169047994b0a9a20364a000a" size="24952604" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4394D753_Liara_Ashes_Spec.dds" destinationname="ASA_ARM_LIAg_SPEC_0x4394D753.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x87712BB0_Liara_Ashes_Diff.dds" destinationname="ASA_ARM_LIAg_Diff_0x87712BB0.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD1B0BC02_Norm.dds" destinationname="ASA_ARM_LIAg_Norm_0xD1B0BC02.dds" />
   </addonfile>
   <addonfile friendlyname="Liara Alternate Armor" author="Ottemis">
-    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/12" filename="ME3 HR Liara Alternate Armor for Texmod-12-1-0.rar" md5="ca6c0ca16a993669f8b859bb5f200af7" size="30487783" />
+    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/12" tooltipname="ME3 HR Liara Alternate Armor" filename="ME3 HR Liara Alternate Armor for Texmod-12-1-0.rar" md5="ca6c0ca16a993669f8b859bb5f200af7" size="30487783" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x066306A3_Liara_norm.dds" destinationname="ASA_ARM_LIAf_Norm_0x066306A3.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8A3624EC_Liara_diff.dds" destinationname="ASA_ARM_LIAf_Diff_0x8A3624EC.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF8FE187D_Liara_spec.dds" destinationname="ASA_ARM_LIAf_Spec_0xF8FE187D.dds" />
   </addonfile>
   <addonfile friendlyname="Liara CE Armor" author="Ottemis">
-    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/140" filename="HR Liara CE Armor for Texmod-140-1-0.rar" md5="1f4caf9707ce73271cb78fb31b9a8200" size="36645478" />
+    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/140" tooltipname="HR Liara CE Armor" filename="HR Liara CE Armor for Texmod-140-1-0.rar" md5="1f4caf9707ce73271cb78fb31b9a8200" size="36645478" />
     <packagefile me3="true" sourcename="0x547F3A29_ASA_ARM_LIAe_Diff_Otte.dds" destinationname="ASA_ARM_LIAe_Diff_0x547F3A29.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x28E843CF_helm.spec.dds" destinationname="ASA_ARM_LIAe_HGR_Spec_0x28E843CF.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x633D960E.dds" destinationname="ASA_ARM_LIAe_Spec_0x633D960E.dds" />
