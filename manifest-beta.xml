@@ -58,7 +58,7 @@
   </addonfile>
   <addonfile alotversion="6" friendlyname="ALOT for ME1 - Textures" tooltipname="Main file for ALOT for ME1" author="CreeperLava">
     <file downloadlink="http://www.nexusmods.com/masseffect/mods/83/" filename="ALOT for ME1 - Textures.zip" unpackedsinglefilename="ALOT_ME1_v6.mem" size="448315060" md5="790a9cdf6dd20c39fa365ef1d47fced4" />
-    <packagefile me1="true" sourcename="ALOT_ME1_v6.mem" movedirectly="true" />
+    <packagefile me1="true" sourcename="ALOT_ME1.mem" movedirectly="true" />
   </addonfile>
   <addonfile alotversion="6" friendlyname="ALOT for ME2 - Textures" tooltipname="Main file for ALOT for ME2" author="CreeperLava">
     <file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/" filename="ALOT for ME2 - Textures.zip" unpackedsinglefilename="ALOT_ME2_v6.mem" size="3564679575" md5="7003a728693682a8988e1a6f3dfef7c7" />
