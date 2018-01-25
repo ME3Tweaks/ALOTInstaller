@@ -317,6 +317,7 @@
                                 <TextBlock Margin="20,0,0,0" Padding="0,0,0,2" Text="Other Credits" HorizontalAlignment="Left"/>
 
                                 <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mass Effect Wiki" ToolTip="This program uses content from the Mass Effect wiki at FANDOM and is licensed under the Creative Commons Attribution-Share Alike License." HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="ME3Tweaks" ToolTip="Powers the log uploading service to Pastebin" HorizontalAlignment="Left"/>
 
                             </StackPanel>
                         </Expander>
