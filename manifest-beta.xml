@@ -150,9 +150,9 @@
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/9" filename="Medium Phoenix Female-9-1-0.rar" md5="bb70d844d5ff871fcdc231fb3d744642" size="17207706" />
     <packagefile me1="true" sourcename="ME1_Med_Phoe_Fem.tpf" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="MEUITM Fix" tooltipname="MEUITM Fix.zip" author="CDAMJC, CreeperLava">
+  <addonfile friendlyname="MEUITM Fix" tooltipname="MEUITM Fix.zip" author="CreeperLava">
     <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="MEUITM Fix.zip" size="12211901" md5="3a747c9d9daf7de4c24fde296d76be83" />
-    <packagefile me3="true" sourcename="MEUITM Fix.mem" movedirectly="true" />
+    <packagefile me1="true" sourcename="MEUITM Fix.mem" movedirectly="true" />
   </addonfile>
   <addonfile friendlyname="HR Weapon Textures (CreeperLava)" tooltipname="HR Weapon Textures (CreeperLava).zip" author="TheDarkFalkon, CreeperLava">
     <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="HR Weapon Textures (CreeperLava).zip" size="76446664" md5="6d7f90031e55c396807e742945628040" />
