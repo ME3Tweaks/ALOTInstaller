@@ -75,10 +75,6 @@ namespace AlotAddOnGUI
 
         private bool ExtractAddon(AddonFile af)
         {
-            if (af.BuildID == "003")
-            {
-                Debug.WriteLine("B");
-            }
             string stagingdirectory = ADDON_FULL_STAGING_DIRECTORY;
 
             string fileToUse = af.Filename;
