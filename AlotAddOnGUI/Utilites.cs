@@ -69,7 +69,8 @@ namespace AlotAddOnGUI
             if (files.Count() > 0)
             {
                 fileName = files[0];
-            } else
+            }
+            else
             {
                 return true;
             }
@@ -552,7 +553,7 @@ namespace AlotAddOnGUI
             return null;
         }
 
-        public static int runProcess(string exe, string args, bool standAlone = false)
+        public static int runProcess(string exe, string args, bool standAlone = false, bool runAsAdmin = false)
         {
             Log.Information("Running process: " + exe + " " + args);
             using (Process p = new Process())
@@ -563,6 +564,10 @@ namespace AlotAddOnGUI
                 p.StartInfo.Arguments = args;
                 p.StartInfo.RedirectStandardOutput = true;
                 p.StartInfo.RedirectStandardError = true;
+                if (runAsAdmin)
+                {
+                    p.StartInfo.Verb = "runas";
+                }
 
                 StringBuilder output = new StringBuilder();
                 StringBuilder error = new StringBuilder();
@@ -631,6 +636,29 @@ namespace AlotAddOnGUI
                 }
             }
         }
+
+        public static int runProcessAsAdmin(string exe, string args, bool standAlone = false)
+        {
+            Log.Information("Running process as admin: " + exe + " " + args);
+            using (Process p = new Process())
+            {
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.FileName = exe;
+                p.StartInfo.UseShellExecute = true;
+                p.StartInfo.Arguments = args;
+                p.StartInfo.Verb = "runas";
+                p.Start();
+                if (!standAlone)
+                {
+                    p.WaitForExit(60000);
+                    return p.ExitCode;
+                } else
+                {
+                    return 0;
+                }
+            }
+        }
+
         public static Task DeleteAsync(string path)
         {
             if (!File.Exists(path))

@@ -1304,42 +1304,20 @@ namespace AlotAddOnGUI
             string me2Path = Utilities.GetGamePath(2);
             string me3Path = Utilities.GetGamePath(3);
             bool isAdmin = Utilities.IsAdministrator();
-            bool needsPermissions = false;
             //int installedGames = 5;
             me1Installed = (me1Path != null && Directory.Exists(me1Path));
             me2Installed = (me2Path != null && Directory.Exists(me2Path));
             me3Installed = (me3Path != null && Directory.Exists(me3Path));
 
-
+            string args = "";
+            List<string> directories = new List<string>();
             if (me1Installed)
             {
                 bool me1Writable = Utilities.IsDirectoryWritable(me1Path);
-                if (!me1Writable || isAdmin)
+                if (!me1Writable)
                 {
-                    if (!me1Writable)
-                    {
-                        needsPermissions = true;
-                    }
-                    if (isAdmin)
-                    {
-                        Log.Warning("Mass Effect game directory not writable. Current user context is admin - attempting to give permissions on: " + me1Path);
-
-                        Utilities.GrantAccess(me1Path);
-                        me1Writable = Utilities.IsDirectoryWritable(me1Path);
-                        if (me1Writable)
-                        {
-                            Log.Information("Mass Effect game directory is now writable.");
-                        }
-                        else
-                        {
-                            Log.Error("Mass Effect game directory still not writable!");
-                        }
-                    }
-                    else
-                    {
-                        Log.Warning("Mass Effect game directory not writable: " + me1Path);
-                        await this.ShowMessageAsync("Mass Effect game directory is write protected", "Run ALOT Installer as an administrator (Right click ALOTInstaller.exe and select Run as Administrator) to grant write permissions to the Mass Effect game directory. Once permissions have been granted, you can run the program without having to run it as an administrator.");
-                    }
+                    Log.Information("ME1 not writable: " + me1Path);
+                    directories.Add(me1Path);
                 }
             }
 
@@ -1348,27 +1326,10 @@ namespace AlotAddOnGUI
                 bool me2Writable = Utilities.IsDirectoryWritable(me2Path);
                 if (!me2Writable)
                 {
-                    needsPermissions = true;
-                    if (isAdmin)
-                    {
-                        Log.Warning("Mass Effect 2 game directory not writable. Current user context is admin - attempting to give permissions on: " + me2Path);
 
-                        Utilities.GrantAccess(me2Path);
-                        me2Writable = Utilities.IsDirectoryWritable(me2Path);
-                        if (me2Writable)
-                        {
-                            Log.Information("Mass Effect 2 game directory is now writable.");
-                        }
-                        else
-                        {
-                            Log.Error("Mass Effect 2 game directory still not writable!");
-                        }
-                    }
-                    else
-                    {
-                        Log.Warning("Mass Effect 2 game directory not writable: " + me2Path);
-                        await this.ShowMessageAsync("Mass Effect 2 game directory is write protected", "Run ALOT Installer as an administrator (Right click ALOTInstaller.exe and select Run as Administrator) to grant write permissions to the Mass Effect 2 game directory. Once permissions have been granted, you can run the program without having to run it as an administrator.");
-                    }
+                    Log.Information("ME2 not writable: " + me1Path);
+                    directories.Add(me2Path);
+
                 }
             }
 
@@ -1377,34 +1338,64 @@ namespace AlotAddOnGUI
                 bool me3Writable = Utilities.IsDirectoryWritable(me3Path);
                 if (!me3Writable)
                 {
-                    needsPermissions = true;
-                    if (isAdmin)
-                    {
-                        Log.Warning("Mass Effect 3 game directory not writable. Current user context is admin - attempting to give permissions on: " + me3Path);
 
-                        Utilities.GrantAccess(me3Path);
-                        me3Writable = Utilities.IsDirectoryWritable(me3Path);
-                        if (me3Writable)
-                        {
-                            Log.Information("Mass Effect 3 game directory is now writable.");
-                        }
-                        else
-                        {
-                            Log.Error("Mass Effect 3 game directory still not writable!");
-                        }
+                    Log.Information("ME3 not writable: " + me1Path);
+                    directories.Add(me3Path);
+                }
+            }
+
+            if (directories.Count() > 0)
+            {
+                foreach (String str in directories)
+                {
+                    if (args != "")
+                    {
+                        args += " ";
+                    }
+                    args += "\"" + str + "\"";
+                }
+                args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" " + args;
+                //need to run write permissions program
+                if (isAdmin)
+                {
+                    string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
+                    int result = Utilities.runProcess(exe, args);
+                    if (result == 0)
+                    {
+                        Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
                     }
                     else
                     {
-                        Log.Warning("Mass Effect 3 game directory not writable: " + me1Path);
-                        await this.ShowMessageAsync("Mass Effect 3 game directory is write protected", "Run ALOT Installer as an administrator (Right click ALOTInstaller.exe and select Run as Administrator) to grant write permissions to the Mass Effect 3 game directory. Once permissions have been granted, you should run the program as a standard user.");
+                        Log.Error("Elevated process returned code " + result + ", directories probably aren't writable.");
+                    }
+                }
+                else
+                {
+                    string message = "Some game folders are not writeable by your user account. ALOT Installer will attempt to grant access to these folders with the PermissionsGranter.exe program:\n";
+                    foreach (String str in directories)
+                    {
+                        message += "\n" + str;
+                    }
+                    await this.ShowMessageAsync("Granting permissions to Mass Effect directories", message);
+                    string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
+                    int result = Utilities.runProcessAsAdmin(exe, args);
+                    if (result == 0)
+                    {
+                        Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
+                    }
+                    else
+                    {
+                        Log.Error("Elevated process returned code " + result + ", directories probably aren't writable.");
                     }
                 }
             }
 
-            if (needsPermissions) { }
-            if (!needsPermissions && isAdmin)
+            if (isAdmin)
             {
-                Log.Warning("This session does not need admin privledges.");
+                if (args == "")
+                {
+                    Log.Warning("This session does not need admin privileges.");
+                }
                 await this.ShowMessageAsync("ALOT Installer should be run as standard user", "Running ALOT Installer as an administrator will disable drag and drop functionality and may cause issues due to the program running in a different user context. You should restart the application without running it as an administrator.");
             }
         }
@@ -2856,8 +2847,7 @@ namespace AlotAddOnGUI
             }
 
             string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
-            string args = "";// "-install-addon-file \""+path+"\" -game "+result;
-            Utilities.runProcess(exe, args, true);
+            Utilities.runProcess(exe, "", true);
         }
 
         private void InstallingOverlayFlyout_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
