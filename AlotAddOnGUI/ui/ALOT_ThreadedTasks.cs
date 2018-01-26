@@ -1617,10 +1617,10 @@ namespace AlotAddOnGUI
             }
             if (INSTALLING_THREAD_GAME == 1)
             {
-                if (installingMEUITM || (versionInfo != null && versionInfo.MEUITMVER > 0))
-                {
-                    args += "- meuitm-mode";
-                }
+                //if (versionInfo != null && versionInfo.MEUITMVER > 0)
+                //{
+                //    args += " -meuitm-mode";
+                //}
             }
             runMEM_Install(exe, args, InstallWorker);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)

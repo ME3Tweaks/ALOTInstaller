@@ -375,10 +375,10 @@ namespace AlotAddOnGUI
             using (FileStream fs = new FileStream(GetALOTMarkerFilePath(game), FileMode.Open, FileAccess.Write))
             {
                 fs.SeekEnd();
-                fs.WriteInt32(alotVersionInfo.MEUITMVER); //MEUITM version. Not used for now //-16
-                fs.WriteInt16(alotVersionInfo.ALOTVER); //-12
-                fs.WriteByte(alotVersionInfo.ALOTUPDATEVER); //-10
-                fs.WriteByte(alotVersionInfo.ALOTHOTFIXVER); //-9
+                fs.WriteInt32(alotVersionInfo.MEUITMVER); //MEUITM version.
+                fs.WriteInt16(alotVersionInfo.ALOTVER); //-12 //ALOT Primary
+                fs.WriteByte(alotVersionInfo.ALOTUPDATEVER); //-10 //ALOT Update
+                fs.WriteByte(alotVersionInfo.ALOTHOTFIXVER); //-9 //Hotfix version (not used)
 
                 //Get versions
                 var versInfo = FileVersionInfo.GetVersionInfo(MainWindow.BINARY_DIRECTORY + "MassEffectModderNoGui.exe");
