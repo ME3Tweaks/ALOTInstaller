@@ -58,6 +58,69 @@ namespace AlotAddOnGUI
             return sb.ToString();
         }
 
+        /// <summary> Checks for write access for the given file.
+        /// </summary>
+        /// <param name="fileName">The filename.</param>
+        /// <returns>true, if write access is allowed, otherwise false</returns>
+        public static bool IsDirectoryWritable(string dir)
+        {
+            var files = Directory.GetFiles(dir);
+            string fileName = "";
+            if (files.Count() > 0)
+            {
+                fileName = files[0];
+            } else
+            {
+                return true;
+            }
+
+            if ((File.GetAttributes(fileName) & FileAttributes.ReadOnly) != 0)
+                return false;
+
+            // Get the access rules of the specified files (user groups and user names that have access to the file)
+            var rules = File.GetAccessControl(fileName).GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
+
+            // Get the identity of the current user and the groups that the user is in.
+            var groups = WindowsIdentity.GetCurrent().Groups;
+            string sidCurrentUser = WindowsIdentity.GetCurrent().User.Value;
+
+            // Check if writing to the file is explicitly denied for this user or a group the user is in.
+            if (rules.OfType<FileSystemAccessRule>().Any(r => (groups.Contains(r.IdentityReference) || r.IdentityReference.Value == sidCurrentUser) && r.AccessControlType == AccessControlType.Deny && (r.FileSystemRights & FileSystemRights.WriteData) == FileSystemRights.WriteData))
+                return false;
+
+            // Check if writing is allowed
+            return rules.OfType<FileSystemAccessRule>().Any(r => (groups.Contains(r.IdentityReference) || r.IdentityReference.Value == sidCurrentUser) && r.AccessControlType == AccessControlType.Allow && (r.FileSystemRights & FileSystemRights.WriteData) == FileSystemRights.WriteData);
+        }
+
+
+        public static bool IsDirectoryWritable2(string dirPath)
+        {
+            try
+            {
+                using (FileStream fs = File.Create(
+                    Path.Combine(
+                        dirPath,
+                        Path.GetRandomFileName()
+                    ),
+                    1,
+                    FileOptions.DeleteOnClose)
+                )
+                { }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool IsAdministrator()
+        {
+            var identity = WindowsIdentity.GetCurrent();
+            var principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
         /// <summary>
         /// Gets the MEM game path. If the MEM game path is not set, the one from the registry is used.
         /// </summary>
@@ -394,6 +457,24 @@ namespace AlotAddOnGUI
             }
         }
 
+
+        public static bool GrantAccess(string fullPath)
+        {
+            try
+            {
+                DirectoryInfo dInfo = new DirectoryInfo(fullPath);
+                DirectorySecurity dSecurity = dInfo.GetAccessControl();
+                dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                dInfo.SetAccessControl(dSecurity);
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error granting write access: " + e.Message);
+                return false;
+            }
+            return true;
+        }
+
         internal static string GetALOTMarkerFilePath(int gameID)
         {
             string gamePath = Utilities.GetGamePath(gameID);
@@ -579,14 +660,6 @@ namespace AlotAddOnGUI
                 return null;
             }
             return Task.Run(() => { File.Move(sourceFileName, destFileName); });
-        }
-
-        public static void GrantAccess(string fullPath)
-        {
-            DirectoryInfo dInfo = new DirectoryInfo(fullPath);
-            DirectorySecurity dSecurity = dInfo.GetAccessControl();
-            dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
-            dInfo.SetAccessControl(dSecurity);
         }
 
         public static void TurnOffOriginAutoUpdateForGame(int game)
