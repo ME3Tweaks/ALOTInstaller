@@ -69,6 +69,7 @@ namespace AlotAddOnGUI
         private string DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods";
         private string EXTRACTED_MODS_DIRECTORY = EXE_DIRECTORY + "Data\\Extracted_Mods";
         private bool ERROR_OCCURED_PLEASE_STOP = false;
+        private bool REPACK_GAME_FILES;
         private const string SETTINGSTR_SOUND = "PlayMusic";
         private const string SET_VISIBILE_ITEMS_LIST = "SET_VISIBILE_ITEMS_LIST";
 
@@ -1235,6 +1236,7 @@ namespace AlotAddOnGUI
                     }
                 }
             }
+            REPACK_GAME_FILES = Checkbox_RepackGameFiles.IsChecked.Value;
             SetInstallFlyoutState(true);
 
             //Load Tips
@@ -1583,7 +1585,12 @@ namespace AlotAddOnGUI
             CurrentTaskPercent = 0;
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, CurrentTask));
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_TASK_PROGRESS, CurrentTaskPercent));
-            args = "-install-mods " + INSTALLING_THREAD_GAME + " \"" + outputDir + "\" -ipc";
+            args = "-install-mods " + INSTALLING_THREAD_GAME + " \"" + outputDir + "\"";
+            if (REPACK_GAME_FILES)
+            {
+                args += " -repack";
+            }
+            args += " -ipc";
             runMEM_Install(exe, args, InstallWorker);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {

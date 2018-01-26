@@ -16,7 +16,9 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Icon="ALOTInstallerIcon.ico"
         ShowIconOnTitleBar="False"
-        Drop="File_Drop_BackgroundThread" AllowDrop="true">
+        Drop="File_Drop_BackgroundThread" 
+        AllowDrop="true"
+        StateChanged="MainWindow_StateChanged">
     <Window.Resources>
         <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
             <Style.Resources>
