@@ -275,7 +275,7 @@ namespace AlotAddOnGUI
                                         Log.Information("Application update was in progress but was canceled.");
                                         downloadClient.CancelAsync();
                                         await updateprogresscontroller.CloseAsync();
-                                        await FetchManifest();
+                                        FetchManifest();
                                     }
                                 };
                                 downloadClient.DownloadFileCompleted += UnzipSelfUpdate;
@@ -288,7 +288,7 @@ namespace AlotAddOnGUI
                             {
                                 AddonFilesLabel.Text = "Application update declined";
                                 Log.Warning("Application update was declined");
-                                await FetchManifest();
+                                FetchManifest();
                             }
                         }
                         else
@@ -296,7 +296,7 @@ namespace AlotAddOnGUI
                             //up to date
                             AddonFilesLabel.Text = "Application up to date";
                             Log.Information("Application is up to date.");
-                            await FetchManifest();
+                            FetchManifest();
                         }
                     }
                 }
@@ -304,7 +304,7 @@ namespace AlotAddOnGUI
             catch (Exception e)
             {
                 Log.Error("Error checking for update: " + e);
-                await FetchManifest();
+                FetchManifest();
             }
         }
 
@@ -1078,65 +1078,45 @@ namespace AlotAddOnGUI
             }
         }
 
-        private async Task FetchManifest()
+        private void FetchManifest()
         {
+            using (WebClient webClient = new WebClient())
             {
-                using (WebClient webClient = new WebClient())
+                webClient.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
+                Log.Information("Fetching latest manifest from github");
+                Build_ProgressBar.IsIndeterminate = true;
+                AddonFilesLabel.Text = "Downloading latest addon manifest";
+                if (!File.Exists("DEV_MODE"))
                 {
-                    webClient.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
-                    Log.Information("Fetching latest manifest from github");
-                    Build_ProgressBar.IsIndeterminate = true;
-                    AddonFilesLabel.Text = "Downloading latest addon manifest";
-                    if (!File.Exists("DEV_MODE"))
+                    try
                     {
-                        try
+                        //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", MANIFEST_LOC);
+                        string url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml";
+                        if (USING_BETA)
                         {
-                            //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", MANIFEST_LOC);
-                            string url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml";
-                            if (USING_BETA)
+                            Log.Information("In BETA mode.");
+                            url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
+                            Title += " BETA MODE";
+                        }
+                        webClient.DownloadStringCompleted += async (sender, e) =>
+                        {
+                            if (e.Error == null)
                             {
-                                Log.Information("In BETA mode.");
-                                url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
-                                Title += " BETA MODE";
-                            }
-                            webClient.DownloadStringCompleted += async (sender, e) =>
-                            {
-                                if (e.Error == null)
+                                string pageSourceCode = e.Result;
+                                if (Utilities.TestXMLIsValid(pageSourceCode))
                                 {
-                                    string pageSourceCode = e.Result;
-                                    if (Utilities.TestXMLIsValid(pageSourceCode))
-                                    {
-                                        Log.Information("Manifest fetched.");
-                                        File.WriteAllText(MANIFEST_LOC, pageSourceCode);
+                                    Log.Information("Manifest fetched.");
+                                    File.WriteAllText(MANIFEST_LOC, pageSourceCode);
                                         //Legacy stuff
                                         if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
-                                        {
-                                            File.Delete(MANIFEST_LOC);
-                                        }
-                                        ManifestDownloaded();
-                                    }
-                                    else
                                     {
-                                        Log.Error("Response from server was not valid XML! " + pageSourceCode);
-                                        if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
-                                        {
-                                            Log.Information("Reading bundled manifest instead.");
-                                            File.Delete(MANIFEST_LOC);
-                                            File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
-                                            UsingBundledManifest = true;
-                                            ManifestDownloaded();
-                                        }
-                                        else
-                                        {
-                                            Log.Error("Local manifest also doesn't exist! No manifest is available.");
-                                            await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
-                                            Environment.Exit(1);
-                                        }
+                                        File.Delete(MANIFEST_LOC);
                                     }
+                                    ManifestDownloaded();
                                 }
                                 else
                                 {
-                                    Log.Error("Exception occured getting manifest from server: " + e.Error.ToString());
+                                    Log.Error("Response from server was not valid XML! " + pageSourceCode);
                                     if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
                                     {
                                         Log.Information("Reading bundled manifest instead.");
@@ -1147,58 +1127,76 @@ namespace AlotAddOnGUI
                                     }
                                     else
                                     {
-                                        Log.Fatal("No local manifest exists to use, exiting...");
+                                        Log.Error("Local manifest also doesn't exist! No manifest is available.");
                                         await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
                                         Environment.Exit(1);
                                     }
                                 }
+                            }
+                            else
+                            {
+                                Log.Error("Exception occured getting manifest from server: " + e.Error.ToString());
+                                if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                                {
+                                    Log.Information("Reading bundled manifest instead.");
+                                    File.Delete(MANIFEST_LOC);
+                                    File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                                    UsingBundledManifest = true;
+                                    ManifestDownloaded();
+                                }
+                                else
+                                {
+                                    Log.Fatal("No local manifest exists to use, exiting...");
+                                    await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
+                                    Environment.Exit(1);
+                                }
+                            }
                                 //do something with results 
                             };
-                            Debug.WriteLine(DateTime.Now);
-                            webClient.DownloadStringAsync(new Uri(url));
-                        }
-                        catch (WebException e)
-                        {
-                            Log.Error("WebException occured getting manifest from server: " + e.ToString());
-                            if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
-                            {
-                                Log.Information("Reading bundled manifest instead.");
-                                File.Delete(MANIFEST_LOC);
-                                File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
-                                UsingBundledManifest = true;
-                                ManifestDownloaded();
-                            }
-                        }
-                        //}
-                        //catch (Exception e)
-                        //{
-                        //    Debug.WriteLine(DateTime.Now);
-                        //    Log.Error("Other Exception occured getting manifest from server/reading manifest: " + e.ToString());
-                        //    if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
-                        //    {
-                        //        Log.Information("Reading bundled manifest instead.");
-                        //        File.Delete(MANIFEST_LOC);
-                        //        File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
-                        //        UsingBundledManifest = true;
-                        //    }
-                        //}
+                        Debug.WriteLine(DateTime.Now);
+                        webClient.DownloadStringAsync(new Uri(url));
                     }
-                    else
+                    catch (WebException e)
                     {
-                        Log.Information("DEV_MODE file found. Not using online manifest.");
-                        UsingBundledManifest = true;
-                        Title += " DEV MODE";
-                        ManifestDownloaded();
+                        Log.Error("WebException occured getting manifest from server: " + e.ToString());
+                        if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                        {
+                            Log.Information("Reading bundled manifest instead.");
+                            File.Delete(MANIFEST_LOC);
+                            File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                            UsingBundledManifest = true;
+                            ManifestDownloaded();
+                        }
                     }
-
-                    //if (!File.Exists(MANIFEST_LOC))
-                    //{
-                    //    Log.Fatal("No local manifest exists to use, exiting...");
-                    //    await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for addon. Information that is required to build the addon is not available. Check the program logs.");
-                    //    Environment.Exit(1);
                     //}
-
+                    //catch (Exception e)
+                    //{
+                    //    Debug.WriteLine(DateTime.Now);
+                    //    Log.Error("Other Exception occured getting manifest from server/reading manifest: " + e.ToString());
+                    //    if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                    //    {
+                    //        Log.Information("Reading bundled manifest instead.");
+                    //        File.Delete(MANIFEST_LOC);
+                    //        File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                    //        UsingBundledManifest = true;
+                    //    }
+                    //}
                 }
+                else
+                {
+                    Log.Information("DEV_MODE file found. Not using online manifest.");
+                    UsingBundledManifest = true;
+                    Title += " DEV MODE";
+                    ManifestDownloaded();
+                }
+
+                //if (!File.Exists(MANIFEST_LOC))
+                //{
+                //    Log.Fatal("No local manifest exists to use, exiting...");
+                //    await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for addon. Information that is required to build the addon is not available. Check the program logs.");
+                //    Environment.Exit(1);
+                //}
+
             }
         }
 
