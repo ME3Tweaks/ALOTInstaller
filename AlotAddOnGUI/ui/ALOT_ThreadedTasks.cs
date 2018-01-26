@@ -1615,13 +1615,13 @@ namespace AlotAddOnGUI
             {
                 args += " -limit2k";
             }
-            if (INSTALLING_THREAD_GAME == 1)
-            {
+            //if (INSTALLING_THREAD_GAME == 1)
+            //{
                 //if (versionInfo != null && versionInfo.MEUITMVER > 0)
                 //{
                 //    args += " -meuitm-mode";
                 //}
-            }
+            //}
             runMEM_Install(exe, args, InstallWorker);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {

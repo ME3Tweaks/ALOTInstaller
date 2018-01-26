@@ -102,6 +102,7 @@ namespace AlotAddOnGUI
         private List<string> musicpackmirrors;
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
+        private const string SETTINGSTR_REPACK = "RepackGameFiles";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
         public const string SETTINGSTR_BETAMODE = "BetaMode";
         public const string SETTINGSTR_DOWNLOADSFOLDER = "DownloadsFolder";
@@ -1107,8 +1108,8 @@ namespace AlotAddOnGUI
                                 {
                                     Log.Information("Manifest fetched.");
                                     File.WriteAllText(MANIFEST_LOC, pageSourceCode);
-                                        //Legacy stuff
-                                        if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
+                                    //Legacy stuff
+                                    if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
                                     {
                                         File.Delete(MANIFEST_LOC);
                                     }
@@ -1151,8 +1152,8 @@ namespace AlotAddOnGUI
                                     Environment.Exit(1);
                                 }
                             }
-                                //do something with results 
-                            };
+                            //do something with results 
+                        };
                         Debug.WriteLine(DateTime.Now);
                         webClient.DownloadStringAsync(new Uri(url));
                     }
@@ -1432,7 +1433,7 @@ namespace AlotAddOnGUI
             }
             else
             {
-                me1ver = "Not Installed";
+                me1ver = "ALOT/MEUITM not installed";
             }
 
             if (CURRENTLY_INSTALLED_ME2_ALOT_INFO != null)
@@ -1448,7 +1449,7 @@ namespace AlotAddOnGUI
             }
             else
             {
-                me2ver = "Not Installed";
+                me2ver = "ALOT not installed";
             }
 
             if (CURRENTLY_INSTALLED_ME3_ALOT_INFO != null)
@@ -1464,12 +1465,12 @@ namespace AlotAddOnGUI
             }
             else
             {
-                me3ver = "Not Installed";
+                me3ver = "ALOT not installed";
             }
 
-            string me1ToolTip = CURRENTLY_INSTALLED_ME1_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed";
-            string me2ToolTip = CURRENTLY_INSTALLED_ME2_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed";
-            string me3ToolTip = CURRENTLY_INSTALLED_ME3_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed";
+            string me1ToolTip = CURRENTLY_INSTALLED_ME1_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed. Detection requires installation through ALOT or MEUITM Installer.";
+            string me2ToolTip = CURRENTLY_INSTALLED_ME2_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed. Detection requires installation through ALOT Installer.";
+            string me3ToolTip = CURRENTLY_INSTALLED_ME3_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed. Detection requires installation through ALOT Installer.";
 
             string message1 = "ME1: " + me1ver;
             string message2 = "ME2: " + me2ver;
@@ -1574,11 +1575,19 @@ namespace AlotAddOnGUI
             musicpackmirrors = new List<string>();
 
             alladdonfiles = new BindingList<AddonFile>(); //prevents crashes
+            List<ManifestTutorial> tutorials = new List<ManifestTutorial>();
             try
             {
                 XElement rootElement = XElement.Load(MANIFEST_LOC);
                 string version = (string)rootElement.Attribute("version") ?? "";
                 musicpackmirrors = rootElement.Elements("musicpackmirror").Select(xe => xe.Value).ToList();
+                tutorials = (from e in rootElement.Elements("tutorial")
+                             select new ManifestTutorial
+                             {
+                                 Link = (string) e.Element("link"),
+                                 Text = (string) e.Element("text"),
+                                 ToolTip = (string) e.Element("tooltip")
+                             }).ToList();
                 linqlist = (from e in rootElement.Elements("addonfile")
                             select new AddonFile
                             {
@@ -1638,7 +1647,35 @@ namespace AlotAddOnGUI
             }
             linqlist = linqlist.OrderBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList();
 
-
+            if (tutorials.Count > 0)
+            {
+                Label_NoTutorials.Visibility = Visibility.Collapsed;
+                foreach (ManifestTutorial tut in tutorials)
+                {
+                    System.Windows.Controls.Button buttonOK = new System.Windows.Controls.Button();
+                    buttonOK.Content = tut.Text;
+                    buttonOK.ToolTip = tut.ToolTip;
+                    buttonOK.Margin = new Thickness(20, 0, 20, 3);
+                    buttonOK.Margin = new Thickness(0, 3, 0, 3);
+//                    buttonOK.FontSize = 12;
+//                    buttonOK.Contr
+//Style = "{StaticResource AccentedSquareButtonStyle}" Controls: ControlsHelper.ContentCharacterCasing = "Upper"
+                    buttonOK.Click += async (s, e) => {
+                        try
+                        {
+                            Log.Information("Opening URL: " + tut.Link);
+                            System.Diagnostics.Process.Start(tut.Link);
+                        }
+                        catch (Exception other)
+                        {
+                            Log.Error("Exception opening browser - handled. The error was " + other.Message);
+                            System.Windows.Clipboard.SetText(tut.Link);
+                            await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar.");
+                        }
+                    };
+                    StackPanel_ManifestTutorials.Children.Add(buttonOK);
+                }
+            }
 
             alladdonfiles = new BindingList<AddonFile>(linqlist);
             addonfiles = alladdonfiles;
@@ -2242,22 +2279,28 @@ namespace AlotAddOnGUI
 
         private async void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            string fname = (string)((Hyperlink)e.Source).Tag;
-
+            string fname = null;
+            if (e.Source is Hyperlink)
+            {
+                fname = (string)((Hyperlink)e.Source).Tag;
+            }
             try
             {
                 Log.Information("Opening URL: " + e.Uri.ToString());
                 System.Diagnostics.Process.Start(e.Uri.ToString());
-                this.nIcon.Visible = true;
-                //this.WindowState = System.Windows.WindowState.Minimized;
-                this.nIcon.Icon = Properties.Resources.tooltiptrayicon;
-                this.nIcon.ShowBalloonTip(14000, "Directions", "Download the file with filename: \"" + fname + "\"", ToolTipIcon.Info);
+                if (fname != null)
+                {
+                    this.nIcon.Visible = true;
+                    //this.WindowState = System.Windows.WindowState.Minimized;
+                    this.nIcon.Icon = Properties.Resources.tooltiptrayicon;
+                    this.nIcon.ShowBalloonTip(14000, "Directions", "Download the file titled: \"" + fname + "\"", ToolTipIcon.Info);
+                }
             }
             catch (Exception other)
             {
                 Log.Error("Exception opening browser - handled. The error was " + other.Message);
                 System.Windows.Clipboard.SetText(e.Uri.ToString());
-                await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar. Download the file named " + fname + ", then drag and drop it onto this program's interface.");
+                await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar."+fname != null ? " Download the file named " + fname + ", then drag and drop it onto this program's interface." : "");
             }
         }
 
@@ -2983,6 +3026,7 @@ namespace AlotAddOnGUI
         {
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "HasRunFirstRun", true);
             FirstRunFlyout.IsOpen = false;
+            SettingsFlyout.IsOpen = true;
             RunMEMUpdater2();
             UpdateALOTStatus();
             RunMEMUpdaterGUI();
@@ -3283,6 +3327,11 @@ namespace AlotAddOnGUI
         {
             DiagnosticsWindow dw = new DiagnosticsWindow();
             dw.ShowDialog();
+        }
+
+        private void Checkbox_RepackFiles_Click(object sender, RoutedEventArgs e)
+        {
+            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_REPACK, ((bool)Checkbox_RepackGameFiles.IsChecked ? 1 : 0));
         }
     }
 }

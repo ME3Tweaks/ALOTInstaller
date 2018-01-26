@@ -152,6 +152,7 @@
     <Compile Include="classes\PackageFile.cs" />
     <Compile Include="classes\StreamIO.cs" />
     <Compile Include="classes\TasksDisplayEngine.cs" />
+    <Compile Include="ManifestTutorial.cs" />
     <Compile Include="music\LoopStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>
