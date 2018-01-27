@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="4.0.7">
+<alotaddonmanifest version="4.0.8">
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <addonfile meuitm="true" friendlyname="MEUITM Anniversary Edition" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
@@ -120,31 +120,6 @@
   <addonfile friendlyname="Zaeed Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/579/?" filename="Zaeed Complexion Tweak 1.0-579-1-0.7z" size="13561527" md5="e1ff127784ed88d5a1ef6ad2edaaa11a" />
     <packagefile me3="true" sourcename="el_ZaeedComplexionTweak_1.tpf" movedirectly="true" />
-  </addonfile>
-  <addonfile friendlyname="FemShep High Quality textures" author="heleuss">
-    <file downloadlink="http://www.mediafire.com/file/v151vbhh7d28kgb/%5BME3%5D+femShep+High+Quality+textures.7z" filename="[ME3] femShep High Quality textures.7z" size="18877523" md5="03d31b6a684a8d498997b03a43e8e53f" />
-    <packagefile me3="true" sourcename="[ME3] KH_eyes.tpf" delete="true" />
-    <packagefile me3="true" sourcename="[ME3] KH_femShep_brows.tpf" movedirectly="true" />
-    <packagefile me3="true" sourcename="[ME3] KH_femShep_eyelashes.tpf" movedirectly="true" />
-    <packagefile me3="true" sourcename="[ME3] KH_femShep_face_textures.tpf" movedirectly="true" />
-    <packagefile me3="true" sourcename="[ME3] KH_femShep_masks.tpf" movedirectly="true" />
-  </addonfile>
-  <addonfile friendlyname="BroShep High Quality textures" author="heleuss">
-    <file downloadlink="http://www.mediafire.com/file/nv78t12776lpitf/%5BME3%5D+broShep+High+Quality+textures.7z" filename="[ME3] broShep High Quality textures.7z" size="19853323" md5="e15875a4f2cf147480d35c03cbd8082c" />
-    <packagefile me3="true" sourcename="[ME3] KH_broShep_face_textures.tpf" delete="true" />
-    <packagefile me3="true" sourcename="[ME3] KH_broShep_wrinkle_fix.tpf" movedirectly="true" />
-  </addonfile>
-  <addonfile friendlyname="FemShep High Quality textures" author="heleuss">
-    <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
-    <packagefile me2="true" sourcename="[ME2] KH_femShep_eyes.tpf" movedirectly="true" />
-    <packagefile me2="true" sourcename="[ME2] KH_femShep_eyebrows.tpf" movedirectly="true" />
-    <packagefile me2="true" sourcename="[ME2] KH_femShep_eyelashes.tpf" movedirectly="true" />
-    <packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true" />
-    <packagefile me2="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" movedirectly="true" />
-  </addonfile>
-  <addonfile friendlyname="BroShep High Quality textures" author="heleuss">
-    <file downloadlink="https://www.dropbox.com/s/g6wg6v7uy8y7x15/%5BME2%5D%20broShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] broShep High Quality textures.7z" size="11802235" md5="4a220058d12c0c125a27a1d30bfff937" />
-    <packagefile me2="true" sourcename="[ME2] KH_broShep_face_textures.tpf" movedirectly="true" />
   </addonfile>
   <addonfile friendlyname="HR Phoenix Armor" author="Ottemis">
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/9" filename="Medium Phoenix Female-9-1-0.rar" md5="bb70d844d5ff871fcdc231fb3d744642" size="17207706" />
