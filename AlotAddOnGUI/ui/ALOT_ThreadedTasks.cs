@@ -1166,7 +1166,7 @@ namespace AlotAddOnGUI
             string bgPath = "images/me" + game + "_bg.jpg";
             if (game == 2 && DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
             {
-                bgPath = "images/me2_alt_bg.jpg";
+                bgPath = "images/me2_bg_alt.jpg";
             }
             ImageBrush background = new ImageBrush(new BitmapImage(new Uri(BaseUriHelper.GetBaseUri(this), bgPath)));
             background.Stretch = Stretch.UniformToFill;
@@ -1220,6 +1220,7 @@ namespace AlotAddOnGUI
                 string musfile = GetMusicDirectory() + "me" + game + ".ogg";
                 if (File.Exists(musfile))
                 {
+                    InstallingOverlay_MusicButton.Visibility = Visibility.Visible;
                     MusicIsPlaying = true;
                     MusicPaused = false;
                     waveOut = new WaveOut();
@@ -1239,7 +1240,13 @@ namespace AlotAddOnGUI
                         MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.SoundMute;
                         waveOut.Pause();
                     }
+                } else
+                {
+                    InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
                 }
+            } else
+            {
+                InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
             }
             REPACK_GAME_FILES = Checkbox_RepackGameFiles.IsChecked.Value;
             SetInstallFlyoutState(true);
@@ -1455,7 +1462,7 @@ namespace AlotAddOnGUI
 
             if (!RemoveMipMaps)
             {
-                STAGE_COUNT -= 2; //Scanning, Removing
+                STAGE_COUNT -= 3; //Scanning, Removing, Marking
             }
             else
             {
@@ -1730,6 +1737,12 @@ namespace AlotAddOnGUI
             if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
             {
                 Utilities.InstallBinkw32Bypass(INSTALLING_THREAD_GAME);
+            }
+
+            //Install IndirectSound fix
+            if (INSTALLING_THREAD_GAME == 1)
+            {
+                //Utilities.InstallIndirectSoundFixForME1();
             }
 
             //If MAIN alot file is here, move it back to downloaded_mods
