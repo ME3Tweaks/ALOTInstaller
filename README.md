@@ -1,8 +1,10 @@
 # ALOT Installer
 
-ALOT Installer facilitates the installation of ALOT, ALOT's updates, the ALOT Addon, and user selected textures for Mass Effect, Mass Effect 2, and Mass Effect 3. It is powered behind the scenes by MassEffectModder. For assistance or directions on using this tool to install ALOT please see the nexus pages. This program used to be known as ALOT Addon Builder.
+ALOT Installer facilitates the installation of ALOT, ALOT's updates, the ALOT Addon, and user selected textures for Mass Effect, Mass Effect 2, and Mass Effect 3. It is powered behind the scenes by [MassEffectModderNoGui](https://github.com/MassEffectModder/MassEffectModderNoGui). For directions on using this tool to install ALOT please see the nexus pages. For reporting issues please join the ALOT Discord.
 
-![Screenshot](http://i.imgur.com/Kg8crFb.png)
+This program used to be known as ALOT Addon Builder.
+
+![Screenshot](https://i.imgur.com/a3hkIvZ.png)
 
 [ALOT for Mass Effect](https://www.nexusmods.com/masseffect/mods/83)
 
