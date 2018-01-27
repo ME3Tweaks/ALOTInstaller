@@ -72,7 +72,16 @@ namespace AlotAddOnGUI
             }
             else
             {
-                return true;
+                try
+                {
+                    System.IO.File.Create(Path.Combine(dir, "temp.txt")).Close();
+                    System.IO.File.Delete(Path.Combine(dir, "temp.txt"));
+                    return true;
+                }
+                catch (System.UnauthorizedAccessException ex)
+                {
+                    return false;
+                }
             }
 
             if ((File.GetAttributes(fileName) & FileAttributes.ReadOnly) != 0)
@@ -698,7 +707,7 @@ namespace AlotAddOnGUI
             if (Directory.Exists(appdatapath))
             {
                 var appdatafiles = Directory.GetFiles(appdatapath, "local_*.xml");
-                foreach(string configfile in appdatafiles)
+                foreach (string configfile in appdatafiles)
                 {
                     try
                     {
@@ -724,12 +733,14 @@ namespace AlotAddOnGUI
                         SetAttrSafe(node, attr);
                         xmlDoc.Save(configfile);
                         Log.Information("Updated file with autopatch off: " + configfile);
-                    } catch (Exception e)
+                    }
+                    catch (Exception e)
                     {
                         Log.Error("Unable to turn off origin in game for file " + configfile + ": " + e.Message);
                     }
                 }
-            } else
+            }
+            else
             {
                 Log.Warning("Origin folder does not exist: " + appdatapath);
             }

@@ -340,7 +340,7 @@ namespace AlotAddOnGUI
                             string destination = EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\\" + Path.GetFileName(fileToUse);
                             if (af.UserFile)
                             {
-                                destination = extractpath+ "\\" + Path.GetFileName(fileToUse);
+                                destination = extractpath + "\\" + Path.GetFileName(fileToUse);
                             }
                             File.Copy(extractSource, destination, true);
 
@@ -725,12 +725,13 @@ namespace AlotAddOnGUI
                         hasUserFiles = true;
                         af.ReadyStatusText = "Waiting for Addon to complete build";
                         af.SetIdle();
-                    } else
+                    }
+                    else
                     {
                         af.ReadyStatusText = "Staged for installation";
                         af.SetIdle();
                     }
-                    
+
                     continue;
                 }
                 bool requiresBuild = false;
@@ -1625,10 +1626,10 @@ namespace AlotAddOnGUI
             }
             //if (INSTALLING_THREAD_GAME == 1)
             //{
-                //if (versionInfo != null && versionInfo.MEUITMVER > 0)
-                //{
-                //    args += " -meuitm-mode";
-                //}
+            //if (versionInfo != null && versionInfo.MEUITMVER > 0)
+            //{
+            //    args += " -meuitm-mode";
+            //}
             //}
             runMEM_Install(exe, args, InstallWorker);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
@@ -2105,7 +2106,29 @@ namespace AlotAddOnGUI
             }
             Log.Information("Reverting lod settings");
             IniSettingsHandler.removeLOD(BACKUP_THREAD_GAME);
-            Directory.CreateDirectory(gamePath);
+
+            if (Utilities.IsDirectoryWritable(Directory.GetParent(gamePath).FullName))
+            {
+                Directory.CreateDirectory(gamePath);
+            }
+            else
+            {
+                //Must have admin rights.
+                string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
+                string args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" -create-directory \"" + gamePath.TrimEnd('\\') + "\"";
+                int result = Utilities.runProcessAsAdmin(exe, args);
+                if (result == 0)
+                {
+                    Log.Information("Elevated process returned code 0, restore directory is hopefully writable now.");
+                }
+                else
+                {
+                    Log.Error("Elevated process returned code " + result + ", directory likely is not writable");
+                    e.Result = false;
+                    return;
+                }
+            }
+
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Restoring game from backup "));
             if (gamePath != null)

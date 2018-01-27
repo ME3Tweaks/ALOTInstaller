@@ -19,13 +19,25 @@ namespace PermissionsGranter
                 Environment.Exit(1);
             }
             bool successful = true;
-            
+
             string username = args[0];
+            bool isFolderCreate = false;
             foreach (string folder in args.Where((source, index) => index != 0).ToArray())
             {
+                if (folder.ToLower() == "-create-directory")
+                {
+                    isFolderCreate = true;
+                    continue;
+                }
+                if (isFolderCreate)
+                {
+                    Console.WriteLine("Creating directory " + folder);
+                    Directory.CreateDirectory(folder);
+                    isFolderCreate = false;
+                }
                 if (Directory.Exists(folder))
                 {
-                    Console.WriteLine("Granting write permissions to "+username+" on: " + folder);
+                    Console.WriteLine("Granting write permissions to " + username + " on: " + folder);
                     if (!GrantAccess(username, folder))
                     {
                         Console.WriteLine("Failed to grant write permissions to Everyone on: " + folder);

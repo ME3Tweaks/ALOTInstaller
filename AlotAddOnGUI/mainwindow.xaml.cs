@@ -2615,10 +2615,16 @@ namespace AlotAddOnGUI
                     long currentBytes = preDownloadStartBytes;
                     currentBytes += e.BytesReceived;
                     double progress = (((double)currentBytes / totalBytes));
+                    int taskbarprogress = (int) ((currentBytes * 100 / totalBytes));
+
+                    TaskbarManager.Instance.SetProgressValue(taskbarprogress, 100);
+
                     progressController.SetProgress(progress);
                 };
                 downloadClient.DownloadFileCompleted += async (s, e) =>
                 {
+                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
+                    TaskbarManager.Instance.SetProgressValue(0, 0);
                     processedBytes += new System.IO.FileInfo(fileToImport.Item3).Length;
                     importedFiles.Add(fileToImport.Item1.FriendlyName);
                     if (filesToImport.Count > 0)
@@ -2658,6 +2664,8 @@ namespace AlotAddOnGUI
                         }
                     }
                 };
+                TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
+                TaskbarManager.Instance.SetProgressValue(0, 100);
                 downloadClient.DownloadFileAsync(new Uri(fileToImport.Item2), fileToImport.Item3);
             }
         }
@@ -2862,7 +2870,7 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    AddonFilesLabel.Text = "Restore failed! Check the logs.";
+                    AddonFilesLabel.Text = "Restore failed! Check the logs. Your game may be in an inconsistent or missing state.";
                 }
                 SetBottomButtonAvailability();
                 UpdateALOTStatus();
