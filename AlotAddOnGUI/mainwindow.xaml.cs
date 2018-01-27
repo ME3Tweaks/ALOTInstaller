@@ -102,6 +102,7 @@ namespace AlotAddOnGUI
         private List<string> musicpackmirrors;
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
+        private const string SETTINGSTR_REPACK = "RepackGameFiles";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
         public const string SETTINGSTR_BETAMODE = "BetaMode";
         public const string SETTINGSTR_DOWNLOADSFOLDER = "DownloadsFolder";
@@ -131,6 +132,8 @@ namespace AlotAddOnGUI
         private WebClient downloadClient;
         private string MANIFEST_LOC = EXE_DIRECTORY + @"Data\\manifest.xml";
         private string MANIFEST_BUNDLED_LOC = EXE_DIRECTORY + @"Data\\manifest-bundled.xml";
+        private List<string> COPY_QUEUE = new List<string>();
+        private List<string> MOVE_QUEUE = new List<string>();
 
         public bool ShowME1Files
         {
@@ -275,7 +278,7 @@ namespace AlotAddOnGUI
                                         Log.Information("Application update was in progress but was canceled.");
                                         downloadClient.CancelAsync();
                                         await updateprogresscontroller.CloseAsync();
-                                        await FetchManifest();
+                                        FetchManifest();
                                     }
                                 };
                                 downloadClient.DownloadFileCompleted += UnzipSelfUpdate;
@@ -288,7 +291,7 @@ namespace AlotAddOnGUI
                             {
                                 AddonFilesLabel.Text = "Application update declined";
                                 Log.Warning("Application update was declined");
-                                await FetchManifest();
+                                FetchManifest();
                             }
                         }
                         else
@@ -296,7 +299,7 @@ namespace AlotAddOnGUI
                             //up to date
                             AddonFilesLabel.Text = "Application up to date";
                             Log.Information("Application is up to date.");
-                            await FetchManifest();
+                            FetchManifest();
                         }
                     }
                 }
@@ -304,7 +307,7 @@ namespace AlotAddOnGUI
             catch (Exception e)
             {
                 Log.Error("Error checking for update: " + e);
-                await FetchManifest();
+                FetchManifest();
             }
         }
 
@@ -875,7 +878,7 @@ namespace AlotAddOnGUI
         {
             fadeInItems = new FrameworkElement[] { FirstRun_MainContent, FirstRunText_TitleBeta, FirstRunText_BetaSummary };
             buildOptionCheckboxes = new System.Windows.Controls.CheckBox[] { Checkbox_BuildOptionALOT, Checkbox_BuildOptionUser, Checkbox_BuildOptionAddon };
-            if (EXE_DIRECTORY.Length > 95)
+            if (EXE_DIRECTORY.Length > 105)
             {
                 Log.Fatal("ALOT Installer is nested too deep for Addon to build properly (" + EXE_DIRECTORY.Length + " chars) due to Windows API limitations.");
                 await this.ShowMessageAsync("ALOT Installer is too deep in the filesystem", "ALOT Installer can have issues extracting and building the Addon if nested too deeply in the filesystem. This is an issue with Windows file path limitations. Move the ALOT Installer directory up a few folders on your filesystem. A good place to put ALOT Installer is in Documents.");
@@ -1078,65 +1081,45 @@ namespace AlotAddOnGUI
             }
         }
 
-        private async Task FetchManifest()
+        private void FetchManifest()
         {
+            using (WebClient webClient = new WebClient())
             {
-                using (WebClient webClient = new WebClient())
+                webClient.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
+                Log.Information("Fetching latest manifest from github");
+                Build_ProgressBar.IsIndeterminate = true;
+                AddonFilesLabel.Text = "Downloading latest installer manifest";
+                if (!File.Exists("DEV_MODE"))
                 {
-                    webClient.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
-                    Log.Information("Fetching latest manifest from github");
-                    Build_ProgressBar.IsIndeterminate = true;
-                    AddonFilesLabel.Text = "Downloading latest addon manifest";
-                    if (!File.Exists("DEV_MODE"))
+                    try
                     {
-                        try
+                        //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", MANIFEST_LOC);
+                        string url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml";
+                        if (USING_BETA)
                         {
-                            //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", MANIFEST_LOC);
-                            string url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml";
-                            if (USING_BETA)
+                            Log.Information("In BETA mode.");
+                            url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
+                            Title += " BETA MODE";
+                        }
+                        webClient.DownloadStringCompleted += async (sender, e) =>
+                        {
+                            if (e.Error == null)
                             {
-                                Log.Information("In BETA mode.");
-                                url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
-                                Title += " BETA MODE";
-                            }
-                            webClient.DownloadStringCompleted += async (sender, e) =>
-                            {
-                                if (e.Error == null)
+                                string pageSourceCode = e.Result;
+                                if (Utilities.TestXMLIsValid(pageSourceCode))
                                 {
-                                    string pageSourceCode = e.Result;
-                                    if (Utilities.TestXMLIsValid(pageSourceCode))
+                                    Log.Information("Manifest fetched.");
+                                    File.WriteAllText(MANIFEST_LOC, pageSourceCode);
+                                    //Legacy stuff
+                                    if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
                                     {
-                                        Log.Information("Manifest fetched.");
-                                        File.WriteAllText(MANIFEST_LOC, pageSourceCode);
-                                        //Legacy stuff
-                                        if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
-                                        {
-                                            File.Delete(MANIFEST_LOC);
-                                        }
-                                        ManifestDownloaded();
+                                        File.Delete(MANIFEST_LOC);
                                     }
-                                    else
-                                    {
-                                        Log.Error("Response from server was not valid XML! " + pageSourceCode);
-                                        if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
-                                        {
-                                            Log.Information("Reading bundled manifest instead.");
-                                            File.Delete(MANIFEST_LOC);
-                                            File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
-                                            UsingBundledManifest = true;
-                                            ManifestDownloaded();
-                                        }
-                                        else
-                                        {
-                                            Log.Error("Local manifest also doesn't exist! No manifest is available.");
-                                            await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
-                                            Environment.Exit(1);
-                                        }
-                                    }
+                                    ManifestDownloaded();
                                 }
                                 else
                                 {
-                                    Log.Error("Exception occured getting manifest from server: " + e.Error.ToString());
+                                    Log.Error("Response from server was not valid XML! " + pageSourceCode);
                                     if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
                                     {
                                         Log.Information("Reading bundled manifest instead.");
@@ -1147,58 +1130,76 @@ namespace AlotAddOnGUI
                                     }
                                     else
                                     {
-                                        Log.Fatal("No local manifest exists to use, exiting...");
-                                        await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
+                                        Log.Error("Local manifest also doesn't exist! No manifest is available.");
+                                        await this.ShowMessageAsync("No Manifest Available", "An error occured downloading or reading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
                                         Environment.Exit(1);
                                     }
                                 }
-                                //do something with results 
-                            };
-                            Debug.WriteLine(DateTime.Now);
-                            webClient.DownloadStringAsync(new Uri(url));
-                        }
-                        catch (WebException e)
-                        {
-                            Log.Error("WebException occured getting manifest from server: " + e.ToString());
-                            if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
-                            {
-                                Log.Information("Reading bundled manifest instead.");
-                                File.Delete(MANIFEST_LOC);
-                                File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
-                                UsingBundledManifest = true;
-                                ManifestDownloaded();
                             }
-                        }
-                        //}
-                        //catch (Exception e)
-                        //{
-                        //    Debug.WriteLine(DateTime.Now);
-                        //    Log.Error("Other Exception occured getting manifest from server/reading manifest: " + e.ToString());
-                        //    if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
-                        //    {
-                        //        Log.Information("Reading bundled manifest instead.");
-                        //        File.Delete(MANIFEST_LOC);
-                        //        File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
-                        //        UsingBundledManifest = true;
-                        //    }
-                        //}
+                            else
+                            {
+                                Log.Error("Exception occured getting manifest from server: " + e.Error.ToString());
+                                if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                                {
+                                    Log.Information("Reading bundled manifest instead.");
+                                    File.Delete(MANIFEST_LOC);
+                                    File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                                    UsingBundledManifest = true;
+                                    ManifestDownloaded();
+                                }
+                                else
+                                {
+                                    Log.Fatal("No local manifest exists to use, exiting...");
+                                    await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
+                                    Environment.Exit(1);
+                                }
+                            }
+                            //do something with results 
+                        };
+                        Debug.WriteLine(DateTime.Now);
+                        webClient.DownloadStringAsync(new Uri(url));
                     }
-                    else
+                    catch (WebException e)
                     {
-                        Log.Information("DEV_MODE file found. Not using online manifest.");
-                        UsingBundledManifest = true;
-                        Title += " DEV MODE";
-                        ManifestDownloaded();
+                        Log.Error("WebException occured getting manifest from server: " + e.ToString());
+                        if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                        {
+                            Log.Information("Reading bundled manifest instead.");
+                            File.Delete(MANIFEST_LOC);
+                            File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                            UsingBundledManifest = true;
+                            ManifestDownloaded();
+                        }
                     }
-
-                    //if (!File.Exists(MANIFEST_LOC))
-                    //{
-                    //    Log.Fatal("No local manifest exists to use, exiting...");
-                    //    await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for addon. Information that is required to build the addon is not available. Check the program logs.");
-                    //    Environment.Exit(1);
                     //}
-
+                    //catch (Exception e)
+                    //{
+                    //    Debug.WriteLine(DateTime.Now);
+                    //    Log.Error("Other Exception occured getting manifest from server/reading manifest: " + e.ToString());
+                    //    if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
+                    //    {
+                    //        Log.Information("Reading bundled manifest instead.");
+                    //        File.Delete(MANIFEST_LOC);
+                    //        File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
+                    //        UsingBundledManifest = true;
+                    //    }
+                    //}
                 }
+                else
+                {
+                    Log.Information("DEV_MODE file found. Not using online manifest.");
+                    UsingBundledManifest = true;
+                    Title += " DEV MODE";
+                    ManifestDownloaded();
+                }
+
+                //if (!File.Exists(MANIFEST_LOC))
+                //{
+                //    Log.Fatal("No local manifest exists to use, exiting...");
+                //    await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for addon. Information that is required to build the addon is not available. Check the program logs.");
+                //    Environment.Exit(1);
+                //}
+
             }
         }
 
@@ -1434,7 +1435,7 @@ namespace AlotAddOnGUI
             }
             else
             {
-                me1ver = "Not Installed";
+                me1ver = "ALOT/MEUITM not installed";
             }
 
             if (CURRENTLY_INSTALLED_ME2_ALOT_INFO != null)
@@ -1450,7 +1451,7 @@ namespace AlotAddOnGUI
             }
             else
             {
-                me2ver = "Not Installed";
+                me2ver = "ALOT not installed";
             }
 
             if (CURRENTLY_INSTALLED_ME3_ALOT_INFO != null)
@@ -1466,12 +1467,12 @@ namespace AlotAddOnGUI
             }
             else
             {
-                me3ver = "Not Installed";
+                me3ver = "ALOT not installed";
             }
 
-            string me1ToolTip = CURRENTLY_INSTALLED_ME1_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed";
-            string me2ToolTip = CURRENTLY_INSTALLED_ME2_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed";
-            string me3ToolTip = CURRENTLY_INSTALLED_ME3_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed";
+            string me1ToolTip = CURRENTLY_INSTALLED_ME1_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed. Detection requires installation through ALOT or MEUITM Installer.";
+            string me2ToolTip = CURRENTLY_INSTALLED_ME2_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed. Detection requires installation through ALOT Installer.";
+            string me3ToolTip = CURRENTLY_INSTALLED_ME3_ALOT_INFO != null ? "ALOT detected as installed" : "ALOT not detected as installed. Detection requires installation through ALOT Installer.";
 
             string message1 = "ME1: " + me1ver;
             string message2 = "ME2: " + me2ver;
@@ -1576,11 +1577,19 @@ namespace AlotAddOnGUI
             musicpackmirrors = new List<string>();
 
             alladdonfiles = new BindingList<AddonFile>(); //prevents crashes
+            List<ManifestTutorial> tutorials = new List<ManifestTutorial>();
             try
             {
                 XElement rootElement = XElement.Load(MANIFEST_LOC);
                 string version = (string)rootElement.Attribute("version") ?? "";
                 musicpackmirrors = rootElement.Elements("musicpackmirror").Select(xe => xe.Value).ToList();
+                tutorials = (from e in rootElement.Elements("tutorial")
+                             select new ManifestTutorial
+                             {
+                                 Link = (string)e.Attribute("link"),
+                                 Text = (string)e.Attribute("text"),
+                                 ToolTip = (string)e.Attribute("tooltip")
+                             }).ToList();
                 linqlist = (from e in rootElement.Elements("addonfile")
                             select new AddonFile
                             {
@@ -1640,7 +1649,38 @@ namespace AlotAddOnGUI
             }
             linqlist = linqlist.OrderBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList();
 
-
+            if (tutorials.Count > 0)
+            {
+                Label_NoTutorials.Visibility = Visibility.Collapsed;
+                foreach (ManifestTutorial tut in tutorials)
+                {
+                    System.Windows.Controls.Button buttonOK = new System.Windows.Controls.Button();
+                    buttonOK.Content = tut.Text;
+                    buttonOK.ToolTip = tut.ToolTip;
+                    buttonOK.Margin = new Thickness(20, 0, 20, 3);
+                    buttonOK.Padding = new Thickness(0, 3, 0, 3);
+                    buttonOK.Style = (Style)FindResource("AccentedSquareButtonStyle");
+                    ControlsHelper.SetContentCharacterCasing(buttonOK, System.Windows.Controls.CharacterCasing.Upper);
+                    //                    buttonOK.FontSize = 12;
+                    //                    buttonOK.Contr
+                    //Style = "{StaticResource AccentedSquareButtonStyle}" Controls: ControlsHelper.ContentCharacterCasing = "Upper"
+                    buttonOK.Click += async (s, e) =>
+                    {
+                        try
+                        {
+                            Log.Information("Opening URL: " + tut.Link);
+                            System.Diagnostics.Process.Start(tut.Link);
+                        }
+                        catch (Exception other)
+                        {
+                            Log.Error("Exception opening browser - handled. The error was " + other.Message);
+                            System.Windows.Clipboard.SetText(tut.Link);
+                            await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar.");
+                        }
+                    };
+                    StackPanel_ManifestTutorials.Children.Add(buttonOK);
+                }
+            }
 
             alladdonfiles = new BindingList<AddonFile>(linqlist);
             addonfiles = alladdonfiles;
@@ -2244,22 +2284,28 @@ namespace AlotAddOnGUI
 
         private async void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            string fname = (string)((Hyperlink)e.Source).Tag;
-
+            string fname = null;
+            if (e.Source is Hyperlink)
+            {
+                fname = (string)((Hyperlink)e.Source).Tag;
+            }
             try
             {
                 Log.Information("Opening URL: " + e.Uri.ToString());
                 System.Diagnostics.Process.Start(e.Uri.ToString());
-                this.nIcon.Visible = true;
-                //this.WindowState = System.Windows.WindowState.Minimized;
-                this.nIcon.Icon = Properties.Resources.tooltiptrayicon;
-                this.nIcon.ShowBalloonTip(14000, "Directions", "Download the file with filename: \"" + fname + "\"", ToolTipIcon.Info);
+                if (fname != null)
+                {
+                    this.nIcon.Visible = true;
+                    //this.WindowState = System.Windows.WindowState.Minimized;
+                    this.nIcon.Icon = Properties.Resources.tooltiptrayicon;
+                    this.nIcon.ShowBalloonTip(14000, "Directions", "Download the file titled: \"" + fname + "\"", ToolTipIcon.Info);
+                }
             }
             catch (Exception other)
             {
                 Log.Error("Exception opening browser - handled. The error was " + other.Message);
                 System.Windows.Clipboard.SetText(e.Uri.ToString());
-                await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar. Download the file named " + fname + ", then drag and drop it onto this program's interface.");
+                await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar." + fname != null ? " Download the file named " + fname + ", then drag and drop it onto this program's interface." : "");
             }
         }
 
@@ -2524,7 +2570,6 @@ namespace AlotAddOnGUI
                 ImportWorker.DoWork += ImportFilesAsMove;
                 ImportWorker.RunWorkerCompleted += ImportCompleted;
                 ImportWorker.RunWorkerAsync(filesToImport);
-
             }
             else
             {
@@ -2567,17 +2612,28 @@ namespace AlotAddOnGUI
                     {
                         //imports finished
                         await progressController.CloseAsync();
-                        string detailsMessage = "The following files were just imported to ALOT Installer:";
-                        foreach (string af in importedFiles)
+                        if (WindowState == WindowState.Minimized)
                         {
-                            detailsMessage += "\n - " + af;
+                            //queue it
+                            foreach (string af in importedFiles)
+                            {
+                                COPY_QUEUE.Add(af);
+                            }
+                        }
+                        else
+                        {
+                            string detailsMessage = "The following files were just imported to ALOT Installer:";
+                            foreach (string af in importedFiles)
+                            {
+                                detailsMessage += "\n - " + af;
+                            }
+
+                            string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
+                            string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods directory.";
+
+                            ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
                         }
                         PreventFileRefresh = false; //allow refresh
-
-                        string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                        string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods directory.";
-
-                        ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
                         if (DOWNLOAD_ASSISTANT_WINDOW != null)
                         {
                             DOWNLOAD_ASSISTANT_WINDOW.ShowStatus(importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s were" : " was") + " imported");
@@ -2615,29 +2671,39 @@ namespace AlotAddOnGUI
                 if (e.Error != null)
                 {
                     //An error has occured
-
+                    Log.Error("Error moving files: " + e.Error.Message);
                 }
                 else
                 if (e.Result != null)
                 {
                     List<string> importedFiles = (List<string>)e.Result;
-                    //imports finished
-                    string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods folder.";
-                    foreach (string af in importedFiles)
+                    if (WindowState == WindowState.Minimized)
                     {
-                        detailsMessage += "\n - " + af;
+                        foreach (string af in importedFiles)
+                        {
+                            MOVE_QUEUE.Add(af);
+                        }
                     }
+                    else
+                    {
+                        //imports finished
+                        string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods folder.";
+                        foreach (string af in importedFiles)
+                        {
+                            detailsMessage += "\n - " + af;
+                        }
+                        string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
+                        string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods directory.";
+                        ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
+
+                    }
+                    CheckImportLibrary_Tick(null, null);
+                    PreventFileRefresh = false; //allow refresh
 
                     if (DOWNLOAD_ASSISTANT_WINDOW != null)
                     {
                         DOWNLOAD_ASSISTANT_WINDOW.ShowStatus(importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s were" : " was") + " imported");
                     }
-                    PreventFileRefresh = false; //allow refresh
-
-                    string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                    string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods directory.";
-                    CheckImportLibrary_Tick(null, null);
-                    ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
                 }
                 PreventFileRefresh = false;
             }
@@ -2712,14 +2778,19 @@ namespace AlotAddOnGUI
         private void LoadSettings()
         {
             bool importasmove = Utilities.GetRegistrySettingBool(SETTINGSTR_IMPORTASMOVE) ?? true;
+            Checkbox_MoveFilesAsImport.IsChecked = importasmove;
+
             USING_BETA = Utilities.GetRegistrySettingBool(SETTINGSTR_BETAMODE) ?? false;
+            Checkbox_BetaMode.IsChecked = USING_BETA;
+
             DOWNLOADS_FOLDER = Utilities.GetRegistrySettingString(SETTINGSTR_DOWNLOADSFOLDER);
             if (DOWNLOADS_FOLDER == null)
             {
                 DOWNLOADS_FOLDER = KnownFolders.GetPath(KnownFolder.Downloads);
             }
-            Checkbox_BetaMode.IsChecked = USING_BETA;
-            Checkbox_MoveFilesAsImport.IsChecked = importasmove;
+
+            bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? false;
+            Checkbox_RepackGameFiles.IsChecked = repack;
 
             if (USING_BETA)
             {
@@ -2985,6 +3056,7 @@ namespace AlotAddOnGUI
         {
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "HasRunFirstRun", true);
             FirstRunFlyout.IsOpen = false;
+            SettingsFlyout.IsOpen = true;
             RunMEMUpdater2();
             UpdateALOTStatus();
             RunMEMUpdaterGUI();
@@ -3285,6 +3357,47 @@ namespace AlotAddOnGUI
         {
             DiagnosticsWindow dw = new DiagnosticsWindow();
             dw.ShowDialog();
+        }
+
+        private void Checkbox_RepackFiles_Click(object sender, RoutedEventArgs e)
+        {
+            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_REPACK, ((bool)Checkbox_RepackGameFiles.IsChecked ? 1 : 0));
+        }
+
+        private void MainWindow_StateChanged(object sender, EventArgs e)
+        {
+            switch (this.WindowState)
+            {
+                case WindowState.Maximized:
+                case WindowState.Normal:
+                    if (COPY_QUEUE.Count > 0)
+                    {
+                        string detailsMessage = "The following files were just imported to ALOT Installer:";
+                        foreach (string af in COPY_QUEUE)
+                        {
+                            detailsMessage += "\n - " + af;
+                        }
+
+                        string originalTitle = COPY_QUEUE.Count + " file" + (COPY_QUEUE.Count != 1 ? "s" : "") + " imported";
+                        string originalMessage = COPY_QUEUE.Count + " file" + (COPY_QUEUE.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods directory.";
+
+                        ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
+                        COPY_QUEUE.Clear();
+                    }
+                    if (MOVE_QUEUE.Count > 0)
+                    {
+                        string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods folder.";
+                        foreach (string af in MOVE_QUEUE)
+                        {
+                            detailsMessage += "\n - " + af;
+                        }
+                        string originalTitle = MOVE_QUEUE.Count + " file" + (MOVE_QUEUE.Count != 1 ? "s" : "") + " imported";
+                        string originalMessage = MOVE_QUEUE.Count + " file" + (MOVE_QUEUE.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods directory.";
+                        ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
+                        MOVE_QUEUE.Clear();
+                    }
+                    break;
+            }
         }
     }
 }

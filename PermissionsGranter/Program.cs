@@ -52,7 +52,7 @@ namespace PermissionsGranter
 
                 DirectoryInfo dInfo = new DirectoryInfo(fullPath);
                 DirectorySecurity dSecurity = dInfo.GetAccessControl();
-                dSecurity.AddAccessRule(new FileSystemAccessRule(userSID, FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                dSecurity.AddAccessRule(new FileSystemAccessRule(userSID, FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.None, AccessControlType.Allow));
                 dInfo.SetAccessControl(dSecurity);
             }
             catch (Exception e)
