@@ -16,7 +16,9 @@
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Icon="ALOTInstallerIcon.ico"
         ShowIconOnTitleBar="False"
-        Drop="File_Drop_BackgroundThread" AllowDrop="true">
+        Drop="File_Drop_BackgroundThread" 
+        AllowDrop="true"
+        StateChanged="MainWindow_StateChanged">
     <Window.Resources>
         <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
             <Style.Resources>
@@ -296,13 +298,22 @@
                         </Expander>
                         <Expander IsExpanded="True" Expanded="Expander_Expanded">
                             <Expander.Header>
-                                <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Misc. Settings" Padding="0,0,0,0"/>
+                                <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Misc Settings" Padding="0,0,0,0"/>
                             </Expander.Header>
                             <StackPanel>
                                 <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowFirstTime" Controls:ControlsHelper.ContentCharacterCasing="Upper" Content="Show Intro Dialog" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Shows the initial instructions screen"/>
                                 <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Controls:ControlsHelper.ContentCharacterCasing="Upper" x:Name="Button_ChangeDownloadFolder" Content="Change Download Folder" Click="Button_ChangeDownloadFolder_Click" ToolTip="Changes the folder used when importing from downloads" Style="{StaticResource AccentedSquareButtonStyle}" />
+                                <CheckBox Margin="5" x:Name="Checkbox_RepackGameFiles" Content="Repack game files" Click="Checkbox_RepackFiles_Click" ToolTip="Repacking game files makes installation take longer, but will save some disk space." />
                                 <CheckBox Margin="5" x:Name="Checkbox_MoveFilesAsImport" Content="Import via Move if on the same drive" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied.&#10;This only is used if files are on same drive - if files are on different drives then they are copied." />
                                 <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
+                            </StackPanel>
+                        </Expander>
+                        <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                            <Expander.Header>
+                                <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Tutorials &amp; Guides" Padding="0,0,0,0"/>
+                            </Expander.Header>
+                            <StackPanel x:Name="StackPanel_ManifestTutorials">
+                                <TextBlock x:Name="Label_NoTutorials" Text="No tutorials available in manifest"/>
                             </StackPanel>
                         </Expander>
                         <Expander IsExpanded="True" Expanded="Expander_Expanded">
@@ -433,7 +444,7 @@
                                 </TextBlock.Effect>
                             </TextBlock>
                         </StackPanel>
-                        <Button x:Name="InstallingOverlay_MusicButton" Margin="10" Grid.Column="0" Grid.Row="1" Height="40" Width="40" Style="{StaticResource MetroCircleButtonStyle}" Click="MusicIcon_Click">
+                        <Button x:Name="InstallingOverlay_MusicButton" Margin="10" Grid.Column="0" Grid.Row="1" Height="40" Width="40" Style="{StaticResource MetroCircleButtonStyle}" ToolTip="Click to toggle music" Click="MusicIcon_Click">
                             <iconPacks:PackIconModern x:Name="MusicButtonIcon" Kind="Sound3" />
                         </Button>
                     </Grid>

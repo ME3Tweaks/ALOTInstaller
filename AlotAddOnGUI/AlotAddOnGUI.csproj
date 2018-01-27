@@ -152,6 +152,7 @@
     <Compile Include="classes\PackageFile.cs" />
     <Compile Include="classes\StreamIO.cs" />
     <Compile Include="classes\TasksDisplayEngine.cs" />
+    <Compile Include="ManifestTutorial.cs" />
     <Compile Include="music\LoopStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <AutoGen>True</AutoGen>
@@ -234,6 +235,9 @@
     <Content Include="7z\7z.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Data\bin\PermissionsGranter.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\bin\7z.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

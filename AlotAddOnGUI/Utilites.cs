@@ -58,6 +58,70 @@ namespace AlotAddOnGUI
             return sb.ToString();
         }
 
+        /// <summary> Checks for write access for the given file.
+        /// </summary>
+        /// <param name="fileName">The filename.</param>
+        /// <returns>true, if write access is allowed, otherwise false</returns>
+        public static bool IsDirectoryWritable(string dir)
+        {
+            var files = Directory.GetFiles(dir);
+            string fileName = "";
+            if (files.Count() > 0)
+            {
+                fileName = files[0];
+            }
+            else
+            {
+                return true;
+            }
+
+            if ((File.GetAttributes(fileName) & FileAttributes.ReadOnly) != 0)
+                return false;
+
+            // Get the access rules of the specified files (user groups and user names that have access to the file)
+            var rules = File.GetAccessControl(fileName).GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
+
+            // Get the identity of the current user and the groups that the user is in.
+            var groups = WindowsIdentity.GetCurrent().Groups;
+            string sidCurrentUser = WindowsIdentity.GetCurrent().User.Value;
+
+            // Check if writing to the file is explicitly denied for this user or a group the user is in.
+            if (rules.OfType<FileSystemAccessRule>().Any(r => (groups.Contains(r.IdentityReference) || r.IdentityReference.Value == sidCurrentUser) && r.AccessControlType == AccessControlType.Deny && (r.FileSystemRights & FileSystemRights.WriteData) == FileSystemRights.WriteData))
+                return false;
+
+            // Check if writing is allowed
+            return rules.OfType<FileSystemAccessRule>().Any(r => (groups.Contains(r.IdentityReference) || r.IdentityReference.Value == sidCurrentUser) && r.AccessControlType == AccessControlType.Allow && (r.FileSystemRights & FileSystemRights.WriteData) == FileSystemRights.WriteData);
+        }
+
+
+        public static bool IsDirectoryWritable2(string dirPath)
+        {
+            try
+            {
+                using (FileStream fs = File.Create(
+                    Path.Combine(
+                        dirPath,
+                        Path.GetRandomFileName()
+                    ),
+                    1,
+                    FileOptions.DeleteOnClose)
+                )
+                { }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool IsAdministrator()
+        {
+            var identity = WindowsIdentity.GetCurrent();
+            var principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
         /// <summary>
         /// Gets the MEM game path. If the MEM game path is not set, the one from the registry is used.
         /// </summary>
@@ -375,10 +439,10 @@ namespace AlotAddOnGUI
             using (FileStream fs = new FileStream(GetALOTMarkerFilePath(game), FileMode.Open, FileAccess.Write))
             {
                 fs.SeekEnd();
-                fs.WriteInt32(alotVersionInfo.MEUITMVER); //MEUITM version. Not used for now //-16
-                fs.WriteInt16(alotVersionInfo.ALOTVER); //-12
-                fs.WriteByte(alotVersionInfo.ALOTUPDATEVER); //-10
-                fs.WriteByte(alotVersionInfo.ALOTHOTFIXVER); //-9
+                fs.WriteInt32(alotVersionInfo.MEUITMVER); //MEUITM version.
+                fs.WriteInt16(alotVersionInfo.ALOTVER); //-12 //ALOT Primary
+                fs.WriteByte(alotVersionInfo.ALOTUPDATEVER); //-10 //ALOT Update
+                fs.WriteByte(alotVersionInfo.ALOTHOTFIXVER); //-9 //Hotfix version (not used)
 
                 //Get versions
                 var versInfo = FileVersionInfo.GetVersionInfo(MainWindow.BINARY_DIRECTORY + "MassEffectModderNoGui.exe");
@@ -392,6 +456,24 @@ namespace AlotAddOnGUI
                 fs.WriteInt16(installerVersionUsed); // -6
                 fs.WriteUInt32(MEMI_TAG); // -4
             }
+        }
+
+
+        public static bool GrantAccess(string fullPath)
+        {
+            try
+            {
+                DirectoryInfo dInfo = new DirectoryInfo(fullPath);
+                DirectorySecurity dSecurity = dInfo.GetAccessControl();
+                dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
+                dInfo.SetAccessControl(dSecurity);
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error granting write access: " + e.Message);
+                return false;
+            }
+            return true;
         }
 
         internal static string GetALOTMarkerFilePath(int gameID)
@@ -471,7 +553,7 @@ namespace AlotAddOnGUI
             return null;
         }
 
-        public static int runProcess(string exe, string args, bool standAlone = false)
+        public static int runProcess(string exe, string args, bool standAlone = false, bool runAsAdmin = false)
         {
             Log.Information("Running process: " + exe + " " + args);
             using (Process p = new Process())
@@ -482,6 +564,10 @@ namespace AlotAddOnGUI
                 p.StartInfo.Arguments = args;
                 p.StartInfo.RedirectStandardOutput = true;
                 p.StartInfo.RedirectStandardError = true;
+                if (runAsAdmin)
+                {
+                    p.StartInfo.Verb = "runas";
+                }
 
                 StringBuilder output = new StringBuilder();
                 StringBuilder error = new StringBuilder();
@@ -550,6 +636,30 @@ namespace AlotAddOnGUI
                 }
             }
         }
+
+        public static int runProcessAsAdmin(string exe, string args, bool standAlone = false)
+        {
+            Log.Information("Running process as admin: " + exe + " " + args);
+            using (Process p = new Process())
+            {
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.FileName = exe;
+                p.StartInfo.UseShellExecute = true;
+                p.StartInfo.Arguments = args;
+                p.StartInfo.Verb = "runas";
+                p.Start();
+                if (!standAlone)
+                {
+                    p.WaitForExit(60000);
+                    return p.ExitCode;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+
         public static Task DeleteAsync(string path)
         {
             if (!File.Exists(path))
@@ -581,14 +691,49 @@ namespace AlotAddOnGUI
             return Task.Run(() => { File.Move(sourceFileName, destFileName); });
         }
 
-        public static void GrantAccess(string fullPath)
+        public static void TurnOffOriginAutoUpdate()
         {
-            DirectoryInfo dInfo = new DirectoryInfo(fullPath);
-            DirectorySecurity dSecurity = dInfo.GetAccessControl();
-            dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.NoPropagateInherit, AccessControlType.Allow));
-            dInfo.SetAccessControl(dSecurity);
-        }
+            Log.Information("Attempting to disable auto update support in Origin");
+            string appdatapath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Origin");
+            if (Directory.Exists(appdatapath))
+            {
+                var appdatafiles = Directory.GetFiles(appdatapath, "local_*.xml");
+                foreach(string configfile in appdatafiles)
+                {
+                    try
+                    {
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.Load(configfile);
 
+                        XmlNode node = xmlDoc.SelectSingleNode("/Settings/Setting[@key='AutoPatch']");
+                        if (node == null)
+                        {
+                            node = xmlDoc.CreateNode("element", "Setting", "");
+                            xmlDoc.SelectSingleNode("/Settings").AppendChild(node);
+                        }
+                        XmlAttribute attr = xmlDoc.CreateAttribute("type");
+                        attr.Value = 1.ToString();
+                        SetAttrSafe(node, attr);
+
+                        attr = xmlDoc.CreateAttribute("value");
+                        attr.Value = "false";
+                        SetAttrSafe(node, attr);
+
+                        attr = xmlDoc.CreateAttribute("key");
+                        attr.Value = "AutoPatch";
+                        SetAttrSafe(node, attr);
+                        xmlDoc.Save(configfile);
+                        Log.Information("Updated file with autopatch off: " + configfile);
+                    } catch (Exception e)
+                    {
+                        Log.Error("Unable to turn off origin in game for file " + configfile + ": " + e.Message);
+                    }
+                }
+            } else
+            {
+                Log.Warning("Origin folder does not exist: " + appdatapath);
+            }
+        }
         public static void TurnOffOriginAutoUpdateForGame(int game)
         {
             Log.Information("Attempting to disable auto update support for game: " + game);
