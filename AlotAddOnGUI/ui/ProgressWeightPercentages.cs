@@ -78,7 +78,7 @@ namespace AlotAddOnGUI.ui
             //if (newProgressValue == 100)
             //    Debug.WriteLine("BREAK");
             stage--; //stages are the display value so they will start at 1.
-            if (stage < 0 || stage > jobWeightList.Count)
+            if (stage < 0 || stage >= jobWeightList.Count)
             {
                 return 0;
             }

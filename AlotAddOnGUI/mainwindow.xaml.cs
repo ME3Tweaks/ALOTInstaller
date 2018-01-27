@@ -1297,8 +1297,6 @@ namespace AlotAddOnGUI
                 await this.ShowMessageAsync("System memory is less than 8 GB", "Building and installing textures uses considerable amounts of memory. Installation will be significantly slower on systems with less than 8 GB for Mass Effect 3, or 6 GB for Mass Effect and Mass Effect 2.");
             }
             Debug.WriteLine("Ram Amount, KB: " + ramAmountKb);
-
-            PerformWriteCheck();
         }
 
         private async void PerformWriteCheck()
@@ -1394,11 +1392,21 @@ namespace AlotAddOnGUI
                 }
             }
 
-            if (isAdmin)
+            //Check if UAC is off
+            bool uacIsOn = true;
+            string softwareKey = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System";
+
+            int? value = (int?)Registry.GetValue(softwareKey, "EnableLUA", null);
+            if (value != null)
+            {
+                uacIsOn = value > 0;
+                Log.Information("UAC is on: " + uacIsOn);
+            }
+            if (isAdmin && uacIsOn)
             {
                 if (args == "")
                 {
-                    Log.Warning("This session does not need admin privileges.");
+                    Log.Warning("This session does not need admin privileges and UAC is on.");
                 }
                 await this.ShowMessageAsync("ALOT Installer should be run as standard user", "Running ALOT Installer as an administrator will disable drag and drop functionality and may cause issues due to the program running in a different user context. You should restart the application without running it as an administrator.");
             }
@@ -2224,7 +2232,7 @@ namespace AlotAddOnGUI
             if (blockDueToMissingALOTFile && manifestHasALOTMainFile)
             {
                 await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + getGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
-                return false;
+                //return false;
             }
 
             if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable)
