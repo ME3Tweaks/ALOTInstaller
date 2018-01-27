@@ -340,7 +340,7 @@ namespace AlotAddOnGUI
                             string destination = EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\\" + Path.GetFileName(fileToUse);
                             if (af.UserFile)
                             {
-                                destination = extractpath + "\\" + af.BuildID + "\\" + Path.GetFileName(fileToUse);
+                                destination = extractpath+ "\\" + Path.GetFileName(fileToUse);
                             }
                             File.Copy(extractSource, destination, true);
 

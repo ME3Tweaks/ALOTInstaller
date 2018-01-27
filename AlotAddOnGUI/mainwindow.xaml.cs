@@ -2232,7 +2232,7 @@ namespace AlotAddOnGUI
             if (blockDueToMissingALOTFile && manifestHasALOTMainFile)
             {
                 await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + getGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
-                //return false;
+                return false;
             }
 
             if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable)
