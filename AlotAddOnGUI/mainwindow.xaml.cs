@@ -595,6 +595,7 @@ namespace AlotAddOnGUI
                     {
                         prefix = "The following mod appears to be installed and is";
                     }
+                    Build_ProgressBar.IsIndeterminate = false;
                     await this.ShowMessageAsync("Incompatible mods detected", prefix + "known to be incompatible with ALOT for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ". Restore your game to an unmodified state, and then install compatible versions of these mods (or do not install them at all)." + badModsStr);
                     PreventFileRefresh = false;
                     break;
@@ -1315,7 +1316,8 @@ namespace AlotAddOnGUI
             List<string> directories = new List<string>();
             if (me1Installed)
             {
-                bool me1Writable = Utilities.IsDirectoryWritable(me1Path);
+                string me1SubPath = Path.Combine(me1Path, @"BioGame\CookedPC\Packages");
+                bool me1Writable = Utilities.IsDirectoryWritable(me1Path) && Utilities.IsDirectoryWritable(me1SubPath);
                 if (!me1Writable)
                 {
                     Log.Information("ME1 not writable: " + me1Path);
@@ -1325,11 +1327,12 @@ namespace AlotAddOnGUI
 
             if (me2Installed)
             {
-                bool me2Writable = Utilities.IsDirectoryWritable(me2Path);
+                string me2SubPath = Path.Combine(me2Path, @"Binaries");
+                bool me2Writable = Utilities.IsDirectoryWritable(me2Path) && Utilities.IsDirectoryWritable(me2SubPath);
                 if (!me2Writable)
                 {
 
-                    Log.Information("ME2 not writable: " + me1Path);
+                    Log.Information("ME2 not writable: " + me2Path);
                     directories.Add(me2Path);
 
                 }
@@ -1337,11 +1340,12 @@ namespace AlotAddOnGUI
 
             if (me3Installed)
             {
-                bool me3Writable = Utilities.IsDirectoryWritable(me3Path);
+                string me3SubPath = Path.Combine(me3Path, @"Binaries");
+                bool me3Writable = Utilities.IsDirectoryWritable(me3Path) && Utilities.IsDirectoryWritable(me3SubPath);
                 if (!me3Writable)
                 {
 
-                    Log.Information("ME3 not writable: " + me1Path);
+                    Log.Information("ME3 not writable: " + me3Path);
                     directories.Add(me3Path);
                 }
             }
