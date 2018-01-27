@@ -652,7 +652,8 @@ namespace AlotAddOnGUI
                 {
                     p.WaitForExit(60000);
                     return p.ExitCode;
-                } else
+                }
+                else
                 {
                     return 0;
                 }
@@ -690,6 +691,49 @@ namespace AlotAddOnGUI
             return Task.Run(() => { File.Move(sourceFileName, destFileName); });
         }
 
+        public static void TurnOffOriginAutoUpdate()
+        {
+            Log.Information("Attempting to disable auto update support in Origin");
+            string appdatapath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Origin");
+            if (Directory.Exists(appdatapath))
+            {
+                var appdatafiles = Directory.GetFiles(appdatapath, "local_*.xml");
+                foreach(string configfile in appdatafiles)
+                {
+                    try
+                    {
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.Load(configfile);
+
+                        XmlNode node = xmlDoc.SelectSingleNode("/Settings/Setting[@key='AutoPatch']");
+                        if (node == null)
+                        {
+                            node = xmlDoc.CreateNode("element", "Setting", "");
+                            xmlDoc.SelectSingleNode("/Settings").AppendChild(node);
+                        }
+                        XmlAttribute attr = xmlDoc.CreateAttribute("type");
+                        attr.Value = 1.ToString();
+                        SetAttrSafe(node, attr);
+
+                        attr = xmlDoc.CreateAttribute("value");
+                        attr.Value = "false";
+                        SetAttrSafe(node, attr);
+
+                        attr = xmlDoc.CreateAttribute("key");
+                        attr.Value = "AutoPatch";
+                        SetAttrSafe(node, attr);
+                        xmlDoc.Save(configfile);
+                        Log.Information("Updated file with autopatch off: " + configfile);
+                    } catch (Exception e)
+                    {
+                        Log.Error("Unable to turn off origin in game for file " + configfile + ": " + e.Message);
+                    }
+                }
+            } else
+            {
+                Log.Warning("Origin folder does not exist: " + appdatapath);
+            }
+        }
         public static void TurnOffOriginAutoUpdateForGame(int game)
         {
             Log.Information("Attempting to disable auto update support for game: " + game);

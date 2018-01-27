@@ -444,7 +444,7 @@
                                 </TextBlock.Effect>
                             </TextBlock>
                         </StackPanel>
-                        <Button x:Name="InstallingOverlay_MusicButton" Margin="10" Grid.Column="0" Grid.Row="1" Height="40" Width="40" Style="{StaticResource MetroCircleButtonStyle}" Click="MusicIcon_Click">
+                        <Button x:Name="InstallingOverlay_MusicButton" Margin="10" Grid.Column="0" Grid.Row="1" Height="40" Width="40" Style="{StaticResource MetroCircleButtonStyle}" ToolTip="Click to toggle music" Click="MusicIcon_Click">
                             <iconPacks:PackIconModern x:Name="MusicButtonIcon" Kind="Sound3" />
                         </Button>
                     </Grid>

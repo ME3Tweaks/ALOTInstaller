@@ -1660,7 +1660,7 @@ namespace AlotAddOnGUI
                     return;
                 }
             }
-            Utilities.TurnOffOriginAutoUpdateForGame(INSTALLING_THREAD_GAME);
+            Utilities.TurnOffOriginAutoUpdate();
 
             //Create/Update Marker File
             short ALOTVersion = 0;
