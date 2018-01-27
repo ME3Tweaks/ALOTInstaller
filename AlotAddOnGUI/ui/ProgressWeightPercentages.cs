@@ -15,12 +15,14 @@ namespace AlotAddOnGUI.ui
         private const double WEIGHT_REMOVE = 0.19155062326;
         private const double WEIGHT_INSTALL = 0.31997680866;
         private const double WEIGHT_SAVE = 0.25787962804;
+        private const double WEIGHT_INSTALLMARKERS = 0.0400000;
 
         public const int JOB_UNPACK = 0;
         public const int JOB_SCAN = 1;
         public const int JOB_REMOVE = 2;
-        public const int JOB_INSTALL = 3;
-        public const int JOB_SAVE = 4;
+        public const int JOB_INSTALLMARKERS = 3;
+        public const int JOB_INSTALL = 4;
+        public const int JOB_SAVE = 5;
 
         private static double TOTAL_ACTIVE_WEIGHT = 0;
         private static List<MutableKeyValuePair<int, double>> jobWeightList = new List<MutableKeyValuePair<int, double>>();
@@ -53,6 +55,10 @@ namespace AlotAddOnGUI.ui
                 case JOB_INSTALL:
                     jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_INSTALL));
                     TOTAL_ACTIVE_WEIGHT += WEIGHT_INSTALL;
+                    break;
+                case JOB_INSTALLMARKERS:
+                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_INSTALLMARKERS));
+                    TOTAL_ACTIVE_WEIGHT += WEIGHT_INSTALLMARKERS;
                     break;
                 case JOB_SAVE:
                     jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_SAVE));

@@ -1435,17 +1435,17 @@ namespace AlotAddOnGUI
             bool RemoveMipMaps = (versionInfo == null); //remove mipmaps only if alot is not installed
             if (INSTALLING_THREAD_GAME == 1)
             {
-                STAGE_COUNT = 4;
+                STAGE_COUNT = 5;
             }
             else if (INSTALLING_THREAD_GAME == 2)
             {
-                STAGE_COUNT = 4;
+                STAGE_COUNT = 5;
             }
             else
             {
                 //me3
                 ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_UNPACK);
-                STAGE_COUNT = 5;
+                STAGE_COUNT = 6;
             }
 
             if (!RemoveMipMaps)
@@ -1456,6 +1456,7 @@ namespace AlotAddOnGUI
             {
                 ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_SCAN);
                 ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_REMOVE);
+                ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_INSTALLMARKERS);
             }
             ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_INSTALL);
             ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_SAVE);
@@ -1555,7 +1556,7 @@ namespace AlotAddOnGUI
             //Scan and remove empty MipMaps
             if (RemoveMipMaps)
             {
-                Log.Information("InstallWorker(): Removing Empty MipMaps");
+                Log.Information("InstallWorker(): Performing texture scan, removing empty mipmaps, adding remaining markers");
 
                 args = "-scan-with-remove " + INSTALLING_THREAD_GAME + " -ipc";
                 runMEM_Install(exe, args, InstallWorker); //output's 2 phase's

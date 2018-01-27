@@ -104,5 +104,11 @@ namespace AlotAddOnGUI
         {
             windowRef.WindowState = WindowState.Minimized;
         }
+
+        internal void SetImportButtonEnabled(bool v)
+        {
+            Button_ImportFromDownloads.IsEnabled = v;
+            Button_ImportFromDownloads.Content = !v ? "Importing..." : "Import from Downloads Folder";
+        }
     }
 }

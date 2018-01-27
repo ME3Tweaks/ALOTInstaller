@@ -689,11 +689,14 @@ namespace AlotAddOnGUI
                     errorOccured = false;
                     break;
             }
-            foreach (AddonFile af in ADDONFILES_TO_BUILD)
+            if (ADDONFILES_TO_BUILD != null)
             {
-                af.ReadyStatusText = null;
-                af.Building = false;
-                af.SetIdle();
+                foreach (AddonFile af in ADDONFILES_TO_BUILD)
+                {
+                    af.ReadyStatusText = null;
+                    af.Building = false;
+                    af.SetIdle();
+                }
             }
             ShowBuildingOnly = false;
             BUILD_ALOT = false;
@@ -2560,12 +2563,14 @@ namespace AlotAddOnGUI
             PreventFileRefresh = true;
             string importingfrom = Path.GetPathRoot(filesToImport[0].Item2);
             string importingto = Path.GetPathRoot(EXE_DIRECTORY);
+            if (DOWNLOAD_ASSISTANT_WINDOW != null)
+            {
+                DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("Importing...");
+                DOWNLOAD_ASSISTANT_WINDOW.SetImportButtonEnabled(false);
+            }
+
             if ((bool)Checkbox_MoveFilesAsImport.IsChecked && importingfrom == importingto)
             {
-                if (DOWNLOAD_ASSISTANT_WINDOW != null)
-                {
-                    DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("Importing...");
-                }
                 ImportWorker = new BackgroundWorker();
                 ImportWorker.DoWork += ImportFilesAsMove;
                 ImportWorker.RunWorkerCompleted += ImportCompleted;
@@ -2637,6 +2642,7 @@ namespace AlotAddOnGUI
                         if (DOWNLOAD_ASSISTANT_WINDOW != null)
                         {
                             DOWNLOAD_ASSISTANT_WINDOW.ShowStatus(importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s were" : " was") + " imported");
+                            DOWNLOAD_ASSISTANT_WINDOW.SetImportButtonEnabled(true);
                         }
                     }
                 };
@@ -2706,6 +2712,10 @@ namespace AlotAddOnGUI
                     }
                 }
                 PreventFileRefresh = false;
+            }
+            if (DOWNLOAD_ASSISTANT_WINDOW != null)
+            {
+                DOWNLOAD_ASSISTANT_WINDOW.SetImportButtonEnabled(true);
             }
         }
 
