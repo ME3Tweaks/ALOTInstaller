@@ -1447,28 +1447,28 @@ namespace AlotAddOnGUI
             bool RemoveMipMaps = (versionInfo == null); //remove mipmaps only if alot is not installed
             if (INSTALLING_THREAD_GAME == 1)
             {
-                STAGE_COUNT = 5;
+                STAGE_COUNT = 4;
             }
             else if (INSTALLING_THREAD_GAME == 2)
             {
-                STAGE_COUNT = 5;
+                STAGE_COUNT = 4;
             }
             else
             {
                 //me3
                 ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_UNPACK);
-                STAGE_COUNT = 6;
+                STAGE_COUNT = 5;
             }
 
             if (!RemoveMipMaps)
             {
-                STAGE_COUNT -= 3; //Scanning, Removing, Marking
+                STAGE_COUNT -= 2; //Scanning, Removing
             }
             else
             {
                 ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_SCAN);
                 ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_REMOVE);
-                ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_INSTALLMARKERS);
+                //ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_INSTALLMARKERS);
             }
             ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_INSTALL);
             ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_SAVE);
@@ -1603,7 +1603,7 @@ namespace AlotAddOnGUI
             {
                 args += " -repack";
             }
-            args += " -ipc -no-markers";
+            args += " -ipc";
             runMEM_Install(exe, args, InstallWorker);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {
