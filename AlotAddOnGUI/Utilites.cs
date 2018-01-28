@@ -413,6 +413,16 @@ namespace AlotAddOnGUI
             return result;
         }
 
+        public static bool InstallIndirectSoundFixForME1()
+        {
+            Log.Information("Installing indirect sound fix  for Mass Effect");
+            string gamePath = GetGamePath(1);
+            gamePath += "\\Binaries\\";
+            System.IO.File.WriteAllBytes(gamePath + "dsound.dll", AlotAddOnGUI.Properties.Resources.dsound);
+            Log.Information("Installed indrectsound for Mass Effect");
+            return true;
+        }
+
         public static bool InstallBinkw32Bypass(int game)
         {
             if (game == 1)

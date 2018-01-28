@@ -253,6 +253,7 @@
     <Resource Include="images\orangedownload.png" />
     <None Include="ALOTADDON.ico" />
     <Resource Include="ALOTInstallerIcon.ico" />
+    <Content Include="binkw32\me1\dsound.dll" />
     <Content Include="binkw32\me2\binkw23.dll" />
     <Content Include="binkw32\me2\binkw32.dll" />
     <Content Include="binkw32\me3\binkw23.dll" />

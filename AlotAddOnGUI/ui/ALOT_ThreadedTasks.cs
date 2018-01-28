@@ -1742,7 +1742,7 @@ namespace AlotAddOnGUI
             //Install IndirectSound fix
             if (INSTALLING_THREAD_GAME == 1)
             {
-                //Utilities.InstallIndirectSoundFixForME1();
+                Utilities.InstallIndirectSoundFixForME1();
             }
 
             //If MAIN alot file is here, move it back to downloaded_mods
