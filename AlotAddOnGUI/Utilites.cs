@@ -22,6 +22,9 @@ namespace AlotAddOnGUI
     public class Utilities
     {
         public const uint MEMI_TAG = 0x494D454D;
+
+        public const int WIN32_EXCEPTION_ELEVATED_CODE = -98763;
+
         [DllImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetPhysicallyInstalledSystemMemory(out long TotalMemoryInKilobytes);
@@ -716,15 +719,23 @@ namespace AlotAddOnGUI
                 p.StartInfo.UseShellExecute = true;
                 p.StartInfo.Arguments = args;
                 p.StartInfo.Verb = "runas";
-                p.Start();
-                if (!standAlone)
+                try
                 {
-                    p.WaitForExit(60000);
-                    return p.ExitCode;
+                    p.Start();
+                    if (!standAlone)
+                    {
+                        p.WaitForExit(60000);
+                        return p.ExitCode;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
                 }
-                else
+                catch (System.ComponentModel.Win32Exception e)
                 {
-                    return 0;
+                    Log.Error("Error running elevated process: " + e.Message);
+                    return WIN32_EXCEPTION_ELEVATED_CODE;
                 }
             }
         }
@@ -911,19 +922,17 @@ namespace AlotAddOnGUI
             return hash.ToString();
         }
 
-        public static void OpenAndSelectFileInExplorer(string filePath)
+        public static bool OpenAndSelectFileInExplorer(string filePath)
         {
-            // suppose that we have a test.txt at E:\
-            if (!File.Exists(filePath))
+            if (!System.IO.File.Exists(filePath))
             {
-                return;
+                return false;
             }
+            //Clean up file path so it can be navigated OK
+            filePath = System.IO.Path.GetFullPath(filePath);
+            System.Diagnostics.Process.Start("explorer.exe", string.Format("/select,\"{0}\"", filePath));
+            return true;
 
-            // combine the arguments together
-            // it doesn't matter if there is a space after ','
-            string argument = "/select, \"" + filePath + "\"";
-
-            System.Diagnostics.Process.Start("explorer.exe", argument);
         }
 
         public static bool IsWindowOpen<T>(string name = "") where T : Window

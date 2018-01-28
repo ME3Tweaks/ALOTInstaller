@@ -199,11 +199,21 @@ namespace AlotAddOnGUI.ui
             }
             else if (e.Result != null)
             {
-                Clipboard.SetText((string)e.Result);
-                DiagnosticHeader.Text = "Diagnostic completed.\nLink to the result has been copied to the clipboard.";
-                System.Diagnostics.Process.Start((string)e.Result);
-                Image_Upload.Source = new BitmapImage(new Uri(@"../images/greencheckmark.png", UriKind.Relative));
+                Uri uriResult;
+                bool result = Uri.TryCreate((string)e.Result, UriKind.Absolute, out uriResult)
+                    && uriResult.Scheme == Uri.UriSchemeHttp;
+                if (result)
+                {
+                    Clipboard.SetText((string)e.Result);
+                    DiagnosticHeader.Text = "Diagnostic completed.\nLink to the result has been copied to the clipboard.";
+                    System.Diagnostics.Process.Start((string)e.Result);
+                    Image_Upload.Source = new BitmapImage(new Uri(@"../images/greencheckmark.png", UriKind.Relative));
+                }
+                else
+                {
+                    Image_Upload.Source = new BitmapImage(new Uri(@"../images/redx_large.png", UriKind.Relative));
 
+                }
             }
             else
             {
@@ -296,8 +306,10 @@ namespace AlotAddOnGUI.ui
                     addDiagLine("MEM returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
                 }
             }
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
 
 
+            //FULL CHECK
             if (TextureCheck)
             {
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_FullCheck));
@@ -329,33 +341,6 @@ namespace AlotAddOnGUI.ui
                 }
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_OFF_TASKBAR_PROGRESS));
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_FullCheck));
-            }
-            else
-            {
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
-                args = "-quick-detect-empty-mipmaps " + DIAGNOSTICS_GAME + " -ipc";
-                runMEM_Diagnostics(exe, args, diagnosticsWorker);
-                WaitForMEM();
-                if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
-                {
-                    addDiagLine("Quick detect empty mipmaps reported errors:");
-                    foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
-                    {
-                        addDiagLine(" - " + str);
-                    }
-                }
-                else
-                {
-                    if (BACKGROUND_MEM_PROCESS.ExitCode != null && BACKGROUND_MEM_PROCESS.ExitCode == 0)
-                    {
-                        addDiagLine("Diagnostics empty mipmap check (quick) did not find any empty mipmaps. This test is not thorough and is meant for quickly accessing a game folder rather than each file.");
-                    }
-                    else
-                    {
-                        addDiagLine("MEM returned non zero exit code, or null (crash) during -quick-detect-empty-mipmaps: " + BACKGROUND_MEM_PROCESS.ExitCode);
-                    }
-                }
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
             }
             args = "-detect-mods " + DIAGNOSTICS_GAME + " -ipc";
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataBasegamemods));

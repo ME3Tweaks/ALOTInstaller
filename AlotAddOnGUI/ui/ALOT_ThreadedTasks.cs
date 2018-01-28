@@ -1567,7 +1567,7 @@ namespace AlotAddOnGUI
                 //Interlocked.Increment(ref INSTALL_STAGE);
                 //InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
             }
-            
+
             //Scan and remove empty MipMaps
             if (RemoveMipMaps)
             {
@@ -1622,10 +1622,10 @@ namespace AlotAddOnGUI
             Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
             ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
             InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
-            
+
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
-            
+
 
             //Apply LOD
             CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
@@ -2156,6 +2156,11 @@ namespace AlotAddOnGUI
                 {
                     Log.Information("Elevated process returned code 0, restore directory is hopefully writable now.");
                 }
+                else if (result == Utilities.WIN32_EXCEPTION_ELEVATED_CODE)
+                {
+                    e.Result = false;
+                    return;
+                }
                 else
                 {
                     Log.Error("Elevated process returned code " + result + ", directory likely is not writable");
@@ -2173,7 +2178,8 @@ namespace AlotAddOnGUI
             if (BACKUP_THREAD_GAME == 3)
             {
                 //Check for cmmvanilla file and remove it present
-                string file = gamePath + "cmm_vanilla";
+
+                string file = gamePath + "\\cmm_vanilla";
                 if (File.Exists(file))
                 {
                     File.Delete(file);

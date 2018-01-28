@@ -28,7 +28,7 @@ namespace PermissionsGranter
 
             string username = args[0];
             bool isFolderCreate = false;
-            bool isRegistryKeyCreate = true;
+            bool isRegistryKeyCreate = false;
             foreach (string folder in args.Where((source, index) => index != 0).ToArray())
             {
                 if (folder.ToLower() == "-create-directory")
