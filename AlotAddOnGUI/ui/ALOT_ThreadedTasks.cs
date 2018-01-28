@@ -34,6 +34,7 @@ namespace AlotAddOnGUI
         private List<AddonFile> ADDONFILES_TO_INSTALL;
         public const string UPDATE_TASK_PROGRESS = "UPDATE_TASK_PROGRESS";
         public const string UPDATE_OVERALL_TASK = "UPDATE_OVERALL_TASK";
+        public const string SHOW_ORIGIN_FLYOUT = "SHOW_ORIGIN_FLYOUT";
         private const int INSTALL_OK = 1;
         private const int RESULT_ME1LAA_FAILED = -43;
         private const int RESULT_TEXTUREINSTALL_FAILED = -42;
@@ -1240,11 +1241,13 @@ namespace AlotAddOnGUI
                         MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.SoundMute;
                         waveOut.Pause();
                     }
-                } else
+                }
+                else
                 {
                     InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
                 }
-            } else
+            }
+            else
             {
                 InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
             }
@@ -1564,7 +1567,7 @@ namespace AlotAddOnGUI
                 //Interlocked.Increment(ref INSTALL_STAGE);
                 //InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
             }
-
+            
             //Scan and remove empty MipMaps
             if (RemoveMipMaps)
             {
@@ -1619,10 +1622,10 @@ namespace AlotAddOnGUI
             Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
             ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
             InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
-
+            
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
-
+            
 
             //Apply LOD
             CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
@@ -1656,7 +1659,7 @@ namespace AlotAddOnGUI
             if (INSTALLING_THREAD_GAME == 1)
             {
                 //Apply ME1 LAA
-                CurrentTask = "Making Mass Effect Large Address Aware";
+                CurrentTask = "Installing fixes for Mass Effect";
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, CurrentTask));
 
                 args = "-apply-me1-laa";
@@ -1668,10 +1671,11 @@ namespace AlotAddOnGUI
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0)
                 {
-                    Log.Error("Error setting ME1 to large address aware: " + processResult);
+                    Log.Error("Error setting ME1 to large address aware/bootable without admin: " + processResult);
                     e.Result = RESULT_ME1LAA_FAILED;
                     return;
                 }
+                Utilities.RemoveRunAsAdminXPSP3FromME1();
             }
             Utilities.TurnOffOriginAutoUpdate();
 
@@ -1798,7 +1802,16 @@ namespace AlotAddOnGUI
             }
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, taskString));
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, "has completed"));
-
+            if (INSTALLING_THREAD_GAME == 1 || INSTALLING_THREAD_GAME == 2)
+            {
+                //Check if origin
+                string originTouchupFile = Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\__Installer\\Touchup.exe";
+                if (File.Exists(originTouchupFile))
+                {
+                    //origin based
+                    InstallWorker.ReportProgress(0, new ThreadCommand(SHOW_ORIGIN_FLYOUT, INSTALLING_THREAD_GAME));
+                }
+            }
             e.Result = INSTALL_OK;
         }
 
@@ -1867,6 +1880,11 @@ namespace AlotAddOnGUI
                 case HIDE_STAGE_LABEL:
                     InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Collapsed;
                     InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Collapsed;
+                    break;
+                case SHOW_ORIGIN_FLYOUT:
+                    var uriSource = new Uri(@"images/origin/me" + tc.Data + "update.png", UriKind.Relative);
+                    OriginWarning_Image.Source = new BitmapImage(uriSource);
+                    OriginWarningFlyout.IsOpen = true;
                     break;
                 case UPDATE_OVERALL_TASK:
                     InstallingOverlay_TopLabel.Text = (string)tc.Data;

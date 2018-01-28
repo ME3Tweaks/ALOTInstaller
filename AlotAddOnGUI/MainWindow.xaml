@@ -329,6 +329,8 @@
 
                                 <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mass Effect Wiki" ToolTip="This program uses content from the Mass Effect wiki at FANDOM and is licensed under the Creative Commons Attribution-Share Alike License." HorizontalAlignment="Left"/>
                                 <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="ME3Tweaks" ToolTip="Powers the log uploading service to Pastebin" HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Erik JS" ToolTip="Developer of binkw32 ASI plugins for ME2 and ME3" HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="John-Paul Ownby " ToolTip="Developer of IndirectSound. Used to fix audio bugs in Mass Effect" HorizontalAlignment="Left"/>
 
                             </StackPanel>
                         </Expander>
@@ -496,6 +498,61 @@
                         </Button>
                     </StackPanel>
                 </StackPanel>
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="OriginWarningFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Left" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
+                <Border x:Name="OriginWarningFlyout_Border" Background="#1e262c" >
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Image x:Name="OriginWarning_Image"  Source="images/origin/me1update.png" Stretch="None"/>
+                        <TextBlock Foreground="#c3c6ce" TextAlignment="Center" FontSize="16" Text="When running the game, you may see this prompt in Origin when you start the game.&#x0a;Never press update or check the box; it will ruin your installation."/>
+                        <Button Content="Got it" Click="OriginWarning_Button_Click" HorizontalAlignment="Center" Margin="5" Padding="20,5,20,5">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="Background" Value="#f56c2d" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="FontSize" Value="{DynamicResource FlatButtonFontSize}" />
+                                    <Setter Property="Foreground" Value="White" />
+                                    <Setter Property="Padding" Value="10 5 10 5" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type Button}" xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro">
+                                                <Border x:Name="Border"
+                            Margin="0"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                                    <Controls:ContentControlEx x:Name="PART_ContentPresenter"
+                                                   Padding="{TemplateBinding Padding}"
+                                                   HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                   VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                   Content="{TemplateBinding Content}"
+                                                   ContentCharacterCasing="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(Controls:ControlsHelper.ContentCharacterCasing)}"
+                                                   ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                   ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                                   RecognizesAccessKey="True"
+                                                   SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#c85e36" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource FlatButtonPressedBackgroundBrush}" />
+                                            <Setter Property="Foreground" Value="{DynamicResource FlatButtonPressedForegroundBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource GrayBrush2}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Border>
             </Controls:Flyout>
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>

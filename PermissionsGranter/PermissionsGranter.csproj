@@ -54,6 +54,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y "$(TargetPath)" "$(SolutionDir)AlotAddonGUI\Data\bin\$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>echo copy /Y "$(TargetPath)" "$(SolutionDir)AlotAddonGUI\Data\bin\$(TargetFileName)"
+copy /Y "$(TargetPath)" "$(SolutionDir)AlotAddonGUI\Data\bin\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

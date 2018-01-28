@@ -423,6 +423,56 @@ namespace AlotAddOnGUI
             return true;
         }
 
+        public static void RemoveRunAsAdminXPSP3FromME1()
+        {
+            string gamePath = GetGamePath(1);
+            gamePath += "\\Binaries\\MassEffect.exe";
+            var compatKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", true);
+            string compatString = (string)compatKey.GetValue(gamePath, null);
+            if (compatString != null) //has compat setting
+            {
+                string[] compatsettings = compatString.Split(' ');
+                List<string> newSettings = new List<string>();
+
+                foreach (string str in compatsettings)
+                {
+                    switch (str)
+                    {
+                        case "~":
+                        case "RUNASADMIN":
+                        case "WINXPSP3":
+                            continue;
+                        default:
+                            newSettings.Add(str);
+                            break;
+                    }
+                }
+
+                if (newSettings.Count > 0)
+                {
+                    string newcompatString = "~";
+                    foreach (string compatitem in newSettings)
+                    {
+                        newcompatString += " " + compatitem;
+                    }
+                    if (newcompatString == compatString)
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        compatKey.SetValue(gamePath, newcompatString);
+                        Log.Information("New stripped compatibility string: " + newcompatString);
+                    }
+                }
+                else
+                {
+                    compatKey.DeleteValue(gamePath);
+                    Log.Information("Removed compatibility settings for ME1.");
+                }
+            }
+        }
+
         public static bool InstallBinkw32Bypass(int game)
         {
             if (game == 1)

@@ -21,6 +21,7 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -134,6 +135,7 @@ namespace AlotAddOnGUI
         private string MANIFEST_BUNDLED_LOC = EXE_DIRECTORY + @"Data\\manifest-bundled.xml";
         private List<string> COPY_QUEUE = new List<string>();
         private List<string> MOVE_QUEUE = new List<string>();
+        private bool INSTALLED_GAME_IS_ORIGIN_BASED = false;
 
         public bool ShowME1Files
         {
@@ -1311,7 +1313,9 @@ namespace AlotAddOnGUI
             me1Installed = (me1Path != null && Directory.Exists(me1Path));
             me2Installed = (me2Path != null && Directory.Exists(me2Path));
             me3Installed = (me3Path != null && Directory.Exists(me3Path));
+            Utilities.RemoveRunAsAdminXPSP3FromME1();
 
+            bool me1AGEIAKeyNotWritable = false;
             string args = "";
             List<string> directories = new List<string>();
             if (me1Installed)
@@ -1322,6 +1326,23 @@ namespace AlotAddOnGUI
                 {
                     Log.Information("ME1 not writable: " + me1Path);
                     directories.Add(me1Path);
+                }
+                try
+                {
+                    var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\AGEIA Technologies", true);
+                    if (key != null)
+                    {
+                        key.Close();
+                    }
+                    else
+                    {
+                        Log.Information("ME1 AGEIA Technologies key is not present or is not writable.");
+                        me1AGEIAKeyNotWritable = true;
+                    }
+                } catch (SecurityException)
+                {
+                    Log.Information("ME1 AGEIA Technologies key is not writable.");
+                    me1AGEIAKeyNotWritable = true;
                 }
             }
 
@@ -1350,7 +1371,7 @@ namespace AlotAddOnGUI
                 }
             }
 
-            if (directories.Count() > 0)
+            if (directories.Count() > 0 || me1AGEIAKeyNotWritable)
             {
                 foreach (String str in directories)
                 {
@@ -1359,6 +1380,11 @@ namespace AlotAddOnGUI
                         args += " ";
                     }
                     args += "\"" + str + "\"";
+                }
+
+                if (me1AGEIAKeyNotWritable)
+                {
+                    args += "-create-hklm-reg-key \"SOFTWARE\\WOW6432Node\\AGEIA Technologies\"";
                 }
                 args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" " + args;
                 //need to run write permissions program
@@ -1377,10 +1403,14 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    string message = "Some game folders are not writeable by your user account. ALOT Installer will attempt to grant access to these folders with the PermissionsGranter.exe program:\n";
+                    string message = "Some game folders/registry keys are not writeable by your user account. ALOT Installer will attempt to grant access to these folders/registry with the PermissionsGranter.exe program:\n";
                     foreach (String str in directories)
                     {
                         message += "\n" + str;
+                    }
+                    if (me1AGEIAKeyNotWritable)
+                    {
+                        message += "\nRegistry: HKLM\\SOFTWARE\\WOW6432Node\\AGEIA Technologies (Fixes an ME1 launch issue)";
                     }
                     await this.ShowMessageAsync("Granting permissions to Mass Effect directories", message);
                     string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
@@ -2615,7 +2645,7 @@ namespace AlotAddOnGUI
                     long currentBytes = preDownloadStartBytes;
                     currentBytes += e.BytesReceived;
                     double progress = (((double)currentBytes / totalBytes));
-                    int taskbarprogress = (int) ((currentBytes * 100 / totalBytes));
+                    int taskbarprogress = (int)((currentBytes * 100 / totalBytes));
 
                     TaskbarManager.Instance.SetProgressValue(taskbarprogress, 100);
 
@@ -3428,6 +3458,11 @@ namespace AlotAddOnGUI
                     }
                     break;
             }
+        }
+
+        private void OriginWarning_Button_Click(object sender, RoutedEventArgs e)
+        {
+            OriginWarningFlyout.IsOpen = false;
         }
     }
 }
