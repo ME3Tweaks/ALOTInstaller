@@ -235,6 +235,7 @@
     <Content Include="7z\7z.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="licenses\IndirectSound.txt" />
     <Resource Include="images\me2_bg_alt.jpg" />
     <None Include="Data\bin\PermissionsGranter.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
