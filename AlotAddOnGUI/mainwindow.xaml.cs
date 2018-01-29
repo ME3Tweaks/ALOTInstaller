@@ -463,6 +463,7 @@ namespace AlotAddOnGUI
                     {
                         //up to date
                         Log.Information("No updates for MEM NO Gui are available");
+                        PerformPostStartup();
                     }
                 }
             }
@@ -470,7 +471,17 @@ namespace AlotAddOnGUI
             {
                 Log.Error("Error checking for MEMNOGUI update: " + e.Message);
                 ShowStatus("Error checking for MEM (NOGUI) update");
+                PerformPostStartup();
             }
+        }
+
+        private void PerformPostStartup()
+        {
+            EnsureOneGameIsInstalled();
+            PerformRAMCheck();
+            PerformWriteCheck();
+            UpdateALOTStatus();
+            RunMEMUpdaterGUI();
         }
 
         private void MEMNoGuiUpdateCanceled(object sender, EventArgs e)
@@ -549,6 +560,7 @@ namespace AlotAddOnGUI
             var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
             int fileVersion = versInfo.FileMajorPart;
             Label_MEMVersion.Content = "MEM Cmd Version: " + fileVersion;
+            PerformPostStartup();
         }
 
         private void UnzipMEMGUIUpdate(object sender, AsyncCompletedEventArgs e)
@@ -895,7 +907,33 @@ namespace AlotAddOnGUI
             if (hasWriteAccess) RunApplicationUpdater2();
         }
 
-        private async void SetupButtons()
+        private async void EnsureOneGameIsInstalled()
+        {
+            string me1Path = Utilities.GetGamePath(1);
+            string me2Path = Utilities.GetGamePath(2);
+            string me3Path = Utilities.GetGamePath(3);
+
+            //int installedGames = 5;
+            me1Installed = (me1Path != null);
+            me2Installed = (me2Path != null);
+            me3Installed = (me3Path != null);
+
+            Log.Information("ME1 Installed: " + me1Installed);
+            Log.Information("ME2 Installed: " + me2Installed);
+            Log.Information("ME3 Installed: " + me3Installed);
+
+            if (!me1Installed && !me2Installed && !me3Installed)
+            {
+                Log.Error("No trilogy games are installed. App won't be able to do anything");
+                await this.ShowMessageAsync("None of the Mass Effect Trilogy games are installed", "ALOT Installer requires at least one of the trilogy games to be installed before you can use it.");
+                Log.Error("Exiting due to no games installed");
+
+                Environment.Exit(1);
+            }
+            Log.Information("At least one game is installed");
+        }
+
+        private void SetupButtons()
         {
             string me1Path = Utilities.GetGamePath(1);
             string me2Path = Utilities.GetGamePath(2);
@@ -932,16 +970,8 @@ namespace AlotAddOnGUI
                     BuildWorker.RunWorkerCompleted += BuildCompleted;
                     BuildWorker.WorkerReportsProgress = true;
                 }
-
                 Button_DownloadAssistant.IsEnabled = true;
-
                 SetBottomButtonAvailability();
-            }
-            else
-            {
-                Log.Error("No trilogy games are installed. Can't build an addon. Shutting down...");
-                await this.ShowMessageAsync("None of the Mass Effect Trilogy games are installed", "ALOT Installer requires at least one of the trilogy games to be installed before you can use it.");
-                Environment.Exit(1);
             }
         }
 
@@ -1235,12 +1265,7 @@ namespace AlotAddOnGUI
             }
             else
             {
-
-                PerformRAMCheck();
                 RunMEMUpdater2();
-                UpdateALOTStatus();
-                RunMEMUpdaterGUI();
-                PerformWriteCheck();
             }
         }
 
@@ -1339,7 +1364,8 @@ namespace AlotAddOnGUI
                         Log.Information("ME1 AGEIA Technologies key is not present or is not writable.");
                         me1AGEIAKeyNotWritable = true;
                     }
-                } catch (SecurityException)
+                }
+                catch (SecurityException)
                 {
                     Log.Information("ME1 AGEIA Technologies key is not writable.");
                     me1AGEIAKeyNotWritable = true;
@@ -2700,6 +2726,13 @@ namespace AlotAddOnGUI
             }
         }
 
+        private void RemoveItemCommand(string item)
+        {
+            //if (!string.IsNullOrEmpty(item))
+            //  MyItems.Remove(item);
+
+        }
+
         private void ImportFilesAsMove(object sender, DoWorkEventArgs e)
         {
             List<Tuple<AddonFile, string, string>> filesToImport = (List<Tuple<AddonFile, string, string>>)e.Argument;
@@ -3118,10 +3151,15 @@ namespace AlotAddOnGUI
             FirstRunFlyout.IsOpen = false;
             SettingsFlyout.IsOpen = true;
             RunMEMUpdater2();
-            UpdateALOTStatus();
-            RunMEMUpdaterGUI();
-            PerformWriteCheck();
+
+            //PerformPostStartup();
+            //EnsureOneGameIsInstalled();
+            //PerformRAMCheck();
+            //UpdateALOTStatus();
+            //RunMEMUpdaterGUI();
+            //PerformWriteCheck();
         }
+        
 
         private void Button_ManualFileME1_Click(object sender, RoutedEventArgs e)
         {

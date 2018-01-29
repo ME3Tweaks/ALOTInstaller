@@ -431,47 +431,49 @@ namespace AlotAddOnGUI
             string gamePath = GetGamePath(1);
             gamePath += "\\Binaries\\MassEffect.exe";
             var compatKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", true);
+            if (compatKey != null) { 
             string compatString = (string)compatKey.GetValue(gamePath, null);
-            if (compatString != null) //has compat setting
-            {
-                string[] compatsettings = compatString.Split(' ');
-                List<string> newSettings = new List<string>();
-
-                foreach (string str in compatsettings)
+                if (compatString != null) //has compat setting
                 {
-                    switch (str)
-                    {
-                        case "~":
-                        case "RUNASADMIN":
-                        case "WINXPSP3":
-                            continue;
-                        default:
-                            newSettings.Add(str);
-                            break;
-                    }
-                }
+                    string[] compatsettings = compatString.Split(' ');
+                    List<string> newSettings = new List<string>();
 
-                if (newSettings.Count > 0)
-                {
-                    string newcompatString = "~";
-                    foreach (string compatitem in newSettings)
+                    foreach (string str in compatsettings)
                     {
-                        newcompatString += " " + compatitem;
+                        switch (str)
+                        {
+                            case "~":
+                            case "RUNASADMIN":
+                            case "WINXPSP3":
+                                continue;
+                            default:
+                                newSettings.Add(str);
+                                break;
+                        }
                     }
-                    if (newcompatString == compatString)
+
+                    if (newSettings.Count > 0)
                     {
-                        return;
+                        string newcompatString = "~";
+                        foreach (string compatitem in newSettings)
+                        {
+                            newcompatString += " " + compatitem;
+                        }
+                        if (newcompatString == compatString)
+                        {
+                            return;
+                        }
+                        else
+                        {
+                            compatKey.SetValue(gamePath, newcompatString);
+                            Log.Information("New stripped compatibility string: " + newcompatString);
+                        }
                     }
                     else
                     {
-                        compatKey.SetValue(gamePath, newcompatString);
-                        Log.Information("New stripped compatibility string: " + newcompatString);
+                        compatKey.DeleteValue(gamePath);
+                        Log.Information("Removed compatibility settings for ME1.");
                     }
-                }
-                else
-                {
-                    compatKey.DeleteValue(gamePath);
-                    Log.Information("Removed compatibility settings for ME1.");
                 }
             }
         }
