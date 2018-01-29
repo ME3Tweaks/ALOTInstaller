@@ -43,6 +43,7 @@ namespace AlotAddOnGUI.ui
         BackgroundWorker diagnosticsWorker;
         private StringBuilder diagStringBuilder;
         private int Context = CONTEXT_NORMAL;
+        private bool MEMI_FOUND = true;
 
         public DiagnosticsWindow()
         {
@@ -211,8 +212,8 @@ namespace AlotAddOnGUI.ui
                 }
                 else
                 {
+                    DiagnosticHeader.Text = (string)e.Result;
                     Image_Upload.Source = new BitmapImage(new Uri(@"../images/redx_large.png", UriKind.Relative));
-
                 }
             }
             else
@@ -227,6 +228,10 @@ namespace AlotAddOnGUI.ui
             diagStringBuilder = new StringBuilder();
             addDiagLine("ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version + " Game Diagnostic");
             addDiagLine("Diagnostic for Mass Effect " + DIAGNOSTICS_GAME);
+            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
+            int fileVersion = versInfo.FileMajorPart;
+            addDiagLine("Using MassEffectModderNoGui v" + fileVersion);
+
             addDiagLine("Game is installed at " + Utilities.GetGamePath(DIAGNOSTICS_GAME));
             string exePath = Utilities.GetGameEXEPath(DIAGNOSTICS_GAME);
             if (File.Exists(exePath))
@@ -248,6 +253,7 @@ namespace AlotAddOnGUI.ui
             if (avi == null)
             {
                 addDiagLine("ALOT Marker file does not have MEMI tag. ALOT/MEUITM not installed, or at least not installed through an installer.");
+                MEMI_FOUND = false;
             }
             else
             {
@@ -269,7 +275,7 @@ namespace AlotAddOnGUI.ui
 
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
-                addDiagLine("Diagnostic reports errors from -check-game-data-mismatch:");
+                addDiagLine("Diagnostic reports some files appear to have been added or removed since texture scan took place:");
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
                     addDiagLine(" - " + str);
@@ -277,7 +283,7 @@ namespace AlotAddOnGUI.ui
             }
             else
             {
-                addDiagLine("Diagnostic reports no errors from -check-game-data-mismatch.");
+                addDiagLine("Diagnostic reports no files appear to have been added or removed since texture scan took place.");
             }
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataMismatch));
 
@@ -285,11 +291,11 @@ namespace AlotAddOnGUI.ui
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
             WaitForMEM();
-            addDiagLine("\n===Vanilla textures scan (after textures were installed)===");
+            addDiagLine("\n===Replaced files scan (after textures were installed)===");
 
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
-                addDiagLine("Diagnostic reports vanilla files appear to still exist in game after textures installation:");
+                addDiagLine("Diagnostic reports some files appear to have been replaced after textures were installed:");
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
                     addDiagLine(" - " + str);
@@ -299,7 +305,7 @@ namespace AlotAddOnGUI.ui
             {
                 if (BACKGROUND_MEM_PROCESS.ExitCode != null && BACKGROUND_MEM_PROCESS.ExitCode == 0)
                 {
-                    addDiagLine("Diagnostic reports no errors from -check-game-data-after.");
+                    addDiagLine("Diagnostic reports no files appear to have been replaced after textures were installed.");
                 }
                 else
                 {
@@ -573,7 +579,10 @@ namespace AlotAddOnGUI.ui
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was added after textures scan: " + param);
                                 break;
                             case "ERROR_VANILLA_MOD_FILE":
-                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: Vanilla-based file was found after textures were installed: " + param);
+                                if (MEMI_FOUND)
+                                {
+                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File missing MEM/MEMNOGUI marker was found: " + param);
+                                }
                                 break;
                             case "MOD":
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("Detected mod: " + param);
