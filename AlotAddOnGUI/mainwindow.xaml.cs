@@ -873,12 +873,12 @@ namespace AlotAddOnGUI
                     {
                         af.Staged = false;
                     }
-                    numdone += ready ? 1 : 0;
+                    numdone += ready && !af.Optional ? 1 : 0;
                     System.Windows.Application.Current.Dispatcher.Invoke(
                     () =>
                     {
                         // Code to run on the GUI thread.
-                        Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Count) * 100);
+                        Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Where(p => !p.Optional).Count()) * 100);
                         string tickerText = "";
                         tickerText += ShowME1Files ? "ME1: " + numME1FilesReady + "/" + numME1Files + " imported" : "ME1: N/A";
                         tickerText += " - ";
@@ -1665,6 +1665,7 @@ namespace AlotAddOnGUI
                             select new AddonFile
                             {
                                 Showing = false,
+                                Enabled = true,
                                 FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
                                 MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
                                 ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
@@ -1810,7 +1811,7 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    if (!af.Ready && ShowReadyFilesOnly)
+                    if ((!af.Ready || !af.Enabled )&& ShowReadyFilesOnly)
                     { continue; }
                     bool shouldDisplay = ((af.Game_ME1 && ShowME1Files) || (af.Game_ME2 && ShowME2Files) || (af.Game_ME3 && ShowME3Files));
                     if (shouldDisplay)
@@ -1820,8 +1821,8 @@ namespace AlotAddOnGUI
                 }
             }
             addonfiles = newList;
-            lvUsers.ItemsSource = addonfiles;
-            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(lvUsers.ItemsSource);
+            ListView_Files.ItemsSource = addonfiles;
+            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(ListView_Files.ItemsSource);
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
             view.GroupDescriptions.Add(groupDescription);
             CheckImportLibrary_Tick(null, null);
@@ -1913,13 +1914,19 @@ namespace AlotAddOnGUI
             int installingALOTver = 0;
 
             bool blockALOTInstallDueToMainVersionDiff = false;
+            bool hasAddonFile = false;
             foreach (AddonFile af in addonfiles)
             {
+                if (!af.Enabled)
+                {
+                    continue;
+                }
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
                     if (af.UserFile && af.Ready)
                     {
                         hasApplicableUserFile = true;
+                        continue;
                     }
                     if (installedInfo != null && installedInfo.ALOTVER != 0 && af.ALOTVersion > installedInfo.ALOTVER)
                     {
@@ -1936,12 +1943,16 @@ namespace AlotAddOnGUI
                         {
                             checkAlotBox = true;
                         }
+                        continue;
                     }
+                    hasAddonFile = true;
                 }
             }
 
             Checkbox_BuildOptionALOT.IsChecked = checkAlotBox;
             Checkbox_BuildOptionALOT.IsEnabled = !checkAlotBox && alotavailalbleforinstall;
+
+            Checkbox_BuildOptionAddon.IsEnabled = hasAddonFile;
 
             Checkbox_BuildOptionUser.IsChecked = hasApplicableUserFile;
             Checkbox_BuildOptionUser.IsEnabled = hasApplicableUserFile;
@@ -2274,7 +2285,7 @@ namespace AlotAddOnGUI
                     }
                     else
                     {
-                        if (af.Ready)
+                        if (af.Ready && af.Enabled)
                         {
                             FileInfo fi = new FileInfo(af.GetFile());
                             if (!af.IsCurrentlySingleFile() && af.FileSize > 0 && af.FileSize != fi.Length)
@@ -2726,26 +2737,7 @@ namespace AlotAddOnGUI
             }
         }
 
-        private ICommand _removeItemCommand;
 
-        public ICommand RemoveItemCommand
-        {
-            get
-            {
-                if (_removeItemCommand == null)
-                {
-                    _removeItemCommand = new RelayCommand(
-                        param => this.DisableAddonFile()
-                    );
-                }
-                return _removeItemCommand;
-            }
-        }
-
-        private void DisableAddonFile()
-        {
-            Debug.WriteLine("hi");
-        }
 
         private void ImportFilesAsMove(object sender, DoWorkEventArgs e)
         {
@@ -2844,7 +2836,7 @@ namespace AlotAddOnGUI
         {
             try
             {
-                using (var file = File.Create("write_permissions_test")) { } ;
+                using (var file = File.Create("write_permissions_test")) { };
                 File.Delete("write_permissions_test");
                 return true;
             }
@@ -2912,9 +2904,23 @@ namespace AlotAddOnGUI
 
         private void Button_ReportIssue_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://discord.gg/w4Smese");
+            openWebPage("https://discord.gg/w4Smese");
         }
 
+        public static void openWebPage(string link)
+        {
+            try
+            {
+                Log.Information("Opening URL: " + link);
+                System.Diagnostics.Process.Start(link);
+            }
+            catch (Exception other)
+            {
+                Log.Error("Exception opening browser - handled. The error was " + other.Message);
+                System.Windows.Clipboard.SetText(link);
+                //await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar.");
+            }
+        }
 
         private void RestoreGame(int game)
         {
@@ -3091,14 +3097,6 @@ namespace AlotAddOnGUI
 
         }
 
-        private void ContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            System.Windows.Controls.ListView source = e.Source as System.Windows.Controls.ListView;
-            var selectedItem = source.SelectedItem;
-            var originalSource = e.OriginalSource;
-            var items = source.Items;
-        }
-
         private void Button_InstallerLOD4k_Click(object sender, RoutedEventArgs e)
         {
             LODLIMIT = 4;
@@ -3174,7 +3172,7 @@ namespace AlotAddOnGUI
             //RunMEMUpdaterGUI();
             //PerformWriteCheck();
         }
-        
+
 
         private void Button_ManualFileME1_Click(object sender, RoutedEventArgs e)
         {
@@ -3197,6 +3195,7 @@ namespace AlotAddOnGUI
                     af.Game_ME3 = true;
                     break;
             }
+            af.Enabled = true;
             af.UserFile = true;
             af.DownloadLink = "http://example.com";
             af.Author = "User Supplied Files (ME" + game + ")";
@@ -3516,6 +3515,80 @@ namespace AlotAddOnGUI
         private void OriginWarning_Button_Click(object sender, RoutedEventArgs e)
         {
             OriginWarningFlyout.IsOpen = false;
+        }
+
+        private void ListView_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            var rowIndex = ListView_Files.SelectedIndex;
+            var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
+            System.Windows.Controls.ContextMenu cm = row.ContextMenu;
+            AddonFile af = (AddonFile)row.DataContext;
+
+            //Reset
+            foreach (System.Windows.Controls.MenuItem mi in cm.Items)
+            {
+                mi.Visibility = Visibility.Visible;
+            }
+
+            int i = 0;
+            while (i < cm.Items.Count)
+            {
+                System.Windows.Controls.MenuItem mi = (System.Windows.Controls.MenuItem)cm.Items[i];
+                switch (i)
+                {
+                    case 0: //Visit download
+                        if (af.UserFile)
+                        {
+                            mi.Visibility = Visibility.Collapsed;
+
+                        }
+                        break;
+                    case 1: //Toggle on/off
+                        if (af.ALOTVersion > 0 || !af.Ready)
+                        {
+                            mi.Visibility = Visibility.Collapsed;
+                            break;
+                        }
+                        if (af.Enabled)
+                        {
+                            mi.Header = "Disable file";
+                        }
+                        else
+                        {
+                            mi.Header = "Enable file";
+                        }
+                        break;
+                }
+                i++;
+            }
+        }
+
+        private void ContextMenu_OpenDownloadPage(object sender, RoutedEventArgs e)
+        {
+            var rowIndex = ListView_Files.SelectedIndex;
+            var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
+            AddonFile af = (AddonFile)row.DataContext;
+            openWebPage(af.DownloadLink);
+        }
+
+        private void ContextMenu_ToggleFile(object sender, RoutedEventArgs e)
+        {
+            var rowIndex = ListView_Files.SelectedIndex;
+            var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
+            AddonFile af = (AddonFile)row.DataContext;
+
+            if (af.Ready)
+            {
+                af.Enabled = !af.Enabled;
+                if (!af.Enabled)
+                {
+                    af.ReadyStatusText = "Disabled";
+                }
+                else
+                {
+                    af.ReadyStatusText = null;
+                }
+            }
         }
     }
 }

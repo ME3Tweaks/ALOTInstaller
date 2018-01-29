@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace AlotAddOnGUI.classes
 {
@@ -39,9 +40,13 @@ namespace AlotAddOnGUI.classes
                 }
                 else
                 {
-                    if (Ready)
+                    if (Ready && Enabled)
                     {
                         return "images/greencheckmark.png";
+                    }
+                    else if (Ready && !Enabled)
+                    {
+                        return "images/greycheckmark.png";
                     }
                     else
                     {
@@ -62,6 +67,10 @@ namespace AlotAddOnGUI.classes
                 if (_readystatustext != null)
                 {
                     return _readystatustext;
+                }
+                if (!Enabled)
+                {
+                    return "Disabled";
                 }
                 if (Staged)
                 {
@@ -174,6 +183,18 @@ namespace AlotAddOnGUI.classes
             }
         }
 
+        public bool ReadyIcon
+        {
+
+            get { return m_ready; }
+            set
+            {
+                m_ready = value;
+                OnPropertyChanged("ReadyIconPath");
+                OnPropertyChanged("Ready");
+            }
+        }
+
         public bool Ready
         {
 
@@ -195,6 +216,38 @@ namespace AlotAddOnGUI.classes
         public string BuildID { get; internal set; }
         public string FileMD5 { get; internal set; }
         public bool Optional { get; internal set; }
+        private bool _enabled;
+        public bool Enabled
+        {
+            get { return _enabled; }
+            internal set
+            {
+                _enabled = value;
+                OnPropertyChanged("LeftBlockColor"); //ui update for tihs property
+                OnPropertyChanged("ReadyIconPath"); //ui update for tihs property
+            }
+        }
+
+        public Color LeftBlockColor
+        {
+            get
+            {
+                if (Ready && Enabled)
+                {
+                    return Color.FromRgb((byte)0x31, (byte)0xae, (byte)0x90);
+                }
+                else if (Ready)
+                {
+                    //Disabled
+                    return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
+                }
+                else
+                {
+                    return Color.FromRgb((byte)0xd9, (byte)0x22, (byte)0x44);
+                }
+            }
+
+        }
 
         private void OnPropertyChanged(string propertyName)
         {
@@ -263,5 +316,8 @@ namespace AlotAddOnGUI.classes
 
             return null;
         }
+        
+
+        
     }
 }

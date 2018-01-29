@@ -463,7 +463,7 @@ namespace AlotAddOnGUI
 
             string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
             string destinationpath = EXTRACTED_MODS_DIRECTORY + "\\";
-            Log.Information("Creating Extracted_Mods folder");
+            Log.Information("Creating Data\\Extracted_Mods folder");
             Directory.CreateDirectory(destinationpath);
 
             ADDONFILES_TO_BUILD = new List<AddonFile>();
@@ -484,6 +484,10 @@ namespace AlotAddOnGUI
 
             foreach (AddonFile af in alladdonfiles)
             {
+                if (!af.Enabled)
+                {
+                    continue;
+                }
                 if (af.Ready && (game == 1 && af.Game_ME1 || game == 2 && af.Game_ME2 || game == 3 && af.Game_ME3))
                 {
                     if (CurrentGameALOTInfo != null)
@@ -522,7 +526,7 @@ namespace AlotAddOnGUI
                         }
                     }
 
-                    if (af.UserFile && BUILD_USER_FILES)
+                    if (af.UserFile && af.Enabled && BUILD_USER_FILES)
                     {
                         Log.Information("Adding User to build list: " + af.FriendlyName);
                         af.Building = true;
@@ -538,8 +542,11 @@ namespace AlotAddOnGUI
 
                     if ((af.ALOTVersion > 0 && BUILD_ALOT) || af.ALOTUpdateVersion > 0)
                     {
-                        ADDONFILES_TO_BUILD.Add(af);
-                        af.Building = true;
+                        if (af.Enabled)
+                        {
+                            ADDONFILES_TO_BUILD.Add(af);
+                            af.Building = true;
+                        }
                     }
                 }
             }

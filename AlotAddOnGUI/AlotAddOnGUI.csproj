@@ -236,6 +236,7 @@
     <Content Include="7z\7z.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="images\greycheckmark.png" />
     <Resource Include="images\origin\me1update.png" />
     <Resource Include="images\origin\me2update.png" />
     <Resource Include="licenses\nvorbis.txt" />

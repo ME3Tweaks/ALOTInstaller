@@ -87,16 +87,9 @@
         </Label>
         <ProgressBar Minimum="0" Maximum="100" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true"/>
 
-        <ListView Grid.Column="0" Grid.Row="3" Name="lvUsers" BorderThickness="0">
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Disable"
-                    Command="{Binding RemoveItemCommand}" 
-                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
-                </ContextMenu>
-            </ListView.ContextMenu>
+        <ListView Grid.Column="0" Grid.Row="3" Name="ListView_Files" BorderThickness="0">
             <!-- This is what each list item looks like-->
-            <ListView.ItemTemplate >
+            <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid x:Name="ListItemElement" Background="Transparent">
                         <Grid.RowDefinitions>
@@ -111,7 +104,11 @@
                             <ColumnDefinition Width="5" />
 
                         </Grid.ColumnDefinitions>
-                        <Border x:Name="ListItemLeftBlock" Grid.Column="0" Grid.RowSpan="2" Grid.Row="0" Background="#d92244" Padding="0" Margin="0"/>
+                        <Border x:Name="ListItemLeftBlock" Grid.Column="0" Grid.RowSpan="2" Grid.Row="0" Padding="0" Margin="0">
+                            <Border.Background>
+                                <SolidColorBrush Color="{Binding LeftBlockColor}" />
+                            </Border.Background>
+                        </Border>
                         <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding FriendlyName}" FontWeight="Bold" VerticalAlignment="Center" />
                         <StackPanel FlowDirection="RightToLeft"  Grid.Row="0" Grid.Column="3"  Orientation="Horizontal">
 
@@ -180,7 +177,7 @@
                         <DataTrigger Binding="{Binding Ready}" Value="True">
                             <Setter TargetName="Download_Hyperlink" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="ReadyStatusText" Property="Visibility" Value="Visible"/>
-                            <Setter TargetName="ListItemLeftBlock" Property="Background" Value="#31ae90"/>
+                            <!--<Setter TargetName="ListItemLeftBlock" Property="Background" Value="#31ae90"/>-->
                         </DataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>
@@ -215,12 +212,34 @@
                     </GroupStyle.ContainerStyle>
                 </GroupStyle>
             </ListView.GroupStyle>
+            <ListView.Resources>
+                <ContextMenu x:Key="ItemContextMenu">
+                <!--<MenuItem Header="Visit webpage"
+                                    Command="{Binding VisitWebpageCommand}" 
+                                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ListViewItem}, Path=PlacementTarget.SelectedItem}" >
+                                    <MenuItem.Style>
+                                        <Style TargetType="{x:Type MenuItem}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu},Path=PlacementTarget.DataContext.UserFile}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </MenuItem.Style>
+                                </MenuItem>-->
+                    <MenuItem Header="Open download page" Click="ContextMenu_OpenDownloadPage"/>
+                    <MenuItem Header="Toggle Enabled/Disabled" Click="ContextMenu_ToggleFile"/>
+                </ContextMenu>
+            </ListView.Resources>
             <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
+                <Style TargetType="{x:Type ListViewItem}">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="Margin" Value="0"/>
                     <Setter Property="Padding" Value="0"/>
                     <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                    <EventSetter Event="ContextMenuOpening" Handler="ListView_ContextMenuOpening" />
+
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
