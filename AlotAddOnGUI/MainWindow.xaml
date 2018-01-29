@@ -88,13 +88,13 @@
         <ProgressBar Minimum="0" Maximum="100" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true"/>
 
         <ListView Grid.Column="0" Grid.Row="3" Name="lvUsers" BorderThickness="0">
-            <!--<ListView.ContextMenu>
+            <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Remove"
-                    Command="{Binding RemoveItem}"
+                    <MenuItem Header="Disable"
+                    Command="{Binding RemoveItemCommand}" 
                     CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu}, Path=PlacementTarget.SelectedItem}" />
                 </ContextMenu>
-            </ListView.ContextMenu>-->
+            </ListView.ContextMenu>
             <!-- This is what each list item looks like-->
             <ListView.ItemTemplate >
                 <DataTemplate>

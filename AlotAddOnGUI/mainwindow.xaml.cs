@@ -2726,11 +2726,25 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void RemoveItemCommand(string item)
-        {
-            //if (!string.IsNullOrEmpty(item))
-            //  MyItems.Remove(item);
+        private ICommand _removeItemCommand;
 
+        public ICommand RemoveItemCommand
+        {
+            get
+            {
+                if (_removeItemCommand == null)
+                {
+                    _removeItemCommand = new RelayCommand(
+                        param => this.DisableAddonFile()
+                    );
+                }
+                return _removeItemCommand;
+            }
+        }
+
+        private void DisableAddonFile()
+        {
+            Debug.WriteLine("hi");
         }
 
         private void ImportFilesAsMove(object sender, DoWorkEventArgs e)
@@ -2830,7 +2844,7 @@ namespace AlotAddOnGUI
         {
             try
             {
-                using (var file = File.Create("write_permissions_test")) ;
+                using (var file = File.Create("write_permissions_test")) { } ;
                 File.Delete("write_permissions_test");
                 return true;
             }
@@ -2844,6 +2858,7 @@ namespace AlotAddOnGUI
             {
                 //do nothing with other ones, I guess.
                 Log.Error("Permissions test failure: " + e.Message);
+                Log.Warning("We are continuing as if we have write permissions. It is possible we don't any.");
             }
             return true;
         }
