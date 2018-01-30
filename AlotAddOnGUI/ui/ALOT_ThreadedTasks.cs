@@ -42,6 +42,8 @@ namespace AlotAddOnGUI
         private NAudio.Vorbis.VorbisWaveReader vorbisStream;
         private const int RESULT_SCAN_REMOVE_FAILED = -41;
         private const int RESULT_UNPACK_FAILED = -40;
+        private const int RESULT_TEXTUREINSTALL_NO_TEXTUREMAP = -44;
+        private const int RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP = -45;
         public const string RESTORE_FAILED_COULD_NOT_DELETE_FOLDER = "RESTORE_FAILED_COULD_NOT_DELETE_FOLDER";
         public string CurrentTask;
         public int CurrentTaskPercent;
@@ -71,6 +73,8 @@ namespace AlotAddOnGUI
         private string EXTRACTED_MODS_DIRECTORY = EXE_DIRECTORY + "Data\\Extracted_Mods";
         private bool ERROR_OCCURED_PLEASE_STOP = false;
         private bool REPACK_GAME_FILES;
+        private const string ERROR_TEXTURE_MAP_MISSING = "ERROR_TEXTURE_MAP_MISSING";
+        private const string ERROR_TEXTURE_MAP_WRONG = "ERROR_TEXTURE_MAP_WRONG";
         private const string SETTINGSTR_SOUND = "PlayMusic";
         private const string SET_VISIBILE_ITEMS_LIST = "SET_VISIBILE_ITEMS_LIST";
 
@@ -1191,6 +1195,8 @@ namespace AlotAddOnGUI
             InstallingOverlay_OverallLabel.Text = "";
             InstallingOverlay_StageLabel.Text = "Getting ready";
             InstallingOverlay_BottomLabel.Text = "Please wait";
+            Button_InstallViewLogs.Visibility = System.Windows.Visibility.Collapsed;
+
 
             SolidColorBrush backgroundShadeBrush = null;
             switch (INSTALLING_THREAD_GAME)
@@ -1361,13 +1367,12 @@ namespace AlotAddOnGUI
                     CURRENTLY_INSTALLED_ME1_ALOT_INFO = Utilities.GetInstalledALOTInfo(1);
                     break;
                 case 2:
-                    CURRENTLY_INSTALLED_ME1_ALOT_INFO = Utilities.GetInstalledALOTInfo(2);
+                    CURRENTLY_INSTALLED_ME2_ALOT_INFO = Utilities.GetInstalledALOTInfo(2);
                     break;
                 case 3:
-                    CURRENTLY_INSTALLED_ME1_ALOT_INFO = Utilities.GetInstalledALOTInfo(3);
+                    CURRENTLY_INSTALLED_ME3_ALOT_INFO = Utilities.GetInstalledALOTInfo(3);
                     break;
             }
-            CURRENTLY_INSTALLED_ME1_ALOT_INFO = Utilities.GetInstalledALOTInfo(1);
 
             if (e.Result != null)
             {
@@ -1403,7 +1408,21 @@ namespace AlotAddOnGUI
                         {
                             InstallingOverlay_TopLabel.Text = "Failed to install textures";
                             InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                            HeaderLabel.Text = "Error occured removing mipmaps from " + gameName;
+                            HeaderLabel.Text = "Error occured installing textures for " + gameName;
+                            break;
+                        }
+                    case RESULT_TEXTUREINSTALL_NO_TEXTUREMAP:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Failed to install textures";
+                            InstallingOverlay_BottomLabel.Text = "Texture map is missing";
+                            HeaderLabel.Text = "Texture map missing - revert " + gameName + " to an unmodified game to fix.";
+                            break;
+                        }
+                    case RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Failed to install textures";
+                            InstallingOverlay_BottomLabel.Text = "Texture map is corrupt";
+                            HeaderLabel.Text = "Texture map is corrupt - revert " + gameName + " to an unmodified game to fix.";
                             break;
                         }
                     case RESULT_UNPACK_FAILED:
@@ -1567,6 +1586,8 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("UNPACK RETURN CODE WAS NOT 0: " + processResult);
                     e.Result = RESULT_UNPACK_FAILED;
+                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
+                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
                     return;
                 }
                 Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
@@ -1592,6 +1613,8 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("SCAN/REMOVE RETURN CODE WAS NOT 0: " + processResult);
                     e.Result = RESULT_SCAN_REMOVE_FAILED;
+                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
+                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
                     return;
                 }
                 Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
@@ -1624,7 +1647,25 @@ namespace AlotAddOnGUI
             if (processResult != 0)
             {
                 Log.Error("TEXTURE INSTALLATION RETURN CODE WAS NOT 0: " + processResult);
-                e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+                {
+                    switch (BACKGROUND_MEM_PROCESS_ERRORS[0])
+                    {
+                        case ERROR_TEXTURE_MAP_MISSING:
+                            e.Result = RESULT_TEXTUREINSTALL_NO_TEXTUREMAP;
+                            break;
+                        case ERROR_TEXTURE_MAP_WRONG:
+                            e.Result = RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP;
+                            break;
+                    }
+                }
+                if (e.Result == null)
+                {
+                    e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                }
+                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
+                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
+
                 return;
             }
             Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
@@ -1904,6 +1945,9 @@ namespace AlotAddOnGUI
                     CurrentTask = (string)tc.Data;
                     InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
                     break;
+                case HIDE_TIPS:
+                    InstallingOverlay_Tip.Visibility = Visibility.Collapsed;
+                    break;
                 case UPDATE_TASK_PROGRESS:
                     int oldTaskProgress = CurrentTaskPercent;
                     if (tc.Data is string)
@@ -2037,7 +2081,10 @@ namespace AlotAddOnGUI
                 {
                     string command = str.Substring(5);
                     int endOfCommand = command.IndexOf(' ');
-                    command = command.Substring(0, endOfCommand);
+                    if (endOfCommand > 0)
+                    {
+                        command = command.Substring(0, endOfCommand);
+                    }
                     if (acceptedIPC == null || acceptedIPC.Contains(command))
                     {
                         string param = str.Substring(endOfCommand + 5).Trim();
@@ -2063,6 +2110,14 @@ namespace AlotAddOnGUI
                                 worker.ReportProgress(completed, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
                                 Interlocked.Increment(ref INSTALL_STAGE);
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_STAGE_LABEL));
+                                break;
+                            case ERROR_TEXTURE_MAP_MISSING:
+                                Log.Fatal("[FATAL]Texture map is missing! We cannot install textures");
+                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_MISSING);
+                                break;
+                            case ERROR_TEXTURE_MAP_WRONG:
+                                Log.Fatal("[FATAL]Texture map is invalid! We cannot install textures");
+                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_WRONG);
                                 break;
                             case "ERROR":
                                 Log.Information("[ERROR] Realtime Process Output: " + param);

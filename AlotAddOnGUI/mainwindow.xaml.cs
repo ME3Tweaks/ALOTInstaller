@@ -48,6 +48,7 @@ namespace AlotAddOnGUI
         public bool BACKGROUND_MEM_RUNNING = false;
         ProgressDialogController updateprogresscontroller;
         public const string UPDATE_OPERATION_LABEL = "UPDATE_OPERATION_LABEL";
+        public const string HIDE_TIPS = "HIDE_TIPS";
         public const string UPDATE_PROGRESSBAR_INDETERMINATE = "SET_PROGRESSBAR_DETERMINACY";
         public const string INCREMENT_COMPLETION_EXTRACTION = "INCREMENT_COMPLETION_EXTRACTION";
         public const string SHOW_DIALOG = "SHOW_DIALOG";
