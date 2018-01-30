@@ -3544,7 +3544,7 @@ namespace AlotAddOnGUI
                         }
                         break;
                     case 1: //Toggle on/off
-                        if (af.ALOTVersion > 0 || !af.Ready)
+                        if (af.ALOTVersion > 0 || !af.Ready || PreventFileRefresh)
                         {
                             mi.Visibility = Visibility.Collapsed;
                             break;

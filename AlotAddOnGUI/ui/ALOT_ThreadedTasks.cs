@@ -1019,7 +1019,7 @@ namespace AlotAddOnGUI
             if (MusicIsPlaying)
             {
                 MusicPaused = !MusicPaused;
-                Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_SOUND, MusicPaused);
+                Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_SOUND, !MusicPaused);
                 if (MusicPaused)
                 {
                     waveOut.Pause();
@@ -1222,15 +1222,15 @@ namespace AlotAddOnGUI
                 }
             }
 
+            MusicPaused = true; //will set to false if music is to start playing
+
             //Set music
             if (playMusic)
             {
                 string musfile = GetMusicDirectory() + "me" + game + ".ogg";
                 if (File.Exists(musfile))
                 {
-                    InstallingOverlay_MusicButton.Visibility = Visibility.Visible;
                     MusicIsPlaying = true;
-                    MusicPaused = false;
                     waveOut = new WaveOut();
                     vorbisStream = new NAudio.Vorbis.VorbisWaveReader(musfile);
                     LoopStream ls = new LoopStream(vorbisStream);
@@ -1242,6 +1242,7 @@ namespace AlotAddOnGUI
                         MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.Sound3;
                         fadeoutProvider.BeginFadeIn(2000);
                         waveOut.Play();
+                        MusicPaused = false;
                     }
                     else
                     {
