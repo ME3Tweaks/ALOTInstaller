@@ -202,7 +202,7 @@ namespace AlotAddOnGUI.ui
             {
                 Uri uriResult;
                 bool result = Uri.TryCreate((string)e.Result, UriKind.Absolute, out uriResult)
-                    && uriResult.Scheme == Uri.UriSchemeHttp;
+                                    && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
                 if (result)
                 {
                     Clipboard.SetText((string)e.Result);
@@ -402,10 +402,10 @@ namespace AlotAddOnGUI.ui
             System.IO.File.WriteAllText(diagfilename, diag);
 
             //upload
-            if (diag.Length < 512000)
+            string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+            if (diag.Length > 512000)
             {
 
-                string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
                 var responseString = "https://me3tweaks.com/alotinstaller/loguploader".PostUrlEncodedAsync(new { LogData = diag, ALOTInstallerVersion = alotInstallerVer }).ReceiveString().Result;
                 Uri uriResult;
                 bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
@@ -426,9 +426,31 @@ namespace AlotAddOnGUI.ui
             }
             else
             {
-                e.Result = "Diagnostic complete.";
-                Log.Warning("Log is too big to upload to pastebin");
-                Utilities.OpenAndSelectFileInExplorer(diagfilename);
+                //Compress with LZMA for VPS Upload
+                string outfile = diagfilename + ".lzma";
+                args = "e \"" + diagfilename + "\" \"" + outfile + "\" -mt2";
+                Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
+                var lzmalog = File.ReadAllBytes(outfile);
+                var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer }).ReceiveString().Result;
+                Uri uriResult;
+                bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
+                    && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                if (result)
+                {
+                    //should be valid URL.
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
+                    e.Result = responseString;
+                    Log.Information("Result from server for log upload: " + responseString);
+                }
+                else
+                {
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from oversized log uploader: " + responseString));
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
+                    Log.Error("Error uploading log. The server responded with: " + responseString);
+                    e.Result = "Diagnostic complete.";
+                    Log.Warning("Log is too big to upload to pastebin");
+                    Utilities.OpenAndSelectFileInExplorer(diagfilename);
+                }
             }
         }
 
