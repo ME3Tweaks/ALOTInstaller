@@ -31,10 +31,12 @@ namespace AlotAddOnGUI.ui
         private const string SET_DIAGTASK_ICON_GREEN = "SET_DIAGTASK_ICON_GREEN";
         private const string SET_DIAGTASK_ICON_RED = "SET_DIAGTASK_ICON_RED";
         private const string SET_FULLSCAN_PROGRESS = "SET_STEP_PROGRESS";
+        private const string SET_REPLACEDFILE_PROGRESS = "SET_REPLACEDFILE_PROGRESS";
         private const string TURN_OFF_TASKBAR_PROGRESS = "TURN_OFF_TASKBAR_PROGRESS";
         private const string TURN_ON_TASKBAR_PROGRESS = "TURN_ON_TASKBAR_PROGRESS";
         private const int CONTEXT_NORMAL = 0;
         private const int CONTEXT_FULLMIPMAP_SCAN = 1;
+        private const int CONTEXT_REPLACEDFILE_SCAN = 2;
         private bool TextureCheck = false;
         private static int DIAGNOSTICS_GAME = 0;
         private static ConsoleApp BACKGROUND_MEM_PROCESS;
@@ -134,10 +136,18 @@ namespace AlotAddOnGUI.ui
                     //AddonFilesLabel.Text = (string)tc.Data;
                     break;
                 case SET_FULLSCAN_PROGRESS:
-                    int progress = (int)tc.Data;
-                    TaskbarManager.Instance.SetProgressValue(progress, 100);
-                    TextBlock_FullCheck.Text = "Scanning textures " + progress + "%";
-                    break;
+                    {
+                        int progress = (int)tc.Data;
+                        TaskbarManager.Instance.SetProgressValue(progress, 100);
+                        TextBlock_FullCheck.Text = "Scanning textures " + progress + "%";
+                        break;
+                    }
+                case SET_REPLACEDFILE_PROGRESS:
+                    {
+                        int progress = (int)tc.Data;
+                        TextBlock_DataAfter.Text = "Checking for replaced files " + progress + "%";
+                        break;
+                    }
                 case TURN_OFF_TASKBAR_PROGRESS:
                     TaskbarManager.Instance.SetProgressValue(0, 100);
                     TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress);
@@ -289,6 +299,7 @@ namespace AlotAddOnGUI.ui
 
             args = "-check-game-data-after " + DIAGNOSTICS_GAME + " -ipc";
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
+            Context = CONTEXT_REPLACEDFILE_SCAN;
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
             WaitForMEM();
             addDiagLine("\n===Replaced files scan (after textures were installed)===");
@@ -313,7 +324,7 @@ namespace AlotAddOnGUI.ui
                 }
             }
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
-
+            Context = CONTEXT_NORMAL;
 
             //FULL CHECK
             if (TextureCheck)
@@ -615,6 +626,10 @@ namespace AlotAddOnGUI.ui
                                 if (Context == CONTEXT_FULLMIPMAP_SCAN)
                                 {
                                     worker.ReportProgress(0, new ThreadCommand(SET_FULLSCAN_PROGRESS, percentInt));
+                                }
+                                else if (Context == CONTEXT_REPLACEDFILE_SCAN)
+                                {
+                                    worker.ReportProgress(0, new ThreadCommand(SET_REPLACEDFILE_PROGRESS, percentInt));
                                 }
                                 break;
                             case "PROCESSING_FILE":
