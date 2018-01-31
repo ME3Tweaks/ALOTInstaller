@@ -319,15 +319,15 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(TargetDir)Downloaded_Mods" mkdir "$(TargetDir)Downloaded_Mods"
 
-if exist "$(TargetDir)Data\lib"  del /s "$(TargetDir)Data\lib\*.pdb"&gt;NUL
-if exist "$(TargetDir)Data\lib" del /s "$(TargetDir)Data\lib\manifest*.xml"&gt;NUL
-if exist "$(TargetDir)alotinstaller.exe.config" del /s "$(TargetDir)alotinstaller.exe.config"&gt;NUL
+if exist "$(TargetDir)Data\lib"  del /q "$(TargetDir)Data\lib\*.pdb"&gt;NUL
+if exist "$(TargetDir)Data\lib" del /q "$(TargetDir)Data\lib\manifest*.xml"&gt;NUL
+if exist "$(TargetDir)alotinstaller.exe.config" del /q "$(TargetDir)alotinstaller.exe.config"&gt;NUL
 
 if not exist "$(TargetDir)Data\lib" mkdir "$(TargetDir)Data\lib"
 move /Y "$(TargetDir)*.dll" "$(TargetDir)Data\Lib\"
-del /s "$(TargetDir)*.xml"
-del /s "$(TargetDir)MahApps.Metro.IconPacks.Modern.pdb"
-del /s "$(TargetDir)MahApps.Metro.pdb"
+del /q "$(TargetDir)*.xml"
+del /q "$(TargetDir)MahApps.Metro.IconPacks.Modern.pdb"
+del /q "$(TargetDir)MahApps.Metro.pdb"
  
 if exist "$(TargetDir)memodder" rmdir /s /q "$(TargetDir)memodder"
 
