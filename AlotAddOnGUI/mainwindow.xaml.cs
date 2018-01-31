@@ -15,11 +15,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
@@ -35,6 +32,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using System.Xml.Linq;
+using Flurl.Http;
 
 namespace AlotAddOnGUI
 {
@@ -1812,7 +1810,7 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    if ((!af.Ready || !af.Enabled )&& ShowReadyFilesOnly)
+                    if ((!af.Ready || !af.Enabled) && ShowReadyFilesOnly)
                     { continue; }
                     bool shouldDisplay = ((af.Game_ME1 && ShowME1Files) || (af.Game_ME2 && ShowME2Files) || (af.Game_ME3 && ShowME3Files));
                     if (shouldDisplay)
@@ -3377,29 +3375,62 @@ namespace AlotAddOnGUI
             ((Expander)sender).BringIntoView();
         }
 
-        private void Button_ZipLog_Click(object sender, RoutedEventArgs e)
+        private async void Button_ZipLog_Click(object sender, RoutedEventArgs e)
         {
             var directory = new DirectoryInfo("logs");
             FileInfo latestlogfile = directory.GetFiles("alotinstaller*.txt").OrderByDescending(f => f.LastWriteTime).First();
+
             if (latestlogfile != null)
             {
-                string zipPath = "logs\\" + Path.GetFileNameWithoutExtension(latestlogfile.FullName) + ".zip";
-                if (File.Exists(zipPath))
-                {
-                    File.Delete(zipPath);
-                }
-
-                string zipStaged = latestlogfile.FullName + "_forZip";
+                Log.Information("Staging log file for upload. This is the final log item that should appear in an uploaded log.");
+                string zipStaged = latestlogfile.FullName + "_forUpload";
                 File.Copy(latestlogfile.FullName, zipStaged, true);
-                string copyPath = zipPath;
+                string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
 
-                using (ZipArchive zip = ZipFile.Open(zipPath, ZipArchiveMode.Create))
+                //Compress with LZMA for VPS Upload
+                string outfile = latestlogfile + "_forUpload.lzma";
+                string args = "e \"" + zipStaged + "\" \"" + outfile + "\" -mt2";
+                Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
+                var lzmalog = File.ReadAllBytes(outfile);
+                try
                 {
-                    zip.CreateEntryFromFile(zipStaged, "logs\\" + Path.GetFileName(latestlogfile.FullName), CompressionLevel.Optimal);
+                    ProgressDialogController progresscontroller = await this.ShowProgressAsync("Uploading log", "Log is currently uploading, please wait...", true);
+                    var responseString = await "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer }).ReceiveString();
+                    await progresscontroller.CloseAsync();
+                    Uri uriResult;
+                    bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
+                        && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                    if (result)
+                    {
+                        //should be valid URL.
+                        //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
+                        //e.Result = responseString;
+                        Log.Information("Result from server for log upload: " + responseString);
+                        openWebPage(responseString);
+                    }
+                    else
+                    {
+                        //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from oversized log uploader: " + responseString));
+                        //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
+                        Log.Error("Error uploading log. The server responded with: " + responseString);
+                        //e.Result = "Diagnostic complete.";
+                        Log.Warning("Log is too big to upload to pastebin");
+                        //Utilities.OpenAndSelectFileInExplorer(diagfilename);
+                    }
+                }
+                catch (FlurlHttpTimeoutException)
+                {
+                    // FlurlHttpTimeoutException derives from FlurlHttpException; catch here only
+                    // if you want to handle timeouts as a special case
+                    Log.Error("Request timed out while uploading log.");
+                }
+                catch (FlurlHttpException ex)
+                {
+                    // ex.Message contains rich details, inclulding the URL, verb, response status,
+                    // and request and response bodies (if available)
+                    Log.Error(ex.Message);
                 }
                 File.Delete(zipStaged);
-                Utilities.OpenAndSelectFileInExplorer(zipPath);
-                ShowStatus("If uploading log to ALOT Discord, drag and drop the .zip file onto the Discord interface.");
             }
         }
 

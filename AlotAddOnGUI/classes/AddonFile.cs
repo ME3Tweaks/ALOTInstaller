@@ -191,6 +191,7 @@ namespace AlotAddOnGUI.classes
             {
                 m_ready = value;
                 OnPropertyChanged("ReadyIconPath");
+                OnPropertyChanged("ReadyIconPath");
                 OnPropertyChanged("Ready");
             }
         }
@@ -202,6 +203,7 @@ namespace AlotAddOnGUI.classes
             set
             {
                 m_ready = value;
+                OnPropertyChanged("LeftBlockColor"); //ui update for tihs property
                 OnPropertyChanged("ReadyIconPath");
                 OnPropertyChanged("Ready");
             }
