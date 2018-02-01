@@ -3393,7 +3393,7 @@ namespace AlotAddOnGUI
             if (latestlogfile != null)
             {
                 Log.Information("Staging log file for upload. This is the final log item that should appear in an uploaded log.");
-                string zipStaged = latestlogfile.FullName + "_forUpload";
+                string zipStaged = EXE_DIRECTORY + "logs\\"+latestlogfile.Name + "_forUpload";
                 File.Copy(latestlogfile.FullName, zipStaged, true);
                 string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
 
@@ -3401,6 +3401,7 @@ namespace AlotAddOnGUI
                 string outfile = latestlogfile + "_forUpload.lzma";
                 string args = "e \"" + zipStaged + "\" \"" + outfile + "\" -mt2";
                 Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
+                File.Delete(zipStaged);
                 var lzmalog = File.ReadAllBytes(outfile);
                 ProgressDialogController progresscontroller = await this.ShowProgressAsync("Uploading log", "Log is currently uploading, please wait...", true);
                 progresscontroller.SetIndeterminate();
@@ -3455,7 +3456,7 @@ namespace AlotAddOnGUI
 
                 }
                 SettingsFlyout.IsOpen = false;
-                File.Delete(zipStaged);
+                File.Delete(outfile);
             }
         }
 
