@@ -278,29 +278,36 @@ namespace AlotAddOnGUI.ui
                     addDiagLine("MEUITM: " + avi.MEUITMVER);
                 }
             }
-
-
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "-check-game-data-mismatch " + DIAGNOSTICS_GAME + " -ipc";
-            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataMismatch));
-            runMEM_Diagnostics(exe, args, diagnosticsWorker);
-            WaitForMEM();
-            addDiagLine("");
-            addDiagLine("===Files added (or removed) after ALOT" + (DIAGNOSTICS_GAME == 1 ? "/MEUITM" : "") + " install");
-
-            if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
+            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MassEffectModder\me" + DIAGNOSTICS_GAME + "map.bin"))
             {
-                addDiagLine("Diagnostic reports some files appear to have been added or removed since texture scan took place:");
-                foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataMismatch));
+                runMEM_Diagnostics(exe, args, diagnosticsWorker);
+                WaitForMEM();
+                addDiagLine("");
+                addDiagLine("===Files added (or removed) after ALOT" + (DIAGNOSTICS_GAME == 1 ? "/MEUITM" : "") + " install");
+
+                if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
                 {
-                    addDiagLine(" - " + str);
+                    addDiagLine("Diagnostic reports some files appear to have been added or removed since texture scan took place:");
+                    foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                    {
+                        addDiagLine(" - " + str);
+                    }
                 }
+                else
+                {
+                    addDiagLine("Diagnostic reports no files appear to have been added or removed since texture scan took place.");
+                }
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataMismatch));
             }
             else
             {
-                addDiagLine("Diagnostic reports no files appear to have been added or removed since texture scan took place.");
+                addDiagLine("===Files added (or removed) after ALOT" + (DIAGNOSTICS_GAME == 1 ? "/MEUITM" : "") + " install");
+                addDiagLine(" - DIAG ERROR: Texture map file is missing: me" + DIAGNOSTICS_GAME + "map.bin");
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_DataMismatch));
             }
-            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataMismatch));
 
             args = "-check-game-data-after " + DIAGNOSTICS_GAME + " -ipc";
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
@@ -348,7 +355,7 @@ namespace AlotAddOnGUI.ui
                     addDiagLine("Full texture check reported errors:");
                     foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                     {
-                        addDiagLine(" - " + str);
+                        addDiagLine(" - DIAG ERROR: " + str);
                     }
                 }
                 else
@@ -379,7 +386,7 @@ namespace AlotAddOnGUI.ui
             }
             else
             {
-                addDiagLine("Diagnostics did not detect any mods (-detect-mods) - if the files had their textures updated already, this detection will likely not be accurate.");
+                addDiagLine("Diagnostics did not detect any mods (-detect-mods). If these files have been modified, detection of them will not work.");
             }
 
             args = "-detect-bad-mods " + DIAGNOSTICS_GAME + " -ipc";
@@ -399,7 +406,7 @@ namespace AlotAddOnGUI.ui
             }
 
             //Get LODs
-            String lodStr = GetLODStr(DIAGNOSTICS_GAME);
+            String lodStr = GetLODStr(DIAGNOSTICS_GAME,avi);
             addDiagLine("");
             addDiagLine("===LOD Information");
             addDiagLine(lodStr);
@@ -471,7 +478,7 @@ namespace AlotAddOnGUI.ui
             }
         }
 
-        private string GetLODStr(int gameID)
+        private string GetLODStr(int gameID, ALOTVersionInfo avi)
         {
             string log = "";
             string iniPath = IniSettingsHandler.GetConfigIniPath(gameID);
@@ -505,6 +512,28 @@ namespace AlotAddOnGUI.ui
                         log += "TEXTUREGROUP_Character_Diff=" + engineConf.Read("TEXTUREGROUP_Character_Diff", "TextureLODSettings") + Environment.NewLine;
                         log += "TEXTUREGROUP_Character_Norm=" + engineConf.Read("TEXTUREGROUP_Character_Norm", "TextureLODSettings") + Environment.NewLine;
                         log += "TEXTUREGROUP_Character_Spec=" + engineConf.Read("TEXTUREGROUP_Character_Spec", "TextureLODSettings") + Environment.NewLine;
+
+                        if (engineConf.Read("TEXTUREGROUP_Character_1024", "TextureLODSettings") != "")
+                        {
+                            if (avi != null)
+                            {
+                                log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
+                            } else
+                            {
+                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have unused mip crashes." + Environment.NewLine;
+                            }
+                        }
+                        else
+                        {
+                            if (avi != null)
+                            {
+                                log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is vanilla-ish." + Environment.NewLine;
+                            }
+                            else
+                            {
+                                log += "HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
+                            }
+                        }
                         break;
                     case 2:
                         log += "TEXTUREGROUP_World=" + engineConf.Read("TEXTUREGROUP_World", "SystemSettings") + Environment.NewLine;
@@ -532,6 +561,29 @@ namespace AlotAddOnGUI.ui
                         log += "TEXTUREGROUP_Character_Diff=" + engineConf.Read("TEXTUREGROUP_Character_Diff", "SystemSettings") + Environment.NewLine;
                         log += "TEXTUREGROUP_Character_Norm=" + engineConf.Read("TEXTUREGROUP_Character_Norm", "SystemSettings") + Environment.NewLine;
                         log += "TEXTUREGROUP_Character_Spec=" + engineConf.Read("TEXTUREGROUP_Character_Spec", "SystemSettings") + Environment.NewLine;
+
+                        if (engineConf.Read("TEXTUREGROUP_Character_1024", "SystemSettings") != "")
+                        {
+                            if (avi != null)
+                            {
+                                log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
+                            }
+                            else
+                            {
+                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
+                            }
+                        }
+                        else
+                        {
+                            if (avi != null)
+                            {
+                                log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is vanilla-ish." + Environment.NewLine;
+                            }
+                            else
+                            {
+                                log += "HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
+                            }
+                        }
                         break;
                     case 3:
                         log += "TEXTUREGROUP_World=" + engineConf.Read("TEXTUREGROUP_World", "SystemSettings") + Environment.NewLine;
@@ -560,12 +612,35 @@ namespace AlotAddOnGUI.ui
                         log += "TEXTUREGROUP_Character_Diff=" + engineConf.Read("TEXTUREGROUP_Character_Diff", "SystemSettings") + Environment.NewLine;
                         log += "TEXTUREGROUP_Character_Norm=" + engineConf.Read("TEXTUREGROUP_Character_Norm", "SystemSettings") + Environment.NewLine;
                         log += "TEXTUREGROUP_Character_Spec=" + engineConf.Read("TEXTUREGROUP_Character_Spec", "SystemSettings") + Environment.NewLine;
+                        if (engineConf.Read("TEXTUREGROUP_Character_1024", "SystemSettings") != "")
+                        {
+                            if (avi != null)
+                            {
+                                log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
+                            }
+                            else
+                            {
+                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
+                            }
+                        }
+                        else
+                        {
+                            //HQ LOD MISSING
+                            if (avi != null)
+                            {
+                                log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
+                            }
+                            else
+                            {
+                                log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is probably vanilla-ish." + Environment.NewLine;
+                            }
+                        }
                         break;
                 }
             }
             else
             {
-                log += "Could not find LOD config file: " + iniPath;
+                log += " - DIAG ERROR: Could not find LOD config file: " + iniPath;
 
             }
             return log;

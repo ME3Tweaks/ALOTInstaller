@@ -711,36 +711,36 @@ namespace AlotAddOnGUI
             }
         }
 
-        public static int runProcessAsAdmin(string exe, string args, bool standAlone = false)
+public static int runProcessAsAdmin(string exe, string args, bool standAlone = false)
+{
+    Log.Information("Running process as admin: " + exe + " " + args);
+    using (Process p = new Process())
+    {
+        p.StartInfo.CreateNoWindow = true;
+        p.StartInfo.FileName = exe;
+        p.StartInfo.UseShellExecute = true;
+        p.StartInfo.Arguments = args;
+        p.StartInfo.Verb = "runas";
+        try
         {
-            Log.Information("Running process as admin: " + exe + " " + args);
-            using (Process p = new Process())
+            p.Start();
+            if (!standAlone)
             {
-                p.StartInfo.CreateNoWindow = true;
-                p.StartInfo.FileName = exe;
-                p.StartInfo.UseShellExecute = true;
-                p.StartInfo.Arguments = args;
-                p.StartInfo.Verb = "runas";
-                try
-                {
-                    p.Start();
-                    if (!standAlone)
-                    {
-                        p.WaitForExit(60000);
-                        return p.ExitCode;
-                    }
-                    else
-                    {
-                        return 0;
-                    }
-                }
-                catch (System.ComponentModel.Win32Exception e)
-                {
-                    Log.Error("Error running elevated process: " + e.Message);
-                    return WIN32_EXCEPTION_ELEVATED_CODE;
-                }
+                p.WaitForExit(60000);
+                return p.ExitCode;
+            }
+            else
+            {
+                return 0;
             }
         }
+        catch (System.ComponentModel.Win32Exception e)
+        {
+            Log.Error("Error running elevated process: " + e.Message);
+            return WIN32_EXCEPTION_ELEVATED_CODE;
+        }
+    }
+}
 
         public static Task DeleteAsync(string path)
         {
