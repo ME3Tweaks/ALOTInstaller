@@ -281,8 +281,8 @@
                                     <Button Margin="10,0,0,0" Padding="0,0,0,5" x:Name="Button_ME1_ShowLODOptions" Content="Change texture quality" ToolTip="Change quality of textures for ME1 to suit your performance needs" Style="{StaticResource LinkLabel}" Click="Button_ToggleME1LODPanel"/>
                                 </StackPanel>
                                 <StackPanel x:Name="Panel_SettingsME1LOD" Orientation="Horizontal" Visibility="Collapsed">
-                                    <Button x:Name="Button_ME12K" Margin="20,0,5,0" FontSize="12" Content="Use 2K Textures" ToolTip="2K textures are slightly lower quality than 4K textures,&#10;but the engine should not hiccup during cutscenes." Click="Button_ME12K_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                    <Button x:Name="Button_ME14K" FontSize="12" Content="Use 4K Textures" ToolTip="4K textures are higher quality, but the engine&#10;may hiccup during certain cutscenes." Click="Button_ME14K_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                    <Button x:Name="Button_ME12K" Margin="20,0,5,0" FontSize="12" Content="2K Textures" ToolTip="2K textures are slightly lower quality than 4K textures,&#10;but the engine should not hiccup during cutscenes." Click="Button_ME12K_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                    <Button x:Name="Button_ME14K" FontSize="12" Content="4K Textures" ToolTip="4K textures are higher quality, but the engine&#10;may hiccup during certain cutscenes." Click="Button_ME14K_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 </StackPanel>
                                 <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME2" Content="ME2: Not Installed"/>
                                 <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME3" Content="ME3: Not Installed"/>
@@ -294,9 +294,9 @@
                                 <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Filtering"/>
                             </Expander.Header>
                             <StackPanel>
-                                <Controls:ToggleSwitch x:Name="Switch_ME1Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect files" OnLabel="Show Mass Effect files" IsChecked="{Binding ShowME1Files}"/>
-                                <Controls:ToggleSwitch x:Name="Switch_ME2Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 2 files" OnLabel="Show Mass Effect 2 files" IsChecked="{Binding ShowME2Files}"/>
-                                <Controls:ToggleSwitch x:Name="Switch_ME3Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 3 files" OnLabel="Show Mass Effect 3 files" IsChecked="{Binding ShowME3Files}"/>
+                                <Controls:ToggleSwitch x:Name="Switch_ME1Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect files" OnLabel="Show Mass Effect files" IsChecked="{Binding ShowME1Files}" ToolTip="Toggle showing files for Mass Effect"/>
+                                <Controls:ToggleSwitch x:Name="Switch_ME2Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 2 files" OnLabel="Show Mass Effect 2 files" IsChecked="{Binding ShowME2Files}" ToolTip="Toggle showing files for Mass Effect 2"/>
+                                <Controls:ToggleSwitch x:Name="Switch_ME3Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 3 files" OnLabel="Show Mass Effect 3 files" IsChecked="{Binding ShowME3Files}" ToolTip="Toggle showing files for Mass Effect 3"/>
                             </StackPanel>
                         </Expander>
                         <Expander IsExpanded="True" Expanded="Expander_Expanded">
@@ -314,12 +314,12 @@
                                 <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Diagnostics &amp; MEM"/>
                             </Expander.Header>
                             <StackPanel>
-                                <Button x:Name="Button_GenerateDiagnostic" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Generate Game Diagnostics" ToolTip="Generates a diagnostic log to help figure out issues with one of the games" Click="Button_GenerateDiagnostics_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                <Button x:Name="Button_GenerateDiagnostic" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Generate Game Diagnostics" ToolTip="Generates a diagnostic log to help figure out issues with one of the games&#10;The log is automatically uploaded for sharing when the diagnostic completes." Click="Button_GenerateDiagnostics_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 <Button x:Name="Button_ViewLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="View log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                <Button x:Name="Button_UploadLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Upload log" ToolTip="Zips up log for uploading" Click="Button_UploadLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                <Button x:Name="Button_UploadLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Upload log" ToolTip="Uploads the latest program log to the ALOT Log Viewing Service" Click="Button_UploadLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 <Button x:Name="Button_ReportIssue" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Report an issue" ToolTip="Go to the ALOT discord" Click="Button_ReportIssue_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                <Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" FontWeight="Bold" x:Name="Button_MEM_GUI" Content="Launch MEM GUI" Click="Button_MEMVersion_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal"/>
-                                <Label HorizontalAlignment="Center" Margin="20,0,20,3" Padding="0,3,0,3" FontWeight="Bold" x:Name="Label_MEMVersion" Content="MEM (NoGUI) Version: TBD" FontSize="12"/>
+                                <Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" FontWeight="Bold" x:Name="Button_MEM_GUI" Content="Launch MEM GUI" Click="Button_MEMVersion_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal" ToolTip="Runs the GUI version of Mass Effect Modder.&#10;You can use this to change game paths and other advanced texture modding."/>
+                                <Label HorizontalAlignment="Center" Margin="20,0,20,3" Padding="0,3,0,3" FontWeight="Bold" x:Name="Label_MEMVersion" Content="MEM (NoGUI) Version: TBD" FontSize="12" ToolTip="Version of MassEffectModderNoGui this program is using"/>
                             </StackPanel>
                         </Expander>
                         <Expander IsExpanded="True" Expanded="Expander_Expanded">
@@ -329,7 +329,7 @@
                             <StackPanel>
                                 <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowFirstTime" Controls:ControlsHelper.ContentCharacterCasing="Upper" Content="Show Intro Dialog" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Shows the initial instructions screen"/>
                                 <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Controls:ControlsHelper.ContentCharacterCasing="Upper" x:Name="Button_ChangeDownloadFolder" Content="Change Download Folder" Click="Button_ChangeDownloadFolder_Click" ToolTip="Changes the folder used when importing from downloads" Style="{StaticResource AccentedSquareButtonStyle}" />
-                                <CheckBox Margin="5" x:Name="Checkbox_RepackGameFiles" Content="Repack game files" Click="Checkbox_RepackFiles_Click" ToolTip="Repacking game files makes installation take longer, but will save some disk space." />
+                                <CheckBox Margin="5" x:Name="Checkbox_RepackGameFiles" Content="Repack game files" Click="Checkbox_RepackFiles_Click" ToolTip="Repacking game files makes installation take longer, but will save some disk space.&#10;This may reduce the performance of Mass Effect." />
                                 <CheckBox Margin="5" x:Name="Checkbox_MoveFilesAsImport" Content="Import via Move if on the same drive" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied.&#10;This only is used if files are on same drive - if files are on different drives then they are copied." />
                                 <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
                             </StackPanel>

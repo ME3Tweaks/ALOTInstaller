@@ -32,6 +32,7 @@ namespace AlotAddOnGUI.ui
         private const string SET_DIAGTASK_ICON_RED = "SET_DIAGTASK_ICON_RED";
         private const string SET_FULLSCAN_PROGRESS = "SET_STEP_PROGRESS";
         private const string SET_REPLACEDFILE_PROGRESS = "SET_REPLACEDFILE_PROGRESS";
+        private const string RESET_REPLACEFILE_TEXT = "RESET_REPLACEFILE_TEXT";
         private const string TURN_OFF_TASKBAR_PROGRESS = "TURN_OFF_TASKBAR_PROGRESS";
         private const string TURN_ON_TASKBAR_PROGRESS = "TURN_ON_TASKBAR_PROGRESS";
         private const int CONTEXT_NORMAL = 0;
@@ -148,6 +149,10 @@ namespace AlotAddOnGUI.ui
                         TextBlock_DataAfter.Text = "Checking for replaced files " + progress + "%";
                         break;
                     }
+                case RESET_REPLACEFILE_TEXT:
+                    TextBlock_DataAfter.Text = "Check for replaced files";
+
+                    break;
                 case TURN_OFF_TASKBAR_PROGRESS:
                     TaskbarManager.Instance.SetProgressValue(0, 100);
                     TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress);
@@ -323,6 +328,7 @@ namespace AlotAddOnGUI.ui
                     addDiagLine("MEM returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
                 }
             }
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(RESET_REPLACEFILE_TEXT));
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
             Context = CONTEXT_NORMAL;
 
@@ -384,7 +390,7 @@ namespace AlotAddOnGUI.ui
                 addDiagLine("Diagnostic reports the following incompatible mods are installed:");
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
-                    addDiagLine(" - " + str);
+                    addDiagLine(" - DIAG ERROR: " + str);
                 }
             }
             else
@@ -589,6 +595,7 @@ namespace AlotAddOnGUI.ui
             BACKGROUND_MEM_PROCESS = new ConsoleApp(exe, args);
             BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
             BACKGROUND_MEM_PROCESS_PARSED_ERRORS = new List<string>();
+            string gamePath = Utilities.GetGamePath(DIAGNOSTICS_GAME);
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
@@ -609,7 +616,7 @@ namespace AlotAddOnGUI.ui
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was removed after textures scan: " + param);
                                 break;
                             case "ERROR_ADDED_FILE":
-                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was added after textures scan: " + param);
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was added after textures scan: " + param + " " + File.GetLastWriteTimeUtc(gamePath + param));
                                 break;
                             case "ERROR_VANILLA_MOD_FILE":
                                 if (MEMI_FOUND)

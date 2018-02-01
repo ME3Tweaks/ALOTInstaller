@@ -995,7 +995,7 @@ namespace AlotAddOnGUI
             else
             {
                 Button_InstallME1.IsEnabled = true;
-                Button_InstallME1.ToolTip = "Click to install build and install textures for Mass Effect";
+                Button_InstallME1.ToolTip = "Click to build and install textures for Mass Effect";
                 Button_InstallME1.Content = "Install for ME1";
             }
 
@@ -1009,7 +1009,7 @@ namespace AlotAddOnGUI
             else
             {
                 Button_InstallME2.IsEnabled = true;
-                Button_InstallME2.ToolTip = "Click to install build and install textures for Mass Effect 2";
+                Button_InstallME2.ToolTip = "Click to build and install textures for Mass Effect 2";
                 Button_InstallME2.Content = "Install for ME2";
             }
 
@@ -1023,7 +1023,7 @@ namespace AlotAddOnGUI
             else
             {
                 Button_InstallME3.IsEnabled = true;
-                Button_InstallME3.ToolTip = "Click to install build and install textures for Mass Effect 3";
+                Button_InstallME3.ToolTip = "Click to build and install textures for Mass Effect 3";
                 Button_InstallME3.Content = "Install for ME3";
             }
         }

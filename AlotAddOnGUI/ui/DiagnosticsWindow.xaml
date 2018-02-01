@@ -22,8 +22,8 @@
             </Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="Panel_DiagnosticsTypes" Visibility="Collapsed">
-            <Button x:Name="Button_QuickDiagnostic" Content="quick diagnostic" ToolTip="Performs a quick game diagnostic with single file tests.&#10;Should not take longer than a minute to complete." HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Margin="3" Click="QuickDiagnostic_Click"/>
-            <Button x:Name="Button_FullDiagnostic" Content="full diagnostic" ToolTip="Performs a full game diagnostic with texture scan.&#10;Will take several minutes to complete." HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Margin="3"  Click="FullDiagnostic_Click"/>
+            <Button x:Name="Button_QuickDiagnostic" Content="quick diagnostic" ToolTip="Performs a quick game diagnostic with single file tests.&#10;Should not take longer than a minute to complete.&#10;Select this one if you don't know which one to choose." HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Margin="3" Click="QuickDiagnostic_Click"/>
+            <Button x:Name="Button_FullDiagnostic" Content="full diagnostic" ToolTip="Performs a full game diagnostic with texture scan.&#10;Will take several minutes to complete.&#10;Select this one only if requested by an ALOT Team Member." HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Margin="3"  Click="FullDiagnostic_Click"/>
         </StackPanel>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Visibility="Collapsed" x:Name="Panel_Progress">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="8,0,0,0">
