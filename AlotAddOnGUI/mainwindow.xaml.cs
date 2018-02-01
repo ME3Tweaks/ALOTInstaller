@@ -3403,9 +3403,10 @@ namespace AlotAddOnGUI
                 Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
                 var lzmalog = File.ReadAllBytes(outfile);
                 ProgressDialogController progresscontroller = await this.ShowProgressAsync("Uploading log", "Log is currently uploading, please wait...", true);
+                progresscontroller.SetIndeterminate();
                 try
                 {
-                    var responseString = await "https://vps.me3tweaks.com/alot/logupload".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer }).ReceiveString();
+                    var responseString = await "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "log" }).ReceiveString();
                     Uri uriResult;
                     bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
                         && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
@@ -3453,6 +3454,7 @@ namespace AlotAddOnGUI
                     await this.ShowMessageAsync("Log upload failed", "The log was unable to upload. The error message is: " + exmessage + "You will need to upload your log manually.");
 
                 }
+                SettingsFlyout.IsOpen = false;
                 File.Delete(zipStaged);
             }
         }

@@ -259,7 +259,7 @@ namespace AlotAddOnGUI.ui
 
 
             ALOTVersionInfo avi = Utilities.GetInstalledALOTInfo(DIAGNOSTICS_GAME);
-            addDiagLine("====INSTALLED ALOT INFO===");
+            addDiagLine("===Latest MEMI Marker Information");
             if (avi == null)
             {
                 addDiagLine("ALOT Marker file does not have MEMI tag. ALOT/MEUITM not installed, or at least not installed through an installer.");
@@ -281,7 +281,7 @@ namespace AlotAddOnGUI.ui
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
             WaitForMEM();
             addDiagLine("");
-            addDiagLine("===Files added (or removed) before/after ALOT/MEUITM install===");
+            addDiagLine("===Files added (or removed) after ALOT" + (DIAGNOSTICS_GAME == 1 ? "/MEUITM" : "") + " install");
 
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
@@ -302,7 +302,7 @@ namespace AlotAddOnGUI.ui
             Context = CONTEXT_REPLACEDFILE_SCAN;
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
             WaitForMEM();
-            addDiagLine("\n===Replaced files scan (after textures were installed)===");
+            addDiagLine("\n===Replaced files scan (after textures were installed)");
 
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
@@ -395,7 +395,7 @@ namespace AlotAddOnGUI.ui
             //Get LODs
             String lodStr = GetLODStr(DIAGNOSTICS_GAME);
             addDiagLine("");
-            addDiagLine("=====LOD INFORMATION=====");
+            addDiagLine("===LOD Information");
             addDiagLine(lodStr);
 
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataBasegamemods));
@@ -442,7 +442,7 @@ namespace AlotAddOnGUI.ui
                 args = "e \"" + diagfilename + "\" \"" + outfile + "\" -mt2";
                 Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
                 var lzmalog = File.ReadAllBytes(outfile);
-                var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer }).ReceiveString().Result;
+                var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag" }).ReceiveString().Result;
                 Uri uriResult;
                 bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
                     && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
