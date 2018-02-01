@@ -38,22 +38,44 @@ namespace AlotAddOnGUI.classes
                 {
                     return _readyiconpath;
                 }
-                else
+                else if (ALOTUpdateVersion > 0 || ALOTVersion > 0)
                 {
-                    if (Ready && Enabled)
+                    //Get current info
+                    ALOTVersionInfo info = null;
+                    if (Game_ME1)
                     {
-                        return "images/greencheckmark.png";
+                        info = MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO;
                     }
-                    else if (Ready && !Enabled)
+                    else if (Game_ME2)
                     {
-                        return "images/greycheckmark.png";
+                        info = MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO;
                     }
                     else
                     {
-                        return "images/orangedownload.png";
+                        info = MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO;
+                    }
+
+                    //Major Upgrade, including on unknown versions
+                    if (ALOTVersion > 0 && info != null && ALOTVersion > info.ALOTVER)
+                    {
+                        return "images/greycheckmark.png";
                     }
                 }
+                //Not ALOT
+                if (Ready && Enabled)
+                {
+                    return "images/greencheckmark.png";
+                }
+                else if (Ready && !Enabled)
+                {
+                    return "images/greycheckmark.png";
+                }
+                else
+                {
+                    return "images/orangedownload.png";
+                }
             }
+            
             set
             {
                 _readyiconpath = value;
@@ -183,19 +205,6 @@ namespace AlotAddOnGUI.classes
             }
         }
 
-        public bool ReadyIcon
-        {
-
-            get { return m_ready; }
-            set
-            {
-                m_ready = value;
-                OnPropertyChanged("ReadyIconPath");
-                OnPropertyChanged("ReadyIconPath");
-                OnPropertyChanged("Ready");
-            }
-        }
-
         public bool Ready
         {
 
@@ -234,6 +243,31 @@ namespace AlotAddOnGUI.classes
         {
             get
             {
+                if (ALOTUpdateVersion > 0 || ALOTVersion > 0)
+                {
+                    //Get current info
+                    ALOTVersionInfo info = null;
+                    if (Game_ME1)
+                    {
+                        info = MainWindow.CURRENTLY_INSTALLED_ME1_ALOT_INFO;
+                    }
+                    else if (Game_ME2)
+                    {
+                        info = MainWindow.CURRENTLY_INSTALLED_ME2_ALOT_INFO;
+                    }
+                    else
+                    {
+                        info = MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO;
+                    }
+
+                    //Major Upgrade, including on unknown versions
+                    if (ALOTVersion > 0 && info != null && ALOTVersion > info.ALOTVER)
+                    {
+                        //Disabled
+                        return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
+                    }
+                }
+
                 if (Ready && Enabled)
                 {
                     return Color.FromRgb((byte)0x31, (byte)0xae, (byte)0x90);
@@ -318,8 +352,8 @@ namespace AlotAddOnGUI.classes
 
             return null;
         }
-        
 
-        
+
+
     }
 }
