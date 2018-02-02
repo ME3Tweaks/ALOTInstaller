@@ -132,7 +132,7 @@
                         <StackPanel  HorizontalAlignment="Left" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal">
                             <Image x:Name="ReadyImageIcon" Height="15" Width="15" Source="{Binding ReadyIconPath}"/>
                             <TextBlock x:Name="Download_Hyperlink"  Margin="5,0">
-                                <Hyperlink ToolTip="{Binding DownloadLink}" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
+                                <Hyperlink x:Name="Download_InnerHyperlink" ToolTip="{Binding DownloadLink}" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
                                     <Hyperlink.Style >
                                         <Style TargetType="Hyperlink"
                                                 BasedOn="{StaticResource {x:Type Hyperlink}}">
@@ -144,7 +144,7 @@
                                     Download
                                 </Hyperlink>
                             </TextBlock>
-                            <TextBlock x:Name="ReadyStatusText" Visibility="Collapsed" Padding="5,0" Text="{Binding ReadyStatusText}" VerticalAlignment="Bottom"/>
+                            <TextBlock x:Name="ReadyStatusText" Visibility="Collapsed" Margin="3,0" Text="{Binding ReadyStatusText}" VerticalAlignment="Bottom"/>
                         </StackPanel>
                         <TextBlock HorizontalAlignment="Right" Grid.Row="1" Grid.Column="3" Text="{Binding Filename}" FontWeight="Bold" VerticalAlignment="Center" />
                     </Grid>
@@ -177,8 +177,18 @@
                         <DataTrigger Binding="{Binding Ready}" Value="True">
                             <Setter TargetName="Download_Hyperlink" Property="Visibility" Value="Collapsed"/>
                             <Setter TargetName="ReadyStatusText" Property="Visibility" Value="Visible"/>
-                            <!--<Setter TargetName="ListItemLeftBlock" Property="Background" Value="#31ae90"/>-->
                         </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=MEUITM}" Value="true" />
+                                <Condition Binding="{Binding Path=AlreadyInstalled}" Value="true" />
+                                <Condition Binding="{Binding Path=Ready}" Value="false" />
+
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ReadyStatusText" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="Download_InnerHyperlink" Property="Foreground" Value="Gray" />
+
+                        </MultiDataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>
             </ListView.ItemTemplate>

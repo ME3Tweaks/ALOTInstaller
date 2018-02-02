@@ -528,6 +528,12 @@ namespace AlotAddOnGUI
                             af.ReadyStatusText = "Update not applicable";
                             continue;
                         }
+
+                        if (af.MEUITM && CurrentGameALOTInfo.MEUITMVER > 0)
+                        {
+                            Log.Information("MEUITM is already installed, skipping...");
+                            continue; //skip
+                        }
                     }
 
                     if (af.UserFile && af.Enabled && BUILD_USER_FILES)

@@ -1672,6 +1672,7 @@ namespace AlotAddOnGUI
                 linqlist = (from e in rootElement.Elements("addonfile")
                             select new AddonFile
                             {
+                                AlreadyInstalled = false,
                                 Showing = false,
                                 Enabled = true,
                                 FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
@@ -1788,10 +1789,10 @@ namespace AlotAddOnGUI
                 }
             }
             UpdateALOTStatus();
-            if (meuitmindex >= 0)
-            {
-                alladdonfiles.RemoveAt(meuitmindex);
-            }
+            //if (meuitmindex >= 0)
+            //{
+            //    alladdonfiles.RemoveAt(meuitmindex);
+            //}
 
             ApplyFiltering(); //sets data source and separators            
         }
@@ -1799,13 +1800,17 @@ namespace AlotAddOnGUI
         private void ApplyFiltering()
         {
             BindingList<AddonFile> newList = new BindingList<AddonFile>();
-            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO == null || CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER == 0)
+            if (meuitmFile != null)
             {
-                //show MEUITM
-                if (meuitmFile != null && alladdonfiles.IndexOf(meuitmFile) < 0)
+
+                if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER > 0)
                 {
-                    alladdonfiles.Add(meuitmFile);
-                    alladdonfiles = new BindingList<AddonFile>(alladdonfiles.OrderBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList());
+                    //Disable MEUITM
+                    meuitmFile.AlreadyInstalled = true;
+                }
+                else
+                {
+                    meuitmFile.AlreadyInstalled = false;
                 }
             }
             foreach (AddonFile af in alladdonfiles)
@@ -3392,7 +3397,7 @@ namespace AlotAddOnGUI
             if (latestlogfile != null)
             {
                 Log.Information("Staging log file for upload. This is the final log item that should appear in an uploaded log.");
-                string zipStaged = EXE_DIRECTORY + "logs\\"+latestlogfile.Name + "_forUpload";
+                string zipStaged = EXE_DIRECTORY + "logs\\" + latestlogfile.Name + "_forUpload";
                 File.Copy(latestlogfile.FullName, zipStaged, true);
                 string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
 
