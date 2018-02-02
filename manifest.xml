@@ -126,7 +126,7 @@
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/9" filename="Medium Phoenix Female-9-1-0.rar" md5="bb70d844d5ff871fcdc231fb3d744642" size="17207706" />
     <packagefile me1="true" sourcename="ME1_Med_Phoe_Fem.tpf" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="Miscellaneous textures" tooltipname="Miscellaneous Textures.zip" author="CreeperLava">
+  <addonfile friendlyname="Miscellaneous textures" tooltipname="Miscellaneous Textures.zip" author="CDAMJC, CreeperLava">
     <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="Miscellaneous Textures.zip" size="12211901" md5="3a747c9d9daf7de4c24fde296d76be83" />
     <packagefile me1="true" sourcename="MEUITM Fix.mem" movedirectly="true" />
   </addonfile>
