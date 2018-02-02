@@ -38,7 +38,7 @@ namespace AlotAddOnGUI.classes
                 {
                     return _readyiconpath;
                 }
-                else if (ALOTUpdateVersion > 0 || ALOTVersion > 0)
+                else if (ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM)
                 {
                     //Get current info
                     ALOTVersionInfo info = null;
@@ -60,6 +60,17 @@ namespace AlotAddOnGUI.classes
                     {
                         return "images/greycheckmark.png";
                     }
+                    if (MEUITM && info != null && info.MEUITMVER > 0)
+                    {
+                        if (Ready)
+                        {
+                            return "images/greycheckmark.png";
+                        }
+                        else
+                        {
+                            return "images/greydownload.png";
+                        }
+                    }
                 }
                 //Not ALOT
                 if (Ready && Enabled)
@@ -75,13 +86,14 @@ namespace AlotAddOnGUI.classes
                     return "images/orangedownload.png";
                 }
             }
-            
+
             set
             {
                 _readyiconpath = value;
                 OnPropertyChanged("ReadyIconPath");
             }
         }
+
         public string ReadyStatusText
         {
             get
@@ -98,7 +110,7 @@ namespace AlotAddOnGUI.classes
                 {
                     return "File staged for installation";
                 }
-                if (ALOTUpdateVersion > 0 || ALOTVersion > 0)
+                if (ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM)
                 {
                     //Get current info
                     ALOTVersionInfo info = null;
@@ -164,6 +176,25 @@ namespace AlotAddOnGUI.classes
                         else
                         {
                             return "ALOT update imported, will be installed";
+                        }
+                    }
+
+                    if (MEUITM)
+                    {
+                        if (info != null)
+                        {
+                            if (info.MEUITMVER > 0)
+                            {
+                                return "MEUITM already installed";
+                            }
+                            else
+                            {
+                                return "MEUITM imported";
+                            }
+                        }
+                        else
+                        {
+                            return "MEUITM imported";
                         }
                     }
                 }
@@ -239,11 +270,13 @@ namespace AlotAddOnGUI.classes
             }
         }
 
+        public bool AlreadyInstalled { get; set; }
+
         public Color LeftBlockColor
         {
             get
             {
-                if (ALOTUpdateVersion > 0 || ALOTVersion > 0)
+                if (ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM)
                 {
                     //Get current info
                     ALOTVersionInfo info = null;
@@ -266,13 +299,18 @@ namespace AlotAddOnGUI.classes
                         //Disabled
                         return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
                     }
+                    if (MEUITM && info != null && info.MEUITMVER > 0)
+                    {
+                        //Disabled
+                        return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
+                    }
                 }
 
                 if (Ready && Enabled)
                 {
                     return Color.FromRgb((byte)0x31, (byte)0xae, (byte)0x90);
                 }
-                else if (Ready)
+                else if (Ready || !Enabled)
                 {
                     //Disabled
                     return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
