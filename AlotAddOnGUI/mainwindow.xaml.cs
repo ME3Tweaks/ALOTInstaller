@@ -134,7 +134,6 @@ namespace AlotAddOnGUI
         private string MANIFEST_BUNDLED_LOC = EXE_DIRECTORY + @"Data\manifest-bundled.xml";
         private List<string> COPY_QUEUE = new List<string>();
         private List<string> MOVE_QUEUE = new List<string>();
-        private bool INSTALLED_GAME_IS_ORIGIN_BASED = false;
 
         public bool ShowME1Files
         {
