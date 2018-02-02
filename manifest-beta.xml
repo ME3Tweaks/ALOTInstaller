@@ -57,15 +57,15 @@
     <packagefile me1="true" sourcename="MEUITM\mods\volus.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\Wrex.mem" movedirectly="true" />
   </addonfile>
-  <addonfile alotversion="6" friendlyname="ALOT for ME1 - Textures" tooltipname="Main file for ALOT for ME1" author="CreeperLava">
+  <addonfile alotversion="6" friendlyname="ALOT for ME1 6.0 - Textures" tooltipname="Main file for ALOT for ME1" author="CreeperLava">
     <file downloadlink="https://mega.nz/#F!glc3mQZS!vFNj9C6Sxp6eTkiybYTrqw" filename="ALOT for ME1 - Textures.zip" unpackedsinglefilename="ALOT_ME1_v6.mem" size="448315060" md5="790a9cdf6dd20c39fa365ef1d47fced4" />
     <packagefile me1="true" sourcename="ALOT_ME1.mem" movedirectly="true" />
   </addonfile>
-  <addonfile alotversion="6" friendlyname="ALOT for ME2 - Textures" tooltipname="Main file for ALOT for ME2" author="CreeperLava">
+  <addonfile alotversion="6" friendlyname="ALOT for ME2 6.0 - Textures" tooltipname="Main file for ALOT for ME2" author="CreeperLava">
     <file downloadlink="https://mega.nz/#F!glc3mQZS!vFNj9C6Sxp6eTkiybYTrqw" filename="ALOT for ME2 - Textures.zip" unpackedsinglefilename="ALOT_ME2_v6.mem" size="3564679575" md5="7003a728693682a8988e1a6f3dfef7c7" />
     <packagefile me2="true" sourcename="ALOT_ME2.mem" movedirectly="true" />
   </addonfile>
-  <addonfile alotversion="6" friendlyname="ALOT for ME3 - Textures" tooltipname="Main file of ALOT for ME3" author="CreeperLava">
+  <addonfile alotversion="6" friendlyname="ALOT for ME3 6.0 - Textures" tooltipname="Main file of ALOT for ME3" author="CreeperLava">
     <file downloadlink="https://mega.nz/#F!glc3mQZS!vFNj9C6Sxp6eTkiybYTrqw" filename="ALOT for ME3 - Textures.zip" unpackedsinglefilename="ALOT_ME3_v6.mem" size="5780531297" md5="4d4b09c0d76f00141d37861f5e3e4e9a" />
     <packagefile me3="true" sourcename="ALOT_ME3.mem" movedirectly="true" />
   </addonfile>
