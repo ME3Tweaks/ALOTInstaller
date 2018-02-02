@@ -995,7 +995,7 @@ namespace AlotAddOnGUI
             else
             {
                 Button_InstallME1.IsEnabled = true;
-                Button_InstallME1.ToolTip = "Click to install build and install textures for Mass Effect";
+                Button_InstallME1.ToolTip = "Click to build and install textures for Mass Effect";
                 Button_InstallME1.Content = "Install for ME1";
             }
 
@@ -1009,7 +1009,7 @@ namespace AlotAddOnGUI
             else
             {
                 Button_InstallME2.IsEnabled = true;
-                Button_InstallME2.ToolTip = "Click to install build and install textures for Mass Effect 2";
+                Button_InstallME2.ToolTip = "Click to build and install textures for Mass Effect 2";
                 Button_InstallME2.Content = "Install for ME2";
             }
 
@@ -1023,7 +1023,7 @@ namespace AlotAddOnGUI
             else
             {
                 Button_InstallME3.IsEnabled = true;
-                Button_InstallME3.ToolTip = "Click to install build and install textures for Mass Effect 3";
+                Button_InstallME3.ToolTip = "Click to build and install textures for Mass Effect 3";
                 Button_InstallME3.Content = "Install for ME3";
             }
         }
@@ -3396,7 +3396,7 @@ namespace AlotAddOnGUI
             if (latestlogfile != null)
             {
                 Log.Information("Staging log file for upload. This is the final log item that should appear in an uploaded log.");
-                string zipStaged = latestlogfile.FullName + "_forUpload";
+                string zipStaged = EXE_DIRECTORY + "logs\\"+latestlogfile.Name + "_forUpload";
                 File.Copy(latestlogfile.FullName, zipStaged, true);
                 string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
 
@@ -3404,6 +3404,7 @@ namespace AlotAddOnGUI
                 string outfile = latestlogfile + "_forUpload.lzma";
                 string args = "e \"" + zipStaged + "\" \"" + outfile + "\" -mt2";
                 Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
+                File.Delete(zipStaged);
                 var lzmalog = File.ReadAllBytes(outfile);
                 ProgressDialogController progresscontroller = await this.ShowProgressAsync("Uploading log", "Log is currently uploading, please wait...", true);
                 progresscontroller.SetIndeterminate();
@@ -3458,7 +3459,7 @@ namespace AlotAddOnGUI
 
                 }
                 SettingsFlyout.IsOpen = false;
-                File.Delete(zipStaged);
+                File.Delete(outfile);
             }
         }
 
