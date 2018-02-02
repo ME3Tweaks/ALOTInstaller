@@ -239,6 +239,7 @@
     <Content Include="Data\bin\lzma.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="images\greydownload.png" />
     <Resource Include="images\greycheckmark.png" />
     <Resource Include="images\origin\me1update.png" />
     <Resource Include="images\origin\me2update.png" />

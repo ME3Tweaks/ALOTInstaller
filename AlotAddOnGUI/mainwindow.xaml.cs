@@ -1789,10 +1789,10 @@ namespace AlotAddOnGUI
                 }
             }
             UpdateALOTStatus();
-            if (meuitmindex >= 0)
-            {
-                alladdonfiles.RemoveAt(meuitmindex);
-            }
+            //if (meuitmindex >= 0)
+            //{
+            //    alladdonfiles.RemoveAt(meuitmindex);
+            //}
 
             ApplyFiltering(); //sets data source and separators            
         }
@@ -1800,13 +1800,16 @@ namespace AlotAddOnGUI
         private void ApplyFiltering()
         {
             BindingList<AddonFile> newList = new BindingList<AddonFile>();
-            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO == null || CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER == 0)
+            if (meuitmFile != null)
             {
-                //show MEUITM
-                if (meuitmFile != null && alladdonfiles.IndexOf(meuitmFile) < 0)
+
+                if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER > 0)
                 {
-                    alladdonfiles.Add(meuitmFile);
-                    alladdonfiles = new BindingList<AddonFile>(alladdonfiles.OrderBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList());
+                    //show MEUITM
+                    meuitmFile.Enabled = false;
+                } else
+                {
+                    meuitmFile.Enabled = true;
                 }
             }
             foreach (AddonFile af in alladdonfiles)

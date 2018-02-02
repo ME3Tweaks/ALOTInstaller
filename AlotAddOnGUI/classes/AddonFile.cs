@@ -48,10 +48,16 @@ namespace AlotAddOnGUI.classes
                     {
                         return "images/greycheckmark.png";
                     }
-                    else
+                    else if (!Enabled)
                     {
-                        return "images/orangedownload.png";
+                        //!Ready and !Enabled
+                        return "images/greydownload.png";
+
                     }
+
+                    //!Ready and Enabled
+                    return "images/orangedownload.png";
+
                 }
             }
             set
@@ -318,8 +324,8 @@ namespace AlotAddOnGUI.classes
 
             return null;
         }
-        
 
-        
+
+
     }
 }
