@@ -1816,18 +1816,28 @@ namespace AlotAddOnGUI
 
                 if (File.Exists(source))
                 {
-                    if (File.Exists(dest))
+                    try
                     {
-                        File.Delete(dest);
+                        if (File.Exists(dest))
+                        {
+                            File.Delete(dest);
+                        }
+                        File.Move(source, dest);
+                        Log.Information("Moved main alot file back to downloaded_mods");
+                        //Delete original
+                        dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotAddonFile.Filename;
+                        if (File.Exists(dest))
+                        {
+                            Log.Information("Deleting original alot archive file from downloaded_mods");
+                            File.Delete(dest);
+                            Log.Information("Deleted original alot archive file from downloaded_mods");
+
+                        }
                     }
-                    File.Move(source, dest);
-                    Log.Information("Moved main alot file back to downloaded_mods");
-                    //Delete original
-                    dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotAddonFile.Filename;
-                    if (File.Exists(dest))
+                    catch (Exception ex)
                     {
-                        Log.Information("Deleted original alot archive file from downloaded_mods");
-                        File.Delete(dest);
+                        Log.Error("Exception attempting to move file back! " + ex.Message);
+                        Log.Error("Skipping moving file back.");
                     }
                 }
                 else
