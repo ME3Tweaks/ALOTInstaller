@@ -66,12 +66,13 @@ namespace AlotAddOnGUI.ui
             }
             if (me2Path == null)
             {
-                Button_ManualFileME2.ToolTip = "Mass Effect 2 4is not installed";
+                Button_ManualFileME2.ToolTip = "Mass Effect 2 is not installed";
             }
             if (me3Path == null)
             {
                 Button_ManualFileME3.ToolTip = "Mass Effect 3 is not installed";
             }
+
         }
 
         private void Button_DiagnosticsME3_Click(object sender, RoutedEventArgs e)

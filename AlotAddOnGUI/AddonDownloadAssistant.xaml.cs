@@ -28,13 +28,15 @@ namespace AlotAddOnGUI
         private List<AddonFile> missingAddonFiles;
         internal bool SHUTTING_DOWN = false;
 
-        public AddonDownloadAssistant(MainWindow windowRef,List<AddonFile> missingAddonFiles)
+        public AddonDownloadAssistant(MainWindow windowRef, List<AddonFile> missingAddonFiles)
         {
             Owner = windowRef;
             InitializeComponent();
             this.windowRef = windowRef;
             this.missingAddonFiles = missingAddonFiles;
             filesList.ItemsSource = missingAddonFiles;
+            ShowStatus("Downloads folder: " + windowRef.DOWNLOADS_FOLDER, 5000);
+
         }
 
         public void setNewMissingAddonfiles(List<AddonFile> missingAddonFiles)
@@ -42,7 +44,7 @@ namespace AlotAddOnGUI
             this.missingAddonFiles = missingAddonFiles;
             filesList.ItemsSource = missingAddonFiles;
         }
-        
+
         private async void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             string fname = (string)((Hyperlink)e.Source).Tag;
@@ -87,7 +89,8 @@ namespace AlotAddOnGUI
             if (!SHUTTING_DOWN)
             {
                 windowRef.WindowState = WindowState.Normal;
-            } else
+            }
+            else
             {
                 windowRef.DOWNLOAD_ASSISTANT_WINDOW = null;
             }
