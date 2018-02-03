@@ -330,7 +330,7 @@ if exist "$(TargetDir)alotinstaller.exe.config" del /q "$(TargetDir)alotinstalle
 
 if not exist "$(TargetDir)Data\lib" mkdir "$(TargetDir)Data\lib"
 move /Y "$(TargetDir)*.dll" "$(TargetDir)Data\Lib\"
-::del /q "$(TargetDir)*.xml"
+del /q "$(TargetDir)*.xml"
 del /q "$(TargetDir)MahApps.Metro.IconPacks.Modern.pdb"
 del /q "$(TargetDir)MahApps.Metro.pdb"
  
