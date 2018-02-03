@@ -7,17 +7,18 @@
         mc:Ignorable="d"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
-        Title="Diagnostics" Height="300" Width="350">
+        Title="Diagnostics" Height="300" Width="350"
+        WindowStartupLocation="CenterOwner">
     <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
         <TextBlock x:Name="DiagnosticHeader" Text="Select which game you are generating diagnostics for." HorizontalAlignment="Center" TextAlignment="Center"/>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-            <Button x:Name="Button_ManualFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="5" Click="Button_DiagnosticsME1_Click">
+            <Button x:Name="Button_ManualFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="5" Click="Button_DiagnosticsME1_Click" ToolTip="Click to perform diagnostic on Mass Effect">
                 <Image Source="../images/logo_me1.png" Height="40" Margin="4"/>
             </Button>
-            <Button x:Name="Button_ManualFileME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="5" Click="Button_DiagnosticsME2_Click">
+            <Button x:Name="Button_ManualFileME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="5" Click="Button_DiagnosticsME2_Click"  ToolTip="Click to perform diagnostic on Mass Effect 2">
                 <Image Source="../images/logo_me2.png" Height="40" Margin="4"/>
             </Button>
-            <Button x:Name="Button_ManualFileME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="5" Click="Button_DiagnosticsME3_Click">
+            <Button x:Name="Button_ManualFileME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="5" Click="Button_DiagnosticsME3_Click" ToolTip="Click to perform diagnostic on Mass Effect 3">
                 <Image Source="../images/logo_me3.png" Height="40" Margin="4"/>
             </Button>
         </StackPanel>

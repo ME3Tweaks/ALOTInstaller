@@ -18,6 +18,7 @@ using Flurl.Http;
 using System.Diagnostics;
 using ByteSizeLib;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using System.Management;
 
 namespace AlotAddOnGUI.ui
 {
@@ -58,10 +59,24 @@ namespace AlotAddOnGUI.ui
             Button_ManualFileME1.IsEnabled = me1Path != null;
             Button_ManualFileME2.IsEnabled = me2Path != null;
             Button_ManualFileME3.IsEnabled = me3Path != null;
+
+            if (me1Path == null)
+            {
+                Button_ManualFileME1.ToolTip = "Mass Effect is not installed";
+            }
+            if (me2Path == null)
+            {
+                Button_ManualFileME2.ToolTip = "Mass Effect 2 4is not installed";
+            }
+            if (me3Path == null)
+            {
+                Button_ManualFileME3.ToolTip = "Mass Effect 3 is not installed";
+            }
         }
 
         private void Button_DiagnosticsME3_Click(object sender, RoutedEventArgs e)
         {
+            Button_ManualFileME3.ToolTip = "Diagnostic will be run on Mass Effect 3";
             Button_ManualFileME1.Visibility = Visibility.Collapsed;
             Button_ManualFileME2.Visibility = Visibility.Collapsed;
             Button_ManualFileME3.Click -= Button_DiagnosticsME3_Click;
@@ -71,6 +86,7 @@ namespace AlotAddOnGUI.ui
 
         private void Button_DiagnosticsME1_Click(object sender, RoutedEventArgs e)
         {
+            Button_ManualFileME1.ToolTip = "Diagnostic will be run on Mass Effect";
             Button_ManualFileME2.Visibility = Visibility.Collapsed;
             Button_ManualFileME3.Visibility = Visibility.Collapsed;
             Button_ManualFileME1.Click -= Button_DiagnosticsME1_Click;
@@ -80,6 +96,7 @@ namespace AlotAddOnGUI.ui
 
         private void Button_DiagnosticsME2_Click(object sender, RoutedEventArgs e)
         {
+            Button_ManualFileME2.ToolTip = "Diagnostic will be run on Mass Effect 2";
             Button_ManualFileME1.Visibility = Visibility.Collapsed;
             Button_ManualFileME3.Visibility = Visibility.Collapsed;
             Button_ManualFileME2.Click -= Button_DiagnosticsME2_Click;
@@ -248,19 +265,39 @@ namespace AlotAddOnGUI.ui
             addDiagLine("Using MassEffectModderNoGui v" + fileVersion);
 
             addDiagLine("Game is installed at " + Utilities.GetGamePath(DIAGNOSTICS_GAME));
+
+
             string exePath = Utilities.GetGameEXEPath(DIAGNOSTICS_GAME);
             if (File.Exists(exePath))
             {
+                versInfo = FileVersionInfo.GetVersionInfo(exePath);
+                addDiagLine("===Executable information");
+                addDiagLine("Version: " + versInfo.FileMajorPart + "." + versInfo.FileMinorPart + "." + versInfo.FileBuildPart + "." + versInfo.FilePrivatePart);
                 using (var md5 = MD5.Create())
                 {
                     using (var stream = File.OpenRead(exePath))
                     {
-                        addDiagLine("Executable hash is " + BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower());
+                        addDiagLine("Hash: " + BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower());
                     }
                 }
             }
 
+
+            addDiagLine("===System information");
             addDiagLine("System Memory: " + ByteSize.FromKiloBytes(Utilities.GetInstalledRamAmount()));
+
+            ManagementObjectSearcher objvide = new ManagementObjectSearcher("select * from Win32_VideoController");
+
+            int vidCardIndex = 1;
+            foreach (ManagementObject obj in objvide.Get())
+            {
+                addDiagLine("");
+                addDiagLine("Video Card " + vidCardIndex);
+                addDiagLine("Name: " + obj["Name"]);
+                addDiagLine("Memory: " + ByteSize.FromBytes(Convert.ToInt64(obj["AdapterRAM"])));
+                addDiagLine("DriverVersion: " + obj["DriverVersion"]);
+                vidCardIndex++;
+            }
 
 
             ALOTVersionInfo avi = Utilities.GetInstalledALOTInfo(DIAGNOSTICS_GAME);
@@ -405,16 +442,51 @@ namespace AlotAddOnGUI.ui
                 addDiagLine("Diagnostic did not find any bad mods installed - if the files were updated already this detection may not be accurate");
             }
 
+            //Get DLCs
+            var dlcPath = Utilities.GetGamePath(DIAGNOSTICS_GAME);
+            switch (DIAGNOSTICS_GAME)
+            {
+                case 1:
+                    dlcPath = Path.Combine(dlcPath, "DLC");
+                    break;
+                case 2:
+                case 3:
+                    dlcPath = Path.Combine(dlcPath, "BIOGame", "DLC");
+                    break;
+            }
+
+            addDiagLine("");
+            addDiagLine("===Installed DLC");
+
+            if (Directory.Exists(dlcPath))
+            {
+
+                var directories = Directory.EnumerateDirectories(dlcPath);
+                foreach (string dir in directories)
+                {
+                    addDiagLine(" - " + Path.GetFileName(dir));
+                }
+            }
+            else
+            {
+                if (DIAGNOSTICS_GAME == 3)
+                {
+                    addDiagLine(" - DIAG ERROR: DLC directory is missing: " + dlcPath + ". Mass Effect 3 always has a DLC folder so this should not be missing.");
+                }
+                else
+                {
+                    addDiagLine(" - DIAG ERROR: DLC directory is missing: " + dlcPath + ". If no DLC is installed, this folder will be missing.");
+                }
+            }
+
+
             //Get LODs
-            String lodStr = GetLODStr(DIAGNOSTICS_GAME,avi);
+            String lodStr = GetLODStr(DIAGNOSTICS_GAME, avi);
             addDiagLine("");
             addDiagLine("===LOD Information");
             addDiagLine(lodStr);
 
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataBasegamemods));
-
-
-
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_Upload));
 
             string diag = diagStringBuilder.ToString();
@@ -427,55 +499,54 @@ namespace AlotAddOnGUI.ui
 
             //upload
             string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
-            if (diag.Length > 512000)
+            //if (diag.Length > 512000)
+            //{
+            //    var responseString = "https://me3tweaks.com/alotinstaller/loguploader".PostUrlEncodedAsync(new { LogData = diag, ALOTInstallerVersion = alotInstallerVer }).ReceiveString().Result;
+            //    Uri uriResult;
+            //    bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
+            //        && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            //    if (result)
+            //    {
+            //        //should be valid URL.
+            //        diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
+            //        e.Result = responseString;
+            //        Log.Information("Result from server for log upload: " + responseString);
+            //    }
+            //    else
+            //    {
+            //        diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from relay: " + responseString));
+            //        diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
+            //        Log.Error("Error uploading log. The server responded with: " + responseString);
+            //    }
+            //}
+            //else
+            //{
+            //Compress with LZMA for VPS Upload
+            string outfile = diagfilename + ".lzma";
+            args = "e \"" + diagfilename + "\" \"" + outfile + "\" -mt2";
+            Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
+            var lzmalog = File.ReadAllBytes(outfile);
+            var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag" }).ReceiveString().Result;
+            Uri uriResult;
+            bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
+                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            if (result)
             {
-
-                var responseString = "https://me3tweaks.com/alotinstaller/loguploader".PostUrlEncodedAsync(new { LogData = diag, ALOTInstallerVersion = alotInstallerVer }).ReceiveString().Result;
-                Uri uriResult;
-                bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
-                    && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-                if (result)
-                {
-                    //should be valid URL.
-                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
-                    e.Result = responseString;
-                    Log.Information("Result from server for log upload: " + responseString);
-                }
-                else
-                {
-                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from relay: " + responseString));
-                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
-                    Log.Error("Error uploading log. The server responded with: " + responseString);
-                }
+                //should be valid URL.
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
+                e.Result = responseString;
+                Log.Information("Result from server for log upload: " + responseString);
             }
             else
             {
-                //Compress with LZMA for VPS Upload
-                string outfile = diagfilename + ".lzma";
-                args = "e \"" + diagfilename + "\" \"" + outfile + "\" -mt2";
-                Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
-                var lzmalog = File.ReadAllBytes(outfile);
-                var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag" }).ReceiveString().Result;
-                Uri uriResult;
-                bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
-                    && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-                if (result)
-                {
-                    //should be valid URL.
-                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
-                    e.Result = responseString;
-                    Log.Information("Result from server for log upload: " + responseString);
-                }
-                else
-                {
-                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from oversized log uploader: " + responseString));
-                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
-                    Log.Error("Error uploading log. The server responded with: " + responseString);
-                    e.Result = "Diagnostic complete.";
-                    Log.Warning("Log is too big to upload to pastebin");
-                    Utilities.OpenAndSelectFileInExplorer(diagfilename);
-                }
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from log server: " + responseString));
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
+                Log.Error("Error uploading log. The server responded with: " + responseString);
+                e.Result = "Diagnostic complete.";
+                Log.Warning("Log was rejected from log server");
+                Utilities.OpenAndSelectFileInExplorer(diagfilename);
             }
+            //}
         }
 
         private string GetLODStr(int gameID, ALOTVersionInfo avi)
@@ -518,7 +589,8 @@ namespace AlotAddOnGUI.ui
                             if (avi != null)
                             {
                                 log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
-                            } else
+                            }
+                            else
                             {
                                 log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have unused mip crashes." + Environment.NewLine;
                             }

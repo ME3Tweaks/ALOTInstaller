@@ -29,6 +29,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>ALOTInstallerIcon.ico</ApplicationIcon>
@@ -56,6 +57,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>AlotAddOnGUI.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ByteSize, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -326,7 +330,7 @@ if exist "$(TargetDir)alotinstaller.exe.config" del /q "$(TargetDir)alotinstalle
 
 if not exist "$(TargetDir)Data\lib" mkdir "$(TargetDir)Data\lib"
 move /Y "$(TargetDir)*.dll" "$(TargetDir)Data\Lib\"
-del /q "$(TargetDir)*.xml"
+::del /q "$(TargetDir)*.xml"
 del /q "$(TargetDir)MahApps.Metro.IconPacks.Modern.pdb"
 del /q "$(TargetDir)MahApps.Metro.pdb"
  

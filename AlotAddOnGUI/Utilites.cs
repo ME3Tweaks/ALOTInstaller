@@ -81,7 +81,7 @@ namespace AlotAddOnGUI
                     System.IO.File.Delete(Path.Combine(dir, "temp.txt"));
                     return true;
                 }
-                catch (System.UnauthorizedAccessException ex)
+                catch (System.UnauthorizedAccessException)
                 {
                     return false;
                 }
@@ -391,7 +391,7 @@ namespace AlotAddOnGUI
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Unable to delete file: " + file + ". It may be open still");
+                    Log.Error("Unable to delete file: " + file + ". It may be open still: "+e.Message);
                     return false;
                 }
             }
@@ -410,7 +410,7 @@ namespace AlotAddOnGUI
             }
             catch (Exception e)
             {
-                Log.Error("Unable to delete directory: " + target_dir + ". It may be open still");
+                Log.Error("Unable to delete directory: " + target_dir + ". It may be open still. "+e.Message);
                 return false;
             }
             return result;
@@ -906,7 +906,7 @@ public static int runProcessAsAdmin(string exe, string args, bool standAlone = f
                 XDocument.Parse(inputXML);
                 return true;
             }
-            catch (XmlException e)
+            catch (XmlException)
             {
                 return false;
             }

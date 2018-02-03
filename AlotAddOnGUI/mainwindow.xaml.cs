@@ -33,6 +33,7 @@ using System.Windows.Navigation;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using Flurl.Http;
+using System.Windows.Media;
 
 namespace AlotAddOnGUI
 {
@@ -480,6 +481,7 @@ namespace AlotAddOnGUI
             PerformWriteCheck();
             UpdateALOTStatus();
             RunMEMUpdaterGUI();
+            Log.Information("PerformPostStartup() has completed. We are now switching over to user control.");
         }
 
         private void MEMNoGuiUpdateCanceled(object sender, EventArgs e)
@@ -1269,6 +1271,7 @@ namespace AlotAddOnGUI
             bool? hasShownFirstRun = Utilities.GetRegistrySettingBool("HasRunFirstRun");
             if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
             {
+                Log.Information("Showing first run flyout");
                 playFirstTimeAnimation();
             }
             else
@@ -1797,7 +1800,7 @@ namespace AlotAddOnGUI
             ApplyFiltering(); //sets data source and separators            
         }
 
-        private void ApplyFiltering()
+        private void ApplyFiltering(bool scrollToBottom = false)
         {
             BindingList<AddonFile> newList = new BindingList<AddonFile>();
             if (meuitmFile != null)
@@ -1851,6 +1854,13 @@ namespace AlotAddOnGUI
                     }
                 }
                 DOWNLOAD_ASSISTANT_WINDOW.setNewMissingAddonfiles(notReadyAddonFiles);
+            }
+
+            if (scrollToBottom && VisualTreeHelper.GetChildrenCount(ListView_Files) > 0)
+            {
+                Border border = (Border)VisualTreeHelper.GetChild(ListView_Files, 0);
+                ScrollViewer scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
+                scrollViewer.ScrollToBottom();
             }
         }
 
@@ -1991,6 +2001,7 @@ namespace AlotAddOnGUI
                 {
                     Label_WhatToBuildAndInstall.Text = "ALOT is already installed. " + Label_WhatToBuildAndInstall.Text;
                 }
+                ShowReadyFilesOnly = false;
                 WhatToBuildFlyout.IsOpen = true;
                 Button_BuildAndInstall.IsEnabled = true;
             }
@@ -2618,6 +2629,7 @@ namespace AlotAddOnGUI
             {
                 PendingUserFiles = acceptableUserFiles;
                 LoadUserFileSelection(PendingUserFiles[0]);
+                WhatToBuildFlyout.IsOpen = false;
                 UserTextures_Flyout.IsOpen = true;
             }
 
@@ -3241,7 +3253,7 @@ namespace AlotAddOnGUI
             {
                 if (RefreshListOnUserImportClose)
                 {
-                    ApplyFiltering();
+                    ApplyFiltering(true);
                     RefreshListOnUserImportClose = false;
                     PendingUserFiles.Clear();
                 }
@@ -3529,7 +3541,9 @@ namespace AlotAddOnGUI
 
         private void Button_GenerateDiagnostics_Click(object sender, RoutedEventArgs e)
         {
+            SettingsFlyout.IsOpen = false;
             DiagnosticsWindow dw = new DiagnosticsWindow();
+            dw.Owner = this;
             dw.ShowDialog();
         }
 
