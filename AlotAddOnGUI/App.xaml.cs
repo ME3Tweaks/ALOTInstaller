@@ -23,13 +23,23 @@ namespace AlotAddOnGUI
     /// </summary>
     public partial class App : Application
     {
+        private static bool POST_STARTUP = false;
+
         [STAThread]
         public static void Main()
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-            var application = new App();
-            application.InitializeComponent();
-            application.Run();
+            try
+            {
+                var application = new App();
+                application.InitializeComponent();
+                application.Run();
+            }
+            catch (Exception e)
+            {
+                OnFatalCrash(e);
+                throw e;
+            }
         }
 
         public App() : base()
@@ -82,6 +92,7 @@ namespace AlotAddOnGUI
                 .WriteTo.RollingFile(loggingBasePath + "\\logs\\alotinstaller-{Date}.txt", flushToDiskInterval: new TimeSpan(0, 0, 15))
               .CreateLogger();
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
+            POST_STARTUP = true;
             Log.Information("=====================================================");
             Log.Information("Logger Started for ALOT Installer.");
             if (preLogMessages != "")
@@ -204,6 +215,15 @@ namespace AlotAddOnGUI
             //e.Handled = true;
         }
 
+        public static void OnFatalCrash(Exception e)
+        {
+            if (!POST_STARTUP)
+            {
+                string errorMessage = string.Format("ALOT Installer has encountered a serious fatal startup crash:\n" + FlattenException(e));
+                File.WriteAllText("FATAL_STARTUP_CRASH.txt", errorMessage);
+            }
+        }
+
         public static string FlattenException(Exception exception)
         {
             var stringBuilder = new StringBuilder();
@@ -246,6 +266,7 @@ namespace AlotAddOnGUI
                 var assy = Assembly.LoadFile(newPath);
                 return assy;
             }
+
             return null;
         }
     }
