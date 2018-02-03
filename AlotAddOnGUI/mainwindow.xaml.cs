@@ -948,10 +948,6 @@ namespace AlotAddOnGUI
             Switch_ME2Filter.IsEnabled = ShowME2Files = me2Installed;
             Switch_ME3Filter.IsEnabled = ShowME3Files = me3Installed;
 
-            Log.Information("ME1 Installed: " + me1Installed);
-            Log.Information("ME2 Installed: " + me2Installed);
-            Log.Information("ME3 Installed: " + me3Installed);
-
             ValidateGameBackup(1);
             ValidateGameBackup(2);
             ValidateGameBackup(3);
@@ -3491,8 +3487,23 @@ namespace AlotAddOnGUI
                             notReadyAddonFiles.Add(af);
                         }
                     }
-                    DOWNLOAD_ASSISTANT_WINDOW = new AddonDownloadAssistant(this, notReadyAddonFiles);
-                    DOWNLOAD_ASSISTANT_WINDOW.Show();
+                    if (notReadyAddonFiles.Count > 0)
+                    {
+
+                        DOWNLOAD_ASSISTANT_WINDOW = new AddonDownloadAssistant(this, notReadyAddonFiles);
+                        DOWNLOAD_ASSISTANT_WINDOW.Show();
+                    }
+                    else
+                    {
+                        if (ShowME1Files && ShowME2Files && ShowME3Files)
+                        {
+                            ShowStatus("All files are already imported", 3000);
+                        }
+                        else
+                        {
+                            ShowStatus("All files with this filter are already imported", 3000);
+                        }
+                    }
                 }
             }
             else

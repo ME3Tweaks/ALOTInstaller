@@ -81,6 +81,9 @@ namespace AlotAddOnGUI
             {
                 missingAddonFiles = missingAddonFiles.Except(readyFiles).ToList();
                 filesList.ItemsSource = missingAddonFiles;
+            } else
+            {
+                Close();
             }
         }
 

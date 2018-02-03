@@ -19,6 +19,7 @@ using System.Diagnostics;
 using ByteSizeLib;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using System.Management;
+using Microsoft.Win32;
 
 namespace AlotAddOnGUI.ui
 {
@@ -295,7 +296,17 @@ namespace AlotAddOnGUI.ui
                 addDiagLine("");
                 addDiagLine("Video Card " + vidCardIndex);
                 addDiagLine("Name: " + obj["Name"]);
-                addDiagLine("Memory: " + ByteSize.FromBytes(Convert.ToInt64(obj["AdapterRAM"])));
+
+                //Get Memory
+                string vidKey = @"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\";
+                vidKey += (vidCardIndex - 1).ToString().PadLeft(4, '0');
+                long regValue = (long)Registry.GetValue(vidKey, "HardwareInformation.qwMemorySize", 0);
+                string displayVal = "Unable to read value from registry";
+                if (regValue != 0)
+                {
+                    displayVal = ByteSize.FromBytes(regValue).ToString();
+                }
+                addDiagLine("Memory: " + displayVal);
                 addDiagLine("DriverVersion: " + obj["DriverVersion"]);
                 vidCardIndex++;
             }
@@ -318,12 +329,12 @@ namespace AlotAddOnGUI.ui
             }
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "-check-game-data-mismatch " + DIAGNOSTICS_GAME + " -ipc";
-            if (File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MassEffectModder\me" + DIAGNOSTICS_GAME + "map.bin"))
+            bool textureMapFileExists = File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MassEffectModder\me" + DIAGNOSTICS_GAME + "map.bin");
+            if (textureMapFileExists)
             {
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataMismatch));
                 runMEM_Diagnostics(exe, args, diagnosticsWorker);
                 WaitForMEM();
-                addDiagLine("");
                 addDiagLine("===Files added (or removed) after ALOT" + (DIAGNOSTICS_GAME == 1 ? "/MEUITM" : "") + " install");
 
                 if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
@@ -343,16 +354,25 @@ namespace AlotAddOnGUI.ui
             else
             {
                 addDiagLine("===Files added (or removed) after ALOT" + (DIAGNOSTICS_GAME == 1 ? "/MEUITM" : "") + " install");
-                addDiagLine(" - DIAG ERROR: Texture map file is missing: me" + DIAGNOSTICS_GAME + "map.bin");
+                if (avi == null)
+                {
+                    addDiagLine("Texture map file is not present:" + DIAGNOSTICS_GAME + "map.bin - MEMI tag missing so this is OK");
+
+                }
+                else
+                {
+                    addDiagLine(" - DIAG ERROR: Texture map file is missing: me" + DIAGNOSTICS_GAME + "map.bin but MEMI tag is present - was game migrated to new system?");
+                }
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_DataMismatch));
             }
+
 
             args = "-check-game-data-after " + DIAGNOSTICS_GAME + " -ipc";
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
             Context = CONTEXT_REPLACEDFILE_SCAN;
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
             WaitForMEM();
-            addDiagLine("\n===Replaced files scan (after textures were installed)");
+            addDiagLine("===Replaced files scan (after textures were installed)");
 
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
@@ -373,6 +393,7 @@ namespace AlotAddOnGUI.ui
                     addDiagLine("MEM returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
                 }
             }
+
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(RESET_REPLACEFILE_TEXT));
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
             Context = CONTEXT_NORMAL;
@@ -410,6 +431,9 @@ namespace AlotAddOnGUI.ui
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_OFF_TASKBAR_PROGRESS));
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_FullCheck));
             }
+
+            addDiagLine("===Game Inventory");
+            addDiagLine("Items in this block are only accurate if ALOT is not installed or items have been installed after ALOT.");
             args = "-detect-mods " + DIAGNOSTICS_GAME + " -ipc";
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataBasegamemods));
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
@@ -424,7 +448,7 @@ namespace AlotAddOnGUI.ui
             }
             else
             {
-                addDiagLine("Diagnostics did not detect any mods (-detect-mods). If these files have been modified, detection of them will not work.");
+                addDiagLine("Diagnostics did not detect any mods (-detect-mods).");
             }
 
             args = "-detect-bad-mods " + DIAGNOSTICS_GAME + " -ipc";
@@ -440,7 +464,7 @@ namespace AlotAddOnGUI.ui
             }
             else
             {
-                addDiagLine("Diagnostic did not find any bad mods installed - if the files were updated already this detection may not be accurate");
+                addDiagLine("Diagnostic did not find any incompatible mods.");
             }
 
             //Get DLCs
@@ -456,16 +480,26 @@ namespace AlotAddOnGUI.ui
                     break;
             }
 
-            addDiagLine("");
             addDiagLine("===Installed DLC");
-
+            addDiagLine("The following folders are present in the DLC directory:");
             if (Directory.Exists(dlcPath))
             {
 
                 var directories = Directory.EnumerateDirectories(dlcPath);
+                bool metadataPresent = false;
                 foreach (string dir in directories)
                 {
-                    addDiagLine(" - " + Path.GetFileName(dir));
+                    string value = Path.GetFileName(dir);
+                    if (value == "__metadata")
+                    {
+                        metadataPresent = true;
+                        continue;
+                    }
+                    addDiagLine(" - " + GetDLCDisplayString(value));
+                }
+                if (metadataPresent)
+                {
+                    addDiagLine("__metadata folder is present");
                 }
             }
             else
@@ -483,7 +517,6 @@ namespace AlotAddOnGUI.ui
 
             //Get LODs
             String lodStr = GetLODStr(DIAGNOSTICS_GAME, avi);
-            addDiagLine("");
             addDiagLine("===LOD Information");
             addDiagLine(lodStr);
 
@@ -833,6 +866,80 @@ namespace AlotAddOnGUI.ui
             Button_FullDiagnostic.Visibility = Visibility.Collapsed;
             Button_QuickDiagnostic.Click -= QuickDiagnostic_Click;
             RunDiagnostics(DIAGNOSTICS_GAME, false);
+        }
+
+
+        private string GetDLCDisplayString(string str)
+        {
+            string name = InteralGetDLCName(str);
+            if (name != null)
+            {
+                return str + " (" + name + ")";
+            }
+
+            return str;
+
+
+
+        }
+
+        private string InteralGetDLCName(string str)
+        {
+            switch (str)
+            {
+                //ME1
+                case "DLC_Vegas": return "Pinnacle Station";
+                case "DLC_UNC": return "Bring Down the Sky";
+
+                //ME2:
+                case "DLC_CER_Arc": return "Cerberus Arc Projector";
+                case "DLC_CER_02": return "Aegis Pack";
+                case "DLC_CON_Pack01": return "Alternate Appearance Pack 1 (Garrus, Thane, Jack)";
+                case "DLC_CON_Pack02": return "Alternate Appearance Pack 2 (Tali, Grunt, Miranda)";
+                case "DLC_DHME1": return "Mass Effect: Genesis";
+                case "DLC_EXP_Part01": return "Lair of the Shadow Broker";
+                case "DLC_EXP_Part02": return "Arrival";
+                case "DLC_HEN_MT": return "Kasumi - Stolen Memory";
+                case "DLC_HEN_VT": return "Zaeed - The Price of Revenge";
+                case "DLC_UNC_Pack01": return "Overlord Pack";
+                case "DLC_MCR_01": return "Firepower Pack";
+                case "DLC_MCR_03": return "Equalizer Pack";
+                case "DLC_PRE_Cerberus": return "Cerberus Weapon and Armor";
+                case "DLC_PRE_Collectors": return "Collectors and Digital Deluxe Edition Bonus Content";
+                case "DLC_PRE_DA": return "Blood Dragon Armor";
+                case "DLC_PRE_Gamestop": return "Terminus Weapon and Armor";
+                case "DLC_PRE_General": return "Inferno Armor";
+                case "DLC_PRE_Incisor": return "M-29 Incisor";
+                case "DLC_PRO_Gulp01": return "Sentry Interface";
+                case "DLC_PRO_Pepper01": return "Umbra Visor";
+                case "DLC_PRO_Pepper02": return "Recon Hood";
+                case "DLC_UNC_Hammer01": return "Firewalker Pack";
+                case "DLC_UNC_Moment01": return "Normandy Crash Site";
+
+                //ME3
+                case "DLC_CON_MP1": return "Resugence";
+                case "DLC_CON_MP2": return "Rebellion";
+                case "DLC_CON_MP3": return "Earth";
+                case "DLC_CON_MP4": return "Retaliation";
+                case "DLC_CON_MP5": return "Reckoning";
+                case "DLC_UPD_Patch01": return "Multiplayer Balance Changes Cache 1";
+                case "DLC_UPD_Patch02": return "Multiplayer Balance Changes Cache 2";
+                case "DLC_HEN_PR": return "From Ashes";
+                case "DLC_CON_END": return "Extended Cut";
+                case "DLC_EXP_Pack001": return "Leviathan";
+                case "DLC_EXP_Pack002": return "Omega";
+                case "DLC_EXP_Pack003": return "Citadel";
+                case "DLC_EXP_Pack003_Base": return "Citadel Base";
+                case "DLC_OnlinePassHidCE": return "Collectors and Digital Deluxe Edition Bonus Content";
+                case "DLC_CON_APP01": return "Alternate Appearance Pack";
+                case "DLC_CON_DH1": return "Genesis 2";
+                case "DLC_CON_GUN01": return "Firefight Pack";
+                case "DLC_CON_GUN02": return "Groundside Resistance Pack";
+
+
+                default:
+                    return null;
+            }
         }
     }
 }
