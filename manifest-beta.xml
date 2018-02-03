@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="4.1.0">
+<alotaddonmanifest version="4.3.1">
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <tutorial link="https://www.youtube.com/watch?v=r0UpfJVfXc0" text="Installation Guide (2017)" tooltip="Video tutorial that walks through installation steps. Uses 2017 version of files."/>
+  <tutorial link="https://ianmooreisme.github.io/ALOT-Comparisons/" text="Comparison Screenshots" tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore."/>
   <addonfile meuitm="true" friendlyname="MEUITM Anniversary Edition" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2-0.zip" size="2991648708" md5="2c8091ccf34e25818bbd2d253fe61743" />
     <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
@@ -57,17 +58,17 @@
     <packagefile me1="true" sourcename="MEUITM\mods\volus.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\Wrex.mem" movedirectly="true" />
   </addonfile>
-  <addonfile alotversion="6" friendlyname="ALOT for ME1 6.0 - Textures" tooltipname="Main file for ALOT for ME1" author="CreeperLava">
+  <addonfile alotversion="6" friendlyname="ALOT for ME1 6.0 - Textures" tooltipname="ALOT for ME1 6.0 - Textures" author="CreeperLava">
     <file downloadlink="https://mega.nz/#F!glc3mQZS!vFNj9C6Sxp6eTkiybYTrqw" filename="ALOT for ME1 - Textures-83-2018-6-0.zip" unpackedsinglefilename="ALOT_ME1_v6.mem" size="448313463" md5="1d0ab6ce0f2ce1940619bf27aade24c2" />
-    <packagefile me1="true" sourcename="ALOT_ME1.mem" movedirectly="true" />
+    <packagefile me1="true" sourcename="ALOT_ME1_v6.mem" movedirectly="true" />
   </addonfile>
-  <addonfile alotversion="6" friendlyname="ALOT for ME2 6.0 - Textures" tooltipname="Main file for ALOT for ME2" author="CreeperLava">
+  <addonfile alotversion="6" friendlyname="ALOT for ME2 6.0 - Textures" tooltipname="ALOT for ME1 6.0 - Textures" author="CreeperLava">
     <file downloadlink="https://mega.nz/#F!glc3mQZS!vFNj9C6Sxp6eTkiybYTrqw" filename="ALOT for ME2 - Textures-68-2018-6-0.zip" unpackedsinglefilename="ALOT_ME2_v6.mem" size="3563362871" md5="c1ed3369c5ba8ae681166b2fb9bc7c14" />
-    <packagefile me2="true" sourcename="ALOT_ME2.mem" movedirectly="true" />
+    <packagefile me2="true" sourcename="ALOT_ME2_v6.mem" movedirectly="true" />
   </addonfile>
-  <addonfile alotversion="6" friendlyname="ALOT for ME3 6.0 - Textures" tooltipname="Main file of ALOT for ME3" author="CreeperLava">
+  <addonfile alotversion="6" friendlyname="ALOT for ME3 6.0 - Textures" tooltipname="ALOT for ME1 6.0 - Textures" author="CreeperLava">
     <file downloadlink="https://mega.nz/#F!glc3mQZS!vFNj9C6Sxp6eTkiybYTrqw" filename="ALOT for ME3 - Textures-363-2018-6-0.zip" unpackedsinglefilename="ALOT_ME3_v6.mem" size="5789453175" md5="2915d3d37ebe655defb541b974a7fa72" />
-    <packagefile me3="true" sourcename="ALOT_ME3.mem" movedirectly="true" />
+    <packagefile me3="true" sourcename="ALOT_ME3_v6.mem" movedirectly="true" />
   </addonfile>
   <addonfile friendlyname="Allers Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_AllersComplexionTweak.7z-580-1-0.7z" md5="d9f3b8f6f63132d86690835a3c766c44" size="8994633" />
