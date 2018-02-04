@@ -429,6 +429,7 @@ namespace AlotAddOnGUI
                                     {
                                         p.Processed = true; //No more processing on this addonfile. It has packagefiles since it could also be zipped still
                                     }
+                                    BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                                     break;
                                 }
                             }
