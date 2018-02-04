@@ -1709,6 +1709,7 @@ namespace AlotAddOnGUI
                             }).ToList();
                 if (!version.Equals(""))
                 {
+                    Log.Information("Manifest version: " + version);
                     Title += " - Manifest version " + version;
                     if (UsingBundledManifest)
                     {

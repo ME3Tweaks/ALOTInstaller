@@ -36,14 +36,15 @@ namespace AlotAddOnGUI
         public const string UPDATE_OVERALL_TASK = "UPDATE_OVERALL_TASK";
         public const string SHOW_ORIGIN_FLYOUT = "SHOW_ORIGIN_FLYOUT";
         private const int INSTALL_OK = 1;
-        private const int RESULT_ME1LAA_FAILED = -43;
-        private const int RESULT_TEXTUREINSTALL_FAILED = -42;
         private WaveOut waveOut;
         private NAudio.Vorbis.VorbisWaveReader vorbisStream;
-        private const int RESULT_SCAN_REMOVE_FAILED = -41;
         private const int RESULT_UNPACK_FAILED = -40;
+        private const int RESULT_SCAN_REMOVE_FAILED = -41;
+        private const int RESULT_TEXTUREINSTALL_FAILED = -42;
+        private const int RESULT_ME1LAA_FAILED = -43;
         private const int RESULT_TEXTUREINSTALL_NO_TEXTUREMAP = -44;
         private const int RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP = -45;
+        private const int RESULT_REPACK_FAILED = -46;
         public const string RESTORE_FAILED_COULD_NOT_DELETE_FOLDER = "RESTORE_FAILED_COULD_NOT_DELETE_FOLDER";
         public string CurrentTask;
         public int CurrentTaskPercent;
@@ -51,7 +52,7 @@ namespace AlotAddOnGUI
         private int INSTALL_STAGE = 0;
         public const string UPDATE_STAGE_LABEL = "UPDATE_STAGE_LABEL";
         private int STAGE_COUNT;
-        public const string HIDE_STAGE_LABEL = "HIDE_STAGE_LABEL";
+        public const string HIDE_STAGES_LABEL = "HIDE_STAGE_LABEL";
         public const string UPDATE_HEADER_LABEL = "UPDATE_HEADER_LABEL";
         public static ALOTVersionInfo CURRENTLY_INSTALLED_ME1_ALOT_INFO;
         public static ALOTVersionInfo CURRENTLY_INSTALLED_ME2_ALOT_INFO;
@@ -522,7 +523,7 @@ namespace AlotAddOnGUI
                         }
 
                         //Check if ALOT update file applies to this version of ALOT main
-                        if (af.ALOTUpdateVersion > 0 && CurrentGameALOTInfo.ALOTUPDATEVER != af.ALOTMainVersionRequired)
+                        if (af.ALOTUpdateVersion > 0 && CurrentGameALOTInfo.ALOTVER != af.ALOTMainVersionRequired)
                         {
                             Log.Information("ALOT Update available but currently installed ALOT version does not match. Skipping...");
                             af.ReadyStatusText = "Update not applicable";
@@ -1431,11 +1432,18 @@ namespace AlotAddOnGUI
                             HeaderLabel.Text = "Texture map is corrupt - revert " + gameName + " to an unmodified game to fix.";
                             break;
                         }
+                    case RESULT_REPACK_FAILED:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Failed to repack game files";
+                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                            HeaderLabel.Text = "Failed to repack game files - game may be in an unusable state.";
+                            break;
+                        }
                     case RESULT_UNPACK_FAILED:
                         {
                             InstallingOverlay_TopLabel.Text = "Failed to unpack DLCs";
                             InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                            HeaderLabel.Text = "Error occured removing mipmaps from " + gameName;
+                            HeaderLabel.Text = "Failed to unpack DLC. Restore your game to unmodified or DLC will not work.";
                             break;
                         }
                 }
@@ -1483,15 +1491,21 @@ namespace AlotAddOnGUI
             bool RemoveMipMaps = (versionInfo == null); //remove mipmaps only if alot is not installed
             if (INSTALLING_THREAD_GAME == 1)
             {
-                STAGE_COUNT = 4;
+                REPACK_GAME_FILES = true;
+                STAGE_COUNT = 5; //scan/remove/install/save/repack
             }
             else if (INSTALLING_THREAD_GAME == 2)
             {
                 STAGE_COUNT = 4;
+                if (REPACK_GAME_FILES)
+                {
+                    STAGE_COUNT++;
+                }
             }
             else
             {
                 //me3
+                REPACK_GAME_FILES = false; //force off, it does nothing
                 ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_UNPACK);
                 STAGE_COUNT = 5;
             }
@@ -1506,8 +1520,14 @@ namespace AlotAddOnGUI
                 ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_REMOVE);
                 //ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_INSTALLMARKERS);
             }
+
+            
             ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_INSTALL);
             ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_SAVE);
+            if (REPACK_GAME_FILES && INSTALLING_THREAD_GAME != 3)
+            {
+                ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_REPACK);
+            }
             ProgressWeightPercentages.ScaleWeights();
             INSTALL_STAGE = 0;
             //Checking files for title
@@ -1639,7 +1659,7 @@ namespace AlotAddOnGUI
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, CurrentTask));
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_TASK_PROGRESS, CurrentTaskPercent));
             args = "-install-mods " + INSTALLING_THREAD_GAME + " \"" + outputDir + "\"";
-            if (REPACK_GAME_FILES)
+            if (REPACK_GAME_FILES && INSTALLING_THREAD_GAME == 2)
             {
                 args += " -repack";
             }
@@ -1678,8 +1698,37 @@ namespace AlotAddOnGUI
             ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
             InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
 
+            if (REPACK_GAME_FILES)
+            {
+                CurrentTask = "Repacking remaining files";
+                CurrentTaskPercent = 0;
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, CurrentTask));
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_TASK_PROGRESS, CurrentTaskPercent));
+                args = "-repack " + INSTALLING_THREAD_GAME + " -ipc";
+
+                runMEM_Install(exe, args, InstallWorker);
+                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+                {
+                    Thread.Sleep(250);
+                }
+                processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+                if (processResult != 0)
+                {
+                    Log.Error("REPACKING RETURN CODE WAS NOT 0: " + processResult);
+                    if (e.Result == null)
+                    {
+                        e.Result = RESULT_REPACK_FAILED;
+                    }
+                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
+                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
+                    return;
+                }
+            }
+
+
+
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
-            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
+            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGES_LABEL));
 
 
             //Apply LOD
@@ -1847,7 +1896,7 @@ namespace AlotAddOnGUI
 
             }
 
-            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_LABEL));
+            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGES_LABEL));
 
             string taskString = "Installation of ALOT for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
             if (!installedALOT)
@@ -1942,7 +1991,7 @@ namespace AlotAddOnGUI
                 case HIDE_LOD_LIMIT:
                     Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Collapsed;
                     break;
-                case HIDE_STAGE_LABEL:
+                case HIDE_STAGES_LABEL:
                     InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Collapsed;
                     InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Collapsed;
                     break;
@@ -1959,7 +2008,7 @@ namespace AlotAddOnGUI
                     break;
                 case UPDATE_OPERATION_LABEL:
                     CurrentTask = (string)tc.Data;
-                    InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
+                    InstallingOverlay_BottomLabel.Text = CurrentTask + ((CurrentTaskPercent >= 0 && CurrentTaskPercent <= 100) ? (" " + CurrentTaskPercent + "%") : "");
                     break;
                 case HIDE_TIPS:
                     InstallingOverlay_Tip.Visibility = Visibility.Collapsed;
@@ -1975,7 +2024,7 @@ namespace AlotAddOnGUI
                         CurrentTaskPercent = (int)tc.Data;
                     }
 
-                    if (CurrentTaskPercent != oldTaskProgress)
+                    if (CurrentTaskPercent != oldTaskProgress && CurrentTaskPercent >= 0 && CurrentTaskPercent <= 100)
                     {
                         int progressval = ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, CurrentTaskPercent);
                         InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
@@ -2121,11 +2170,17 @@ namespace AlotAddOnGUI
                                 break;
                             case "PHASE":
                                 Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
-                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
                                 int overallProgress = ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
                                 worker.ReportProgress(completed, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
                                 Interlocked.Increment(ref INSTALL_STAGE);
-                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_STAGE_LABEL));
+                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
+                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_STAGE_LABEL, param));
+                                break;
+                            case "SET_STAGE_LABEL":
+                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
+                                break;
+                            case "HIDE_STAGES":
+                                worker.ReportProgress(completed, new ThreadCommand(HIDE_STAGES_LABEL));
                                 break;
                             case ERROR_TEXTURE_MAP_MISSING:
                                 Log.Fatal("[FATAL]Texture map is missing! We cannot install textures");
