@@ -16,6 +16,7 @@ using System.Security.Principal;
 using System.Xml;
 using System.Windows;
 using System.Xml.Linq;
+using System.Security.Cryptography;
 
 namespace AlotAddOnGUI
 {
@@ -424,6 +425,18 @@ namespace AlotAddOnGUI
             System.IO.File.WriteAllBytes(gamePath + "dsound.dll", AlotAddOnGUI.Properties.Resources.dsound);
             Log.Information("Installed indrectsound for Mass Effect");
             return true;
+        }
+
+        public static string CalculateMD5(string filename)
+        {
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(filename))
+                {
+                    var hash = md5.ComputeHash(stream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+            }
         }
 
         public static void RemoveRunAsAdminXPSP3FromME1()

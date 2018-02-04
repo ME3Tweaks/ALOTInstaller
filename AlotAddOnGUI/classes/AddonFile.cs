@@ -343,6 +343,10 @@ namespace AlotAddOnGUI.classes
         {
             ReadyIconPath = "images/redx_large.png";
         }
+        internal bool IsInErrorState()
+        {
+            return ReadyIconPath == "images/redx_large.png";
+        }
         internal void SetIdle()
         {
             ReadyIconPath = null;

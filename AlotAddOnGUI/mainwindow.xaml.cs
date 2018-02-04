@@ -427,21 +427,46 @@ namespace AlotAddOnGUI
             try
             {
                 Log.Information("Checking for updates to MEMNOGUI. The local version is " + fileVersion);
-
+                if (USING_BETA)
+                {
+                    Log.Information("We will include prerelease builds as we are in beta mode.");
+                }
                 var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
                 var releases = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModderNoGui");
                 Log.Information("Fetched MEMNOGui releases from github...");
+                Release latest = null;
                 if (releases.Count > 0)
                 {
                     //The release we want to check is always the latest, so [0]
-                    Release latest = releases[0];
-                    int releaseNameInt = Convert.ToInt32(latest.TagName);
-                    if (fileVersion < releaseNameInt && latest.Assets.Count > 0)
+                    foreach (Release r in releases)
                     {
-                        Log.Information("MEMNOGUI update available: " + releaseNameInt);
+                        if (!USING_BETA && r.Prerelease)
+                        {
+                            continue;
+                        }
+                        if (r.Assets.Count == 0)
+                        {
+                            continue; //latest release has no assets
+                        }
+                        int releaseNameInt = Convert.ToInt32(r.TagName);
+                        if (releaseNameInt > fileVersion)
+                        {
+                            latest = r;
+                            break;
+                        }
+                        else
+                        {
+                            Log.Information("Latest release available to us is v" + releaseNameInt + " - no update available for us");
+                            break;
+                        }
+                    }
+
+                    if (latest != null)
+                    {
+                        Log.Information("MEMNOGUI update available: " + latest.TagName);
 
                         //there's an update
-                        updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder (Cmd Version) is updating (to v" + releaseNameInt + "). Please wait...", true);
+                        updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder (Cmd Version) is updating (to v" + latest.TagName + "). Please wait...", true);
                         updateprogresscontroller.SetIndeterminate();
                         updateprogresscontroller.Canceled += MEMNoGuiUpdateCanceled;
                         downloadClient = new WebClient();
@@ -474,13 +499,31 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void PerformPostStartup()
+        private async void PerformPostStartup()
         {
             EnsureOneGameIsInstalled();
             PerformRAMCheck();
             PerformWriteCheck();
             UpdateALOTStatus();
             RunMEMUpdaterGUI();
+            string appCrashFile = EXE_DIRECTORY + @"Data\APP_CRASH";
+            if (File.Exists(appCrashFile))
+            {
+                DateTime crashTime = File.GetCreationTime(appCrashFile);
+                File.Delete(appCrashFile);
+                if (crashTime.Date == DateTime.Today)
+                {
+                    MetroDialogSettings mds = new MetroDialogSettings();
+                    mds.AffirmativeButtonText = "Upload";
+                    mds.NegativeButtonText = "No";
+                    mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                    var upload = await this.ShowMessageAsync("Previous installer session crashed", "The previous installer session crashed. Would you like to upload the log to help the developers fix it?", MessageDialogStyle.AffirmativeAndNegative, mds);
+                    if (upload == MessageDialogResult.Affirmative)
+                    {
+                        uploadLatestLog(true);
+                    }
+                }
+            }
             Log.Information("PerformPostStartup() has completed. We are now switching over to user control.");
         }
 
@@ -616,8 +659,8 @@ namespace AlotAddOnGUI
                 case -1:
                 default:
                     Log.Error("BuildCompleted() got -1 (or default catch all) result.");
-                    HeaderLabel.Text = "An error occured building the Addon.\nView the log (Settings -> Diagnostics -> View Log) for more information.";
-                    AddonFilesLabel.Text = "Addon not successfully built";
+                    HeaderLabel.Text = "An error occured while building and staging textures for installation.\nView the log (Settings -> Diagnostics -> View Installer Log) for more information.";
+                    AddonFilesLabel.Text = "Staging aborted";
                     RefreshesUntilRealRefresh = 4;
                     break;
                 case 1:
@@ -708,9 +751,12 @@ namespace AlotAddOnGUI
             {
                 foreach (AddonFile af in ADDONFILES_TO_BUILD)
                 {
-                    af.ReadyStatusText = null;
+                    if (!af.IsInErrorState())
+                    {
+                        af.SetIdle();
+                        af.ReadyStatusText = null;
+                    }
                     af.Building = false;
-                    af.SetIdle();
                 }
             }
             ShowBuildingOnly = false;
@@ -749,49 +795,7 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void BuildAddon(object sender, DoWorkEventArgs e)
-        {
-            BlockingMods = new List<string>();
-            if (CURRENT_GAME_BUILD < 3)
-            {
-                string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-detect-bad-mods " + CURRENT_GAME_BUILD + " -ipc";
-                runMEM_DetectBadMods(exe, args, null);
-                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
-                {
-                    Thread.Sleep(250);
-                }
-                if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
-                {
-                    BlockingMods = BACKGROUND_MEM_PROCESS_ERRORS;
-                    e.Result = -2;
-                    return;
-                }
-                else
-                {
-                    Log.Information("No blocking mods were found.");
-                }
-            }
 
-            string outDir = getOutputDir((int)e.Argument);
-            if (Directory.Exists(outDir)) //Prompt for reinstall or rebuild
-            {
-                bool deletedOutput = Utilities.DeleteFilesAndFoldersRecursively(outDir);
-                if (!deletedOutput)
-                {
-                    KeyValuePair<string, string> messageStr = new KeyValuePair<string, string>("Unable to cleanup existing output directory", "An error occured deleting the existing output directory. Something may still be accessing it. Close other programs and try again.");
-                    BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, messageStr));
-                    e.Result = -1; //1 = Error
-                    return;
-                }
-            }
-            Directory.CreateDirectory(outDir);
-
-
-            bool result = ExtractAddons((int)e.Argument); //arg is game id.
-
-            e.Result = result ? (int)e.Argument : -1; //-1 = Build Error
-        }
 
         // Tick handler    
         private void CheckImportLibrary_Tick(object sender, EventArgs e)
@@ -860,6 +864,8 @@ namespace AlotAddOnGUI
                     }
                     if (af.Ready != ready) //ensure the file applies to something
                     {
+                        af.ReadyStatusText = null;
+                        af.ReadyIconPath = null;
                         af.Ready = ready;
                     }
 
@@ -895,7 +901,7 @@ namespace AlotAddOnGUI
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             fadeInItems = new FrameworkElement[] { FirstRun_MainContent, FirstRunText_TitleBeta, FirstRunText_BetaSummary };
-            buildOptionCheckboxes = new System.Windows.Controls.CheckBox[] { Checkbox_BuildOptionALOT, Checkbox_BuildOptionUser, Checkbox_BuildOptionAddon };
+            buildOptionCheckboxes = new System.Windows.Controls.CheckBox[] { Checkbox_BuildOptionALOT, Checkbox_BuildOptionALOTUpdate, Checkbox_BuildOptionUser, Checkbox_BuildOptionAddon };
             if (EXE_DIRECTORY.Length > 105)
             {
                 Log.Fatal("ALOT Installer is nested too deep for Addon to build properly (" + EXE_DIRECTORY.Length + " chars) due to Windows API limitations.");
@@ -1903,13 +1909,7 @@ namespace AlotAddOnGUI
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
             bool alotInstalled = installedInfo != null; //default value
             bool alotavailalbleforinstall = false;
-            foreach (AddonFile af in alladdonfiles)
-            {
-                if (af.ALOTVersion > 0 && af.Ready)
-                {
-                    //i forgot to put code here... hmm.
-                }
-            }
+            bool alotupdateavailalbeforinstall = false;
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
             if (installedInfo == null || installedInfo.ALOTVER == 0) //not installed or mem installed
             {
@@ -1931,6 +1931,8 @@ namespace AlotAddOnGUI
 
             bool hasApplicableUserFile = false;
             bool checkAlotBox = false;
+            bool checkAlotUpdateBox = false;
+
             int installingALOTver = 0;
 
             bool blockALOTInstallDueToMainVersionDiff = false;
@@ -1965,12 +1967,37 @@ namespace AlotAddOnGUI
                         }
                         continue;
                     }
+                    if (af.ALOTUpdateVersion > 0)
+                    {
+                        alotupdateavailalbeforinstall = true;
+                        //Perform update check...
+                        if (installedInfo != null)
+                        {
+                            if (installedInfo.ALOTUPDATEVER >= af.ALOTUpdateVersion)
+                            {
+                                checkAlotUpdateBox = false; //same or higher update is already installed
+                                continue;
+                            }
+                            else
+                            {
+                                checkAlotUpdateBox = true;
+                            }
+                        }
+                        else
+                        {
+                            checkAlotUpdateBox = true; //same or higher update is already installed
+                        }
+                    }
                     hasAddonFile = true;
                 }
             }
 
             Checkbox_BuildOptionALOT.IsChecked = checkAlotBox;
             Checkbox_BuildOptionALOT.IsEnabled = !checkAlotBox && alotavailalbleforinstall;
+
+            Checkbox_BuildOptionALOTUpdate.IsChecked = checkAlotUpdateBox;
+            Checkbox_BuildOptionALOTUpdate.IsEnabled = !checkAlotUpdateBox && alotupdateavailalbeforinstall;
+            Checkbox_BuildOptionALOTUpdate.Visibility = alotupdateavailalbeforinstall ? Visibility.Visible : Visibility.Collapsed;
 
             Checkbox_BuildOptionAddon.IsEnabled = hasAddonFile;
 
@@ -3364,6 +3391,7 @@ namespace AlotAddOnGUI
                         BUILD_ALOT = Checkbox_BuildOptionALOT.IsChecked.Value;
                         BUILD_ADDON_FILES = Checkbox_BuildOptionAddon.IsChecked.Value;
                         BUILD_USER_FILES = Checkbox_BuildOptionUser.IsChecked.Value;
+                        BUILD_ALOT_UPDATE = Checkbox_BuildOptionALOTUpdate.IsChecked.Value;
 
                         TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
                         BuildWorker.RunWorkerAsync(CURRENT_GAME_BUILD);
@@ -3398,7 +3426,12 @@ namespace AlotAddOnGUI
             ((Expander)sender).BringIntoView();
         }
 
-        private async void Button_UploadLog_Click(object sender, RoutedEventArgs e)
+        private void Button_UploadLog_Click(object sender, RoutedEventArgs e)
+        {
+            uploadLatestLog(false);
+        }
+
+        private async void uploadLatestLog(bool isPreviousCrashLog)
         {
             var directory = new DirectoryInfo("logs");
             FileInfo latestlogfile = directory.GetFiles("alotinstaller*.txt").OrderByDescending(f => f.LastWriteTime).First();
@@ -3420,7 +3453,7 @@ namespace AlotAddOnGUI
                 progresscontroller.SetIndeterminate();
                 try
                 {
-                    var responseString = await "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "log" }).ReceiveString();
+                    var responseString = await "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "log", CrashLog = isPreviousCrashLog }).ReceiveString();
                     Uri uriResult;
                     bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
                         && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
@@ -3628,11 +3661,16 @@ namespace AlotAddOnGUI
                         if (af.UserFile)
                         {
                             mi.Visibility = Visibility.Collapsed;
-
                         }
                         break;
-                    case 1: //Toggle on/off
-                        if (af.ALOTVersion > 0 || !af.Ready || PreventFileRefresh)
+                    case 1:
+                        if (!af.Ready || PreventFileRefresh)
+                        {
+                            mi.Visibility = Visibility.Collapsed;
+                        }
+                        break;
+                    case 2: //Toggle on/off
+                        if (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0 || !af.Ready || PreventFileRefresh)
                         {
                             mi.Visibility = Visibility.Collapsed;
                             break;
@@ -3676,6 +3714,17 @@ namespace AlotAddOnGUI
                 {
                     af.ReadyStatusText = null;
                 }
+            }
+        }
+
+        private void ContextMenu_ViewFile(object sender, RoutedEventArgs e)
+        {
+            var rowIndex = ListView_Files.SelectedIndex;
+            var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
+            AddonFile af = (AddonFile)row.DataContext;
+            if (af.Ready)
+            {
+                Utilities.OpenAndSelectFileInExplorer(af.GetFile());
             }
         }
     }

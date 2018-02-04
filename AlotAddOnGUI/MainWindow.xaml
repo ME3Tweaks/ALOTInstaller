@@ -238,6 +238,7 @@
                                     </MenuItem.Style>
                                 </MenuItem>-->
                     <MenuItem Header="Open download page" Click="ContextMenu_OpenDownloadPage"/>
+                    <MenuItem Header="Open file location" Click="ContextMenu_ViewFile"/>
                     <MenuItem Header="Toggle Enabled/Disabled" Click="ContextMenu_ToggleFile"/>
                 </ContextMenu>
             </ListView.Resources>
@@ -325,8 +326,8 @@
                             </Expander.Header>
                             <StackPanel>
                                 <Button x:Name="Button_GenerateDiagnostic" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Generate Game Diagnostics" ToolTip="Generates a diagnostic log to help figure out issues with one of the games&#10;The log is automatically uploaded for sharing when the diagnostic completes." Click="Button_GenerateDiagnostics_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                <Button x:Name="Button_ViewLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="View log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                <Button x:Name="Button_UploadLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Upload log" ToolTip="Uploads the latest program log to the ALOT Log Viewing Service" Click="Button_UploadLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                <Button x:Name="Button_ViewLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="View installer log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                <Button x:Name="Button_UploadLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Upload installer log" ToolTip="Uploads the latest program log to the ALOT Log Viewing Service" Click="Button_UploadLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 <Button x:Name="Button_ReportIssue" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Report an issue" ToolTip="Go to the ALOT discord" Click="Button_ReportIssue_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 <Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" FontWeight="Bold" x:Name="Button_MEM_GUI" Content="Launch MEM GUI" Click="Button_MEMVersion_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal" ToolTip="Runs the GUI version of Mass Effect Modder.&#10;You can use this to change game paths and other advanced texture modding."/>
                                 <Label HorizontalAlignment="Center" Margin="20,0,20,3" Padding="0,3,0,3" FontWeight="Bold" x:Name="Label_MEMVersion" Content="MEM (NoGUI) Version: TBD" FontSize="12" ToolTip="Version of MassEffectModderNoGui this program is using"/>
@@ -339,7 +340,7 @@
                             <StackPanel>
                                 <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowFirstTime" Controls:ControlsHelper.ContentCharacterCasing="Upper" Content="Show Intro Dialog" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Shows the initial instructions screen"/>
                                 <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Controls:ControlsHelper.ContentCharacterCasing="Upper" x:Name="Button_ChangeDownloadFolder" Content="Change Download Folder" Click="Button_ChangeDownloadFolder_Click" ToolTip="Changes the folder used when importing from downloads" Style="{StaticResource AccentedSquareButtonStyle}" />
-                                <CheckBox Margin="5" x:Name="Checkbox_RepackGameFiles" Content="Repack game files" Click="Checkbox_RepackFiles_Click" ToolTip="Repacking game files makes installation take longer, but will save some disk space.&#10;This may reduce the performance of Mass Effect." />
+                                <CheckBox Margin="5" x:Name="Checkbox_RepackGameFiles" Content="Repack ME2 files" Click="Checkbox_RepackFiles_Click" ToolTip="Repacking game files makes installation take longer, but will save some disk space.&#10;This option only affects ME2." />
                                 <CheckBox Margin="5" x:Name="Checkbox_MoveFilesAsImport" Content="Import via Move if on the same drive" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied.&#10;This only is used if files are on same drive - if files are on different drives then they are copied." />
                                 <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
                             </StackPanel>
@@ -382,6 +383,7 @@
                     <TextBlock Text="To add user files, drop an archive containing TPF, MEM, or DDS files onto the interface and choose the game they apply to. You can also drop TPF, PNG, JPG, BMP, DDS, MOD and MEM files directly." TextWrapping="Wrap" MaxWidth="500" TextAlignment="Center" FontSize="12" Padding="5"></TextBlock>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                         <CheckBox x:Name="Checkbox_BuildOptionALOT" Content="ALOT" Margin="5" IsChecked="True" IsEnabled="False"></CheckBox>
+                        <CheckBox x:Name="Checkbox_BuildOptionALOTUpdate" Content="ALOT Update" Margin="5" IsChecked="True" IsEnabled="False"></CheckBox>
                         <CheckBox x:Name="Checkbox_BuildOptionAddon" Content="Addon" Margin="5" IsChecked="True"></CheckBox>
                         <CheckBox x:Name="Checkbox_BuildOptionUser" Content="User Files" Margin="5"></CheckBox>
 

@@ -68,6 +68,7 @@ namespace AlotAddOnGUI
         public bool BUILD_ALOT { get; private set; }
         private bool BUILD_ADDON_FILES = false;
         private bool BUILD_USER_FILES = false;
+        private bool BUILD_ALOT_UPDATE = false;
         private FadeInOutSampleProvider fadeoutProvider;
         private bool MusicPaused;
         private string DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods";
@@ -81,11 +82,11 @@ namespace AlotAddOnGUI
 
         public bool MusicIsPlaying { get; private set; }
 
-        private bool ExtractAddon(AddonFile af)
+        private KeyValuePair<AddonFile, bool> ExtractAddon(AddonFile af)
         {
             if (ERROR_OCCURED_PLEASE_STOP)
             {
-                return true;
+                return new KeyValuePair<AddonFile, bool>(af, true); //skip
             }
             string stagingdirectory = ADDON_FULL_STAGING_DIRECTORY;
 
@@ -157,13 +158,20 @@ namespace AlotAddOnGUI
                             Log.Information(prefix + "Extracting file: " + extractSource);
                             string exe = BINARY_DIRECTORY + "7z.exe";
                             string args = "x \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
-                            Utilities.runProcess(exe, args);
+                            var returncode = Utilities.runProcess(exe, args);
+                            if (returncode != 0)
+                            {
+                                af.ReadyStatusText = "Failed to extract";
+                                af.SetError();
+                                return new KeyValuePair<AddonFile, bool>(af, false);
+                            }
+
                             if (af.UserFile)
                             {
                                 af.ReadyStatusText = "Waiting for Addon to complete build";
                                 af.SetIdle();
                                 BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
-                                return true;
+                                return new KeyValuePair<AddonFile, bool>(af, true);
                             }
                             //get free space for debug purposes
                             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
@@ -398,7 +406,7 @@ namespace AlotAddOnGUI
                                     af.ReadyStatusText = "Waiting for Addon to complete build";
                                     af.SetIdle();
                                     BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
-                                    return true;
+                                    return new KeyValuePair<AddonFile, bool>(af, true);
                                 }
                                 else
                                 {
@@ -439,7 +447,7 @@ namespace AlotAddOnGUI
                 af.ReadyStatusText = "Error occured during extraction";
                 af.SetError();
                 ERROR_OCCURED_PLEASE_STOP = true;
-                return false;
+                return new KeyValuePair<AddonFile, bool>(af, false);
             }
             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
 
@@ -451,7 +459,51 @@ namespace AlotAddOnGUI
             }
             af.ReadyStatusText = "Queued for staging";
             af.SetIdle();
-            return true;
+            return new KeyValuePair<AddonFile, bool>(af, true);
+        }
+
+        private void BuildAddon(object sender, DoWorkEventArgs e)
+        {
+            BlockingMods = new List<string>();
+            if (CURRENT_GAME_BUILD < 3)
+            {
+                string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
+                string args = "-detect-bad-mods " + CURRENT_GAME_BUILD + " -ipc";
+                runMEM_DetectBadMods(exe, args, null);
+                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+                {
+                    Thread.Sleep(250);
+                }
+                if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+                {
+                    BlockingMods = BACKGROUND_MEM_PROCESS_ERRORS;
+                    e.Result = -2;
+                    return;
+                }
+                else
+                {
+                    Log.Information("No blocking mods were found.");
+                }
+            }
+
+            string outDir = getOutputDir((int)e.Argument);
+            if (Directory.Exists(outDir)) //Prompt for reinstall or rebuild
+            {
+                bool deletedOutput = Utilities.DeleteFilesAndFoldersRecursively(outDir);
+                if (!deletedOutput)
+                {
+                    KeyValuePair<string, string> messageStr = new KeyValuePair<string, string>("Unable to cleanup existing output directory", "An error occured deleting the existing output directory. Something may still be accessing it. Close other programs and try again.");
+                    BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, messageStr));
+                    e.Result = -1; //1 = Error
+                    return;
+                }
+            }
+            Directory.CreateDirectory(outDir);
+
+
+            bool result = ExtractAddons((int)e.Argument); //arg is game id.
+
+            e.Result = result ? (int)e.Argument : -1; //-1 = Build Error
         }
 
         private bool ExtractAddons(int game)
@@ -486,7 +538,7 @@ namespace AlotAddOnGUI
                     break;
             }
 
-
+            //compile list of addon files to process
             foreach (AddonFile af in alladdonfiles)
             {
                 if (!af.Enabled)
@@ -614,15 +666,41 @@ namespace AlotAddOnGUI
                 threads--; //cores - 1
             }
             ERROR_OCCURED_PLEASE_STOP = false;
-            bool[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
-            foreach (bool result in results)
+            KeyValuePair<AddonFile, bool>[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
+            foreach (KeyValuePair<AddonFile, bool> result in results)
             {
-                if (!result)
+                bool successful = result.Value;
+                AddonFile af = result.Key;
+                if (!successful)
                 {
-                    Log.Error("Failed to extract a file! Check previous entries in this log");
+                    Log.Error("Failed to extract " + af.GetFile());
+                    if (af.FileMD5 != null && af.FileMD5 != "" && !af.UserFile && !af.IsCurrentlySingleFile())
+                    {
+                        Log.Information("MD5 checksumming " + af.GetFile());
+                        af.SetWorking();
+                        af.ReadyStatusText = "Checking file";
+                        BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+                        BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Checking files that failed to extract"));
+                        var md5 = Utilities.CalculateMD5(af.GetFile());
+                        if (md5 != af.FileMD5)
+                        {
+                            af.SetError();
+                            af.ReadyStatusText = "File is corrupt";
+                            Log.Error("Checksum for " + af.FriendlyName + " is wrong. Imported MD5: " + md5 + ", manifest MD5: " + af.FileMD5);
+                            Log.Error("This file cannot be used");
+                            KeyValuePair<string, string> message = new KeyValuePair<string, string>("File for " + af.FriendlyName + " is corrupt", "An error occured extracting " + af.GetFile() + ". This file is corrupt. Delete this file and download a new copy of it.");
+                            BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, message));
+                        }
+                        //perform MD5
+                    }
+                    else
+                    {
+                        BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Failed to extract " + af.FriendlyName + ". Check the logs for more information."));
+                        KeyValuePair<string, string> messageStr = new KeyValuePair<string, string>("Error extracting " + af.FriendlyName, "An error occured extracting " + af.GetFile() + ". This file may be corrupt. Please check if you can open it in a archive program - if not, this file will need to be deleted.");
+                        BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, messageStr));
+                        CURRENT_GAME_BUILD = 0; //reset
+                    }
                     BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
-                    BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Failed to extract a file - check logs"));
-                    CURRENT_GAME_BUILD = 0; //reset
                     return false;
                 }
             }
@@ -1521,7 +1599,7 @@ namespace AlotAddOnGUI
                 //ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_INSTALLMARKERS);
             }
 
-            
+
             ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_INSTALL);
             ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_SAVE);
             if (REPACK_GAME_FILES && INSTALLING_THREAD_GAME != 3)
@@ -1958,13 +2036,12 @@ namespace AlotAddOnGUI
                         Build_ProgressBar.IsIndeterminate = (bool)tc.Data;
                         break;
                     case ERROR_OCCURED:
-
                         Build_ProgressBar.IsIndeterminate = false;
                         Build_ProgressBar.Value = 0;
                         if (!ERROR_SHOWING)
                         {
                             ERROR_SHOWING = true;
-                            await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
+                            await this.ShowMessageAsync("Error while building and staging textures", "An error occured building and staging files for installation. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                             ERROR_SHOWING = false;
                         }
                         break;
