@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="4.3.2">
+<alotaddonmanifest version="4.3.3">
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps."/>
@@ -128,16 +128,16 @@
     <packagefile me1="true" sourcename="ME1_Med_Phoe_Fem.tpf" movedirectly="true" />
   </addonfile>
   <addonfile friendlyname="Miscellaneous textures" tooltipname="Miscellaneous Textures.zip" author="CDAMJC, CreeperLava">
-    <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="Miscellaneous Textures.zip" size="12211901" md5="3a747c9d9daf7de4c24fde296d76be83" />
+    <file downloadlink="https://mega.nz/#!NlsnhAjT!AVx8Xof32tQRG-b00AixhLJ16tDKulYcyHvg3xh-tRk" filename="Miscellaneous Textures.zip" size="12211901" md5="3a747c9d9daf7de4c24fde296d76be83" />
     <packagefile me1="true" sourcename="MEUITM Fix.mem" movedirectly="true" />
   </addonfile>
   <addonfile friendlyname="HR Weapon Textures (CreeperLava)" tooltipname="HR Weapon Textures (CreeperLava).zip" author="TheDarkFalkon, CreeperLava">
-    <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="HR Weapon Textures (CreeperLava).zip" size="76446664" md5="6d7f90031e55c396807e742945628040" />
+    <file downloadlink="https://mega.nz/#!A90hHL7A!m8Coh6BS8ERZLwe4VNrZjihGt9ZOITZBn6RMSRxd78w" filename="HR Weapon Textures (CreeperLava).zip" size="76446664" md5="6d7f90031e55c396807e742945628040" />
     <packagefile me3="true" sourcename="HR Weapon Textures ME3.mem" movedirectly="true" />
     <packagefile me2="true" sourcename="HR Weapon Textures ME2.mem" movedirectly="true" />
   </addonfile>
   <addonfile friendlyname="HR Predator Texture" tooltipname="WpnPredator_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="WpnPredator_HRv1.5.zip" size="3286846" md5="d52bb74179ba9ea8521f86617a4d35e7" />
+    <file downloadlink="https://mega.nz/#!w093GCyK!9FI05eXXua0V7VaG8vp27miHZfZ26QqGirwB1pfcCw4" filename="WpnPredator_HRv1.5.zip" size="3286846" md5="d52bb74179ba9ea8521f86617a4d35e7" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0xA4E25886.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x17836EC0.dds" destinationname="WPN_PSTa_Diff_0x17836EC0.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0x7E3D8CAD.dds" />
@@ -145,41 +145,41 @@
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF4295780.dds" destinationname="WPN_PSTa_Tint_0xF4295780.dds" />
   </addonfile>
   <addonfile friendlyname="HR Shuriken Texture" tooltipname="WpnShuriken_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="WpnShuriken_HRv1.5.zip" size="3127609" md5="25daf87a0b6deae25506c574d6c9723c" />
+    <file downloadlink="https://mega.nz/#!kwdz0AbK!L1vVXdvdkxs3VHXfpTTJcnwDNNcPT2yec5RQExkOi9k" filename="WpnShuriken_HRv1.5.zip" size="3127609" md5="25daf87a0b6deae25506c574d6c9723c" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WPN_PSTc_Diff_0x71A3F10A.dds" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x057B3D5A.dds" destinationname="WPN_PSTc_Tint_0x057B3D5A.dds" />
   </addonfile>
   <addonfile friendlyname="HR Mantis Texture" tooltipname="WpnMantis_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="WpnMantis_HRv1.5.zip" size="3341991" md5="d577e69976cd14495cd8c972a968846f" />
+    <file downloadlink="https://mega.nz/#!4k8REYTQ!UEbSRrbxx1Y6fjkHSnFHaMSy8W8pThIsjOffdJ0jy70" filename="WpnMantis_HRv1.5.zip" size="3341991" md5="d577e69976cd14495cd8c972a968846f" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds" />
   </addonfile>
   <addonfile friendlyname="HR Katana Texture" tooltipname="WpnKatana_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="WpnKatana_HRv1.5.zip" size="2660646" md5="8940f294ac40c1b9cb5699990eee2a0f" />
+    <file downloadlink="https://mega.nz/#!ZgcQFB7Y!mdXAG9Xbthf5K9FN5aUOV4QmnhD3qcdGPtI7NBnJdBs" filename="WpnKatana_HRv1.5.zip" size="2660646" md5="8940f294ac40c1b9cb5699990eee2a0f" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0x738FAA8B.dds" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0xB0DD05E4.dds" destinationname="WPN_BLSb_Spec_0xB0DD05E4.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE999983A.dds" destinationname="WPN_BLSb_Tint_0xE999983A.dds" />
     <packagefile me2="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0xA56179D6.dds" />
   </addonfile>
   <addonfile friendlyname="HR Carnifex Texture" tooltipname="WpnCarnifex_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="WpnCarnifex_HRv1.5.zip" size="4216670" md5="8064c75754b4e3d6cedad3a0fed6ef29" />
+    <file downloadlink="https://mega.nz/#!JlEFnSIQ!LIblPk7G2vB9gdtgekfXQ6HqteGlzM9U-EaW9iJkG5A" filename="WpnCarnifex_HRv1.5.zip" size="4216670" md5="8064c75754b4e3d6cedad3a0fed6ef29" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x073BF3F5.dds" destinationname="WPN_PSTb_Spec_0x073BF3F5.dds" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x6085274E.dds" destinationname="WPN_PSTb_Diff_0x6085274E.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x809FC86B.dds" destinationname="WPN_PSTb_Tint_0x809FC86B.dds" />
   </addonfile>
   <addonfile friendlyname="HR Paladin Texture" tooltipname="WpnPaladin_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="WpnPaladin_HRv1.5.zip" size="2694764" md5="f13bddb44806d106b61bb0c3a80d66d4" />
+    <file downloadlink="https://mega.nz/#!40UjWa6J!0czjbA-lxW0Rb5yk5HOojS2Zlx78Jc6qRsHxgDpDb3Q" filename="WpnPaladin_HRv1.5.zip" size="2694764" md5="f13bddb44806d106b61bb0c3a80d66d4" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x498B35ED.dds" destinationname="WPN_PSTm_Diff_0x498B35ED.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB8151BBB.dds" destinationname="WPN_PSTm_Spec_0xB8151BBB.dds" />
   </addonfile>
   <addonfile friendlyname="HR Phaeston Texture" tooltipname="WpnPhaeston_HRv1.65.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="WpnPhaeston_HRv1.65.zip" size="4286256" md5="92ffcf7ff8635e26cb2d61ce411697ff" />
+    <file downloadlink="https://mega.nz/#!ckkVibAL!AoasulfLSzPFjChIV2J0B9plldCApkHnjJLOCGPvFTs" filename="WpnPhaeston_HRv1.65.zip" size="4286256" md5="92ffcf7ff8635e26cb2d61ce411697ff" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA18F8A44.dds" destinationname="WPN_ASLg_Tint_0xA18F8A44.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE1EDE859.dds" destinationname="WPN_ASLg_Diff_0xE1EDE859.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEEFDCFA9.dds" destinationname="WPN_ASLg_Spec_0xEEFDCFA9.dds" />
   </addonfile>
   <addonfile friendlyname="HR Cain Texture" tooltipname="WpnCain_HRv1.7.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#F!0ptB1SqY!KrHxLZUwEMNQVA9OxUxRCQ" filename="WpnCain_HRv1.7.zip" size="4010295" md5="500c968c87ebe44e05f25de5294c3d07" />
+    <file downloadlink="https://mega.nz/#!Ald1iIQJ!Emkz041FtD4M43HUcU-zx0glyhEBe4a2dU22klCAG_w" filename="WpnCain_HRv1.7.zip" size="4010295" md5="500c968c87ebe44e05f25de5294c3d07" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x637DADD4.dds" destinationname="WPN_HVYb_Diff_0x637DADD4.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds" />
   </addonfile>
