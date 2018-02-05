@@ -51,6 +51,7 @@ namespace AlotAddOnGUI.ui
         private StringBuilder diagStringBuilder;
         private int Context = CONTEXT_NORMAL;
         private bool MEMI_FOUND = true;
+        private bool FIXED_LOD_SETTINGS = false;
 
         public DiagnosticsWindow()
         {
@@ -195,7 +196,8 @@ namespace AlotAddOnGUI.ui
                     //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                     break;
                 case SHOW_DIALOG_BAD_LOD:
-                    Width = 650;
+                    ThreadCommandDialogOptions tcdo = (ThreadCommandDialogOptions)tc.Data;
+                    Width = 720;
                     this.Left = Owner.Left + (Owner.Width - this.ActualWidth) / 2;
                     this.Top = Owner.Top + (Owner.Height - this.ActualHeight) / 2;
                     MetroDialogSettings settings = new MetroDialogSettings();
@@ -207,9 +209,17 @@ namespace AlotAddOnGUI.ui
                     {
                         Log.Information("Removing bad LOD values from game");
                         string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                        string args = "-remove-lod" + DIAGNOSTICS_GAME;
-                        Utilities.runProcess(exe, args);
+                        string args = "-remove-lods " + DIAGNOSTICS_GAME;
+                        int returncode = Utilities.runProcess(exe, args);
+                        if (returncode == 0)
+                        {
+                            FIXED_LOD_SETTINGS = true;
+                        } else
+                        {
+                            Log.Warning("Failed to remove LOD settings, return code not 0: " + returncode);
+                        }
                     }
+                    tcdo.signalHandler.Set();
                     break;
                 case INCREMENT_COMPLETION_EXTRACTION:
                     //TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
@@ -305,6 +315,24 @@ namespace AlotAddOnGUI.ui
                 {
                     displayVal = ByteSize.FromBytes(regValue).ToString();
                 }
+                else
+                {
+                    try
+                    {
+                        UInt32 wmiValue = (UInt32)obj["AdapterRam"];
+                        displayVal = ByteSize.FromBytes((long)wmiValue).ToString();
+                        if (displayVal == "4GB")
+                        {
+                            displayVal += " (possibly more, variable is 32-bit unsigned)";
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        displayVal = "Unable to read value from registry/WMI";
+
+                    }
+                }
+
                 addDiagLine("Memory: " + displayVal);
                 addDiagLine("DriverVersion: " + obj["DriverVersion"]);
                 vidCardIndex++;
@@ -504,7 +532,7 @@ namespace AlotAddOnGUI.ui
                         {
                             compatPatchInstalled = true;
                         }
-                        if (dir != "DLC_CON_XBX" && dir != "DLC_CON_UIScaling" && dir!= "DLC_CON_UIScaling_Shared" && InteralGetDLCName(dir) == "")
+                        if (dir != "DLC_CON_XBX" && dir != "DLC_CON_UIScaling" && dir != "DLC_CON_UIScaling_Shared" && InteralGetDLCName(dir) == "")
                         {
                             requiresCompatPatch = true;
                         }
@@ -515,7 +543,8 @@ namespace AlotAddOnGUI.ui
                 if (requiresCompatPatch && compatPatchInstalled)
                 {
                     addDiagLine("This installation requires a UI compatibility patch. This patch appears to be installed.");
-                } else if (requiresCompatPatch && !compatPatchInstalled)
+                }
+                else if (requiresCompatPatch && !compatPatchInstalled)
                 {
                     addDiagLine("This installation may require a UI compatibility patch from Mass Effect 3 Mod Manager due to installation of a UI mod with other mods. In Mod Manager use Mod Management > Check for Custom DLC conflicts to see if you need one.");
                 }
@@ -591,6 +620,7 @@ namespace AlotAddOnGUI.ui
             Uri uriResult;
             bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
                 && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            File.Delete(outfile);
             if (result)
             {
                 //should be valid URL.
@@ -612,7 +642,6 @@ namespace AlotAddOnGUI.ui
 
         private string GetLODStr(int gameID, ALOTVersionInfo avi)
         {
-            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG_BAD_LOD));
             string log = "";
             string iniPath = IniSettingsHandler.GetConfigIniPath(gameID);
             if (File.Exists(iniPath))
@@ -655,7 +684,7 @@ namespace AlotAddOnGUI.ui
                             else
                             {
                                 log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have unused mip crashes." + Environment.NewLine;
-                                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG_BAD_LOD));
+                                log = ShowBadLODDialog(log);
                             }
                         }
                         else
@@ -706,7 +735,7 @@ namespace AlotAddOnGUI.ui
                             else
                             {
                                 log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
-                                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG_BAD_LOD));
+                                log = ShowBadLODDialog(log);
                             }
                         }
                         else
@@ -757,7 +786,8 @@ namespace AlotAddOnGUI.ui
                             else
                             {
                                 log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
-                                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG_BAD_LOD));
+                                log = ShowBadLODDialog(log);
+
                             }
                         }
                         else
@@ -780,6 +810,19 @@ namespace AlotAddOnGUI.ui
             {
                 log += " - DIAG ERROR: Could not find LOD config file: " + iniPath;
 
+            }
+            return log;
+        }
+
+        private string ShowBadLODDialog(string log)
+        {
+            ThreadCommandDialogOptions tcdo = new ThreadCommandDialogOptions();
+            tcdo.signalHandler = new EventWaitHandle(false, EventResetMode.AutoReset);
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG_BAD_LOD, tcdo));
+            tcdo.signalHandler.WaitOne();
+            if (FIXED_LOD_SETTINGS)
+            {
+                log += "User has selected to fix LOD settings. This should fix black textures or crashes due to game being restored manually/repaired but configuration files were not reset." + Environment.NewLine;
             }
             return log;
         }
