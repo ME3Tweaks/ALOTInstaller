@@ -195,18 +195,20 @@ namespace AlotAddOnGUI.ui
                     //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                     break;
                 case SHOW_DIALOG_BAD_LOD:
-                    ThreadCommandDialogOptions tcdo = (ThreadCommandDialogOptions)tc.Data;
+                    Width = 650;
+                    this.Left = Owner.Left + (Owner.Width - this.ActualWidth) / 2;
+                    this.Top = Owner.Top + (Owner.Height - this.ActualHeight) / 2;
                     MetroDialogSettings settings = new MetroDialogSettings();
                     settings.NegativeButtonText = "Don't fix";
                     settings.AffirmativeButtonText = "Fix";
                     settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                    MessageDialogResult result = await this.ShowMessageAsync("Texture settings won't work with current installation", "The current texture settings for the game will cause black textures or the game to possibly crash. It is recommended you restore these settings to their unmodifid states to prevent this issue.", MessageDialogStyle.AffirmativeAndNegative, settings);
+                    MessageDialogResult result = await this.ShowMessageAsync("Texture settings won't work with current installation", "The current texture settings for the game will cause black textures or the game to possibly crash. It is recommended you restore these settings to their unmodified states to prevent this issue. This will not change your game files, only the texture settings.", MessageDialogStyle.AffirmativeAndNegative, settings);
                     if (result == MessageDialogResult.Affirmative)
                     {
                         Log.Information("Removing bad LOD values from game");
                         string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                         string args = "-remove-lod" + DIAGNOSTICS_GAME;
-                        Utilities.runProcess(exe,args);
+                        Utilities.runProcess(exe, args);
                     }
                     break;
                 case INCREMENT_COMPLETION_EXTRACTION:
@@ -484,6 +486,8 @@ namespace AlotAddOnGUI.ui
 
                 var directories = Directory.EnumerateDirectories(dlcPath);
                 bool metadataPresent = false;
+                bool requiresCompatPatch = false;
+                bool compatPatchInstalled = false;
                 foreach (string dir in directories)
                 {
                     string value = Path.GetFileName(dir);
@@ -492,8 +496,34 @@ namespace AlotAddOnGUI.ui
                         metadataPresent = true;
                         continue;
                     }
+                    if (DIAGNOSTICS_GAME == 3)
+                    {
+                        //check for ISM/Controller patch
+                        int mountpriority = GetDLCPriority(dir);
+                        if (mountpriority == 31050)
+                        {
+                            compatPatchInstalled = true;
+                        }
+                        if (dir != "DLC_CON_XBX" && dir != "DLC_CON_UIScaling" && dir!= "DLC_CON_UIScaling_Shared" && InteralGetDLCName(dir) == "")
+                        {
+                            requiresCompatPatch = true;
+                        }
+                    }
                     addDiagLine(" - " + GetDLCDisplayString(value));
                 }
+
+                if (requiresCompatPatch && compatPatchInstalled)
+                {
+                    addDiagLine("This installation requires a UI compatibility patch. This patch appears to be installed.");
+                } else if (requiresCompatPatch && !compatPatchInstalled)
+                {
+                    addDiagLine("This installation may require a UI compatibility patch from Mass Effect 3 Mod Manager due to installation of a UI mod with other mods. In Mod Manager use Mod Management > Check for Custom DLC conflicts to see if you need one.");
+                }
+                else if (!requiresCompatPatch && compatPatchInstalled)
+                {
+                    addDiagLine(" - DIAG ERROR: This installation does not require a UI compatibilty patch but one is installed. This may lead to game crashing.");
+                }
+
                 if (metadataPresent)
                 {
                     addDiagLine("__metadata folder is present");
@@ -507,7 +537,7 @@ namespace AlotAddOnGUI.ui
                 }
                 else
                 {
-                    addDiagLine(" - DIAG ERROR: DLC directory is missing: " + dlcPath + ". If no DLC is installed, this folder will be missing.");
+                    addDiagLine("DLC directory is missing: " + dlcPath + ". If no DLC is installed, this folder will be missing.");
                 }
             }
 
@@ -880,9 +910,28 @@ namespace AlotAddOnGUI.ui
             }
 
             return str;
+        }
 
-
-
+        public static int GetDLCPriority(string DLCBasePath)
+        {
+            try
+            {
+                using (System.IO.FileStream s = new FileStream(DLCBasePath + "\\CookedPCConsole\\Mount.dlc", FileMode.Open))
+                {
+                    byte[] pdata = new byte[2];
+                    s.Seek(16, SeekOrigin.Begin);
+                    s.Read(pdata, 0, 2);
+                    // swap bytes
+                    byte b = pdata[0];
+                    pdata[0] = pdata[1];
+                    pdata[1] = b;
+                    return BitConverter.ToInt16(pdata, 0);
+                }
+            }
+            catch (Exception e)
+            {
+                return -1;
+            }
         }
 
         private string InteralGetDLCName(string str)
@@ -938,6 +987,9 @@ namespace AlotAddOnGUI.ui
                 case "DLC_CON_GUN01": return "Firefight Pack";
                 case "DLC_CON_GUN02": return "Groundside Resistance Pack";
 
+                case "DLC_CON_XBX": return "[MOD] Singleplayer Native Controller Support";
+                case "DLC_CON_UIScaling": return "[MOD] Interface Scaling Mod";
+                case "DLC_CON_UIScaling_Shared": return "[MOD] Interface Scaling Add-on";
 
                 default:
                     return null;
