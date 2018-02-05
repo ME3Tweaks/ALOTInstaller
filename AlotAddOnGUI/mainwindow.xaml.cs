@@ -865,13 +865,18 @@ namespace AlotAddOnGUI
                             af.Staged = true;
                         }
                     }
-                    if (af.Ready != ready) //ensure the file applies to something
+                    List<AddonFile> newUnreadyUserFiles = new List<AddonFile>();
+
+                    if (af.Ready != ready) //status is changing
                     {
                         af.ReadyStatusText = null;
                         af.ReadyIconPath = null;
                         af.Ready = ready;
+                        if (!af.Ready && af.UserFile)
+                        {
+                            newUnreadyUserFiles.Add(af);
+                        }
                     }
-
                     if (af.Ready)
                     {
                         if (af.Game_ME1) numME1FilesReady++;
@@ -884,7 +889,7 @@ namespace AlotAddOnGUI
                     }
                     numdone += ready && !af.Optional ? 1 : 0;
                     System.Windows.Application.Current.Dispatcher.Invoke(
-                    () =>
+                    async () =>
                     {
                         // Code to run on the GUI thread.
                         Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Where(p => !p.Optional).Count()) * 100);
@@ -895,6 +900,18 @@ namespace AlotAddOnGUI
                         tickerText += " - ";
                         tickerText += ShowME3Files ? "ME3: " + numME3FilesReady + "/" + numME3Files + " imported" : "ME3: N/A";
                         AddonFilesLabel.Text = tickerText;
+
+                        if (newUnreadyUserFiles.Count > 0)
+                        {
+                            alladdonfiles = new BindingList<AddonFile>(alladdonfiles.Except(newUnreadyUserFiles).ToList());
+                            ApplyFiltering();
+                            string message = "The following user files are no longer available on disk (they may have been moved or deleted) and have been removed from the list of files available in ALOT Installer. If you wish to use these files you will need to drag and drop them onto the interface again.";
+                            foreach(AddonFile removeFile in newUnreadyUserFiles)
+                            {
+                                message += "\n - " + removeFile.UserFilePath;
+                            }
+                            await this.ShowMessageAsync("Some files no longer available", message);
+                        }
                     });
                 }
 

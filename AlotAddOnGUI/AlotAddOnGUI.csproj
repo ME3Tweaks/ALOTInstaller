@@ -290,9 +290,7 @@
     <None Include="Data\bin\MassEffectModder.pdb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Data\bin\MassEffectModderNoGui.exe">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Data\bin\MassEffectModderNoGui.exe" />
     <None Include="Data\bin\MassEffectModderNoGui.pdb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

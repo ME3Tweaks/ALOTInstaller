@@ -131,8 +131,8 @@
 
                         <StackPanel  HorizontalAlignment="Left" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal">
                             <Image x:Name="ReadyImageIcon" Height="15" Width="15" Source="{Binding ReadyIconPath}"/>
-                            <TextBlock x:Name="Download_Hyperlink"  Margin="5,0">
-                                <Hyperlink x:Name="Download_InnerHyperlink" ToolTip="{Binding DownloadLink}" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
+                            <TextBlock x:Name="Download_Hyperlink" Margin="5,0">
+                                <Hyperlink x:Name="Download_InnerHyperlink" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
                                     <Hyperlink.Style >
                                         <Style TargetType="Hyperlink"
                                                 BasedOn="{StaticResource {x:Type Hyperlink}}">
@@ -141,6 +141,16 @@
 
                                         </Style>
                                     </Hyperlink.Style>
+                                    <Hyperlink.ToolTip>
+                                        <TextBlock>
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}{0}&#10;File title: {1}">
+                                                    <Binding Path="DownloadLink" />
+                                                    <Binding Path="Tooltipname" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </Hyperlink.ToolTip>
                                     Download
                                 </Hyperlink>
                             </TextBlock>
