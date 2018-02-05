@@ -135,6 +135,7 @@ namespace AlotAddOnGUI
         private string MANIFEST_BUNDLED_LOC = EXE_DIRECTORY + @"Data\manifest-bundled.xml";
         private List<string> COPY_QUEUE = new List<string>();
         private List<string> MOVE_QUEUE = new List<string>();
+        private DateTime bootTime;
 
         public bool ShowME1Files
         {
@@ -185,6 +186,7 @@ namespace AlotAddOnGUI
             Title = "ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             HeaderLabel.Text = "Preparing application...";
             AddonFilesLabel.Text = "Please wait";
+            bootTime = DateTime.Now;
         }
 
         /// <summary>
@@ -193,6 +195,7 @@ namespace AlotAddOnGUI
         /// <param name="action">Action to run</param>
         /// <param name="timeoutInMilliseconds">Delay in ms</param>
         /// <returns></returns>
+        /// 
         public async Task Execute(Action action, int timeoutInMilliseconds)
         {
             await Task.Delay(timeoutInMilliseconds);
@@ -2164,7 +2167,8 @@ namespace AlotAddOnGUI
                 if (info.ALOTVER > 0)
                 {
                     await this.ShowMessageAsync("ALOT is installed", "You cannot backup an installation that has ALOT already installed. If you have a backup, you can restore it by clicking the game backup button in the Settings menu. Otherwise, delete your game folder and redownload it.");
-                } else if (info.MEUITMVER > 0)
+                }
+                else if (info.MEUITMVER > 0)
                 {
                     await this.ShowMessageAsync("MEUITM is installed", "You cannot backup an installation that has ALOT already installed. If you have a backup, you can restore it by clicking the game backup button in the Settings menu. Otherwise, delete your game folder and redownload it.");
                 }
@@ -2197,7 +2201,7 @@ namespace AlotAddOnGUI
                 await this.ShowMessageAsync("Directory is not empty", "The backup destination directory must be empty.");
                 return;
             }
-            if (Utilities.IsSubfolder(Utilities.GetGamePath(game),dir))
+            if (Utilities.IsSubfolder(Utilities.GetGamePath(game), dir))
             {
                 Log.Warning("User attempting to backup to subdirectory of backup source - not allowed because this will cause infinite recursion and will be deleted when restores are attempted");
                 await this.ShowMessageAsync("Directory is subdirectory of game", "Backup directories cannot be subfolders of the game directory. Choose a different directory.");
@@ -3453,18 +3457,33 @@ namespace AlotAddOnGUI
 
         private async void uploadLatestLog(bool isPreviousCrashLog)
         {
+            Log.Information("Preparing to upload installer log");
             var directory = new DirectoryInfo("logs");
-            FileInfo latestlogfile = directory.GetFiles("alotinstaller*.txt").OrderByDescending(f => f.LastWriteTime).First();
-
-            if (latestlogfile != null)
+            var logfiles = directory.GetFiles("alotinstaller*.txt").OrderByDescending(f => f.LastWriteTime).ToList();
+            if (logfiles.Count() > 0)
             {
+                var currentTime = DateTime.Now;
+                string log = "";
+                if (currentTime.Date != bootTime.Date && logfiles.Count() > 1)
+                {
+                    //we need to do last 2 files
+                    Log.Information("Log file has rolled over since app was booted - including previous days' log.");
+                    File.Copy(logfiles.ElementAt(1).FullName, logfiles.ElementAt(1).FullName + ".tmp");
+                    log = File.ReadAllText(logfiles.ElementAt(1).FullName+".tmp");
+                    File.Delete(logfiles.ElementAt(1).FullName + ".tmp");
+                    log += "\n";
+                }
                 Log.Information("Staging log file for upload. This is the final log item that should appear in an uploaded log.");
-                string zipStaged = EXE_DIRECTORY + "logs\\" + latestlogfile.Name + "_forUpload";
-                File.Copy(latestlogfile.FullName, zipStaged, true);
+                File.Copy(logfiles.ElementAt(0).FullName, logfiles.ElementAt(0).FullName + ".tmp");
+                log += File.ReadAllText(logfiles.ElementAt(0).FullName + ".tmp");
+                File.Delete(logfiles.ElementAt(0).FullName + ".tmp");
+
+                string zipStaged = EXE_DIRECTORY + "logs\\logfile_forUpload";
+                File.WriteAllText(zipStaged, log);
                 string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
 
                 //Compress with LZMA for VPS Upload
-                string outfile = latestlogfile + "_forUpload.lzma";
+                string outfile = "logfile_forUpload.lzma";
                 string args = "e \"" + zipStaged + "\" \"" + outfile + "\" -mt2";
                 Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
                 File.Delete(zipStaged);
@@ -3523,8 +3542,12 @@ namespace AlotAddOnGUI
                 }
                 SettingsFlyout.IsOpen = false;
                 File.Delete(outfile);
+            } else
+            {
+                Log.Error("No log files were found. User has hit an exceedingly rare case, well done.");
             }
         }
+
 
         private void Button_OpenAddonAssistantWindow_Click(object sender, RoutedEventArgs e)
         {
