@@ -2042,7 +2042,7 @@ namespace AlotAddOnGUI
             {
                 return;
             }
-            if (ValidateGameBackup(1))
+            if (false && ValidateGameBackup(1))
             {
                 if (Utilities.isGameRunning(1))
                 {
@@ -2195,12 +2195,13 @@ namespace AlotAddOnGUI
             HeaderLabel.Text = "Backing up Mass Effect" + (game == 1 ? "" : " " + game) + "...\nDo not close the application until this process completes.";
             BackupWorker.RunWorkerAsync(dir);
             Button_InstallME1.IsEnabled = Button_InstallME2.IsEnabled = Button_InstallME3.IsEnabled = Button_Settings.IsEnabled = Button_DownloadAssistant.IsEnabled = false;
-            ShowStatus("Verifying game data before backup", 6000);
+            ShowStatus("Verifying game data before backup", 4000);
             // get all the directories in selected dirctory
         }
 
         private void BackupCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            Build_ProgressBar.IsIndeterminate = false;
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
             string destPath = (string)e.Result;
             if (destPath != null)

@@ -34,8 +34,16 @@ namespace AlotAddOnGUI.classes
                 {
                     continue; //don't copy logs
                 }
-                Log.Information(@"Copying {0}\{1}", target.FullName, fi.Name);
-                fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
+                //Log.Information(@"Copying {0}\{1}", target.FullName, fi.Name);
+                try
+                {
+                    fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Error copying file: " + fi + " -> " + Path.Combine(target.FullName, fi.Name));
+                    throw e;
+                }
             }
 
             // Copy each subdirectory using recursion.

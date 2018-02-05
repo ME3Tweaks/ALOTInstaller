@@ -1187,6 +1187,29 @@ namespace AlotAddOnGUI
 
         private void BackupGame(object sender, DoWorkEventArgs e)
         {
+            BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Calculating space requirements..."));
+            BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+
+
+            //Get size
+            string backupPath = (string)e.Argument;
+
+            long dirsize = Utilities.DirSize(new DirectoryInfo(Utilities.GetGamePath(BACKUP_THREAD_GAME)));
+            dirsize = Convert.ToInt64(dirsize * 1.1);
+
+
+            ulong freeBytes;
+            ulong diskSize;
+            ulong totalFreeBytes;
+            bool gotFreeSpace = Utilities.GetDiskFreeSpaceEx(backupPath, out freeBytes, out diskSize, out totalFreeBytes);
+
+            if ((long)freeBytes < dirsize)
+            {
+                Log.Error("Not enough free space on drive for backup. We need " + ByteSize.FromBytes(dirsize) + " but we only have " + ByteSize.FromBytes(freeBytes));
+                BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Not enough free space on drive", "There is not enough space on " + Path.GetPathRoot(backupPath) + " to store a backup.\nFree space: " + ByteSize.FromBytes(freeBytes) + "\nRequired space: " + ByteSize.FromBytes(dirsize))));
+                e.Result = null;
+                return;
+            }
 
             //verify vanilla
             Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
@@ -1231,11 +1254,24 @@ namespace AlotAddOnGUI
                 }
             }
             string gamePath = Utilities.GetGamePath(BACKUP_THREAD_GAME);
-            string backupPath = (string)e.Argument;
             string[] ignoredExtensions = { ".wav", ".pdf", ".bak" };
             if (gamePath != null)
             {
-                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, -1, 0, ignoredExtensions);
+                Log.Information("Creating backup... Only errors will be reported.");
+                try
+                {
+                    CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, -1, 0, ignoredExtensions);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Error creating backup:");
+                    Log.Error(App.FlattenException(ex));
+                    BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Backup failed", "Backup of Mass Effect"+getGameNumberSuffix(BACKUP_THREAD_GAME)+" failed. An error occured during the copy process. The error message was: "+ex.Message+".\nSome files may have been copied, but this backup is not usable. You can delete the folder you were backing up files into.\nReview the installer log for more information.")));
+
+                    e.Result = null;
+                    return;
+                }
+                Log.Information("Backup copy created");
             }
             if (BACKUP_THREAD_GAME == 3)
             {
