@@ -3749,11 +3749,17 @@ namespace AlotAddOnGUI
                         if (af.Enabled)
                         {
                             mi.Header = "Disable file";
+                            mi.ToolTip = "Click to disable file for this session.\nThis file will not be processed when staging files for installation.";
+                            mi.ToolTip = "Prevents this file from being used for installation";
                         }
                         else
                         {
                             mi.Header = "Enable file";
+                            mi.ToolTip = "Allows this file to be used for installation";
                         }
+                        break;
+                    case 3: //Remove user file
+                        mi.Visibility = af.UserFile ? Visibility.Visible : Visibility.Collapsed;
                         break;
                 }
                 i++;
@@ -3796,6 +3802,18 @@ namespace AlotAddOnGUI
             if (af.Ready)
             {
                 Utilities.OpenAndSelectFileInExplorer(af.GetFile());
+            }
+        }
+
+        private void ContextMenu_RemoveFile(object sender, RoutedEventArgs e)
+        {
+            var rowIndex = ListView_Files.SelectedIndex;
+            var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
+            AddonFile af = (AddonFile)row.DataContext;
+            if (af.UserFile)
+            {
+                alladdonfiles.Remove(af);
+                ApplyFiltering();
             }
         }
     }

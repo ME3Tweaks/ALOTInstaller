@@ -247,9 +247,10 @@
                                         </Style>
                                     </MenuItem.Style>
                                 </MenuItem>-->
-                    <MenuItem Header="Open download page" Click="ContextMenu_OpenDownloadPage"/>
-                    <MenuItem Header="Open file location" Click="ContextMenu_ViewFile"/>
+                    <MenuItem Header="Open download page" Click="ContextMenu_OpenDownloadPage" ToolTip="Opens the page where this file can be downloaded from."/>
+                    <MenuItem Header="Open file location" Click="ContextMenu_ViewFile" ToolTip="Opens location of file on disk"/>
                     <MenuItem Header="Toggle Enabled/Disabled" Click="ContextMenu_ToggleFile"/>
+                    <MenuItem Header="Remove file" Click="ContextMenu_RemoveFile" ToolTip="Removes file from ALOT Installer list. This does not remove the file on disk."/>
                 </ContextMenu>
             </ListView.Resources>
             <ListView.ItemContainerStyle>
