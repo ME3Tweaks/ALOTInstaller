@@ -383,7 +383,7 @@ namespace AlotAddOnGUI.ui
                 addDiagLine("===Files added (or removed) after ALOT" + (DIAGNOSTICS_GAME == 1 ? "/MEUITM" : "") + " install");
                 if (avi == null)
                 {
-                    addDiagLine("Texture map file is not present:" + DIAGNOSTICS_GAME + "map.bin - MEMI tag missing so this is OK");
+                    addDiagLine("Texture map file is not present: me" + DIAGNOSTICS_GAME + "map.bin - MEMI tag missing so this is OK");
 
                 }
                 else
