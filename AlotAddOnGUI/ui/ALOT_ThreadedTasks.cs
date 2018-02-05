@@ -653,7 +653,7 @@ namespace AlotAddOnGUI
 
             ADDONSTOBUILD_COUNT = ADDONFILES_TO_BUILD.Count;
             completed = 0;
-            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Preparing files for installation.\nDon't close the window until this operation completes."));
+            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Preparing files for installation.\nThis may take a few minutes."));
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Extracting Mods..."));
             BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
 

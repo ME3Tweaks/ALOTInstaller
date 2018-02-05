@@ -1042,6 +1042,7 @@ namespace AlotAddOnGUI
                     {
                         string me1path = Utilities.GetGamePath(1, true);
                         string path = Utilities.GetGameBackupPath(1);
+                        CheckIfRunningInGameSubDir(me1path);
                         if (path != null && me1path != null)
                         {
                             Button_ME1Backup.Content = "Restore ME1";
@@ -1067,6 +1068,7 @@ namespace AlotAddOnGUI
                     {
                         string path = Utilities.GetGameBackupPath(2);
                         string me2path = Utilities.GetGamePath(2, true);
+                        CheckIfRunningInGameSubDir(me2path);
 
                         if (path != null && me2path != null)
                         {
@@ -1093,6 +1095,7 @@ namespace AlotAddOnGUI
                 case 3:
                     {
                         string me3path = Utilities.GetGamePath(3, true);
+                        CheckIfRunningInGameSubDir(me3path);
                         string path = Utilities.GetGameBackupPath(3);
                         if (path != null && me3path != null)
                         {
@@ -1118,6 +1121,16 @@ namespace AlotAddOnGUI
                     }
                 default:
                     return false;
+            }
+        }
+
+        private async void CheckIfRunningInGameSubDir(string path)
+        {
+            if (path != null && Utilities.IsSubfolder(path, EXE_DIRECTORY))
+            {
+                Log.Error("FATAL: Running from subdirectory of a game: "+path+" This is not allowed. App will now exit.");
+                await this.ShowMessageAsync("ALOT Installer is in a game directory", "ALOT Installer cannot run from inside a game directory. Move ALOT Installer out of of the game directory and into a folder like Desktop or Documents.");
+                Environment.Exit(1);
             }
         }
 
@@ -2302,7 +2315,7 @@ namespace AlotAddOnGUI
                     mds.AffirmativeButtonText = "Backup";
                     mds.NegativeButtonText = "Continue";
                     mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                    MessageDialogResult result = await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " not backed up", "You should create a backup of your game before installing ALOT. In the event something goes wrong, you can quickly restore back to an unmodified state. Backups only work if you game is unmodified. Create a backup before install?", MessageDialogStyle.AffirmativeAndNegative, mds);
+                    MessageDialogResult result = await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " not backed up", "You should create a backup of your game before installing ALOT. In the event something goes wrong, you can quickly restore back to an unmodified state. Creating a backup is strongly recommended and should be done on an unmodified game. Create a backup before install?\n\nNote: You can press continue and still decline texture installation if you need to by selecting 'Install Later' at the installation prompt.", MessageDialogStyle.AffirmativeAndNegative, mds);
                     if (result == MessageDialogResult.Affirmative)
                     {
                         BackupGame(game);
@@ -3021,7 +3034,7 @@ namespace AlotAddOnGUI
                 if (result)
                 {
                     AddonFilesLabel.Text = "Restore completed.";
-                    await this.ShowMessageAsync("Restore completed", "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has been restored back to an unmodified state from backup.");
+                    await this.ShowMessageAsync("Restore completed", "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has been restored from backup.");
                 }
                 else
                 {
