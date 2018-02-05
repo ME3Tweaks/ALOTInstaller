@@ -514,8 +514,9 @@ namespace AlotAddOnGUI.ui
 
                 var directories = Directory.EnumerateDirectories(dlcPath);
                 bool metadataPresent = false;
-                bool requiresCompatPatch = false;
+                bool hasUIMod = false;
                 bool compatPatchInstalled = false;
+                bool hasNonUIDLCMod = false;
                 foreach (string dir in directories)
                 {
                     string value = Path.GetFileName(dir);
@@ -532,23 +533,28 @@ namespace AlotAddOnGUI.ui
                         {
                             compatPatchInstalled = true;
                         }
-                        if (dir != "DLC_CON_XBX" && dir != "DLC_CON_UIScaling" && dir != "DLC_CON_UIScaling_Shared" && InteralGetDLCName(dir) == "")
+                        if (value != "DLC_CON_XBX" && value != "DLC_CON_UIScaling" && value != "DLC_CON_UIScaling_Shared" && InteralGetDLCName(value) == null)
                         {
-                            requiresCompatPatch = true;
+                            hasNonUIDLCMod = true;
+                        }
+                        if (value == "DLC_CON_XBX" || value == "DLC_CON_UIScaling" || value == "DLC_CON_UIScaling_Shared")
+                        {
+                            hasUIMod = true;
                         }
                     }
                     addDiagLine(" - " + GetDLCDisplayString(value));
                 }
 
-                if (requiresCompatPatch && compatPatchInstalled)
+                if (hasUIMod && hasNonUIDLCMod && compatPatchInstalled)
                 {
                     addDiagLine("This installation requires a UI compatibility patch. This patch appears to be installed.");
                 }
-                else if (requiresCompatPatch && !compatPatchInstalled)
+                else if (hasUIMod && hasNonUIDLCMod && !compatPatchInstalled)
                 {
-                    addDiagLine("This installation may require a UI compatibility patch from Mass Effect 3 Mod Manager due to installation of a UI mod with other mods. In Mod Manager use Mod Management > Check for Custom DLC conflicts to see if you need one.");
+                    addDiagLine("This installation may require a UI compatibility patch from Mass Effect 3 Mod Manager due to installation of a UI mod with other mods.");
+                    addDiagLine("In Mass Effect 3 Mod Manager use Mod Management > Check for Custom DLC conflicts to see if you need one.");
                 }
-                else if (!requiresCompatPatch && compatPatchInstalled)
+                else if (!hasUIMod && compatPatchInstalled)
                 {
                     addDiagLine(" - DIAG ERROR: This installation does not require a UI compatibilty patch but one is installed. This may lead to game crashing.");
                 }
@@ -965,10 +971,10 @@ namespace AlotAddOnGUI.ui
                     s.Seek(16, SeekOrigin.Begin);
                     s.Read(pdata, 0, 2);
                     // swap bytes
-                    byte b = pdata[0];
-                    pdata[0] = pdata[1];
-                    pdata[1] = b;
-                    return BitConverter.ToInt16(pdata, 0);
+                    //byte b = pdata[0];
+                    //pdata[0] = pdata[1];
+                    //pdata[1] = b;
+                    return BitConverter.ToUInt16(pdata, 0);
                 }
             }
             catch (Exception e)
