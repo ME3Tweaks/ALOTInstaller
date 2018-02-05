@@ -2387,8 +2387,11 @@ namespace AlotAddOnGUI
                     Log.Error("Exception deleting game directory: " + gamePath + ": " + ex.Message);
                 }
             }
+
             Log.Information("Reverting lod settings");
-            IniSettingsHandler.removeLOD(BACKUP_THREAD_GAME);
+            string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
+            string args = "-remove-lod" + BACKUP_THREAD_GAME;
+            Utilities.runProcess(exe, args);
 
             if (Utilities.IsDirectoryWritable(Directory.GetParent(gamePath).FullName))
             {
@@ -2397,8 +2400,8 @@ namespace AlotAddOnGUI
             else
             {
                 //Must have admin rights.
-                string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
-                string args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" -create-directory \"" + gamePath.TrimEnd('\\') + "\"";
+                exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
+                args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" -create-directory \"" + gamePath.TrimEnd('\\') + "\"";
                 int result = Utilities.runProcessAsAdmin(exe, args);
                 if (result == 0)
                 {

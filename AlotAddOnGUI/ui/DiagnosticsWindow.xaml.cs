@@ -20,6 +20,7 @@ using ByteSizeLib;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using System.Management;
 using Microsoft.Win32;
+using MahApps.Metro.Controls.Dialogs;
 
 namespace AlotAddOnGUI.ui
 {
@@ -28,6 +29,7 @@ namespace AlotAddOnGUI.ui
     /// </summary>
     public partial class DiagnosticsWindow : MetroWindow
     {
+        public const string SHOW_DIALOG_BAD_LOD = "SHOW_DIALOG_BAD_LOD";
         private const string SET_DIAG_TEXT = "SET_DIAG_TEXT";
         private const string SET_DIAGTASK_ICON_WORKING = "SET_DIAGTASK_ICON_WORKING";
         private const string SET_DIAGTASK_ICON_GREEN = "SET_DIAGTASK_ICON_GREEN";
@@ -132,7 +134,7 @@ namespace AlotAddOnGUI.ui
             diagnosticsWorker.RunWorkerAsync();
         }
 
-        private void DiagnosticsProgressChanged(object sender, ProgressChangedEventArgs e)
+        private async void DiagnosticsProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             ThreadCommand tc = (ThreadCommand)e.UserState;
             switch (tc.Command)
@@ -192,26 +194,21 @@ namespace AlotAddOnGUI.ui
                     //Build_ProgressBar.Value = 0;
                     //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                     break;
-                case SHOW_DIALOG:
-                    //KeyValuePair<string, string> messageStr = (KeyValuePair<string, string>)tc.Data;
-                    //await this.ShowMessageAsync(messageStr.Key, messageStr.Value);
+                case SHOW_DIALOG_BAD_LOD:
+                    ThreadCommandDialogOptions tcdo = (ThreadCommandDialogOptions)tc.Data;
+                    MetroDialogSettings settings = new MetroDialogSettings();
+                    settings.NegativeButtonText = "Don't fix";
+                    settings.AffirmativeButtonText = "Fix";
+                    settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                    MessageDialogResult result = await this.ShowMessageAsync("Texture settings won't work with current installation", "The current texture settings for the game will cause black textures or the game to possibly crash. It is recommended you restore these settings to their unmodifid states to prevent this issue.", MessageDialogStyle.AffirmativeAndNegative, settings);
+                    if (result == MessageDialogResult.Affirmative)
+                    {
+                        Log.Information("Removing bad LOD values from game");
+                        string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
+                        string args = "-remove-lod" + DIAGNOSTICS_GAME;
+                        Utilities.runProcess(exe,args);
+                    }
                     break;
-                //    case SHOW_DIALOG_YES_NO:
-                //ThreadCommandDialogOptions tcdo = (ThreadCommandDialogOptions)tc.Data;
-                //MetroDialogSettings settings = new MetroDialogSettings();
-                //ettings.NegativeButtonText = tcdo.NegativeButtonText;
-                //settings.AffirmativeButtonText = tcdo.AffirmativeButtonText;
-                //MessageDialogResult result = await this.ShowMessageAsync(tcdo.title, tcdo.message, MessageDialogStyle.AffirmativeAndNegative, settings);
-                /*if (result == MessageDialogResult.Negative)
-                {
-                    CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = false;
-                }
-                else
-                {
-                    CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = true;
-                }
-                tcdo.signalHandler.Set();*/
-                //      break;
                 case INCREMENT_COMPLETION_EXTRACTION:
                     //TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
 
@@ -300,7 +297,7 @@ namespace AlotAddOnGUI.ui
                 //Get Memory
                 string vidKey = @"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\";
                 vidKey += (vidCardIndex - 1).ToString().PadLeft(4, '0');
-                long regValue = (long)Registry.GetValue(vidKey, "HardwareInformation.qwMemorySize", 0);
+                long regValue = (long)Registry.GetValue(vidKey, "HardwareInformation.qwMemorySize", 0L);
                 string displayVal = "Unable to read value from registry";
                 if (regValue != 0)
                 {
@@ -585,6 +582,7 @@ namespace AlotAddOnGUI.ui
 
         private string GetLODStr(int gameID, ALOTVersionInfo avi)
         {
+            diagnosticsWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG_BAD_LOD));
             string log = "";
             string iniPath = IniSettingsHandler.GetConfigIniPath(gameID);
             if (File.Exists(iniPath))
@@ -627,6 +625,7 @@ namespace AlotAddOnGUI.ui
                             else
                             {
                                 log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have unused mip crashes." + Environment.NewLine;
+                                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG_BAD_LOD));
                             }
                         }
                         else
@@ -677,6 +676,7 @@ namespace AlotAddOnGUI.ui
                             else
                             {
                                 log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
+                                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG_BAD_LOD));
                             }
                         }
                         else
@@ -727,6 +727,7 @@ namespace AlotAddOnGUI.ui
                             else
                             {
                                 log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
+                                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG_BAD_LOD));
                             }
                         }
                         else
@@ -735,6 +736,7 @@ namespace AlotAddOnGUI.ui
                             if (avi != null)
                             {
                                 log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
+
                             }
                             else
                             {
