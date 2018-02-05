@@ -1042,7 +1042,7 @@ namespace AlotAddOnGUI
                     {
                         string me1path = Utilities.GetGamePath(1, true);
                         string path = Utilities.GetGameBackupPath(1);
-                        if (path != null)
+                        if (path != null && me1path != null)
                         {
                             Button_ME1Backup.Content = "Restore ME1";
                             Button_ME1Backup.ToolTip = "Click to restore game from " + Environment.NewLine + path;
@@ -1068,7 +1068,7 @@ namespace AlotAddOnGUI
                         string path = Utilities.GetGameBackupPath(2);
                         string me2path = Utilities.GetGamePath(2, true);
 
-                        if (path != null)
+                        if (path != null && me2path != null)
                         {
                             Button_ME2Backup.Content = "Restore ME2";
                             Button_ME2Backup.ToolTip = "Click to restore game from " + Environment.NewLine + path;
@@ -1093,9 +1093,8 @@ namespace AlotAddOnGUI
                 case 3:
                     {
                         string me3path = Utilities.GetGamePath(3, true);
-
                         string path = Utilities.GetGameBackupPath(3);
-                        if (path != null)
+                        if (path != null && me3path != null)
                         {
                             Button_ME3Backup.Content = "Restore ME3";
                             Button_ME3Backup.ToolTip = "Click to restore game from " + Environment.NewLine + path;
@@ -1207,7 +1206,6 @@ namespace AlotAddOnGUI
                             }
                             //do something with results 
                         };
-                        Debug.WriteLine(DateTime.Now);
                         webClient.DownloadStringAsync(new Uri(url));
                     }
                     catch (WebException e)
