@@ -2042,7 +2042,7 @@ namespace AlotAddOnGUI
             {
                 return;
             }
-            if (false && ValidateGameBackup(1))
+            if (ValidateGameBackup(1))
             {
                 if (Utilities.isGameRunning(1))
                 {
@@ -2157,10 +2157,21 @@ namespace AlotAddOnGUI
 
         private async void BackupGame(int game)
         {
-            if (Utilities.GetInstalledALOTInfo(game) != null)
+            ALOTVersionInfo info = Utilities.GetInstalledALOTInfo(game);
+            if (info != null)
             {
                 //Game is modified via ALOT flag
-                await this.ShowMessageAsync("ALOT is installed", "You cannot backup an installation that has ALOT already installed. If you have a backup, you can restore it by clicking the game backup button in the Settings menu. Otherwise, delete your game folder and redownload it.");
+                if (info.ALOTVER > 0)
+                {
+                    await this.ShowMessageAsync("ALOT is installed", "You cannot backup an installation that has ALOT already installed. If you have a backup, you can restore it by clicking the game backup button in the Settings menu. Otherwise, delete your game folder and redownload it.");
+                } else if (info.MEUITMVER > 0)
+                {
+                    await this.ShowMessageAsync("MEUITM is installed", "You cannot backup an installation that has ALOT already installed. If you have a backup, you can restore it by clicking the game backup button in the Settings menu. Otherwise, delete your game folder and redownload it.");
+                }
+                else
+                {
+                    await this.ShowMessageAsync("ALOT is installed", "You cannot backup an installation that has ALOT already installed. If you have a backup, you can restore it by clicking the game backup button in the Settings menu. Otherwise, delete your game folder and redownload it.");
+                }
                 return;
             }
 
@@ -2176,12 +2187,20 @@ namespace AlotAddOnGUI
             var dir = openFolder.FileName;
             if (!Directory.Exists(dir))
             {
+                Log.Error("User attempting to backup to directory that doesn't exist. Explorer can cause this issue sometimes by allow selection of previous directory.");
                 await this.ShowMessageAsync("Directory does not exist", "The backup destination directory does not exist: " + dir);
                 return;
             }
             if (!Utilities.IsDirectoryEmpty(dir))
             {
+                Log.Warning("User attempting to backup to directory that is not empty");
                 await this.ShowMessageAsync("Directory is not empty", "The backup destination directory must be empty.");
+                return;
+            }
+            if (Utilities.IsSubfolder(Utilities.GetGamePath(game),dir))
+            {
+                Log.Warning("User attempting to backup to subdirectory of backup source - not allowed because this will cause infinite recursion and will be deleted when restores are attempted");
+                await this.ShowMessageAsync("Directory is subdirectory of game", "Backup directories cannot be subfolders of the game directory. Choose a different directory.");
                 return;
             }
             BackupWorker = new BackgroundWorker();
