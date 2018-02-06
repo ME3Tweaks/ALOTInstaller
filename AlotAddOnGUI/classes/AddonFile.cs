@@ -385,10 +385,10 @@ namespace AlotAddOnGUI.classes
                 }
                 else
                 {
-                    if (File.Exists(UserFilePath))
-                    {
-                        return UserFilePath;
-                    }
+                    //if (File.Exists(UserFilePath))
+                    //{
+                    return UserFilePath;
+                    //}
                 }
             }
 

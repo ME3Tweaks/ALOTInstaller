@@ -658,7 +658,17 @@ namespace AlotAddOnGUI
             ulong fullsize = 0;
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
+
                 string file = af.GetFile();
+                if (!File.Exists(file))
+                {
+                    //RIP
+                    Log.Error("FILE FOR PROCESSING HAS GONE MISSING SINCE PRECHECK: " + file);
+                    Log.Error("Aborting build");
+                    BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Build aborted"));
+                    BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("File for processing no longer available", "The following file is no longer available for processing:\n" + file + "\n\nBuild has been aborted.")));
+                    return false;
+                }
                 ulong size = (ulong)((new FileInfo(file).Length) * 2.5);
                 fullsize += size;
             }

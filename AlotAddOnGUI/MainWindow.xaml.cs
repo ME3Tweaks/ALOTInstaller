@@ -662,7 +662,7 @@ namespace AlotAddOnGUI
             SetBottomButtonAvailability();
             Button_Settings.IsEnabled = true;
             Button_DownloadAssistant.IsEnabled = true;
-
+            Build_ProgressBar.IsIndeterminate = false;
 
             switch (result)
             {
@@ -679,7 +679,6 @@ namespace AlotAddOnGUI
                     {
                         prefix = "The following mod appears to be installed and is";
                     }
-                    Build_ProgressBar.IsIndeterminate = false;
                     await this.ShowMessageAsync("Incompatible mods detected", prefix + "known to be incompatible with ALOT for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ". Restore your game to an unmodified state, and then install compatible versions of these mods (or do not install them at all)." + badModsStr);
                     PreventFileRefresh = false;
                     break;
@@ -695,9 +694,10 @@ namespace AlotAddOnGUI
                 case 3:
                     if (errorOccured)
                     {
+                        Log.Warning("Error while building and staging, see previous entries in log.");
                         HeaderLabel.Text = "Addon built with errors.\nThe Addon was built but some files did not process correctly and were skipped.\nThe MEM packages for the addon have been placed into the " + MEM_OUTPUT_DISPLAY_DIR + " directory.";
                         AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
-                        await this.ShowMessageAsync("ALOT Addon for Mass Effect" + getGameNumberSuffix(result) + " was built, but had errors", "Some files had errors occured during the build process. These files were skipped. Your game may look strange in some parts if you use the built Addon. You should report this to the developers on Discord.");
+                        await this.ShowMessageAsync("Textures staged for Mass Effect" + getGameNumberSuffix(result) + " with errors", "Some files had errors occur during the build and staging process. These files were skipped. Your game may look strange in some parts if you were to install these textures. You should report this to the developers on Discord (Settings -> Report an issue).");
                     }
                     else
                     {
@@ -735,7 +735,7 @@ namespace AlotAddOnGUI
 
                         if (readyToInstallALOT || currentAlotInfo != null) //not installed
                         {
-                            HeaderLabel.Text = "Ready to install new textures";
+                            HeaderLabel.Text = "Ready to install";
                             AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
                             MetroDialogSettings mds = new MetroDialogSettings();
                             mds.AffirmativeButtonText = "Install Now";
@@ -768,6 +768,7 @@ namespace AlotAddOnGUI
                         }
                         else
                         {
+                            //we should never hit this condition anymore.
                             await this.ShowMessageAsync("Addon(s) have been built", "Your textures have been built into MEM files, ready for installation. Due to ALOT not being installed, you will have to install these manually. The files have been placed into the MEM_Packages subdirectory.");
                         }
                     }
@@ -2672,6 +2673,14 @@ namespace AlotAddOnGUI
                 }
                 if (!hasMatch)
                 {
+                    string datadir = EXE_DIRECTORY + @"Data";
+                    string path = Path.GetDirectoryName(file);
+                    if (Utilities.IsSubfolder(datadir,path) || datadir == path)
+                    {
+                        Log.Warning("User file from data subdirectory (or deeper) is not allowed: "+file);
+                        ShowStatus("Files not allowed to be added from Data folder or subdirectories", 5000);
+                        continue;
+                    }
                     string extension = Path.GetExtension(file).ToLower();
                     switch (extension)
                     {
