@@ -510,11 +510,26 @@ namespace AlotAddOnGUI
             UpdateALOTStatus();
             RunMEMUpdaterGUI();
             string appCrashFile = EXE_DIRECTORY + @"Data\APP_CRASH";
+            string appCrashHandledFile = EXE_DIRECTORY + @"Data\APP_CRASH_HANDLED";
+
             if (File.Exists(appCrashFile))
             {
                 DateTime crashTime = File.GetCreationTime(appCrashFile);
-                File.Delete(appCrashFile);
-                if (crashTime.Date == DateTime.Today)
+                bool showUpload = true;
+                try
+                { 
+                    File.Delete(appCrashFile);
+                    File.Delete(appCrashHandledFile);
+                } catch (Exception e)
+                {
+                    Log.Error("Cannot remove APP_CRASH:" + e.Message);
+                    if (!File.Exists(appCrashHandledFile))
+                    {
+                        File.Create(appCrashHandledFile);
+                    }
+                    showUpload = false;
+                }
+                if (crashTime.Date == DateTime.Today && showUpload)
                 {
                     MetroDialogSettings mds = new MetroDialogSettings();
                     mds.AffirmativeButtonText = "Upload";
@@ -579,7 +594,7 @@ namespace AlotAddOnGUI
                     Environment.Exit(0);
                 } else
                 {
-                    Log.Error("Failed to exract update, 7zip return code not 0: " + result);
+                    Log.Error("Failed to extract update, 7zip return code not 0: " + result);
                     await this.ShowMessageAsync("Update failed to extract","The update failed to extract. There may have been an issue downloading it. ALOT Installer will attempt the update again when the application is restarted.");
                 }
             }
