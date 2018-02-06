@@ -212,7 +212,7 @@ namespace AlotAddOnGUI
             Log.Information("Forcing beta mode off");
             Utilities.WriteRegistryKey(Registry.CurrentUser, AlotAddOnGUI.MainWindow.REGISTRY_KEY, AlotAddOnGUI.MainWindow.SETTINGSTR_BETAMODE, 0);
 
-            if (Directory.Exists("Data"))
+            if (Directory.Exists("Data") && !File.Exists(@"Data\APP_CRASH"))
             {
                 File.Create(@"Data\APP_CRASH");
             }

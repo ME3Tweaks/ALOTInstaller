@@ -82,6 +82,29 @@ namespace AlotAddOnGUI
 
         public bool MusicIsPlaying { get; private set; }
 
+        public ConsoleApp Run7zWithProgressForAddonFile(string args, AddonFile af)
+        {
+            Log.Information("Running 7z progress process: 7z " + args);
+            ConsoleApp ca = new ConsoleApp(MainWindow.BINARY_DIRECTORY + "7z.exe", args);
+            ca.ConsoleOutput += (o, args2) =>
+            {
+                if (args2.IsError && args2.Line.Trim() != "")
+                {
+                    int percentIndex = args2.Line.IndexOf("%");
+                    if (percentIndex > 0)
+                    {
+                        af.ReadyStatusText = "Extracting - " + args2.Line.Substring(0, percentIndex + 1).Trim();
+                    }
+                }
+                else
+                {
+                    Log.Information("Realtime Process Output: " + args2.Line);
+                }
+            };
+            ca.Run();
+            return ca;
+        }
+
         private KeyValuePair<AddonFile, bool> ExtractAddon(AddonFile af)
         {
             if (ERROR_OCCURED_PLEASE_STOP)
@@ -157,8 +180,13 @@ namespace AlotAddOnGUI
 
                             Log.Information(prefix + "Extracting file: " + extractSource);
                             string exe = BINARY_DIRECTORY + "7z.exe";
-                            string args = "x \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
-                            var returncode = Utilities.runProcess(exe, args);
+                            string args = "x -bsp2 \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
+                            ConsoleApp extractProcess = Run7zWithProgressForAddonFile(args,af);
+                            while (extractProcess.State == AppState.Running)
+                            {
+                                Thread.Sleep(250);
+                            }
+                            var returncode = extractProcess.ExitCode;
                             if (returncode != 0)
                             {
                                 af.ReadyStatusText = "Failed to extract";

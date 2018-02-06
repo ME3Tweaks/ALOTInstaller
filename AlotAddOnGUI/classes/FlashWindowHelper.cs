@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -141,11 +142,17 @@ namespace AlotAddOnGUI.classes
         /// <returns></returns>
         public static bool Flash(IntPtr hwnd, uint count)
         {
-            if (Win2000OrLater)
+            try
             {
-                FLASHWINFO fi = CreateFlashInfoStruct(hwnd, FLASHW_ALL | FLASHW_TIMERNOFG, count, 0);
+                if (Win2000OrLater)
+                {
+                    FLASHWINFO fi = CreateFlashInfoStruct(hwnd, FLASHW_ALL | FLASHW_TIMERNOFG, count, 0);
 
-                return FlashWindowEx(ref fi);
+                    return FlashWindowEx(ref fi);
+                }
+            } catch (Exception e)
+            {
+                Log.Error("Error flashing window... somehow: " + e.Message);
             }
 
             return false;
