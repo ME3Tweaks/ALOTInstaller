@@ -2186,28 +2186,35 @@ namespace AlotAddOnGUI
                 List<string> folders = ME3Constants.getStandardDLCFolders();
                 string me3DLCPath = ME3Constants.GetDLCPath();
                 List<string> dlcFolders = new List<string>();
-                foreach (string s in Directory.GetDirectories(me3DLCPath))
+                if (Directory.Exists(me3DLCPath))
                 {
-                    dlcFolders.Add(s.Remove(0, me3DLCPath.Length + 1)); //+1 for the final \\
-                }
-                var hasCustomDLC = dlcFolders.Except(folders);
-                if (hasCustomDLC.Count() > 0)
-                {
-                    //Game is modified
-                    string message = "Additional folders in the DLC directory were detected:";
-                    foreach (string str in hasCustomDLC)
+                    foreach (string s in Directory.GetDirectories(me3DLCPath))
                     {
-                        message += "\n - " + str;
+                        dlcFolders.Add(s.Remove(0, me3DLCPath.Length + 1)); //+1 for the final \\
                     }
+                    var hasCustomDLC = dlcFolders.Except(folders);
+                    if (hasCustomDLC.Count() > 0)
+                    {
+                        //Game is modified
+                        string message = "Additional folders in the DLC directory were detected:";
+                        foreach (string str in hasCustomDLC)
+                        {
+                            message += "\n - " + str;
+                        }
 
-                    message += "\n\nThis installation cannot be used for backup as it has been modified.";
-                    await this.ShowMessageAsync("Mass Effect 3 is modified", message);
+                        message += "\n\nThis installation cannot be used for backup as it has been modified.";
+                        await this.ShowMessageAsync("Mass Effect 3 is modified", message);
+                        return;
+                    }
+                    //MEM - VERIFY VANILLA FOR BACKUP
+
+                    BackupGame(3);
+                } else
+                {
+                    Log.Error("Mass Effect 3 DLC directory is missing! Game path may be wrong, or game is probably FUBAR'd: " + me3DLCPath);
+                    await this.ShowMessageAsync("Mass Effect 3 DLC directory is missing", "The DLC directory doesn't exist. There should be a DLC directory at "+);
                     return;
                 }
-                //MEM - VERIFY VANILLA FOR BACKUP
-
-                BackupGame(3);
-
             }
         }
 

@@ -96,13 +96,17 @@ namespace AlotAddOnGUI
                     {
                         message = "Extracting - " + args2.Line.Substring(0, percentIndex + 1).Trim();
                     }
-                    if (message != "" && message != af.ReadyStatusText) {
+                    if (message != "" && message != af.ReadyStatusText)
+                    {
                         af.ReadyStatusText = "Extracting - " + args2.Line.Substring(0, percentIndex + 1).Trim();
                     }
                 }
                 else
                 {
-                    Log.Information("Realtime Process Output: " + args2.Line);
+                    if (args2.Line.Trim() != "")
+                    {
+                        Log.Information("Realtime Process Output: " + args2.Line);
+                    }
                 }
             };
             ca.Run();
@@ -2280,7 +2284,10 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    Log.Information("Realtime Process Output: " + str);
+                    if (str.Trim() != "")
+                    {
+                        Log.Information("Realtime Process Output: " + str);
+                    }
                 }
             };
             BACKGROUND_MEM_PROCESS.Run();
@@ -2358,7 +2365,10 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    Log.Information("Realtime Process Output: " + str);
+                    if (str.Trim() != "")
+                    {
+                        Log.Information("Realtime Process Output: " + str);
+                    }
                 }
             };
             BACKGROUND_MEM_PROCESS.Run();
@@ -2387,7 +2397,7 @@ namespace AlotAddOnGUI
                         switch (command)
                         {
                             case "ERROR":
-                                Log.Information("[ERROR] Realtime Process Output: " + param);
+                                Log.Error("ERROR IPC received with param: " + param);
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
                                 break;
                             default:
@@ -2398,7 +2408,10 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    Log.Information("Realtime Process Output: " + str);
+                    if (str.Trim() != "")
+                    {
+                        Log.Information("Realtime Process Output: " + str);
+                    }
                 }
             };
             BACKGROUND_MEM_PROCESS.Run();
