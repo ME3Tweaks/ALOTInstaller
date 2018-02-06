@@ -2305,7 +2305,7 @@ namespace AlotAddOnGUI
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_WRONG);
                                 break;
                             case "ERROR":
-                                Log.Information("[ERROR] Realtime Process Output: " + param);
+                                Log.Error("Error IPC from MEM: " + param);
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
                                 break;
                             default:
