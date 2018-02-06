@@ -91,8 +91,12 @@ namespace AlotAddOnGUI
                 if (args2.IsError && args2.Line.Trim() != "")
                 {
                     int percentIndex = args2.Line.IndexOf("%");
+                    string message = "";
                     if (percentIndex > 0)
                     {
+                        message = "Extracting - " + args2.Line.Substring(0, percentIndex + 1).Trim();
+                    }
+                    if (message != "" && message != af.ReadyStatusText) {
                         af.ReadyStatusText = "Extracting - " + args2.Line.Substring(0, percentIndex + 1).Trim();
                     }
                 }

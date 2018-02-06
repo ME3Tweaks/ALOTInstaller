@@ -295,6 +295,7 @@ namespace AlotAddOnGUI
                             {
                                 AddonFilesLabel.Text = "Application update declined";
                                 Log.Warning("Application update was declined");
+                                await this.ShowMessageAsync("Old versions are not supported", "Outdated versions of ALOT Installer are not supported and may stop working as the installer manifest and MEMNoGui are updated.");
                                 FetchManifest();
                             }
                         }
@@ -602,7 +603,7 @@ namespace AlotAddOnGUI
             }
             else
             {
-                kp.Key.CloseAsync();
+                await kp.Key.CloseAsync();
             }
         }
 
