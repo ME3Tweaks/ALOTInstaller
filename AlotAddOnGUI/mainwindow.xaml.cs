@@ -510,11 +510,26 @@ namespace AlotAddOnGUI
             UpdateALOTStatus();
             RunMEMUpdaterGUI();
             string appCrashFile = EXE_DIRECTORY + @"Data\APP_CRASH";
+            string appCrashHandledFile = EXE_DIRECTORY + @"Data\APP_CRASH_HANDLED";
+
             if (File.Exists(appCrashFile))
             {
                 DateTime crashTime = File.GetCreationTime(appCrashFile);
-                File.Delete(appCrashFile);
-                if (crashTime.Date == DateTime.Today)
+                bool showUpload = true;
+                try
+                { 
+                    File.Delete(appCrashFile);
+                    File.Delete(appCrashHandledFile);
+                } catch (Exception e)
+                {
+                    Log.Error("Cannot remove APP_CRASH:" + e.Message);
+                    if (!File.Exists(appCrashHandledFile))
+                    {
+                        File.Create(appCrashHandledFile);
+                    }
+                    showUpload = false;
+                }
+                if (crashTime.Date == DateTime.Today && showUpload)
                 {
                     MetroDialogSettings mds = new MetroDialogSettings();
                     mds.AffirmativeButtonText = "Upload";
@@ -543,7 +558,7 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void UnzipSelfUpdate(object sender, AsyncCompletedEventArgs e)
+        private async void UnzipSelfUpdate(object sender, AsyncCompletedEventArgs e)
         {
             KeyValuePair<ProgressDialogController, string> kp = (KeyValuePair<ProgressDialogController, string>)e.UserState;
             if (e.Cancelled)
@@ -565,17 +580,23 @@ namespace AlotAddOnGUI
                 string path = BINARY_DIRECTORY + "7z.exe";
                 string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + EXE_DIRECTORY + "Update\"";
                 Log.Information("Extracting update...");
-                Utilities.runProcess(path, args);
+                int result = Utilities.runProcess(path, args);
+                if (result == 0)
+                {
+                    File.Delete((string)kp.Value);
+                    await kp.Key.CloseAsync();
 
-                File.Delete((string)kp.Value);
-                kp.Key.CloseAsync();
-
-                Log.Information("Update Extracted - rebooting to update mode");
-                string exe = EXE_DIRECTORY + "Update\\" + System.AppDomain.CurrentDomain.FriendlyName;
-                string currentDirNoSlash = EXE_DIRECTORY.Substring(0, EXE_DIRECTORY.Length - 1);
-                args = "--update-dest \"" + currentDirNoSlash + "\"";
-                Utilities.runProcess(exe, args, true);
-                Environment.Exit(0);
+                    Log.Information("Update Extracted - rebooting to update mode");
+                    string exe = EXE_DIRECTORY + "Update\\" + System.AppDomain.CurrentDomain.FriendlyName;
+                    string currentDirNoSlash = EXE_DIRECTORY.Substring(0, EXE_DIRECTORY.Length - 1);
+                    args = "--update-dest \"" + currentDirNoSlash + "\"";
+                    Utilities.runProcess(exe, args, true);
+                    Environment.Exit(0);
+                } else
+                {
+                    Log.Error("Failed to extract update, 7zip return code not 0: " + result);
+                    await this.ShowMessageAsync("Update failed to extract","The update failed to extract. There may have been an issue downloading it. ALOT Installer will attempt the update again when the application is restarted.");
+                }
             }
             else
             {
