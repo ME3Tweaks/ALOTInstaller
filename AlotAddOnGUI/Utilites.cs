@@ -17,6 +17,7 @@ using System.Xml;
 using System.Windows;
 using System.Xml.Linq;
 using System.Security.Cryptography;
+using SlavaGu.ConsoleAppLauncher;
 
 namespace AlotAddOnGUI
 {
@@ -392,7 +393,7 @@ namespace AlotAddOnGUI
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Unable to delete file: " + file + ". It may be open still: "+e.Message);
+                    Log.Error("Unable to delete file: " + file + ". It may be open still: " + e.Message);
                     return false;
                 }
             }
@@ -411,7 +412,7 @@ namespace AlotAddOnGUI
             }
             catch (Exception e)
             {
-                Log.Error("Unable to delete directory: " + target_dir + ". It may be open still. "+e.Message);
+                Log.Error("Unable to delete directory: " + target_dir + ". It may be open still. " + e.Message);
                 return false;
             }
             return result;
@@ -444,8 +445,9 @@ namespace AlotAddOnGUI
             string gamePath = GetGamePath(1);
             gamePath += "\\Binaries\\MassEffect.exe";
             var compatKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", true);
-            if (compatKey != null) { 
-            string compatString = (string)compatKey.GetValue(gamePath, null);
+            if (compatKey != null)
+            {
+                string compatString = (string)compatKey.GetValue(gamePath, null);
                 if (compatString != null) //has compat setting
                 {
                     string[] compatsettings = compatString.Split(' ');
@@ -562,7 +564,7 @@ namespace AlotAddOnGUI
             }
             return true;
         }
-
+        
         internal static string GetALOTMarkerFilePath(int gameID)
         {
             string gamePath = Utilities.GetGamePath(gameID);
@@ -724,36 +726,36 @@ namespace AlotAddOnGUI
             }
         }
 
-public static int runProcessAsAdmin(string exe, string args, bool standAlone = false)
-{
-    Log.Information("Running process as admin: " + exe + " " + args);
-    using (Process p = new Process())
-    {
-        p.StartInfo.CreateNoWindow = true;
-        p.StartInfo.FileName = exe;
-        p.StartInfo.UseShellExecute = true;
-        p.StartInfo.Arguments = args;
-        p.StartInfo.Verb = "runas";
-        try
+        public static int runProcessAsAdmin(string exe, string args, bool standAlone = false)
         {
-            p.Start();
-            if (!standAlone)
+            Log.Information("Running process as admin: " + exe + " " + args);
+            using (Process p = new Process())
             {
-                p.WaitForExit(60000);
-                return p.ExitCode;
-            }
-            else
-            {
-                return 0;
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.FileName = exe;
+                p.StartInfo.UseShellExecute = true;
+                p.StartInfo.Arguments = args;
+                p.StartInfo.Verb = "runas";
+                try
+                {
+                    p.Start();
+                    if (!standAlone)
+                    {
+                        p.WaitForExit(60000);
+                        return p.ExitCode;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+                }
+                catch (System.ComponentModel.Win32Exception e)
+                {
+                    Log.Error("Error running elevated process: " + e.Message);
+                    return WIN32_EXCEPTION_ELEVATED_CODE;
+                }
             }
         }
-        catch (System.ComponentModel.Win32Exception e)
-        {
-            Log.Error("Error running elevated process: " + e.Message);
-            return WIN32_EXCEPTION_ELEVATED_CODE;
-        }
-    }
-}
 
         public static Task DeleteAsync(string path)
         {

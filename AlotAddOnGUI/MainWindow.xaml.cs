@@ -517,10 +517,11 @@ namespace AlotAddOnGUI
                 DateTime crashTime = File.GetCreationTime(appCrashFile);
                 bool showUpload = true;
                 try
-                { 
+                {
                     File.Delete(appCrashFile);
                     File.Delete(appCrashHandledFile);
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     Log.Error("Cannot remove APP_CRASH:" + e.Message);
                     if (!File.Exists(appCrashHandledFile))
@@ -592,10 +593,11 @@ namespace AlotAddOnGUI
                     args = "--update-dest \"" + currentDirNoSlash + "\"";
                     Utilities.runProcess(exe, args, true);
                     Environment.Exit(0);
-                } else
+                }
+                else
                 {
                     Log.Error("Failed to extract update, 7zip return code not 0: " + result);
-                    await this.ShowMessageAsync("Update failed to extract","The update failed to extract. There may have been an issue downloading it. ALOT Installer will attempt the update again when the application is restarted.");
+                    await this.ShowMessageAsync("Update failed to extract", "The update failed to extract. There may have been an issue downloading it. ALOT Installer will attempt the update again when the application is restarted.");
                 }
             }
             else
@@ -927,7 +929,7 @@ namespace AlotAddOnGUI
                             alladdonfiles = new BindingList<AddonFile>(alladdonfiles.Except(newUnreadyUserFiles).ToList());
                             ApplyFiltering();
                             string message = "The following user files are no longer available on disk (they may have been moved or deleted) and have been removed from the list of files available in ALOT Installer. If you wish to use these files you will need to drag and drop them onto the interface again.";
-                            foreach(AddonFile removeFile in newUnreadyUserFiles)
+                            foreach (AddonFile removeFile in newUnreadyUserFiles)
                             {
                                 message += "\n - " + removeFile.UserFilePath;
                             }
@@ -1166,7 +1168,7 @@ namespace AlotAddOnGUI
         {
             if (path != null && Utilities.IsSubfolder(path, EXE_DIRECTORY))
             {
-                Log.Error("FATAL: Running from subdirectory of a game: "+path+" This is not allowed. App will now exit.");
+                Log.Error("FATAL: Running from subdirectory of a game: " + path + " This is not allowed. App will now exit.");
                 await this.ShowMessageAsync("ALOT Installer is in a game directory", "ALOT Installer cannot run from inside a game directory. Move ALOT Installer out of of the game directory and into a folder like Desktop or Documents.");
                 Environment.Exit(1);
             }
@@ -2514,7 +2516,7 @@ namespace AlotAddOnGUI
 
         private async Task<bool> InitBuild(int game)
         {
-            Log.Information("InitBuild() started.");
+            Log.Information("InitBuild() started for Mass Effect " + game);
 
             AddonFilesLabel.Text = "Preparing to build texture packages...";
             CheckOutputDirectoriesForUnpackedSingleFiles(game);
@@ -3518,7 +3520,7 @@ namespace AlotAddOnGUI
                     //we need to do last 2 files
                     Log.Information("Log file has rolled over since app was booted - including previous days' log.");
                     File.Copy(logfiles.ElementAt(1).FullName, logfiles.ElementAt(1).FullName + ".tmp");
-                    log = File.ReadAllText(logfiles.ElementAt(1).FullName+".tmp");
+                    log = File.ReadAllText(logfiles.ElementAt(1).FullName + ".tmp");
                     File.Delete(logfiles.ElementAt(1).FullName + ".tmp");
                     log += "\n";
                 }
@@ -3591,7 +3593,8 @@ namespace AlotAddOnGUI
                 }
                 SettingsFlyout.IsOpen = false;
                 File.Delete(outfile);
-            } else
+            }
+            else
             {
                 Log.Error("No log files were found. User has hit an exceedingly rare case, well done.");
             }
