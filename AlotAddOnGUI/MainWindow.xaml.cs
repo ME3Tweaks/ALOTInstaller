@@ -1479,7 +1479,7 @@ namespace AlotAddOnGUI
 
                 if (me1AGEIAKeyNotWritable)
                 {
-                    args += "-create-hklm-reg-key \"SOFTWARE\\WOW6432Node\\AGEIA Technologies\"";
+                    args += " -create-hklm-reg-key \"SOFTWARE\\WOW6432Node\\AGEIA Technologies\"";
                 }
                 args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" " + args;
                 //need to run write permissions program

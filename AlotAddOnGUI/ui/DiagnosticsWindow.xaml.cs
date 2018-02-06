@@ -451,6 +451,7 @@ namespace AlotAddOnGUI.ui
             //FULL CHECK
             if (TextureCheck)
             {
+                addDiagLine("===Full Textures Check");
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_FullCheck));
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_ON_TASKBAR_PROGRESS));
                 args = "-check-game-data-textures " + DIAGNOSTICS_GAME + " -ipc";
