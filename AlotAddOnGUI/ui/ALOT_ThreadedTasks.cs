@@ -2220,7 +2220,7 @@ namespace AlotAddOnGUI
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
                                 break;
                             case "ERROR":
-                                Log.Information("[ERROR] Realtime Process Output: " + param);
+                                Log.Error("Error IPC from MEM: " + param);
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
                                 break;
                             case "ERROR_NO_BUILDABLE_FILES":
