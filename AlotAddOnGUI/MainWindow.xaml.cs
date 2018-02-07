@@ -2413,6 +2413,14 @@ namespace AlotAddOnGUI
 
                     if (!af.Ready && !af.Optional)
                     {
+                        //Check if MEUITM and if MEUITM is installed currently
+                        if (installedInfo != null)
+                        {
+                            if (installedInfo.MEUITMVER > 0 && af.MEUITM)
+                            {
+                                continue; //this this file as meuitm is already installed
+                            }
+                        }
                         nummissing++;
                     }
                     else

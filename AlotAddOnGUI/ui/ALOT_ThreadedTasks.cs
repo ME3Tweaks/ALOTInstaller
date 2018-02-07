@@ -2445,7 +2445,7 @@ namespace AlotAddOnGUI
 
             Log.Information("Reverting lod settings");
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-            string args = "-remove-lod" + BACKUP_THREAD_GAME;
+            string args = "-remove-lods " + BACKUP_THREAD_GAME;
             Utilities.runProcess(exe, args);
 
             if (Utilities.IsDirectoryWritable(Directory.GetParent(gamePath).FullName))
