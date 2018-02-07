@@ -2212,7 +2212,7 @@ namespace AlotAddOnGUI
                 } else
                 {
                     Log.Error("Mass Effect 3 DLC directory is missing! Game path may be wrong, or game is probably FUBAR'd: " + me3DLCPath);
-                    await this.ShowMessageAsync("Mass Effect 3 DLC directory is missing", "The DLC directory doesn't exist. There should be a DLC directory at "+);
+                    await this.ShowMessageAsync("Mass Effect 3 DLC directory is missing", "The DLC directory doesn't exist. There should be a DLC directory at "+me3DLCPath);
                     return;
                 }
             }
