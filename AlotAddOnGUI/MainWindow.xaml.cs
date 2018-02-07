@@ -295,6 +295,7 @@ namespace AlotAddOnGUI
                             {
                                 AddonFilesLabel.Text = "Application update declined";
                                 Log.Warning("Application update was declined");
+                                await this.ShowMessageAsync("Old versions are not supported", "Outdated versions of ALOT Installer are not supported and may stop working as the installer manifest and MEMNoGui are updated.");
                                 FetchManifest();
                             }
                         }
@@ -517,10 +518,11 @@ namespace AlotAddOnGUI
                 DateTime crashTime = File.GetCreationTime(appCrashFile);
                 bool showUpload = true;
                 try
-                { 
+                {
                     File.Delete(appCrashFile);
                     File.Delete(appCrashHandledFile);
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     Log.Error("Cannot remove APP_CRASH:" + e.Message);
                     if (!File.Exists(appCrashHandledFile))
@@ -592,15 +594,16 @@ namespace AlotAddOnGUI
                     args = "--update-dest \"" + currentDirNoSlash + "\"";
                     Utilities.runProcess(exe, args, true);
                     Environment.Exit(0);
-                } else
+                }
+                else
                 {
                     Log.Error("Failed to extract update, 7zip return code not 0: " + result);
-                    await this.ShowMessageAsync("Update failed to extract","The update failed to extract. There may have been an issue downloading it. ALOT Installer will attempt the update again when the application is restarted.");
+                    await this.ShowMessageAsync("Update failed to extract", "The update failed to extract. There may have been an issue downloading it. ALOT Installer will attempt the update again when the application is restarted.");
                 }
             }
             else
             {
-                kp.Key.CloseAsync();
+                await kp.Key.CloseAsync();
             }
         }
 
@@ -659,7 +662,7 @@ namespace AlotAddOnGUI
             SetBottomButtonAvailability();
             Button_Settings.IsEnabled = true;
             Button_DownloadAssistant.IsEnabled = true;
-
+            Build_ProgressBar.IsIndeterminate = false;
 
             switch (result)
             {
@@ -676,7 +679,6 @@ namespace AlotAddOnGUI
                     {
                         prefix = "The following mod appears to be installed and is";
                     }
-                    Build_ProgressBar.IsIndeterminate = false;
                     await this.ShowMessageAsync("Incompatible mods detected", prefix + "known to be incompatible with ALOT for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ". Restore your game to an unmodified state, and then install compatible versions of these mods (or do not install them at all)." + badModsStr);
                     PreventFileRefresh = false;
                     break;
@@ -692,9 +694,10 @@ namespace AlotAddOnGUI
                 case 3:
                     if (errorOccured)
                     {
+                        Log.Warning("Error while building and staging, see previous entries in log.");
                         HeaderLabel.Text = "Addon built with errors.\nThe Addon was built but some files did not process correctly and were skipped.\nThe MEM packages for the addon have been placed into the " + MEM_OUTPUT_DISPLAY_DIR + " directory.";
                         AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
-                        await this.ShowMessageAsync("ALOT Addon for Mass Effect" + getGameNumberSuffix(result) + " was built, but had errors", "Some files had errors occured during the build process. These files were skipped. Your game may look strange in some parts if you use the built Addon. You should report this to the developers on Discord.");
+                        await this.ShowMessageAsync("Textures staged for Mass Effect" + getGameNumberSuffix(result) + " with errors", "Some files had errors occur during the build and staging process. These files were skipped. Your game may look strange in some parts if you were to install these textures. You should report this to the developers on Discord (Settings -> Report an issue).");
                     }
                     else
                     {
@@ -732,7 +735,7 @@ namespace AlotAddOnGUI
 
                         if (readyToInstallALOT || currentAlotInfo != null) //not installed
                         {
-                            HeaderLabel.Text = "Ready to install new textures";
+                            HeaderLabel.Text = "Ready to install";
                             AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
                             MetroDialogSettings mds = new MetroDialogSettings();
                             mds.AffirmativeButtonText = "Install Now";
@@ -765,6 +768,7 @@ namespace AlotAddOnGUI
                         }
                         else
                         {
+                            //we should never hit this condition anymore.
                             await this.ShowMessageAsync("Addon(s) have been built", "Your textures have been built into MEM files, ready for installation. Due to ALOT not being installed, you will have to install these manually. The files have been placed into the MEM_Packages subdirectory.");
                         }
                     }
@@ -927,7 +931,7 @@ namespace AlotAddOnGUI
                             alladdonfiles = new BindingList<AddonFile>(alladdonfiles.Except(newUnreadyUserFiles).ToList());
                             ApplyFiltering();
                             string message = "The following user files are no longer available on disk (they may have been moved or deleted) and have been removed from the list of files available in ALOT Installer. If you wish to use these files you will need to drag and drop them onto the interface again.";
-                            foreach(AddonFile removeFile in newUnreadyUserFiles)
+                            foreach (AddonFile removeFile in newUnreadyUserFiles)
                             {
                                 message += "\n - " + removeFile.UserFilePath;
                             }
@@ -1166,7 +1170,7 @@ namespace AlotAddOnGUI
         {
             if (path != null && Utilities.IsSubfolder(path, EXE_DIRECTORY))
             {
-                Log.Error("FATAL: Running from subdirectory of a game: "+path+" This is not allowed. App will now exit.");
+                Log.Error("FATAL: Running from subdirectory of a game: " + path + " This is not allowed. App will now exit.");
                 await this.ShowMessageAsync("ALOT Installer is in a game directory", "ALOT Installer cannot run from inside a game directory. Move ALOT Installer out of of the game directory and into a folder like Desktop or Documents.");
                 Environment.Exit(1);
             }
@@ -1475,7 +1479,7 @@ namespace AlotAddOnGUI
 
                 if (me1AGEIAKeyNotWritable)
                 {
-                    args += "-create-hklm-reg-key \"SOFTWARE\\WOW6432Node\\AGEIA Technologies\"";
+                    args += " -create-hklm-reg-key \"SOFTWARE\\WOW6432Node\\AGEIA Technologies\"";
                 }
                 args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" " + args;
                 //need to run write permissions program
@@ -2182,28 +2186,35 @@ namespace AlotAddOnGUI
                 List<string> folders = ME3Constants.getStandardDLCFolders();
                 string me3DLCPath = ME3Constants.GetDLCPath();
                 List<string> dlcFolders = new List<string>();
-                foreach (string s in Directory.GetDirectories(me3DLCPath))
+                if (Directory.Exists(me3DLCPath))
                 {
-                    dlcFolders.Add(s.Remove(0, me3DLCPath.Length + 1)); //+1 for the final \\
-                }
-                var hasCustomDLC = dlcFolders.Except(folders);
-                if (hasCustomDLC.Count() > 0)
-                {
-                    //Game is modified
-                    string message = "Additional folders in the DLC directory were detected:";
-                    foreach (string str in hasCustomDLC)
+                    foreach (string s in Directory.GetDirectories(me3DLCPath))
                     {
-                        message += "\n - " + str;
+                        dlcFolders.Add(s.Remove(0, me3DLCPath.Length + 1)); //+1 for the final \\
                     }
+                    var hasCustomDLC = dlcFolders.Except(folders);
+                    if (hasCustomDLC.Count() > 0)
+                    {
+                        //Game is modified
+                        string message = "Additional folders in the DLC directory were detected:";
+                        foreach (string str in hasCustomDLC)
+                        {
+                            message += "\n - " + str;
+                        }
 
-                    message += "\n\nThis installation cannot be used for backup as it has been modified.";
-                    await this.ShowMessageAsync("Mass Effect 3 is modified", message);
+                        message += "\n\nThis installation cannot be used for backup as it has been modified.";
+                        await this.ShowMessageAsync("Mass Effect 3 is modified", message);
+                        return;
+                    }
+                    //MEM - VERIFY VANILLA FOR BACKUP
+
+                    BackupGame(3);
+                } else
+                {
+                    Log.Error("Mass Effect 3 DLC directory is missing! Game path may be wrong, or game is probably FUBAR'd: " + me3DLCPath);
+                    await this.ShowMessageAsync("Mass Effect 3 DLC directory is missing", "The DLC directory doesn't exist. There should be a DLC directory at "+me3DLCPath);
                     return;
                 }
-                //MEM - VERIFY VANILLA FOR BACKUP
-
-                BackupGame(3);
-
             }
         }
 
@@ -2514,7 +2525,7 @@ namespace AlotAddOnGUI
 
         private async Task<bool> InitBuild(int game)
         {
-            Log.Information("InitBuild() started.");
+            Log.Information("InitBuild() started for Mass Effect " + game);
 
             AddonFilesLabel.Text = "Preparing to build texture packages...";
             CheckOutputDirectoriesForUnpackedSingleFiles(game);
@@ -2669,6 +2680,14 @@ namespace AlotAddOnGUI
                 }
                 if (!hasMatch)
                 {
+                    string datadir = EXE_DIRECTORY + @"Data";
+                    string path = Path.GetDirectoryName(file);
+                    if (Utilities.IsSubfolder(datadir,path) || datadir == path)
+                    {
+                        Log.Warning("User file from data subdirectory (or deeper) is not allowed: "+file);
+                        ShowStatus("Files not allowed to be added from Data folder or subdirectories", 5000);
+                        continue;
+                    }
                     string extension = Path.GetExtension(file).ToLower();
                     switch (extension)
                     {
@@ -3518,7 +3537,7 @@ namespace AlotAddOnGUI
                     //we need to do last 2 files
                     Log.Information("Log file has rolled over since app was booted - including previous days' log.");
                     File.Copy(logfiles.ElementAt(1).FullName, logfiles.ElementAt(1).FullName + ".tmp");
-                    log = File.ReadAllText(logfiles.ElementAt(1).FullName+".tmp");
+                    log = File.ReadAllText(logfiles.ElementAt(1).FullName + ".tmp");
                     File.Delete(logfiles.ElementAt(1).FullName + ".tmp");
                     log += "\n";
                 }
@@ -3591,7 +3610,8 @@ namespace AlotAddOnGUI
                 }
                 SettingsFlyout.IsOpen = false;
                 File.Delete(outfile);
-            } else
+            }
+            else
             {
                 Log.Error("No log files were found. User has hit an exceedingly rare case, well done.");
             }

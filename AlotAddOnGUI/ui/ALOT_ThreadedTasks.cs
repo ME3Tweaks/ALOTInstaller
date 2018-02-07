@@ -82,6 +82,37 @@ namespace AlotAddOnGUI
 
         public bool MusicIsPlaying { get; private set; }
 
+        public ConsoleApp Run7zWithProgressForAddonFile(string args, AddonFile af)
+        {
+            Log.Information("Running 7z progress process: 7z " + args);
+            ConsoleApp ca = new ConsoleApp(MainWindow.BINARY_DIRECTORY + "7z.exe", args);
+            ca.ConsoleOutput += (o, args2) =>
+            {
+                if (args2.IsError && args2.Line.Trim() != "")
+                {
+                    int percentIndex = args2.Line.IndexOf("%");
+                    string message = "";
+                    if (percentIndex > 0)
+                    {
+                        message = "Extracting - " + args2.Line.Substring(0, percentIndex + 1).Trim();
+                    }
+                    if (message != "" && message != af.ReadyStatusText)
+                    {
+                        af.ReadyStatusText = "Extracting - " + args2.Line.Substring(0, percentIndex + 1).Trim();
+                    }
+                }
+                else
+                {
+                    if (args2.Line.Trim() != "")
+                    {
+                        Log.Information("Realtime Process Output: " + args2.Line);
+                    }
+                }
+            };
+            ca.Run();
+            return ca;
+        }
+
         private KeyValuePair<AddonFile, bool> ExtractAddon(AddonFile af)
         {
             if (ERROR_OCCURED_PLEASE_STOP)
@@ -157,8 +188,13 @@ namespace AlotAddOnGUI
 
                             Log.Information(prefix + "Extracting file: " + extractSource);
                             string exe = BINARY_DIRECTORY + "7z.exe";
-                            string args = "x \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
-                            var returncode = Utilities.runProcess(exe, args);
+                            string args = "x -bsp2 \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
+                            ConsoleApp extractProcess = Run7zWithProgressForAddonFile(args,af);
+                            while (extractProcess.State == AppState.Running)
+                            {
+                                Thread.Sleep(250);
+                            }
+                            var returncode = extractProcess.ExitCode;
                             if (returncode != 0)
                             {
                                 af.ReadyStatusText = "Failed to extract";
@@ -626,7 +662,17 @@ namespace AlotAddOnGUI
             ulong fullsize = 0;
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
+
                 string file = af.GetFile();
+                if (!File.Exists(file))
+                {
+                    //RIP
+                    Log.Error("FILE FOR PROCESSING HAS GONE MISSING SINCE PRECHECK: " + file);
+                    Log.Error("Aborting build");
+                    BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Build aborted"));
+                    BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("File for processing no longer available", "The following file is no longer available for processing:\n" + file + "\n\nBuild has been aborted.")));
+                    return false;
+                }
                 ulong size = (ulong)((new FileInfo(file).Length) * 2.5);
                 fullsize += size;
             }
@@ -2238,7 +2284,10 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    Log.Information("Realtime Process Output: " + str);
+                    if (str.Trim() != "")
+                    {
+                        Log.Information("Realtime Process Output: " + str);
+                    }
                 }
             };
             BACKGROUND_MEM_PROCESS.Run();
@@ -2305,7 +2354,7 @@ namespace AlotAddOnGUI
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_WRONG);
                                 break;
                             case "ERROR":
-                                Log.Information("[ERROR] Realtime Process Output: " + param);
+                                Log.Error("Error IPC from MEM: " + param);
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
                                 break;
                             default:
@@ -2316,7 +2365,10 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    Log.Information("Realtime Process Output: " + str);
+                    if (str.Trim() != "")
+                    {
+                        Log.Information("Realtime Process Output: " + str);
+                    }
                 }
             };
             BACKGROUND_MEM_PROCESS.Run();
@@ -2345,7 +2397,7 @@ namespace AlotAddOnGUI
                         switch (command)
                         {
                             case "ERROR":
-                                Log.Information("[ERROR] Realtime Process Output: " + param);
+                                Log.Error("ERROR IPC received with param: " + param);
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
                                 break;
                             default:
@@ -2356,7 +2408,10 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    Log.Information("Realtime Process Output: " + str);
+                    if (str.Trim() != "")
+                    {
+                        Log.Information("Realtime Process Output: " + str);
+                    }
                 }
             };
             BACKGROUND_MEM_PROCESS.Run();

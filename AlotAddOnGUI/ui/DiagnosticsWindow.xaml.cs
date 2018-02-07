@@ -214,7 +214,8 @@ namespace AlotAddOnGUI.ui
                         if (returncode == 0)
                         {
                             FIXED_LOD_SETTINGS = true;
-                        } else
+                        }
+                        else
                         {
                             Log.Warning("Failed to remove LOD settings, return code not 0: " + returncode);
                         }
@@ -295,6 +296,8 @@ namespace AlotAddOnGUI.ui
 
 
             addDiagLine("===System information");
+            addDiagLine("Processors");
+            addDiagLine(GetCPUString());
             addDiagLine("System Memory: " + ByteSize.FromKiloBytes(Utilities.GetInstalledRamAmount()));
 
             ManagementObjectSearcher objvide = new ManagementObjectSearcher("select * from Win32_VideoController");
@@ -366,7 +369,14 @@ namespace AlotAddOnGUI.ui
 
                 if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
                 {
-                    addDiagLine("Diagnostic reports some files appear to have been added or removed since texture scan took place:");
+                    if (MEMI_FOUND)
+                    {
+                        addDiagLine("Diagnostic reports some files appear to have been added or removed since texture scan took place:");
+                    }
+                    else
+                    {
+                        addDiagLine("Diagnostic reports some files appear to have been added or removed since texture scan took place. MEMI tag was not found - the game may have been restored, so these are likely not errors:");
+                    }
                     foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                     {
                         addDiagLine(" - " + str);
@@ -388,7 +398,7 @@ namespace AlotAddOnGUI.ui
                 }
                 else
                 {
-                    addDiagLine(" - DIAG ERROR: Texture map file is missing: me" + DIAGNOSTICS_GAME + "map.bin but MEMI tag is present - was game migrated to new system?");
+                    addDiagLine(" - DIAG ERROR: Texture map file is missing: me" + DIAGNOSTICS_GAME + "map.bin but MEMI tag is present - was game migrated to new system or on different user account?");
                 }
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_DataMismatch));
             }
@@ -403,10 +413,23 @@ namespace AlotAddOnGUI.ui
 
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
-                addDiagLine("Diagnostic reports some files appear to have been replaced after textures were installed:");
+                if (MEMI_FOUND)
+                {
+                    addDiagLine("Diagnostic reports some files appear to have been replaced after textures were installed:");
+                } else
+                {
+                    addDiagLine("Diagnostic reports some files appear to have been replaced after textures were installed.\nMEMI tag is missing, so the game may have been restored. This information may not be relevant.");
+                }
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
-                    addDiagLine(" - " + str);
+                    if (MEMI_FOUND)
+                    {
+                        addDiagLine(" - DIAG ERROR: " + str);
+                    } else
+                    {
+                        addDiagLine(" - " + str);
+
+                    }
                 }
             }
             else
@@ -428,6 +451,7 @@ namespace AlotAddOnGUI.ui
             //FULL CHECK
             if (TextureCheck)
             {
+                addDiagLine("===Full Textures Check");
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_FullCheck));
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_ON_TASKBAR_PROGRESS));
                 args = "-check-game-data-textures " + DIAGNOSTICS_GAME + " -ipc";
@@ -467,7 +491,7 @@ namespace AlotAddOnGUI.ui
             WaitForMEM();
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
-                addDiagLine("The following mods were detected:");
+                addDiagLine("The following basegame mods were detected:");
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
                     addDiagLine(" - " + str);
@@ -644,6 +668,56 @@ namespace AlotAddOnGUI.ui
                 Utilities.OpenAndSelectFileInExplorer(diagfilename);
             }
             //}
+        }
+
+        private string GetCPUString()
+        {
+            string str = "";
+
+            ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
+
+            foreach (ManagementObject moProcessor in mosProcessor.Get())
+            {
+                if (str != "")
+                {
+                    str += "\n";
+                }
+
+                if (moProcessor["name"] != null)
+                {
+                    str += moProcessor["name"].ToString();
+                    str += "\n";
+                }
+                if (moProcessor["maxclockspeed"] != null)
+                {
+                    str += "Maximum reported clock speed: ";
+                    str += moProcessor["maxclockspeed"].ToString();
+                    str += " Mhz\n";
+                }
+                if (moProcessor["numberofcores"] != null)
+                {
+                    str += "Cores: ";
+
+                    str += moProcessor["numberofcores"].ToString();
+                    str += "\n";
+                }
+                if (moProcessor["numberoflogicalprocessors"] != null)
+                {
+                    str += "Logical processors: ";
+                    str += moProcessor["numberoflogicalprocessors"].ToString();
+                    str += "\n";
+                }
+
+            }
+            return str
+               .Replace("(TM)", "™")
+               .Replace("(tm)", "™")
+               .Replace("(R)", "®")
+               .Replace("(r)", "®")
+               .Replace("(C)", "©")
+               .Replace("(c)", "©")
+               .Replace("    ", " ")
+               .Replace("  ", " ");
         }
 
         private string GetLODStr(int gameID, ALOTVersionInfo avi)
@@ -875,10 +949,24 @@ namespace AlotAddOnGUI.ui
                         switch (command)
                         {
                             case "ERROR_REMOVED_FILE":
-                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was removed after textures scan: " + param);
+                                if (MEMI_FOUND)
+                                {
+                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was removed after textures scan: " + param);
+                                }
+                                else
+                                {
+                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File was removed after textures scan: " + param);
+                                }
                                 break;
                             case "ERROR_ADDED_FILE":
-                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was added after textures scan: " + param + " " + File.GetLastWriteTimeUtc(gamePath + param));
+                                if (MEMI_FOUND)
+                                {
+                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was added after textures scan: " + param + " " + File.GetCreationTimeUtc(gamePath + param));
+                                }
+                                else
+                                {
+                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File was added after textures scan: " + param + " " + File.GetCreationTimeUtc(gamePath + param));
+                                }
                                 break;
                             case "ERROR_VANILLA_MOD_FILE":
                                 if (MEMI_FOUND)
@@ -905,7 +993,7 @@ namespace AlotAddOnGUI.ui
                                 worker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
                                 break;
                             case "ERROR":
-                                Log.Information("[ERROR] Realtime Process Output: " + param);
+                                Log.Error("Realtime Process Output: " + param);
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
                                 break;
                             case "ERROR_TEXTURE_SCAN_DIAGNOSTIC":
@@ -977,7 +1065,7 @@ namespace AlotAddOnGUI.ui
                     return BitConverter.ToUInt16(pdata, 0);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return -1;
             }

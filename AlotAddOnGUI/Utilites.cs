@@ -17,6 +17,8 @@ using System.Xml;
 using System.Windows;
 using System.Xml.Linq;
 using System.Security.Cryptography;
+using SlavaGu.ConsoleAppLauncher;
+using System.ComponentModel;
 
 namespace AlotAddOnGUI
 {
@@ -25,8 +27,9 @@ namespace AlotAddOnGUI
         public const uint MEMI_TAG = 0x494D454D;
 
         public const int WIN32_EXCEPTION_ELEVATED_CODE = -98763;
-
         [DllImport("kernel32.dll")]
+        static extern uint GetLastError();
+        [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool GetPhysicallyInstalledSystemMemory(out long TotalMemoryInKilobytes);
         public static string GetOperatingSystemInfo()
@@ -900,6 +903,12 @@ namespace AlotAddOnGUI
         {
             long memKb;
             GetPhysicallyInstalledSystemMemory(out memKb);
+            if (memKb == 0L)
+            {
+                uint errorcode = GetLastError();
+                string errorMessage = new Win32Exception(Marshal.GetLastWin32Error()).Message;
+                Log.Warning("Failed to get RAM amount. This may indicate a potential (or soon coming) hardware problem. The error message was: " + errorMessage);
+            }
             return memKb;
         }
 
