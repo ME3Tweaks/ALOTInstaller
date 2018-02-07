@@ -1963,7 +1963,7 @@ namespace AlotAddOnGUI
             ShowReadyFilesOnly = true;
             ApplyFiltering();
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
-            bool alotInstalled = installedInfo != null; //default value
+            bool alotInstalled = installedInfo != null && installedInfo.ALOTVER > 0; //default value
             bool alotavailalbleforinstall = false;
             bool alotupdateavailalbeforinstall = false;
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;

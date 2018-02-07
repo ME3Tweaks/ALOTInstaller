@@ -56,7 +56,7 @@ namespace AlotAddOnGUI.classes
                     }
 
                     //Major Upgrade, including on unknown versions
-                    if (ALOTVersion > 0 && info != null && ALOTVersion > info.ALOTVER)
+                    if (ALOTVersion > 0 && info != null && ALOTVersion > info.ALOTVER && info.ALOTVER > 0 && info.MEUITMVER == 0)
                     {
                         return "images/greycheckmark.png";
                     }
@@ -129,13 +129,19 @@ namespace AlotAddOnGUI.classes
 
                     //Major Upgrade, including on unknown versinos
                     if (ALOTVersion > 0)
-
                     {
                         if (info != null)
                         {
-                            if (ALOTVersion > info.ALOTVER)
+                            if (ALOTVersion > info.ALOTVER && info.ALOTVER != 0) //me1 issue - we cannot detect 5.0 with no meuitm
                             {
+                                //newer version of ALOT is available
                                 return "Restore to unmodified to install upgrade";
+                            }
+
+                            if (ALOTVersion > info.ALOTVER && info.ALOTVER == 0 && info.MEUITMVER > 0 ) //me1 issue - we cannot detect 5.0 with no meuitm
+                            {
+                                //alot not installed, meuitm installed. This could also be 5.0 with MEUITM but... :(
+                                return "ALOT main file imported, will be installed";
                             }
                             if (ALOTVersion == info.ALOTVER)
                             {
@@ -294,7 +300,7 @@ namespace AlotAddOnGUI.classes
                     }
 
                     //Major Upgrade, including on unknown versions
-                    if (ALOTVersion > 0 && info != null && ALOTVersion > info.ALOTVER)
+                    if (ALOTVersion > 0 && info != null && ALOTVersion > info.ALOTVER && info.MEUITMVER == 0)
                     {
                         //Disabled
                         return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
