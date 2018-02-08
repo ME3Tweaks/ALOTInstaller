@@ -34,6 +34,7 @@ using System.Windows.Threading;
 using System.Xml.Linq;
 using Flurl.Http;
 using System.Windows.Media;
+using System.IO.Compression;
 
 namespace AlotAddOnGUI
 {
@@ -92,6 +93,8 @@ namespace AlotAddOnGUI
 
         private const string ADDON_STAGING_DIR = "ADDON_STAGING";
         private const string USER_STAGING_DIR = "USER_STAGING";
+        private const string UPDATE_STAGING_MEMNOGUI_DIR = "Data\\UpdateMemNoGui";
+        private const string UPDATE_STAGING_MEM_DIR = "Data\\UpdateMem";
 
         private string ADDON_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\" + ADDON_STAGING_DIR + "\\";
         private string USER_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\" + USER_STAGING_DIR + "\\";
@@ -204,6 +207,48 @@ namespace AlotAddOnGUI
 
         private async void RunApplicationUpdater2()
         {
+            //Check local files are OK first.
+            Log.Information("Checking for local supporting files");
+            string sevenZ = BINARY_DIRECTORY + "7z.exe";
+            string sevenZdll = BINARY_DIRECTORY + "7z.dll";
+            string lzma = BINARY_DIRECTORY + "lzma.exe";
+            string permissionsgranter = BINARY_DIRECTORY + "PermissionsGranter.exe";
+            string[] requiredSupportingFiles = { sevenZ, sevenZdll, lzma, permissionsgranter };
+
+            bool requiredToolDownloadRequired = false;
+            foreach (string file in requiredSupportingFiles)
+            {
+                if (!File.Exists(file))
+                {
+                    requiredToolDownloadRequired = true;
+                    Log.Warning("Required tool missing: " + file);
+                    break;
+                }
+            }
+
+            if (requiredToolDownloadRequired)
+            {
+                try
+                {
+                    Log.Warning("A required tool is missing. Downloading requirements package now.");
+                    AddonFilesLabel.Text = "Downloading required application files";
+                    string requiredFilesEndpoint = "https://vps.me3tweaks.com/alot/miscbin.zip".DownloadFileAsync(EXE_DIRECTORY + "Data", "miscbin.zip").Result;
+                    ZipFile.ExtractToDirectory(EXE_DIRECTORY + "Data\\miscbin.zip", BINARY_DIRECTORY);
+                    File.Delete(EXE_DIRECTORY + "Data\\miscbin.zip");
+                    throw new Exception("derp");
+                } catch (Exception e)
+                {
+                    ThemeManager.ChangeAppStyle(System.Windows.Application.Current,
+                                                    ThemeManager.GetAccent("Red"),
+                                                    ThemeManager.GetAppTheme("BaseDark")); // or appStyle.Item1
+                    AddonFilesLabel.Text = "Failed to download missing required files";
+                    Log.Fatal("REQUIRED FILES ARE MISSING AND WERE UNABLE TO BE ACQUIRED. THE PROGRAM WILL NOT BE ABLE TO FUNCTION PROPERLY.");
+                    Log.Fatal(App.FlattenException(e));
+                    await this.ShowMessageAsync("Required files are unavailable", "Some required files are unavailable and could not be downloaded. These files are critical to usage of the application. Please download a new copy of ALOT Installer as this copy is not functional.");
+                    Environment.Exit(1);
+                }
+            }
+
             Log.Information("Checking for application updates from gitub");
             AddonFilesLabel.Text = "Checking for application updates";
             var versInfo = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
@@ -607,7 +652,7 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void UnzipProgramUpdate(object sender, AsyncCompletedEventArgs e)
+        private async void UnzipProgramUpdate(object sender, AsyncCompletedEventArgs e)
         {
             if (e.Cancelled)
             {
@@ -618,18 +663,34 @@ namespace AlotAddOnGUI
             kp.Key.SetTitle("Extracting MassEffectModderNoGUI Update");
             //Extract 7z
             string path = BINARY_DIRECTORY + "7z.exe";
-            string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + BINARY_DIRECTORY + "\"";
+            string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + UPDATE_STAGING_MEMNOGUI_DIR + "\"";
 
-            Log.Information("Extracting MassEffectModderNoGUI update...");
-            Utilities.runProcess(path, args);
-            Log.Information("Extraction complete.");
+            Log.Information("Extracting MassEffectModderNoGUI update to staging...");
+            int extractcode = Utilities.runProcess(path, args);
+            if (extractcode == 0)
+            {
+                //We're OK
+                Log.Information("Extraction complete with code " + extractcode);
+                Log.Information("Applying staged update for MEMNOGUI");
+                CopyDir.CopyAll(new DirectoryInfo(UPDATE_STAGING_MEMNOGUI_DIR), new DirectoryInfo(BINARY_DIRECTORY));
+                Log.Information("Update completed");
+            }
+            else
+            {
+                //RIP
+                Log.Error("MEMNoGui update extraction failed with code " + extractcode);
+                await this.ShowMessageAsync("MassEffectModderNoGui update failed", "MassEffectModderNoGui update failed. This program is used to install textures and other operations. The update will be attempted when the program is restarted.");
+            }
+            Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEMNOGUI_DIR);
 
             File.Delete((string)kp.Value);
-            kp.Key.CloseAsync();
-
-            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
-            int fileVersion = versInfo.FileMajorPart;
-            Label_MEMVersion.Content = "MEM Cmd Version: " + fileVersion;
+            await kp.Key.CloseAsync();
+            if (File.Exists(BINARY_DIRECTORY + MEM_EXE_NAME))
+            {
+                var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
+                int fileVersion = versInfo.FileMajorPart;
+                Label_MEMVersion.Content = "MEM Cmd Version: " + fileVersion;
+            }
             PerformPostStartup();
         }
 
@@ -638,17 +699,35 @@ namespace AlotAddOnGUI
 
             //Extract 7z
             string path = BINARY_DIRECTORY + "7z.exe";
-            string pathWithoutTrailingSlash = BINARY_DIRECTORY.Substring(0, BINARY_DIRECTORY.Length - 1);
-            string args = "x \"" + e.UserState + "\" -aoa -r -o\"" + BINARY_DIRECTORY + "\"";
+            //  string pathWithoutTrailingSlash = BINARY_DIRECTORY.Substring(0, BINARY_DIRECTORY.Length - 1);
+            string args = "x \"" + e.UserState + "\" -aoa -r -o\"" + UPDATE_STAGING_MEM_DIR + "\"";
             Log.Information("Extracting MEMGUI update...");
-            Utilities.runProcess(path, args);
-            Log.Information("Extraction complete.");
+            int extractcode = Utilities.runProcess(path, args);
+            if (extractcode == 0)
+            {
+                //We're OK
+                Log.Information("Extraction complete with code " + extractcode);
+                Log.Information("Applying staged update for MEM GUI");
+                CopyDir.CopyAll(new DirectoryInfo(UPDATE_STAGING_MEM_DIR), new DirectoryInfo(BINARY_DIRECTORY));
+                Log.Information("Update completed");
+            }
+            else
+            {
+                //RIP
+                Log.Error("MEM GUI update extraction failed with code " + extractcode);
+                ShowStatus("Error updating MEM", 4000);
+                // await this.ShowMessageAsync("MassEffectModderNoGui update failed", "MassEffectModderNoGui update failed. This program is used to install textures and other operations. The update will be attempted when the program is restarted.");
+            }
+            Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEM_DIR);
 
             File.Delete((string)e.UserState);
-            var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
-            int fileVersion = versInfo.FileMajorPart;
-            Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
-            ShowStatus("Updated Mass Effect Modder (GUI version) to v" + fileVersion, 3000);
+            if (File.Exists(BINARY_DIRECTORY + "MassEffectModder.exe"))
+            {
+                var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
+                int fileVersion = versInfo.FileMajorPart;
+                Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
+                ShowStatus("Updated Mass Effect Modder (GUI version) to v" + fileVersion, 3000);
+            }
             RunMusicDownloadCheck();
         }
 
@@ -656,8 +735,8 @@ namespace AlotAddOnGUI
         {
             ShowReadyFilesOnly = false;
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
-            Log.Information("BuildCompleted()");
             int result = (int)e.Result;
+            Log.Information("BuildCompleted() with result " + result);
             PreventFileRefresh = false;
             SetBottomButtonAvailability();
             Button_Settings.IsEnabled = true;
@@ -667,6 +746,7 @@ namespace AlotAddOnGUI
             switch (result)
             {
                 case -2:
+                    Log.Warning("BuildCompleted result: Blocked due to incompatible mods installed");
                     HeaderLabel.Text = "Installation blocked due to incompatible mods detected in Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nRestore your game to a compatible state and do not install these mods.";
                     AddonFilesLabel.Text = "Installation aborted";
                     string badModsStr = "";
@@ -760,7 +840,8 @@ namespace AlotAddOnGUI
                                 {
                                     Log.Information("User has chosen to install textures after build - we are now starting InstallALOT()");
                                     InstallALOT(result, ADDONFILES_TO_BUILD);
-                                } else
+                                }
+                                else
                                 {
                                     Log.Warning("User has declined to install textures after build, or the game is running.");
                                 }
@@ -2214,10 +2295,11 @@ namespace AlotAddOnGUI
                     //MEM - VERIFY VANILLA FOR BACKUP
 
                     BackupGame(3);
-                } else
+                }
+                else
                 {
                     Log.Error("Mass Effect 3 DLC directory is missing! Game path may be wrong, or game is probably FUBAR'd: " + me3DLCPath);
-                    await this.ShowMessageAsync("Mass Effect 3 DLC directory is missing", "The DLC directory doesn't exist. There should be a DLC directory at "+me3DLCPath);
+                    await this.ShowMessageAsync("Mass Effect 3 DLC directory is missing", "The DLC directory doesn't exist. There should be a DLC directory at " + me3DLCPath);
                     return;
                 }
             }
@@ -2695,9 +2777,9 @@ namespace AlotAddOnGUI
                 {
                     string datadir = EXE_DIRECTORY + @"Data";
                     string path = Path.GetDirectoryName(file);
-                    if (Utilities.IsSubfolder(datadir,path) || datadir == path)
+                    if (Utilities.IsSubfolder(datadir, path) || datadir == path)
                     {
-                        Log.Warning("User file from data subdirectory (or deeper) is not allowed: "+file);
+                        Log.Warning("User file from data subdirectory (or deeper) is not allowed: " + file);
                         ShowStatus("Files not allowed to be added from Data folder or subdirectories", 5000);
                         continue;
                     }
@@ -3868,6 +3950,60 @@ namespace AlotAddOnGUI
             {
                 alladdonfiles.Remove(af);
                 ApplyFiltering();
+            }
+        }
+
+        private async void CleanupDownloadedMods(object sender, RoutedEventArgs e)
+        {
+            if (Directory.Exists(DOWNLOADED_MODS_DIRECTORY))
+            {
+                Log.Information("Determining files that are no longer relevant...");
+
+                var files = new DirectoryInfo(DOWNLOADED_MODS_DIRECTORY).GetFiles().Select(o => o.Name).ToList();
+                var outdatedFiles = new List<string>(files);
+                string list = "";
+
+                foreach (AddonFile af in alladdonfiles)
+                {
+                    if (af.Ready && !af.UserFile)
+                    {
+                        string name = af.GetFile();
+                        if (name != null)
+                        { //crash may occur in some extreme cases
+                            name = Path.GetFileName(name);
+                        }
+
+                        bool isOutdatedFile = outdatedFiles.Remove(name);
+                        if (isOutdatedFile)
+                        {
+                            list += "\n - " + name;
+                            Log.Information(" - File no longer relevant: " + name);
+                        }
+                    }
+                }
+                Debugger.Break();
+
+                if (outdatedFiles.Count > 0)
+                {
+                    MetroDialogSettings mds = new MetroDialogSettings();
+                    mds.AffirmativeButtonText = "Delete";
+                    mds.NegativeButtonText = "Keep";
+                    mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                    MessageDialogResult mdr = await this.ShowMessageAsync("Found outdated files", "The following files in the Downloaded_Mods folder are no longer listed in the manifest and can be safely deleted: "+list, MessageDialogStyle.AffirmativeAndNegative, mds);
+                    if (mdr == MessageDialogResult.Affirmative)
+                    {
+                        Log.Information("User elected to delete outdated files.");
+                        foreach(string file in outdatedFiles)
+                        {
+                            Log.Information("Deleting " + file);
+                            File.Delete(DOWNLOADED_MODS_DIRECTORY + file);
+                        }
+                    }
+                } else
+                {
+                    Log.Information("No outdated files found.");
+                    ShowStatus("No outdated files were found", 4000);
+                }
             }
         }
     }

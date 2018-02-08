@@ -689,7 +689,7 @@ namespace AlotAddOnGUI
             Log.Information("We will need around " + ByteSize.FromBytes(fullsize) + " to build this set. The free space is " + ByteSize.FromBytes(freeBytes));
             if (freeBytes < fullsize)
             {
-                Log.Error("Not enough space to build textures locally. We only have " + ByteSize.FromBytes(freeBytes) + " available");
+                Log.Error("Not enough space to build textures locally. We only have " + ByteSize.FromBytes(freeBytes) + " available but we need "+ByteSize.FromBytes(fullsize));
                 //not enough disk space for build
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Not enough free space to build textures.\nYou will need around " + ByteSize.FromBytes(fullsize) + " of free space on " + Path.GetPathRoot(EXE_DIRECTORY) + " to build the installation packages."));
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Build aborted"));
