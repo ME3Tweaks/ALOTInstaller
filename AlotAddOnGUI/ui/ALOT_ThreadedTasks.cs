@@ -189,7 +189,7 @@ namespace AlotAddOnGUI
                             Log.Information(prefix + "Extracting file: " + extractSource);
                             string exe = BINARY_DIRECTORY + "7z.exe";
                             string args = "x -bsp2 \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
-                            ConsoleApp extractProcess = Run7zWithProgressForAddonFile(args,af);
+                            ConsoleApp extractProcess = Run7zWithProgressForAddonFile(args, af);
                             while (extractProcess.State == AppState.Running)
                             {
                                 Thread.Sleep(250);
@@ -685,7 +685,7 @@ namespace AlotAddOnGUI
                 //not enough disk space for build
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Not enough free space to build textures.\nYou will need around " + ByteSize.FromBytes(fullsize) + " of free space on " + Path.GetPathRoot(EXE_DIRECTORY) + " to build the installation packages."));
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Build aborted"));
-                BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Not enough free space to build textures", "You will need around " + ByteSize.FromBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to build the installation packages.")));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Not enough free space to build textures", "You will need around " + ByteSize.FromBytes(fullsize) + " of free space on " + Path.GetPathRoot(EXE_DIRECTORY) + " to build the installation packages.")));
 
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
                 return false;
@@ -1312,7 +1312,7 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("Error creating backup:");
                     Log.Error(App.FlattenException(ex));
-                    BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Backup failed", "Backup of Mass Effect"+getGameNumberSuffix(BACKUP_THREAD_GAME)+" failed. An error occured during the copy process. The error message was: "+ex.Message+".\nSome files may have been copied, but this backup is not usable. You can delete the folder you were backing up files into.\nReview the installer log for more information.")));
+                    BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Backup failed", "Backup of Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " failed. An error occured during the copy process. The error message was: " + ex.Message + ".\nSome files may have been copied, but this backup is not usable. You can delete the folder you were backing up files into.\nReview the installer log for more information.")));
 
                     e.Result = null;
                     return;
@@ -1649,6 +1649,14 @@ namespace AlotAddOnGUI
             Log.Information("InstallWorker Thread starting for ME" + INSTALLING_THREAD_GAME);
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
+
+            Log.Information("Files being installed in this installation session:");
+            foreach (AddonFile af in ADDONFILES_TO_INSTALL)
+            {
+                Log.Information(" - " + af.FriendlyName);
+            }
+
+
             bool RemoveMipMaps = (versionInfo == null); //remove mipmaps only if alot is not installed
             if (INSTALLING_THREAD_GAME == 1)
             {
@@ -2041,8 +2049,12 @@ namespace AlotAddOnGUI
                             Log.Information("Deleting original alot archive file from downloaded_mods");
                             File.Delete(dest);
                             Log.Information("Deleted original alot archive file from downloaded_mods");
-
                         }
+                        if (alotAddonFile != null)
+                        {
+                            alotAddonFile.Staged = false;
+                        }
+
                     }
                     catch (Exception ex)
                     {
@@ -2445,7 +2457,7 @@ namespace AlotAddOnGUI
 
             Log.Information("Reverting lod settings");
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-            string args = "-remove-lod" + BACKUP_THREAD_GAME;
+            string args = "-remove-lods " + BACKUP_THREAD_GAME;
             Utilities.runProcess(exe, args);
 
             if (Utilities.IsDirectoryWritable(Directory.GetParent(gamePath).FullName))

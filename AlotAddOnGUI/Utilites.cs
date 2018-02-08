@@ -644,7 +644,7 @@ namespace AlotAddOnGUI
             return null;
         }
 
-        public static int runProcess(string exe, string args, bool standAlone = false, bool runAsAdmin = false)
+        public static int runProcess(string exe, string args, bool standAlone = false)
         {
             Log.Information("Running process: " + exe + " " + args);
             using (Process p = new Process())
@@ -655,10 +655,7 @@ namespace AlotAddOnGUI
                 p.StartInfo.Arguments = args;
                 p.StartInfo.RedirectStandardOutput = true;
                 p.StartInfo.RedirectStandardError = true;
-                if (runAsAdmin)
-                {
-                    p.StartInfo.Verb = "runas";
-                }
+
 
                 StringBuilder output = new StringBuilder();
                 StringBuilder error = new StringBuilder();
@@ -701,16 +698,15 @@ namespace AlotAddOnGUI
                             errorWaitHandle.WaitOne(timeout))
                         {
                             // Process completed. Check process.ExitCode here.
-                            string outputmsg = "Process output of " + exe + " " + args + ":";
+                            Log.Information("Process standard output of " + exe + " " + args + ":");
                             if (output.ToString().Length > 0)
                             {
-                                outputmsg += "\nStandard:\n" + output.ToString();
+                                Log.Information("Standard:\n" + output.ToString());
                             }
                             if (error.ToString().Length > 0)
                             {
-                                outputmsg += "\nError:\n" + error.ToString();
+                                Log.Error("Error output:\n" + error.ToString());
                             }
-                            Log.Information(outputmsg);
                             return p.ExitCode;
                         }
                         else

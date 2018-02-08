@@ -758,7 +758,11 @@ namespace AlotAddOnGUI
                                 }
                                 if (run)
                                 {
+                                    Log.Information("User has chosen to install textures after build - we are now starting InstallALOT()");
                                     InstallALOT(result, ADDONFILES_TO_BUILD);
+                                } else
+                                {
+                                    Log.Warning("User has declined to install textures after build, or the game is running.");
                                 }
                             }
                             else
@@ -894,6 +898,7 @@ namespace AlotAddOnGUI
 
                     if (af.Ready != ready) //status is changing
                     {
+                        Log.Information(af.FriendlyName + " changing ready states. Is now ready: " + ready);
                         af.ReadyStatusText = null;
                         af.ReadyIconPath = null;
                         af.Ready = ready;
@@ -1963,7 +1968,7 @@ namespace AlotAddOnGUI
             ShowReadyFilesOnly = true;
             ApplyFiltering();
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
-            bool alotInstalled = installedInfo != null; //default value
+            bool alotInstalled = installedInfo != null && installedInfo.ALOTVER > 0; //default value
             bool alotavailalbleforinstall = false;
             bool alotupdateavailalbeforinstall = false;
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
@@ -2413,6 +2418,14 @@ namespace AlotAddOnGUI
 
                     if (!af.Ready && !af.Optional)
                     {
+                        //Check if MEUITM and if MEUITM is installed currently
+                        if (installedInfo != null)
+                        {
+                            if (installedInfo.MEUITMVER > 0 && af.MEUITM)
+                            {
+                                continue; //this this file as meuitm is already installed
+                            }
+                        }
                         nummissing++;
                     }
                     else
@@ -2470,7 +2483,7 @@ namespace AlotAddOnGUI
             //if alot is already installed we don't need to show missing message, unless installed via MEM directly
             if (installedInfo == null || installedInfo.ALOTVER == 0)
             {
-                MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " Addon are missing - do you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
+                MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " addon are missing. These files add a significant amount of high quality textures from third party artists. These should be installed if you want all of the high quality textures; these files are not included directly in ALOT because of ownership rights.\n\nAre you sure you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
                 return result == MessageDialogResult.Affirmative;
             }
             else

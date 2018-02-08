@@ -546,6 +546,8 @@
                             <Image Source="images/logo_me3.png" Height="40" Margin="10"></Image>
                         </Button>
                     </StackPanel>
+                    <TextBlock x:Name="UserTextures_Warning" Text="This file will be treated as a user file. User files are not tested by the developers and may not be compatible. User files are installed after ALOT, ALOT Updates, and MEUITM. If the file you are importing is listed above (as not a user file), you are importing the wrong file." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700"/>
+
                 </StackPanel>
             </Controls:Flyout>
             <Controls:Flyout x:Name="OriginWarningFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Left" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
