@@ -2479,7 +2479,7 @@ namespace AlotAddOnGUI
             //if alot is already installed we don't need to show missing message, unless installed via MEM directly
             if (installedInfo == null || installedInfo.ALOTVER == 0)
             {
-                MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " Addon are missing - do you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
+                MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " addon are missing. These files add a significant amount of high quality textures from third party artists. These should be installed if you want all of the high quality textures; these files are not included directly in ALOT because of ownership rights.\n\nAre you sure you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
                 return result == MessageDialogResult.Affirmative;
             }
             else

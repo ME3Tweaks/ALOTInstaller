@@ -2041,8 +2041,12 @@ namespace AlotAddOnGUI
                             Log.Information("Deleting original alot archive file from downloaded_mods");
                             File.Delete(dest);
                             Log.Information("Deleted original alot archive file from downloaded_mods");
-
                         }
+                        if (alotAddonFile != null)
+                        {
+                            alotAddonFile.Staged = false;
+                        }
+                        
                     }
                     catch (Exception ex)
                     {
