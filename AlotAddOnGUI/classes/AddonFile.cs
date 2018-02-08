@@ -141,7 +141,7 @@ namespace AlotAddOnGUI.classes
                             if (ALOTVersion > info.ALOTVER && info.ALOTVER == 0 && info.MEUITMVER > 0 ) //me1 issue - we cannot detect 5.0 with no meuitm
                             {
                                 //alot not installed, meuitm installed. This could also be 5.0 with MEUITM but... :(
-                                return "ALOT main file imported, will be installed";
+                                return "ALOT main file imported";
                             }
                             if (ALOTVersion == info.ALOTVER)
                             {
@@ -154,7 +154,7 @@ namespace AlotAddOnGUI.classes
                         }
                         else
                         {
-                            return "ALOT main file imported, will be installed";
+                            return "ALOT main file imported";
                         }
                     }
 
@@ -166,7 +166,7 @@ namespace AlotAddOnGUI.classes
                             {
                                 if (ALOTUpdateVersion > info.ALOTUPDATEVER)
                                 {
-                                    return "ALOT update imported, will be applied";
+                                    return "ALOT update imported";
                                 }
                                 else
                                 {
@@ -181,7 +181,7 @@ namespace AlotAddOnGUI.classes
                         }
                         else
                         {
-                            return "ALOT update imported, will be installed";
+                            return "ALOT update imported";
                         }
                     }
 

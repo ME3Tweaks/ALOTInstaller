@@ -236,7 +236,8 @@ namespace AlotAddOnGUI
                     ZipFile.ExtractToDirectory(EXE_DIRECTORY + "Data\\miscbin.zip", BINARY_DIRECTORY);
                     File.Delete(EXE_DIRECTORY + "Data\\miscbin.zip");
                     throw new Exception("derp");
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     ThemeManager.ChangeAppStyle(System.Windows.Application.Current,
                                                     ThemeManager.GetAccent("Red"),
@@ -3960,9 +3961,9 @@ namespace AlotAddOnGUI
                 Log.Information("Determining files that are no longer relevant...");
 
                 var files = new DirectoryInfo(DOWNLOADED_MODS_DIRECTORY).GetFiles().Select(o => o.Name).ToList();
-                var outdatedFiles = new List<string>(files);
                 string list = "";
 
+                SettingsFlyout.IsOpen = false;
                 foreach (AddonFile af in alladdonfiles)
                 {
                     if (af.Ready && !af.UserFile)
@@ -3972,34 +3973,37 @@ namespace AlotAddOnGUI
                         { //crash may occur in some extreme cases
                             name = Path.GetFileName(name);
                         }
+                        files.Remove(name);
 
-                        bool isOutdatedFile = outdatedFiles.Remove(name);
-                        if (isOutdatedFile)
-                        {
-                            list += "\n - " + name;
-                            Log.Information(" - File no longer relevant: " + name);
-                        }
+
                     }
                 }
-                Debugger.Break();
 
-                if (outdatedFiles.Count > 0)
+                foreach (string file in files)
+                {
+                    list += "\n - " + file;
+                    Log.Information(" - File no longer relevant: " + file);
+                }
+
+                if (files.Count > 0)
                 {
                     MetroDialogSettings mds = new MetroDialogSettings();
                     mds.AffirmativeButtonText = "Delete";
                     mds.NegativeButtonText = "Keep";
                     mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                    MessageDialogResult mdr = await this.ShowMessageAsync("Found outdated files", "The following files in the Downloaded_Mods folder are no longer listed in the manifest and can be safely deleted: "+list, MessageDialogStyle.AffirmativeAndNegative, mds);
+                    MessageDialogResult mdr = await this.ShowMessageAsync("Found outdated files", "The following files in the Downloaded_Mods folder are no longer listed in the manifest and can be safely deleted: " + list, MessageDialogStyle.AffirmativeAndNegative, mds);
                     if (mdr == MessageDialogResult.Affirmative)
                     {
                         Log.Information("User elected to delete outdated files.");
-                        foreach(string file in outdatedFiles)
+                        foreach (string file in files)
                         {
                             Log.Information("Deleting " + file);
-                            File.Delete(DOWNLOADED_MODS_DIRECTORY + file);
+                            File.Delete(DOWNLOADED_MODS_DIRECTORY + "\\" + file);
                         }
+                        ShowStatus("Deleted " + files.Count + " file" + (files.Count != 1 ? "s" : ""));
                     }
-                } else
+                }
+                else
                 {
                     Log.Information("No outdated files found.");
                     ShowStatus("No outdated files were found", 4000);
