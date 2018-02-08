@@ -52,6 +52,7 @@ namespace AlotAddOnGUI.ui
         private int Context = CONTEXT_NORMAL;
         private bool MEMI_FOUND = true;
         private bool FIXED_LOD_SETTINGS = false;
+        private List<string> AddedFiles = new List<string>();
 
         public DiagnosticsWindow()
         {
@@ -413,10 +414,12 @@ namespace AlotAddOnGUI.ui
 
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
+
                 if (MEMI_FOUND)
                 {
                     addDiagLine("Diagnostic reports some files appear to have been replaced after textures were installed:");
-                } else
+                }
+                else
                 {
                     addDiagLine("Diagnostic reports some files appear to have been replaced after textures were installed.\nMEMI tag is missing, so the game may have been restored. This information may not be relevant.");
                 }
@@ -425,7 +428,8 @@ namespace AlotAddOnGUI.ui
                     if (MEMI_FOUND)
                     {
                         addDiagLine(" - DIAG ERROR: " + str);
-                    } else
+                    }
+                    else
                     {
                         addDiagLine(" - " + str);
 
@@ -961,6 +965,7 @@ namespace AlotAddOnGUI.ui
                             case "ERROR_ADDED_FILE":
                                 if (MEMI_FOUND)
                                 {
+                                    AddedFiles.Add(param.ToLower());
                                     BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File was added after textures scan: " + param + " " + File.GetCreationTimeUtc(gamePath + param));
                                 }
                                 else
@@ -971,7 +976,15 @@ namespace AlotAddOnGUI.ui
                             case "ERROR_VANILLA_MOD_FILE":
                                 if (MEMI_FOUND)
                                 {
-                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File missing MEM/MEMNOGUI marker was found: " + param);
+                                    string subpath = param;
+                                    if (param.Length > gamePath.Length)
+                                    {
+                                        subpath = subpath.Substring(gamePath.Length);
+                                    }
+                                    if (!AddedFiles.Contains(subpath.ToLower()))
+                                    {
+                                        BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File missing MEM/MEMNOGUI marker was found: " + subpath);
+                                    }
                                 }
                                 break;
                             case "MOD":
@@ -993,7 +1006,7 @@ namespace AlotAddOnGUI.ui
                                 worker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
                                 break;
                             case "ERROR":
-                                Log.Error("Realtime Process Output: " + param);
+                                Log.Error("IPC ERROR: " + param);
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
                                 break;
                             case "ERROR_TEXTURE_SCAN_DIAGNOSTIC":

@@ -45,6 +45,9 @@ namespace AlotAddOnGUI
         private const int RESULT_TEXTUREINSTALL_NO_TEXTUREMAP = -44;
         private const int RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP = -45;
         private const int RESULT_REPACK_FAILED = -46;
+        private const int RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED = -47;
+        private const int RESULT_TEXTUREINSTALL_GAME_FILE_ADDED = -48;
+
         public const string RESTORE_FAILED_COULD_NOT_DELETE_FOLDER = "RESTORE_FAILED_COULD_NOT_DELETE_FOLDER";
         public string CurrentTask;
         public int CurrentTaskPercent;
@@ -77,6 +80,8 @@ namespace AlotAddOnGUI
         private bool REPACK_GAME_FILES;
         private const string ERROR_TEXTURE_MAP_MISSING = "ERROR_TEXTURE_MAP_MISSING";
         private const string ERROR_TEXTURE_MAP_WRONG = "ERROR_TEXTURE_MAP_WRONG";
+        private const string ERROR_FILE_ADDED = "ERROR_FILE_ADDED";
+        private const string ERROR_FILE_REMOVED = "ERROR_FILE_REMOVED";
         private const string SETTINGSTR_SOUND = "PlayMusic";
         private const string SET_VISIBILE_ITEMS_LIST = "SET_VISIBILE_ITEMS_LIST";
 
@@ -209,6 +214,9 @@ namespace AlotAddOnGUI
                                 BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                                 return new KeyValuePair<AddonFile, bool>(af, true);
                             }
+
+                            af.ReadyStatusText = "Processing";
+
                             //get free space for debug purposes
                             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
                             Log.Information("[SIZE] ADDONEXTRACTFINISH Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
@@ -1586,6 +1594,20 @@ namespace AlotAddOnGUI
                             HeaderLabel.Text = "Texture map missing - revert " + gameName + " to an unmodified game to fix.";
                             break;
                         }
+                    case RESULT_TEXTUREINSTALL_GAME_FILE_ADDED:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Failed to install textures";
+                            InstallingOverlay_BottomLabel.Text = "Game file(s) were added after initial install";
+                            HeaderLabel.Text = "Game files were added after initial installation of ALOT or MEUITM - this is not supported. You will need to revert to an unmodified game to fix.";
+                            break;
+                        }
+                    case RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Failed to install textures";
+                            InstallingOverlay_BottomLabel.Text = "Game file(s) were removed after initial install";
+                            HeaderLabel.Text = "Game files were removed after initial installation of ALOT or MEUITM - this is not supported. You will need to revert to an unmodified game to fix.";
+                            break;
+                        }
                     case RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP:
                         {
                             InstallingOverlay_TopLabel.Text = "Failed to install textures";
@@ -1852,6 +1874,12 @@ namespace AlotAddOnGUI
                         case ERROR_TEXTURE_MAP_WRONG:
                             e.Result = RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP;
                             break;
+                        case ERROR_FILE_ADDED:
+                            e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_ADDED;
+                            break;
+                        case ERROR_FILE_REMOVED:
+                            e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED;
+                            break;
                     }
                 }
                 if (e.Result == null)
@@ -1860,7 +1888,6 @@ namespace AlotAddOnGUI
                 }
                 InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
                 InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
-
                 return;
             }
             Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
@@ -2364,6 +2391,14 @@ namespace AlotAddOnGUI
                             case ERROR_TEXTURE_MAP_WRONG:
                                 Log.Fatal("[FATAL]Texture map is invalid! We cannot install textures");
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_WRONG);
+                                break;
+                            case "ERROR_ADDED_FILE":
+                                Log.Error("MEM detects game file was removed since initial texture installation! Installation aborted");
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("Game files were added since texture install");
+                                break;
+                            case "ERROR_REMOVED_FILE":
+                                Log.Error("MEM detects game file was removed since initial texture installation! Installation aborted");
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("Game files were removed since texture install");
                                 break;
                             case "ERROR":
                                 Log.Error("Error IPC from MEM: " + param);
