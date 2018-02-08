@@ -72,6 +72,8 @@ namespace AlotAddOnGUI
         private bool BUILD_ADDON_FILES = false;
         private bool BUILD_USER_FILES = false;
         private bool BUILD_ALOT_UPDATE = false;
+        private bool BUILD_MEUITM = false;
+
         private FadeInOutSampleProvider fadeoutProvider;
         private bool MusicPaused;
         private string DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods";
@@ -232,7 +234,7 @@ namespace AlotAddOnGUI
                                     string name = Utilities.GetRelativePath(moveableFile, extractpath);
                                     foreach (PackageFile pf in af.PackageFiles)
                                     {
-                                        if (pf.SourceName == name)
+                                        if (pf.SourceName.Equals(name, StringComparison.InvariantCultureIgnoreCase))
                                         {
                                             string fname = Path.GetFileName(name);
                                             if (pf.MoveDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTVersion > 0)
@@ -627,9 +629,9 @@ namespace AlotAddOnGUI
                             continue;
                         }
 
-                        if (af.MEUITM && CurrentGameALOTInfo.MEUITMVER > 0)
+                        if (af.MEUITM && !BUILD_MEUITM)
                         {
-                            Log.Information("MEUITM is already installed, skipping...");
+                            Log.Information("MEUITM is already installed and user has not selected it for installation, skipping...");
                             continue; //skip
                         }
                     }
@@ -689,7 +691,7 @@ namespace AlotAddOnGUI
             Log.Information("We will need around " + ByteSize.FromBytes(fullsize) + " to build this set. The free space is " + ByteSize.FromBytes(freeBytes));
             if (freeBytes < fullsize)
             {
-                Log.Error("Not enough space to build textures locally. We only have " + ByteSize.FromBytes(freeBytes) + " available but we need "+ByteSize.FromBytes(fullsize));
+                Log.Error("Not enough space to build textures locally. We only have " + ByteSize.FromBytes(freeBytes) + " available but we need " + ByteSize.FromBytes(fullsize));
                 //not enough disk space for build
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Not enough free space to build textures.\nYou will need around " + ByteSize.FromBytes(fullsize) + " of free space on " + Path.GetPathRoot(EXE_DIRECTORY) + " to build the installation packages."));
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Build aborted"));
@@ -1697,8 +1699,16 @@ namespace AlotAddOnGUI
             {
                 //me3
                 REPACK_GAME_FILES = false; //force off, it does nothing
-                ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_UNPACK);
                 STAGE_COUNT = 5;
+
+                if (versionInfo == null)
+                {
+                    ProgressWeightPercentages.AddTask(ProgressWeightPercentages.JOB_UNPACK);
+                }
+                else
+                {
+                    STAGE_COUNT--; //no unpack dlc stage
+                }
             }
 
             if (!RemoveMipMaps)
@@ -1723,7 +1733,7 @@ namespace AlotAddOnGUI
             INSTALL_STAGE = 0;
             //Checking files for title
 
-            AddonFile alotAddonFile = null;
+            AddonFile alotMainFile = null;
             bool installedALOT = false;
             byte justInstalledUpdate = 0;
             bool installingMEUITM = false;
@@ -1737,7 +1747,7 @@ namespace AlotAddOnGUI
                 }
                 if (af.ALOTVersion > 0)
                 {
-                    alotAddonFile = af;
+                    alotMainFile = af;
                     Log.Information("InstallWorker: We are installing ALOT v" + af.ALOTVersion + " in this pass.");
                     installedALOT = true;
                 }
@@ -1781,7 +1791,7 @@ namespace AlotAddOnGUI
             int processResult = 0;
             int overallProgress = 0;
             stopwatch = Stopwatch.StartNew();
-            if (INSTALLING_THREAD_GAME == 3)
+            if (INSTALLING_THREAD_GAME == 3 && versionInfo == null)
             {
                 //Unpack DLC
                 Log.Information("InstallWorker(): ME3 -> Unpacking DLC.");
@@ -1896,10 +1906,7 @@ namespace AlotAddOnGUI
 
             if (REPACK_GAME_FILES)
             {
-                CurrentTask = "Repacking remaining files";
                 CurrentTaskPercent = 0;
-                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, CurrentTask));
-                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_TASK_PROGRESS, CurrentTaskPercent));
                 args = "-repack " + INSTALLING_THREAD_GAME + " -ipc";
 
                 runMEM_Install(exe, args, InstallWorker);
@@ -1980,25 +1987,8 @@ namespace AlotAddOnGUI
             Utilities.TurnOffOriginAutoUpdate();
 
             //Create/Update Marker File
-            short ALOTVersion = 0;
-            int meuitmFlag = (installingMEUITM) ? 1 : 0; //if 0 we can or it with existing info
-            if (versionInfo == null)
-            {
-                //Check if ALOT is in files that were installed
-                foreach (AddonFile af in ADDONFILES_TO_INSTALL)
-                {
-                    if (af.ALOTVersion > 0)
-                    {
-                        ALOTVersion = af.ALOTVersion;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                ALOTVersion = versionInfo.ALOTVER;
-                meuitmFlag |= versionInfo.MEUITMVER;
-            }
+            int meuitmFlag = (installingMEUITM) ? meuitmFile.MEUITMVer : (versionInfo != null ? versionInfo.MEUITMVER : 0);
+            short alotMainVersionFlag = (alotMainFile != null) ? alotMainFile.ALOTVersion : (versionInfo != null ? versionInfo.ALOTVER : (short)0); //we should not see it write 0... hopefully
 
             //Update Marker
             byte updateVersion = 0;
@@ -2011,10 +2001,8 @@ namespace AlotAddOnGUI
                 updateVersion = versionInfo != null ? versionInfo.ALOTUPDATEVER : (byte)0;
             }
 
-
-
             //Write Marker
-            ALOTVersionInfo newVersion = new ALOTVersionInfo(ALOTVersion, updateVersion, 0, meuitmFlag);
+            ALOTVersionInfo newVersion = new ALOTVersionInfo(alotMainVersionFlag, updateVersion, 0, meuitmFlag);
             Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
             ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
             if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
@@ -2050,10 +2038,10 @@ namespace AlotAddOnGUI
             }
 
             //If MAIN alot file is here, move it back to downloaded_mods
-            if (installedALOT && alotAddonFile.UnpackedSingleFilename != null)
+            if (installedALOT && alotMainFile.UnpackedSingleFilename != null)
             {
                 //ALOT was just installed. We are going to move it back to mods folder
-                string extractedName = alotAddonFile.UnpackedSingleFilename;
+                string extractedName = alotMainFile.UnpackedSingleFilename;
 
                 Log.Information("ALOT MAIN FILE - Unpacked - moving to downloaded_mods from install dir: " + extractedName);
                 string source = getOutputDir(INSTALLING_THREAD_GAME) + "000_" + extractedName;
@@ -2070,16 +2058,16 @@ namespace AlotAddOnGUI
                         File.Move(source, dest);
                         Log.Information("Moved main alot file back to downloaded_mods");
                         //Delete original
-                        dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotAddonFile.Filename;
+                        dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotMainFile.Filename;
                         if (File.Exists(dest))
                         {
                             Log.Information("Deleting original alot archive file from downloaded_mods");
                             File.Delete(dest);
                             Log.Information("Deleted original alot archive file from downloaded_mods");
                         }
-                        if (alotAddonFile != null)
+                        if (alotMainFile != null)
                         {
-                            alotAddonFile.Staged = false;
+                            alotMainFile.Staged = false;
                         }
 
                     }

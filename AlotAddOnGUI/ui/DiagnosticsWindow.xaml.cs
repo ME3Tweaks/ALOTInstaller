@@ -113,6 +113,12 @@ namespace AlotAddOnGUI.ui
         private void ShowDiagnosticTypes()
         {
             DiagnosticHeader.Text = "Select type of diagnostic.";
+            ALOTVersionInfo avi = Utilities.GetInstalledALOTInfo(DIAGNOSTICS_GAME);
+            if (avi == null)
+            {
+                Button_FullDiagnostic.IsEnabled = false;
+                Button_FullDiagnostic.ToolTip = "MEMI tag missing - full scan won't provide any useful info";
+            }
             Panel_DiagnosticsTypes.Visibility = Visibility.Visible;
         }
 
@@ -299,8 +305,12 @@ namespace AlotAddOnGUI.ui
             addDiagLine("===System information");
             addDiagLine("Processors");
             addDiagLine(GetCPUString());
-            addDiagLine("System Memory: " + ByteSize.FromKiloBytes(Utilities.GetInstalledRamAmount()));
-
+            long ramInBytes = Utilities.GetInstalledRamAmount();
+            addDiagLine("System Memory: " + ByteSize.FromKiloBytes(ramInBytes));
+            if (ramInBytes == 0)
+            {
+                addDiagLine("~~~Unable to get the read amount of physically installed ram. This may be a sign of impending hardware failure in the SMBIOS");
+            }
             ManagementObjectSearcher objvide = new ManagementObjectSearcher("select * from Win32_VideoController");
 
             int vidCardIndex = 1;

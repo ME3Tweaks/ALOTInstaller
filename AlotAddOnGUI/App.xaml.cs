@@ -185,6 +185,9 @@ namespace AlotAddOnGUI
             //Normal Mode
             ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(UIElement),
             new FrameworkPropertyMetadata(15000));
+            ToolTipService.ShowOnDisabledProperty.OverrideMetadata(
+            typeof(Control),
+            new FrameworkPropertyMetadata(true));
             if (Directory.Exists(loggingBasePath + "Update"))
             {
                 Thread.Sleep(1000);

@@ -60,7 +60,7 @@ namespace AlotAddOnGUI.classes
                     {
                         return "images/greycheckmark.png";
                     }
-                    if (MEUITM && info != null && info.MEUITMVER > 0)
+                    if (MEUITM && info != null && info.MEUITMVER >= MEUITMVer)
                     {
                         if (Ready)
                         {
@@ -189,11 +189,15 @@ namespace AlotAddOnGUI.classes
                     {
                         if (info != null)
                         {
-                            if (info.MEUITMVER > 0)
+                            if (info.MEUITMVER >= MEUITMVer)
                             {
-                                return "MEUITM already installed";
+                                return "MEUITM v"+MEUITMVer+" already installed";
                             }
-                            else
+                            else if (info.MEUITMVER < MEUITMVer)
+                            {
+                                return "MEUITM upgrade imported";
+                            }
+                            else if (info.MEUITMVER == 0)
                             {
                                 return "MEUITM imported";
                             }
@@ -305,7 +309,7 @@ namespace AlotAddOnGUI.classes
                         //Disabled
                         return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
                     }
-                    if (MEUITM && info != null && info.MEUITMVER > 0)
+                    if (MEUITM && info != null && info.MEUITMVER >= MEUITMVer)
                     {
                         //Disabled
                         return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
@@ -328,6 +332,8 @@ namespace AlotAddOnGUI.classes
             }
 
         }
+
+        public int MEUITMVer { get; internal set; }
 
         private void OnPropertyChanged(string propertyName)
         {

@@ -1033,7 +1033,7 @@ namespace AlotAddOnGUI
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             fadeInItems = new FrameworkElement[] { FirstRun_MainContent, FirstRunText_TitleBeta, FirstRunText_BetaSummary };
-            buildOptionCheckboxes = new System.Windows.Controls.CheckBox[] { Checkbox_BuildOptionALOT, Checkbox_BuildOptionALOTUpdate, Checkbox_BuildOptionUser, Checkbox_BuildOptionAddon };
+            buildOptionCheckboxes = new System.Windows.Controls.CheckBox[] { Checkbox_BuildOptionALOT, Checkbox_BuildOptionALOTUpdate, Checkbox_BuildOptionMEUITM, Checkbox_BuildOptionUser, Checkbox_BuildOptionAddon };
             if (EXE_DIRECTORY.Length > 105)
             {
                 Log.Fatal("ALOT Installer is nested too deep for Addon to build properly (" + EXE_DIRECTORY.Length + " chars) due to Windows API limitations.");
@@ -1645,13 +1645,13 @@ namespace AlotAddOnGUI
                 if (CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER > 0)
                 {
                     bool meuitminstalled = CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER > 0;
-                    me1ver = CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER + (meuitminstalled ? ", MEUITM" : "");
+                    me1ver = CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER + (meuitminstalled ? ", MEUITM v"+ CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER : "");
                 }
                 else
                 {
                     if (CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER > 0)
                     {
-                        me1ver = "Not Installed, MEUITM Installed";
+                        me1ver = "ALOT: N/A, MEUITM: v"+ CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER;
 
                     }
                     else
@@ -1825,6 +1825,7 @@ namespace AlotAddOnGUI
                                 Enabled = true,
                                 FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
                                 MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
+                                MEUITMVer = e.Attribute("meuitmver") != null ? Convert.ToInt32((string)e.Attribute("meuitmver")) : 0,
                                 ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
                                 Author = (string)e.Attribute("author"),
                                 FriendlyName = (string)e.Attribute("friendlyname"),
@@ -2053,6 +2054,7 @@ namespace AlotAddOnGUI
             bool alotInstalled = installedInfo != null && installedInfo.ALOTVER > 0; //default value
             bool alotavailalbleforinstall = false;
             bool alotupdateavailalbeforinstall = false;
+            bool meuitmavailableforinstall = false;
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
             if (installedInfo == null || installedInfo.ALOTVER == 0) //not installed or mem installed
             {
@@ -2075,6 +2077,7 @@ namespace AlotAddOnGUI
             bool hasApplicableUserFile = false;
             bool checkAlotBox = false;
             bool checkAlotUpdateBox = false;
+            bool checkMEUITMBox = false;
 
             int installingALOTver = 0;
 
@@ -2119,7 +2122,6 @@ namespace AlotAddOnGUI
                             if (installedInfo.ALOTUPDATEVER >= af.ALOTUpdateVersion)
                             {
                                 checkAlotUpdateBox = false; //same or higher update is already installed
-                                continue;
                             }
                             else
                             {
@@ -2130,7 +2132,19 @@ namespace AlotAddOnGUI
                         {
                             checkAlotUpdateBox = true; //same or higher update is already installed
                         }
+                        continue;
                     }
+
+                    if (af.MEUITM)
+                    {
+                        meuitmavailableforinstall = true;
+                        if (installedInfo == null || installedInfo.MEUITMVER < af.MEUITMVer)
+                        {
+                            checkMEUITMBox = true;
+                        }
+                        continue;
+                    }
+
                     hasAddonFile = true;
                 }
             }
@@ -2142,10 +2156,18 @@ namespace AlotAddOnGUI
             Checkbox_BuildOptionALOTUpdate.IsEnabled = !checkAlotUpdateBox && alotupdateavailalbeforinstall;
             Checkbox_BuildOptionALOTUpdate.Visibility = alotupdateavailalbeforinstall ? Visibility.Visible : Visibility.Collapsed;
 
+            Checkbox_BuildOptionMEUITM.IsChecked = checkMEUITMBox;
+            Checkbox_BuildOptionMEUITM.IsEnabled = !checkMEUITMBox && meuitmavailableforinstall;
+            Checkbox_BuildOptionMEUITM.Visibility = meuitmavailableforinstall ? Visibility.Visible : Visibility.Collapsed;
+
+
+
             Checkbox_BuildOptionAddon.IsEnabled = hasAddonFile;
 
             Checkbox_BuildOptionUser.IsChecked = hasApplicableUserFile;
             Checkbox_BuildOptionUser.IsEnabled = hasApplicableUserFile;
+
+
 
             bool hasOneOption = false;
             foreach (System.Windows.Controls.CheckBox cb in buildOptionCheckboxes)
@@ -3580,6 +3602,7 @@ namespace AlotAddOnGUI
                         BUILD_ADDON_FILES = Checkbox_BuildOptionAddon.IsChecked.Value;
                         BUILD_USER_FILES = Checkbox_BuildOptionUser.IsChecked.Value;
                         BUILD_ALOT_UPDATE = Checkbox_BuildOptionALOTUpdate.IsChecked.Value;
+                        BUILD_MEUITM = Checkbox_BuildOptionMEUITM.IsChecked.Value;
 
                         TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
                         BuildWorker.RunWorkerAsync(CURRENT_GAME_BUILD);

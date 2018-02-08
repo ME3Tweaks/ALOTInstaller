@@ -396,6 +396,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                         <CheckBox x:Name="Checkbox_BuildOptionALOT" Content="ALOT" Margin="5" IsChecked="True" IsEnabled="False"></CheckBox>
                         <CheckBox x:Name="Checkbox_BuildOptionALOTUpdate" Content="ALOT Update" Margin="5" IsChecked="True" IsEnabled="False"></CheckBox>
+                        <CheckBox x:Name="Checkbox_BuildOptionMEUITM" Content="MEUITM" Margin="5" IsChecked="True" IsEnabled="False"></CheckBox>
                         <CheckBox x:Name="Checkbox_BuildOptionAddon" Content="Addon" Margin="5" IsChecked="True"></CheckBox>
                         <CheckBox x:Name="Checkbox_BuildOptionUser" Content="User Files" Margin="5"></CheckBox>
 

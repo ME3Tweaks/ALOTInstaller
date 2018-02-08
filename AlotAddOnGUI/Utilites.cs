@@ -595,50 +595,58 @@ namespace AlotAddOnGUI
             string gamePath = Utilities.GetALOTMarkerFilePath(gameID);
             if (gamePath != null && File.Exists(gamePath))
             {
-                using (FileStream fs = new FileStream(gamePath, System.IO.FileMode.Open, FileAccess.Read))
+                try
                 {
-                    fs.SeekEnd();
-                    long endPos = fs.Position;
-                    fs.Position = endPos - 4;
-                    uint memi = fs.ReadUInt32();
-
-                    if (memi == MEMI_TAG)
+                    using (FileStream fs = new FileStream(gamePath, System.IO.FileMode.Open, FileAccess.Read))
                     {
-                        //ALOT has been installed
-                        fs.Position = endPos - 8;
-                        int installerVersionUsed = fs.ReadInt32();
-                        int perGameFinal4Bytes = -20;
-                        switch (gameID)
-                        {
-                            case 1:
-                                perGameFinal4Bytes = 0;
-                                break;
-                            case 2:
-                                perGameFinal4Bytes = 4352;
-                                break;
-                            case 3:
-                                perGameFinal4Bytes = 16777472;
-                                break;
-                        }
+                        fs.SeekEnd();
+                        long endPos = fs.Position;
+                        fs.Position = endPos - 4;
+                        uint memi = fs.ReadUInt32();
 
-                        if (installerVersionUsed >= 10 && installerVersionUsed != perGameFinal4Bytes) //default bytes before 178 MEMI Format
+                        if (memi == MEMI_TAG)
                         {
-                            fs.Position = endPos - 12;
-                            short ALOTVER = fs.ReadInt16();
-                            byte ALOTUPDATEVER = (byte)fs.ReadByte();
-                            byte ALOTHOTFIXVER = (byte)fs.ReadByte();
+                            //ALOT has been installed
+                            fs.Position = endPos - 8;
+                            int installerVersionUsed = fs.ReadInt32();
+                            int perGameFinal4Bytes = -20;
+                            switch (gameID)
+                            {
+                                case 1:
+                                    perGameFinal4Bytes = 0;
+                                    break;
+                                case 2:
+                                    perGameFinal4Bytes = 4352;
+                                    break;
+                                case 3:
+                                    perGameFinal4Bytes = 16777472;
+                                    break;
+                            }
 
-                            //unused for now
-                            fs.Position = endPos - 16;
-                            int MEUITMVER = fs.ReadInt32();
+                            if (installerVersionUsed >= 10 && installerVersionUsed != perGameFinal4Bytes) //default bytes before 178 MEMI Format
+                            {
+                                fs.Position = endPos - 12;
+                                short ALOTVER = fs.ReadInt16();
+                                byte ALOTUPDATEVER = (byte)fs.ReadByte();
+                                byte ALOTHOTFIXVER = (byte)fs.ReadByte();
 
-                            return new ALOTVersionInfo(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER);
-                        }
-                        else
-                        {
-                            return new ALOTVersionInfo(0, 0, 0, 0); //MEMI tag but no info we know of
+                                //unused for now
+                                fs.Position = endPos - 16;
+                                int MEUITMVER = fs.ReadInt32();
+
+                                return new ALOTVersionInfo(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER);
+                            }
+                            else
+                            {
+                                return new ALOTVersionInfo(0, 0, 0, 0); //MEMI tag but no info we know of
+                            }
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Error reading marker file for Mass Effect " + gameID + ". ALOT Info will be returned as null (nothing installed). " + e.Message);
+                    return null;
                 }
             }
             return null;
@@ -740,7 +748,15 @@ namespace AlotAddOnGUI
                     if (!standAlone)
                     {
                         p.WaitForExit(60000);
-                        return p.ExitCode;
+                        try
+                        {
+                            return p.ExitCode;
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error("Error getting return code from admin process. It may have timed out.\n" + App.FlattenException(e));
+                            return -1;
+                        }
                     }
                     else
                     {
