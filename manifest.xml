@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="4.3.7">
+<alotaddonmanifest version="4.3.8">
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps."/>
   <tutorial link="https://ianmooreisme.github.io/ALOT-Comparisons/" text="Comparison Screenshots" tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore."/>
   <addonfile meuitm="true" friendlyname="MEUITM Anniversary Edition" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
-    <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2-0.zip" size="2991648708" md5="2c8091ccf34e25818bbd2d253fe61743" />
+    <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2-0.zip" size="2974978097" md5="3e33c8e2e3ded44a2c15742fd6dfac07" />
     <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\Asari.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\Ash Face.mem" movedirectly="true" />
@@ -22,7 +22,7 @@
     <packagefile me1="true" sourcename="MEUITM\mods\councilandudina.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\Elcor.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\eyes.mem" movedirectly="true" />
-    <packagefile me1="true" sourcename="MEUITM\mods\femshep.mem" movedirectly="true" />
+    <packagefile me1="true" sourcename="MEUITM\mods\FemShep.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\Feros.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\Filmgrain.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\Garrus_Face.mem" movedirectly="true" />
@@ -66,8 +66,8 @@
     <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 - Textures-68-2018-6-0.zip" unpackedsinglefilename="ALOT_ME2_v6.mem" size="3563362871" md5="c1ed3369c5ba8ae681166b2fb9bc7c14" />
     <packagefile me2="true" sourcename="ALOT_ME2_v6.mem" movedirectly="true" />
   </addonfile>
-  <addonfile appliestomainversion="6" alotupdateversion="4" friendlyname="ALOT for ME2 6.4 - Update" tooltipname="ALOT for ME2 6.4 - Update" author="CreeperLava">
-	<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 6.4 - Update-68-2018-6-4.zip" size="30044778" md5="1d37e65ed046556163f63dc0fdd7dfab"/>
+  <addonfile appliestomainversion="6" alotupdateversion="5" friendlyname="ALOT for ME2 6.5 - Update" tooltipname="ALOT for ME2 6.5 - Update" author="CreeperLava">
+	<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 6.5 - Update-68-2018-6-5.zip" size="34951704" md5="d28f6045b2f4f50e4c5f5f243e53c5d1"/>
 	<packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v6.mem" movedirectly="true"/>
   </addonfile>
   <addonfile alotversion="6" friendlyname="ALOT for ME3 6.0 - Textures" tooltipname="ALOT for ME3 6.0 - Textures" author="CreeperLava">
