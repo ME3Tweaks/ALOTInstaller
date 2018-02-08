@@ -7,7 +7,7 @@
   <addonfile meuitm="true" friendlyname="MEUITM Anniversary Edition" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2-0.zip" size="2974978097" md5="3e33c8e2e3ded44a2c15742fd6dfac07" />
     <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
-    <packagefile me1="true" sourcename="MEUITM\mods\Asari.mem" movedirectly="true" />
+    <packagefile me1="true" sourcename="MEUITM\mods\AsariSmooth.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\Ash Face.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\AshandLiaraRomanceBodies.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\AshArmor.mem" movedirectly="true" />
@@ -56,7 +56,7 @@
     <packagefile me1="true" sourcename="MEUITM\mods\TurianArmors.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\Virmire.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\volus.mem" movedirectly="true" />
-    <packagefile me1="true" sourcename="MEUITM\mods\Wrex.mem" movedirectly="true" />
+    <packagefile me1="true" sourcename="MEUITM\mods\WrexVS.mem" movedirectly="true" />
   </addonfile>
   <addonfile alotversion="6" friendlyname="ALOT for ME1 6.0 - Textures" tooltipname="ALOT for ME1 6.0 - Textures" author="CreeperLava">
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/83?tab=files" filename="ALOT for ME1 - Textures-83-2018-6-0.zip" unpackedsinglefilename="ALOT_ME1_v6.mem" size="448313463" md5="1d0ab6ce0f2ce1940619bf27aade24c2" />
