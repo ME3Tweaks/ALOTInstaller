@@ -189,7 +189,7 @@ namespace AlotAddOnGUI
                             Log.Information(prefix + "Extracting file: " + extractSource);
                             string exe = BINARY_DIRECTORY + "7z.exe";
                             string args = "x -bsp2 \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
-                            ConsoleApp extractProcess = Run7zWithProgressForAddonFile(args,af);
+                            ConsoleApp extractProcess = Run7zWithProgressForAddonFile(args, af);
                             while (extractProcess.State == AppState.Running)
                             {
                                 Thread.Sleep(250);
@@ -1312,7 +1312,7 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("Error creating backup:");
                     Log.Error(App.FlattenException(ex));
-                    BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Backup failed", "Backup of Mass Effect"+getGameNumberSuffix(BACKUP_THREAD_GAME)+" failed. An error occured during the copy process. The error message was: "+ex.Message+".\nSome files may have been copied, but this backup is not usable. You can delete the folder you were backing up files into.\nReview the installer log for more information.")));
+                    BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Backup failed", "Backup of Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " failed. An error occured during the copy process. The error message was: " + ex.Message + ".\nSome files may have been copied, but this backup is not usable. You can delete the folder you were backing up files into.\nReview the installer log for more information.")));
 
                     e.Result = null;
                     return;
@@ -1649,6 +1649,14 @@ namespace AlotAddOnGUI
             Log.Information("InstallWorker Thread starting for ME" + INSTALLING_THREAD_GAME);
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
+
+            Log.Information("Files being installed in this installation session:");
+            foreach (AddonFile af in ADDONFILES_TO_INSTALL)
+            {
+                Log.Information(" - " + af.FriendlyName);
+            }
+
+
             bool RemoveMipMaps = (versionInfo == null); //remove mipmaps only if alot is not installed
             if (INSTALLING_THREAD_GAME == 1)
             {
@@ -2046,7 +2054,7 @@ namespace AlotAddOnGUI
                         {
                             alotAddonFile.Staged = false;
                         }
-                        
+
                     }
                     catch (Exception ex)
                     {

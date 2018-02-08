@@ -758,7 +758,11 @@ namespace AlotAddOnGUI
                                 }
                                 if (run)
                                 {
+                                    Log.Information("User has chosen to install textures after build - we are now starting InstallALOT()");
                                     InstallALOT(result, ADDONFILES_TO_BUILD);
+                                } else
+                                {
+                                    Log.Warning("User has declined to install textures after build, or the game is running.");
                                 }
                             }
                             else
