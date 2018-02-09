@@ -305,7 +305,7 @@ namespace AlotAddOnGUI.ui
             //Windows 10 only
             string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
             string productName = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName", "").ToString();
-            string verLine = "Running Windows " + productName;
+            string verLine = "Running " + productName;
             if (osBuildVersion.Major == 10)
             {
                 verLine += " " + releaseId;
