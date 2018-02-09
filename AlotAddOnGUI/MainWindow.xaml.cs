@@ -1645,13 +1645,13 @@ namespace AlotAddOnGUI
                 if (CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER > 0)
                 {
                     bool meuitminstalled = CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER > 0;
-                    me1ver = CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER + (meuitminstalled ? ", MEUITM v"+ CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER : "");
+                    me1ver = CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER + (meuitminstalled ? ", MEUITM v" + CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER : "");
                 }
                 else
                 {
                     if (CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER > 0)
                     {
-                        me1ver = "ALOT: N/A, MEUITM: v"+ CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER;
+                        me1ver = "ALOT: N/A, MEUITM: v" + CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER;
 
                     }
                     else

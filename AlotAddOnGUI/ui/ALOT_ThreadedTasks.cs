@@ -1616,15 +1616,15 @@ namespace AlotAddOnGUI
                         }
                     case RESULT_TEXTUREINSTALL_GAME_FILE_ADDED:
                         {
-                            InstallingOverlay_TopLabel.Text = "Failed to install textures";
-                            InstallingOverlay_BottomLabel.Text = "Game file(s) were added after initial install";
+                            InstallingOverlay_TopLabel.Text = "Texture installation blocked";
+                            InstallingOverlay_BottomLabel.Text = "Game file(s) were added after initial install\nDo not add game files after initial installation";
                             HeaderLabel.Text = "Game files were added after initial installation of ALOT or MEUITM - this is not supported. You will need to revert to an unmodified game to fix.";
                             break;
                         }
                     case RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED:
                         {
-                            InstallingOverlay_TopLabel.Text = "Failed to install textures";
-                            InstallingOverlay_BottomLabel.Text = "Game file(s) were removed after initial install";
+                            InstallingOverlay_TopLabel.Text = "Texture installation blocked";
+                            InstallingOverlay_BottomLabel.Text = "Game file(s) were removed after initial install\nDo not remove game files after initial installation";
                             HeaderLabel.Text = "Game files were removed after initial installation of ALOT or MEUITM - this is not supported. You will need to revert to an unmodified game to fix.";
                             break;
                         }
@@ -2356,7 +2356,7 @@ namespace AlotAddOnGUI
 
             BACKGROUND_MEM_PROCESS = new ConsoleApp(exe, args);
             BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
-
+            BACKGROUND_MEM_PROCESS_PARSED_ERRORS = new List<string>();
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
@@ -2409,12 +2409,12 @@ namespace AlotAddOnGUI
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_WRONG);
                                 break;
                             case "ERROR_ADDED_FILE":
-                                Log.Error("MEM detects game file was removed since initial texture installation! Installation aborted");
-                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("Game files were added since texture install");
+                                Log.Error("MEM detects some game file(s) were added since initial texture installation! This is not supported. Installation aborted");
+                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_ADDED);
                                 break;
                             case "ERROR_REMOVED_FILE":
-                                Log.Error("MEM detects game file was removed since initial texture installation! Installation aborted");
-                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("Game files were removed since texture install");
+                                Log.Error("MEM detects some game file(s) were removed since initial texture installation! This is not supported. Installation aborted");
+                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_REMOVED);
                                 break;
                             case "ERROR":
                                 Log.Error("Error IPC from MEM: " + param);
