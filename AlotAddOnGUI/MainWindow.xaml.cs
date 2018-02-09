@@ -586,7 +586,7 @@ namespace AlotAddOnGUI
                     var upload = await this.ShowMessageAsync("Previous installer session crashed", "The previous installer session crashed. Would you like to upload the log to help the developers fix it?", MessageDialogStyle.AffirmativeAndNegative, mds);
                     if (upload == MessageDialogResult.Affirmative)
                     {
-                        uploadLatestLog(true);
+                        await uploadLatestLog(true);
                     }
                 }
             }
