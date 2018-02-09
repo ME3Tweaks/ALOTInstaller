@@ -60,17 +60,6 @@ namespace AlotAddOnGUI.classes
                     {
                         return "images/greycheckmark.png";
                     }
-                    if (MEUITM && info != null && info.MEUITMVER >= MEUITMVer)
-                    {
-                        if (Ready)
-                        {
-                            return "images/greycheckmark.png";
-                        }
-                        else
-                        {
-                            return "images/greydownload.png";
-                        }
-                    }
                 }
                 //Not ALOT
                 if (Ready && Enabled)
@@ -138,7 +127,7 @@ namespace AlotAddOnGUI.classes
                                 return "Restore to unmodified to install upgrade";
                             }
 
-                            if (ALOTVersion > info.ALOTVER && info.ALOTVER == 0 && info.MEUITMVER > 0 ) //me1 issue - we cannot detect 5.0 with no meuitm
+                            if (ALOTVersion > info.ALOTVER && info.ALOTVER == 0 && info.MEUITMVER > 0) //me1 issue - we cannot detect 5.0 with no meuitm
                             {
                                 //alot not installed, meuitm installed. This could also be 5.0 with MEUITM but... :(
                                 return "ALOT main file imported";
@@ -187,24 +176,35 @@ namespace AlotAddOnGUI.classes
 
                     if (MEUITM)
                     {
-                        if (info != null)
+                        if (Ready)
                         {
-                            if (info.MEUITMVER >= MEUITMVer)
+                            if (info != null)
                             {
-                                return "MEUITM v"+MEUITMVer+" already installed";
+                                if (info.MEUITMVER >= MEUITMVer)
+                                {
+                                    return "MEUITM v" + MEUITMVer + " already installed";
+                                }
+                                else if (info.MEUITMVER < MEUITMVer)
+                                {
+                                    return "MEUITM upgrade imported";
+                                }
+                                else if (info.MEUITMVER == 0)
+                                {
+                                    return "MEUITM imported";
+                                }
                             }
-                            else if (info.MEUITMVER < MEUITMVer)
-                            {
-                                return "MEUITM upgrade imported";
-                            }
-                            else if (info.MEUITMVER == 0)
+                            else
                             {
                                 return "MEUITM imported";
                             }
                         }
                         else
                         {
-                            return "MEUITM imported";
+                            if (info != null && info.MEUITMVER != 0 && info.MEUITMVER < MEUITMVer)
+                            {
+                                return "MEUITM upgrade available";
+                            }
+                            return "";
                         }
                     }
                 }
@@ -305,11 +305,6 @@ namespace AlotAddOnGUI.classes
 
                     //Major Upgrade, including on unknown versions
                     if (ALOTVersion > 0 && info != null && ALOTVersion > info.ALOTVER && info.MEUITMVER == 0)
-                    {
-                        //Disabled
-                        return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
-                    }
-                    if (MEUITM && info != null && info.MEUITMVER >= MEUITMVer)
                     {
                         //Disabled
                         return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);

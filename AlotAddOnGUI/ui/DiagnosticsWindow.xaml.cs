@@ -39,6 +39,7 @@ namespace AlotAddOnGUI.ui
         private const string RESET_REPLACEFILE_TEXT = "RESET_REPLACEFILE_TEXT";
         private const string TURN_OFF_TASKBAR_PROGRESS = "TURN_OFF_TASKBAR_PROGRESS";
         private const string TURN_ON_TASKBAR_PROGRESS = "TURN_ON_TASKBAR_PROGRESS";
+        private const string UPLOAD_LINKED_LOG = "UPLOAD_LINKED_LOG";
         private const int CONTEXT_NORMAL = 0;
         private const int CONTEXT_FULLMIPMAP_SCAN = 1;
         private const int CONTEXT_REPLACEDFILE_SCAN = 2;
@@ -53,6 +54,7 @@ namespace AlotAddOnGUI.ui
         private bool MEMI_FOUND = true;
         private bool FIXED_LOD_SETTINGS = false;
         private List<string> AddedFiles = new List<string>();
+        private string LINKEDLOGURL;
 
         public DiagnosticsWindow()
         {
@@ -190,17 +192,9 @@ namespace AlotAddOnGUI.ui
                     TaskbarManager.Instance.SetProgressValue(0, 100);
                     TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
                     break;
-                case UPDATE_HEADER_LABEL:
-                    //HeaderLabel.Text = (string)tc.Data;
-                    break;
-                case UPDATE_PROGRESSBAR_INDETERMINATE:
-                    //TaskbarManager.Instance.SetProgressState((bool)tc.Data ? TaskbarProgressBarState.Indeterminate : TaskbarProgressBarState.Normal);
-                    //Build_ProgressBar.IsIndeterminate = (bool)tc.Data;
-                    break;
-                case ERROR_OCCURED:
-                    //Build_ProgressBar.IsIndeterminate = false;
-                    //Build_ProgressBar.Value = 0;
-                    //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
+                case UPLOAD_LINKED_LOG:
+                    LINKEDLOGURL = await ((MainWindow)(Owner)).uploadLatestLog(false,false);
+                    ((EventWaitHandle)(tc.Data)).Set();
                     break;
                 case SHOW_DIALOG_BAD_LOD:
                     ThreadCommandDialogOptions tcdo = (ThreadCommandDialogOptions)tc.Data;
@@ -277,8 +271,10 @@ namespace AlotAddOnGUI.ui
         private void PerformDiagnostics(object sender, DoWorkEventArgs e)
         {
             diagStringBuilder = new StringBuilder();
+            bool pairLog = false;
             addDiagLine("ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version + " Game Diagnostic");
             addDiagLine("Diagnostic for Mass Effect " + DIAGNOSTICS_GAME);
+            addDiagLine("Diagnostic generated on " + DateTime.Now.ToShortDateString());
             var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
             int fileVersion = versInfo.FileMajorPart;
             addDiagLine("Using MassEffectModderNoGui v" + fileVersion);
@@ -303,6 +299,20 @@ namespace AlotAddOnGUI.ui
 
 
             addDiagLine("===System information");
+            OperatingSystem os = Environment.OSVersion;
+            Version osBuildVersion = os.Version;
+
+            //Windows 10 only
+            string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
+            string productName = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName", "").ToString();
+            string verLine = "Running Windows " + productName;
+            if (osBuildVersion.Major == 10)
+            {
+                verLine += " " + releaseId;
+            }
+            addDiagLine(verLine);
+            addDiagLine("Version " + osBuildVersion);
+            addDiagLine("");
             addDiagLine("Processors");
             addDiagLine(GetCPUString());
             long ramInBytes = Utilities.GetInstalledRamAmount();
@@ -445,6 +455,11 @@ namespace AlotAddOnGUI.ui
 
                     }
                 }
+                if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
+                {
+                    pairLog = true;
+                    addDiagLine("MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                }
             }
             else
             {
@@ -454,7 +469,8 @@ namespace AlotAddOnGUI.ui
                 }
                 else
                 {
-                    addDiagLine("MEM returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                    pairLog = true;
+                    addDiagLine("MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
                 }
             }
 
@@ -481,6 +497,11 @@ namespace AlotAddOnGUI.ui
                     {
                         addDiagLine(" - DIAG ERROR: " + str);
                     }
+                    if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
+                    {
+                        pairLog = true;
+                        addDiagLine("MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-textures. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                    }
                 }
                 else
                 {
@@ -490,7 +511,8 @@ namespace AlotAddOnGUI.ui
                     }
                     else
                     {
-                        addDiagLine("MEM returned non zero exit code, or null (crash) during -check-game-data-textures: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                        pairLog = true;
+                        addDiagLine("MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-textures: " + BACKGROUND_MEM_PROCESS.ExitCode);
                     }
                 }
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_OFF_TASKBAR_PROGRESS));
@@ -623,6 +645,21 @@ namespace AlotAddOnGUI.ui
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataBasegamemods));
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_Upload));
 
+            if (pairLog)
+            {
+                //program has had issue and log should be linked
+                EventWaitHandle waitHandle = new EventWaitHandle(false, EventResetMode.AutoReset);
+                diagnosticsWorker.ReportProgress(0, new ThreadCommand(UPLOAD_LINKED_LOG, waitHandle));
+                waitHandle.WaitOne();
+                if (LINKEDLOGURL != null)
+                {
+                    Log.Information("Linked log for this diagnostic: " + LINKEDLOGURL);
+                    addDiagLine("[LINKEDLOG]" + LINKEDLOGURL);
+                }
+            }
+
+
+
             string diag = diagStringBuilder.ToString();
             string hash = Utilities.sha256(diag);
             diag += hash;
@@ -633,28 +670,8 @@ namespace AlotAddOnGUI.ui
 
             //upload
             string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
-            //if (diag.Length > 512000)
-            //{
-            //    var responseString = "https://me3tweaks.com/alotinstaller/loguploader".PostUrlEncodedAsync(new { LogData = diag, ALOTInstallerVersion = alotInstallerVer }).ReceiveString().Result;
-            //    Uri uriResult;
-            //    bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
-            //        && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-            //    if (result)
-            //    {
-            //        //should be valid URL.
-            //        diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
-            //        e.Result = responseString;
-            //        Log.Information("Result from server for log upload: " + responseString);
-            //    }
-            //    else
-            //    {
-            //        diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from relay: " + responseString));
-            //        diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
-            //        Log.Error("Error uploading log. The server responded with: " + responseString);
-            //    }
-            //}
-            //else
-            //{
+
+
             //Compress with LZMA for VPS Upload
             string outfile = diagfilename + ".lzma";
             args = "e \"" + diagfilename + "\" \"" + outfile + "\" -mt2";

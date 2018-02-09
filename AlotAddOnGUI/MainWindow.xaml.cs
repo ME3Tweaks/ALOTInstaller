@@ -981,9 +981,9 @@ namespace AlotAddOnGUI
                     if (af.Ready != ready) //status is changing
                     {
                         Log.Information(af.FriendlyName + " changing ready states. Is now ready: " + ready);
+                        af.Ready = ready;
                         af.ReadyStatusText = null;
                         af.ReadyIconPath = null;
-                        af.Ready = ready;
                         if (!af.Ready && af.UserFile)
                         {
                             newUnreadyUserFiles.Add(af);
@@ -1890,6 +1890,8 @@ namespace AlotAddOnGUI
                     buttonOK.ToolTip = tut.ToolTip;
                     buttonOK.Margin = new Thickness(20, 0, 20, 3);
                     buttonOK.Padding = new Thickness(0, 3, 0, 3);
+                    buttonOK.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
+
                     buttonOK.Style = (Style)FindResource("AccentedSquareButtonStyle");
                     ControlsHelper.SetContentCharacterCasing(buttonOK, System.Windows.Controls.CharacterCasing.Upper);
                     //                    buttonOK.FontSize = 12;
@@ -2184,7 +2186,7 @@ namespace AlotAddOnGUI
                 Label_WhatToBuildAndInstall.Text = "Choose what to install for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
                 if (blockALOTInstallDueToMainVersionDiff)
                 {
-                    Label_WhatToBuildAndInstall.Text = "Imported ALOT file (" + installingALOTver + ".0) cannot be installed over the current installation (" + installedInfo.ALOTVER + "." + installedInfo.ALOTUPDATEVER + ")." + System.Environment.NewLine + Label_WhatToBuildAndInstall.Text;
+                    Label_WhatToBuildAndInstall.Text = "Imported ALOT file (" + installingALOTver + ".x) cannot be installed over the current installation (" + installedInfo.ALOTVER + "." + installedInfo.ALOTUPDATEVER + ")." + System.Environment.NewLine + Label_WhatToBuildAndInstall.Text;
                 }
                 else if (alotInstalled && installedInfo.ALOTVER > 0)
                 {
@@ -2219,7 +2221,7 @@ namespace AlotAddOnGUI
                 MetroDialogSettings settings = new MetroDialogSettings();
                 settings.NegativeButtonText = "Cancel";
                 settings.AffirmativeButtonText = "Restore";
-                MessageDialogResult result = await this.ShowMessageAsync("Restoring Mass Effect to unmodified state", "Restoring Mass Effect will wipe out all mods and put your game back to an unmodified state. Are you sure you want to do this?", MessageDialogStyle.AffirmativeAndNegative, settings);
+                MessageDialogResult result = await this.ShowMessageAsync("Restoring Mass Effect from backup", "Restoring Mass Effect will wipe out the current installation and put your game back to the state when you backed it up. state. Are you sure you want to do this?", MessageDialogStyle.AffirmativeAndNegative, settings);
                 if (result == MessageDialogResult.Affirmative)
                 {
                     //RESTORE
@@ -2250,7 +2252,7 @@ namespace AlotAddOnGUI
                 MetroDialogSettings settings = new MetroDialogSettings();
                 settings.NegativeButtonText = "Cancel";
                 settings.AffirmativeButtonText = "Restore";
-                MessageDialogResult result = await this.ShowMessageAsync("Restoring ME2 to unmodified state", "Restoring Mass Effect 2 will wipe out all mods and put your game back to an unmodified state. Are you sure you want to do this?", MessageDialogStyle.AffirmativeAndNegative, settings);
+                MessageDialogResult result = await this.ShowMessageAsync("Restoring Mass Effect 2 from backup", "Restoring Mass Effect 2 will wipe out the current installation and put your game back to the state when you backed it up. state. Are you sure you want to do this?", MessageDialogStyle.AffirmativeAndNegative, settings);
                 if (result == MessageDialogResult.Affirmative)
                 {
                     //RESTORE
@@ -2282,7 +2284,7 @@ namespace AlotAddOnGUI
                 MetroDialogSettings settings = new MetroDialogSettings();
                 settings.NegativeButtonText = "Cancel";
                 settings.AffirmativeButtonText = "Restore";
-                MessageDialogResult result = await this.ShowMessageAsync("Restoring game from backup", "Restoring your game will wipe out all mods and put your game back to an unmodified state. Are you sure you want to do this?", MessageDialogStyle.AffirmativeAndNegative, settings);
+                MessageDialogResult result = await this.ShowMessageAsync("Restoring Mass Effect 3 from backup", "Restoring Mass Effect 3 will wipe out the current installation and put your game back to the state when you backed it up. state. Are you sure you want to do this?", MessageDialogStyle.AffirmativeAndNegative, settings);
                 if (result == MessageDialogResult.Affirmative)
                 {
                     //RESTORE
@@ -3637,12 +3639,12 @@ namespace AlotAddOnGUI
             ((Expander)sender).BringIntoView();
         }
 
-        private void Button_UploadLog_Click(object sender, RoutedEventArgs e)
+        private async void Button_UploadLog_Click(object sender, RoutedEventArgs e)
         {
-            uploadLatestLog(false);
+            await uploadLatestLog(false);
         }
 
-        private async void uploadLatestLog(bool isPreviousCrashLog)
+        public async Task<string> uploadLatestLog(bool isPreviousCrashLog, bool openPageWhenFinished = true)
         {
             Log.Information("Preparing to upload installer log");
             var directory = new DirectoryInfo("logs");
@@ -3690,7 +3692,11 @@ namespace AlotAddOnGUI
                         //e.Result = responseString;
                         await progresscontroller.CloseAsync();
                         Log.Information("Result from server for log upload: " + responseString);
-                        openWebPage(responseString);
+                        if (openPageWhenFinished)
+                        {
+                            openWebPage(responseString);
+                        }
+                        return responseString;
                     }
                     else
                     {
@@ -3734,6 +3740,7 @@ namespace AlotAddOnGUI
             {
                 Log.Error("No log files were found. User has hit an exceedingly rare case, well done.");
             }
+            return null;
         }
 
 

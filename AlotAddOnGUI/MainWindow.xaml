@@ -193,7 +193,6 @@
                                 <Condition Binding="{Binding Path=MEUITM}" Value="true" />
                                 <Condition Binding="{Binding Path=AlreadyInstalled}" Value="true" />
                                 <Condition Binding="{Binding Path=Ready}" Value="false" />
-
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="ReadyStatusText" Property="Visibility" Value="Visible" />
                             <Setter TargetName="Download_InnerHyperlink" Property="Foreground" Value="Gray" />

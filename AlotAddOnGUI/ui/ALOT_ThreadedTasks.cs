@@ -650,6 +650,13 @@ namespace AlotAddOnGUI
                         ADDONFILES_TO_BUILD.Add(af);
                     }
 
+                    if (af.MEUITM && BUILD_MEUITM)
+                    {
+                        Log.Information("Adding MEUITM to build list: " + af.FriendlyName);
+                        af.Building = true;
+                        ADDONFILES_TO_BUILD.Add(af);
+                    }
+
                     if ((af.ALOTVersion > 0 && BUILD_ALOT) || af.ALOTUpdateVersion > 0)
                     {
                         if (af.Enabled)
@@ -724,12 +731,14 @@ namespace AlotAddOnGUI
             }
             ERROR_OCCURED_PLEASE_STOP = false;
             KeyValuePair<AddonFile, bool>[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
+            bool fileFailed = false;
             foreach (KeyValuePair<AddonFile, bool> result in results)
             {
                 bool successful = result.Value;
                 AddonFile af = result.Key;
                 if (!successful)
                 {
+                    fileFailed = true;
                     Log.Error("Failed to extract " + af.GetFile());
                     if (af.FileMD5 != null && af.FileMD5 != "" && !af.UserFile && !af.IsCurrentlySingleFile())
                     {
@@ -747,6 +756,14 @@ namespace AlotAddOnGUI
                             Log.Error("This file cannot be used");
                             KeyValuePair<string, string> message = new KeyValuePair<string, string>("File for " + af.FriendlyName + " is corrupt", "An error occured extracting " + af.GetFile() + ". This file is corrupt. Delete this file and download a new copy of it.");
                             BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, message));
+                        } else
+                        {
+                            af.SetError();
+                            af.ReadyStatusText = "Failed to extract";
+                            Log.Warning("Checksum for " + af.FriendlyName + " is correct, but the file failed to extract. Imported MD5: " + md5 + ", manifest MD5: " + af.FileMD5);
+                            Log.Warning("This file should still be usable - but why did extraction or processing fail?");
+                            KeyValuePair<string, string> message = new KeyValuePair<string, string>(af.FriendlyName + " failed to process", "An error occured extracting or processing " + af.GetFile() + ". This file does not appear to be corrupt. Attempt installation again, and if it continues to fail, come to the ALOT Discord (Settings -> Report an issue) to help troubleshoot this issue.");
+                            BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, message));
                         }
                         //perform MD5
                     }
@@ -757,12 +774,13 @@ namespace AlotAddOnGUI
                         BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, messageStr));
                         CURRENT_GAME_BUILD = 0; //reset
                     }
+                    TasksDisplayEngine.ClearTasks();
+
                     BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
                     return false;
                 }
             }
             TasksDisplayEngine.ClearTasks();
-
             if (ERROR_OCCURED_PLEASE_STOP)
             {
                 return false;
@@ -933,7 +951,7 @@ namespace AlotAddOnGUI
             if (SHOULD_HAVE_OUTPUT_FILE)
             {
                 BuildWorker.ReportProgress(0);
-                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building ALOT Addon for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nDon't close the window until this operation completes."));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building ALOT Addon for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nThis may take a few minutes."));
 
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Building Addon MEM Package..."));
                 {
@@ -1757,25 +1775,35 @@ namespace AlotAddOnGUI
                     justInstalledUpdate = af.ALOTUpdateVersion;
                 }
             }
-            string primary = "ALOT";
+            string primary = "";
+            if (installedALOT)
+            {
+                primary = "ALOT";
+            }
+
+            if (justInstalledUpdate > 0)
+            {
+                if (primary != "")
+                {
+                    primary += ", ";
+                }
+                primary += "ALOT update";
+            }
+
             if (installingMEUITM)
             {
-                primary += " & MEUITM";
+                if (primary != "")
+                {
+                    primary += " & ";
+                }
+                primary += "MEUITM";
+            }
+
+            if (primary == "")
+            {
+                primary = "texture mods";
             }
             MAINTASK_TEXT = "Installing " + primary + " for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
-            if (!installedALOT)
-            {
-                if (justInstalledUpdate > 0)
-                {
-                    MAINTASK_TEXT = "Installing ALOT Update for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
-                }
-                else
-                {
-                    MAINTASK_TEXT = "Installing texture mods for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
-                }
-            }
-
-
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OVERALL_TASK, MAINTASK_TEXT));
 
 

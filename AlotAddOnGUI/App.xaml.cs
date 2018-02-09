@@ -33,7 +33,7 @@ namespace AlotAddOnGUI
             {
                 var application = new App();
                 application.InitializeComponent();
-                application.Run();
+                 application.Run();
             }
             catch (Exception e)
             {
