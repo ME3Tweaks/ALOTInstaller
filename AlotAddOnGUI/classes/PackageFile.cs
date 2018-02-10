@@ -18,6 +18,7 @@ namespace AlotAddOnGUI.classes
         public bool ME2 { get; set; }
         public bool ME3 { get; set; }
         public bool Processed { get; set; }
+        public string ChoiceTitle { get; internal set; }
 
         internal bool AppliesToGame(int game)
         {

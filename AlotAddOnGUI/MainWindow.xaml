@@ -6,7 +6,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-        mc:Ignorable="d"
+    xmlns:simpleChildWindow="clr-namespace:MahApps.Metro.SimpleChildWindow;assembly=MahApps.Metro.SimpleChildWindow"
+    mc:Ignorable="d"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
         Title="ALOT Installer" MinHeight="600" MinWidth="800" Height="600" Width="800"
@@ -67,7 +68,6 @@
             <Setter Property="Margin" Value="0,0,0,0" />
         </Style>
     </Window.Resources>
-
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -79,6 +79,27 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
+        <simpleChildWindow:ChildWindow
+                 IsOpen="False"
+                 HorizontalContentAlignment="Stretch"
+                 VerticalContentAlignment="Stretch"
+                 Padding="15"
+                 ChildWindowImage="Error"
+                 Title="MEUITM Settings">
+        <Grid>
+                <ComboBox Width="200"
+                          Margin="0 10 0 0"
+                          Controls:TextBoxHelper.ClearTextButton="True"
+                          Controls:TextBoxHelper.UseFloatingWatermark="True"
+                          Controls:TextBoxHelper.Watermark="Tali Visor Type"
+                          SelectedIndex="0">
+
+                    <ComboBoxItem Name="cbi1">Vanilla Style</ComboBoxItem>
+                    <ComboBoxItem Name="cbi2">See-through style</ComboBoxItem>
+                    <ComboBoxItem Name="cbi3">LSD Style</ComboBoxItem>
+                </ComboBox>
+            </Grid>
+        </simpleChildWindow:ChildWindow>
         <Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
             <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
         </Label>
@@ -386,7 +407,7 @@
             <Controls:Flyout x:Name="StatusFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
                 <TextBlock x:Name="StatusLabel" FontSize="14" Text="This is the statusbar. You should not see this text." Padding="5"></TextBlock>
             </Controls:Flyout>
-            <Controls:Flyout x:Name="WhatToBuildFlyout" TitleVisibility="Hidden" IsPinned="true" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
+            <Controls:Flyout x:Name="WhatToBuildFlyout" TitleVisibility="Hidden" IsPinned="true" IsModal="True" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
                 <StackPanel Margin="10">
                     <TextBlock x:Name="Label_WhatToBuildAndInstall" Text="Choose what to build and install for Mass Effect." TextAlignment="Center" FontSize="16" Padding="5"></TextBlock>
                     <TextBlock Text="To add user files, drop an archive containing TPF, MEM, or DDS files onto the interface and choose the game they apply to. You can also drop TPF, PNG, JPG, BMP, DDS, MOD and MEM files directly." TextWrapping="Wrap" MaxWidth="500" TextAlignment="Center" FontSize="12" Padding="5"></TextBlock>
