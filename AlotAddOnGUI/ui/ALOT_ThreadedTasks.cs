@@ -102,10 +102,13 @@ namespace AlotAddOnGUI
                     if (percentIndex > 0)
                     {
                         message = "Extracting - " + args2.Line.Substring(0, percentIndex + 1).Trim();
-                    }
-                    if (message != "" && message != af.ReadyStatusText)
+                        if (message != af.ReadyStatusText)
+                        {
+                            af.ReadyStatusText = "Extracting - " + args2.Line.Substring(0, percentIndex + 1).Trim();
+                        }
+                    } else
                     {
-                        af.ReadyStatusText = "Extracting - " + args2.Line.Substring(0, percentIndex + 1).Trim();
+                        Log.Error("StdError from 7z: " + args2.Line.Trim());
                     }
                 }
                 else
@@ -643,11 +646,12 @@ namespace AlotAddOnGUI
                         ADDONFILES_TO_BUILD.Add(af);
                     }
 
-                    if (af.ALOTUpdateVersion == 0 && af.ALOTVersion == 0 && !af.UserFile && BUILD_ADDON_FILES)
+                    if (af.ALOTUpdateVersion == 0 && af.ALOTVersion == 0 && !af.UserFile && !af.MEUITM && BUILD_ADDON_FILES)
                     {
                         Log.Information("Adding AddonFile to build list: " + af.FriendlyName);
                         af.Building = true;
                         ADDONFILES_TO_BUILD.Add(af);
+
                     }
 
                     if (af.MEUITM && BUILD_MEUITM)
@@ -731,14 +735,12 @@ namespace AlotAddOnGUI
             }
             ERROR_OCCURED_PLEASE_STOP = false;
             KeyValuePair<AddonFile, bool>[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
-            bool fileFailed = false;
             foreach (KeyValuePair<AddonFile, bool> result in results)
             {
                 bool successful = result.Value;
                 AddonFile af = result.Key;
                 if (!successful)
                 {
-                    fileFailed = true;
                     Log.Error("Failed to extract " + af.GetFile());
                     if (af.FileMD5 != null && af.FileMD5 != "" && !af.UserFile && !af.IsCurrentlySingleFile())
                     {
@@ -1692,6 +1694,9 @@ namespace AlotAddOnGUI
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
 
+
+            Log.Information("Setting biogame directory to read-write");
+            Utilities.MakeAllFilesInDirReadWrite(Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\BIOGame");
             Log.Information("Files being installed in this installation session:");
             foreach (AddonFile af in ADDONFILES_TO_INSTALL)
             {

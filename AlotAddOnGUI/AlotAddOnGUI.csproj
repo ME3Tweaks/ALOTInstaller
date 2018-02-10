@@ -87,6 +87,9 @@
     <Reference Include="MahApps.Metro.IconPacks.Modern, Version=2.0.0.31, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.Modern.2.0.0\lib\net45\MahApps.Metro.IconPacks.Modern.dll</HintPath>
     </Reference>
+    <Reference Include="MahApps.Metro.SimpleChildWindow, Version=1.4.1.6, Culture=neutral, PublicKeyToken=bbbfdff7f500a992, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.SimpleChildWindow.1.4.1\lib\net45\MahApps.Metro.SimpleChildWindow.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
@@ -149,6 +152,7 @@
     </Page>
     <Compile Include="classes\ALOTVersionInfo.cs" />
     <Compile Include="classes\AddonFile.cs" />
+    <Compile Include="classes\ChoiceFile.cs" />
     <Compile Include="classes\CopyDir.cs" />
     <Compile Include="classes\DataConverters.cs" />
     <Compile Include="classes\FlashWindowHelper.cs" />

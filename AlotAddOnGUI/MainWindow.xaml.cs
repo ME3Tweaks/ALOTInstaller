@@ -586,7 +586,7 @@ namespace AlotAddOnGUI
                     var upload = await this.ShowMessageAsync("Previous installer session crashed", "The previous installer session crashed. Would you like to upload the log to help the developers fix it?", MessageDialogStyle.AffirmativeAndNegative, mds);
                     if (upload == MessageDialogResult.Affirmative)
                     {
-                        uploadLatestLog(true);
+                        await uploadLatestLog(true);
                     }
                 }
             }
@@ -1851,6 +1851,7 @@ namespace AlotAddOnGUI
                                 PackageFiles = e.Elements("packagefile")
                                     .Select(r => new PackageFile
                                     {
+                                        ChoiceTitle = "", //unused in this block
                                         SourceName = (string)r.Attribute("sourcename"),
                                         DestinationName = (string)r.Attribute("destinationname"),
                                         TPFSource = (string)r.Attribute("tpfsource"),
@@ -1861,6 +1862,25 @@ namespace AlotAddOnGUI
                                         ME2 = r.Attribute("me2") != null ? true : false,
                                         ME3 = r.Attribute("me3") != null ? true : false,
                                         Processed = false
+                                    }).ToList(),
+                                ChoiceFiles = e.Elements("choicefile")
+                                    .Select(q => new ChoiceFile
+                                    {
+                                        ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                        Choices = q.Elements("packagefile").Select(c => new PackageFile
+                                        {
+                                            ChoiceTitle = (string)c.Attribute("choicetitle"),
+                                            SourceName = (string)c.Attribute("sourcename"),
+                                            DestinationName = (string)c.Attribute("destinationname"),
+                                            TPFSource = (string)c.Attribute("tpfsource"),
+                                            MoveDirectly = c.Attribute("movedirectly") != null ? true : false,
+                                            CopyDirectly = c.Attribute("copydirectly") != null ? true : false,
+                                            Delete = c.Attribute("delete") != null ? true : false,
+                                            ME1 = c.Attribute("me1") != null ? true : false,
+                                            ME2 = c.Attribute("me2") != null ? true : false,
+                                            ME3 = c.Attribute("me3") != null ? true : false,
+                                            Processed = false
+                                        }).ToList()
                                     }).ToList(),
                             }).ToList();
                 if (!version.Equals(""))

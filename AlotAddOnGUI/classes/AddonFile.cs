@@ -237,6 +237,7 @@ namespace AlotAddOnGUI.classes
         public string DownloadLink { get; set; }
         public List<String> Duplicates { get; set; }
         public List<PackageFile> PackageFiles { get; set; }
+        public List<ChoiceFile> ChoiceFiles { get; set; }
         public string DownloadAssistantString
         {
             get

@@ -651,6 +651,18 @@ namespace AlotAddOnGUI
             }
             return null;
         }
+        private static FileAttributes RemoveAttribute(FileAttributes attributes, FileAttributes attributesToRemove)
+        {
+            return attributes & ~attributesToRemove;
+        }
+
+        public static void MakeAllFilesInDirReadWrite(string directory)
+        {
+            var di = new DirectoryInfo(directory);
+            foreach (var file in di.GetFiles("*", SearchOption.AllDirectories))
+                file.Attributes &= ~FileAttributes.ReadOnly;
+        }
+
 
         public static int runProcess(string exe, string args, bool standAlone = false)
         {
