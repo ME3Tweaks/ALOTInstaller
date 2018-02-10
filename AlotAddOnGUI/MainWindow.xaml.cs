@@ -682,8 +682,10 @@ namespace AlotAddOnGUI
                 Log.Error("MEMNoGui update extraction failed with code " + extractcode);
                 await this.ShowMessageAsync("MassEffectModderNoGui update failed", "MassEffectModderNoGui update failed. This program is used to install textures and other operations. The update will be attempted when the program is restarted.");
             }
-            Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEMNOGUI_DIR);
-
+            if (Directory.Exists(UPDATE_STAGING_MEMNOGUI_DIR))
+            {
+                Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEMNOGUI_DIR);
+            }
             File.Delete((string)kp.Value);
             await kp.Key.CloseAsync();
             if (File.Exists(BINARY_DIRECTORY + MEM_EXE_NAME))
@@ -719,7 +721,11 @@ namespace AlotAddOnGUI
                 ShowStatus("Error updating MEM", 4000);
                 // await this.ShowMessageAsync("MassEffectModderNoGui update failed", "MassEffectModderNoGui update failed. This program is used to install textures and other operations. The update will be attempted when the program is restarted.");
             }
-            Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEM_DIR);
+
+            if (Directory.Exists(UPDATE_STAGING_MEM_DIR))
+            {
+                Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEM_DIR);
+            }
 
             File.Delete((string)e.UserState);
             if (File.Exists(BINARY_DIRECTORY + "MassEffectModder.exe"))
