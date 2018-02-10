@@ -86,6 +86,7 @@ namespace AlotAddOnGUI
         private const string ERROR_FILE_REMOVED = "ERROR_FILE_REMOVED";
         private const string SETTINGSTR_SOUND = "PlayMusic";
         private const string SET_VISIBILE_ITEMS_LIST = "SET_VISIBILE_ITEMS_LIST";
+        private const int END_OF_PROCESS_POLL_INTERVAL = 100;
 
         public bool MusicIsPlaying { get; private set; }
 
@@ -95,7 +96,7 @@ namespace AlotAddOnGUI
             ConsoleApp ca = new ConsoleApp(MainWindow.BINARY_DIRECTORY + "7z.exe", args);
             ca.ConsoleOutput += (o, args2) =>
             {
-                if (args2.IsError && args2.Line.Trim() != "")
+                if (args2.IsError && args2.Line.Trim() != "" && !args2.Line.Trim().StartsWith("0M"))
                 {
                     int percentIndex = args2.Line.IndexOf("%");
                     string message = "";
@@ -1835,12 +1836,7 @@ namespace AlotAddOnGUI
                 Interlocked.Increment(ref INSTALL_STAGE); //unpack-dlcs does not output phase 
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
                 args = "-unpack-dlcs -ipc";
-                runMEM_Install(exe, args, InstallWorker);
-                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
-                {
-                    Thread.Sleep(250);
-                }
-
+                RunAndTimeMEM_Install(exe, args, InstallWorker);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0)
                 {
@@ -1863,11 +1859,7 @@ namespace AlotAddOnGUI
                 Log.Information("InstallWorker(): Performing texture scan, removing empty mipmaps, adding remaining markers");
 
                 args = "-scan-with-remove " + INSTALLING_THREAD_GAME + " -ipc";
-                runMEM_Install(exe, args, InstallWorker); //output's 2 phase's
-                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
-                {
-                    Thread.Sleep(250);
-                }
+                RunAndTimeMEM_Install(exe, args, InstallWorker);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
                 if (processResult != 0)
                 {
@@ -1898,11 +1890,8 @@ namespace AlotAddOnGUI
                 args += " -repack";
             }
             args += " -ipc";
-            runMEM_Install(exe, args, InstallWorker);
-            while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
-            {
-                Thread.Sleep(250);
-            }
+            RunAndTimeMEM_Install(exe, args, InstallWorker);
+
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
             if (processResult != 0)
             {
@@ -1941,12 +1930,7 @@ namespace AlotAddOnGUI
             {
                 CurrentTaskPercent = 0;
                 args = "-repack " + INSTALLING_THREAD_GAME + " -ipc";
-
-                runMEM_Install(exe, args, InstallWorker);
-                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
-                {
-                    Thread.Sleep(250);
-                }
+                RunAndTimeMEM_Install(exe, args, InstallWorker);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0)
                 {
@@ -1978,18 +1962,7 @@ namespace AlotAddOnGUI
             {
                 args += " -limit2k";
             }
-            //if (INSTALLING_THREAD_GAME == 1)
-            //{
-            //if (versionInfo != null && versionInfo.MEUITMVER > 0)
-            //{
-            //    args += " -meuitm-mode";
-            //}
-            //}
-            runMEM_Install(exe, args, InstallWorker);
-            while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
-            {
-                Thread.Sleep(250);
-            }
+            RunAndTimeMEM_Install(exe, args, InstallWorker);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
             if (processResult != 0)
             {
@@ -2003,11 +1976,7 @@ namespace AlotAddOnGUI
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, CurrentTask));
 
                 args = "-apply-me1-laa";
-                runMEM_Install(exe, args, InstallWorker);
-                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
-                {
-                    Thread.Sleep(250);
-                }
+                RunAndTimeMEM_Install(exe, args, InstallWorker);                
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0)
                 {
@@ -2148,6 +2117,21 @@ namespace AlotAddOnGUI
                 }
             }
             e.Result = INSTALL_OK;
+        }
+
+        private void RunAndTimeMEM_Install(string exe, string args, BackgroundWorker installWorker)
+        {
+            Stopwatch sw = Stopwatch.StartNew();
+            runMEM_Install(exe, args, InstallWorker);
+            while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+            {
+                Thread.Sleep(END_OF_PROCESS_POLL_INTERVAL);
+            }
+            sw.Stop();
+            int minutes = (int)sw.Elapsed.TotalMinutes;
+            double fsec = 60 * (sw.Elapsed.TotalMinutes - minutes);
+            int sec = (int)fsec;
+            Log.Information("Process complete - finished in " + minutes + " minutes "+ sec + " seconds");
         }
 
         private async void BuildWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)

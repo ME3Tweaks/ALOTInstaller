@@ -298,7 +298,7 @@ namespace AlotAddOnGUI
                             mds.NegativeButtonText = "Later";
                             mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
 
-                            MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Addon Builder " + releaseName + " is available. You are currently using version " + versInfo.ToString() + ".\n========================\n" + versionInfo + "\n" + latest.Body + "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative, mds);
+                            MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Installer " + releaseName + " is available. You are currently using version " + versInfo.ToString() + ".\n========================\n" + versionInfo + "\n" + latest.Body + "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative, mds);
                             if (result == MessageDialogResult.Affirmative)
                             {
                                 Log.Information("Downloading update for application");
