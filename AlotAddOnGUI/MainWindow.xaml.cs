@@ -235,7 +235,6 @@ namespace AlotAddOnGUI
                     string requiredFilesEndpoint = "https://vps.me3tweaks.com/alot/miscbin.zip".DownloadFileAsync(EXE_DIRECTORY + "Data", "miscbin.zip").Result;
                     ZipFile.ExtractToDirectory(EXE_DIRECTORY + "Data\\miscbin.zip", BINARY_DIRECTORY);
                     File.Delete(EXE_DIRECTORY + "Data\\miscbin.zip");
-                    throw new Exception("derp");
                 }
                 catch (Exception e)
                 {
