@@ -2391,6 +2391,15 @@ namespace AlotAddOnGUI
                 return;
             }
 
+            string gamedir = Utilities.GetGamePath(game);
+            if (gamedir == null)
+            {
+                //exe is missing? not sure how this could be null at this point.
+                Log.Error("Game directory is null - has the filesystem changed since the app was booted?");
+                await this.ShowMessageAsync("Cannot determine game path", "The game path cannot be determined - this is most likely a bug. Please report this issue to the developers on Discord (Settings -> Report an issue).");
+                return;
+            }
+
             var openFolder = new CommonOpenFileDialog();
             openFolder.IsFolderPicker = true;
             openFolder.Title = "Select backup destination";
@@ -2415,7 +2424,8 @@ namespace AlotAddOnGUI
                 await this.ShowMessageAsync("Directory is not empty", "The backup destination directory must be empty.");
                 return;
             }
-            if (Utilities.IsSubfolder(Utilities.GetGamePath(game), dir))
+            
+            if (Utilities.IsSubfolder(gamedir, dir))
             {
                 Log.Warning("User attempting to backup to subdirectory of backup source - not allowed because this will cause infinite recursion and will be deleted when restores are attempted");
                 await this.ShowMessageAsync("Directory is subdirectory of game", "Backup directories cannot be subfolders of the game directory. Choose a different directory.");
