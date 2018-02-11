@@ -107,7 +107,8 @@ namespace AlotAddOnGUI
                         {
                             af.ReadyStatusText = "Extracting - " + args2.Line.Substring(0, percentIndex + 1).Trim();
                         }
-                    } else
+                    }
+                    else
                     {
                         Log.Error("StdError from 7z: " + args2.Line.Trim());
                     }
@@ -408,38 +409,42 @@ namespace AlotAddOnGUI
                             }
                             File.Copy(extractSource, destination, true);
 
-                            Log.Information(prefix + " Extracting AddonFile (TPF)");
-                            string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                            string args = "-extract-tpf \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\" \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\"";
-                            Utilities.runProcess(exe, args);
-
-                            //Flatten Move files up to folder
-                            List<string> files = new List<string>();
-                            foreach (string file in Directory.EnumerateFiles(extractpath, "*.dds", SearchOption.AllDirectories))
+                            //extract files if we have any package files as we will need to obtain them.
+                            if (af.PackageFiles.Count > 0)
                             {
-                                files.Add(file);
-                            }
+                                Log.Information(prefix + " Extracting AddonFile (TPF)");
+                                string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
+                                string args = "-extract-tpf \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\" \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\"";
+                                Utilities.runProcess(exe, args);
 
-                            foreach (string file in files)
-                            {
-                                destination = extractpath + "\\" + Path.GetFileName(file);
-                                if (!destination.ToLower().Equals(file.ToLower()))
+                                //Flatten Move files up to folder
+                                List<string> files = new List<string>();
+                                foreach (string file in Directory.EnumerateFiles(extractpath, "*.dds", SearchOption.AllDirectories))
                                 {
-                                    //Log.Information("Deleting existing file (if any): " + extractpath + "\\" + Path.GetFileName(file));
-                                    if (File.Exists(destination))
+                                    files.Add(file);
+                                }
+
+                                //move up one dir so the directory is now flattened
+                                foreach (string file in files)
+                                {
+                                    destination = extractpath + "\\" + Path.GetFileName(file);
+                                    if (!destination.ToLower().Equals(file.ToLower()))
                                     {
-                                        Log.Information("Deleted existing file " + extractpath + "\\" + Path.GetFileName(file));
-                                        File.Delete(destination);
+                                        //Log.Information("Deleting existing file (if any): " + extractpath + "\\" + Path.GetFileName(file));
+                                        if (File.Exists(destination))
+                                        {
+                                            Log.Information("Deleted existing file " + extractpath + "\\" + Path.GetFileName(file));
+                                            File.Delete(destination);
+                                        }
+                                        Log.Information(file + " -> " + destination);
+                                        File.Move(file, destination);
                                     }
-                                    Log.Information(file + " -> " + destination);
-                                    File.Move(file, destination);
-                                }
-                                else
-                                {
-                                    Log.Information("File is already in correct place, no further processing necessary: " + extractpath + "\\" + Path.GetFileName(file));
+                                    else
+                                    {
+                                        Log.Information("File is already in correct place, no further processing necessary: " + extractpath + "\\" + Path.GetFileName(file));
+                                    }
                                 }
                             }
-
                             BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                             break;
                         }
@@ -735,7 +740,7 @@ namespace AlotAddOnGUI
                 threads--; //cores - 1
             }
             ERROR_OCCURED_PLEASE_STOP = false;
-            KeyValuePair<AddonFile, bool>[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
+            KeyValuePair<AddonFile, bool>[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(1).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
             foreach (KeyValuePair<AddonFile, bool> result in results)
             {
                 bool successful = result.Value;
@@ -759,7 +764,8 @@ namespace AlotAddOnGUI
                             Log.Error("This file cannot be used");
                             KeyValuePair<string, string> message = new KeyValuePair<string, string>("File for " + af.FriendlyName + " is corrupt", "An error occured extracting " + af.GetFile() + ". This file is corrupt. Delete this file and download a new copy of it.");
                             BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, message));
-                        } else
+                        }
+                        else
                         {
                             af.SetError();
                             af.ReadyStatusText = "Failed to extract";
@@ -850,6 +856,17 @@ namespace AlotAddOnGUI
                 {
                     continue;
                 }
+
+                if (af.CopyDirectly)
+                {
+                    string sourcefile = basepath + "\\" + af.BuildID + "\\" + Path.GetFileName(af.GetFile());
+                    string destination = stagingdirectory + Path.GetFileName(af.GetFile());
+
+                    Log.Information("Copy Directly for AddonFile: " + sourcefile + "->" + destination);
+                    File.Copy(sourcefile, destination, true);
+                    SHOULD_HAVE_OUTPUT_FILE = true;
+                }
+
                 if (af.PackageFiles.Count > 0)
                 {
                     foreach (PackageFile pf in af.PackageFiles)
@@ -866,7 +883,9 @@ namespace AlotAddOnGUI
                             }
                             else if (pf.DestinationName == null)
                             {
-                                Log.Error("File destination is null. This means there is a problem in the manifest or manifest parser. File: " + pf.SourceName);
+                                Log.Error("File destination is null. This means there is a problem in the manifest or manifest as a packagefile was not previously marked as processed and does not have destinationname assigned for the staging step. AddonFile: " + af.FriendlyName + ", PackageFile: " + pf.SourceName);
+                                af.SetError();
+                                af.ReadyStatusText = "Staged with errors";
                                 errorOccured = true;
                             }
                             else
@@ -887,6 +906,7 @@ namespace AlotAddOnGUI
             }
             bool hasUserFiles = false;
             bool hasAddonFiles = false;
+            List<AddonFile> AddonFilesToSetStatusFor = new List<AddonFile>();
             foreach (AddonFile af in ADDONFILES_TO_BUILD)
             {
                 if (af.ALOTUpdateVersion == 0 && af.ALOTVersion == 0 && !af.UserFile && !af.MEUITM)
@@ -915,8 +935,9 @@ namespace AlotAddOnGUI
                     if (pf.Processed != true)
                     {
                         requiresBuild = true;
-                        af.ReadyStatusText = "Building into Addon MEM file";
-                        af.SetWorking();
+                        af.ReadyStatusText = "Waiting for cleanup to complete";
+                        af.SetIdle();
+                        AddonFilesToSetStatusFor.Add(af); //set to building into mem file... after cleanup finishes
                         break;
                     }
                 }
@@ -949,6 +970,11 @@ namespace AlotAddOnGUI
             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
             Log.Information("[SIZE] AFTER_EXTRACTION_CLEANUP Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
 
+            foreach (AddonFile af in AddonFilesToSetStatusFor)
+            {
+                af.ReadyStatusText = "Building into Addon MEM file";
+                af.SetWorking();
+            }
             //BUILD MEM PACKAGE
             int mainBuildResult = SHOULD_HAVE_OUTPUT_FILE ? -2 : 0; //if we have no files just set return code for addon to 0
             if (SHOULD_HAVE_OUTPUT_FILE)
@@ -1331,7 +1357,8 @@ namespace AlotAddOnGUI
                     Log.Warning("User continuing even with non-vanilla backup.");
                     CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = false; //reset
                 }
-            } else
+            }
+            else
             {
                 Log.Information("Backup verification passed - no issues.");
             }
@@ -1981,7 +2008,7 @@ namespace AlotAddOnGUI
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_SUBTASK, CurrentTask));
 
                 args = "-apply-me1-laa";
-                RunAndTimeMEM_Install(exe, args, InstallWorker);                
+                RunAndTimeMEM_Install(exe, args, InstallWorker);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0)
                 {
@@ -2136,7 +2163,7 @@ namespace AlotAddOnGUI
             int minutes = (int)sw.Elapsed.TotalMinutes;
             double fsec = 60 * (sw.Elapsed.TotalMinutes - minutes);
             int sec = (int)fsec;
-            Log.Information("Process complete - finished in " + minutes + " minutes "+ sec + " seconds");
+            Log.Information("Process complete - finished in " + minutes + " minutes " + sec + " seconds");
         }
 
         private async void BuildWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -2367,17 +2394,17 @@ namespace AlotAddOnGUI
                         string param = str.Substring(endOfCommand + 5).Trim();
                         switch (command)
                         {
-                            //worker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
-                            //int percentInt = Convert.ToInt32(param);
-                            //worker.ReportProgress(percentInt);
-                            case "PROCESSING_FILE":
+                                //worker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+                                //int percentInt = Convert.ToInt32(param);
+                                //worker.ReportProgress(percentInt);
+                                case "PROCESSING_FILE":
                             case "PROCESSING_MOD":
                                 Log.Information("MEM Reports processing file: " + param);
-                                //worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
-                                break;
+                                    //worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
+                                    break;
                             case "OVERALL_PROGRESS":
-                            //This will be changed later
-                            case "TASK_PROGRESS":
+                                //This will be changed later
+                                case "TASK_PROGRESS":
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_TASK_PROGRESS, param));
                                 break;
                             case "PHASE":
@@ -2498,7 +2525,8 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("Exception deleting game directory: " + gamePath + ": " + ex.Message);
                 }
-            } else
+            }
+            else
             {
                 Log.Error("Game directory not found! Was it removed while the app was running?");
             }
@@ -2542,7 +2570,7 @@ namespace AlotAddOnGUI
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Restoring game from backup "));
             if (gamePath != null)
             {
-                Log.Information("Copying backup to game directory: "+ backupPath +" -> " + gamePath);
+                Log.Information("Copying backup to game directory: " + backupPath + " -> " + gamePath);
                 CopyDir.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(gamePath), BackupWorker, -1, 0);
                 Log.Information("Restore of game data has completed");
             }

@@ -586,6 +586,16 @@ namespace AlotAddOnGUI
                     if (upload == MessageDialogResult.Affirmative)
                     {
                         await uploadLatestLog(true);
+                        ShowStatus("Crash log uploaded");
+                    }
+                    mds = new MetroDialogSettings();
+                    mds.AffirmativeButtonText = "Join Discord";
+                    mds.NegativeButtonText = "Decline";
+                    mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                    var result = await this.ShowMessageAsync("Join the ALOT Discord to help troubleshoot?", "While crash logs are helpful, they doesn't always tell us everything we need to fix bugs. If we need more information, we would appreciate if you joined the ALOT Discord so we can gather some extra information from you to implement a fix.", MessageDialogStyle.AffirmativeAndNegative, mds);
+                    if (result == MessageDialogResult.Affirmative)
+                    {
+                        openWebPage("https://discord.gg/w4Smese");
                     }
                 }
             }
@@ -1829,6 +1839,7 @@ namespace AlotAddOnGUI
                                 Showing = false,
                                 Enabled = true,
                                 FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
+                                CopyDirectly = e.Element("file").Attribute("copydirectly") != null ? (bool)e.Element("file").Attribute("copydirectly") : false,
                                 MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
                                 MEUITMVer = e.Attribute("meuitmver") != null ? Convert.ToInt32((string)e.Attribute("meuitmver")) : 0,
                                 ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
@@ -2357,20 +2368,24 @@ namespace AlotAddOnGUI
 
         private async void BackupGame(int game)
         {
+            Log.Information("Start of UI thread BackupGame() for Mass Effect " + game);
             ALOTVersionInfo info = Utilities.GetInstalledALOTInfo(game);
             if (info != null)
             {
                 //Game is modified via ALOT flag
                 if (info.ALOTVER > 0)
                 {
+                    Log.Warning("ALOT is installed. Backup of ALOT installed game is not allowed.");
                     await this.ShowMessageAsync("ALOT is installed", "You cannot backup an installation that has ALOT already installed. If you have a backup, you can restore it by clicking the game backup button in the Settings menu. Otherwise, delete your game folder and redownload it.");
                 }
                 else if (info.MEUITMVER > 0)
                 {
+                    Log.Warning("MEUITM is installed. Backup of MEUITM installed game is not allowed.");
                     await this.ShowMessageAsync("MEUITM is installed", "You cannot backup an installation that has ALOT already installed. If you have a backup, you can restore it by clicking the game backup button in the Settings menu. Otherwise, delete your game folder and redownload it.");
                 }
                 else
                 {
+                    Log.Warning("ALOT or MEUITM is installed. Backup of ALOT or MEUITM installed game is not allowed.");
                     await this.ShowMessageAsync("ALOT is installed", "You cannot backup an installation that has ALOT already installed. If you have a backup, you can restore it by clicking the game backup button in the Settings menu. Otherwise, delete your game folder and redownload it.");
                 }
                 return;
@@ -2385,6 +2400,8 @@ namespace AlotAddOnGUI
             {
                 return;
             }
+            Log.Information("User has chosen directory for backup destination: "+openFolder.FileName);
+
             var dir = openFolder.FileName;
             if (!Directory.Exists(dir))
             {

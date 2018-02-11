@@ -270,6 +270,8 @@ namespace AlotAddOnGUI.classes
         public string FileMD5 { get; internal set; }
         public bool Optional { get; internal set; }
         private bool _enabled;
+        public bool CopyDirectly { get; internal set; }
+
         public bool Enabled
         {
             get { return _enabled; }

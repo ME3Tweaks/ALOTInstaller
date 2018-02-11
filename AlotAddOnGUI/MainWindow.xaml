@@ -7,6 +7,7 @@
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:simpleChildWindow="clr-namespace:MahApps.Metro.SimpleChildWindow;assembly=MahApps.Metro.SimpleChildWindow"
+    xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
     mc:Ignorable="d"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
@@ -67,19 +68,20 @@
         <Style TargetType="{x:Type ContentPresenter}">
             <Setter Property="Margin" Value="0,0,0,0" />
         </Style>
-    </Window.Resources>
-    <Dialog:CustomDialog x:Key="CustomDialogTest"
+        <Dialog:CustomDialog x:Key="CustomDialogTest"
                         Style="{StaticResource NewCustomDialogStyle}"
                         Title="This dialog allows arbitrary content. It will close in 5 seconds."
                         x:Name="CustomTestDialog">
-        <StackPanel>
-            <TextBlock Height="30"
+            <StackPanel>
+                <TextBlock Height="30"
                     Text="This dialog allows arbitrary content. You have to close it yourself by clicking the close button below."
                     TextWrapping="Wrap"
                     Foreground="{DynamicResource AccentColorBrush}" />
-            <Button Content="Close Me!" />
-        </StackPanel>
-    </Dialog:CustomDialog>
+                <Button Content="Close Me!" />
+            </StackPanel>
+        </Dialog:CustomDialog>
+    </Window.Resources>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
