@@ -21,6 +21,7 @@ using Microsoft.WindowsAPICodePack.Taskbar;
 using System.Management;
 using Microsoft.Win32;
 using MahApps.Metro.Controls.Dialogs;
+using System.Linq;
 
 namespace AlotAddOnGUI.ui
 {
@@ -312,6 +313,21 @@ namespace AlotAddOnGUI.ui
                         addDiagLine("Hash: " + BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower());
                     }
                 }
+                string d3d9file = Path.GetDirectoryName(exePath) + "\\d3d9.dll";
+                if (File.Exists(d3d9file))
+                {
+                    addDiagLine("~~~d3d9.dll exists - External dll is hooking via DirectX into game process");
+                }
+                string fpscounter = Path.GetDirectoryName(exePath) + @"\fpscounter\fpscounter.dll";
+                if (File.Exists(fpscounter))
+                {
+                    addDiagLine("~~~fpscounter.dll exists - FPS Counter plugin detected");
+                }
+                string dinput8 = Path.GetDirectoryName(exePath) + "\\dinput8.dll";
+                if (File.Exists(dinput8))
+                {
+                    addDiagLine("~~~dinput8.dll exists - External dll is hooking via input dll into game process");
+                }
             }
 
 
@@ -339,7 +355,6 @@ namespace AlotAddOnGUI.ui
                 addDiagLine("~~~Unable to get the read amount of physically installed ram. This may be a sign of impending hardware failure in the SMBIOS");
             }
             ManagementObjectSearcher objvide = new ManagementObjectSearcher("select * from Win32_VideoController");
-
             int vidCardIndex = 1;
             foreach (ManagementObject obj in objvide.Get())
             {
@@ -373,14 +388,13 @@ namespace AlotAddOnGUI.ui
 
                     }
                 }
-
                 addDiagLine("Memory: " + displayVal);
                 addDiagLine("DriverVersion: " + obj["DriverVersion"]);
                 vidCardIndex++;
             }
 
 
-            
+
             addDiagLine("===Latest MEMI Marker Information");
             if (avi == null)
             {
@@ -535,18 +549,26 @@ namespace AlotAddOnGUI.ui
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_FullCheck));
             }
 
-            addDiagLine("===Game Inventory");
+            addDiagLine("===Basegame mods");
             addDiagLine("Items in this block are only accurate if ALOT is not installed or items have been installed after ALOT.");
+            addDiagLine("If ALOT was installed, detection of mods in the basegame is not possible.");
+
             args = "-detect-mods " + DIAGNOSTICS_GAME + " -ipc";
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataBasegamemods));
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
             WaitForMEM();
+            string prefix = "";
+            if (MEMI_FOUND)
+            {
+                prefix = " - DIAG ERROR:";
+            }
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
-                addDiagLine("The following basegame mods were detected:");
+                
+                addDiagLine(prefix + "The following basegame mods were detected:");
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
-                    addDiagLine(" - " + str);
+                    addDiagLine(prefix + " - " + str);
                 }
             }
             else
@@ -660,6 +682,53 @@ namespace AlotAddOnGUI.ui
 
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataBasegamemods));
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_Upload));
+
+            //ME1: LOGS
+            if (DIAGNOSTICS_GAME == 1)
+            {
+                //GET LOGS
+                string logsdir = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + @"\BioWare\Mass Effect\Logs";
+                if (Directory.Exists(logsdir))
+                {
+                    DirectoryInfo info = new DirectoryInfo(logsdir);
+                    FileInfo[] files = info.GetFiles().Where(f => f.LastWriteTime > DateTime.Now.AddDays(-7)).OrderByDescending(p => p.LastWriteTime).ToArray();
+                    DateTime threeDaysAgo = DateTime.Now.AddDays(-3);
+                    Console.WriteLine("---");
+                    foreach (FileInfo file in files)
+                    {
+                        Console.WriteLine(file.Name + " " + file.LastWriteTime);
+                        var logLines = File.ReadAllLines(file.FullName);
+                        int crashIndex = 0;
+                        int index = 0;
+                        foreach (string line in logLines)
+                        {
+
+                            if (line.Contains("Critical: appError called"))
+                            {
+                                crashIndex = index;
+                                Log.Information("Found crash in ME1 log " + file.Name + " on line " + index);
+                                break;
+                            }
+                            index++;
+                        }
+
+                        if (crashIndex > 0)
+                        {
+                            crashIndex = Math.Max(0, crashIndex - 10);
+                            //this log has a crash
+                            addDiagLine("===Mass Effect crash log " + file.Name);
+                            if (crashIndex > 0)
+                            {
+                                addDiagLine("[CRASHLOG]...");
+                            }
+                            for (int i = crashIndex; i < logLines.Length; i++)
+                            {
+                                addDiagLine("[CRASHLOG]" + logLines[i]);
+                            }
+                        }
+                    }
+                }
+            }
 
             if (pairLog)
             {

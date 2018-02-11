@@ -739,8 +739,15 @@ namespace AlotAddOnGUI
             {
                 threads--; //cores - 1
             }
+            if (threads > 5)
+            {
+                threads = 5;
+            }
             ERROR_OCCURED_PLEASE_STOP = false;
-            KeyValuePair<AddonFile, bool>[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(1).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
+            Stopwatch sw = Stopwatch.StartNew();
+            KeyValuePair<AddonFile, bool>[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
+            sw.Stop();
+            Console.WriteLine(sw.Elapsed.TotalSeconds);
             foreach (KeyValuePair<AddonFile, bool> result in results)
             {
                 bool successful = result.Value;
@@ -1740,8 +1747,8 @@ namespace AlotAddOnGUI
             bool RemoveMipMaps = (versionInfo == null); //remove mipmaps only if alot is not installed
             if (INSTALLING_THREAD_GAME == 1)
             {
-                REPACK_GAME_FILES = true;
-                STAGE_COUNT = 5; //scan/remove/install/save/repack
+                REPACK_GAME_FILES = false;
+                STAGE_COUNT = 4; //scan/remove/install/save
             }
             else if (INSTALLING_THREAD_GAME == 2)
             {
@@ -1878,7 +1885,6 @@ namespace AlotAddOnGUI
                     InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
                     return;
                 }
-                Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
                 overallProgress = ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
                 InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
                 //Interlocked.Increment(ref INSTALL_STAGE);
@@ -1901,7 +1907,7 @@ namespace AlotAddOnGUI
                     InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
                     return;
                 }
-                Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
+                Log.Warning("Stage " + INSTALL_STAGE + " has completed.");
                 overallProgress = ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
                 InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
                 //scan with remove or install textures will increment this
@@ -1954,7 +1960,7 @@ namespace AlotAddOnGUI
                 InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
                 return;
             }
-            Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
+            Log.Warning("Stage " + INSTALL_STAGE + " has completed.");
             ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
             InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
 
@@ -1975,6 +1981,7 @@ namespace AlotAddOnGUI
                     InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
                     return;
                 }
+                Log.Warning("Stage " + INSTALL_STAGE + " has completed.");
             }
 
 
@@ -2404,7 +2411,7 @@ namespace AlotAddOnGUI
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_TASK_PROGRESS, param));
                                 break;
                             case "PHASE":
-                                Log.Warning("[TASK TIMING] End of stage " + INSTALL_STAGE + " " + stopwatch.ElapsedMilliseconds);
+                                Log.Warning("Stage " + INSTALL_STAGE + " has completed.");
                                 int overallProgress = ProgressWeightPercentages.SubmitProgress(INSTALL_STAGE, 100);
                                 worker.ReportProgress(completed, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
                                 Interlocked.Increment(ref INSTALL_STAGE);
