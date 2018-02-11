@@ -8,7 +8,7 @@
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2.7z" size="2974978097" md5="3e33c8e2e3ded44a2c15742fd6dfac07" />
     <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
 	<choicefile choicetitle="Asari Face Style">
-		<packagefile me1="true" sourcename="MEUITM\mods\AsariSmooth.mem" movedirectly="true" "Smooth"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\AsariSmooth.mem" movedirectly="true" choicetitle="Smooth"/>
    		<packagefile me1="true" sourcename="MEUITM\mods\Asari.mem" movedirectly="true" choicetitle="High detail"/>
 	</choicefile>
 	<packagefile me1="true" sourcename="MEUITM\mods\Ash Face.mem" movedirectly="true" />
@@ -28,10 +28,9 @@
 	    <packagefile me1="true" sourcename="MEUITM\mods\Eyes_Vanillastyle.mem" movedirectly="true" />
 		<packagefile me1="true" sourcename="MEUITM\mods\Eyes_Vibrant.mem" movedirectly="true" />
 	</choicefile>
-	
 	<choicefile choicetitle="FemShep Style">
-		<packagefile me1="true" sourcename="MEUITM\mods\FemShep.mem" movedirectly="true" "CDAMJC Cut"/>
-		<packagefile me1="true" sourcename="MEUITM\mods\FemShepOM.mem" movedirectly="true" choice="Original MEUITM"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\FemShep.mem" movedirectly="true" choicetitle="CDAMJC Cut"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\FemShepOM.mem" movedirectly="true" choicetitle="Original MEUITM"/>
 		<packagefile me1="true" sourcename="MEUITM\mods\FemShepVS.mem" movedirectly="true" choicetitle="Vanilla"/>
 	</choicefile>
     <packagefile me1="true" sourcename="MEUITM\mods\Feros.mem" movedirectly="true" />
@@ -77,7 +76,7 @@
 	<packagefile me1="true" sourcename="MEUITM\mods\Virmire.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\volus.mem" movedirectly="true" />
 	<choicefile choicetitle="Wrex Style">
-		<packagefile me1="true" sourcename="MEUITM\mods\WrexVS.mem" movedirectly="true "choicetitle="Vanilla" />
+		<packagefile me1="true" sourcename="MEUITM\mods\WrexVS.mem" movedirectly="true" choicetitle="Vanilla" />
 		<packagefile me1="true" sourcename="MEUITM\mods\WrexVS.mem" movedirectly="true" choicetitle="Battle hardened"/>
 	</choicefile>
   </addonfile>
