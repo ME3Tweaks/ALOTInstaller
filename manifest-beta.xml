@@ -97,12 +97,10 @@
     <packagefile me3="true" sourcename="ALOT_ME3_v6.mem" movedirectly="true" />
   </addonfile>
   <addonfile friendlyname="Better Hair Textures" author="heleuss" optional="true">
-    <file downloadlink="https://www.dropbox.com/s/enyzgfewu9sk4lp/ME1_Better%20Hair.tpf?dl=0" filename="ME1_Better Hair.tpf" size="27879592" md5="3817491d7842a65b7fb6736fc6f1dfa1" />
-    <packagefile me1="true" sourcename="ME1_Better Hair.tpf" movedirectly="true" />
+    <file downloadlink="https://www.dropbox.com/s/enyzgfewu9sk4lp/ME1_Better%20Hair.tpf?dl=0" filename="ME1_Better Hair.tpf" size="27879592" md5="3817491d7842a65b7fb6736fc6f1dfa1" copydirectly="true"/>
   </addonfile>
   <addonfile friendlyname="Better Hair Textures" author="heleuss" optional="true">
-    <file downloadlink="http://heleuss.tumblr.com/post/156937764524/me1-me2-better-hair-textures-oldie-but-goodie" filename="ME2 Better Hair.tpf" size="25923956" md5="57f20a3e21efa375d823dbbe72c1986e" />
-    <packagefile me2="true" sourcename="ME2 Better Hair.tpf" movedirectly="true" />
+    <file downloadlink="http://heleuss.tumblr.com/post/156937764524/me1-me2-better-hair-textures-oldie-but-goodie" filename="ME2 Better Hair.tpf" size="25923956" md5="57f20a3e21efa375d823dbbe72c1986e" copydirectly="true"/>  
   </addonfile>
   <addonfile friendlyname="FemShep High Quality textures" author="heleuss" optional="true">
     <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
