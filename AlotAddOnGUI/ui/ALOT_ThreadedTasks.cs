@@ -1434,8 +1434,8 @@ namespace AlotAddOnGUI
             {
                 case 1:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x77, 0, 0, 0));
-                    Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Visible;
-                    LODLIMIT = 0;
+                    Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Collapsed;
+                    //LODLIMIT = 0;
                     break;
                 case 2:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x55, 0, 0, 0));
@@ -1990,10 +1990,6 @@ namespace AlotAddOnGUI
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT, CurrentTask));
 
             args = "-apply-lods-gfx " + INSTALLING_THREAD_GAME;
-            if (LODLIMIT == 2)
-            {
-                args += " -limit2k";
-            }
             RunAndTimeMEM_Install(exe, args, InstallWorker);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
             if (processResult != 0)

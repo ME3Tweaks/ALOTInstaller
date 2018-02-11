@@ -125,7 +125,7 @@ namespace AlotAddOnGUI
         private bool _showME2Files = true;
         private bool _showME3Files = true;
         private bool Loading = true;
-        private int LODLIMIT = 0;
+        //private int LODLIMIT = 0;
         private FrameworkElement[] fadeInItems;
         private List<FrameworkElement> currentFadeInItems = new List<FrameworkElement>();
         private bool ShowReadyFilesOnly = false;
@@ -3412,13 +3412,13 @@ namespace AlotAddOnGUI
 
         private void Button_InstallerLOD4k_Click(object sender, RoutedEventArgs e)
         {
-            LODLIMIT = 4;
+            //LODLIMIT = 4;
             Panel_ME1LODLimit.Visibility = Visibility.Collapsed;
         }
 
         private void Button_InstallerLOD2k_Click(object sender, RoutedEventArgs e)
         {
-            LODLIMIT = 2;
+            //LODLIMIT = 2;
             Panel_ME1LODLimit.Visibility = Visibility.Collapsed;
         }
 
@@ -4093,12 +4093,12 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void Button_ConfigureMod(object sender, RoutedEventArgs e)
+        private void Button_ConfigureMod_Click(object sender, RoutedEventArgs e)
         {
             var rowIndex = ListView_Files.SelectedIndex;
             var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
             AddonFile af = (AddonFile)row.DataContext;
-            ChildWindow_ConfigMod.IsOpen = true;
+            
         }
     }
 }

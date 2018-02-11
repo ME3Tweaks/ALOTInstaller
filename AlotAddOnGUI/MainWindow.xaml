@@ -163,7 +163,7 @@
                             <Border x:Name="GameIcon_Optional" Visibility="Collapsed" ToolTip="This file is optional" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#FF156095" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_Optional_Text" FontSize="10"  Text="Optional" VerticalAlignment="Center"/>
                             </Border>
-                            <Button Margin="10,0,0,0" Padding="0,0,0,5" Content="Configure" Style="{StaticResource LinkLabel}" Click="Button_ConfigureMod"/>
+                            <Button x:Name="Button_ConfigureMod" Margin="10,1,0,0" Padding="0,0,0,6" Content="Configure" Style="{StaticResource LinkLabel}" Click="Button_ConfigureMod_Click"/>
                         </StackPanel>
 
                         <StackPanel  HorizontalAlignment="Left" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal">
@@ -233,7 +233,12 @@
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="ReadyStatusText" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger>
+                        <DataTrigger Binding="{Binding ChoiceFiles.Count}" Value="0">
+                            <Setter TargetName="Button_ConfigureMod" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+
                     </DataTemplate.Triggers>
+                    
                 </DataTemplate>
             </ListView.ItemTemplate>
 

@@ -9,9 +9,8 @@
         BorderThickness="1"
         Title="Diagnostics" Height="300" Width="350"
         WindowStartupLocation="CenterOwner">
-    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-        <TextBlock x:Name="DiagnosticHeader" Text="Select which game you are generating diagnostics for." HorizontalAlignment="Center" TextAlignment="Center"/>
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+    <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
             <Button x:Name="Button_ManualFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="5" Click="Button_DiagnosticsME1_Click" ToolTip="Click to perform diagnostic on Mass Effect">
                 <Image Source="../images/logo_me1.png" Height="40" Margin="4"/>
             </Button>
@@ -21,10 +20,14 @@
             <Button x:Name="Button_ManualFileME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="5" Click="Button_DiagnosticsME3_Click" ToolTip="Click to perform diagnostic on Mass Effect 3">
                 <Image Source="../images/logo_me3.png" Height="40" Margin="4"/>
             </Button>
+            <Image x:Name="Image_DiagME1" Source="../images/logo_me1.png" Height="40" Margin="4" Visibility="Collapsed"/>
+            <Image x:Name="Image_DiagME2" Source="../images/logo_me2.png" Height="40" Margin="4" Visibility="Collapsed"/>
+            <Image x:Name="Image_DiagME3" Source="../images/logo_me3.png" Height="40" Margin="4" Visibility="Collapsed"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="Panel_DiagnosticsTypes" Visibility="Collapsed">
             <Button x:Name="Button_QuickDiagnostic" Content="quick diagnostic" ToolTip="Performs a quick game diagnostic with single file tests.&#10;Should not take longer than a minute to complete.&#10;Select this one if you don't know which one to choose." HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Margin="3" Click="QuickDiagnostic_Click"/>
             <Button x:Name="Button_FullDiagnostic" Content="full diagnostic" ToolTip="Performs a full game diagnostic with texture scan.&#10;Will take several minutes to complete.&#10;Select this one only if requested by an ALOT Team Member." HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Margin="3"  Click="FullDiagnostic_Click"/>
+            <TextBlock x:Name="TextBlock_DiagnosticType" Text="QUICK DIAGNOSTIC" FontSize="15" Margin="5,5,5,5" Visibility="Collapsed"/>
         </StackPanel>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Visibility="Collapsed" x:Name="Panel_Progress">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="8,0,0,0">
@@ -55,7 +58,9 @@
             </StackPanel>
             
             <Button x:Name="Button_Close" Visibility="Hidden" Content="Close" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Margin="8" Click="CloseButton_Click"/>
-        
+
         </StackPanel>
+        <TextBlock x:Name="DiagnosticHeader" Text="Select which game you are generating diagnostics for." HorizontalAlignment="Center" TextAlignment="Center"/>
+
     </StackPanel>
 </Controls:MetroWindow>

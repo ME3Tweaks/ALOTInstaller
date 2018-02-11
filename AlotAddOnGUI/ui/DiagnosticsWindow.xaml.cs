@@ -87,27 +87,30 @@ namespace AlotAddOnGUI.ui
             Button_ManualFileME3.ToolTip = "Diagnostic will be run on Mass Effect 3";
             Button_ManualFileME1.Visibility = Visibility.Collapsed;
             Button_ManualFileME2.Visibility = Visibility.Collapsed;
-            Button_ManualFileME3.Click -= Button_DiagnosticsME3_Click;
+            Button_ManualFileME3.Visibility = Visibility.Collapsed;
+            Image_DiagME3.Visibility = Visibility.Visible;
             DIAGNOSTICS_GAME = 3;
             ShowDiagnosticTypes();
         }
 
         private void Button_DiagnosticsME1_Click(object sender, RoutedEventArgs e)
         {
-            Button_ManualFileME1.ToolTip = "Diagnostic will be run on Mass Effect";
+            Image_DiagME1.ToolTip = "Diagnostic will be run on Mass Effect";
+            Button_ManualFileME1.Visibility = Visibility.Collapsed;
             Button_ManualFileME2.Visibility = Visibility.Collapsed;
             Button_ManualFileME3.Visibility = Visibility.Collapsed;
-            Button_ManualFileME1.Click -= Button_DiagnosticsME1_Click;
+            Image_DiagME1.Visibility = Visibility.Visible;
             DIAGNOSTICS_GAME = 1;
             ShowDiagnosticTypes();
         }
 
         private void Button_DiagnosticsME2_Click(object sender, RoutedEventArgs e)
         {
-            Button_ManualFileME2.ToolTip = "Diagnostic will be run on Mass Effect 2";
+            Image_DiagME2.ToolTip = "Diagnostic will be run on Mass Effect 2";
             Button_ManualFileME1.Visibility = Visibility.Collapsed;
+            Button_ManualFileME2.Visibility = Visibility.Collapsed;
             Button_ManualFileME3.Visibility = Visibility.Collapsed;
-            Button_ManualFileME2.Click -= Button_DiagnosticsME2_Click;
+            Image_DiagME2.Visibility = Visibility.Visible;
             DIAGNOSTICS_GAME = 2;
             ShowDiagnosticTypes();
         }
@@ -193,7 +196,7 @@ namespace AlotAddOnGUI.ui
                     TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
                     break;
                 case UPLOAD_LINKED_LOG:
-                    LINKEDLOGURL = await ((MainWindow)(Owner)).uploadLatestLog(false,false);
+                    LINKEDLOGURL = await ((MainWindow)(Owner)).uploadLatestLog(false, false);
                     ((EventWaitHandle)(tc.Data)).Set();
                     break;
                 case SHOW_DIALOG_BAD_LOD:
@@ -278,9 +281,10 @@ namespace AlotAddOnGUI.ui
             var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
             int fileVersion = versInfo.FileMajorPart;
             addDiagLine("Using MassEffectModderNoGui v" + fileVersion);
-
             addDiagLine("Game is installed at " + Utilities.GetGamePath(DIAGNOSTICS_GAME));
 
+            ALOTVersionInfo avi = Utilities.GetInstalledALOTInfo(DIAGNOSTICS_GAME);
+            MEMI_FOUND = avi != null;
 
             string exePath = Utilities.GetGameEXEPath(DIAGNOSTICS_GAME);
             if (File.Exists(exePath))
@@ -376,12 +380,11 @@ namespace AlotAddOnGUI.ui
             }
 
 
-            ALOTVersionInfo avi = Utilities.GetInstalledALOTInfo(DIAGNOSTICS_GAME);
+            
             addDiagLine("===Latest MEMI Marker Information");
             if (avi == null)
             {
                 addDiagLine("ALOT Marker file does not have MEMI tag. ALOT/MEUITM not installed, or at least not installed through an installer.");
-                MEMI_FOUND = false;
             }
             else
             {
@@ -1078,15 +1081,19 @@ namespace AlotAddOnGUI.ui
 
         private void FullDiagnostic_Click(object sender, RoutedEventArgs e)
         {
+            Button_FullDiagnostic.Visibility = Visibility.Collapsed;
             Button_QuickDiagnostic.Visibility = Visibility.Collapsed;
-            Button_FullDiagnostic.Click -= FullDiagnostic_Click;
+            TextBlock_DiagnosticType.Text = "FULL DIAGNOSTIC";
+            TextBlock_DiagnosticType.Visibility = Visibility.Visible;
             RunDiagnostics(DIAGNOSTICS_GAME, true);
         }
 
         private void QuickDiagnostic_Click(object sender, RoutedEventArgs e)
         {
             Button_FullDiagnostic.Visibility = Visibility.Collapsed;
-            Button_QuickDiagnostic.Click -= QuickDiagnostic_Click;
+            Button_QuickDiagnostic.Visibility = Visibility.Collapsed;
+            TextBlock_DiagnosticType.Text = "QUICK DIAGNOSTIC";
+            TextBlock_DiagnosticType.Visibility = Visibility.Visible;
             RunDiagnostics(DIAGNOSTICS_GAME, false);
         }
 
