@@ -68,6 +68,18 @@
             <Setter Property="Margin" Value="0,0,0,0" />
         </Style>
     </Window.Resources>
+    <Dialog:CustomDialog x:Key="CustomDialogTest"
+                        Style="{StaticResource NewCustomDialogStyle}"
+                        Title="This dialog allows arbitrary content. It will close in 5 seconds."
+                        x:Name="CustomTestDialog">
+        <StackPanel>
+            <TextBlock Height="30"
+                    Text="This dialog allows arbitrary content. You have to close it yourself by clicking the close button below."
+                    TextWrapping="Wrap"
+                    Foreground="{DynamicResource AccentColorBrush}" />
+            <Button Content="Close Me!" />
+        </StackPanel>
+    </Dialog:CustomDialog>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -80,6 +92,7 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <simpleChildWindow:ChildWindow
+                x:Name="ChildWindow_ConfigMod"
                  IsOpen="False"
                  HorizontalContentAlignment="Stretch"
                  VerticalContentAlignment="Stretch"
@@ -148,6 +161,7 @@
                             <Border x:Name="GameIcon_Optional" Visibility="Collapsed" ToolTip="This file is optional" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#FF156095" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_Optional_Text" FontSize="10"  Text="Optional" VerticalAlignment="Center"/>
                             </Border>
+                            <Button Margin="10,0,0,0" Padding="0,0,0,5" Content="Configure" Style="{StaticResource LinkLabel}" Click="Button_ConfigureMod"/>
                         </StackPanel>
 
                         <StackPanel  HorizontalAlignment="Left" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal">
@@ -318,7 +332,7 @@
                             <StackPanel HorizontalAlignment="Left">
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                     <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME1" Content="ME1: Not Installed"/>
-                                    <Button Margin="10,0,0,0" Padding="0,0,0,5" x:Name="Button_ME1_ShowLODOptions" Content="Change texture quality" ToolTip="Change quality of textures for ME1 to suit your performance needs" Style="{StaticResource LinkLabel}" Click="Button_ToggleME1LODPanel"/>
+                                    <!-- <Button Margin="10,0,0,0" Padding="0,0,0,5" x:Name="Button_ME1_ShowLODOptions" Content="Change texture quality" ToolTip="Change quality of textures for ME1 to suit your performance needs" Style="{StaticResource LinkLabel}" Click="Button_ToggleME1LODPanel"/> -->
                                 </StackPanel>
                                 <StackPanel x:Name="Panel_SettingsME1LOD" Orientation="Horizontal" Visibility="Collapsed">
                                     <Button x:Name="Button_ME12K" Margin="20,0,5,0" FontSize="12" Content="2K Textures" ToolTip="2K textures are slightly lower quality than 4K textures,&#10;but the engine should not hiccup during cutscenes." Click="Button_ME12K_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>

@@ -1718,7 +1718,7 @@ namespace AlotAddOnGUI
             Label_ALOTStatus_ME2.ToolTip = me2ToolTip;
             Label_ALOTStatus_ME3.ToolTip = me3ToolTip;
 
-            Button_ME1_ShowLODOptions.Visibility = (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER > 0) ? Visibility.Visible : Visibility.Collapsed;
+            //Button_ME1_ShowLODOptions.Visibility = (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER > 0) ? Visibility.Visible : Visibility.Collapsed;
 
             foreach (AddonFile af in alladdonfiles)
             {
@@ -3399,7 +3399,7 @@ namespace AlotAddOnGUI
         {
             Log.Information("Using 2K textures for ME1 (button click)");
             Panel_SettingsME1LOD.Visibility = Visibility.Collapsed;
-            Button_ME1_ShowLODOptions.Content = "Using 2K Textures";
+            //Button_ME1_ShowLODOptions.Content = "Using 2K Textures";
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "-apply-lods-gfx 1 -limit2k";
             Utilities.runProcess(exe, args, true);
@@ -3408,7 +3408,7 @@ namespace AlotAddOnGUI
         private void Button_ME14K_Click(object sender, RoutedEventArgs e)
         {
             Panel_SettingsME1LOD.Visibility = Visibility.Collapsed;
-            Button_ME1_ShowLODOptions.Content = "Using 4K Textures";
+            //Button_ME1_ShowLODOptions.Content = "Using 4K Textures";
             Log.Information("Using 4K textures for ME1 (button click)");
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "-apply-lods-gfx 1";
@@ -4064,6 +4064,14 @@ namespace AlotAddOnGUI
                     ShowStatus("No outdated files were found", 4000);
                 }
             }
+        }
+
+        private void Button_ConfigureMod(object sender, RoutedEventArgs e)
+        {
+            var rowIndex = ListView_Files.SelectedIndex;
+            var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
+            AddonFile af = (AddonFile)row.DataContext;
+            ChildWindow_ConfigMod.IsOpen = true;
         }
     }
 }

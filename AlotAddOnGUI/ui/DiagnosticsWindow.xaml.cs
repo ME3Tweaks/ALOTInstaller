@@ -288,6 +288,19 @@ namespace AlotAddOnGUI.ui
                 versInfo = FileVersionInfo.GetVersionInfo(exePath);
                 addDiagLine("===Executable information");
                 addDiagLine("Version: " + versInfo.FileMajorPart + "." + versInfo.FileMinorPart + "." + versInfo.FileBuildPart + "." + versInfo.FilePrivatePart);
+                if (DIAGNOSTICS_GAME == 1)
+                {
+                    bool me1LAAEnabled = Utilities.GetME1LAAEnabled();
+                    if (MEMI_FOUND && !me1LAAEnabled)
+                    {
+                        addDiagLine(" - DIAG ERROR: Large Address Aware: " + me1LAAEnabled + " - ALOT/MEUITM is installed - this will almost certainly cause crashes");
+                    }
+                    else
+                    {
+                        addDiagLine("Large Address Aware: " + me1LAAEnabled);
+                    }
+                }
+
                 using (var md5 = MD5.Create())
                 {
                     using (var stream = File.OpenRead(exePath))

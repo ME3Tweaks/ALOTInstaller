@@ -382,6 +382,23 @@ namespace AlotAddOnGUI
             return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
         }
 
+        public static bool GetME1LAAEnabled()
+        {
+            string exePath = Utilities.GetGameEXEPath(1);
+            if (File.Exists(exePath))
+            {
+                using (FileStream fs = new FileStream(exePath, FileMode.Open, FileAccess.Read))
+                {
+                    fs.JumpTo(0x3C); // jump to offset of COFF header
+                    uint offset = fs.ReadUInt32() + 4; // skip PE signature too
+                    fs.JumpTo(offset + 0x12); // jump to flags entry
+                    ushort flag = fs.ReadUInt16(); // read flags
+                    return (flag & 0x20) == 0x20; // check for LAA flag
+                }
+            }
+            return false;
+        }
+
         public static bool DeleteFilesAndFoldersRecursively(string target_dir)
         {
             bool result = true;

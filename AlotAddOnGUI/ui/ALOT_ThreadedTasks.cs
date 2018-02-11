@@ -1302,8 +1302,8 @@ namespace AlotAddOnGUI
             {
                 Thread.Sleep(250);
             }
-            int buildresult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-            if (buildresult != 0)
+            int backupVerifyResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+            if (backupVerifyResult != 0)
             {
                 string modified = "";
                 string gameDir = Utilities.GetGamePath(BACKUP_THREAD_GAME);
@@ -1311,6 +1311,7 @@ namespace AlotAddOnGUI
                 {
                     modified += "\n - " + error.Remove(0, gameDir.Length + 1);
                 }
+                Log.Warning("Backup verification failed. Allowing user to choose to continue or not");
                 ThreadCommandDialogOptions tcdo = new ThreadCommandDialogOptions();
                 tcdo.signalHandler = new EventWaitHandle(false, EventResetMode.AutoReset);
                 tcdo.title = "Game is modified";
@@ -1327,8 +1328,12 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
+                    Log.Warning("User continuing even with non-vanilla backup.");
                     CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = false; //reset
                 }
+            } else
+            {
+                Log.Information("Backup verification passed - no issues.");
             }
             string gamePath = Utilities.GetGamePath(BACKUP_THREAD_GAME);
             string[] ignoredExtensions = { ".wav", ".pdf", ".bak" };
@@ -2493,6 +2498,9 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("Exception deleting game directory: " + gamePath + ": " + ex.Message);
                 }
+            } else
+            {
+                Log.Error("Game directory not found! Was it removed while the app was running?");
             }
 
             Log.Information("Reverting lod settings");
@@ -2507,6 +2515,7 @@ namespace AlotAddOnGUI
             else
             {
                 //Must have admin rights.
+                Log.Information("We need admin rights to create this directory");
                 exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
                 args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" -create-directory \"" + gamePath.TrimEnd('\\') + "\"";
                 int result = Utilities.runProcessAsAdmin(exe, args);
@@ -2516,6 +2525,8 @@ namespace AlotAddOnGUI
                 }
                 else if (result == Utilities.WIN32_EXCEPTION_ELEVATED_CODE)
                 {
+                    Log.Information("Elevated process returned exception code, user probably declined prompt");
+
                     e.Result = false;
                     return;
                 }
@@ -2531,7 +2542,9 @@ namespace AlotAddOnGUI
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, "Restoring game from backup "));
             if (gamePath != null)
             {
+                Log.Information("Copying backup to game directory: "+ backupPath +" -> " + gamePath);
                 CopyDir.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(gamePath), BackupWorker, -1, 0);
+                Log.Information("Restore of game data has completed");
             }
             if (BACKUP_THREAD_GAME == 3)
             {
@@ -2540,6 +2553,7 @@ namespace AlotAddOnGUI
                 string file = gamePath + "\\cmm_vanilla";
                 if (File.Exists(file))
                 {
+                    Log.Information("Removing cmm_vanilla file");
                     File.Delete(file);
                 }
             }
