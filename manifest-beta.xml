@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.0.0">
+<alotaddonmanifest version="5.0.3">
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps."/>
@@ -8,7 +8,7 @@
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2.7z" size="2974978097" md5="3e33c8e2e3ded44a2c15742fd6dfac07" />
     <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
 	<choicefile choicetitle="Asari Face Style">
-		<packagefile me1="true" sourcename="MEUITM\mods\AsariSmooth.mem" movedirectly="true" "Smooth"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\AsariSmooth.mem" movedirectly="true" choicetitle="Smooth"/>
    		<packagefile me1="true" sourcename="MEUITM\mods\Asari.mem" movedirectly="true" choicetitle="High detail"/>
 	</choicefile>
 	<packagefile me1="true" sourcename="MEUITM\mods\Ash Face.mem" movedirectly="true" />
@@ -28,10 +28,9 @@
 	    <packagefile me1="true" sourcename="MEUITM\mods\Eyes_Vanillastyle.mem" movedirectly="true" />
 		<packagefile me1="true" sourcename="MEUITM\mods\Eyes_Vibrant.mem" movedirectly="true" />
 	</choicefile>
-	
 	<choicefile choicetitle="FemShep Style">
-		<packagefile me1="true" sourcename="MEUITM\mods\FemShep.mem" movedirectly="true" "CDAMJC Cut"/>
-		<packagefile me1="true" sourcename="MEUITM\mods\FemShepOM.mem" movedirectly="true" choice="Original MEUITM"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\FemShep.mem" movedirectly="true" choicetitle="CDAMJC Cut"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\FemShepOM.mem" movedirectly="true" choicetitle="Original MEUITM"/>
 		<packagefile me1="true" sourcename="MEUITM\mods\FemShepVS.mem" movedirectly="true" choicetitle="Vanilla"/>
 	</choicefile>
     <packagefile me1="true" sourcename="MEUITM\mods\Feros.mem" movedirectly="true" />
@@ -77,7 +76,7 @@
 	<packagefile me1="true" sourcename="MEUITM\mods\Virmire.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\volus.mem" movedirectly="true" />
 	<choicefile choicetitle="Wrex Style">
-		<packagefile me1="true" sourcename="MEUITM\mods\WrexVS.mem" movedirectly="true "choicetitle="Vanilla" />
+		<packagefile me1="true" sourcename="MEUITM\mods\WrexVS.mem" movedirectly="true" choicetitle="Vanilla" />
 		<packagefile me1="true" sourcename="MEUITM\mods\WrexVS.mem" movedirectly="true" choicetitle="Battle hardened"/>
 	</choicefile>
   </addonfile>
@@ -96,6 +95,26 @@
   <addonfile alotversion="6" friendlyname="ALOT for ME3 6.0 - Textures" tooltipname="ALOT for ME3 6.0 - Textures" author="CreeperLava">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" filename="ALOT for ME3 - Textures-363-2018-6-0.zip" unpackedsinglefilename="ALOT_ME3_v6.mem" size="5789453175" md5="2915d3d37ebe655defb541b974a7fa72" />
     <packagefile me3="true" sourcename="ALOT_ME3_v6.mem" movedirectly="true" />
+  </addonfile>
+  <addonfile friendlyname="Better Hair Textures" author="heleuss" optional="true">
+    <file downloadlink="https://www.dropbox.com/s/enyzgfewu9sk4lp/ME1_Better%20Hair.tpf?dl=0" filename="ME1_Better Hair.tpf" size="27879592" md5="3817491d7842a65b7fb6736fc6f1dfa1" copydirectly="true"/>
+    <games me1="true" me2="false" me3="false"/>
+  </addonfile>
+  <addonfile friendlyname="Better Hair Textures" author="heleuss" optional="true">
+    <file downloadlink="http://heleuss.tumblr.com/post/156937764524/me1-me2-better-hair-textures-oldie-but-goodie" filename="ME2 Better Hair.tpf" size="25923956" md5="57f20a3e21efa375d823dbbe72c1986e" copydirectly="true"/>  
+    <games  me1="false" me2="true" me3="false" />
+  </addonfile>
+  <addonfile friendlyname="FemShep High Quality textures" author="heleuss" optional="true">
+    <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
+    <packagefile me2="true" sourcename="[ME2] KH_femShep_eyes.tpf" movedirectly="true" />
+    <packagefile me2="true" sourcename="[ME2] KH_femShep_eyebrows.tpf" movedirectly="true" />
+    <packagefile me2="true" sourcename="[ME2] KH_femShep_eyelashes.tpf" movedirectly="true" />
+    <packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true" />
+    <packagefile me2="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" movedirectly="true" />
+  </addonfile>
+  <addonfile friendlyname="BroShep High Quality textures" author="heleuss" optional="true">
+    <file downloadlink="https://www.dropbox.com/s/g6wg6v7uy8y7x15/%5BME2%5D%20broShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] broShep High Quality textures.7z" size="11802235" md5="4a220058d12c0c125a27a1d30bfff937" />
+    <packagefile me2="true" sourcename="[ME2] KH_broShep_face_textures.tpf" movedirectly="true" />
   </addonfile>
   <addonfile friendlyname="Allers Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_AllersComplexionTweak.7z-580-1-0.7z" md5="d9f3b8f6f63132d86690835a3c766c44" size="8994633" />
