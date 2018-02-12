@@ -575,20 +575,25 @@
             </Controls:Flyout>
             <Controls:Flyout x:Name="UserTextures_Flyout" IsOpenChanged="UserTextures_Flyout_IsOpenChanged" IsPinned="False" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
                 <StackPanel VerticalAlignment="Top"  HorizontalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
-                    <TextBlock x:Name="UserTextures_Title" Text="Select which game this file applies to" FontSize="20" FontWeight="Light" HorizontalAlignment="Center"></TextBlock>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button x:Name="Button_ManualFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME1_Click">
-                            <Image Source="images/logo_me1.png" Height="40" Margin="10"></Image>
-                        </Button>
-                        <Button x:Name="Button_ManualFileME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME2_Click">
-                            <Image Source="images/logo_me2.png" Height="40" Margin="10"></Image>
-                        </Button>
-                        <Button x:Name="Button_ManualFileME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME3_Click">
-                            <Image Source="images/logo_me3.png" Height="40" Margin="10"></Image>
-                        </Button>
+                    <TextBlock x:Name="UserTextures_Title" Text="Select which game this file applies to" FontSize="20" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
+                    <StackPanel x:Name="Panel_UserTexturesSelectGame" Orientation="Vertical" HorizontalAlignment="Center" Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button x:Name="Button_ManualFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME1_Click">
+                                <Image Source="images/logo_me1.png" Height="40" Margin="10"></Image>
+                            </Button>
+                            <Button x:Name="Button_ManualFileME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME2_Click">
+                                <Image Source="images/logo_me2.png" Height="40" Margin="10"></Image>
+                            </Button>
+                            <Button x:Name="Button_ManualFileME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME3_Click">
+                                <Image Source="images/logo_me3.png" Height="40" Margin="10"></Image>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock x:Name="UserTextures_Warning" Text="This file will be treated as a user file. User files are not tested by the developers and may not be compatible. User files are installed after ALOT, ALOT Updates, and MEUITM. If the file you are importing is listed above (as not a user file), you are importing the wrong file." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700"/>
                     </StackPanel>
-                    <TextBlock x:Name="UserTextures_Warning" Text="This file will be treated as a user file. User files are not tested by the developers and may not be compatible. User files are installed after ALOT, ALOT Updates, and MEUITM. If the file you are importing is listed above (as not a user file), you are importing the wrong file." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700"/>
-
+                    <StackPanel x:Name="Panel_UserTexturesBadArchive" Orientation="Vertical" HorizontalAlignment="Center" Visibility="Visible" Margin="5">
+                        <TextBlock x:Name="Textblock_UserTexturesBadArchive" Text="This archive file is not usable. It may not have any texture files in it, or contain texture files that don't meet the required naming standards for usage." FontSize="16" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="600"/>
+                        <Button Controls:ControlsHelper.ContentCharacterCasing="Upper" x:Name="Button_UserTexturesBadArchive" Margin="0,10,0,10"  HorizontalAlignment="Center"  Content="Continue" Click="Button_UserTexturesBadFile_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                    </StackPanel>
                 </StackPanel>
             </Controls:Flyout>
             <Controls:Flyout x:Name="OriginWarningFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Left" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">

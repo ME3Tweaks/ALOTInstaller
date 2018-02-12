@@ -109,7 +109,6 @@ namespace AlotAddOnGUI
             return rules.OfType<FileSystemAccessRule>().Any(r => (groups.Contains(r.IdentityReference) || r.IdentityReference.Value == sidCurrentUser) && r.AccessControlType == AccessControlType.Allow && (r.FileSystemRights & FileSystemRights.WriteData) == FileSystemRights.WriteData);
         }
 
-
         public static bool IsDirectoryWritable2(string dirPath)
         {
             try
@@ -759,6 +758,42 @@ namespace AlotAddOnGUI
                     }
                 }
             }
+        }
+
+        public static Task<List<string>> Run7zWithProgressForAddonFile(string archive)
+        {
+            string path = MainWindow.BINARY_DIRECTORY + "7z.exe";
+            string args = "l \"" + archive + "\"";
+
+            Log.Information("Running 7z archive inspector process: 7z " + args);
+            ConsoleApp ca = new ConsoleApp(path, args);
+            int startindex = 0;
+            List<string> files = new List<string>();
+            ca.ConsoleOutput += (o, args2) =>
+            {
+                if (startindex < 0)
+                {
+                    return;
+                }
+                if (args2.Line.Contains("------------------------"))
+                {
+                    if (startindex > 0)
+                    {
+                        //we found final line
+                        startindex = -1;
+                        return;
+                    }
+                    startindex = args2.Line.IndexOf("------------------------"); //this is such a hack...
+                    return;
+                }
+                if (startindex > 0)
+                {
+                    files.Add(args2.Line.Substring(startindex));
+                }
+            };
+            ca.Run();
+            ca.WaitForExit();
+            return Task.FromResult<List<string>>(files);
         }
 
         public static int runProcessAsAdmin(string exe, string args, bool standAlone = false)

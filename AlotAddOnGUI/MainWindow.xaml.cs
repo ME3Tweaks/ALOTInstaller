@@ -2021,11 +2021,17 @@ namespace AlotAddOnGUI
                     }
                 }
             }
-            addonfiles = newList;
-            ListView_Files.ItemsSource = addonfiles;
-            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(ListView_Files.ItemsSource);
-            PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
-            view.GroupDescriptions.Add(groupDescription);
+            var set = new HashSet<AddonFile>(newList);
+
+            if (ListView_Files.Items.Count == 0 || !set.SetEquals(addonfiles))
+            {
+                //refresh ui
+                addonfiles = newList;
+                ListView_Files.ItemsSource = addonfiles;
+                CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(ListView_Files.ItemsSource);
+                PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
+                view.GroupDescriptions.Add(groupDescription);
+            }
             CheckImportLibrary_Tick(null, null);
 
             if (DOWNLOAD_ASSISTANT_WINDOW != null)
@@ -2048,10 +2054,6 @@ namespace AlotAddOnGUI
                 scrollViewer.ScrollToBottom();
             }
         }
-
-
-
-
 
         public class ThreadCommand
         {
@@ -3517,6 +3519,11 @@ namespace AlotAddOnGUI
 
             af.UserFilePath = file;
             alladdonfiles.Add(af);
+            QueueNextUserFile();
+        }
+
+        private void QueueNextUserFile()
+        {
             PendingUserFiles.RemoveAt(0);
             RefreshListOnUserImportClose = true;
             if (PendingUserFiles.Count <= 0)
@@ -3530,9 +3537,89 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void LoadUserFileSelection(string v)
+        private async void LoadUserFileSelection(string v)
         {
+            string extension = Path.GetExtension(v.ToLower());
+            if (extension == ".zip" || extension == ".rr" || extension == ".7z")
+            {
+                List<string> files = await Utilities.Run7zWithProgressForAddonFile(v);
+                if (ArchiveHasValidFiles(files))
+                {
+                    UserTextures_Title.Text = "Select which game " + Path.GetFileName(v) + " applies to";
+                    Panel_UserTexturesSelectGame.Visibility = Visibility.Visible;
+                    Panel_UserTexturesBadArchive.Visibility = Visibility.Collapsed;
+
+                }
+                else
+                {
+                    //archive is not acceptable
+                    UserFileNotAcceptable(v);
+                    return;
+                }
+            }
             UserTextures_Title.Text = "Select which game " + Path.GetFileName(v) + " applies to";
+            Panel_UserTexturesSelectGame.Visibility = Visibility.Visible;
+            Panel_UserTexturesBadArchive.Visibility = Visibility.Collapsed;
+        }
+
+        private void UserFileNotAcceptable(string v)
+        {
+            UserTextures_Title.Text = Path.GetFileName(v) + " is not a usable file";
+            Panel_UserTexturesSelectGame.Visibility = Visibility.Collapsed;
+            Panel_UserTexturesBadArchive.Visibility = Visibility.Visible;
+        }
+
+        private bool ArchiveHasValidFiles(List<string> files)
+        {
+            bool hasAtLeastOnceAcceptableFile = false;
+            foreach (string file in files)
+            {
+                string extension = Path.GetExtension(file).ToLower();
+                switch (extension)
+                {
+                    case ".tpf":
+                    case ".mem":
+                    case ".mod":
+                        //acceptable
+                        hasAtLeastOnceAcceptableFile = true;
+                        break;
+                    case ".dds":
+                    case ".png":
+                    case ".jpg":
+                    case ".jpeg":
+                    case ".tga":
+                    case ".bmp":
+                        string filename = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
+                        if (!filename.Contains("0x"))
+                        {
+                            Log.Error("Texture filename in archive not valid: " + Path.GetFileName(file) + " Texture filename must include texture CRC (0xhhhhhhhh)");
+                            return false;
+                        }
+                        int idx = filename.IndexOf("0x");
+                        if (filename.Length - idx < 10)
+                        {
+                            Log.Error("Texture filename in archive not valid: " + Path.GetFileName(file) + " Texture filename must include texture CRC (0xhhhhhhhh)");
+                            return false;
+                        }
+                        uint crc;
+                        string crcStr = filename.Substring(idx + 2, 8);
+                        try
+                        {
+                            crc = uint.Parse(crcStr, System.Globalization.NumberStyles.HexNumber);
+                        }
+                        catch
+                        {
+                            Log.Error("Texture filename in archive not valid: " + Path.GetFileName(file) + " Texture filename must include texture CRC (0xhhhhhhhh)");
+                            return false;
+                        }
+                        hasAtLeastOnceAcceptableFile = true;
+                        break;
+                    default:
+                        //we don't care
+                        break;
+                }
+            }
+            return hasAtLeastOnceAcceptableFile;
         }
 
         private void UserTextures_Flyout_IsOpenChanged(object sender, RoutedEventArgs e)
@@ -4099,6 +4186,11 @@ namespace AlotAddOnGUI
             var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
             AddonFile af = (AddonFile)row.DataContext;
             
+        }
+
+        private void Button_UserTexturesBadFile_Click(object sender, RoutedEventArgs e)
+        {
+            QueueNextUserFile();
         }
     }
 }

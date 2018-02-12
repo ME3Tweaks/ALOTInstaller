@@ -343,7 +343,7 @@ move /Y "$(TargetDir)*.dll" "$(TargetDir)Data\Lib\"
 del /q "$(TargetDir)*.xml"
 del /q "$(TargetDir)MahApps.Metro.IconPacks.Modern.pdb"
 del /q "$(TargetDir)MahApps.Metro.pdb"
- 
+del /q "$(TargetDir)MahApps.Metro.SimpleChildWindow.pdb"
 if exist "$(TargetDir)memodder" rmdir /s /q "$(TargetDir)memodder"
 
 if exist "$(TargetDir)7z" rmdir /s /q "$(TargetDir)7z"
