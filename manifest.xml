@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="4.3.14">
+<alotaddonmanifest version="4.3.16">
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps."/>
@@ -66,8 +66,8 @@
     <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 - Textures-68-2018-6-0.zip" unpackedsinglefilename="ALOT_ME2_v6.mem" size="3563362871" md5="c1ed3369c5ba8ae681166b2fb9bc7c14" />
     <packagefile me2="true" sourcename="ALOT_ME2_v6.mem" movedirectly="true" />
   </addonfile>
-  <addonfile appliestomainversion="6" alotupdateversion="6" friendlyname="ALOT for ME2 6.6 - Update" tooltipname="ALOT for ME2 6.6 - Update" author="CreeperLava">
-	<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 6.6 - Update-68-2018-6-6.zip" size="314230567" md5="5514e07dc6aa5eb24806d6a2afd14424"/>
+  <addonfile appliestomainversion="6" alotupdateversion="7" friendlyname="ALOT for ME2 6.7 - Update" tooltipname="ALOT for ME2 6.7 - Update" author="CreeperLava">
+	<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 6.6 - Update-68-2018-6-7.zip" size="387026628" md5="7b72fd6e1645a50d369fcad3277c9ce9"/>
 	<packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v6.mem" movedirectly="true"/>
   </addonfile>
   <addonfile appliestomainversion="6" alotupdateversion="3" friendlyname="ALOT for ME3 6.3 - Update" tooltipname="ALOT for ME3 6.3 - Update" author="CreeperLava">

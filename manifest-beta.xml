@@ -25,8 +25,8 @@
     <packagefile me1="true" sourcename="MEUITM\mods\councilandudina.mem" movedirectly="true" />
     <packagefile me1="true" sourcename="MEUITM\mods\Elcor.mem" movedirectly="true" />
 	<choicefile choicetitle="Eyes Style">
-	    <packagefile me1="true" sourcename="MEUITM\mods\Eyes_Vanillastyle.mem" movedirectly="true" />
-		<packagefile me1="true" sourcename="MEUITM\mods\Eyes_Vibrant.mem" movedirectly="true" />
+		<packagefile me1="true" sourcename="MEUITM\mods\Eyes_Vanillastyle.mem" movedirectly="true"  choicetitle="Vanilla"/>
+		<packagefile me1="true" sourcename="MEUITM\mods\Eyes_Vibrant.mem" movedirectly="true"  choicetitle="Vibrant"/>
 	</choicefile>
 	<choicefile choicetitle="FemShep Style">
 		<packagefile me1="true" sourcename="MEUITM\mods\FemShep.mem" movedirectly="true" choicetitle="CDAMJC Cut"/>
