@@ -448,13 +448,22 @@ namespace AlotAddOnGUI
 
         public static string CalculateMD5(string filename)
         {
-            using (var md5 = MD5.Create())
+            try
             {
-                using (var stream = File.OpenRead(filename))
+                using (var md5 = MD5.Create())
                 {
-                    var hash = md5.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                    using (var stream = File.OpenRead(filename))
+                    {
+                        var hash = md5.ComputeHash(stream);
+                        return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                    }
                 }
+            } catch (IOException e)
+            {
+                Log.Error("I/O ERROR CALCULATING CHECKSUM OF FILE: " + filename);
+                Log.Error("This is a critical error - this system may have hardware issues.");
+                Log.Error(App.FlattenException(e));
+                return "";
             }
         }
 
