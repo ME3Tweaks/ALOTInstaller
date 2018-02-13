@@ -170,8 +170,16 @@ namespace AlotAddOnGUI
                 extractSource = af.UserFilePath;
                 extractpath = USER_FULL_STAGING_DIRECTORY + af.BuildID;
             }
-            Directory.CreateDirectory(extractpath);
-
+            try
+            {
+                Directory.CreateDirectory(extractpath);
+            } catch (Exception e)
+            {
+                Log.Error("Error creating extraction directory: " + extractpath);
+                Log.Error(App.FlattenException(e));
+                ERROR_OCCURED_PLEASE_STOP = true;
+                return new KeyValuePair<AddonFile, bool>(af,false);
+            }
             try
             {
                 switch (fileextension)
@@ -237,7 +245,14 @@ namespace AlotAddOnGUI
                                 foreach (string moveableFile in moveableFiles)
                                 {
                                     string name = Utilities.GetRelativePath(moveableFile, extractpath);
-                                    foreach (PackageFile pf in af.PackageFiles)
+
+                                    List<PackageFile> packageFiles = af.PackageFiles;
+                                    foreach (ChoiceFile cf in af.ChoiceFiles)
+                                    {
+                                        Log.Information("Option chosen on " + af + ": Using choicefile " + cf.GetChosenFile().DestinationName);
+                                        packageFiles.Add(cf.GetChosenFile());
+                                    }
+                                    foreach (PackageFile pf in packageFiles)
                                     {
                                         if (pf.SourceName.Equals(name, StringComparison.InvariantCultureIgnoreCase))
                                         {

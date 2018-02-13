@@ -611,16 +611,17 @@ namespace AlotAddOnGUI
                     {
                         await uploadLatestLog(true);
                         ShowStatus("Crash log uploaded");
+                        mds = new MetroDialogSettings();
+                        mds.AffirmativeButtonText = "Join Discord";
+                        mds.NegativeButtonText = "Decline";
+                        mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                        var result = await this.ShowMessageAsync("Join the ALOT Discord to help troubleshoot?", "While crash logs are helpful, they doesn't always tell us everything we need to fix bugs. If we need more information, we would appreciate if you joined the ALOT Discord so we can gather some extra information from you to implement a fix.", MessageDialogStyle.AffirmativeAndNegative, mds);
+                        if (result == MessageDialogResult.Affirmative)
+                        {
+                            openWebPage("https://discord.gg/w4Smese");
+                        }
                     }
-                    mds = new MetroDialogSettings();
-                    mds.AffirmativeButtonText = "Join Discord";
-                    mds.NegativeButtonText = "Decline";
-                    mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                    var result = await this.ShowMessageAsync("Join the ALOT Discord to help troubleshoot?", "While crash logs are helpful, they doesn't always tell us everything we need to fix bugs. If we need more information, we would appreciate if you joined the ALOT Discord so we can gather some extra information from you to implement a fix.", MessageDialogStyle.AffirmativeAndNegative, mds);
-                    if (result == MessageDialogResult.Affirmative)
-                    {
-                        openWebPage("https://discord.gg/w4Smese");
-                    }
+                   
                 }
             }
             Log.Information("PerformPostStartup() has completed. We are now switching over to user control.");
@@ -3241,7 +3242,7 @@ namespace AlotAddOnGUI
             bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? false;
             Checkbox_RepackGameFiles.IsChecked = repack;
 
-            if (!USING_BETA)
+            if (USING_BETA)
             {
                 ThemeManager.ChangeAppStyle(System.Windows.Application.Current,
                                                     ThemeManager.GetAccent("Crimson"),

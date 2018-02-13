@@ -39,11 +39,21 @@ namespace AlotAddOnGUI
             foreach (ChoiceFile cf in ListView_ChoiceFiles.Items)
             {
                 var row = (System.Windows.Controls.ListViewItem)ListView_ChoiceFiles.ItemContainerGenerator.ContainerFromItem(cf);
-                
+
 
             }
 
             await mainWindowRef.HideMetroDialogAsync(this);
+        }
+
+        private void Combobox_DropdownClosed(object sender, EventArgs e)
+        {
+            if (sender is ComboBox)
+            {
+                ComboBox cb = (ComboBox)sender;
+                ChoiceFile choisefile = (ChoiceFile)cb.DataContext;
+                choisefile.SelectedIndex = cb.SelectedIndex;
+            }
         }
     }
 }

@@ -20,28 +20,14 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Background="Transparent" Margin="5">
-                        <!--<Grid.RowDefinitions>
-                            <RowDefinition Height="20" />
-                            <RowDefinition Height="25" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="7" />
-                            <ColumnDefinition Width="5" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="5" />
-
-                        </Grid.ColumnDefinitions>-->
-
                         <ComboBox
                           x:Name="Combobox_ChoiceFile"
                           Controls:TextBoxHelper.UseFloatingWatermark="True"
                           Controls:TextBoxHelper.Watermark="{Binding ChoiceTitle}"
-                          SelectedIndex="0"
+                          SelectedIndex="{Binding Path=SelectedIndex}"
                           ItemsSource="{Binding Path=Choices}" 
                           DisplayMemberPath="ChoiceTitle"
-                          SelectedValue="{Binding CategoryID, Mode=TwoWay}" 
-                SelectedValuePath="ID" >
+                          SelectionChanged="Combobox_DropdownClosed">
                         </ComboBox>
 
                     </StackPanel>
