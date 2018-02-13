@@ -292,7 +292,7 @@ namespace AlotAddOnGUI
                             bool upgrade = false;
                             bool canCancel = true;
                             Log.Information("Latest release is applicable to us.");
-                            if (myReleaseAge > 5)
+                            if (myReleaseAge > 5 || USING_BETA)
                             {
                                 Log.Warning("This is an old release. We are force upgrading this client.");
                                 upgrade = true;
@@ -322,7 +322,13 @@ namespace AlotAddOnGUI
                                 string message = "Downloading update...";
                                 if (!canCancel)
                                 {
-                                    message = "This copy of ALOT Installer is outdated and must be updated.";
+                                    if (!USING_BETA)
+                                    {
+                                        message = "This copy of ALOT Installer is outdated and must be updated.";
+                                    } else
+                                    {
+                                        message = "Clients on the Beta channel of ALOT Installer must use the latest version.";
+                                    }
                                 }
                                 updateprogresscontroller = await this.ShowProgressAsync("Downloading Update", message, canCancel);
                                 updateprogresscontroller.SetIndeterminate();
