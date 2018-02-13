@@ -179,6 +179,9 @@
     <Compile Include="ui\DiagnosticsWindow.xaml.cs">
       <DependentUpon>DiagnosticsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ui\ModConfigurationDialog.xaml.cs">
+      <DependentUpon>ModConfigurationDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ui\ProgressWeightPercentages.cs" />
     <Compile Include="Utilites.cs" />
     <Page Include="MainWindow.xaml">
@@ -202,6 +205,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ui\DiagnosticsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ui\ModConfigurationDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,0 +1,70 @@
+﻿<Dialog:CustomDialog  Title="Dialog Title"
+                      x:Class="AlotAddOnGUI.ModConfigurationDialog"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"    
+                      xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                      Style="{StaticResource CustomDialogExample}">
+    <StackPanel Margin="10">
+        <ListView Name="ListView_ChoiceFiles" BorderThickness="0">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+
+            <!-- This is what each list item looks like-->
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Background="Transparent" Margin="5">
+                        <!--<Grid.RowDefinitions>
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="25" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="7" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="5" />
+
+                        </Grid.ColumnDefinitions>-->
+
+                        <ComboBox
+                          x:Name="Combobox_ChoiceFile"
+                          Controls:TextBoxHelper.UseFloatingWatermark="True"
+                          Controls:TextBoxHelper.Watermark="{Binding ChoiceTitle}"
+                          SelectedIndex="0"
+                          ItemsSource="{Binding Path=Choices}" 
+                          DisplayMemberPath="ChoiceTitle"
+                          SelectedValue="{Binding CategoryID, Mode=TwoWay}" 
+                SelectedValuePath="ID" >
+                        </ComboBox>
+
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="{x:Type ListViewItem}">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+        <Button x:Name="Close_Button" Content="Close" Click="Close_Dialog" HorizontalAlignment="Right" Style="{StaticResource AccentedDialogSquareButton}"
+                BorderThickness="2,2,2,2"
+                Padding="5,6,5,6"
+                Height="35"
+                Width="80"
+                Margin="5,0,5,0"/>
+    </StackPanel>
+</Dialog:CustomDialog>

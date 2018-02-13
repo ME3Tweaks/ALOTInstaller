@@ -255,6 +255,7 @@ namespace AlotAddOnGUI
             var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
             try
             {
+                int myReleaseAge = 0;
                 var releases = await client.Repository.Release.GetAll("Mgamerz", "ALOTAddonGUI");
                 if (releases.Count > 0)
                 {
@@ -270,7 +271,10 @@ namespace AlotAddOnGUI
                             continue;
                         }
                         Version releaseVersion = new Version(r.TagName);
-
+                        if (versInfo.Major == releaseVersion.Major && versInfo.Build < releaseVersion.Build)
+                        {
+                            myReleaseAge++;
+                        }
                         if (releaseVersion > latestVer)
                         {
                             latest = r;
@@ -285,25 +289,42 @@ namespace AlotAddOnGUI
                         Version releaseName = new Version(latest.TagName);
                         if (versInfo < releaseName && latest.Assets.Count > 0)
                         {
+                            bool upgrade = false;
+                            bool canCancel = true;
                             Log.Information("Latest release is applicable to us.");
-                            string versionInfo = "";
-                            if (latest.Prerelease)
+                            if (myReleaseAge > 5)
                             {
-                                versionInfo += "This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.\n\n";
+                                Log.Warning("This is an old release. We are force upgrading this client.");
+                                upgrade = true;
+                                canCancel = false;
                             }
-                            versionInfo += "Release date: " + latest.PublishedAt.Value.ToLocalTime().ToString();
-                            MetroDialogSettings mds = new MetroDialogSettings();
-                            mds.AffirmativeButtonText = "Update";
-                            mds.NegativeButtonText = "Later";
-                            mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                            else
+                            {
+                                string versionInfo = "";
+                                if (latest.Prerelease)
+                                {
+                                    versionInfo += "This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.\n\n";
+                                }
+                                versionInfo += "Release date: " + latest.PublishedAt.Value.ToLocalTime().ToString();
+                                MetroDialogSettings mds = new MetroDialogSettings();
+                                mds.AffirmativeButtonText = "Update";
+                                mds.NegativeButtonText = "Later";
+                                mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
 
-                            MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Installer " + releaseName + " is available. You are currently using version " + versInfo.ToString() + ".\n========================\n" + versionInfo + "\n" + latest.Body + "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative, mds);
-                            if (result == MessageDialogResult.Affirmative)
+                                MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Installer " + releaseName + " is available. You are currently using version " + versInfo.ToString() + ".\n========================\n" + versionInfo + "\n" + latest.Body + "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative, mds);
+                                upgrade = result == MessageDialogResult.Affirmative;
+                            }
+                            if (upgrade)
                             {
                                 Log.Information("Downloading update for application");
 
                                 //there's an update
-                                updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "ALOT Installer is updating. Please wait...", true);
+                                string message = "Downloading update...";
+                                if (!canCancel)
+                                {
+                                    message = "This copy of ALOT Installer is outdated and must be updated.";
+                                }
+                                updateprogresscontroller = await this.ShowProgressAsync("Downloading Update", message, canCancel);
                                 updateprogresscontroller.SetIndeterminate();
                                 WebClient downloadClient = new WebClient();
 
@@ -317,6 +338,9 @@ namespace AlotAddOnGUI
                                     {
                                         Log.Information("Program update download percent: " + e.ProgressPercentage);
                                     }
+                                    string downloadedStr = ByteSize.FromBytes(e.BytesReceived).ToString() + " of " + ByteSize.FromBytes(e.TotalBytesToReceive).ToString();
+                                    updateprogresscontroller.SetMessage(message + "\n\n" + downloadedStr);
+
                                     downloadProgress = e.ProgressPercentage;
                                     updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
                                 };
@@ -1483,7 +1507,7 @@ namespace AlotAddOnGUI
 
             if (ReImportedFiles)
             {
-                ShowStatus("Re-imported files due to shutdown during build or install");
+                ShowStatus("Re-imported files due to shutdown during build or install", 3000);
             }
         }
 
@@ -2411,7 +2435,7 @@ namespace AlotAddOnGUI
             {
                 return;
             }
-            Log.Information("User has chosen directory for backup destination: "+openFolder.FileName);
+            Log.Information("User has chosen directory for backup destination: " + openFolder.FileName);
 
             var dir = openFolder.FileName;
             if (!Directory.Exists(dir))
@@ -2426,7 +2450,7 @@ namespace AlotAddOnGUI
                 await this.ShowMessageAsync("Directory is not empty", "The backup destination directory must be empty.");
                 return;
             }
-            
+
             if (Utilities.IsSubfolder(gamedir, dir))
             {
                 Log.Warning("User attempting to backup to subdirectory of backup source - not allowed because this will cause infinite recursion and will be deleted when restores are attempted");
@@ -2856,10 +2880,20 @@ namespace AlotAddOnGUI
                 {
                     string datadir = EXE_DIRECTORY + @"Data";
                     string path = Path.GetDirectoryName(file);
+                    path = path.TrimEnd('\\', '/');
                     if (Utilities.IsSubfolder(datadir, path) || datadir == path)
                     {
                         Log.Warning("User file from data subdirectory (or deeper) is not allowed: " + file);
                         ShowStatus("Files not allowed to be added from Data folder or subdirectories", 5000);
+                        continue;
+                    }
+                    string temppath = Path.GetTempPath();
+                    temppath = temppath.TrimEnd('\\', '/');
+
+                    if (Utilities.IsSubfolder(temppath, path) || temppath == path)
+                    {
+                        Log.Warning("User file from temp subdirectory is not allowed. Please extract files before attempting to add as a user file. File: " + file);
+                        ShowStatus("Files not allowed to be added from Temp directory", 5000);
                         continue;
                     }
                     string extension = Path.GetExtension(file).ToLower();
@@ -2987,7 +3021,7 @@ namespace AlotAddOnGUI
                     progressController.SetMessage("ALOT Installer is importing files, please wait...\nImporting " + fileToImport.Item1.FriendlyName);
                     if (DOWNLOAD_ASSISTANT_WINDOW != null)
                     {
-                        DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("Importing " + importedFiles.Count + " file" + (importedFiles.Count == 1 ? "s" : ""));
+                        DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("Importing " + importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : ""));
                     }
                 }
                 WebClient downloadClient = new WebClient();
@@ -3207,7 +3241,7 @@ namespace AlotAddOnGUI
             bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? false;
             Checkbox_RepackGameFiles.IsChecked = repack;
 
-            if (USING_BETA)
+            if (!USING_BETA)
             {
                 ThemeManager.ChangeAppStyle(System.Windows.Application.Current,
                                                     ThemeManager.GetAccent("Crimson"),
@@ -3510,6 +3544,7 @@ namespace AlotAddOnGUI
                     af.Game_ME3 = true;
                     break;
             }
+            af.ChoiceFiles = new List<ChoiceFile>();
             af.Enabled = true;
             af.UserFile = true;
             af.DownloadLink = "http://example.com";
@@ -4135,7 +4170,11 @@ namespace AlotAddOnGUI
                 SettingsFlyout.IsOpen = false;
                 foreach (AddonFile af in alladdonfiles)
                 {
-                    if (af.Ready && !af.UserFile)
+                    if (!af.Ready)
+                    {
+                       // Debugger.Break();
+                    }
+                    if (!af.UserFile && File.Exists(af.GetFile()))
                     {
                         string name = af.GetFile();
                         if (name != null)
@@ -4143,8 +4182,6 @@ namespace AlotAddOnGUI
                             name = Path.GetFileName(name);
                         }
                         files.Remove(name);
-
-
                     }
                 }
 
@@ -4180,12 +4217,21 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void Button_ConfigureMod_Click(object sender, RoutedEventArgs e)
+        private async void Button_ConfigureMod_Click(object sender, RoutedEventArgs e)
         {
             var rowIndex = ListView_Files.SelectedIndex;
             var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
             AddonFile af = (AddonFile)row.DataContext;
-            
+
+            ModConfigurationDialog mcd = new ModConfigurationDialog(af, this);
+            await this.ShowMetroDialogAsync(mcd);
+        }
+
+        private async void CloseCustomDialog(object sender, RoutedEventArgs e)
+        {
+            var dialog = (BaseMetroDialog)this.Resources["Dialog_ModConfiguration"];
+
+            await this.HideMetroDialogAsync(dialog);
         }
 
         private void Button_UserTexturesBadFile_Click(object sender, RoutedEventArgs e)

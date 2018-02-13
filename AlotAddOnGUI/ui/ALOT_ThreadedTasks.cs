@@ -405,12 +405,12 @@ namespace AlotAddOnGUI
                             string destination = EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\\" + Path.GetFileName(fileToUse);
                             if (af.UserFile)
                             {
-                                destination = extractpath + "\\" + Path.GetFileName(fileToUse);
+                                destination = extractpath + "\\" + fileToUse;
                             }
                             File.Copy(extractSource, destination, true);
 
                             //extract files if we have any package files as we will need to obtain them.
-                            if (af.PackageFiles.Count > 0)
+                            if (af.UserFile || af.PackageFiles.Count > 0)
                             {
                                 Log.Information(prefix + " Extracting AddonFile (TPF)");
                                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
@@ -1479,19 +1479,28 @@ namespace AlotAddOnGUI
                     vorbisStream = new NAudio.Vorbis.VorbisWaveReader(musfile);
                     LoopStream ls = new LoopStream(vorbisStream);
                     fadeoutProvider = new FadeInOutSampleProvider(ls.ToSampleProvider());
-                    waveOut.Init(fadeoutProvider);
-                    InstallingOverlay_MusicButton.Visibility = Visibility.Visible;
-                    if (Utilities.GetRegistrySettingBool(SETTINGSTR_SOUND) ?? true)
+                    try
                     {
-                        MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.Sound3;
-                        fadeoutProvider.BeginFadeIn(2000);
-                        waveOut.Play();
-                        MusicPaused = false;
-                    }
-                    else
+                        waveOut.Init(fadeoutProvider);
+                        InstallingOverlay_MusicButton.Visibility = Visibility.Visible;
+                        if (Utilities.GetRegistrySettingBool(SETTINGSTR_SOUND) ?? true)
+                        {
+                            MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.Sound3;
+                            fadeoutProvider.BeginFadeIn(2000);
+                            waveOut.Play();
+                            MusicPaused = false;
+                        }
+                        else
+                        {
+                            MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.SoundMute;
+                            waveOut.Pause();
+                        }
+                    } catch (Exception e)
                     {
-                        MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.SoundMute;
-                        waveOut.Pause();
+                        Log.Error("Error initializing audio device and UI:" + e.Message);
+                        InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
+                        MusicPaused = true;
+                        MusicIsPlaying = false;
                     }
                 }
                 else

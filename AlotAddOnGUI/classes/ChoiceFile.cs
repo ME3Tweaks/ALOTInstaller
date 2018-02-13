@@ -6,5 +6,6 @@ namespace AlotAddOnGUI.classes
     {
         public string ChoiceTitle { get; set; }
         public List<PackageFile> Choices { get; set; }
+        public int ID { get; set; }
     }
 }

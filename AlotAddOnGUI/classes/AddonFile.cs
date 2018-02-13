@@ -379,28 +379,27 @@ namespace AlotAddOnGUI.classes
         }
         internal string GetFile()
         {
-            if (Ready)
+            if (!UserFile)
             {
-                if (!UserFile)
+                if (UnpackedSingleFilename != null && File.Exists(MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + UnpackedSingleFilename))
                 {
-                    if (UnpackedSingleFilename != null && File.Exists(MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + UnpackedSingleFilename))
-                    {
-                        return MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + UnpackedSingleFilename;
-                    }
-
-                    if (File.Exists(MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + Filename))
-                    {
-                        return MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + Filename;
-                    }
+                    return MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + UnpackedSingleFilename;
                 }
-                else
+
+                if (File.Exists(MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + Filename))
                 {
-                    //if (File.Exists(UserFilePath))
-                    //{
-                    return UserFilePath;
-                    //}
+                    return MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + Filename;
                 }
             }
+            else
+            {
+
+                //if (File.Exists(UserFilePath))
+                //{
+                return UserFilePath;
+                //}
+            }
+
             return null;
         }
     }

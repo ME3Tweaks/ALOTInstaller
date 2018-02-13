@@ -68,16 +68,15 @@
         <Style TargetType="{x:Type ContentPresenter}">
             <Setter Property="Margin" Value="0,0,0,0" />
         </Style>
-        <Dialog:CustomDialog x:Key="CustomDialogTest"
-                        Style="{StaticResource NewCustomDialogStyle}"
-                        Title="This dialog allows arbitrary content. It will close in 5 seconds."
-                        x:Name="CustomTestDialog">
+        <Dialog:CustomDialog x:Key="Dialog_ModConfiguration"
+                        Title="MEUITM Settings"
+                        x:Name="Dialog_ModConfiguration"
+                        Style="{StaticResource CustomDialogExample}">
             <StackPanel>
-                <TextBlock Height="30"
-                    Text="This dialog allows arbitrary content. You have to close it yourself by clicking the close button below."
-                    TextWrapping="Wrap"
-                    Foreground="{DynamicResource AccentColorBrush}" />
-                <Button Content="Close Me!" />
+                <TextBlock x:Name="Dialog_ModConfiguration_Directions"
+                    Text="Select options to configure when installing MEUITM."
+                    TextWrapping="Wrap" />
+                <Button Click="CloseCustomDialog" Content="Save" HorizontalAlignment="Right"/>
             </StackPanel>
         </Dialog:CustomDialog>
     </Window.Resources>

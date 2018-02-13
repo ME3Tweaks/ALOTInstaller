@@ -30,9 +30,9 @@
                                                 Content="{TemplateBinding DialogTop}" />
                                 <Grid Grid.Row="1">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="10*" />
-                                        <ColumnDefinition Width="80*" />
-                                        <ColumnDefinition Width="10*" />
+                                        <ColumnDefinition Width="15*" />
+                                        <ColumnDefinition Width="70*" />
+                                        <ColumnDefinition Width="15*" />
                                     </Grid.ColumnDefinitions>
                                     <!--  Content area  -->
                                     <Grid Grid.Column="1"
