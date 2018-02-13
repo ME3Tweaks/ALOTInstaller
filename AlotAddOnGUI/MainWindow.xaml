@@ -68,17 +68,6 @@
         <Style TargetType="{x:Type ContentPresenter}">
             <Setter Property="Margin" Value="0,0,0,0" />
         </Style>
-        <Dialog:CustomDialog x:Key="Dialog_ModConfiguration"
-                        Title="MEUITM Settings"
-                        x:Name="Dialog_ModConfiguration"
-                        Style="{StaticResource CustomDialogExample}">
-            <StackPanel>
-                <TextBlock x:Name="Dialog_ModConfiguration_Directions"
-                    Text="Select options to configure when installing MEUITM."
-                    TextWrapping="Wrap" />
-                <Button Click="CloseCustomDialog" Content="Save" HorizontalAlignment="Right"/>
-            </StackPanel>
-        </Dialog:CustomDialog>
     </Window.Resources>
     
     <Grid>
@@ -162,7 +151,7 @@
                             <Border x:Name="GameIcon_Optional" Visibility="Collapsed" ToolTip="This file is optional" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#FF156095" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_Optional_Text" FontSize="10"  Text="Optional" VerticalAlignment="Center"/>
                             </Border>
-                            <Button x:Name="Button_ConfigureMod" Margin="10,1,0,0" Padding="0,0,0,6" Content="Configure" Style="{StaticResource LinkLabel}" Click="Button_ConfigureMod_Click"/>
+                            <Button x:Name="Button_ConfigureMod" Margin="10,1,0,0" Padding="0,0,0,6" Content="Configure" Style="{StaticResource LinkLabel}" ToolTip="Click to change options for this mod" Click="Button_ConfigureMod_Click"/>
                         </StackPanel>
 
                         <StackPanel  HorizontalAlignment="Left" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal">

@@ -179,6 +179,9 @@
     <Compile Include="ui\DiagnosticsWindow.xaml.cs">
       <DependentUpon>DiagnosticsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ui\UpdateAvailableDialog.xaml.cs">
+      <DependentUpon>UpdateAvailableDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ui\ModConfigurationDialog.xaml.cs">
       <DependentUpon>ModConfigurationDialog.xaml</DependentUpon>
     </Compile>
@@ -200,13 +203,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ui\CustomDialogExample.xaml">
+    <Page Include="ui\WiderDialogStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ui\DiagnosticsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ui\UpdateAvailableDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="ui\ModConfigurationDialog.xaml">
       <SubType>Designer</SubType>

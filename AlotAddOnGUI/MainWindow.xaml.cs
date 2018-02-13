@@ -106,6 +106,7 @@ namespace AlotAddOnGUI
         private List<string> musicpackmirrors;
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
+        private const string SETTINGSTR_DONT_FORCE_UPGRADES = "DontForceUpgrades";
         private const string SETTINGSTR_REPACK = "RepackGameFiles";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
         public const string SETTINGSTR_BETAMODE = "BetaMode";
@@ -130,6 +131,7 @@ namespace AlotAddOnGUI
         private List<FrameworkElement> currentFadeInItems = new List<FrameworkElement>();
         private bool ShowReadyFilesOnly = false;
         internal AddonDownloadAssistant DOWNLOAD_ASSISTANT_WINDOW;
+        private bool DONT_FORCE_UPGRADES = false;
         public static string DOWNLOADS_FOLDER;
         private int RefreshesUntilRealRefresh;
         private bool ShowBuildingOnly;
@@ -292,7 +294,7 @@ namespace AlotAddOnGUI
                             bool upgrade = false;
                             bool canCancel = true;
                             Log.Information("Latest release is applicable to us.");
-                            if (myReleaseAge > 5 || USING_BETA)
+                            if ((myReleaseAge > 5 || USING_BETA) && !DONT_FORCE_UPGRADES)
                             {
                                 Log.Warning("This is an old release. We are force upgrading this client.");
                                 upgrade = true;
@@ -303,16 +305,36 @@ namespace AlotAddOnGUI
                                 string versionInfo = "";
                                 if (latest.Prerelease)
                                 {
-                                    versionInfo += "This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.\n\n";
+                                    versionInfo += "This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
                                 }
-                                versionInfo += "Release date: " + latest.PublishedAt.Value.ToLocalTime().ToString();
+                                int daysAgo = (DateTime.Now - latest.PublishedAt.Value).Days;
+                                string ageStr = "";
+                                if (daysAgo == 1)
+                                {
+                                    ageStr = "1 day ago";
+                                }
+                                else if (daysAgo == 0)
+                                {
+                                    ageStr = "today";
+                                }
+                                else
+                                {
+                                    ageStr = daysAgo + " days ago";
+                                }
+
+                                versionInfo += "\nReleased " + ageStr;
                                 MetroDialogSettings mds = new MetroDialogSettings();
                                 mds.AffirmativeButtonText = "Update";
                                 mds.NegativeButtonText = "Later";
                                 mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
 
-                                MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Installer " + releaseName + " is available. You are currently using version " + versInfo.ToString() + ".\n========================\n" + versionInfo + "\n" + latest.Body + "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative, mds);
-                                upgrade = result == MessageDialogResult.Affirmative;
+                                //MessageDialogResult result = await this.ShowMessageAsync("Update Available", "ALOT Installer " + releaseName + " is available. You are currently using version " + versInfo.ToString() + ".\n========================\n" + versionInfo + "\n" + latest.Body + "\n========================\nInstall the update?", MessageDialogStyle.AffirmativeAndNegative, mds);
+                                //upgrade = result == MessageDialogResult.Affirmative;
+                                string message = "ALOT Installer " + releaseName + " is available. You are currently using version " + versInfo.ToString() + "." + versionInfo;
+                                UpdateAvailableDialog uad = new UpdateAvailableDialog(message, latest.Body, this);
+                                await this.ShowMetroDialogAsync(uad, mds);
+                                await uad.WaitUntilUnloadedAsync();
+                                upgrade = uad.wasUpdateAccepted();
                             }
                             if (upgrade)
                             {
@@ -325,7 +347,8 @@ namespace AlotAddOnGUI
                                     if (!USING_BETA)
                                     {
                                         message = "This copy of ALOT Installer is outdated and must be updated.";
-                                    } else
+                                    }
+                                    else
                                     {
                                         message = "Clients on the Beta channel of ALOT Installer must use the latest version.";
                                     }
@@ -632,7 +655,7 @@ namespace AlotAddOnGUI
                             openWebPage("https://discord.gg/w4Smese");
                         }
                     }
-                   
+
                 }
             }
             Log.Information("PerformPostStartup() has completed. We are now switching over to user control.");
@@ -1171,12 +1194,17 @@ namespace AlotAddOnGUI
             me2Installed = (me2Path != null);
             me3Installed = (me3Path != null);
 
+            Switch_ME1Filter.IsEnabled = me1Installed;
+            Switch_ME2Filter.IsEnabled = me2Installed;
+            Switch_ME3Filter.IsEnabled = me3Installed;
+
             if (!me1Installed)
             {
                 Log.Information("ME1 not installed - disabling ME1 install");
                 Button_InstallME1.IsEnabled = false;
                 Button_InstallME1.ToolTip = "Mass Effect is not installed. To install textures for ME1 the game must already be installed";
                 Button_InstallME1.Content = "ME1 Not Installed";
+
             }
             else
             {
@@ -1874,7 +1902,7 @@ namespace AlotAddOnGUI
                                 AlreadyInstalled = false,
                                 Showing = false,
                                 Enabled = true,
-                                ComparisonsLink = (string) e.Attribute("comparisonslink"),
+                                ComparisonsLink = (string)e.Attribute("comparisonslink"),
                                 FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
                                 CopyDirectly = e.Element("file").Attribute("copydirectly") != null ? (bool)e.Element("file").Attribute("copydirectly") : false,
                                 MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
@@ -2566,11 +2594,16 @@ namespace AlotAddOnGUI
                     MetroDialogSettings mds = new MetroDialogSettings();
                     mds.AffirmativeButtonText = "Backup";
                     mds.NegativeButtonText = "Continue";
+                    mds.FirstAuxiliaryButtonText = "Cancel";
                     mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                    MessageDialogResult result = await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " not backed up", "You should create a backup of your game before installing ALOT. In the event something goes wrong, you can quickly restore back to an unmodified state. Creating a backup is strongly recommended and should be done on an unmodified game. Create a backup before install?\n\nNote: You can press continue and still decline texture installation if you need to by selecting 'Install Later' at the installation prompt.", MessageDialogStyle.AffirmativeAndNegative, mds);
+                    MessageDialogResult result = await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " not backed up", "You should create a backup of your game before installing ALOT. In the event something goes wrong, you can quickly restore back to an unmodified state. Creating a backup is strongly recommended and should be done on an unmodified game. Create a backup before install?", MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, mds);
                     if (result == MessageDialogResult.Affirmative)
                     {
                         BackupGame(game);
+                        return false;
+                    }
+                    if (result == MessageDialogResult.FirstAuxiliary)
+                    {
                         return false;
                     }
                 }
@@ -3244,6 +3277,8 @@ namespace AlotAddOnGUI
 
             USING_BETA = Utilities.GetRegistrySettingBool(SETTINGSTR_BETAMODE) ?? false;
             Checkbox_BetaMode.IsChecked = USING_BETA;
+
+            DONT_FORCE_UPGRADES = Utilities.GetRegistrySettingBool(SETTINGSTR_DONT_FORCE_UPGRADES) ?? false;
 
             DOWNLOADS_FOLDER = Utilities.GetRegistrySettingString(SETTINGSTR_DOWNLOADSFOLDER);
             if (DOWNLOADS_FOLDER == null)
@@ -4157,7 +4192,7 @@ namespace AlotAddOnGUI
                 {
                     if (!af.Ready)
                     {
-                       // Debugger.Break();
+                        // Debugger.Break();
                     }
                     if (!af.UserFile && File.Exists(af.GetFile()))
                     {

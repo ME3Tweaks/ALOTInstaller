@@ -3,7 +3,7 @@
                     xmlns:local="clr-namespace:AlotAddOnGUI.ui"
                     xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro">
     <Style TargetType="{x:Type Dialog:BaseMetroDialog}"
-        x:Key="CustomDialogExample"
+        x:Key="WiderDialogStyle"
         BasedOn="{StaticResource {x:Type Dialog:BaseMetroDialog}}">
         <Setter Property="Template">
             <Setter.Value>
