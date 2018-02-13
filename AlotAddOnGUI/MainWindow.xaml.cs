@@ -585,11 +585,17 @@ namespace AlotAddOnGUI
             if (File.Exists(appCrashFile))
             {
                 DateTime crashTime = File.GetCreationTime(appCrashFile);
-                bool showUpload = true;
+                bool hasBeenHandled = false;
                 try
                 {
                     File.Delete(appCrashFile);
-                    File.Delete(appCrashHandledFile);
+                    Log.Warning("Removed APP_CRASH");
+                    if (File.Exists(appCrashHandledFile))
+                    {
+                        hasBeenHandled = true;
+                        Log.Warning("Removed APP_CRASH_HANDLED - the previous crash has already been handled");
+                        File.Delete(appCrashHandledFile);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -598,9 +604,8 @@ namespace AlotAddOnGUI
                     {
                         File.Create(appCrashHandledFile);
                     }
-                    showUpload = false;
                 }
-                if (crashTime.Date == DateTime.Today && showUpload)
+                if (crashTime.Date == DateTime.Today && !hasBeenHandled)
                 {
                     MetroDialogSettings mds = new MetroDialogSettings();
                     mds.AffirmativeButtonText = "Upload";
