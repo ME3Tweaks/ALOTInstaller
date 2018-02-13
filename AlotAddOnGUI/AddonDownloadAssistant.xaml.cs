@@ -1,9 +1,12 @@
 ﻿using AlotAddOnGUI.classes;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,8 +38,6 @@ namespace AlotAddOnGUI
             this.windowRef = windowRef;
             this.missingAddonFiles = missingAddonFiles;
             filesList.ItemsSource = missingAddonFiles;
-            ShowStatus("Downloads folder: " + windowRef.DOWNLOADS_FOLDER, 5000);
-
         }
 
         public void setNewMissingAddonfiles(List<AddonFile> missingAddonFiles)
@@ -81,7 +82,7 @@ namespace AlotAddOnGUI
             {
                 missingAddonFiles = missingAddonFiles.Except(readyFiles).ToList();
                 filesList.ItemsSource = missingAddonFiles;
-            } 
+            }
             if (filesList.Items.Count == 0)
             {
                 Close();
@@ -116,6 +117,36 @@ namespace AlotAddOnGUI
         {
             Button_ImportFromDownloads.IsEnabled = v;
             Button_ImportFromDownloads.Content = !v ? "Importing..." : "Import from Downloads Folder";
+        }
+
+        private void Button_ChangeDownloadsFolder_Click(object sender, RoutedEventArgs e)
+        {
+            Topmost = false;
+            var openFolder = new CommonOpenFileDialog();
+            openFolder.IsFolderPicker = true;
+            openFolder.Title = "Select Downloads Folder where files from your browser are downloaded to";
+            openFolder.AllowNonFileSystemItems = false;
+            openFolder.EnsurePathExists = true;
+            if (Directory.Exists(MainWindow.DOWNLOADS_FOLDER))
+            {
+                openFolder.InitialDirectory = MainWindow.DOWNLOADS_FOLDER;
+            }
+            if (openFolder.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                Topmost = true;
+                return;
+            }
+            Topmost = true;
+
+            var dir = openFolder.FileName;
+            if (!Directory.Exists(dir))
+            {
+                //await this.ShowMessageAsync("Directory does not exist", "The backup destination directory does not exist: " + dir);
+                return;
+            }
+            Utilities.WriteRegistryKey(Registry.CurrentUser, MainWindow.REGISTRY_KEY, MainWindow.SETTINGSTR_DOWNLOADSFOLDER, dir);
+            MainWindow.DOWNLOADS_FOLDER = dir;
+            TextBlock_DownloadsFolder.Text = "Current Downloads folder: "+ MainWindow.DOWNLOADS_FOLDER;
         }
     }
 }

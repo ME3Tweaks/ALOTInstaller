@@ -130,7 +130,7 @@ namespace AlotAddOnGUI
         private List<FrameworkElement> currentFadeInItems = new List<FrameworkElement>();
         private bool ShowReadyFilesOnly = false;
         internal AddonDownloadAssistant DOWNLOAD_ASSISTANT_WINDOW;
-        public string DOWNLOADS_FOLDER;
+        public static string DOWNLOADS_FOLDER;
         private int RefreshesUntilRealRefresh;
         private bool ShowBuildingOnly;
         private WebClient downloadClient;
@@ -1874,6 +1874,7 @@ namespace AlotAddOnGUI
                                 AlreadyInstalled = false,
                                 Showing = false,
                                 Enabled = true,
+                                ComparisonsLink = (string) e.Attribute("comparisonslink"),
                                 FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
                                 CopyDirectly = e.Element("file").Attribute("copydirectly") != null ? (bool)e.Element("file").Attribute("copydirectly") : false,
                                 MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
@@ -3259,8 +3260,6 @@ namespace AlotAddOnGUI
                                                     ThemeManager.GetAccent("Crimson"),
                                                     ThemeManager.GetAppTheme("BaseDark")); // or appStyle.Item1
             }
-            Button_ChangeDownloadFolder.ToolTip = "Changes folder where download assistant will import from.\nThis should be your browser's download folder.\nThe current directory is\n" + DOWNLOADS_FOLDER;
-
         }
 
         private void Button_ReportIssue_Click(object sender, RoutedEventArgs e)
@@ -3968,32 +3967,6 @@ namespace AlotAddOnGUI
             {
                 ShowStatus("Download directory is not set to valid folder. Set a valid one in settings.");
             }
-        }
-
-        private void Button_ChangeDownloadFolder_Click(object sender, RoutedEventArgs e)
-        {
-            var openFolder = new CommonOpenFileDialog();
-            openFolder.IsFolderPicker = true;
-            openFolder.Title = "Select Downloads Folder where files from your browser are downloaded to";
-            openFolder.AllowNonFileSystemItems = false;
-            openFolder.EnsurePathExists = true;
-            if (Directory.Exists(DOWNLOADS_FOLDER))
-            {
-                openFolder.InitialDirectory = DOWNLOADS_FOLDER;
-            }
-            if (openFolder.ShowDialog() != CommonFileDialogResult.Ok)
-            {
-                return;
-            }
-            var dir = openFolder.FileName;
-            if (!Directory.Exists(dir))
-            {
-                //await this.ShowMessageAsync("Directory does not exist", "The backup destination directory does not exist: " + dir);
-                return;
-            }
-            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_DOWNLOADSFOLDER, dir);
-            DOWNLOADS_FOLDER = dir;
-            Button_ChangeDownloadFolder.ToolTip = "Changes folder where download assistant will import from.\nThis should be your browser's download folder.\nThe current directory is\n" + DOWNLOADS_FOLDER;
         }
 
         private void DownloadAssisant_IsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)

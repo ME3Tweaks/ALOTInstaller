@@ -18,6 +18,7 @@ namespace AlotAddOnGUI.classes
         public short ALOTVersion { get; set; }
         public byte ALOTUpdateVersion { get; set; }
         public short ALOTMainVersionRequired { get; set; }
+        public string ComparisonsLink { get; set; }
 
         public bool IsRequiredFile
         {

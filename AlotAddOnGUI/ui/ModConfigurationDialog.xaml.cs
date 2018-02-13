@@ -31,10 +31,14 @@ namespace AlotAddOnGUI
             mainWindowRef = mainWindow;
             DataContext = af;
             ListView_ChoiceFiles.ItemsSource = af.ChoiceFiles;
+            if (af.ComparisonsLink == null)
+            {
+                Comparison_Button.Visibility = Visibility.Collapsed;
+            }
         }
 
 
-        private async void Close_Dialog(object sender, RoutedEventArgs e)
+        private async void Close_Dialog_Click(object sender, RoutedEventArgs e)
         {
             foreach (ChoiceFile cf in ListView_ChoiceFiles.Items)
             {
@@ -54,6 +58,11 @@ namespace AlotAddOnGUI
                 ChoiceFile choisefile = (ChoiceFile)cb.DataContext;
                 choisefile.SelectedIndex = cb.SelectedIndex;
             }
+        }
+
+        private void Comparisons_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.openWebPage(((AddonFile)DataContext).ComparisonsLink);
         }
     }
 }

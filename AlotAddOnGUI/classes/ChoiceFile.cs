@@ -8,7 +8,6 @@ namespace AlotAddOnGUI.classes
         public List<PackageFile> Choices { get; set; }
         public int ID { get; set; }
         public int SelectedIndex { get; set; }
-
         public PackageFile GetChosenFile()
         {
             return Choices[SelectedIndex];
