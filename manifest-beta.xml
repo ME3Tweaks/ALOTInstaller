@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.0.4">
+<alotaddonmanifest version="5.0.5">
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps."/>
   <tutorial link="https://ianmooreisme.github.io/ALOT-Comparisons/" text="Comparison Screenshots" tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore."/>
-  <addonfile meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
+  <addonfile meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC" comparisonslink="http://example.com">
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2.7z" size="2974978097" md5="3e33c8e2e3ded44a2c15742fd6dfac07" />
     <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
   <choicefile choicetitle="Asari Face Style">
