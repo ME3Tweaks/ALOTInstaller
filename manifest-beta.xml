@@ -77,7 +77,7 @@
     <packagefile me1="true" sourcename="MEUITM\mods\volus.mem" movedirectly="true" />
   <choicefile choicetitle="Wrex Style">
     <packagefile me1="true" sourcename="MEUITM\mods\WrexVS.mem" movedirectly="true" choicetitle="Vanilla" />
-    <packagefile me1="true" sourcename="MEUITM\mods\WrexVS.mem" movedirectly="true" choicetitle="Battle hardened"/>
+    <packagefile me1="true" sourcename="MEUITM\mods\Wrex.mem" movedirectly="true" choicetitle="Battle hardened"/>
   </choicefile>
   </addonfile>
   <addonfile alotversion="6" friendlyname="ALOT for ME1 6.0 - Textures" tooltipname="ALOT for ME1 6.0 - Textures" author="CreeperLava">
