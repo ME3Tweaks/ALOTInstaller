@@ -741,8 +741,16 @@ namespace AlotAddOnGUI
                 //We're OK
                 Log.Information("Extraction complete with code " + extractcode);
                 Log.Information("Applying staged update for MEMNOGUI");
-                CopyDir.CopyAll(new DirectoryInfo(UPDATE_STAGING_MEMNOGUI_DIR), new DirectoryInfo(BINARY_DIRECTORY));
-                Log.Information("Update completed");
+                try
+                {
+                    CopyDir.CopyAll(new DirectoryInfo(UPDATE_STAGING_MEMNOGUI_DIR), new DirectoryInfo(BINARY_DIRECTORY));
+                    Log.Information("Update completed");
+                } catch (Exception exception)
+                {
+                    Log.Error("Error extracting MEMNOGUI update:");
+                    Log.Error(App.FlattenException(exception));
+                    await this.ShowMessageAsync("MassEffectModderNoGui update failed", "MassEffectModderNoGui update failed to apply. This program is used to install textures and other operations. The update will be attempted when the program is restarted.\nThe error was: "+exception.Message);
+                }
             }
             else
             {
