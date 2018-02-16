@@ -66,8 +66,8 @@ namespace AlotAddOnGUI
         private int CURRENT_GAME_BUILD = 0; //set when extraction is run/finished
         private int ADDONSTOBUILD_COUNT = 0;
         private bool PreventFileRefresh = false;
-        public static readonly string REGISTRY_KEY = @"SOFTWARE\ALOTAddon";
-        public static readonly string ME3_BACKUP_REGISTRY_KEY = @"SOFTWARE\Mass Effect 3 Mod Manager";
+        public const string REGISTRY_KEY = @"SOFTWARE\ALOTAddon";
+        public const string ME3_BACKUP_REGISTRY_KEY = @"SOFTWARE\Mass Effect 3 Mod Manager";
 
         private BackgroundWorker BuildWorker = new BackgroundWorker();
         private BackgroundWorker BackupWorker = new BackgroundWorker();
@@ -106,6 +106,7 @@ namespace AlotAddOnGUI
         private List<string> musicpackmirrors;
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
+        private readonly string SETTINGSTR_DEBUGLOGGING = "DebugLogging";
         private const string SETTINGSTR_DONT_FORCE_UPGRADES = "DontForceUpgrades";
         private const string SETTINGSTR_REPACK = "RepackGameFiles";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
@@ -141,6 +142,7 @@ namespace AlotAddOnGUI
         private List<string> COPY_QUEUE = new List<string>();
         private List<string> MOVE_QUEUE = new List<string>();
         private DateTime bootTime;
+        public static bool DEBUG_LOGGING;
 
         public bool ShowME1Files
         {
@@ -2639,7 +2641,7 @@ namespace AlotAddOnGUI
                         }
                         else if (af.ALOTVersion > 0 && !af.Ready)
                         {
-                            Log.Warning("Installation for ME" + game + " being blocked due to ALOT main file not installed and is required.");
+                            Log.Warning("Installation for ME" + game + " being blocked: ALOT/MEUITM is not installed currently, and ALOT's main file is not present or ready for use. ALOT must be installed if it's not already done so.");
                             break;
                         }
                     }
@@ -2650,7 +2652,7 @@ namespace AlotAddOnGUI
                         if (!af.Ready)
                         {
                             blockDueToMissingALOTUpdateFile = true;
-                            Log.Warning("Installation for ME" + game + " being blocked due to ALOT Update available that is not ready");
+                            Log.Warning("Installation for ME" + game + " being blocked due to ALOT update available, but not ready for installation in the import library.");
                             break;
                         }
                     }
@@ -3283,6 +3285,9 @@ namespace AlotAddOnGUI
             bool importasmove = Utilities.GetRegistrySettingBool(SETTINGSTR_IMPORTASMOVE) ?? true;
             Checkbox_MoveFilesAsImport.IsChecked = importasmove;
 
+            DEBUG_LOGGING = Utilities.GetRegistrySettingBool(SETTINGSTR_DEBUGLOGGING) ?? false;
+            Checkbox_DebugLogging.IsChecked = DEBUG_LOGGING;
+
             USING_BETA = Utilities.GetRegistrySettingBool(SETTINGSTR_BETAMODE) ?? false;
             Checkbox_BetaMode.IsChecked = USING_BETA;
 
@@ -3910,6 +3915,7 @@ namespace AlotAddOnGUI
                 try
                 {
                     var responseString = await "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "log", CrashLog = isPreviousCrashLog }).ReceiveString();
+                    File.Delete(outfile);
                     Uri uriResult;
                     bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
                         && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
@@ -3928,6 +3934,8 @@ namespace AlotAddOnGUI
                     }
                     else
                     {
+                        File.Delete(outfile);
+
                         //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from oversized log uploader: " + responseString));
                         //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
                         await progresscontroller.CloseAsync();
@@ -3959,7 +3967,6 @@ namespace AlotAddOnGUI
                         exmessage = exmessage.Substring(0, index);
                     }
                     await this.ShowMessageAsync("Log upload failed", "The log was unable to upload. The error message is: " + exmessage + "You will need to upload your log manually.");
-
                 }
                 SettingsFlyout.IsOpen = false;
                 File.Delete(outfile);
@@ -4265,6 +4272,13 @@ namespace AlotAddOnGUI
         private void Button_UserTexturesBadFile_Click(object sender, RoutedEventArgs e)
         {
             QueueNextUserFile();
+        }
+
+        private void Checkbox_DebugLogging_Click(object sender, RoutedEventArgs e)
+        {
+            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_DEBUGLOGGING, (Checkbox_DebugLogging.IsChecked.Value ? 1 : 0));
+            DEBUG_LOGGING = Checkbox_DebugLogging.IsChecked.Value;
+            Log.Information("Debug logging is being turned " + (DEBUG_LOGGING ? "on" : "off"));
         }
     }
 }

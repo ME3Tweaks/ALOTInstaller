@@ -144,15 +144,19 @@ namespace AlotAddOnGUI
         /// <returns></returns>
         public static String GetGamePath(int gameID, bool allowMissingEXE = false)
         {
+            Utilities.WriteDebugLog("Looking up game path for Mass Effect "+gameID+", allow missing EXE: "+allowMissingEXE);
             //Read config file.
             string path = null;
             string mempath = null;
             string inipath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                         "MassEffectModder");
             inipath = Path.Combine(inipath, "MassEffectModder.ini");
+            Utilities.WriteDebugLog("MEM ini path " + inipath);
 
             if (File.Exists(inipath))
             {
+                Utilities.WriteDebugLog("ini exists - loading mem ini");
+
                 IniFile configIni = new IniFile(inipath);
                 string key = "ME" + gameID;
                 path = configIni.Read(key, "GameDataPath");
@@ -160,6 +164,8 @@ namespace AlotAddOnGUI
                 {
                     path = path.TrimEnd(Path.DirectorySeparatorChar);
                     mempath = path;
+                    Utilities.WriteDebugLog("gamepath from mem ini: "+mempath);
+
                     string GameEXEPath = "";
                     switch (gameID)
                     {
@@ -175,9 +181,15 @@ namespace AlotAddOnGUI
                     }
 
                     if (!File.Exists(GameEXEPath))
+                    {
+                        Utilities.WriteDebugLog("mem path has missing exe, not using mem path: " + GameEXEPath);
                         path = null; //mem path is not valid. might still be able to return later.
+                    }
                     else
+                    {
+                        Utilities.WriteDebugLog("Using mem path: " + GameEXEPath);
                         return path;
+                    }
                 }
             }
 
@@ -202,6 +214,8 @@ namespace AlotAddOnGUI
             }
             if (path != null)
             {
+                Utilities.WriteDebugLog("Found game path via registry: " + path);
+
                 path = path.TrimEnd(Path.DirectorySeparatorChar);
 
                 string GameEXEPath = "";
@@ -217,15 +231,30 @@ namespace AlotAddOnGUI
                         GameEXEPath = Path.Combine(path, @"Binaries\Win32\MassEffect3.exe");
                         break;
                 }
+                Utilities.WriteDebugLog("GetGamePath Registry EXE Check Path: " + GameEXEPath);
 
                 if (File.Exists(GameEXEPath))
+                {
+                    Utilities.WriteDebugLog("EXE file exists - returning this path: "+GameEXEPath);
+
                     return path; //we have path now
+                }
             }
             if (mempath != null && allowMissingEXE)
             {
+                Utilities.WriteDebugLog("mem path not null and we allow missing EXEs. Returning "+mempath);
                 return mempath;
             }
+            Utilities.WriteDebugLog("No path found. Returning null");
             return null;
+        }
+
+        private static void WriteDebugLog(string v)
+        {
+            if (MainWindow.DEBUG_LOGGING)
+            {
+                Log.Debug(v);
+            }
         }
 
         public static string GetGameEXEPath(int game)
@@ -235,10 +264,13 @@ namespace AlotAddOnGUI
             switch (game)
             {
                 case 1:
+                    Utilities.WriteDebugLog("GetEXE ME1 Path: " + Path.Combine(path, @"Binaries\MassEffect.exe"));
                     return Path.Combine(path, @"Binaries\MassEffect.exe");
                 case 2:
+                    Utilities.WriteDebugLog("GetEXE ME2 Path: " + Path.Combine(path, @"Binaries\MassEffect.exe"));
                     return Path.Combine(path, @"Binaries\MassEffect2.exe");
                 case 3:
+                    Utilities.WriteDebugLog("GetEXE ME3 Path: " + Path.Combine(path, @"Binaries\MassEffect.exe"));
                     return Path.Combine(path, @"Binaries\Win32\MassEffect3.exe");
             }
             return null;

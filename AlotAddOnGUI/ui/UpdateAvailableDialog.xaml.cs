@@ -30,7 +30,6 @@ namespace AlotAddOnGUI
             mainWindowRef = mainWindow;
             Textblock_UpdateText.Text = headertext;
             Textblock_ChangelogText.Text = changelog;
-
         }
 
         private async void Update_Button_Click(object sender, RoutedEventArgs e)
