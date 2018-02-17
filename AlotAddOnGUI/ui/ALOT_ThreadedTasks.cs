@@ -173,12 +173,13 @@ namespace AlotAddOnGUI
             try
             {
                 Directory.CreateDirectory(extractpath);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Log.Error("Error creating extraction directory: " + extractpath);
                 Log.Error(App.FlattenException(e));
                 ERROR_OCCURED_PLEASE_STOP = true;
-                return new KeyValuePair<AddonFile, bool>(af,false);
+                return new KeyValuePair<AddonFile, bool>(af, false);
             }
             try
             {
@@ -1510,7 +1511,8 @@ namespace AlotAddOnGUI
                             MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.SoundMute;
                             waveOut.Pause();
                         }
-                    } catch (Exception e)
+                    }
+                    catch (Exception e)
                     {
                         Log.Error("Error initializing audio device and UI:" + e.Message);
                         InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
@@ -2044,6 +2046,7 @@ namespace AlotAddOnGUI
                     return;
                 }
                 Utilities.RemoveRunAsAdminXPSP3FromME1();
+
             }
             Utilities.TurnOffOriginAutoUpdate();
 
@@ -2190,6 +2193,12 @@ namespace AlotAddOnGUI
             int minutes = (int)sw.Elapsed.TotalMinutes;
             double fsec = 60 * (sw.Elapsed.TotalMinutes - minutes);
             int sec = (int)fsec;
+            string iniPath = IniSettingsHandler.GetConfigIniPath(1);
+            if (File.Exists(iniPath))
+            {
+                IniFile engineConf = new IniFile(iniPath);
+                engineConf.Write("DeviceName", "Generic Hardware", "ISACTAudio.ISACTAudioDevice");
+            }
             Log.Information("Process complete - finished in " + minutes + " minutes " + sec + " seconds");
         }
 
@@ -2421,17 +2430,17 @@ namespace AlotAddOnGUI
                         string param = str.Substring(endOfCommand + 5).Trim();
                         switch (command)
                         {
-                                //worker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
-                                //int percentInt = Convert.ToInt32(param);
-                                //worker.ReportProgress(percentInt);
-                                case "PROCESSING_FILE":
+                            //worker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+                            //int percentInt = Convert.ToInt32(param);
+                            //worker.ReportProgress(percentInt);
+                            case "PROCESSING_FILE":
                             case "PROCESSING_MOD":
                                 Log.Information("MEM Reports processing file: " + param);
-                                    //worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
-                                    break;
+                                //worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
+                                break;
                             case "OVERALL_PROGRESS":
-                                //This will be changed later
-                                case "TASK_PROGRESS":
+                            //This will be changed later
+                            case "TASK_PROGRESS":
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_TASK_PROGRESS, param));
                                 break;
                             case "PHASE":

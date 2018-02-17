@@ -190,6 +190,9 @@ namespace AlotAddOnGUI
                         Utilities.WriteDebugLog("Using mem path: " + GameEXEPath);
                         return path;
                     }
+                } else
+                {
+                    Utilities.WriteDebugLog("mem ini does not have path for this game.");
                 }
             }
 
@@ -215,7 +218,6 @@ namespace AlotAddOnGUI
             if (path != null)
             {
                 Utilities.WriteDebugLog("Found game path via registry: " + path);
-
                 path = path.TrimEnd(Path.DirectorySeparatorChar);
 
                 string GameEXEPath = "";
@@ -236,9 +238,11 @@ namespace AlotAddOnGUI
                 if (File.Exists(GameEXEPath))
                 {
                     Utilities.WriteDebugLog("EXE file exists - returning this path: "+GameEXEPath);
-
                     return path; //we have path now
                 }
+            } else
+            {
+                Utilities.WriteDebugLog("Could not find game via registry.");
             }
             if (mempath != null && allowMissingEXE)
             {
