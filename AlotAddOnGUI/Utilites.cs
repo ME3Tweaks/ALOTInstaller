@@ -144,7 +144,7 @@ namespace AlotAddOnGUI
         /// <returns></returns>
         public static String GetGamePath(int gameID, bool allowMissingEXE = false)
         {
-            Utilities.WriteDebugLog("Looking up game path for Mass Effect "+gameID+", allow missing EXE: "+allowMissingEXE);
+            Utilities.WriteDebugLog("Looking up game path for Mass Effect " + gameID + ", allow missing EXE: " + allowMissingEXE);
             //Read config file.
             string path = null;
             string mempath = null;
@@ -164,7 +164,7 @@ namespace AlotAddOnGUI
                 {
                     path = path.TrimEnd(Path.DirectorySeparatorChar);
                     mempath = path;
-                    Utilities.WriteDebugLog("gamepath from mem ini: "+mempath);
+                    Utilities.WriteDebugLog("gamepath from mem ini: " + mempath);
 
                     string GameEXEPath = "";
                     switch (gameID)
@@ -190,7 +190,8 @@ namespace AlotAddOnGUI
                         Utilities.WriteDebugLog("Using mem path: " + GameEXEPath);
                         return path;
                     }
-                } else
+                }
+                else
                 {
                     Utilities.WriteDebugLog("mem ini does not have path for this game.");
                 }
@@ -237,16 +238,17 @@ namespace AlotAddOnGUI
 
                 if (File.Exists(GameEXEPath))
                 {
-                    Utilities.WriteDebugLog("EXE file exists - returning this path: "+GameEXEPath);
+                    Utilities.WriteDebugLog("EXE file exists - returning this path: " + GameEXEPath);
                     return path; //we have path now
                 }
-            } else
+            }
+            else
             {
                 Utilities.WriteDebugLog("Could not find game via registry.");
             }
             if (mempath != null && allowMissingEXE)
             {
-                Utilities.WriteDebugLog("mem path not null and we allow missing EXEs. Returning "+mempath);
+                Utilities.WriteDebugLog("mem path not null and we allow missing EXEs. Returning " + mempath);
                 return mempath;
             }
             Utilities.WriteDebugLog("No path found. Returning null");
@@ -494,7 +496,8 @@ namespace AlotAddOnGUI
                         return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
                     }
                 }
-            } catch (IOException e)
+            }
+            catch (IOException e)
             {
                 Log.Error("I/O ERROR CALCULATING CHECKSUM OF FILE: " + filename);
                 Log.Error("This is a critical error - this system may have hardware issues.");
@@ -562,23 +565,33 @@ namespace AlotAddOnGUI
             {
                 return false;
             }
-            Log.Information("Installing binkw32 for Mass Effect " + game);
-            string gamePath = GetGamePath(game);
-            switch (game)
+            try
             {
-                case 2:
-                    gamePath += "\\Binaries\\";
-                    System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me2_binkw23);
-                    System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me2_binkw32);
-                    break;
-                case 3:
-                    gamePath += "\\Binaries\\Win32\\";
-                    System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me3_binkw23);
-                    System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me3_binkw32);
-                    break;
+                Log.Information("Installing binkw32 for Mass Effect " + game);
+                string gamePath = GetGamePath(game);
+                switch (game)
+                {
+                    case 2:
+                        gamePath += "\\Binaries\\";
+                        System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me2_binkw23);
+                        System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me2_binkw32);
+                        break;
+                    case 3:
+                        gamePath += "\\Binaries\\Win32\\";
+                        System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me3_binkw23);
+                        System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me3_binkw32);
+                        break;
+                }
+                Log.Information("Installed binkw32 for Mass Effect " + game);
+                return true;
             }
-            Log.Information("Installed binkw32 for Mass Effect " + game);
-            return true;
+            catch (Exception e)
+            {
+                Log.Error("Unable to install binkw32: " + e.Message);
+                Log.Error(App.FlattenException(e));
+                Log.Error("DLC will not authenticate.");
+            }
+            return false;
         }
 
         /// <summary>
@@ -719,6 +732,8 @@ namespace AlotAddOnGUI
 
         public static void MakeAllFilesInDirReadWrite(string directory)
         {
+            Log.Information("Marking all files in directory to read-write: " + directory);
+            Log.Warning("If the application crashes after this statement, please come to to the ALOT discord - this is an issue we have not yet been able to reproduce and thus can't fix without outside assistance.");
             var di = new DirectoryInfo(directory);
             foreach (var file in di.GetFiles("*", SearchOption.AllDirectories))
                 file.Attributes &= ~FileAttributes.ReadOnly;

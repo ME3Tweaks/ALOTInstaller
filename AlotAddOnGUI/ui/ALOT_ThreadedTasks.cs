@@ -1760,7 +1760,6 @@ namespace AlotAddOnGUI
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
 
-
             Log.Information("Setting biogame directory to read-write");
             Utilities.MakeAllFilesInDirReadWrite(Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\BIOGame");
             Log.Information("Files being installed in this installation session:");

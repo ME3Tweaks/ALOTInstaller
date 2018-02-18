@@ -564,7 +564,7 @@ namespace AlotAddOnGUI.ui
             }
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
-                
+
                 addDiagLine(prefix + "The following basegame mods were detected:");
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
@@ -623,6 +623,9 @@ namespace AlotAddOnGUI.ui
                         metadataPresent = true;
                         continue;
                     }
+                    long sfarsize = 0;
+                    long propersize = 32L;
+                    bool hasSfarSizeError = false;
                     if (DIAGNOSTICS_GAME == 3)
                     {
                         //check for ISM/Controller patch
@@ -639,8 +642,22 @@ namespace AlotAddOnGUI.ui
                         {
                             hasUIMod = true;
                         }
+                        string sfar = dir + "\\CookedPCConsole\\Default.sfar";
+                        if (File.Exists(sfar))
+                        {
+                            FileInfo fi = new FileInfo(sfar);
+                            sfarsize = fi.Length;
+                            hasSfarSizeError = sfarsize != propersize;
+                        }
                     }
-                    addDiagLine(" - " + GetDLCDisplayString(value));
+                    if (hasSfarSizeError && MEMI_FOUND)
+                    {
+                        addDiagLine(" - DIAG ERROR: " + GetDLCDisplayString(value) + " - SFAR is not unpacked size. Should be 32 bytes, however SFAR is " + ByteSize.FromBytes(sfarsize)+". If HQ graphics settings are on (MEMI was found so they should be) this will 99% of the time crash the game. See below for LOD str.");
+                    }
+                    else
+                    {
+                        addDiagLine(" - " + GetDLCDisplayString(value));
+                    }
                 }
 
                 if (hasUIMod && hasNonUIDLCMod && compatPatchInstalled)

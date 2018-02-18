@@ -607,7 +607,7 @@ namespace AlotAddOnGUI
         {
             EnsureOneGameIsInstalled();
             PerformRAMCheck();
-            PerformWriteCheck();
+            await PerformWriteCheck(false);
             UpdateALOTStatus();
             RunMEMUpdaterGUI();
             string appCrashFile = EXE_DIRECTORY + @"Data\APP_CRASH";
@@ -747,11 +747,12 @@ namespace AlotAddOnGUI
                 {
                     CopyDir.CopyAll(new DirectoryInfo(UPDATE_STAGING_MEMNOGUI_DIR), new DirectoryInfo(BINARY_DIRECTORY));
                     Log.Information("Update completed");
-                } catch (Exception exception)
+                }
+                catch (Exception exception)
                 {
                     Log.Error("Error extracting MEMNOGUI update:");
                     Log.Error(App.FlattenException(exception));
-                    await this.ShowMessageAsync("MassEffectModderNoGui update failed", "MassEffectModderNoGui update failed to apply. This program is used to install textures and other operations. The update will be attempted when the program is restarted.\nThe error was: "+exception.Message);
+                    await this.ShowMessageAsync("MassEffectModderNoGui update failed", "MassEffectModderNoGui update failed to apply. This program is used to install textures and other operations. The update will be attempted when the program is restarted.\nThe error was: " + exception.Message);
                 }
             }
             else
@@ -900,40 +901,60 @@ namespace AlotAddOnGUI
 
                         if (readyToInstallALOT || currentAlotInfo != null) //not installed
                         {
-                            HeaderLabel.Text = "Ready to install";
-                            AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
-                            MetroDialogSettings mds = new MetroDialogSettings();
-                            mds.AffirmativeButtonText = "Install Now";
-
-                            mds.NegativeButtonText = "Install Later";
-                            mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                            var buildResult = await this.ShowMessageAsync("Ready to install textures", "You can install these textures now, or you can manually install them with MEM. The files have been placed into the Data\\MEM_Packages subdirectory.", MessageDialogStyle.AffirmativeAndNegative, mds);
-                            if (buildResult == MessageDialogResult.Affirmative)
+                            var ready = false;
+                            for (int i = 0; i < 4; i++)
                             {
-                                bool run = true;
-                                while (Utilities.isGameRunning(CURRENT_GAME_BUILD))
+                                if (!ready)
                                 {
-                                    run = false;
-                                    await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + " is running", "Please close Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + " to continue.");
-                                    if (!Utilities.isGameRunning(CURRENT_GAME_BUILD))
-                                    {
-                                        run = true;
-                                        break;
-                                    }
+                                    ready = await PerformWriteCheck(true);
                                 }
-                                if (run)
+                            }
+
+                            if (!ready)
+                            {
+                                Log.Warning("Cannot determine if game directory is writable, or user is declining PermissionsGranter.exe. Aborting installation.");
+                                await this.ShowMessageAsync("Unable to gain write access to game directories", "ALOT Installer was unable to gain write access to all installed game's directories. ALOT Installer will not attempt installation if the privledge checks don't pass. Please allow ALOT Installer permissions through PermissionsGranter.exe's UAC prompt.");
+                                errorOccured = false;
+                                break;
+                            }
+
+                            if (ready)
+                            {
+                                HeaderLabel.Text = "Ready to install";
+                                AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
+                                MetroDialogSettings mds = new MetroDialogSettings();
+                                mds.AffirmativeButtonText = "Install Now";
+
+                                mds.NegativeButtonText = "Install Later";
+                                mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                                var buildResult = await this.ShowMessageAsync("Ready to install textures", "You can install these textures now, or you can manually install them with MEM. The files have been placed into the Data\\MEM_Packages subdirectory.", MessageDialogStyle.AffirmativeAndNegative, mds);
+                                if (buildResult == MessageDialogResult.Affirmative)
                                 {
-                                    Log.Information("User has chosen to install textures after build - we are now starting InstallALOT()");
-                                    InstallALOT(result, ADDONFILES_TO_BUILD);
+                                    bool run = true;
+                                    while (Utilities.isGameRunning(CURRENT_GAME_BUILD))
+                                    {
+                                        run = false;
+                                        await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + " is running", "Please close Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + " to continue.");
+                                        if (!Utilities.isGameRunning(CURRENT_GAME_BUILD))
+                                        {
+                                            run = true;
+                                            break;
+                                        }
+                                    }
+                                    if (run)
+                                    {
+                                        Log.Information("User has chosen to install textures after build - we are now starting InstallALOT()");
+                                        InstallALOT(result, ADDONFILES_TO_BUILD);
+                                    }
+                                    else
+                                    {
+                                        Log.Warning("User has declined to install textures after build, or the game is running.");
+                                    }
                                 }
                                 else
                                 {
-                                    Log.Warning("User has declined to install textures after build, or the game is running.");
+                                    HeaderLabel.Text = PRIMARY_HEADER;
                                 }
-                            }
-                            else
-                            {
-                                HeaderLabel.Text = PRIMARY_HEADER;
                             }
                         }
                         else
@@ -1140,9 +1161,9 @@ namespace AlotAddOnGUI
             me2Installed = (me2Path != null);
             me3Installed = (me3Path != null);
 
-            Log.Information("ME1 Installed: " + me1Installed);
-            Log.Information("ME2 Installed: " + me2Installed);
-            Log.Information("ME3 Installed: " + me3Installed);
+            Log.Information("ME1 Installed: " + me1Installed + " " + me1Path);
+            Log.Information("ME2 Installed: " + me2Installed + " " + me2Path);
+            Log.Information("ME3 Installed: " + me3Installed + " " + me3Path);
 
             if (!me1Installed && !me2Installed && !me3Installed)
             {
@@ -1516,6 +1537,7 @@ namespace AlotAddOnGUI
 
         private void CheckOutputDirectoriesForUnpackedSingleFiles(int game = 0)
         {
+            Utilities.CreateMarkerFile(3, new ALOTVersionInfo(6, 3, 0, 0));
             bool ReImportedFiles = false;
             foreach (AddonFile af in alladdonfiles)
             {
@@ -1572,7 +1594,7 @@ namespace AlotAddOnGUI
             Debug.WriteLine("Ram Amount, KB: " + ramAmountKb);
         }
 
-        private async void PerformWriteCheck()
+        private async Task<bool> PerformWriteCheck(bool required)
         {
             Log.Information("Performing Write Check...");
             string me1Path = Utilities.GetGamePath(1);
@@ -1666,15 +1688,21 @@ namespace AlotAddOnGUI
                     if (result == 0)
                     {
                         Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
+                        return true;
                     }
                     else
                     {
                         Log.Error("Elevated process returned code " + result + ", directories probably aren't writable.");
+                        return false;
                     }
                 }
                 else
                 {
                     string message = "Some game folders/registry keys are not writeable by your user account. ALOT Installer will attempt to grant access to these folders/registry with the PermissionsGranter.exe program:\n";
+                    if (required)
+                    {
+                        message = "Some game paths and registry keys are not writeable by your user account. These need to be writable or ALOT Installer will be unable to install ALOT. Please grant administrative privledges to PermissionsGranter.exe to give your account the necessary privileges to the following:\n";
+                    }
                     foreach (String str in directories)
                     {
                         message += "\n" + str;
@@ -1689,13 +1717,21 @@ namespace AlotAddOnGUI
                     if (result == 0)
                     {
                         Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
+                        return true;
                     }
                     else
                     {
                         Log.Error("Elevated process returned code " + result + ", directories probably aren't writable.");
+                        return false;
                     }
                 }
             }
+            return true;
+        }
+
+        private async void PerformUACCheck()
+        {
+            bool isAdmin = Utilities.IsAdministrator();
 
             //Check if UAC is off
             bool uacIsOn = true;
@@ -1709,10 +1745,7 @@ namespace AlotAddOnGUI
             }
             if (isAdmin && uacIsOn)
             {
-                if (args == "")
-                {
-                    Log.Warning("This session does not need admin privileges and UAC is on.");
-                }
+                Log.Warning("This session is running as administrator.");
                 await this.ShowMessageAsync("ALOT Installer should be run as standard user", "Running ALOT Installer as an administrator will disable drag and drop functionality and may cause issues due to the program running in a different user context. You should restart the application without running it as an administrator.");
             }
         }
