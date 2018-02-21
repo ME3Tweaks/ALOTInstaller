@@ -175,7 +175,8 @@
     <Compile Include="AddonDownloadAssistant.xaml.cs">
       <DependentUpon>AddonDownloadAssistant.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ui\ALOT_ThreadedTasks.cs" />
+    <Compile Include="ui\ALOT_AddonUIMode_ThreadedTasks.cs" />
+    <Compile Include="ui\ALOT_InstallMode_ThreadedTasks.cs" />
     <Compile Include="ui\DiagnosticsWindow.xaml.cs">
       <DependentUpon>DiagnosticsWindow.xaml</DependentUpon>
     </Compile>

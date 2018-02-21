@@ -47,7 +47,7 @@ namespace AlotAddOnGUI
         public ConsoleApp BACKGROUND_MEM_PROCESS = null;
         public bool BACKGROUND_MEM_RUNNING = false;
         ProgressDialogController updateprogresscontroller;
-        public const string UPDATE_OPERATION_LABEL = "UPDATE_OPERATION_LABEL";
+        public const string UPDATE_ADDONUI_CURRENTTASK = "UPDATE_OPERATION_LABEL";
         public const string HIDE_TIPS = "HIDE_TIPS";
         public const string UPDATE_PROGRESSBAR_INDETERMINATE = "SET_PROGRESSBAR_DETERMINACY";
         public const string INCREMENT_COMPLETION_EXTRACTION = "INCREMENT_COMPLETION_EXTRACTION";
@@ -734,7 +734,7 @@ namespace AlotAddOnGUI
             kp.Key.SetTitle("Extracting MassEffectModderNoGUI Update");
             //Extract 7z
             string path = BINARY_DIRECTORY + "7z.exe";
-            string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + UPDATE_STAGING_MEMNOGUI_DIR + "\"";
+            string args = "x \"" + kp.Value + "\" -aoa -r -o\"" + EXE_DIRECTORY + "\\" + UPDATE_STAGING_MEMNOGUI_DIR + "\"";
 
             Log.Information("Extracting MassEffectModderNoGUI update to staging...");
             int extractcode = Utilities.runProcess(path, args);
@@ -761,9 +761,9 @@ namespace AlotAddOnGUI
                 Log.Error("MEMNoGui update extraction failed with code " + extractcode);
                 await this.ShowMessageAsync("MassEffectModderNoGui update failed", "MassEffectModderNoGui update failed. This program is used to install textures and other operations. The update will be attempted when the program is restarted.");
             }
-            if (Directory.Exists(UPDATE_STAGING_MEMNOGUI_DIR))
+            if (Directory.Exists(EXE_DIRECTORY + "\\" + UPDATE_STAGING_MEMNOGUI_DIR))
             {
-                Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEMNOGUI_DIR);
+                Utilities.DeleteFilesAndFoldersRecursively(EXE_DIRECTORY + "\\" + UPDATE_STAGING_MEMNOGUI_DIR);
             }
             File.Delete((string)kp.Value);
             await kp.Key.CloseAsync();
@@ -1537,7 +1537,6 @@ namespace AlotAddOnGUI
 
         private void CheckOutputDirectoriesForUnpackedSingleFiles(int game = 0)
         {
-            Utilities.CreateMarkerFile(3, new ALOTVersionInfo(6, 3, 0, 0));
             bool ReImportedFiles = false;
             foreach (AddonFile af in alladdonfiles)
             {
@@ -2163,14 +2162,27 @@ namespace AlotAddOnGUI
             }
         }
 
+        /// <summary>
+        /// Class for passing data between theads
+        /// </summary>
         public class ThreadCommand
         {
+            /// <summary>
+            /// Creates a new thread command object with the specified command and data object. This constructori s used for passing data to another thread. The receiver will need to read the command then cast the data.
+            /// </summary>
+            /// <param name="command">command for this thread communication.</param>
+            /// <param name="data">data to pass to another thread</param>
             public ThreadCommand(string command, object data)
             {
                 this.Command = command;
                 this.Data = data;
             }
 
+            /// <summary>
+            /// Creates a new thread command object with the specified command. This constructor is used for notifying other threads something has happened.
+            /// </summary>
+            /// <param name="command">command for this thread communication.</param>
+            /// <param name="data">data to pass to another thread</param>
             public ThreadCommand(string command)
             {
                 this.Command = command;

@@ -88,7 +88,7 @@ namespace AlotAddOnGUI.ui
             {
                 return 0;
             }
-            Log.Information("Setting progress for stage " + (stage+1) + " to " + newProgressValue + ". Overall progress for this task accounts for " + (jobWeightList[stage].Key * jobWeightList[stage].Value));
+            //Log.Information("Setting progress for stage " + (stage+1) + " to " + newProgressValue + ". Overall progress for this task accounts for " + (jobWeightList[stage].Key * jobWeightList[stage].Value));
             jobWeightList[stage].Key = newProgressValue;
             return GetOverallProgress();
         }
@@ -114,7 +114,7 @@ namespace AlotAddOnGUI.ui
             if (TOTAL_ACTIVE_WEIGHT > 0)
             {
                 int progress = (int)currentFinishedWeight;
-                Log.Information("Overall Progress: " + progress);
+                Log.Information("Overall Progress: " + progress+"%");
                 return progress;
             }
             return 0;

@@ -168,7 +168,7 @@ namespace AlotAddOnGUI.ui
                 case RESTORE_FAILED_COULD_NOT_DELETE_FOLDER:
                     //await this.ShowMessageAsync("Restore failed", "Could not delete the existing game directory. This is usually due to something open or running from within the game folder. Close other programs and try again.");
                     return;
-                case UPDATE_OPERATION_LABEL:
+                case UPDATE_ADDONUI_CURRENTTASK:
                     //AddonFilesLabel.Text = (string)tc.Data;
                     break;
                 case SET_FULLSCAN_PROGRESS:
@@ -560,7 +560,7 @@ namespace AlotAddOnGUI.ui
             string prefix = "";
             if (MEMI_FOUND)
             {
-                prefix = " - DIAG ERROR:";
+                prefix = " - DIAG ERROR: ";
             }
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
@@ -569,6 +569,10 @@ namespace AlotAddOnGUI.ui
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
                     addDiagLine(prefix + " - " + str);
+                }
+                if (MEMI_FOUND)
+                {
+                    addDiagLine("[ERROR]These mods appear to be installed after ALOT. This will break the game. Follow the directions for ALOT to avoid this issue.");
                 }
             }
             else
@@ -652,11 +656,13 @@ namespace AlotAddOnGUI.ui
                     }
                     if (hasSfarSizeError && MEMI_FOUND)
                     {
-                        addDiagLine(" - DIAG ERROR: " + GetDLCDisplayString(value) + " - SFAR is not unpacked size. Should be 32 bytes, however SFAR is " + ByteSize.FromBytes(sfarsize)+". If HQ graphics settings are on (MEMI was found so they should be) this will 99% of the time crash the game. See below for LOD str.");
+                        addDiagLine("[ERROR]" + GetDLCDisplayString(value));
+                        addDiagLine("[ERROR]      SFAR is not unpacked size. Should be 32 bytes, however SFAR is " + ByteSize.FromBytes(sfarsize) + ".");
+                        addDiagLine("[ERROR]      If HQ graphics settings are on (MEMI was found so they should be) this will 99% of the time crash the game. See below for current LOD settings.");
                     }
                     else
                     {
-                        addDiagLine(" - " + GetDLCDisplayString(value));
+                        addDiagLine(GetDLCDisplayString(value));
                     }
                 }
 
@@ -1132,7 +1138,7 @@ namespace AlotAddOnGUI.ui
                                 }
                                 break;
                             case "PROCESSING_FILE":
-                                worker.ReportProgress(0, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
+                                worker.ReportProgress(0, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, param));
                                 break;
                             case "ERROR":
                                 Log.Error("IPC ERROR: " + param);
@@ -1189,10 +1195,10 @@ namespace AlotAddOnGUI.ui
             string name = InteralGetDLCName(str);
             if (name != null)
             {
-                return str + " (" + name + ")";
+                return " - " + str + " (" + name + ")";
             }
 
-            return str;
+            return "[DLC]" + str;
         }
 
         public static int GetDLCPriority(string DLCBasePath)
@@ -1270,9 +1276,9 @@ namespace AlotAddOnGUI.ui
                 case "DLC_CON_GUN01": return "Firefight Pack";
                 case "DLC_CON_GUN02": return "Groundside Resistance Pack";
 
-                case "DLC_CON_XBX": return "[MOD] Singleplayer Native Controller Support";
-                case "DLC_CON_UIScaling": return "[MOD] Interface Scaling Mod";
-                case "DLC_CON_UIScaling_Shared": return "[MOD] Interface Scaling Add-on";
+                //case "DLC_CON_XBX": return "[MOD] Singleplayer Native Controller Support";
+                //case "DLC_CON_UIScaling": return "[MOD] Interface Scaling Mod";
+                //case "DLC_CON_UIScaling_Shared": return "[MOD] Interface Scaling Add-on";
 
                 default:
                     return null;

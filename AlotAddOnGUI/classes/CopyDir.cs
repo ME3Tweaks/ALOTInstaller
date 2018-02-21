@@ -94,7 +94,7 @@ namespace AlotAddOnGUI.classes
                     long length = new System.IO.FileInfo(fi.FullName).Length;
                     displayName += " (" + ByteSize.FromBytes(length) + ")";
                 }
-                worker.ReportProgress(done, new ThreadCommand(UPDATE_OPERATION_LABEL, displayName));
+                worker.ReportProgress(done, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, displayName));
                 try
                 {
                     fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
