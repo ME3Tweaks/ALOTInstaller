@@ -617,6 +617,10 @@ namespace AlotAddOnGUI
                 {
                     if (CurrentGameALOTInfo != null)
                     {
+                        if (af.ALOTUpdateVersion > 0)
+                        {
+                            Debugger.Break();
+                        }
                         //Detected MEMI tag
                         //Check if ALOT main file is installed. If it is and this is ALOT file, skip
                         if (af.ALOTVersion > 0 && CurrentGameALOTInfo.ALOTVER >= 0 && BUILD_ALOT == false)
@@ -635,7 +639,7 @@ namespace AlotAddOnGUI
                         }
 
                         //Check if ALOT update file of this version or higher is installed. If it is and this is ALOT update file, skip
-                        if (af.ALOTUpdateVersion > 0 && CurrentGameALOTInfo.ALOTUPDATEVER >= af.ALOTUpdateVersion)
+                        if (af.ALOTUpdateVersion > 0 && CurrentGameALOTInfo.ALOTUPDATEVER >= af.ALOTUpdateVersion && BUILD_ALOT_UPDATE == false)
                         {
                             Log.Information("ALOT Update File in queue for processing, but ALOT update of this version or greater is already installed. Skipping...");
                             af.ReadyStatusText = "Update already applied";

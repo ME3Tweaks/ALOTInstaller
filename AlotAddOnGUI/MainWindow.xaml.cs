@@ -899,6 +899,16 @@ namespace AlotAddOnGUI
                             break;
                         }
 
+                        if (ADDONFILES_TO_BUILD.Count == 0)
+                        {
+                            //bug found
+                            HeaderLabel.Text = "No files selected to install for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
+                            AddonFilesLabel.Text = "This is a bug. Please report this to the developers on Discord.";
+                            await this.ShowMessageAsync("No files selected for installation", "No files were selected for installation. This should not be possible - you have found a bug. Please report this to the developers on Discord.");
+                            errorOccured = false;
+                            break;
+                        }
+
                         if (readyToInstallALOT || currentAlotInfo != null) //not installed
                         {
                             var ready = false;
@@ -982,6 +992,7 @@ namespace AlotAddOnGUI
             BUILD_ALOT = false;
             BUILD_ADDON_FILES = false;
             BUILD_USER_FILES = false;
+            BUILD_ALOT_UPDATE = false;
             ApplyFiltering();
             CURRENT_GAME_BUILD = 0; //reset
         }
