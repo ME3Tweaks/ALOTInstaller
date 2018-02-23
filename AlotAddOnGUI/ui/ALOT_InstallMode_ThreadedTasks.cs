@@ -415,70 +415,73 @@ namespace AlotAddOnGUI
                 Thread.Sleep(END_OF_PROCESS_POLL_INTERVAL);
             }
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-            if (processResult != 0)
+            if (!STAGE_DONE_REACHED)
             {
-                Log.Error("MassEffectModderNoGui process exited with non-zero code: " + processResult);
-                Log.Warning("Application exited with in context: " + CURRENT_STAGE_CONTEXT);
-                switch (CURRENT_STAGE_CONTEXT)
+                if (processResult != 0)
                 {
-                    case "STAGE_UNPACKDLC":
-                        Log.Error("MassEffectModderNoGui exited or crashed while unpacking DLC");
-                        e.Result = RESULT_UNPACK_FAILED;
-                        break;
-                    case "STAGE_SCAN":
-                        Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
-                        e.Result = RESULT_SCAN_REMOVE_FAILED;
-                        break;
-                    case "STAGE_INSTALLTEXTURES":
-                        Log.Error("MassEffectModderNoGui exited or crashed while installing textures");
-                        if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
-                        {
-                            switch (BACKGROUND_MEM_PROCESS_ERRORS[0])
+                    Log.Error("MassEffectModderNoGui process exited with non-zero code: " + processResult);
+                    Log.Warning("Application exited with in context: " + CURRENT_STAGE_CONTEXT);
+                    switch (CURRENT_STAGE_CONTEXT)
+                    {
+                        case "STAGE_UNPACKDLC":
+                            Log.Error("MassEffectModderNoGui exited or crashed while unpacking DLC");
+                            e.Result = RESULT_UNPACK_FAILED;
+                            break;
+                        case "STAGE_SCAN":
+                            Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
+                            e.Result = RESULT_SCAN_REMOVE_FAILED;
+                            break;
+                        case "STAGE_INSTALLTEXTURES":
+                            Log.Error("MassEffectModderNoGui exited or crashed while installing textures");
+                            if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
                             {
-                                case ERROR_TEXTURE_MAP_MISSING:
-                                    e.Result = RESULT_TEXTUREINSTALL_NO_TEXTUREMAP;
-                                    break;
-                                case ERROR_TEXTURE_MAP_WRONG:
-                                    e.Result = RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP;
-                                    break;
-                                case ERROR_FILE_ADDED:
-                                    e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_ADDED;
-                                    break;
-                                case ERROR_FILE_REMOVED:
-                                    e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED;
-                                    break;
-                                default:
-                                    Log.Error("Background MEM errors has item not handled: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
-                                    e.Result = RESULT_TEXTUREINSTALL_FAILED;
-                                    break;
+                                switch (BACKGROUND_MEM_PROCESS_ERRORS[0])
+                                {
+                                    case ERROR_TEXTURE_MAP_MISSING:
+                                        e.Result = RESULT_TEXTUREINSTALL_NO_TEXTUREMAP;
+                                        break;
+                                    case ERROR_TEXTURE_MAP_WRONG:
+                                        e.Result = RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP;
+                                        break;
+                                    case ERROR_FILE_ADDED:
+                                        e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_ADDED;
+                                        break;
+                                    case ERROR_FILE_REMOVED:
+                                        e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED;
+                                        break;
+                                    default:
+                                        Log.Error("Background MEM errors has item not handled: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
+                                        e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                                        break;
+                                }
                             }
-                        }
-                        else
-                        {
-                            e.Result = RESULT_TEXTUREINSTALL_FAILED;
-                        }
-                        break;
-                    case "STAGE_SAVING":
-                        Log.Error("MassEffectModderNoGui exited or crashed while saving packages");
-                        e.Result = RESULT_SAVING_FAILED;
-                        break;
-                    case "STAGE_REMOVEMIPMAPS":
-                        Log.Error("MassEffectModderNoGui exited or crashed while removing empty mipmaps");
-                        e.Result = RESULT_REMOVE_MIPMAPS_FAILED;
-                        break;
-                    case "STAGE_REPACK":
-                        Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
-                        e.Result = RESULT_REPACK_FAILED;
-                        break;
-                    default:
-                        Log.Error("MEM Exited during unknown stage context: " + STAGE_CONTEXT);
-                        break;
-                }
+                            else
+                            {
+                                e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                            }
+                            break;
+                        case "STAGE_SAVING":
+                            Log.Error("MassEffectModderNoGui exited or crashed while saving packages");
+                            e.Result = RESULT_SAVING_FAILED;
+                            break;
+                        case "STAGE_REMOVEMIPMAPS":
+                            Log.Error("MassEffectModderNoGui exited or crashed while removing empty mipmaps");
+                            e.Result = RESULT_REMOVE_MIPMAPS_FAILED;
+                            break;
+                        case "STAGE_REPACK":
+                            Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
+                            e.Result = RESULT_REPACK_FAILED;
+                            break;
+                        default:
+                            Log.Error("MEM Exited during unknown stage context: " + STAGE_CONTEXT);
+                            break;
+                    }
 
-                e.Result = RESULT_UNPACK_FAILED;
-                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
-                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
-                return;
+                    e.Result = RESULT_UNPACK_FAILED;
+                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
+                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
+                    return;
+                }
             }
             overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
             InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));

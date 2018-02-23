@@ -29,6 +29,7 @@ namespace AlotAddOnGUI
         public static void Main()
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
             try
             {
                 var application = new App();
