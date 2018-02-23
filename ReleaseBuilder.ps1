@@ -55,6 +55,9 @@ if (Test-Path "$($PSScriptRoot)\..\..\update-backcompat\ALOTAddonBuilder.exe") {
     Copy-Item "$($PSScriptRoot)\..\..\update-backcompat\ALOTAddonBuilder.exe" "$($PSScriptRoot)\Release\ALOTAddonBuilder.exe" -Force
 }
 
+$Cert = Get-ChildItem -Path "Cert:\CurrentUser\My" -CodeSigningCert
+Set-AuthenticodeSignature -FilePath "Release\ALOTInstaller.exe" -TimestampServer "http://timestamp.digicert.com" -HashAlgorithm -Certificate $Cert
+
 
 $fileversion = [System.Diagnostics.FileVersionInfo]::GetVersionInfo("Release\ALOTInstaller.exe").FileVersion
 $outputfile = "$($PSScriptRoot)\ALOTInstaller_$($fileversion).7z"
