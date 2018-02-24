@@ -39,6 +39,15 @@ namespace AlotAddOnGUI
             this.missingAddonFiles = missingAddonFiles;
             filesList.ItemsSource = missingAddonFiles;
             Button_ImportFromDownloads.IsEnabled = Directory.Exists(MainWindow.DOWNLOADS_FOLDER);
+            if (!Directory.Exists(MainWindow.DOWNLOADS_FOLDER))
+            {
+                TextBlock_DownloadsFolder.Text = "Current Downloads folder is invalid. Please change it below.";
+                TextBlock_DownloadsFolder.Foreground = new BrushConverter().ConvertFromString("Red") as SolidColorBrush;
+            } else
+            {
+                TextBlock_DownloadsFolder.Text = "Current Downloads folder: " + MainWindow.DOWNLOADS_FOLDER;
+                TextBlock_DownloadsFolder.Foreground = new BrushConverter().ConvertFromString("Lime") as SolidColorBrush;
+            }
         }
 
         public void setNewMissingAddonfiles(List<AddonFile> missingAddonFiles)
@@ -149,6 +158,7 @@ namespace AlotAddOnGUI
             Utilities.WriteRegistryKey(Registry.CurrentUser, MainWindow.REGISTRY_KEY, MainWindow.SETTINGSTR_DOWNLOADSFOLDER, dir);
             MainWindow.DOWNLOADS_FOLDER = dir;
             TextBlock_DownloadsFolder.Text = "Current Downloads folder: " + MainWindow.DOWNLOADS_FOLDER;
+            TextBlock_DownloadsFolder.Foreground = new BrushConverter().ConvertFromString("Lime") as SolidColorBrush;
             Button_ImportFromDownloads.IsEnabled = true;
         }
     }
