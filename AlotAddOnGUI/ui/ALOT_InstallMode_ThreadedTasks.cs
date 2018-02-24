@@ -1592,6 +1592,7 @@ namespace AlotAddOnGUI
                             //worker.ReportProgress(percentInt);
                             case "PROCESSING_FILE":
                             case "PROCESSING_MOD":
+                            case "PROCESSING_TEXTURE_INSTALL":
                                 Log.Information("MEM Reports processing file: " + param);
                                 //worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
                                 break;

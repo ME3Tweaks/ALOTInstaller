@@ -638,6 +638,7 @@ namespace AlotAddOnGUI
                 }
                 if (crashTime.Date == DateTime.Today && !hasBeenHandled)
                 {
+                    Log.Information("Crash date: " + crashTime.Date + ", today is " + DateTime.Today + ", crash not handled. Prompting to upload");
                     MetroDialogSettings mds = new MetroDialogSettings();
                     mds.AffirmativeButtonText = "Upload";
                     mds.NegativeButtonText = "No";
@@ -1412,11 +1413,19 @@ namespace AlotAddOnGUI
                                 if (Utilities.TestXMLIsValid(pageSourceCode))
                                 {
                                     Log.Information("Manifest fetched.");
-                                    File.WriteAllText(MANIFEST_LOC, pageSourceCode);
-                                    //Legacy stuff
-                                    if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
+                                    try
                                     {
-                                        File.Delete(MANIFEST_LOC);
+                                        File.WriteAllText(MANIFEST_LOC, pageSourceCode);
+                                        //Legacy stuff
+                                        if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
+                                        {
+                                            File.Delete(MANIFEST_LOC);
+                                        }
+                                    } catch (Exception ex)
+                                    {
+                                        Log.Error("Unable to write and remove old manifest! We're probably headed towards a crash.");
+                                        Log.Error(App.FlattenException(ex));
+                                        UsingBundledManifest = true;
                                     }
                                     ManifestDownloaded();
                                 }
@@ -2906,8 +2915,9 @@ namespace AlotAddOnGUI
                 string file = files[0];
                 string basepath = DOWNLOADED_MODS_DIRECTORY + "\\";
 
-                if (file.ToLower().StartsWith(basepath))
+                if (file.ToLower().StartsWith(basepath.ToLower()))
                 {
+                    Log.Information("Cannot import files from downloaded_mods folder.");
                     ShowStatus("Can't import files from Downloaded_Mods", 5000);
                     return;
                 }
@@ -3297,12 +3307,13 @@ namespace AlotAddOnGUI
         {
             try
             {
-                using (var file = File.Create("write_permissions_test")) { };
-                File.Delete("write_permissions_test");
+                using (var file = File.Create(EXE_DIRECTORY + "\\write_permissions_test")) { };
+                File.Delete(EXE_DIRECTORY + "\\write_permissions_test");
                 return true;
             }
             catch (UnauthorizedAccessException)
             {
+                Log.Error("The program cannot run in a directory that is write-protected.");
                 await this.ShowMessageAsync("Running from write-protected directory", "Your user account doesn't have write permissions to the current directory. Move ALOT Installer to somewhere where yours does, like the Documents folder.");
                 Environment.Exit(1);
                 return false;
@@ -3310,8 +3321,8 @@ namespace AlotAddOnGUI
             catch (Exception e)
             {
                 //do nothing with other ones, I guess.
-                Log.Error("Permissions test failure: " + e.Message);
-                Log.Warning("We are continuing as if we have write permissions. It is possible we don't any.");
+                Log.Error("Exception testing write permissions: " + e.Message);
+                Log.Warning("We are continuing as if we have write permissions. It is possible we don't have any. Application will probably crash in these conditions.");
             }
             return true;
         }
