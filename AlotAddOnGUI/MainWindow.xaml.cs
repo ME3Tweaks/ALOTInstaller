@@ -4037,41 +4037,33 @@ namespace AlotAddOnGUI
 
         private void Button_OpenAddonAssistantWindow_Click(object sender, RoutedEventArgs e)
         {
-            if (Directory.Exists(DOWNLOADS_FOLDER))
+            if (!Utilities.IsWindowOpen<AddonDownloadAssistant>())
             {
-
-                if (!Utilities.IsWindowOpen<AddonDownloadAssistant>())
+                List<AddonFile> notReadyAddonFiles = new List<AddonFile>();
+                foreach (AddonFile af in addonfiles)
                 {
-                    List<AddonFile> notReadyAddonFiles = new List<AddonFile>();
-                    foreach (AddonFile af in addonfiles)
+                    if (!af.Ready && !af.UserFile)
                     {
-                        if (!af.Ready && !af.UserFile)
-                        {
-                            notReadyAddonFiles.Add(af);
-                        }
+                        notReadyAddonFiles.Add(af);
                     }
-                    if (notReadyAddonFiles.Count > 0)
-                    {
+                }
+                if (notReadyAddonFiles.Count > 0)
+                {
 
-                        DOWNLOAD_ASSISTANT_WINDOW = new AddonDownloadAssistant(this, notReadyAddonFiles);
-                        DOWNLOAD_ASSISTANT_WINDOW.Show();
+                    DOWNLOAD_ASSISTANT_WINDOW = new AddonDownloadAssistant(this, notReadyAddonFiles);
+                    DOWNLOAD_ASSISTANT_WINDOW.Show();
+                }
+                else
+                {
+                    if (ShowME1Files && ShowME2Files && ShowME3Files)
+                    {
+                        ShowStatus("All files are already imported", 3000);
                     }
                     else
                     {
-                        if (ShowME1Files && ShowME2Files && ShowME3Files)
-                        {
-                            ShowStatus("All files are already imported", 3000);
-                        }
-                        else
-                        {
-                            ShowStatus("All files with this filter are already imported", 3000);
-                        }
+                        ShowStatus("All files with this filter are already imported", 3000);
                     }
                 }
-            }
-            else
-            {
-                ShowStatus("Download directory is not set to valid folder. Set a valid one in settings.");
             }
         }
 

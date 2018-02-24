@@ -38,6 +38,7 @@ namespace AlotAddOnGUI
             this.windowRef = windowRef;
             this.missingAddonFiles = missingAddonFiles;
             filesList.ItemsSource = missingAddonFiles;
+            Button_ImportFromDownloads.IsEnabled = Directory.Exists(MainWindow.DOWNLOADS_FOLDER);
         }
 
         public void setNewMissingAddonfiles(List<AddonFile> missingAddonFiles)
@@ -139,6 +140,7 @@ namespace AlotAddOnGUI
             Topmost = true;
 
             var dir = openFolder.FileName;
+
             if (!Directory.Exists(dir))
             {
                 //await this.ShowMessageAsync("Directory does not exist", "The backup destination directory does not exist: " + dir);
@@ -146,7 +148,8 @@ namespace AlotAddOnGUI
             }
             Utilities.WriteRegistryKey(Registry.CurrentUser, MainWindow.REGISTRY_KEY, MainWindow.SETTINGSTR_DOWNLOADSFOLDER, dir);
             MainWindow.DOWNLOADS_FOLDER = dir;
-            TextBlock_DownloadsFolder.Text = "Current Downloads folder: "+ MainWindow.DOWNLOADS_FOLDER;
+            TextBlock_DownloadsFolder.Text = "Current Downloads folder: " + MainWindow.DOWNLOADS_FOLDER;
+            Button_ImportFromDownloads.IsEnabled = true;
         }
     }
 }
