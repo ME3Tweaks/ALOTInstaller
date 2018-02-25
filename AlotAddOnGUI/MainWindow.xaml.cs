@@ -2277,7 +2277,7 @@ namespace AlotAddOnGUI
                         hasApplicableUserFile = true;
                         continue;
                     }
-                    if (installedInfo != null && af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0)
+                    if (installedInfo != null && (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0))
                     {
                         if (installedInfo.ALOTVER == 0 && installedInfo.MEUITMVER == 0)
                         {

@@ -6,9 +6,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-    xmlns:simpleChildWindow="clr-namespace:MahApps.Metro.SimpleChildWindow;assembly=MahApps.Metro.SimpleChildWindow"
-    xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
-    mc:Ignorable="d"
+        xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+        mc:Ignorable="d"
         BorderBrush="{DynamicResource AccentColorBrush}"
         BorderThickness="1"
         Title="ALOT Installer" MinHeight="600" MinWidth="800" Height="600" Width="800"
@@ -28,17 +27,17 @@
             </Style.Resources>
         </Style>
         <Style x:Key="BottomButton_Left" TargetType="{x:Type Button}" BasedOn="{StaticResource AccentedSquareButtonStyle}">
-            <Setter Property="BorderThickness" Value="3,2,1,3" />
+            <Setter Property="BorderThickness" Value="2,2,1,2" />
         </Style>
         <Style x:Key="BottomButton_Middle" TargetType="{x:Type Button}" BasedOn="{StaticResource AccentedSquareButtonStyle}">
-            <Setter Property="BorderThickness" Value="1,2,1,3" />
+            <Setter Property="BorderThickness" Value="1,2,1,2" />
         </Style>
         <Style x:Key="BottomButton_BlackMiddle" TargetType="{x:Type Button}" BasedOn="{StaticResource SquareButtonStyle}">
-            <Setter Property="BorderThickness" Value="1,2,1,3" />
+            <Setter Property="BorderThickness" Value="1,2,1,2" />
             <Setter Property="Padding" Value="10,5,10,5" />
         </Style>
         <Style x:Key="BottomButton_BlackRight" TargetType="{x:Type Button}" BasedOn="{StaticResource SquareButtonStyle}">
-            <Setter Property="BorderThickness" Value="1,2,3,3" />
+            <Setter Property="BorderThickness" Value="1,2,2,2" />
             <Setter Property="Padding" Value="10,5,10,5" />
 
         </Style>
@@ -81,28 +80,6 @@
             <RowDefinition Height="1*" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <simpleChildWindow:ChildWindow
-                x:Name="ChildWindow_ConfigMod"
-                 IsOpen="False"
-                 HorizontalContentAlignment="Stretch"
-                 VerticalContentAlignment="Stretch"
-                 Padding="15"
-                 ChildWindowImage="Error"
-                 Title="MEUITM Settings">
-        <Grid>
-                <ComboBox Width="200"
-                          Margin="0 10 0 0"
-                          Controls:TextBoxHelper.ClearTextButton="True"
-                          Controls:TextBoxHelper.UseFloatingWatermark="True"
-                          Controls:TextBoxHelper.Watermark="Tali Visor Type"
-                          SelectedIndex="0">
-
-                    <ComboBoxItem Name="cbi1">Vanilla Style</ComboBoxItem>
-                    <ComboBoxItem Name="cbi2">See-through style</ComboBoxItem>
-                    <ComboBoxItem Name="cbi3">LSD Style</ComboBoxItem>
-                </ComboBox>
-            </Grid>
-        </simpleChildWindow:ChildWindow>
         <Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
             <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
         </Label>
