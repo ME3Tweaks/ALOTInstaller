@@ -4387,12 +4387,22 @@ namespace AlotAddOnGUI
 
         private async void Button_ConfigureMod_Click(object sender, RoutedEventArgs e)
         {
-            var rowIndex = ListView_Files.SelectedIndex;
-            var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
-            AddonFile af = (AddonFile)row.DataContext;
+            System.Windows.Controls.ListViewItem lvi = FindAncestor<System.Windows.Controls.ListViewItem>(((FrameworkElement)sender));
+            ListView_Files.SelectedIndex = ListView_Files.Items.IndexOf(lvi.DataContext);
+            AddonFile af = (AddonFile)lvi.DataContext;
 
             ModConfigurationDialog mcd = new ModConfigurationDialog(af, this);
             await this.ShowMetroDialogAsync(mcd);
+        }
+
+        public static T FindAncestor<T>(DependencyObject dependencyObject) where T : DependencyObject
+        {
+            var parent = VisualTreeHelper.GetParent(dependencyObject);
+
+            if (parent == null) return null;
+
+            var parentT = parent as T;
+            return parentT ?? FindAncestor<T>(parent);
         }
 
         private async void CloseCustomDialog(object sender, RoutedEventArgs e)

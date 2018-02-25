@@ -1,13 +1,18 @@
 ﻿<Dialog:CustomDialog  Title="Dialog Title"
                       x:Class="AlotAddOnGUI.ModConfigurationDialog"
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"    
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"  
                       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                      xmlns:sys="clr-namespace:System;assembly=mscorlib"
                       Style="{StaticResource WiderDialogStyle}">
+    <Dialog:CustomDialog.Resources>
+        <Style x:Key="MahApps.Metro.Styles.MetroWatermarkTextBlock"
+            BasedOn="{StaticResource MetroTextBlock}"
+            TargetType="{x:Type TextBlock}">
+            <Setter Property="IsHitTestVisible" Value="False" />
+            <Setter Property="Opacity" Value="0.0" />
+        </Style>
+    </Dialog:CustomDialog.Resources>
     <StackPanel Margin="10">
         <ListView Name="ListView_ChoiceFiles" BorderThickness="0">
             <ListView.ItemsPanel>

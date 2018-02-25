@@ -86,9 +86,9 @@ namespace AlotAddOnGUI
 
             //Set BG for this game
             string bgPath = "images/me" + game + "_bg.jpg";
-            if (game == 2 && DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
+            if (DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
             {
-                bgPath = "images/me2_bg_alt.jpg";
+                bgPath = "images/me" + game + "_bg_alt.jpg";
             }
             ImageBrush background = new ImageBrush(new BitmapImage(new Uri(BaseUriHelper.GetBaseUri(this), bgPath)));
             background.Stretch = Stretch.UniformToFill;
