@@ -5,14 +5,6 @@
                       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       Style="{StaticResource WiderDialogStyle}">
-    <Dialog:CustomDialog.Resources>
-        <Style x:Key="MahApps.Metro.Styles.MetroWatermarkTextBlock"
-            BasedOn="{StaticResource MetroTextBlock}"
-            TargetType="{x:Type TextBlock}">
-            <Setter Property="IsHitTestVisible" Value="False" />
-            <Setter Property="Opacity" Value="0.0" />
-        </Style>
-    </Dialog:CustomDialog.Resources>
     <StackPanel Margin="10">
         <ListView Name="ListView_ChoiceFiles" BorderThickness="0">
             <ListView.ItemsPanel>
