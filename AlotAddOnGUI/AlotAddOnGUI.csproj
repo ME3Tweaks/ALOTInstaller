@@ -187,6 +187,7 @@
     <Compile Include="ui\DiagnosticsWindow.xaml.cs">
       <DependentUpon>DiagnosticsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ui\ProgressBarSmooth.cs" />
     <Compile Include="ui\UpdateAvailableDialog.xaml.cs">
       <DependentUpon>UpdateAvailableDialog.xaml</DependentUpon>
     </Compile>
@@ -365,7 +366,7 @@ move /Y "$(TargetDir)*.dll" "$(TargetDir)Data\Lib\"
 del /q "$(TargetDir)*.xml"
 del /q "$(TargetDir)MahApps.Metro.IconPacks.Modern.pdb"
 del /q "$(TargetDir)MahApps.Metro.pdb"
-del /q "$(TargetDir)MahApps.Metro.SimpleChildWindow.pdb"
+del /q "$(TargetDir)ControlzEx.pdb"
 if exist "$(TargetDir)memodder" rmdir /s /q "$(TargetDir)memodder"
 
 if exist "$(TargetDir)7z" rmdir /s /q "$(TargetDir)7z"

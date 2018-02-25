@@ -184,6 +184,19 @@ namespace AlotAddOnGUI
             }
         }
 
+        private double _progressBarValue;
+        public double ProgressBarValue
+        {
+            get { return _progressBarValue; }
+            set
+            {
+                if (_progressBarValue != value)
+                {
+                    _progressBarValue = value;
+                    OnPropertyChanged("ProgressBarValue");
+                }
+            }
+        }
 
         public MainWindow()
         {
@@ -1053,6 +1066,7 @@ namespace AlotAddOnGUI
                 int numME1FilesReady = 0;
                 int numME2FilesReady = 0;
                 int numME3FilesReady = 0;
+                List<AddonFile> newUnreadyUserFiles = new List<AddonFile>();
                 foreach (AddonFile af in addonfiles)
                 {
                     if (af.Game_ME1) numME1Files++;
@@ -1093,7 +1107,6 @@ namespace AlotAddOnGUI
                             af.Staged = true;
                         }
                     }
-                    List<AddonFile> newUnreadyUserFiles = new List<AddonFile>();
 
                     if (af.Ready != ready) //status is changing
                     {
@@ -1117,11 +1130,13 @@ namespace AlotAddOnGUI
                         af.Staged = false;
                     }
                     numdone += ready && !af.Optional ? 1 : 0;
-                    System.Windows.Application.Current.Dispatcher.Invoke(
+
+                }
+                System.Windows.Application.Current.Dispatcher.Invoke(
                     async () =>
                     {
                         // Code to run on the GUI thread.
-                        Build_ProgressBar.Value = (int)(((double)numdone / addonfiles.Where(p => !p.Optional).Count()) * 100);
+                        ProgressBarValue = (((double)numdone / addonfiles.Where(p => !p.Optional).Count()) * 100);
                         string tickerText = "";
                         tickerText += ShowME1Files ? "ME1: " + numME1FilesReady + "/" + numME1Files + " imported" : "ME1: N/A";
                         tickerText += " - ";
@@ -1142,8 +1157,6 @@ namespace AlotAddOnGUI
                             await this.ShowMessageAsync("Some files no longer available", message);
                         }
                     });
-                }
-
             }
         }
 
@@ -2105,6 +2118,39 @@ namespace AlotAddOnGUI
                 }
             }
             UpdateALOTStatus();
+            string me1status = "ME1 MEMI Marker: ";
+            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null)
+            {
+                me1status += "ALOT " + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTUPDATEVER + "." + CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTHOTFIXVER + ", MEUITM v" + CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER;
+            }
+            else
+            {
+                me1status += "Not installed";
+            }
+            Log.Information(me1status);
+
+            string me2status = "ME2 MEMI Marker: ";
+            if (CURRENTLY_INSTALLED_ME2_ALOT_INFO != null)
+            {
+                me2status += "ALOT " + CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTUPDATEVER + "." + CURRENTLY_INSTALLED_ME2_ALOT_INFO.ALOTHOTFIXVER;
+            }
+            else
+            {
+                me2status += "Not installed";
+            }
+            Log.Information(me2status);
+
+            string me3status = "ME3 MEMI Marker: ";
+            if (CURRENTLY_INSTALLED_ME3_ALOT_INFO != null)
+            {
+                me3status += "ALOT " + CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTVER + "." + CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTUPDATEVER + "." + CURRENTLY_INSTALLED_ME3_ALOT_INFO.ALOTHOTFIXVER;
+            }
+            else
+            {
+                me3status += "Not installed";
+            }
+            Log.Information(me3status);
+
             //if (meuitmindex >= 0)
             //{
             //    alladdonfiles.RemoveAt(meuitmindex);
@@ -3394,7 +3440,7 @@ namespace AlotAddOnGUI
                 DOWNLOADS_FOLDER = KnownFolders.GetPath(KnownFolder.Downloads);
             }
 
-            bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? false;
+            bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? true;
             Checkbox_RepackGameFiles.IsChecked = repack;
 
             if (USING_BETA)

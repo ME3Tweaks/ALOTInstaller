@@ -280,7 +280,7 @@ namespace AlotAddOnGUI
                     break;
                 case ERROR_OCCURED:
                     Build_ProgressBar.IsIndeterminate = false;
-                    Build_ProgressBar.Value = 0;
+                    ProgressBarValue = 0;
                     //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                     break;
                 case SHOW_DIALOG:

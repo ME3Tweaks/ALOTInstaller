@@ -563,8 +563,14 @@ namespace AlotAddOnGUI.ui
             }
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
-
-                addDiagLine(prefix + "The following basegame mods were detected:");
+                if (MEMI_FOUND)
+                {
+                    addDiagLine("[ERROR]The following basegame mods were detected:");
+                }
+                else
+                {
+                    addDiagLine("The following basegame mods were detected:");
+                }
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
                     addDiagLine(prefix + " - " + str);

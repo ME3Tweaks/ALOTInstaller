@@ -1230,7 +1230,7 @@ namespace AlotAddOnGUI
         {
             if (e.UserState is null)
             {
-                Build_ProgressBar.Value = e.ProgressPercentage;
+                ProgressBarValue = e.ProgressPercentage;
                 TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
                 TaskbarManager.Instance.SetProgressValue(e.ProgressPercentage, 100);
             }
@@ -1254,7 +1254,7 @@ namespace AlotAddOnGUI
                         break;
                     case ERROR_OCCURED:
                         Build_ProgressBar.IsIndeterminate = false;
-                        Build_ProgressBar.Value = 0;
+                        ProgressBarValue = 0;
                         //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                         break;
                     case SHOW_DIALOG:
@@ -1277,13 +1277,7 @@ namespace AlotAddOnGUI
                         }
                         tcdo.signalHandler.Set();
                         break;
-                    case INCREMENT_COMPLETION_EXTRACTION:
-                        TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
 
-                        Interlocked.Increment(ref completed);
-                        Build_ProgressBar.Value = (completed / (double)ADDONSTOBUILD_COUNT) * 100;
-
-                        break;
                 }
             }
         }
@@ -1584,7 +1578,7 @@ namespace AlotAddOnGUI
         {
             if (e.UserState is null)
             {
-                Build_ProgressBar.Value = e.ProgressPercentage;
+                ProgressBarValue = e.ProgressPercentage;
                 TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
                 TaskbarManager.Instance.SetProgressValue(e.ProgressPercentage, 100);
             }
@@ -1610,7 +1604,7 @@ namespace AlotAddOnGUI
                         break;
                     case ERROR_OCCURED:
                         Build_ProgressBar.IsIndeterminate = false;
-                        Build_ProgressBar.Value = 0;
+                        ProgressBarValue = 0;
                         if (!ERROR_SHOWING)
                         {
                             ERROR_SHOWING = true;
@@ -1624,7 +1618,7 @@ namespace AlotAddOnGUI
                         break;
                     case INCREMENT_COMPLETION_EXTRACTION:
                         Interlocked.Increment(ref completed);
-                        Build_ProgressBar.Value = (completed / (double)ADDONSTOBUILD_COUNT) * 100;
+                        ProgressBarValue = (completed / (double)ADDONSTOBUILD_COUNT) * 100;
                         break;
                 }
             }
