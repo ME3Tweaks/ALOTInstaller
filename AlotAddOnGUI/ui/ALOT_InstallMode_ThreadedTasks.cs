@@ -69,14 +69,14 @@ namespace AlotAddOnGUI
             WARN_USER_OF_EXIT = true;
             InstallingOverlay_TopLabel.Text = "Preparing installer";
             InstallWorker = new BackgroundWorker();
-            if (USING_BETA)
-            {
-                InstallWorker.DoWork += InstallALOTContextBased;
-            }
-            else
-            {
-                InstallWorker.DoWork += InstallALOT;
-            }
+            //if (USING_BETA)
+            //{
+            InstallWorker.DoWork += InstallALOTContextBased;
+            //}
+            //else
+            //{
+            // InstallWorker.DoWork += InstallALOT;
+            //}
             InstallWorker.WorkerReportsProgress = true;
             InstallWorker.ProgressChanged += InstallWorker_ProgressChanged;
             InstallWorker.RunWorkerCompleted += InstallCompleted;
