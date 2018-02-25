@@ -617,10 +617,6 @@ namespace AlotAddOnGUI
                 {
                     if (CurrentGameALOTInfo != null)
                     {
-                        if (af.ALOTUpdateVersion > 0)
-                        {
-                            Debugger.Break();
-                        }
                         //Detected MEMI tag
                         //Check if ALOT main file is installed. If it is and this is ALOT file, skip
                         if (af.ALOTVersion > 0 && CurrentGameALOTInfo.ALOTVER >= 0 && BUILD_ALOT == false)
@@ -858,7 +854,7 @@ namespace AlotAddOnGUI
                     continue;
                 }
                 totalfiles += af.PackageFiles.Count;
-                Debug.WriteLine(totalfiles);
+                //Debug.WriteLine(totalfiles);
             }
 
             basepath = EXTRACTED_MODS_DIRECTORY;

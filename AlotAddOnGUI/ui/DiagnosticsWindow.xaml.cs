@@ -130,7 +130,6 @@ namespace AlotAddOnGUI.ui
 
         private void RunDiagnostics(int game, bool full)
         {
-            Debug.WriteLine("running diags...");
             DiagnosticHeader.Text = "Performing diagnostics...";
             TextureCheck = full;
             if (TextureCheck)

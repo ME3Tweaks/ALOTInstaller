@@ -31,15 +31,18 @@ namespace AlotAddOnGUI
         private bool STAGE_DONE_REACHED = false;
         private const int RESULT_UNPACK_FAILED = -40;
         private const int RESULT_SCAN_REMOVE_FAILED = -41;
-        private const int RESULT_TEXTUREINSTALL_FAILED = -42;
         private const int RESULT_ME1LAA_FAILED = -43;
         private const int RESULT_TEXTUREINSTALL_NO_TEXTUREMAP = -44;
         private const int RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP = -45;
-        private const int RESULT_REPACK_FAILED = -46;
         private const int RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED = -47;
         private const int RESULT_TEXTUREINSTALL_GAME_FILE_ADDED = -48;
+        private const int RESULT_TEXTUREINSTALL_FAILED = -42;
+
         private const int RESULT_SAVING_FAILED = -49;
         private const int RESULT_REMOVE_MIPMAPS_FAILED = -50;
+        private const int RESULT_REPACK_FAILED = -46;
+        private const int RESULT_UNKNOWN_ERROR = -51;
+        private const int RESULT_SCAN_FAILED = -52;
 
         private void MusicIcon_Click(object sender, RoutedEventArgs e)
         {
@@ -316,6 +319,7 @@ namespace AlotAddOnGUI
             CURRENT_STAGE_CONTEXT = null;
             CURRENT_STAGE_NUM = 0;
             STAGE_COUNT = 0;
+            STAGE_DONE_REACHED = false;
             CurrentTask = "";
             Log.Information("InstallWorker Thread starting for ME" + INSTALLING_THREAD_GAME);
             Log.Information("This installer session is context based and will run in a single instance.");
@@ -429,7 +433,7 @@ namespace AlotAddOnGUI
                             break;
                         case "STAGE_SCAN":
                             Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
-                            e.Result = RESULT_SCAN_REMOVE_FAILED;
+                            e.Result = RESULT_SCAN_FAILED;
                             break;
                         case "STAGE_INSTALLTEXTURES":
                             Log.Error("MassEffectModderNoGui exited or crashed while installing textures");
@@ -474,10 +478,10 @@ namespace AlotAddOnGUI
                             break;
                         default:
                             Log.Error("MEM Exited during unknown stage context: " + STAGE_CONTEXT);
+                            e.Result = RESULT_UNKNOWN_ERROR;
                             break;
                     }
 
-                    e.Result = RESULT_UNPACK_FAILED;
                     InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
                     InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
                     return;
@@ -767,7 +771,7 @@ namespace AlotAddOnGUI
             }
 
             WARN_USER_OF_EXIT = false;
-            Log.Information("InstallCompleted()");
+            Log.Information("InstallCompleted() with code " + e.Result);
             InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Collapsed;
 
             tipticker.Stop();
@@ -865,6 +869,20 @@ namespace AlotAddOnGUI
                             HeaderLabel.Text = "Failed to unpack DLC. Restore your game to unmodified or DLC will not work.";
                             break;
                         }
+                    case RESULT_SCAN_FAILED:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Failed to scan textures";
+                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                            if (INSTALLING_THREAD_GAME == 3)
+                            {
+                                HeaderLabel.Text = "Failed to scan textures. Any packed DLC has now been unpacked, it may not pass authentication.";
+                            }
+                            else
+                            {
+                                HeaderLabel.Text = "Failed to scan textures. Your game has not been modified.";
+                            }
+                            break;
+                        }
                     case RESULT_REMOVE_MIPMAPS_FAILED:
                         {
                             InstallingOverlay_TopLabel.Text = "Failed to remove empty mipmaps";
@@ -877,6 +895,13 @@ namespace AlotAddOnGUI
                             InstallingOverlay_TopLabel.Text = "Failed to save game packages";
                             InstallingOverlay_BottomLabel.Text = "Check the logs for details";
                             HeaderLabel.Text = "Failed to save game packages. Restore your game to unmodified. The game is in an unusable state.";
+                            break;
+                        }
+                    case RESULT_UNKNOWN_ERROR:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Unknown error has occured";
+                            InstallingOverlay_BottomLabel.Text = "Check the logs for more details";
+                            HeaderLabel.Text = "Error occured during installation.";
                             break;
                         }
                 }
@@ -1082,6 +1107,7 @@ namespace AlotAddOnGUI
             if (RemoveMipMaps)
             {
                 Log.Information("InstallWorker(): Performing texture scan, removing empty mipmaps, adding remaining markers");
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, "Scanning textures"));
 
                 args = "-scan-with-remove " + INSTALLING_THREAD_GAME + " -ipc";
                 RunAndTimeMEM_Install(exe, args, InstallWorker);
@@ -1107,7 +1133,7 @@ namespace AlotAddOnGUI
             string outputDir = getOutputDir(INSTALLING_THREAD_GAME, false);
             CurrentTask = "Installing textures";
             CurrentTaskPercent = 0;
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, CurrentTask));
+            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENT_STAGE_PROGRESS, CurrentTaskPercent));
             args = "-install-mods " + INSTALLING_THREAD_GAME + " \"" + outputDir + "\"";
             if (REPACK_GAME_FILES && INSTALLING_THREAD_GAME == 2)
@@ -1473,8 +1499,8 @@ namespace AlotAddOnGUI
                                     CurrentTask = task;
                                     int progressval = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 0);
                                     worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENTTASK_NAME, task));
-                                    InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
-                                    InstallingOverlay_OverallLabel.Text = "(" + progressval.ToString() + "%)";
+                                    //InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
+                                    //InstallingOverlay_OverallLabel.Text = "(" + progressval.ToString() + "%)";
                                     break;
                                 }
                             case "PROCESSING_FILE":
@@ -1605,7 +1631,9 @@ namespace AlotAddOnGUI
                                 int overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
                                 worker.ReportProgress(completed, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
                                 Interlocked.Increment(ref CURRENT_STAGE_NUM);
-                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_STAGE_OF_STAGE_LABEL, param));
+                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_STAGE_OF_STAGE_LABEL));
+                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENTTASK_NAME, param));
+
                                 break;
                             case "HIDE_STAGES":
                                 worker.ReportProgress(completed, new ThreadCommand(HIDE_STAGES_LABEL));

@@ -39,7 +39,7 @@ namespace AlotAddOnGUI.classes
                 {
                     return _readyiconpath;
                 }
-                else if (ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM)
+                else if ((ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM) && Ready)
                 {
                     //Get current info
                     ALOTVersionInfo info = null;
@@ -56,10 +56,18 @@ namespace AlotAddOnGUI.classes
                         info = MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO;
                     }
 
-                    //Major Upgrade, including on unknown versions
-                    if (ALOTVersion > 0 && info != null && ALOTVersion > info.ALOTVER && info.ALOTVER > 0 && info.MEUITMVER == 0)
+
+                    if (info != null)
                     {
-                        return "images/greycheckmark.png";
+                        if (ALOTVersion > 0 && (ALOTVersion != info.ALOTVER && (info.MEUITMVER == 0 || info.ALOTVER > 0)))
+                        {
+                            return "images/greycheckmark.png";
+                        }
+
+                        if (ALOTUpdateVersion > 0 && ALOTMainVersionRequired != info.ALOTVER)
+                        {
+                            return "images/greycheckmark.png";
+                        }
                     }
                 }
                 //Not ALOT
@@ -122,7 +130,7 @@ namespace AlotAddOnGUI.classes
                     {
                         if (info != null)
                         {
-                            if (ALOTVersion > info.ALOTVER && info.ALOTVER != 0) //me1 issue - we cannot detect 5.0 with no meuitm
+                            if (ALOTVersion > info.ALOTVER && (info.ALOTVER != 0 || info.ALOTVER == 0 && info.MEUITMVER == 0)) //me1 issue - we cannot detect 5.0 with no meuitm
                             {
                                 //newer version of ALOT is available
                                 return "Restore to unmodified to install upgrade";
@@ -139,7 +147,7 @@ namespace AlotAddOnGUI.classes
                             }
                             if (ALOTVersion == info.ALOTVER)
                             {
-                                return "Newer version of ALOT Main already installed";
+                                return "Newer major version of ALOT already installed";
                             }
                         }
                         else
@@ -290,7 +298,7 @@ namespace AlotAddOnGUI.classes
         {
             get
             {
-                if (ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM)
+                if ((ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM) && Ready)
                 {
                     //Get current info
                     ALOTVersionInfo info = null;
@@ -308,10 +316,18 @@ namespace AlotAddOnGUI.classes
                     }
 
                     //Major Upgrade, including on unknown versions
-                    if (ALOTVersion > 0 && info != null && ALOTVersion > info.ALOTVER && info.MEUITMVER == 0)
+                    if (info != null)
                     {
-                        //Disabled
-                        return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
+                        if (ALOTVersion > 0 && (ALOTVersion != info.ALOTVER && info.MEUITMVER == 0) || (ALOTVersion != info.ALOTVER && ALOTVersion != 0 && info.MEUITMVER != 0))
+                        {
+                            //Disabled
+                            return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
+                        }
+
+                        if (ALOTUpdateVersion > 0 && ALOTMainVersionRequired != info.ALOTVER)
+                        {
+                            return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
+                        }
                     }
                 }
 

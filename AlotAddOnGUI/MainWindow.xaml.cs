@@ -1421,7 +1421,8 @@ namespace AlotAddOnGUI
                                         {
                                             File.Delete(MANIFEST_LOC);
                                         }
-                                    } catch (Exception ex)
+                                    }
+                                    catch (Exception ex)
                                     {
                                         Log.Error("Unable to write and remove old manifest! We're probably headed towards a crash.");
                                         Log.Error(App.FlattenException(ex));
@@ -1610,7 +1611,7 @@ namespace AlotAddOnGUI
             {
                 await this.ShowMessageAsync("System memory is less than 8 GB", "Building and installing textures uses considerable amounts of memory. Installation will be significantly slower on systems with less than 8 GB for Mass Effect 3, or 6 GB for Mass Effect and Mass Effect 2.");
             }
-            Debug.WriteLine("Ram Amount, KB: " + ramAmountKb);
+            //Debug.WriteLine("Ram Amount, KB: " + ramAmountKb);
         }
 
         private async Task<bool> PerformWriteCheck(bool required)
@@ -2236,7 +2237,7 @@ namespace AlotAddOnGUI
             bool alotupdateavailalbeforinstall = false;
             bool meuitmavailableforinstall = false;
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
-            if (installedInfo == null || installedInfo.ALOTVER == 0) //not installed or mem installed
+            if (installedInfo == null || installedInfo.ALOTVER == 0 && installedInfo.MEUITMVER > 0) //not installed or mem installed
             {
                 Checkbox_BuildOptionAddon.IsChecked = true;
                 Checkbox_BuildOptionAddon.IsEnabled = false;
@@ -2276,13 +2277,30 @@ namespace AlotAddOnGUI
                         hasApplicableUserFile = true;
                         continue;
                     }
-                    if (installedInfo != null && installedInfo.ALOTVER != 0 && af.ALOTVersion > installedInfo.ALOTVER)
+                    if (installedInfo != null && af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0)
                     {
-                        //alot installed same version
-                        Log.Information("ALOT main version " + af.ALOTVersion + " blocked from installing because it is different main version than the currently installed one.");
-                        blockALOTInstallDueToMainVersionDiff = true;
-                        installingALOTver = af.ALOTVersion;
-                        continue;
+                        if (installedInfo.ALOTVER == 0 && installedInfo.MEUITMVER == 0)
+                        {
+                            //alot 5.0 or unable to find version
+                            Log.Warning("ALOT main version " + af.ALOTVersion + " blocked from installing because we are unable to detect version information for ALOT. This is typically from old 5.0 or lower installations which is not supported.");
+                            blockALOTInstallDueToMainVersionDiff = true;
+                            if (af.ALOTVersion > 0)
+                            {
+                                installingALOTver = af.ALOTVersion;
+                            }
+                            continue;
+                        }
+                        if (installedInfo.ALOTVER != 0 && installedInfo.ALOTVER != af.ALOTVersion && installedInfo.MEUITMVER > 0)
+                        {
+                            //alot installed same version
+                            Log.Warning("ALOT main version " + af.ALOTVersion + " blocked from installing because it is different main version than the currently installed one.");
+                            blockALOTInstallDueToMainVersionDiff = true;
+                            if (af.ALOTVersion > 0)
+                            {
+                                installingALOTver = af.ALOTVersion;
+                            }
+                            continue;
+                        }
                     }
                     if (af.ALOTVersion > 0)
                     {
@@ -2359,12 +2377,18 @@ namespace AlotAddOnGUI
                 }
             }
 
-            if (hasOneOption)
+            if (hasOneOption || blockALOTInstallDueToMainVersionDiff)
             {
                 Label_WhatToBuildAndInstall.Text = "Choose what to install for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
                 if (blockALOTInstallDueToMainVersionDiff)
                 {
-                    Label_WhatToBuildAndInstall.Text = "Imported ALOT file (" + installingALOTver + ".x) cannot be installed over the current installation (" + installedInfo.ALOTVER + "." + installedInfo.ALOTUPDATEVER + ")." + System.Environment.NewLine + Label_WhatToBuildAndInstall.Text;
+                    string currentString = "(Unknown version)";
+                    if (installedInfo != null && installedInfo.ALOTVER > 0)
+                    {
+                        currentString = "(" + installedInfo.ALOTVER + "." + installedInfo.ALOTUPDATEVER + ")";
+                    }
+
+                    Label_WhatToBuildAndInstall.Text = "Imported ALOT file (" + installingALOTver + ".x) cannot be installed over the current installation " + currentString + "." + System.Environment.NewLine + Label_WhatToBuildAndInstall.Text;
                 }
                 else if (alotInstalled && installedInfo.ALOTVER > 0)
                 {
@@ -2376,6 +2400,10 @@ namespace AlotAddOnGUI
             }
             else
             {
+                if (blockALOTInstallDueToMainVersionDiff)
+                {
+                    Label_WhatToBuildAndInstall.Text = "Imported ALOT file (" + installingALOTver + ".x) cannot be installed over the current installation (" + installedInfo.ALOTVER + "." + installedInfo.ALOTUPDATEVER + ")." + System.Environment.NewLine + Label_WhatToBuildAndInstall.Text;
+                }
                 //Run button 
                 Button_BuildAndInstall_Click(null, null);
             }
