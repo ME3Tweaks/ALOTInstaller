@@ -88,7 +88,7 @@
             <TextBlock x:Name="AddonFilesLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
         </Label>
         <ProgressBar alotaddonguiui:ProgressBarSmooth.SmoothValue="{Binding ProgressBarValue}" Value="{Binding Path=ProgressBarValue, Mode=OneWay}" Minimum="0" Maximum="100" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true" />
-        <ListView Grid.Column="0" Grid.Row="3" Name="ListView_Files" BorderThickness="0">
+        <ListView Grid.Column="0" Grid.Row="3" Name="ListView_Files" BorderThickness="0" Loaded="ListView_Files_Loaded" SelectionChanged="ListView_Files_SelectionChanged">
             <!-- This is what each list item looks like-->
             <ListView.ItemTemplate>
                 <DataTemplate>
@@ -553,7 +553,7 @@
                                 <Image Source="images/logo_me3.png" Height="40" Margin="10"></Image>
                             </Button>
                         </StackPanel>
-                        <TextBlock x:Name="UserTextures_Warning" Text="This file will be treated as a user file. User files are not tested by the developers and may not be compatible. User files are installed after ALOT, ALOT Updates, and MEUITM. If the file you are importing is listed above (as not a user file), you are importing the wrong file." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700"/>
+                        <TextBlock x:Name="UserTextures_Warning" Text="This file will be treated as a user supplied file as it is not listed in the ALOT manifest. User files are not tested by the developers and may not be compatible. User files are installed after ALOT, ALOT Updates, and MEUITM. If the file you are importing is listed above (as a manifest file), you are importing the wrong file. Do not extract or rename ANY files listed in the main manifest." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700"/>
                     </StackPanel>
                     <StackPanel x:Name="Panel_UserTexturesBadArchive" Orientation="Vertical" HorizontalAlignment="Center" Visibility="Visible" Margin="5">
                         <TextBlock x:Name="Textblock_UserTexturesBadArchive" Text="This archive file is not usable. It may not have any texture files in it, or contain texture files that don't meet the required naming standards for usage." FontSize="16" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="600"/>

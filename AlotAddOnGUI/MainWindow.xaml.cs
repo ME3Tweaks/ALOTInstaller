@@ -2761,15 +2761,15 @@ namespace AlotAddOnGUI
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
             bool blockDueToMissingALOTUpdateFile = false; //default value
             string blockDueToBadImportedFile = null; //default vaule
-            bool manifestHasALOTMainFile = false;
             bool manifestHasUpdateAvailable = false;
+            AddonFile alotmainfile = null;
             foreach (AddonFile af in alladdonfiles)
             {
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
                     if (af.ALOTVersion > 0)
                     {
-                        manifestHasALOTMainFile = true;
+                        alotmainfile = af;
                     }
                     if (blockDueToMissingALOTFile)
                     {
@@ -2825,8 +2825,11 @@ namespace AlotAddOnGUI
                 }
             }
 
-            if (blockDueToMissingALOTFile && manifestHasALOTMainFile)
+            if (blockDueToMissingALOTFile && alotmainfile != null)
             {
+                int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
+                ListView_Files.SelectedIndex = alotindex;
+
                 await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + getGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
                 return false;
             }
@@ -4422,6 +4425,22 @@ namespace AlotAddOnGUI
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_DEBUGLOGGING, (Checkbox_DebugLogging.IsChecked.Value ? 1 : 0));
             DEBUG_LOGGING = Checkbox_DebugLogging.IsChecked.Value;
             Log.Information("Debug logging is being turned " + (DEBUG_LOGGING ? "on" : "off"));
+        }
+
+        private void ListView_Files_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ListView_Files.SelectedItem != null)
+            {
+                ListView_Files.ScrollIntoView(ListView_Files.SelectedItem);
+            }
+        }
+
+        private void ListView_Files_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (ListView_Files.SelectedItem != null)
+            {
+                ListView_Files.ScrollIntoView(ListView_Files.SelectedItem);
+            }
         }
     }
 }
