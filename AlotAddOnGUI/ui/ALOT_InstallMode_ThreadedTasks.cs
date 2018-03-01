@@ -407,161 +407,90 @@ namespace AlotAddOnGUI
             CurrentTaskPercent = -1;
             string outputDir = getOutputDir(INSTALLING_THREAD_GAME, false);
 
-            args = "-install-mods " + INSTALLING_THREAD_GAME + " \"" + outputDir + "\"";
-            if (REPACK_GAME_FILES)
-            {
-                args += " -repack";
-            }
-            args += " -ipc -gui-installer -new-way";
-            runMEM_InstallContextBased(exe, args, InstallWorker);
-            while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
-            {
-                Thread.Sleep(END_OF_PROCESS_POLL_INTERVAL);
-            }
-            processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-            if (!STAGE_DONE_REACHED)
-            {
-                if (processResult != 0)
-                {
-                    Log.Error("MassEffectModderNoGui process exited with non-zero code: " + processResult);
-                    Log.Warning("Application exited with in context: " + CURRENT_STAGE_CONTEXT);
-                    switch (CURRENT_STAGE_CONTEXT)
-                    {
-                        case "STAGE_UNPACKDLC":
-                            Log.Error("MassEffectModderNoGui exited or crashed while unpacking DLC");
-                            e.Result = RESULT_UNPACK_FAILED;
-                            break;
-                        case "STAGE_SCAN":
-                            Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
-                            e.Result = RESULT_SCAN_FAILED;
-                            break;
-                        case "STAGE_INSTALLTEXTURES":
-                            Log.Error("MassEffectModderNoGui exited or crashed while installing textures");
-                            if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
-                            {
-                                switch (BACKGROUND_MEM_PROCESS_ERRORS[0])
-                                {
-                                    case ERROR_TEXTURE_MAP_MISSING:
-                                        e.Result = RESULT_TEXTUREINSTALL_NO_TEXTUREMAP;
-                                        break;
-                                    case ERROR_TEXTURE_MAP_WRONG:
-                                        e.Result = RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP;
-                                        break;
-                                    case ERROR_FILE_ADDED:
-                                        e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_ADDED;
-                                        break;
-                                    case ERROR_FILE_REMOVED:
-                                        e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED;
-                                        break;
-                                    default:
-                                        Log.Error("Background MEM errors has item not handled: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
-                                        e.Result = RESULT_TEXTUREINSTALL_FAILED;
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                e.Result = RESULT_TEXTUREINSTALL_FAILED;
-                            }
-                            break;
-                        case "STAGE_SAVING":
-                            Log.Error("MassEffectModderNoGui exited or crashed while saving packages");
-                            e.Result = RESULT_SAVING_FAILED;
-                            break;
-                        case "STAGE_REMOVEMIPMAPS":
-                            Log.Error("MassEffectModderNoGui exited or crashed while removing empty mipmaps");
-                            e.Result = RESULT_REMOVE_MIPMAPS_FAILED;
-                            break;
-                        case "STAGE_REPACK":
-                            Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
-                            e.Result = RESULT_REPACK_FAILED;
-                            break;
-                        default:
-                            Log.Error("MEM Exited during unknown stage context: " + STAGE_CONTEXT);
-                            e.Result = RESULT_UNKNOWN_ERROR;
-                            break;
-                    }
-
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
-                    return;
-                }
-            }
-            overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
-            InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
-            //Interlocked.Increment(ref INSTALL_STAGE);
-            //InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_STAGE_LABEL));
-
             if (false)
             {
-                //CONTEXT = UNPACK_DLC
+                args = "-install-mods " + INSTALLING_THREAD_GAME + " \"" + outputDir + "\"";
+                if (REPACK_GAME_FILES)
+                {
+                    args += " -repack";
+                }
+                args += " -ipc -gui-installer -new-way";
+                runMEM_InstallContextBased(exe, args, InstallWorker);
+                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+                {
+                    Thread.Sleep(END_OF_PROCESS_POLL_INTERVAL);
+                }
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-                if (processResult != 0)
+                if (!STAGE_DONE_REACHED)
                 {
-                    Log.Error("UNPACK RETURN CODE WAS NOT 0: " + processResult);
-                    e.Result = RESULT_UNPACK_FAILED;
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
-                    return;
-                }
-
-                //CONTEXT = SCAN
-                if (processResult != 0)
-                {
-                    Log.Error("MassEffectModderNoGui exited during Scanning Textures stage with code: " + processResult);
-                    e.Result = RESULT_SCAN_REMOVE_FAILED;
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
-                    return;
-                }
-
-                //CONTEXT = STAGE_REMOVEMIPMAPS
-                if (processResult != 0)
-                {
-                    Log.Error("MassEffectModderNoGui exited during Scanning Textures stage with code: " + processResult);
-                    e.Result = RESULT_SCAN_REMOVE_FAILED;
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
-                    return;
-                }
-
-                //Context = STAGE_INSTALLTEXTURES
-                processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-                if (processResult != 0)
-                {
-                    Log.Error("TEXTURE INSTALLATION RETURN CODE WAS NOT 0: " + processResult);
-                    if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+                    if (processResult != 0)
                     {
-                        switch (BACKGROUND_MEM_PROCESS_ERRORS[0])
+                        Log.Error("MassEffectModderNoGui process exited with non-zero code: " + processResult);
+                        Log.Warning("Application exited with in context: " + CURRENT_STAGE_CONTEXT);
+                        switch (CURRENT_STAGE_CONTEXT)
                         {
-                            case ERROR_TEXTURE_MAP_MISSING:
-                                e.Result = RESULT_TEXTUREINSTALL_NO_TEXTUREMAP;
+                            case "STAGE_UNPACKDLC":
+                                Log.Error("MassEffectModderNoGui exited or crashed while unpacking DLC");
+                                e.Result = RESULT_UNPACK_FAILED;
                                 break;
-                            case ERROR_TEXTURE_MAP_WRONG:
-                                e.Result = RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP;
+                            case "STAGE_SCAN":
+                                Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
+                                e.Result = RESULT_SCAN_FAILED;
                                 break;
-                            case ERROR_FILE_ADDED:
-                                e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_ADDED;
+                            case "STAGE_INSTALLTEXTURES":
+                                Log.Error("MassEffectModderNoGui exited or crashed while installing textures");
+                                if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+                                {
+                                    switch (BACKGROUND_MEM_PROCESS_ERRORS[0])
+                                    {
+                                        case ERROR_TEXTURE_MAP_MISSING:
+                                            e.Result = RESULT_TEXTUREINSTALL_NO_TEXTUREMAP;
+                                            break;
+                                        case ERROR_TEXTURE_MAP_WRONG:
+                                            e.Result = RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP;
+                                            break;
+                                        case ERROR_FILE_ADDED:
+                                            e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_ADDED;
+                                            break;
+                                        case ERROR_FILE_REMOVED:
+                                            e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED;
+                                            break;
+                                        default:
+                                            Log.Error("Background MEM errors has item not handled: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
+                                            e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                                }
                                 break;
-                            case ERROR_FILE_REMOVED:
-                                e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED;
+                            case "STAGE_SAVING":
+                                Log.Error("MassEffectModderNoGui exited or crashed while saving packages");
+                                e.Result = RESULT_SAVING_FAILED;
+                                break;
+                            case "STAGE_REMOVEMIPMAPS":
+                                Log.Error("MassEffectModderNoGui exited or crashed while removing empty mipmaps");
+                                e.Result = RESULT_REMOVE_MIPMAPS_FAILED;
+                                break;
+                            case "STAGE_REPACK":
+                                Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
+                                e.Result = RESULT_REPACK_FAILED;
+                                break;
+                            default:
+                                Log.Error("MEM Exited during unknown stage context: " + STAGE_CONTEXT);
+                                e.Result = RESULT_UNKNOWN_ERROR;
                                 break;
                         }
-                    }
-                }
 
-                //Context = STAGE_REPACK
-                if (processResult != 0)
-                {
-                    Log.Error("REPACKING RETURN CODE WAS NOT 0: " + processResult);
-                    if (e.Result == null)
-                    {
-                        e.Result = RESULT_REPACK_FAILED;
+                        InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
+                        InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
+                        return;
                     }
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
-                    return;
                 }
+                overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
+                InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
             }
 
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
@@ -624,28 +553,48 @@ namespace AlotAddOnGUI
             }
 
             //Write Marker
+            bool showMarkerFailedMessage = false;
             ALOTVersionInfo newVersion = new ALOTVersionInfo(alotMainVersionFlag, updateVersion, 0, meuitmFlag);
-            Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
-            ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
-            if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
+            Log.Information("Writing or updating MEMI marker with info: " + newVersion.ToString());
+            try
             {
-                //Marker file written was bad
-                Log.Error("Marker file was not properly written!");
-                if (test == null)
+                Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
+                ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
+
+                if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER || test.MEUITMVER != newVersion.MEUITMVER)
                 {
-                    Log.Error("Marker file does not indicate anything was installed.");
+                    //Marker file written was bad
+                    Log.Error("Marker file was not properly written!");
+                    if (test == null)
+                    {
+                        Log.Error("Marker file does not indicate anything was installed.");
+                    }
+                    else
+                    {
+                        if (test.ALOTVER != newVersion.ALOTVER)
+                        {
+                            Log.Error("Marker file does not show that ALOT was installed, but we detect some version was installed.");
+                        }
+                        if (test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
+                        {
+                            Log.Error("Marker file does not show that ALOT update was applied or installed to our current version");
+                        }
+                        if (test.MEUITMVER != newVersion.MEUITMVER)
+                        {
+                            Log.Error("Marker file does not show that MEUITM was applied or installed to our current installation when it should have been");
+                        }
+                    }
+                    showMarkerFailedMessage = true;
                 }
                 else
                 {
-                    if (test.ALOTVER != newVersion.ALOTVER)
-                    {
-                        Log.Error("Marker file does not show that ALOT was installed, but we detect some version was installed.");
-                    }
-                    if (test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
-                    {
-                        Log.Error("Marker file does not show that ALOT Update was applied or installed to our current version");
-                    }
+                    Log.Information("Reading information back from disk, should match above: " + test.ToString());
                 }
+            } catch (Exception ex)
+            {
+                Log.Error("Marker file was unable to be written due to an exception: "+ex.Message);
+                Log.Error("An error like this occuring could indicate significant other issues");
+
             }
             //Install Binkw32
             if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
@@ -697,6 +646,12 @@ namespace AlotAddOnGUI
                     Log.Error("ALOT MAIN FILE - Unpacked - does not match the singlefilename! Not moving back. " + extractedName);
                 }
 
+            }
+
+            if (showMarkerFailedMessage)
+            {
+                KeyValuePair<string, string> dialog = new KeyValuePair<string, string>("Marker file not properly written", "The 'MEMI Marker' file that ALOT Installer uses to track the installation status of ALOT/MEUITM could not be written. The installation status of ALOT/MEUITM for this game will not be accurate, however installation has completed. Please check the logs for more information.");
+                InstallWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, dialog));
             }
 
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGES_LABEL));

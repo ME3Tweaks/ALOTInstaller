@@ -14,5 +14,10 @@
             this.ALOTHOTFIXVER = ALOTHotfixVersion;
             this.MEUITMVER = MEUITMVersion;
         }
+
+        public override string ToString()
+        {
+            return "ALOTVer " + ALOTVER + "." + ALOTUPDATEVER + "." + ALOTHOTFIXVER + ", MEUITM v" + MEUITMVER;
+        }
     }
 }
