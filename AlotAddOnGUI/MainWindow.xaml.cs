@@ -3496,6 +3496,7 @@ namespace AlotAddOnGUI
         private async void RestoreCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
+            Build_ProgressBar.IsIndeterminate = false;
             if (e.Result != null)
             {
                 bool result = (bool)e.Result;

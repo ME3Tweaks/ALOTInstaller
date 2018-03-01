@@ -169,8 +169,10 @@
     <Compile Include="classes\ME3Constants.cs" />
     <Compile Include="classes\PackageFile.cs" />
     <Compile Include="classes\RelayCommand.cs" />
+    <Compile Include="classes\SerializingFile.cs" />
     <Compile Include="classes\StreamIO.cs" />
     <Compile Include="classes\TasksDisplayEngine.cs" />
+    <Compile Include="classes\TOCBinFile.cs" />
     <Compile Include="ManifestTutorial.cs" />
     <Compile Include="music\LoopStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
