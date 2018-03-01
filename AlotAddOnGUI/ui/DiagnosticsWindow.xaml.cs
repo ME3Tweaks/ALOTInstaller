@@ -130,6 +130,14 @@ namespace AlotAddOnGUI.ui
 
         private void RunDiagnostics(int game, bool full)
         {
+            ALOTVersionInfo avi = Utilities.GetInstalledALOTInfo(DIAGNOSTICS_GAME);
+            if (avi == null)
+            {
+                TextBlock_DataAfter.Text = "Check files are readable";
+                TextBlock_DataMismatch.Visibility = Visibility.Collapsed;
+                Image_DataMismatch.Visibility = Visibility.Collapsed;
+            }
+
             DiagnosticHeader.Text = "Performing diagnostics...";
             TextureCheck = full;
             if (TextureCheck)
@@ -180,11 +188,25 @@ namespace AlotAddOnGUI.ui
                 case SET_REPLACEDFILE_PROGRESS:
                     {
                         int progress = (int)tc.Data;
-                        TextBlock_DataAfter.Text = "Checking for replaced files " + progress + "%";
+                        if (MEMI_FOUND)
+                        {
+                            TextBlock_DataAfter.Text = "Checking for replaced files " + progress + "%";
+                        }
+                        else
+                        {
+                            TextBlock_DataAfter.Text = "Checking files are readable " + progress + "%";
+                        }
                         break;
                     }
                 case RESET_REPLACEFILE_TEXT:
-                    TextBlock_DataAfter.Text = "Check for replaced files";
+                    if (MEMI_FOUND)
+                    {
+                        TextBlock_DataAfter.Text = "Check for replaced files";
+                    }
+                    else
+                    {
+                        TextBlock_DataAfter.Text = "Check files are readable";
+                    }
 
                     break;
                 case TURN_OFF_TASKBAR_PROGRESS:
@@ -512,7 +534,8 @@ namespace AlotAddOnGUI.ui
                 {
                     pairLog = true;
                     addDiagLine("MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
-                } else
+                }
+                else
                 {
                     if (MEMI_FOUND)
                     {
@@ -528,7 +551,14 @@ namespace AlotAddOnGUI.ui
             {
                 if (BACKGROUND_MEM_PROCESS.ExitCode != null && BACKGROUND_MEM_PROCESS.ExitCode == 0)
                 {
-                    addDiagLine("Diagnostic reports no files appear to have been replaced after textures were installed.");
+                    if (MEMI_FOUND)
+                    {
+                        addDiagLine("Diagnostic reports no files appear to have been replaced after textures were installed.");
+                    }
+                    else
+                    {
+                        addDiagLine("Diagnostic did not have any trouble scanning files.");
+                    }
                 }
                 else
                 {
@@ -1225,8 +1255,8 @@ namespace AlotAddOnGUI.ui
                                 break;
                             case "TASK_PROGRESS":
                             case "OVERALL_PROGRESS": //will be removed in future
-                                //worker.ReportProgress(0, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
-                                int percentInt = Convert.ToInt32(param);
+                                                     //worker.ReportProgress(0, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
+                            int percentInt = Convert.ToInt32(param);
                                 if (Context == CONTEXT_FULLMIPMAP_SCAN)
                                 {
                                     worker.ReportProgress(0, new ThreadCommand(SET_FULLSCAN_PROGRESS, percentInt));
