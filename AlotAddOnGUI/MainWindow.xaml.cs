@@ -805,8 +805,17 @@ namespace AlotAddOnGUI
                 //We're OK
                 Log.Information("Extraction complete with code " + extractcode);
                 Log.Information("Applying staged update for MEM GUI");
-                CopyDir.CopyAll(new DirectoryInfo(UPDATE_STAGING_MEM_DIR), new DirectoryInfo(BINARY_DIRECTORY));
-                Log.Information("Update completed");
+                try
+                {
+                    CopyDir.CopyAll(new DirectoryInfo(UPDATE_STAGING_MEM_DIR), new DirectoryInfo(BINARY_DIRECTORY));
+                    Log.Information("Update completed");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("MEMGUI update could not be applied: " + ex.Message);
+                    //await this.ShowMessageAsync("MassEffectModderNoGui update failed", "MassEffectModderNoGui update failed. This program is used to install textures and other operations. The update will be attempted when the program is restarted.");
+                    ShowStatus("Failed to apply MEM GUI update - we will try again next application boot");
+                }
             }
             else
             {
@@ -4458,12 +4467,12 @@ namespace AlotAddOnGUI
                 path = Path.Combine(path, "ME3Logger_truncating.asi");
                 System.IO.File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.ME3Logger_truncating);
                 Log.Information("Installed ME3Logger_truncating.asi...");
-                await this.ShowMessageAsync("ME3Logger installed", "When the MassEffect3.exe process exits, a file named ME3Log.txt will be created at "+logpath+". The process must be fully exited for this file to be properly written. Please upload this log file to the ALOT Discord if requested.");
+                await this.ShowMessageAsync("ME3Logger installed", "When the MassEffect3.exe process exits, a file named ME3Log.txt will be created at " + logpath + ". The process must be fully exited for this file to be properly written. Please upload this log file to the ALOT Discord if requested.");
             }
             catch (Exception ex)
             {
                 Log.Error("Failed to install me3logger_truncating: " + ex.Message);
-                await this.ShowMessageAsync("Failed to install logger", "Failed to install the ME3Logger asi: "+ex.Message);
+                await this.ShowMessageAsync("Failed to install logger", "Failed to install the ME3Logger asi: " + ex.Message);
             }
         }
     }
