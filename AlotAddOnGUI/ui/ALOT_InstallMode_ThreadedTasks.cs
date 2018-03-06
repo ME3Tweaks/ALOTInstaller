@@ -419,7 +419,7 @@ namespace AlotAddOnGUI
             {
                 args += " -repack";
             }
-            args += " -ipc -gui-installer -new-way";
+            args += " -ipc -alot-mode -new-way";
             runMEM_InstallContextBased(exe, args, InstallWorker);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {
