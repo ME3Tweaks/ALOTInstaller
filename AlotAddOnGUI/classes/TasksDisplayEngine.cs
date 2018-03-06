@@ -9,10 +9,14 @@ namespace AlotAddOnGUI.classes
     class TasksDisplayEngine
     {
         private static List<string> Tasks = new List<string>();
+        private static Object thisLock = new Object();
 
         public static void SubmitTask(string task)
         {
-            Tasks.Add(task);
+            lock (thisLock)
+            {
+                Tasks.Add(task);
+            }
         }
 
         /// <summary>
@@ -22,7 +26,10 @@ namespace AlotAddOnGUI.classes
         /// <returns>Running task or null if none</returns>
         public static string ReleaseTask(string task)
         {
-            Tasks.RemoveAll(item => item == task);
+            lock (thisLock)
+            {
+                Tasks.RemoveAll(item => item == task);
+            }
             if (Tasks.Count > 0)
             {
                 return Tasks[0];

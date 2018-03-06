@@ -1240,7 +1240,8 @@ namespace AlotAddOnGUI
                 switch (tc.Command)
                 {
                     case RESTORE_FAILED_COULD_NOT_DELETE_FOLDER:
-                        await this.ShowMessageAsync("Restore failed", "Could not delete the existing game directory. This is usually due to something open or running from within the game folder. Close other programs and try again.");
+                        Log.Error("Restore has failed - could not delete existing installation. Some may be missing - consider this game installation ruined and requires a restore now.");
+                        await this.ShowMessageAsync("Restore failed", "Could not delete the existing game directory. This is usually due to something still open (such as the game), or running something from within the game folder. Close other programs and try again.");
                         return;
                     case UPDATE_ADDONUI_CURRENTTASK:
                         AddonFilesLabel.Text = (string)tc.Data;

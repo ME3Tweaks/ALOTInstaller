@@ -43,6 +43,7 @@ namespace AlotAddOnGUI
         private const int RESULT_REPACK_FAILED = -46;
         private const int RESULT_UNKNOWN_ERROR = -51;
         private const int RESULT_SCAN_FAILED = -52;
+        private const int RESULT_BIOGAME_MISSING = -53;
 
         private void MusicIcon_Click(object sender, RoutedEventArgs e)
         {
@@ -327,6 +328,12 @@ namespace AlotAddOnGUI
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
 
             Log.Information("Setting biogame directory to read-write");
+            string biogamepath = Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\BIOGame";
+            if (!Directory.Exists(biogamepath))
+            {
+                e.Result = RESULT_BIOGAME_MISSING;
+                return;
+            }
             Utilities.MakeAllFilesInDirReadWrite(Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\BIOGame");
             Log.Information("Files being installed in this installation session:");
             AddonFile alotMainFile = null;
@@ -834,6 +841,13 @@ namespace AlotAddOnGUI
                             {
                                 HeaderLabel.Text = "Failed to scan textures. Your game has not been modified.";
                             }
+                            break;
+                        }
+                    case RESULT_BIOGAME_MISSING:
+                        {
+                            InstallingOverlay_TopLabel.Text = "BIOGame directory is missing";
+                            InstallingOverlay_BottomLabel.Text = "Game needs to be reinstalled, see logs";
+                            HeaderLabel.Text = "BIOGame directory is missing. This means the installation is completely unusable.\nCheck logs for more information about this.";
                             break;
                         }
                     case RESULT_REMOVE_MIPMAPS_FAILED:
