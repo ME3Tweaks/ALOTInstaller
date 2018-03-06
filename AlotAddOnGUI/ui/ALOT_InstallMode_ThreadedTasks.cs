@@ -420,11 +420,7 @@ namespace AlotAddOnGUI
                 args += " -repack";
             }
             args += " -ipc -alot-mode -new-way";
-            runMEM_InstallContextBased(exe, args, InstallWorker);
-            while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
-            {
-                Thread.Sleep(END_OF_PROCESS_POLL_INTERVAL);
-            }
+            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
             if (!STAGE_DONE_REACHED)
             {

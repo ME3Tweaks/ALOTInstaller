@@ -7,17 +7,17 @@
                       Style="{StaticResource WiderDialogStyle}">
     <StackPanel>
         <TextBlock Name="Textblock_UpdateText" Text="This is where the update text would be." FontSize="15" TextWrapping="Wrap"/>
-        <TextBlock Name="Textblock_ChangelogText" Text="This is where the update changelog would be." FontSize="13" TextWrapping="Wrap" Foreground="Bisque"/>
-        <TextBlock Text="Install the update?" FontSize="15"/>
+        <TextBlock Name="Textblock_ChangelogText" Text="This is where the update changelog would be." FontSize="13" TextWrapping="Wrap" Foreground="#FFC7C2FF"/>
+        <TextBlock Name="Textblock_UpdateAskText" Text="Install the update?" FontSize="15" Margin="0,5"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,21">
-            <Button x:Name="Update_Button" Content="Update" Controls:ControlsHelper.ContentCharacterCasing="Normal"  Click="Update_Button_Click" HorizontalAlignment="Right" Style="{StaticResource AccentedDialogSquareButton}"
+            <Button x:Name="Button_Update" Content="Update" Controls:ControlsHelper.ContentCharacterCasing="Normal"  Click="Update_Button_Click" HorizontalAlignment="Right" Style="{StaticResource AccentedDialogSquareButton}"
                 BorderThickness="2,2,2,2"
                 Padding="5,6,5,6"
                 Height="35"
                 Width="80"
                 Margin="5,0,5,0"/>
-            <Button x:Name="Later_Button" Content="Later" Controls:ControlsHelper.ContentCharacterCasing="Normal" Click="Later_Button_Click" HorizontalAlignment="Right" Style="{StaticResource SquareButtonStyle}"
+            <Button x:Name="Button_Later" Content="Later" Controls:ControlsHelper.ContentCharacterCasing="Normal" Click="Later_Button_Click" HorizontalAlignment="Right" Style="{StaticResource SquareButtonStyle}"
                 BorderThickness="2,2,2,2"
                 Padding="5,6,5,6"
                 Height="35"

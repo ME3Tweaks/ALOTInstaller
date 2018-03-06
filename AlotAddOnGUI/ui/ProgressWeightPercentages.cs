@@ -28,6 +28,9 @@ namespace AlotAddOnGUI.ui
 
         private static double TOTAL_ACTIVE_WEIGHT = 0;
         private static List<MutableKeyValuePair<int, double>> jobWeightList = new List<MutableKeyValuePair<int, double>>();
+
+        private static int OVERALL_PROGRESS = -1;
+
         public static void ClearTasks()
         {
             TOTAL_ACTIVE_WEIGHT = 0;
@@ -114,7 +117,11 @@ namespace AlotAddOnGUI.ui
             if (TOTAL_ACTIVE_WEIGHT > 0)
             {
                 int progress = (int)currentFinishedWeight;
-                Log.Information("Overall Progress: " + progress+"%");
+                if (OVERALL_PROGRESS != progress)
+                {
+                    Log.Information("Overall Progress: " + progress + "%");
+                    OVERALL_PROGRESS = progress;
+                }
                 return progress;
             }
             return 0;

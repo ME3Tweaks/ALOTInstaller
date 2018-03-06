@@ -363,10 +363,6 @@ namespace AlotAddOnGUI
                                     {
                                         message = "This copy of ALOT Installer is outdated and must be updated.";
                                     }
-                                    else
-                                    {
-                                        message = "Clients on the Beta channel of ALOT Installer must use the latest version.";
-                                    }
                                 }
                                 updateprogresscontroller = await this.ShowProgressAsync("Downloading Update", message, canCancel);
                                 updateprogresscontroller.SetIndeterminate();
@@ -2877,8 +2873,18 @@ namespace AlotAddOnGUI
             //if alot is already installed we don't need to show missing message, unless installed via MEM directly
             if (installedInfo == null || installedInfo.ALOTVER == 0)
             {
-                MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " addon are missing. These files add a significant amount of high quality textures from third party artists. These should be installed if you want all of the high quality textures; these files are not included directly in ALOT because of ownership rights.\n\nAre you sure you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
-                return result == MessageDialogResult.Affirmative;
+                Log.Information(nummissing + " addon files are missing - prompting user to decline install.");
+                MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " addon are not imported. Addon files add a significant amount of high quality textures from third party artists and are tested to work with ALOT. These files must be imported if you want all of the high quality textures; these files are not included directly in ALOT because of ownership rights.\n\nNot importing these files will significantly degrade the ALOT experience. Are you sure you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
+                if (result == MessageDialogResult.Affirmative)
+                {
+                    Log.Warning("User is continuing build step without all non-optional addon files. If user complains about a high amount of low quality textures this might be why.");
+                    return true;
+                }
+                else
+                {
+                    Log.Information("User has aborted installation due to missing files");
+                    return false;
+                }
             }
             else
             {
@@ -3268,11 +3274,12 @@ namespace AlotAddOnGUI
                     {
                         Log.Error("Destination file doesn't exist after file copy. This may need some more analysis to determine the exact cause.");
                         Log.Error("Destination file: " + destfile);
-                        await this.ShowMessageAsync("File failed to import","'"+ fileToImport.Item1 + "' failed to import. The destination file does not exist:\n"+fileToImport.Item3+".\n\nThis may indicate a lack of disk space on the drive ALOT Installer is running from, or possibly other issues.");
+                        await this.ShowMessageAsync("File failed to import", "'" + fileToImport.Item1 + "' failed to import. The destination file does not exist:\n" + fileToImport.Item3 + ".\n\nThis may indicate a lack of disk space on the drive ALOT Installer is running from, or possibly other issues.");
                         if (importedFiles.Count > 0)
                         {
                             ShowCopyImportsFinishedMessage(progressController, importedFiles);
-                        } else
+                        }
+                        else
                         {
                             await progressController.CloseAsync();
                         }
