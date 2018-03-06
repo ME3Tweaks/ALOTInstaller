@@ -621,6 +621,7 @@ namespace AlotAddOnGUI
             EnsureOneGameIsInstalled();
             PerformRAMCheck();
             await PerformWriteCheck(false);
+            PerformUACCheck();
             UpdateALOTStatus();
             RunMEMUpdaterGUI();
             string appCrashFile = EXE_DIRECTORY + @"Data\APP_CRASH";
