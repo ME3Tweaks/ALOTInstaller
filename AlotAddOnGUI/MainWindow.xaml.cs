@@ -3244,51 +3244,40 @@ namespace AlotAddOnGUI
                     int taskbarprogress = (int)((currentBytes * 100 / totalBytes));
 
                     TaskbarManager.Instance.SetProgressValue(taskbarprogress, 100);
-
                     progressController.SetProgress(progress);
                 };
                 downloadClient.DownloadFileCompleted += async (s, e) =>
                 {
-                    TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
-                    TaskbarManager.Instance.SetProgressValue(0, 0);
-                    processedBytes += new System.IO.FileInfo(fileToImport.Item3).Length;
-                    importedFiles.Add(fileToImport.Item1.FriendlyName);
-                    if (filesToImport.Count > 0)
+                    string destfile = fileToImport.Item3;
+                    if (File.Exists(destfile))
                     {
-                        ImportFiles(filesToImport, importedFiles, progressController, processedBytes, totalBytes);
-                    }
-                    else
-                    {
-                        //imports finished
-                        await progressController.CloseAsync();
-                        if (WindowState == WindowState.Minimized)
+                        TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
+                        TaskbarManager.Instance.SetProgressValue(0, 0);
+                        processedBytes += new System.IO.FileInfo(destfile).Length;
+                        importedFiles.Add(fileToImport.Item1.FriendlyName);
+                        if (filesToImport.Count > 0)
                         {
-                            //queue it
-                            foreach (string af in importedFiles)
-                            {
-                                COPY_QUEUE.Add(af);
-                            }
+                            ImportFiles(filesToImport, importedFiles, progressController, processedBytes, totalBytes);
                         }
                         else
                         {
-                            string detailsMessage = "The following files were just imported to ALOT Installer:";
-                            foreach (string af in importedFiles)
-                            {
-                                detailsMessage += "\n - " + af;
-                            }
-
-                            string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                            string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods directory.";
-
-                            ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
-                        }
-                        PreventFileRefresh = false; //allow refresh
-                        if (DOWNLOAD_ASSISTANT_WINDOW != null)
-                        {
-                            DOWNLOAD_ASSISTANT_WINDOW.ShowStatus(importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s were" : " was") + " imported");
-                            DOWNLOAD_ASSISTANT_WINDOW.SetImportButtonEnabled(true);
+                            ShowCopyImportsFinishedMessage(progressController, importedFiles);
                         }
                     }
+                    else
+                    {
+                        Log.Error("Destination file doesn't exist after file copy. This may need some more analysis to determine the exact cause.");
+                        Log.Error("Destination file: " + destfile);
+                        await this.ShowMessageAsync("File failed to import","'"+ fileToImport.Item1 + "' failed to import. The destination file does not exist:\n"+fileToImport.Item3+".\n\nThis may indicate a lack of disk space on the drive ALOT Installer is running from, or possibly other issues.");
+                        if (importedFiles.Count > 0)
+                        {
+                            ShowCopyImportsFinishedMessage(progressController, importedFiles);
+                        } else
+                        {
+                            await progressController.CloseAsync();
+                        }
+                    }
+
                 };
                 TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
                 TaskbarManager.Instance.SetProgressValue(0, 100);
@@ -3296,7 +3285,38 @@ namespace AlotAddOnGUI
             }
         }
 
+        private async void ShowCopyImportsFinishedMessage(ProgressDialogController progressController, List<string> importedFiles)
+        {
+            //imports finished
+            await progressController.CloseAsync();
+            if (WindowState == WindowState.Minimized)
+            {
+                //queue it
+                foreach (string af in importedFiles)
+                {
+                    COPY_QUEUE.Add(af);
+                }
+            }
+            else
+            {
+                string detailsMessage = "The following files were just imported to ALOT Installer:";
+                foreach (string af in importedFiles)
+                {
+                    detailsMessage += "\n - " + af;
+                }
 
+                string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
+                string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods directory.";
+
+                ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
+            }
+            PreventFileRefresh = false; //allow refresh
+            if (DOWNLOAD_ASSISTANT_WINDOW != null)
+            {
+                DOWNLOAD_ASSISTANT_WINDOW.ShowStatus(importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s were" : " was") + " imported");
+                DOWNLOAD_ASSISTANT_WINDOW.SetImportButtonEnabled(true);
+            }
+        }
 
         private void ImportFilesAsMove(object sender, DoWorkEventArgs e)
         {

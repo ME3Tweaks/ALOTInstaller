@@ -564,7 +564,6 @@ namespace AlotAddOnGUI
             {
                 Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
                 ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
-
                 if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER || test.MEUITMVER != newVersion.MEUITMVER)
                 {
                     //Marker file written was bad
@@ -599,7 +598,6 @@ namespace AlotAddOnGUI
             {
                 Log.Error("Marker file was unable to be written due to an exception: " + ex.Message);
                 Log.Error("An error like this occuring could indicate significant other issues");
-
             }
             //Install Binkw32
             if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
