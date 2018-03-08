@@ -736,7 +736,15 @@ namespace AlotAddOnGUI
             Log.Warning("If the application crashes after this statement, please come to to the ALOT discord - this is an issue we have not yet been able to reproduce and thus can't fix without outside assistance.");
             var di = new DirectoryInfo(directory);
             foreach (var file in di.GetFiles("*", SearchOption.AllDirectories))
+            {
+                if (!file.Exists)
+                {
+                    Log.Warning("File is no longer in the game directory: " + file.FullName);
+                    Log.Error("This file was found when the read-write filescan took place, but is no longer present. The application is going to crash.");
+                    Log.Error("Another session may be running, or there may be a bug. Please come to the ALOT Discord so we can analyze this as we cannot reproduce it.");
+                }
                 file.Attributes &= ~FileAttributes.ReadOnly;
+            }
         }
 
 
