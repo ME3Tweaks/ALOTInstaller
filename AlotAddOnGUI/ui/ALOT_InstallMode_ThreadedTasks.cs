@@ -50,16 +50,31 @@ namespace AlotAddOnGUI
             if (MusicIsPlaying)
             {
                 MusicPaused = !MusicPaused;
-                Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_SOUND, !MusicPaused);
                 if (MusicPaused)
                 {
-                    waveOut.Pause();
-                    MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.SoundMute;
+                    try
+                    {
+                        waveOut.Pause();
+                        MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.SoundMute;
+                        Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_SOUND, !MusicPaused);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("Exception attempting to pause music: " + ex.Message);
+                    }
                 }
                 else
                 {
-                    MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.Sound3;
-                    waveOut.Play();
+                    try
+                    {
+                        waveOut.Play();
+                        MusicButtonIcon.Kind = MahApps.Metro.IconPacks.PackIconModernKind.Sound3;
+                        Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_SOUND, !MusicPaused);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("Exception attempting to play music: " + ex.Message);
+                    }
                 }
             }
         }
