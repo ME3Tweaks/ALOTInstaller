@@ -451,10 +451,6 @@ namespace AlotAddOnGUI.ui
                         {
                             addDiagLine("Diagnostic reports some files appear to have been added or removed since texture scan took place:");
                         }
-                        else
-                        {
-                            addDiagLine("Diagnostic reports some files appear to have been added or removed since texture scan took place. MEMI tag was not found - the game may have been restored, so these are likely not errors:");
-                        }
                         foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                         {
                             addDiagLine(" - " + str);
@@ -534,17 +530,6 @@ namespace AlotAddOnGUI.ui
                 {
                     pairLog = true;
                     addDiagLine("MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
-                }
-                else
-                {
-                    if (MEMI_FOUND)
-                    {
-                        addDiagLine("Diagnostic reports some files appear to have been replaced after textures were installed:");
-                    }
-                    else
-                    {
-                        addDiagLine("The following files did not pass the file scan check:");
-                    }
                 }
             }
             else
@@ -1246,7 +1231,7 @@ namespace AlotAddOnGUI.ui
                                     }
                                     if (!AddedFiles.Contains(subpath.ToLower()))
                                     {
-                                        BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("DIAG ERROR: File missing MEM/MEMNOGUI marker was found: " + subpath);
+                                        BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File missing MEM/MEMNOGUI marker was found: " + subpath);
                                     }
                                 }
                                 break;
