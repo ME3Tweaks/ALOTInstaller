@@ -63,7 +63,7 @@
         <TextBlock HorizontalAlignment="Center" Grid.Row="0" TextAlignment="Center" Text="Download the listed files, then click the import button to import them. Only files not imported are shown." TextWrapping="Wrap"/>
         <TextBlock Name="TextBlock_DownloadsFolder" HorizontalAlignment="Center" Grid.Row="1" TextAlignment="Center" Text="Current Downloads folder: " TextWrapping="Wrap" Foreground="Lime"/>
 
-        <ListView Grid.Column="0" Grid.Row="2" Name="filesList" BorderThickness="0" >
+        <ListView Grid.Column="0" Grid.Row="2" Name="filesList" BorderThickness="0" ScrollViewer.PanningMode="Both">
             <!-- This is what each list item looks like-->
             <ListView.ItemTemplate >
                 <DataTemplate>

@@ -73,16 +73,16 @@ namespace AlotAddOnGUI
         {
             var files = Directory.GetFiles(dir);
             string fileName = "";
-            if (files.Count() > 0)
-            {
-                fileName = files[0];
-            }
-            else
+            //if (files.Count() > 0)
+            //{
+            //    fileName = files[0];
+            //}
+            //else
             {
                 try
                 {
-                    System.IO.File.Create(Path.Combine(dir, "temp.txt")).Close();
-                    System.IO.File.Delete(Path.Combine(dir, "temp.txt"));
+                    System.IO.File.Create(Path.Combine(dir, "temp_alot.txt")).Close();
+                    System.IO.File.Delete(Path.Combine(dir, "temp_alot.txt"));
                     return true;
                 }
                 catch (System.UnauthorizedAccessException)
