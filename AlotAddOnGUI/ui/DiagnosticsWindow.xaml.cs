@@ -369,7 +369,7 @@ namespace AlotAddOnGUI.ui
             addDiagLine("Version " + osBuildVersion);
             addDiagLine("");
             addDiagLine("Processors");
-            addDiagLine(GetCPUString());
+            addDiagLine(Utilities.GetCPUString());
             long ramInBytes = Utilities.GetInstalledRamAmount();
             addDiagLine("System Memory: " + ByteSize.FromKiloBytes(ramInBytes));
             if (ramInBytes == 0)
@@ -922,55 +922,7 @@ namespace AlotAddOnGUI.ui
             //}
         }
 
-        private string GetCPUString()
-        {
-            string str = "";
-
-            ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
-
-            foreach (ManagementObject moProcessor in mosProcessor.Get())
-            {
-                if (str != "")
-                {
-                    str += "\n";
-                }
-
-                if (moProcessor["name"] != null)
-                {
-                    str += moProcessor["name"].ToString();
-                    str += "\n";
-                }
-                if (moProcessor["maxclockspeed"] != null)
-                {
-                    str += "Maximum reported clock speed: ";
-                    str += moProcessor["maxclockspeed"].ToString();
-                    str += " Mhz\n";
-                }
-                if (moProcessor["numberofcores"] != null)
-                {
-                    str += "Cores: ";
-
-                    str += moProcessor["numberofcores"].ToString();
-                    str += "\n";
-                }
-                if (moProcessor["numberoflogicalprocessors"] != null)
-                {
-                    str += "Logical processors: ";
-                    str += moProcessor["numberoflogicalprocessors"].ToString();
-                    str += "\n";
-                }
-
-            }
-            return str
-               .Replace("(TM)", "™")
-               .Replace("(tm)", "™")
-               .Replace("(R)", "®")
-               .Replace("(r)", "®")
-               .Replace("(C)", "©")
-               .Replace("(c)", "©")
-               .Replace("    ", " ")
-               .Replace("  ", " ");
-        }
+        
 
         private string GetLODStr(int gameID, ALOTVersionInfo avi)
         {

@@ -19,6 +19,7 @@ using System.Xml.Linq;
 using System.Security.Cryptography;
 using SlavaGu.ConsoleAppLauncher;
 using System.ComponentModel;
+using ByteSizeLib;
 
 namespace AlotAddOnGUI
 {
@@ -35,34 +36,73 @@ namespace AlotAddOnGUI
         public static string GetOperatingSystemInfo()
         {
             StringBuilder sb = new StringBuilder();
-            //Create an object of ManagementObjectSearcher class and pass query as parameter.
-            ManagementObjectSearcher mos = new ManagementObjectSearcher("select * from Win32_OperatingSystem");
-            foreach (ManagementObject managementObject in mos.Get())
-            {
-                if (managementObject["Caption"] != null)
-                {
-                    sb.AppendLine("Operating System Name  :  " + managementObject["Caption"].ToString());   //Display operating system caption
-                }
-                if (managementObject["OSArchitecture"] != null)
-                {
-                    sb.AppendLine("Operating System Architecture  :  " + managementObject["OSArchitecture"].ToString());   //Display operating system architecture.
-                }
-                if (managementObject["CSDVersion"] != null)
-                {
-                    sb.AppendLine("Operating System Service Pack   :  " + managementObject["CSDVersion"].ToString());     //Display operating system version.
-                }
-            }
-            sb.AppendLine("\nProcessor Information-------");
-            RegistryKey processor_name = Registry.LocalMachine.OpenSubKey(@"Hardware\Description\System\CentralProcessor\0", RegistryKeyPermissionCheck.ReadSubTree);   //This registry entry contains entry for processor info.
+            OperatingSystem os = Environment.OSVersion;
+            Version osBuildVersion = os.Version;
 
-            if (processor_name != null)
+            //Windows 10 only
+            string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
+            string productName = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName", "").ToString();
+            string verLine = productName;
+            if (osBuildVersion.Major == 10)
             {
-                if (processor_name.GetValue("ProcessorNameString") != null)
-                {
-                    sb.AppendLine((string)processor_name.GetValue("ProcessorNameString"));   //Display processor ingo.
-                }
+                verLine += " " + releaseId;
             }
+            sb.AppendLine(verLine);
+            sb.AppendLine("Version " + osBuildVersion);
+            sb.AppendLine(GetCPUString());
+            long ramInBytes = Utilities.GetInstalledRamAmount();
+            sb.AppendLine("System Memory: " + ByteSize.FromKiloBytes(ramInBytes));
             return sb.ToString();
+        }
+
+        public static  string GetCPUString()
+        {
+            string str = "";
+
+            ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
+
+            foreach (ManagementObject moProcessor in mosProcessor.Get())
+            {
+                if (str != "")
+                {
+                    str += "\n";
+                }
+
+                if (moProcessor["name"] != null)
+                {
+                    str += moProcessor["name"].ToString();
+                    str += "\n";
+                }
+                if (moProcessor["maxclockspeed"] != null)
+                {
+                    str += "Maximum reported clock speed: ";
+                    str += moProcessor["maxclockspeed"].ToString();
+                    str += " Mhz\n";
+                }
+                if (moProcessor["numberofcores"] != null)
+                {
+                    str += "Cores: ";
+
+                    str += moProcessor["numberofcores"].ToString();
+                    str += "\n";
+                }
+                if (moProcessor["numberoflogicalprocessors"] != null)
+                {
+                    str += "Logical processors: ";
+                    str += moProcessor["numberoflogicalprocessors"].ToString();
+                    str += "\n";
+                }
+
+            }
+            return str
+               .Replace("(TM)", "™")
+               .Replace("(tm)", "™")
+               .Replace("(R)", "®")
+               .Replace("(r)", "®")
+               .Replace("(C)", "©")
+               .Replace("(c)", "©")
+               .Replace("    ", " ")
+               .Replace("  ", " ").Trim();
         }
 
         /// <summary> Checks for write access for the given file.

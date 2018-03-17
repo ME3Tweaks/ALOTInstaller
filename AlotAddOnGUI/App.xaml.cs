@@ -229,25 +229,22 @@ namespace AlotAddOnGUI
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
             Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
             string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
-            Log.Information("Running Windows " + releaseId);
             Utilities.GetAntivirusInfo();
         }
 
         void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            string errorMessage = string.Format("ALOT Installer has crashed! This exception that caused the crash:");
+            string errorMessage = string.Format("ALOT Installer has crashed! This is the exception that caused the crash:");
             string st = FlattenException(e.Exception);
-            Log.Error(errorMessage);
-            Log.Error(st);
-            Log.Information("Forcing beta mode off");
+            Log.Fatal(errorMessage);
+            Log.Fatal(st);
+            Log.Information("Forcing beta mode off before exiting...");
             Utilities.WriteRegistryKey(Registry.CurrentUser, AlotAddOnGUI.MainWindow.REGISTRY_KEY, AlotAddOnGUI.MainWindow.SETTINGSTR_BETAMODE, 0);
 
             if (Directory.Exists("Data") && !File.Exists(@"Data\APP_CRASH"))
             {
                 File.Create(@"Data\APP_CRASH");
             }
-            //MetroDial.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //e.Handled = true;
         }
 
         public static void OnFatalCrash(Exception e)
