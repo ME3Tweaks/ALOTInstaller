@@ -434,6 +434,20 @@ namespace AlotAddOnGUI
                 fileVersion = versInfo.FileMajorPart;
                 Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
             }
+
+            if (Directory.Exists(UPDATE_STAGING_MEM_DIR))
+            {
+                try
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEM_DIR);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Could not delete " + UPDATE_STAGING_MEM_DIR + ". We will try again later. Exception message: " + ex.Message);
+                    return;
+                }
+            }
+
             try
             {
                 var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
@@ -823,7 +837,14 @@ namespace AlotAddOnGUI
 
             if (Directory.Exists(UPDATE_STAGING_MEM_DIR))
             {
-                Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEM_DIR);
+                try
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEM_DIR);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Could not delete " + UPDATE_STAGING_MEM_DIR + ". We will try again later. Exception message: "+ex.Message);
+                }
             }
 
             File.Delete((string)e.UserState);
