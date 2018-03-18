@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.0.9">
+<alotaddonmanifest version="5.0.10">
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps."/>
