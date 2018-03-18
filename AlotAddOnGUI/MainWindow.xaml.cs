@@ -1220,8 +1220,8 @@ namespace AlotAddOnGUI
 
             if (!me1Installed && !me2Installed && !me3Installed)
             {
-                Log.Error("No trilogy games are installed. App won't be able to do anything");
-                await this.ShowMessageAsync("None of the Mass Effect Trilogy games are installed", "ALOT Installer requires at least one of the trilogy games to be installed before you can use it.");
+                Log.Error("No trilogy games are installed (could not find any using lookups). App won't be able to do anything");
+                await this.ShowMessageAsync("None of the Mass Effect Trilogy games are installed", "ALOT Installer requires at least one of the trilogy games to be installed before you can use it.\n\nIf you're using the Steam version of Mass Effect or Mass Effect 2, you must run the game at least once so the game can be detected.");
                 Log.Error("Exiting due to no games installed");
 
                 Environment.Exit(1);
