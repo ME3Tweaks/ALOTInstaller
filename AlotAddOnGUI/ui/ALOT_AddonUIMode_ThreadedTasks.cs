@@ -72,7 +72,7 @@ namespace AlotAddOnGUI
 
         private FadeInOutSampleProvider fadeoutProvider;
         private bool MusicPaused;
-        private string DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods";
+        public static string DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods";
         private string EXTRACTED_MODS_DIRECTORY = EXE_DIRECTORY + "Data\\Extracted_Mods";
         private bool ERROR_OCCURED_PLEASE_STOP = false;
         private bool REPACK_GAME_FILES;

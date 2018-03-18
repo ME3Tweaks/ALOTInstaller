@@ -990,6 +990,20 @@ namespace AlotAddOnGUI
                                     ProgressWeightPercentages.AddTask(task);
                                     break;
                                 }
+                            case "STAGE_WEIGHT":
+                                string[] parameters = param.Split(' ');
+                                try
+                                {
+                                    double scale = Double.Parse(parameters[1]);
+                                    Log.Information("Reweighting stage " + parameters[0] + " by " + parameters[1]);
+
+                                    ProgressWeightPercentages.ScaleCurrentTaskWeight(CURRENT_STAGE_NUM-1, scale);
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Information("STAGE_WEIGHT parameter invalid: " + e);
+                                }
+                                break;
                             case "STAGE_CONTEXT":
                                 {
                                     if (param == "STAGE_DONE")

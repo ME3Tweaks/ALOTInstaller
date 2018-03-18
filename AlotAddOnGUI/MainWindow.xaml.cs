@@ -108,6 +108,7 @@ namespace AlotAddOnGUI
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
         private readonly string SETTINGSTR_DEBUGLOGGING = "DebugLogging";
         private const string SETTINGSTR_DONT_FORCE_UPGRADES = "DontForceUpgrades";
+        private const string SETTINGSTR_LIBRARYDIR = "LibraryDir";
         private const string SETTINGSTR_REPACK = "RepackGameFiles";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
         public const string SETTINGSTR_BETAMODE = "BetaMode";
@@ -3500,6 +3501,12 @@ namespace AlotAddOnGUI
             if (DOWNLOADS_FOLDER == null)
             {
                 DOWNLOADS_FOLDER = KnownFolders.GetPath(KnownFolder.Downloads);
+            }
+
+            string librarydir = Utilities.GetRegistrySettingString(SETTINGSTR_LIBRARYDIR);
+            if (librarydir != null && Directory.Exists(librarydir))
+            {
+                DOWNLOADED_MODS_DIRECTORY = librarydir;
             }
 
             bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? true;
