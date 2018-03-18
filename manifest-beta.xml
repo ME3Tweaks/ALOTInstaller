@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.0.10">
+<alotaddonmanifest version="5.0.11">
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps."/>
@@ -80,7 +80,7 @@
     <packagefile me1="true" sourcename="MEUITM\mods\Wrex.mem" movedirectly="true" choicetitle="Battle hardened"/>
   </choicefile>
   <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\MEUITMReShade.zip" gamedestinationpath="binaries" choicetitle="MEUITM Reshade"/>
-  <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows"/>
+  <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows"/>
   <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen"/>
   </addonfile>
   <addonfile alotversion="6" friendlyname="ALOT for ME1 6.0 - Textures" tooltipname="ALOT for ME1 6.0 - Textures" author="CreeperLava">
