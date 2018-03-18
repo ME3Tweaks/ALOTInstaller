@@ -79,9 +79,9 @@
     <packagefile me1="true" sourcename="MEUITM\mods\WrexVS.mem" movedirectly="true" choicetitle="Vanilla" />
     <packagefile me1="true" sourcename="MEUITM\mods\Wrex.mem" movedirectly="true" choicetitle="Battle hardened"/>
   </choicefile>
-  <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\MEUITMReShade.zip" gamepathdestination="binaries" friendlyname="MEUITM Reshade"/>
-  <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" gamepathdestination="Engine\Shaders" friendlyname="Soft Shadows"/>
-  <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamepathdestination="BioGame\Splash\Splash.bmp" friendlyname="MEUITM Splash Screen"/>
+  <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\MEUITMReShade.zip" gamepathdestination="binaries" deleteshaders="true" choicetitle="MEUITM Reshade"/>
+  <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" gamedestinationpath="Engine\Shaders" choicetitle="Soft Shadows"/>
+  <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen"/>
   </addonfile>
   <addonfile alotversion="6" friendlyname="ALOT for ME1 6.0 - Textures" tooltipname="ALOT for ME1 6.0 - Textures" author="CreeperLava">
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/83?tab=files" filename="ALOT for ME1 - Textures-83-2018-6-0.zip" unpackedsinglefilename="ALOT_ME1_v6.mem" size="448313463" md5="1d0ab6ce0f2ce1940619bf27aade24c2" />
