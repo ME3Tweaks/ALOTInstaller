@@ -511,14 +511,75 @@ namespace AlotAddOnGUI
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGES_LABEL));
 
+            //things like soft shadows, reshade
+            bool hasSoftShadowsMEUITM = false;
+            foreach (AddonFile af in ADDONFILES_TO_INSTALL)
+            {
+                foreach (CopyFile cf in af.CopyFiles)
+                {
+                    if (cf.IsSelectedForInstallation())
+                    {
+                        CurrentTask = "Installing non-texture file modifications for mods";
+                        InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                        string stagedPath = getOutputDir(INSTALLING_THREAD_GAME) + af.BuildID + "_" + cf.ID + "_" + Path.GetFileName(cf.InArchivePath);
+                        string installationPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), cf.GameDestinationPath);
+                        File.Copy(stagedPath, installationPath, true);
+                        Log.Information("Installed copyfile: " + cf.ChoiceTitle + ", " + stagedPath + " to " + installationPath);
+                    }
+                }
 
+                foreach (ZipFile zf in af.ZipFiles)
+                {
+                    if (zf.IsSelectedForInstallation())
+                    {
+                        CurrentTask = "Installing non-texture file modifications for mods";
+                        InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                        string stagedPath = getOutputDir(INSTALLING_THREAD_GAME) + af.BuildID + "_" + zf.ID + "_" + Path.GetFileName(zf.InArchivePath);
+                        string installationPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), zf.GameDestinationPath);
+
+                        string path = BINARY_DIRECTORY + "7z.exe";
+                        //  string pathWithoutTrailingSlash = BINARY_DIRECTORY.Substring(0, BINARY_DIRECTORY.Length - 1);
+                        string extractargs = "x \"" + stagedPath + "\" -aoa -r -o\"" + installationPath + "\"";
+                        int extractcode = Utilities.runProcess(path, args);
+                        if (extractcode == 0)
+                        {
+                            Log.Information("Installed zipfile: " + zf.ChoiceTitle + ", " + stagedPath + " to " + installationPath);
+                        }
+                        else
+                        {
+                            Log.Error("Extraction of " + zf.ChoiceTitle + " failed with code " + extractcode);
+                        }
+                        if (INSTALLING_THREAD_GAME == 1 && zf.DeleteShaders)
+                        {
+                            string documents = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                            string localusershaderscache = Path.Combine(documents, @"BioWare\Mass Effect\Published\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
+                            File.Delete(localusershaderscache);
+                            Log.Information("Deleted user localshadercache: " + localusershaderscache);
+
+                            string gamelocalshadercache = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), @"BioGame\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
+                            File.Delete(gamelocalshadercache);
+                            Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
+                        }
+
+                        if (zf.MEUITMSoftShadows)
+                        {
+                            hasSoftShadowsMEUITM = true;
+                        }
+                    }
+                }
+            }
             //Apply LOD
             CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
 
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT, CurrentTask));
 
-            args = "-apply-lods-gfx " + INSTALLING_THREAD_GAME;
+            args = "-apply-lods-gfx ";
+            if (hasSoftShadowsMEUITM)
+            {
+                args += "-soft-shadows-mode ";
+            }
+            args += INSTALLING_THREAD_GAME;
             RunAndTimeMEM_Install(exe, args, InstallWorker);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
             if (processResult != 0)
@@ -997,7 +1058,7 @@ namespace AlotAddOnGUI
                                     double scale = Double.Parse(parameters[1]);
                                     Log.Information("Reweighting stage " + parameters[0] + " by " + parameters[1]);
 
-                                    ProgressWeightPercentages.ScaleCurrentTaskWeight(CURRENT_STAGE_NUM-1, scale);
+                                    ProgressWeightPercentages.ScaleCurrentTaskWeight(CURRENT_STAGE_NUM - 1, scale);
                                 }
                                 catch (Exception e)
                                 {

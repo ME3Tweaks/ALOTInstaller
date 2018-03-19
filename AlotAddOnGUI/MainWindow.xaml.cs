@@ -65,7 +65,19 @@ namespace AlotAddOnGUI
         //private int addonstoinstall = 0;
         private int CURRENT_GAME_BUILD = 0; //set when extraction is run/finished
         private int ADDONSTOBUILD_COUNT = 0;
-        private bool PreventFileRefresh = false;
+        private bool _preventFileRefresh = false;
+        public bool PreventFileRefresh
+        {
+            get { return _preventFileRefresh; }
+            set
+            {
+                if (_preventFileRefresh != value)
+                {
+                    _preventFileRefresh = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public const string REGISTRY_KEY = @"SOFTWARE\ALOTAddon";
         public const string ME3_BACKUP_REGISTRY_KEY = @"SOFTWARE\Mass Effect 3 Mod Manager";
 
@@ -251,7 +263,7 @@ namespace AlotAddOnGUI
                     Log.Warning("A required tool is missing. Downloading requirements package now.");
                     AddonFilesLabel.Text = "Downloading required application files";
                     string requiredFilesEndpoint = "https://vps.me3tweaks.com/alot/miscbin.zip".DownloadFileAsync(EXE_DIRECTORY + "Data", "miscbin.zip").Result;
-                    ZipFile.ExtractToDirectory(EXE_DIRECTORY + "Data\\miscbin.zip", BINARY_DIRECTORY);
+                    System.IO.Compression.ZipFile.ExtractToDirectory(EXE_DIRECTORY + "Data\\miscbin.zip", BINARY_DIRECTORY);
                     File.Delete(EXE_DIRECTORY + "Data\\miscbin.zip");
                 }
                 catch (Exception e)
@@ -844,7 +856,7 @@ namespace AlotAddOnGUI
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Could not delete " + UPDATE_STAGING_MEM_DIR + ". We will try again later. Exception message: "+ex.Message);
+                    Log.Error("Could not delete " + UPDATE_STAGING_MEM_DIR + ". We will try again later. Exception message: " + ex.Message);
                 }
             }
 
@@ -1993,6 +2005,7 @@ namespace AlotAddOnGUI
             {
                 XElement rootElement = XElement.Load(MANIFEST_LOC);
                 string version = (string)rootElement.Attribute("version") ?? "";
+                Debug.WriteLine("Manifest version: " + version);
                 musicpackmirrors = rootElement.Elements("musicpackmirror").Select(xe => xe.Value).ToList();
                 tutorials = (from e in rootElement.Elements("tutorial")
                              select new ManifestTutorial
@@ -2061,6 +2074,26 @@ namespace AlotAddOnGUI
                                             ME3 = c.Attribute("me3") != null ? true : false,
                                             Processed = false
                                         }).ToList()
+                                    }).ToList(),
+                                ZipFiles = e.Elements("zipfile")
+                                    .Select(q => new classes.ZipFile
+                                    {
+                                        ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                        Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
+                                        DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
+                                        InArchivePath = q.Attribute("inarchivepath").Value,
+                                        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
+                                        DeleteShaders = q.Attribute("deleteshaders") != null ? (bool)q.Attribute("deleteshaders") : false, //me1 only
+                                        MEUITMSoftShadows = q.Attribute("meuitmsoftshadows") != null ? (bool)q.Attribute("meuitmsoftshadows") : false, //me1,meuitm only
+                                    }).ToList(),
+                                CopyFiles = e.Elements("copyfile")
+                                    .Select(q => new CopyFile
+                                    {
+                                        ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                        Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
+                                        DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
+                                        InArchivePath = q.Attribute("inarchivepath").Value,
+                                        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
                                     }).ToList(),
                             }).ToList();
                 if (!version.Equals(""))

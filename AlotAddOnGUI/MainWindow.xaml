@@ -201,7 +201,9 @@
                         <DataTrigger Binding="{Binding ChoiceFiles.Count}" Value="0">
                             <Setter TargetName="Button_ConfigureMod" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
-
+                        <DataTrigger Binding="{Binding Path=PreventFileRefresh,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="true">
+                            <Setter TargetName="Button_ConfigureMod" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
                     </DataTemplate.Triggers>
                     
                 </DataTemplate>
