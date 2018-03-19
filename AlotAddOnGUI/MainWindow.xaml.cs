@@ -65,7 +65,19 @@ namespace AlotAddOnGUI
         //private int addonstoinstall = 0;
         private int CURRENT_GAME_BUILD = 0; //set when extraction is run/finished
         private int ADDONSTOBUILD_COUNT = 0;
-        private bool PreventFileRefresh = false;
+        private bool _preventFileRefresh = false;
+        public bool PreventFileRefresh
+        {
+            get { return _preventFileRefresh; }
+            set
+            {
+                if (_preventFileRefresh != value)
+                {
+                    _preventFileRefresh = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         public const string REGISTRY_KEY = @"SOFTWARE\ALOTAddon";
         public const string ME3_BACKUP_REGISTRY_KEY = @"SOFTWARE\Mass Effect 3 Mod Manager";
 
@@ -108,6 +120,7 @@ namespace AlotAddOnGUI
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
         private readonly string SETTINGSTR_DEBUGLOGGING = "DebugLogging";
         private const string SETTINGSTR_DONT_FORCE_UPGRADES = "DontForceUpgrades";
+        private const string SETTINGSTR_LIBRARYDIR = "LibraryDir";
         private const string SETTINGSTR_REPACK = "RepackGameFiles";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
         public const string SETTINGSTR_BETAMODE = "BetaMode";
@@ -250,7 +263,7 @@ namespace AlotAddOnGUI
                     Log.Warning("A required tool is missing. Downloading requirements package now.");
                     AddonFilesLabel.Text = "Downloading required application files";
                     string requiredFilesEndpoint = "https://vps.me3tweaks.com/alot/miscbin.zip".DownloadFileAsync(EXE_DIRECTORY + "Data", "miscbin.zip").Result;
-                    ZipFile.ExtractToDirectory(EXE_DIRECTORY + "Data\\miscbin.zip", BINARY_DIRECTORY);
+                    System.IO.Compression.ZipFile.ExtractToDirectory(EXE_DIRECTORY + "Data\\miscbin.zip", BINARY_DIRECTORY);
                     File.Delete(EXE_DIRECTORY + "Data\\miscbin.zip");
                 }
                 catch (Exception e)
@@ -434,6 +447,20 @@ namespace AlotAddOnGUI
                 fileVersion = versInfo.FileMajorPart;
                 Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
             }
+
+            if (Directory.Exists(UPDATE_STAGING_MEM_DIR))
+            {
+                try
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEM_DIR);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Could not delete " + UPDATE_STAGING_MEM_DIR + ". We will try again later. Exception message: " + ex.Message);
+                    return;
+                }
+            }
+
             try
             {
                 var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
@@ -823,7 +850,14 @@ namespace AlotAddOnGUI
 
             if (Directory.Exists(UPDATE_STAGING_MEM_DIR))
             {
-                Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEM_DIR);
+                try
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEM_DIR);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Could not delete " + UPDATE_STAGING_MEM_DIR + ". We will try again later. Exception message: " + ex.Message);
+                }
             }
 
             File.Delete((string)e.UserState);
@@ -1198,8 +1232,8 @@ namespace AlotAddOnGUI
 
             if (!me1Installed && !me2Installed && !me3Installed)
             {
-                Log.Error("No trilogy games are installed. App won't be able to do anything");
-                await this.ShowMessageAsync("None of the Mass Effect Trilogy games are installed", "ALOT Installer requires at least one of the trilogy games to be installed before you can use it.");
+                Log.Error("No trilogy games are installed (could not find any using lookups). App won't be able to do anything");
+                await this.ShowMessageAsync("None of the Mass Effect Trilogy games are installed", "ALOT Installer requires at least one of the trilogy games to be installed before you can use it.\n\nIf you're using the Steam version of Mass Effect or Mass Effect 2, you must run the game at least once so the game can be detected.");
                 Log.Error("Exiting due to no games installed");
 
                 Environment.Exit(1);
@@ -1971,6 +2005,7 @@ namespace AlotAddOnGUI
             {
                 XElement rootElement = XElement.Load(MANIFEST_LOC);
                 string version = (string)rootElement.Attribute("version") ?? "";
+                Debug.WriteLine("Manifest version: " + version);
                 musicpackmirrors = rootElement.Elements("musicpackmirror").Select(xe => xe.Value).ToList();
                 tutorials = (from e in rootElement.Elements("tutorial")
                              select new ManifestTutorial
@@ -2039,6 +2074,26 @@ namespace AlotAddOnGUI
                                             ME3 = c.Attribute("me3") != null ? true : false,
                                             Processed = false
                                         }).ToList()
+                                    }).ToList(),
+                                ZipFiles = e.Elements("zipfile")
+                                    .Select(q => new classes.ZipFile
+                                    {
+                                        ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                        Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
+                                        DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
+                                        InArchivePath = q.Attribute("inarchivepath").Value,
+                                        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
+                                        DeleteShaders = q.Attribute("deleteshaders") != null ? (bool)q.Attribute("deleteshaders") : false, //me1 only
+                                        MEUITMSoftShadows = q.Attribute("meuitmsoftshadows") != null ? (bool)q.Attribute("meuitmsoftshadows") : false, //me1,meuitm only
+                                    }).ToList(),
+                                CopyFiles = e.Elements("copyfile")
+                                    .Select(q => new CopyFile
+                                    {
+                                        ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                        Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
+                                        DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
+                                        InArchivePath = q.Attribute("inarchivepath").Value,
+                                        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
                                     }).ToList(),
                             }).ToList();
                 if (!version.Equals(""))
@@ -2846,18 +2901,18 @@ namespace AlotAddOnGUI
             {
                 if (installedInfo == null)
                 {
-                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation.");
+                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation. Drag and drop the archive onto the interface - do not extract it.");
                 }
                 else
                 {
-                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue.");
+                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue. Drag and drop the archive onto the interface - do not extract it.");
                 }
                 return false;
             }
 
             if (blockDueToBadImportedFile != null)
             {
-                await this.ShowMessageAsync("Corrupt/Bad file detected", "The file " + blockDueToBadImportedFile + " is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from Download_Mods.");
+                await this.ShowMessageAsync("Corrupt/Bad file detected", "The file " + blockDueToBadImportedFile + " is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from Download_Mods, it is not usable.");
                 return false;
             }
 
@@ -3480,6 +3535,12 @@ namespace AlotAddOnGUI
             if (DOWNLOADS_FOLDER == null)
             {
                 DOWNLOADS_FOLDER = KnownFolders.GetPath(KnownFolder.Downloads);
+            }
+
+            string librarydir = Utilities.GetRegistrySettingString(SETTINGSTR_LIBRARYDIR);
+            if (librarydir != null && Directory.Exists(librarydir))
+            {
+                DOWNLOADED_MODS_DIRECTORY = librarydir;
             }
 
             bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? true;

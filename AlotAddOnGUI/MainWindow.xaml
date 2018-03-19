@@ -88,7 +88,7 @@
             <TextBlock x:Name="AddonFilesLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
         </Label>
         <ProgressBar alotaddonguiui:ProgressBarSmooth.SmoothValue="{Binding ProgressBarValue}" Value="{Binding Path=ProgressBarValue, Mode=OneWay}" Minimum="0" Maximum="100" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true" />
-        <ListView Grid.Column="0" Grid.Row="3" Name="ListView_Files" BorderThickness="0" Loaded="ListView_Files_Loaded" SelectionChanged="ListView_Files_SelectionChanged">
+        <ListView Grid.Column="0" Grid.Row="3" Name="ListView_Files" BorderThickness="0" ScrollViewer.PanningMode="VerticalFirst" Loaded="ListView_Files_Loaded" SelectionChanged="ListView_Files_SelectionChanged">
             <!-- This is what each list item looks like-->
             <ListView.ItemTemplate>
                 <DataTemplate>
@@ -201,7 +201,9 @@
                         <DataTrigger Binding="{Binding ChoiceFiles.Count}" Value="0">
                             <Setter TargetName="Button_ConfigureMod" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
-
+                        <DataTrigger Binding="{Binding Path=PreventFileRefresh,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Value="true">
+                            <Setter TargetName="Button_ConfigureMod" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
                     </DataTemplate.Triggers>
                     
                 </DataTemplate>
@@ -295,7 +297,7 @@
             <Controls:Flyout x:Name="SettingsFlyout" Header="Settings" IsPinned="False" Theme="Accent" Position="Right">
 
                 <!--<Label x:Name="ImportFailedLabel" FontSize="14" Content="An import failed!"></Label>-->
-                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible">
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible" ScrollViewer.PanningMode="VerticalFirst">
                     <StackPanel>
                         <Expander IsExpanded="True" HorizontalAlignment="Stretch" Expanded="Expander_Expanded">
                             <Expander.Header>

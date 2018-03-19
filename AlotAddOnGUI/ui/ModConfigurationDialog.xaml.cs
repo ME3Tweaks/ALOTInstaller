@@ -27,10 +27,15 @@ namespace AlotAddOnGUI
         public ModConfigurationDialog(AddonFile af, MainWindow mainWindow)
         {
             InitializeComponent();
-            Title = af.FriendlyName + " configuration";
+            Title = af.FriendlyName;
             mainWindowRef = mainWindow;
             DataContext = af;
-            ListView_ChoiceFiles.ItemsSource = af.ChoiceFiles;
+            List<ConfigurableModInterface> configurableItems = new List<ConfigurableModInterface>();
+            configurableItems.AddRange(af.ChoiceFiles);
+            configurableItems.AddRange(af.CopyFiles.Where(s => s.Optional));
+            configurableItems.AddRange(af.ZipFiles.Where(s => s.Optional));
+
+            ListView_ChoiceFiles.ItemsSource = configurableItems;
             if (af.ComparisonsLink == null)
             {
                 Comparison_Button.Visibility = Visibility.Collapsed;
@@ -40,12 +45,12 @@ namespace AlotAddOnGUI
 
         private async void Close_Dialog_Click(object sender, RoutedEventArgs e)
         {
-            foreach (ChoiceFile cf in ListView_ChoiceFiles.Items)
-            {
-                var row = (System.Windows.Controls.ListViewItem)ListView_ChoiceFiles.ItemContainerGenerator.ContainerFromItem(cf);
+            //foreach (ChoiceFile cf in ListView_ChoiceFiles.Items)
+            //{
+            //    var row = (System.Windows.Controls.ListViewItem)ListView_ChoiceFiles.ItemContainerGenerator.ContainerFromItem(cf);
 
 
-            }
+            //}
 
             await mainWindowRef.HideMetroDialogAsync(this);
         }
@@ -55,8 +60,8 @@ namespace AlotAddOnGUI
             if (sender is ComboBox)
             {
                 ComboBox cb = (ComboBox)sender;
-                ChoiceFile choisefile = (ChoiceFile)cb.DataContext;
-                choisefile.SelectedIndex = cb.SelectedIndex;
+                ConfigurableModInterface choicefile = (ConfigurableModInterface)cb.DataContext;
+                choicefile.SelectedIndex = cb.SelectedIndex;
             }
         }
 

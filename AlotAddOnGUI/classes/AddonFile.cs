@@ -247,6 +247,9 @@ namespace AlotAddOnGUI.classes
         public List<String> Duplicates { get; set; }
         public List<PackageFile> PackageFiles { get; set; }
         public List<ChoiceFile> ChoiceFiles { get; set; }
+        public List<ZipFile> ZipFiles { get; set; }
+        public List<CopyFile> CopyFiles { get; set; }
+
         public string DownloadAssistantString
         {
             get
@@ -400,12 +403,12 @@ namespace AlotAddOnGUI.classes
             {
                 if (UnpackedSingleFilename != null && File.Exists(MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + UnpackedSingleFilename))
                 {
-                    return MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + UnpackedSingleFilename;
+                    return Path.Combine(MainWindow.DOWNLOADED_MODS_DIRECTORY,UnpackedSingleFilename);
                 }
 
-                if (File.Exists(MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + Filename))
+                if (File.Exists(Path.Combine(MainWindow.DOWNLOADED_MODS_DIRECTORY, Filename)))
                 {
-                    return MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + Filename;
+                    return Path.Combine(MainWindow.DOWNLOADED_MODS_DIRECTORY, Filename);
                 }
             }
             else

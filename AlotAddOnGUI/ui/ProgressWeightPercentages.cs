@@ -101,6 +101,13 @@ namespace AlotAddOnGUI.ui
         /// </summary>
         public static void ScaleWeights()
         {
+            TOTAL_ACTIVE_WEIGHT = 0;
+            //recalculate total weight
+            foreach (MutableKeyValuePair<int, double> job in jobWeightList)
+            {
+                TOTAL_ACTIVE_WEIGHT += job.Value;
+            }
+            //calculate each job's value
             foreach (MutableKeyValuePair<int, double> job in jobWeightList)
             {
                 job.Value = job.Value / TOTAL_ACTIVE_WEIGHT;
@@ -125,6 +132,12 @@ namespace AlotAddOnGUI.ui
                 return progress;
             }
             return 0;
+        }
+
+        internal static void ScaleCurrentTaskWeight(int index, double scale)
+        {
+            jobWeightList[index].Value = scale;
+            ScaleWeights();
         }
     }
 

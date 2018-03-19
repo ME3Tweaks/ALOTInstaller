@@ -159,6 +159,9 @@
     </Page>
     <Compile Include="classes\ALOTVersionInfo.cs" />
     <Compile Include="classes\AddonFile.cs" />
+    <Compile Include="classes\ConfigurableModInterface.cs" />
+    <Compile Include="classes\CopyFile.cs" />
+    <Compile Include="classes\ZipFile.cs" />
     <Compile Include="classes\ChoiceFile.cs" />
     <Compile Include="classes\CopyDir.cs" />
     <Compile Include="classes\DataConverters.cs" />

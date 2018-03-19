@@ -72,7 +72,7 @@ namespace AlotAddOnGUI
 
         private FadeInOutSampleProvider fadeoutProvider;
         private bool MusicPaused;
-        private string DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods";
+        public static string DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods";
         private string EXTRACTED_MODS_DIRECTORY = EXE_DIRECTORY + "Data\\Extracted_Mods";
         private bool ERROR_OCCURED_PLEASE_STOP = false;
         private bool REPACK_GAME_FILES;
@@ -177,6 +177,7 @@ namespace AlotAddOnGUI
                 ERROR_OCCURED_PLEASE_STOP = true;
                 return new KeyValuePair<AddonFile, bool>(af, false);
             }
+            bool hasFilesToStage = true;
             try
             {
                 switch (fileextension)
@@ -238,7 +239,6 @@ namespace AlotAddOnGUI
                             if (moveableFiles.Count() > 0)
                             {
                                 //check for copy directly items first, and move them.
-
                                 foreach (string moveableFile in moveableFiles)
                                 {
                                     string name = Utilities.GetRelativePath(moveableFile, extractpath);
@@ -291,7 +291,8 @@ namespace AlotAddOnGUI
                                                 {
                                                     File.Delete(movename);
                                                 }
-                                                File.Move(moveableFile, movename); pf.Processed = true; //no more ops on this package file.
+                                                File.Move(moveableFile, movename);
+                                                pf.Processed = true; //no more ops on this package file.
                                                 break;
                                             }
                                             if (pf.MoveDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD))
@@ -382,7 +383,6 @@ namespace AlotAddOnGUI
                             //get free space for debug purposes
                             Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
                             Log.Information("[SIZE] ADDONFULLEXTRACT Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
-
                             List<string> files = new List<string>();
                             foreach (string file in Directory.EnumerateFiles(extractpath, "*.dds", SearchOption.AllDirectories))
                             {
@@ -406,6 +406,35 @@ namespace AlotAddOnGUI
                                 else
                                 {
                                     Log.Information("File is already in correct place, no further processing necessary: " + extractpath + "\\" + Path.GetFileName(file));
+                                }
+                            }
+
+                            //CopyFile and ZipFile
+                            int stagedID = 1;
+                            foreach (ZipFile zip in af.ZipFiles)
+                            {
+                                if (zip.IsSelectedForInstallation())
+                                {
+                                    //install
+                                    string zipfile = Path.Combine(extractpath, zip.InArchivePath);
+                                    string stagedPath = getOutputDir(CURRENT_GAME_BUILD) + af.BuildID + "_" + stagedID + "_" + Path.GetFileName(zip.InArchivePath);
+                                    File.Move(zipfile, stagedPath);
+                                    zip.ID = stagedID;
+                                    stagedID++;
+                                }
+                            }
+
+                            stagedID = 1;
+                            foreach (CopyFile copy in af.CopyFiles)
+                            {
+                                if (copy.IsSelectedForInstallation())
+                                {
+                                    //install
+                                    string zipfile = Path.Combine(extractpath, copy.InArchivePath);
+                                    string stagedPath = getOutputDir(CURRENT_GAME_BUILD) + af.BuildID + "_" + stagedID + "_" + Path.GetFileName(copy.InArchivePath);
+                                    File.Move(zipfile, stagedPath);
+                                    copy.ID = stagedID;
+                                    stagedID++;
                                 }
                             }
                             BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
@@ -494,12 +523,15 @@ namespace AlotAddOnGUI
                                     File.Move(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
                                     foreach (PackageFile p in af.PackageFiles)
                                     {
-                                        p.Processed = true; //No more processing on this addonfile. It has packagefiles since it could also be zipped still
+                                        p.Processed = true; //No more processing on this addonfile.
                                     }
+
                                     BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
+                                    hasFilesToStage = false;
                                     break;
                                 }
                             }
+                            hasFilesToStage = false;
                             BuildWorker.ReportProgress(0, new ThreadCommand(INCREMENT_COMPLETION_EXTRACTION));
                             break;
                         }
@@ -525,8 +557,16 @@ namespace AlotAddOnGUI
             {
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, newText));
             }
-            af.ReadyStatusText = "Queued for staging";
-            af.SetIdle();
+            if (hasFilesToStage)
+            {
+                af.ReadyStatusText = "Queued for staging";
+                af.SetIdle();
+            }
+            else
+            {
+                af.ReadyStatusText = "Staged for installation";
+                af.SetIdle();
+            }
             return new KeyValuePair<AddonFile, bool>(af, true);
         }
 

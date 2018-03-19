@@ -50,7 +50,7 @@
                                                         Content="{TemplateBinding Content}" />
                                     </Grid>
                                 </Grid>
-                                <ContentPresenter Grid.Row="2"
+                                <ContentPresenter Grid.Row="2" Margin="0,0,0,0"
                                                 Content="{TemplateBinding DialogBottom}" />
                             </Grid>
                         </Border>

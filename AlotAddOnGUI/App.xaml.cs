@@ -34,7 +34,7 @@ namespace AlotAddOnGUI
             {
                 var application = new App();
                 application.InitializeComponent();
-                 application.Run();
+                application.Run();
             }
             catch (Exception e)
             {
@@ -116,8 +116,33 @@ namespace AlotAddOnGUI
             {
                 Thread.Sleep(2000); //SLEEP WHILE WE WAIT FOR PARENT PROCESS TO STOP.
                 Log.Information("In update mode. Update destination: " + updateDestinationPath);
-                Log.Information("Applying update");
-                CopyDir.CopyAll(new DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory), new DirectoryInfo(updateDestinationPath));
+                int i = 0;
+                while (i < 5)
+                {
+
+                    i++;
+                    try
+                    {
+                        Log.Information("Applying update");
+                        CopyDir.CopyAll(new DirectoryInfo(System.AppDomain.CurrentDomain.BaseDirectory), new DirectoryInfo(updateDestinationPath));
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error("Error applying update: " + e.Message);
+                        if (i < 5)
+                        {
+                            Thread.Sleep(1000);
+                            Log.Information("Attempt #" + (i + 1));
+                        }
+                        else
+                        {
+                            Log.Fatal("Unable to apply update after 5 attempts. We are giving up.");
+                            MessageBox.Show("Update was unable to apply. See the logs directory for more information. If this continues to happen please come to the ALOT discord or download a new copy from GitHub.");
+                            Environment.Exit(1);
+                        }
+                    }
+                }
                 Log.Information("Update files have been applied.");
                 updateDestinationPath += "\\"; //add slash
                 Log.Information("Performing update migrations...");
@@ -126,6 +151,7 @@ namespace AlotAddOnGUI
                     Log.Information("Migrating MEM_Packages folder into subfolder");
                     Directory.Move(updateDestinationPath + "MEM_Packages", updateDestinationPath + @"Data\MEM_Packages");
                 }
+
 
                 if (Directory.Exists(updateDestinationPath + "music") && !Directory.Exists(updateDestinationPath + @"Data\Music"))
                 {
@@ -185,7 +211,7 @@ namespace AlotAddOnGUI
 
             //Normal Mode
             ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(UIElement),
-            new FrameworkPropertyMetadata(15000));
+                new FrameworkPropertyMetadata(15000));
             ToolTipService.ShowOnDisabledProperty.OverrideMetadata(
             typeof(Control),
             new FrameworkPropertyMetadata(true));
@@ -203,25 +229,22 @@ namespace AlotAddOnGUI
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
             Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
             string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
-            Log.Information("Running Windows " + releaseId);
             Utilities.GetAntivirusInfo();
         }
 
         void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            string errorMessage = string.Format("ALOT Installer has crashed! This exception that caused the crash:");
+            string errorMessage = string.Format("ALOT Installer has crashed! This is the exception that caused the crash:");
             string st = FlattenException(e.Exception);
-            Log.Error(errorMessage);
-            Log.Error(st);
-            Log.Information("Forcing beta mode off");
+            Log.Fatal(errorMessage);
+            Log.Fatal(st);
+            Log.Information("Forcing beta mode off before exiting...");
             Utilities.WriteRegistryKey(Registry.CurrentUser, AlotAddOnGUI.MainWindow.REGISTRY_KEY, AlotAddOnGUI.MainWindow.SETTINGSTR_BETAMODE, 0);
 
             if (Directory.Exists("Data") && !File.Exists(@"Data\APP_CRASH"))
             {
                 File.Create(@"Data\APP_CRASH");
             }
-            //MetroDial.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            //e.Handled = true;
         }
 
         public static void OnFatalCrash(Exception e)
