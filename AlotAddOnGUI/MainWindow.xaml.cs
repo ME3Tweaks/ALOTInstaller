@@ -2718,6 +2718,7 @@ namespace AlotAddOnGUI
 
         private async Task<bool> InstallPrecheck(int game)
         {
+            Log.Information("Running installation precheck for ME" + game);
             CheckOutputDirectoriesForUnpackedSingleFiles();
             CheckImportLibrary_Tick(null, null); //get all ready files
             Loading = true; //prevent 1;
@@ -2734,7 +2735,7 @@ namespace AlotAddOnGUI
                 //game has not been run yet.
                 Log.Error("Config file missing for Mass Effect " + game + ". Blocking install");
                 await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " has not been run yet", "Mass Effect" + getGameNumberSuffix(game) + " must be run at least once in order for the game to generate default configuration files for this installer to edit. Start the game, and exit at the main menu to generate them.");
-                // return false;
+                return false;
             }
 
             int nummissing = 0;
@@ -2817,7 +2818,7 @@ namespace AlotAddOnGUI
                     }
                     else
                     {
-                        if (af.Ready && af.Enabled)
+                        if (af.Ready && af.Enabled && af.GetFile() != null && File.Exists(af.GetFile()))
                         {
                             FileInfo fi = new FileInfo(af.GetFile());
                             if (!af.IsCurrentlySingleFile() && af.FileSize > 0 && af.FileSize != fi.Length)
