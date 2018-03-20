@@ -204,11 +204,19 @@ namespace AlotAddOnGUI
                             af.ReadyStatusText = "Extracting";
                             af.SetWorking();
                             //Extract file
-
+                            int threads = Environment.ProcessorCount;
+                            if (threads > 1)
+                            {
+                                threads--; //cores - 1
+                            }
+                            if (threads > 5)
+                            {
+                                threads = 5;
+                            }
 
                             Log.Information(prefix + "Extracting file: " + extractSource);
                             string exe = BINARY_DIRECTORY + "7z.exe";
-                            string args = "x -bsp2 \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
+                            string args = "x -mmt"+threads+" -bsp2 \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
                             ConsoleApp extractProcess = Run7zWithProgressForAddonFile(args, af);
                             while (extractProcess.State == AppState.Running)
                             {

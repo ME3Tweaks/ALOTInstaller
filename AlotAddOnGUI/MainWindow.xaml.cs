@@ -2773,6 +2773,7 @@ namespace AlotAddOnGUI
 
         private async Task<bool> InstallPrecheck(int game)
         {
+            Log.Information("Running installation precheck for ME" + game);
             CheckOutputDirectoriesForUnpackedSingleFiles();
             CheckImportLibrary_Tick(null, null); //get all ready files
             Loading = true; //prevent 1;
@@ -2872,7 +2873,7 @@ namespace AlotAddOnGUI
                     }
                     else
                     {
-                        if (af.Ready && af.Enabled)
+                        if (af.Ready && af.Enabled && af.GetFile() != null && File.Exists(af.GetFile()))
                         {
                             if (af.GetFile() == null)
                             {
