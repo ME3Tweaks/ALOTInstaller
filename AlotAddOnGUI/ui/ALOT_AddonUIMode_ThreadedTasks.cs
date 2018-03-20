@@ -76,6 +76,8 @@ namespace AlotAddOnGUI
         private string EXTRACTED_MODS_DIRECTORY = EXE_DIRECTORY + "Data\\Extracted_Mods";
         private bool ERROR_OCCURED_PLEASE_STOP = false;
         private bool REPACK_GAME_FILES;
+        private bool TaskbarProgressIndeterminateManaged = false;
+        private const string SET_TASKBAR_INDETERMINATE = "SET_TASKBAR_INDETERMINATE";
         private const string ERROR_TEXTURE_MAP_MISSING = "ERROR_TEXTURE_MAP_MISSING";
         private const string ERROR_TEXTURE_MAP_WRONG = "ERROR_TEXTURE_MAP_WRONG";
         private const string ERROR_FILE_ADDED = "ERROR_FILE_ADDED";
@@ -520,7 +522,16 @@ namespace AlotAddOnGUI
                                     {
                                         File.Delete(movename);
                                     }
-                                    File.Move(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
+                                    string importingfrom = Path.GetPathRoot(DOWNLOADED_MODS_DIRECTORY);
+                                    string importingto = Path.GetPathRoot(getOutputDir(CURRENT_GAME_BUILD));
+                                    af.ReadyStatusText = "Staging for installation";
+                                    if (importingfrom == importingto)
+                                    {
+                                        File.Move(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
+                                    } else
+                                    {
+                                        File.Copy(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
+                                    }
                                     foreach (PackageFile p in af.PackageFiles)
                                     {
                                         p.Processed = true; //No more processing on this addonfile.
@@ -796,10 +807,13 @@ namespace AlotAddOnGUI
                 threads = 5;
             }
             ERROR_OCCURED_PLEASE_STOP = false;
+            TaskbarProgressIndeterminateManaged = true;
+            BuildWorker.ReportProgress(0, new ThreadCommand(SET_TASKBAR_INDETERMINATE, true));
             Stopwatch sw = Stopwatch.StartNew();
             KeyValuePair<AddonFile, bool>[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
             sw.Stop();
-            Console.WriteLine(sw.Elapsed.TotalSeconds);
+            TaskbarProgressIndeterminateManaged = false;
+            BuildWorker.ReportProgress(0, new ThreadCommand(SET_TASKBAR_INDETERMINATE, false));
             foreach (KeyValuePair<AddonFile, bool> result in results)
             {
                 bool successful = result.Value;
@@ -1293,6 +1307,9 @@ namespace AlotAddOnGUI
                         TaskbarManager.Instance.SetProgressState((bool)tc.Data ? TaskbarProgressBarState.Indeterminate : TaskbarProgressBarState.Normal);
                         Build_ProgressBar.IsIndeterminate = (bool)tc.Data;
                         break;
+                    case SET_TASKBAR_INDETERMINATE:
+                        TaskbarManager.Instance.SetProgressState((bool)tc.Data ? TaskbarProgressBarState.Indeterminate : TaskbarProgressBarState.NoProgress);
+                        break;
                     case ERROR_OCCURED:
                         Build_ProgressBar.IsIndeterminate = false;
                         ProgressBarValue = 0;
@@ -1640,8 +1657,14 @@ namespace AlotAddOnGUI
                         HeaderLabel.Text = (string)tc.Data;
                         break;
                     case UPDATE_PROGRESSBAR_INDETERMINATE:
-                        TaskbarManager.Instance.SetProgressState((bool)tc.Data ? TaskbarProgressBarState.Indeterminate : TaskbarProgressBarState.Normal);
+                        if (!TaskbarProgressIndeterminateManaged)
+                        {
+                            TaskbarManager.Instance.SetProgressState((bool)tc.Data ? TaskbarProgressBarState.Indeterminate : TaskbarProgressBarState.Normal);
+                        }
                         Build_ProgressBar.IsIndeterminate = (bool)tc.Data;
+                        break;
+                    case SET_TASKBAR_INDETERMINATE:
+                        TaskbarManager.Instance.SetProgressState((bool)tc.Data ? TaskbarProgressBarState.Indeterminate : TaskbarProgressBarState.NoProgress);
                         break;
                     case ERROR_OCCURED:
                         Build_ProgressBar.IsIndeterminate = false;
