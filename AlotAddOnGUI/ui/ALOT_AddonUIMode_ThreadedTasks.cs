@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
@@ -38,8 +39,6 @@ namespace AlotAddOnGUI
         private const int INSTALL_OK = 1;
         private WaveOut waveOut;
         private NAudio.Vorbis.VorbisWaveReader vorbisStream;
-
-
         public const string RESTORE_FAILED_COULD_NOT_DELETE_FOLDER = "RESTORE_FAILED_COULD_NOT_DELETE_FOLDER";
         public string CurrentTask;
         public int CurrentTaskPercent;
@@ -216,7 +215,7 @@ namespace AlotAddOnGUI
 
                             Log.Information(prefix + "Extracting file: " + extractSource);
                             string exe = BINARY_DIRECTORY + "7z.exe";
-                            string args = "x -mmt"+threads+" -bsp2 \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
+                            string args = "x -mmt" + threads + " -bsp2 \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
                             ConsoleApp extractProcess = Run7zWithProgressForAddonFile(args, af);
                             while (extractProcess.State == AppState.Running)
                             {
@@ -536,9 +535,19 @@ namespace AlotAddOnGUI
                                     if (importingfrom == importingto)
                                     {
                                         File.Move(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
-                                    } else
+                                    }
+                                    else
                                     {
-                                        File.Copy(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
+
+                                        // Instantiate the delegate using an anonymous method.
+                                        SingleFileCopy.ProgressHandlerDel testDelC = (x) => {
+                                            af.ReadyStatusText = "Staging for installation - " + x.ProgressPercentage + "% ("+ByteSize.FromBytes(x.BytesReceived)+")";
+                                        };
+
+                                        SingleFileCopy sfc = new SingleFileCopy();
+                                        sfc.DownloadFile(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse, testDelC);
+
+                                        //File.Copy(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
                                     }
                                     foreach (PackageFile p in af.PackageFiles)
                                     {

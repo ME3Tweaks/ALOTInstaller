@@ -232,6 +232,11 @@ namespace AlotAddOnGUI
             Utilities.GetAntivirusInfo();
         }
 
+        /// <summary>
+        /// Called when an unhandled exception occurs. This method can only be invoked after startup has completed. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">Exception to process</param>
         void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             string errorMessage = string.Format("ALOT Installer has crashed! This is the exception that caused the crash:");
@@ -247,6 +252,10 @@ namespace AlotAddOnGUI
             }
         }
 
+        /// <summary>
+        /// Called when a fatal crash occurs. Only does something if startup has not completed.
+        /// </summary>
+        /// <param name="e">The fatal exception.</param>
         public static void OnFatalCrash(Exception e)
         {
             if (!POST_STARTUP)
@@ -256,6 +265,11 @@ namespace AlotAddOnGUI
             }
         }
 
+        /// <summary>
+        /// Flattens an exception into a printable string
+        /// </summary>
+        /// <param name="exception">Exception to flatten</param>
+        /// <returns>Printable string</returns>
         public static string FlattenException(Exception exception)
         {
             var stringBuilder = new StringBuilder();
@@ -271,6 +285,11 @@ namespace AlotAddOnGUI
             return stringBuilder.ToString();
         }
 
+        /// <summary>
+        /// Called when the application is exiting normally
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Application_Exit(object sender, ExitEventArgs e)
         {
             var exists = System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1;
@@ -283,6 +302,12 @@ namespace AlotAddOnGUI
             Log.Information("Closing application via AppClosing()");
         }
 
+        /// <summary>
+        /// Resolves assemblies in Data/lib.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
         private static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             var probingPath = AppDomain.CurrentDomain.BaseDirectory + @"Data\lib";

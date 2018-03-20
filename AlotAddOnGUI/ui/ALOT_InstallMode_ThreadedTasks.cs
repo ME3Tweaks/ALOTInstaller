@@ -682,45 +682,50 @@ namespace AlotAddOnGUI
             {
                 //ALOT was just installed. We are going to move it back to mods folder
                 string extractedName = alotMainFile.UnpackedSingleFilename;
-                Log.Information("ALOT MAIN FILE - Unpacked - moving to downloaded_mods from install dir: " + extractedName);
                 string source = getOutputDir(INSTALLING_THREAD_GAME) + "000_" + extractedName;
                 string dest = DOWNLOADED_MODS_DIRECTORY + "\\" + extractedName;
-
-                if (File.Exists(source))
+                if (Path.GetPathRoot(source) == Path.GetPathRoot(dest))
                 {
-                    try
+                    Log.Information("ALOT MAIN FILE - Unpacked - moving to downloaded_mods from install dir: " + extractedName);
+                    if (File.Exists(source))
                     {
-                        if (File.Exists(dest))
+                        try
                         {
-                            File.Delete(dest);
-                        }
-                        File.Move(source, dest);
-                        Log.Information("Moved main alot file back to downloaded_mods");
-                        //Delete original
-                        dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotMainFile.Filename;
-                        if (File.Exists(dest))
-                        {
-                            Log.Information("Deleting original alot archive file from downloaded_mods");
-                            File.Delete(dest);
-                            Log.Information("Deleted original alot archive file from downloaded_mods");
-                        }
-                        if (alotMainFile != null)
-                        {
-                            alotMainFile.Staged = false;
-                        }
+                            if (File.Exists(dest))
+                            {
+                                File.Delete(dest);
+                            }
+                            File.Move(source, dest);
+                            Log.Information("Moved main alot file back to import library "+DOWNLOADED_MODS_DIRECTORY);
+                            //Delete original
+                            dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotMainFile.Filename;
+                            if (File.Exists(dest))
+                            {
+                                Log.Information("Deleting original alot archive file from import library");
+                                File.Delete(dest);
+                                Log.Information("Deleted original alot archive file from import library");
+                            }
+                            if (alotMainFile != null)
+                            {
+                                alotMainFile.Staged = false;
+                            }
 
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error("Exception attempting to move file back! " + ex.Message);
+                            Log.Error("Skipping moving file back.");
+                        }
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Log.Error("Exception attempting to move file back! " + ex.Message);
-                        Log.Error("Skipping moving file back.");
+                        Log.Error("ALOT MAIN FILE - Unpacked - does not match the singlefilename! Not moving back. " + extractedName);
                     }
                 }
                 else
                 {
-                    Log.Error("ALOT MAIN FILE - Unpacked - does not match the singlefilename! Not moving back. " + extractedName);
+                    Log.Information("ALOT main was copied from import library on another partition or network share. Not moving back.");
                 }
-
             }
 
             if (showMarkerFailedMessage)
