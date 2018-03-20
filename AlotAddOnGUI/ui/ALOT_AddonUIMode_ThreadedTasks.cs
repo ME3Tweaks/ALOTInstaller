@@ -626,7 +626,7 @@ namespace AlotAddOnGUI
             bool gotFreeSpace = Utilities.GetDiskFreeSpaceEx(stagingdirectory, out freeBytes, out diskSize, out totalFreeBytes);
             Log.Information("[SIZE] PREBUILD Free Space on current drive: " + ByteSize.FromBytes(freeBytes) + " " + freeBytes);
 
-            string basepath = EXE_DIRECTORY + @"Downloaded_Mods\";
+            string basepath = MainWindow.DOWNLOADED_MODS_DIRECTORY;
             string destinationpath = EXTRACTED_MODS_DIRECTORY + "\\";
             Log.Information("Creating Data\\Extracted_Mods folder");
             Directory.CreateDirectory(destinationpath);

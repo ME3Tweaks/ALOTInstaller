@@ -2874,6 +2874,10 @@ namespace AlotAddOnGUI
                     {
                         if (af.Ready && af.Enabled)
                         {
+                            if (af.GetFile() == null)
+                            {
+                                Debugger.Break();
+                            }
                             FileInfo fi = new FileInfo(af.GetFile());
                             if (!af.IsCurrentlySingleFile() && af.FileSize > 0 && af.FileSize != fi.Length)
                             {

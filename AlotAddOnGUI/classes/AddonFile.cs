@@ -388,7 +388,7 @@ namespace AlotAddOnGUI.classes
             {
                 if (!UserFile)
                 {
-                    if (UnpackedSingleFilename != null && File.Exists(MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + UnpackedSingleFilename))
+                    if (UnpackedSingleFilename != null && File.Exists(Path.Combine(MainWindow.DOWNLOADED_MODS_DIRECTORY, UnpackedSingleFilename)))
                     {
                         return true;
                     }
@@ -401,7 +401,7 @@ namespace AlotAddOnGUI.classes
         {
             if (!UserFile)
             {
-                if (UnpackedSingleFilename != null && File.Exists(MainWindow.EXE_DIRECTORY + "Downloaded_Mods\\" + UnpackedSingleFilename))
+                if (UnpackedSingleFilename != null && File.Exists(Path.Combine(MainWindow.DOWNLOADED_MODS_DIRECTORY,UnpackedSingleFilename)))
                 {
                     return Path.Combine(MainWindow.DOWNLOADED_MODS_DIRECTORY,UnpackedSingleFilename);
                 }
