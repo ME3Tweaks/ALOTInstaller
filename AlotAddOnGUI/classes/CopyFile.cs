@@ -8,8 +8,12 @@ namespace AlotAddOnGUI.classes
         //Interface
         public string ChoiceTitle { get; set; }
         public List<string> ChoicesHuman { get { return new List<string>(Choices); } }
-        public int SelectedIndex { get; set; }
-
+        private int _selectedIndex = -1;
+        public int SelectedIndex
+        {
+            get { return _selectedIndex != -1 ? _selectedIndex : (DefaultOption ? 0 : 1); }
+            set { _selectedIndex = value; }
+        }
         //Class Specific
         public bool Optional { get; set; }
         public bool DefaultOption { get; set; }
