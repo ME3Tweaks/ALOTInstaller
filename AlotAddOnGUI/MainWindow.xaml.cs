@@ -3815,21 +3815,28 @@ namespace AlotAddOnGUI
             FirstRunFlyout.IsOpen = true;
         }
 
-        private void Button_FirstTimeRunDismiss_Click(object sender, RoutedEventArgs e)
+        private async void Button_FirstTimeRunDismiss_Click(object sender, RoutedEventArgs e)
         {
+            bool? hasShownFirstRun = Utilities.GetRegistrySettingBool("HasRunFirstRun");
+
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "HasRunFirstRun", true);
             FirstRunFlyout.IsOpen = false;
             SettingsFlyout.IsOpen = true;
             RunMEMUpdater2();
 
-            //PerformPostStartup();
-            //EnsureOneGameIsInstalled();
-            //PerformRAMCheck();
-            //UpdateALOTStatus();
-            //RunMEMUpdaterGUI();
-            //PerformWriteCheck();
-        }
+            if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
+            {
+                bool me1backedup = Utilities.GetGameBackupPath(1) != null;
+                bool me2backedup = Utilities.GetGameBackupPath(1) != null;
+                bool me3backedup = Utilities.GetGameBackupPath(1) != null;
 
+                if (!(me1backedup || me2backedup || me3backedup))
+                {
+                    //no games backed up
+                    await this.ShowMessageAsync("Backup games before installing ALOT", "It is strongly recommended you make a game backup before installing ALOT. By doing so, you have an easy way to restore the game in the event something goes wrong, and ALOT Installer will handle the extra work required to fully uninstall ALOT. The ALOT team recommends a backup of an unmodified game; you can backup and restore from the settings menu.");
+                }
+            }
+        }
 
         private void Button_ManualFileME1_Click(object sender, RoutedEventArgs e)
         {
