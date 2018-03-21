@@ -214,6 +214,7 @@ namespace AlotAddOnGUI
         public MainWindow()
         {
             Log.Information("MainWindow() is starting");
+            DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods"; //This will be changed when settings load;
             InitializeComponent();
             LoadSettings();
             Title = "ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
