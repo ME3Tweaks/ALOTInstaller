@@ -904,12 +904,12 @@ namespace AlotAddOnGUI
             return Task.FromResult<List<string>>(files);
         }
 
-        public static int runProcessAsAdmin(string exe, string args, bool standAlone = false)
+        public static int runProcessAsAdmin(string exe, string args, bool standAlone = false, bool createWindow = false)
         {
             Log.Information("Running process as admin: " + exe + " " + args);
             using (Process p = new Process())
             {
-                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.CreateNoWindow = createWindow;
                 p.StartInfo.FileName = exe;
                 p.StartInfo.UseShellExecute = true;
                 p.StartInfo.Arguments = args;

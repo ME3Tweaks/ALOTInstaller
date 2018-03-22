@@ -540,12 +540,13 @@ namespace AlotAddOnGUI
                                     {
 
                                         // Instantiate the delegate using an anonymous method.
-                                        SingleFileCopy.ProgressHandlerDel testDelC = (x) => {
-                                            af.ReadyStatusText = "Staging for installation - " + x.ProgressPercentage + "% ("+ByteSize.FromBytes(x.BytesReceived)+")";
+                                        SingleFileCopy.ProgressHandlerDel testDelC = (x) =>
+                                        {
+                                            af.ReadyStatusText = "Staging for installation - " + x.ProgressPercentage + "% (" + ByteSize.FromBytes(x.BytesReceived) + ")";
                                         };
 
                                         SingleFileCopy sfc = new SingleFileCopy();
-                                        sfc.DownloadFile(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse, testDelC);
+                                        sfc.DownloadFile(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse, testDelC, null);
 
                                         //File.Copy(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
                                     }

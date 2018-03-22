@@ -236,7 +236,7 @@ namespace AlotAddOnGUI
             action();
         }
 
-        private async void RunApplicationUpdater2()
+        private async void PerformPreUpdateCheck()
         {
             //Check local files are OK first.
             Log.Information("Checking for local supporting files");
@@ -288,12 +288,20 @@ namespace AlotAddOnGUI
                 mds.AffirmativeButtonText = "Install";
                 mds.NegativeButtonText = "Later";
                 mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                var upgradenet = await this.ShowMessageAsync(".NET upgrade required", "To continue receiving updates you'll need to install Microsoft .NET 4.7.1 or higher. ALOT Installer can do this for you, select Install below to download and run the installer.");
+                var upgradenet = await this.ShowMessageAsync(".NET upgrade required", "To continue receiving updates you'll need to install Microsoft .NET 4.7.1 or higher. ALOT Installer can do this for you, select Install below to download and run the installer.", MessageDialogStyle.AffirmativeAndNegative, mds);
                 if (upgradenet == MessageDialogResult.Affirmative)
                 {
-                    UpgradeDotNet();
+                    await UpgradeDotNet();
                 }
             }
+            else
+            {
+                PerformUpdateCheck(true);
+            }
+        }
+
+        private async void PerformUpdateCheck(bool dotNetSatisfiedForUpdate)
+        {
             Log.Information("Checking for application updates from gitub");
             AddonFilesLabel.Text = "Checking for application updates";
             var versInfo = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
@@ -330,10 +338,25 @@ namespace AlotAddOnGUI
                     if (latest != null)
                     {
                         Log.Information("Latest available: " + latest.TagName);
-
                         Version releaseName = new Version(latest.TagName);
                         if (versInfo < releaseName && latest.Assets.Count > 0)
                         {
+                            if (!dotNetSatisfiedForUpdate)
+                            {
+                                await this.ShowMessageAsync(".NET upgrade required", "An update is available for ALOT Installer, but the new version requires .NET 4.7.1 to be installed before the update. Restart ALOT Installer and choose the Install option at the .NET prompt.");
+                                Log.Error(".NET update declined but we require an update - exiting.");
+                                if ((myReleaseAge > 5 || USING_BETA) && !DONT_FORCE_UPGRADES)
+                                {
+                                    Environment.Exit(1);
+                                }
+                            }
+                            else
+                            {
+                                FetchManifest();
+                                return;
+                            }
+
+
                             bool upgrade = false;
                             bool canCancel = true;
                             Log.Information("Latest release is applicable to us.");
@@ -345,6 +368,7 @@ namespace AlotAddOnGUI
                             }
                             else
                             {
+
                                 string versionInfo = "";
                                 if (latest.Prerelease)
                                 {
@@ -453,58 +477,52 @@ namespace AlotAddOnGUI
             }
         }
 
-        private async void UpgradeDotNet()
+        private async Task UpgradeDotNet()
         {
-            string net471webinstallerlink = "https://download.microsoft.com/download/A/E/A/AEAE0F3F-96E9-4711-AADA-5E35EF902306/NDP47-KB3186500-Web.exe";
             Log.Information("Downloading .NET 4.7.1 web-installer");
-
-            //there's an update
             string message = "Installation will begin once the download has completed. You will need to restart your computer after installation is complete.";
-            updateprogresscontroller = await this.ShowProgressAsync("Downloading .NET Installer", message, false);
+            updateprogresscontroller = await this.ShowProgressAsync("Downloading .NET Web Installer", message, false);
             updateprogresscontroller.SetIndeterminate();
-            WebClient downloadClient = new WebClient();
-            downloadClient.Headers["user-agent"] = "ALOTInstaller";
             string temppath = Path.GetTempPath();
-            int downloadProgress = 0;
+            string downloadPath = Path.Combine(temppath, "NDP471-KB4033344-Web.exe");
+            WebClient downloadClient = new WebClient();
+
+            downloadClient.Headers["user-agent"] = "ALOTInstaller";
             downloadClient.DownloadProgressChanged += (s, e) =>
             {
                 string downloadedStr = ByteSize.FromBytes(e.BytesReceived).ToString() + " of " + ByteSize.FromBytes(e.TotalBytesToReceive).ToString();
                 updateprogresscontroller.SetMessage(message + "\n\n" + downloadedStr);
-
-                downloadProgress = e.ProgressPercentage;
                 updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
             };
-            //updateprogresscontroller.Canceled += async (s, e) =>
-            //{
-            //    if (downloadClient != null)
-            //    {
-            //        Log.Information(".NET update was in progress but was canceled.");
-            //        downloadClient.CancelAsync();
-            //        await updateprogresscontroller.CloseAsync();
-            //        FetchManifest();
-            //    }
-            //};
-            string downloadPath = Path.Combine(temppath, "NDP47-KB3186500-Web.exe");
 
-            downloadClient.DownloadFileCompleted += async (sender, args) =>
+            downloadClient.DownloadFileCompleted += async (s, e) =>
             {
-                updateprogresscontroller.SetIndeterminate();
-                updateprogresscontroller.SetMessage("Installing .NET 4.7.1. You will need to restart your computer after installation has completed.");
-                string argx = "/passive";
-                int returncode = Utilities.runProcessAsAdmin(downloadPath, argx);
-                Log.Information(".NET 4.7.1 web installer exit code: " + returncode);
-                if (returncode == 0)
+                await updateprogresscontroller.CloseAsync();
+                if (e.Error != null)
                 {
-                    await updateprogresscontroller.CloseAsync();
-                    await this.ShowMessageAsync("Restart computer to continue", "Restart your system to continue using ALOT Installer.");
+                    Log.Error("Error downloading .NET update.");
+                    Log.Error(App.FlattenException(e.Error));
+                    await this.ShowMessageAsync("Error downloading installer", "Error downloading .NET update: "+e.Error.Message+". ALOT Installer will now close.");
+                    Environment.Exit(0);
+                }
+                try
+                {
+                    string argx = "/passive /promptrestart /showfinalerror";
+                    Utilities.runProcessAsAdmin(downloadPath, argx, true, true);
+                    Log.Information(".NET 4.7.1 web installer has begun. We will now close ALOT Installer while it runs.");
+                    await this.ShowMessageAsync("Wait for installation to finish", "Once installation has finished, you may need to restart your system. If prompted to do so, restart your system to continue using ALOT Installer.");
+                    Environment.Exit(0);
+                } catch (Exception ex)
+                {
+                    Log.Error("Error running .NET update.");
+                    Log.Error(App.FlattenException(ex));
+                    await this.ShowMessageAsync("Error running installer", "Error running .NET installer: " + e.Error.Message + ". ALOT Installer will now close.");
                     Environment.Exit(0);
                 }
             };
-            //DEBUG ONLY
-            Uri downloadUri = new Uri(net471webinstallerlink);
-            downloadClient.DownloadFileAsync(downloadUri, downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
+            string net471webinstallerlink = "https://download.microsoft.com/download/8/E/2/8E2BDDE7-F06E-44CC-A145-56C6B9BBE5DD/NDP471-KB4033344-Web.exe";
+            downloadClient.DownloadFileAsync(new Uri(net471webinstallerlink), downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
         }
-
 
         private async void RunMEMUpdaterGUI()
         {
@@ -1280,7 +1298,7 @@ namespace AlotAddOnGUI
             }
 
             bool hasWriteAccess = await testWriteAccess();
-            if (hasWriteAccess) RunApplicationUpdater2();
+            if (hasWriteAccess) PerformPreUpdateCheck();
         }
 
         private async void EnsureOneGameIsInstalled()

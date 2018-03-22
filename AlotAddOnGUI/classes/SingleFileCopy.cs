@@ -12,12 +12,19 @@ namespace AlotAddOnGUI.classes
     class SingleFileCopy
     {
         public delegate void ProgressHandlerDel(DownloadProgressChangedEventArgs args);
-        public ProgressHandlerDel progressDelegate;
-        public void DownloadFile(string source, string destination, ProgressHandlerDel progressDelegate)
+        private ProgressHandlerDel progressDelegate;
+
+        public delegate void ProgressCompleteDel(AsyncCompletedEventArgs args);
+        private ProgressCompleteDel completedDelegate;
+
+        public void DownloadFile(string source, string destination, ProgressHandlerDel progressDelegate, ProgressCompleteDel completedDelegate)
         {
             this.progressDelegate = progressDelegate;
+            this.completedDelegate = completedDelegate;
+
             using (var wc = new WebClient())
             {
+                wc.Headers["user-agent"] = "ALOTInstaller";
                 wc.Proxy = null;
                 wc.DownloadProgressChanged += HandleDownloadProgress;
                 wc.DownloadFileCompleted += HandleDownloadComplete;
@@ -38,6 +45,10 @@ namespace AlotAddOnGUI.classes
         {
             lock (e.UserState)
             {
+                if (completedDelegate != null)
+                {
+                    completedDelegate(e);
+                }
                 //releases blocked thread
                 Monitor.Pulse(e.UserState);
             }
@@ -46,7 +57,10 @@ namespace AlotAddOnGUI.classes
         public void HandleDownloadProgress(object sender, DownloadProgressChangedEventArgs args)
         {
             //Process progress updates here
-            progressDelegate(args);
+            if (progressDelegate != null)
+            {
+                progressDelegate(args);
+            }
         }
     }
 }
