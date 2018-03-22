@@ -283,19 +283,32 @@ namespace AlotAddOnGUI
             int netVersion = Utilities.Get45PlusFromRegistry();
             if (netVersion < 461308)
             {
+                Log.Warning(".NET 4.7.1 or greater is not installed.");
                 //.net 4.7.1
                 MetroDialogSettings mds = new MetroDialogSettings();
                 mds.AffirmativeButtonText = "Install";
-                mds.NegativeButtonText = "Later";
+                mds.NegativeButtonText = "Manual";
+                mds.FirstAuxiliaryButtonText = "Later";
                 mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                var upgradenet = await this.ShowMessageAsync(".NET upgrade required", "To continue receiving updates you'll need to install Microsoft .NET 4.7.1 or higher. ALOT Installer can do this for you, select Install below to download and run the installer.", MessageDialogStyle.AffirmativeAndNegative, mds);
+                var upgradenet = await this.ShowMessageAsync(".NET upgrade required", "To continue receiving updates you'll need to install Microsoft .NET 4.7.1 or higher. ALOT Installer can do this for you, select Install below to download and run the installer. Alternatively you can manually install .NET 4.7.1 by clicking the Manual button.", MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, mds);
                 if (upgradenet == MessageDialogResult.Affirmative)
                 {
                     await UpgradeDotNet();
                 }
+                else if (upgradenet == MessageDialogResult.Negative)
+                {
+                    string link = "https://www.microsoft.com/en-us/download/details.aspx?id=56115";
+                    openWebPage(link);
+                }
+                else
+                {
+                    Log.Warning("User has declined .NET 4.7.1 install.");
+                    PerformUpdateCheck(false);
+                }
             }
             else
             {
+                Log.Information(".NET 4.7.1 or greater is installed.");
                 PerformUpdateCheck(true);
             }
         }
@@ -502,22 +515,26 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("Error downloading .NET update.");
                     Log.Error(App.FlattenException(e.Error));
-                    await this.ShowMessageAsync("Error downloading installer", "Error downloading .NET update: "+e.Error.Message+". ALOT Installer will now close.");
-                    Environment.Exit(0);
+                    await this.ShowMessageAsync("Error downloading installer", "Error downloading .NET update: " + e.Error.Message + ". ALOT Installer will now close.");
+                    Environment.Exit(1);
                 }
                 try
                 {
                     string argx = "/passive /promptrestart /showfinalerror";
-                    Utilities.runProcessAsAdmin(downloadPath, argx, true, true);
-                    Log.Information(".NET 4.7.1 web installer has begun. We will now close ALOT Installer while it runs.");
-                    await this.ShowMessageAsync("Wait for installation to finish", "Once installation has finished, you may need to restart your system. If prompted to do so, restart your system to continue using ALOT Installer.");
+                    int run = Utilities.runProcessAsAdmin(downloadPath, argx, true, true);
+                    if (run == 0)
+                    {
+                        Log.Information(".NET 4.7.1 web installer has begun. We will now close ALOT Installer while it runs.");
+                        await this.ShowMessageAsync("Wait for installation to finish", "Once installation has finished, you may need to restart your system. If prompted to do so, restart your system to continue using ALOT Installer.");
+                    }
                     Environment.Exit(0);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Log.Error("Error running .NET update.");
                     Log.Error(App.FlattenException(ex));
                     await this.ShowMessageAsync("Error running installer", "Error running .NET installer: " + e.Error.Message + ". ALOT Installer will now close.");
-                    Environment.Exit(0);
+                    Environment.Exit(1);
                 }
             };
             string net471webinstallerlink = "https://download.microsoft.com/download/8/E/2/8E2BDDE7-F06E-44CC-A145-56C6B9BBE5DD/NDP471-KB4033344-Web.exe";
