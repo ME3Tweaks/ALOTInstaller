@@ -279,7 +279,21 @@ namespace AlotAddOnGUI
                     Environment.Exit(1);
                 }
             }
-
+            Log.Information("Checking for .NET version 4.7.1...");
+            int netVersion = Utilities.Get45PlusFromRegistry();
+            if (netVersion < 461308)
+            {
+                //.net 4.7.1
+                MetroDialogSettings mds = new MetroDialogSettings();
+                mds.AffirmativeButtonText = "Install";
+                mds.NegativeButtonText = "Later";
+                mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
+                var upgradenet = await this.ShowMessageAsync(".NET upgrade required", "To continue receiving updates you'll need to install Microsoft .NET 4.7.1 or higher. ALOT Installer can do this for you, select Install below to download and run the installer.");
+                if (upgradenet == MessageDialogResult.Affirmative)
+                {
+                    UpgradeDotNet();
+                }
+            }
             Log.Information("Checking for application updates from gitub");
             AddonFilesLabel.Text = "Checking for application updates";
             var versInfo = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
@@ -438,6 +452,59 @@ namespace AlotAddOnGUI
                 FetchManifest();
             }
         }
+
+        private async void UpgradeDotNet()
+        {
+            string net471webinstallerlink = "https://download.microsoft.com/download/A/E/A/AEAE0F3F-96E9-4711-AADA-5E35EF902306/NDP47-KB3186500-Web.exe";
+            Log.Information("Downloading .NET 4.7.1 web-installer");
+
+            //there's an update
+            string message = "Installation will begin once the download has completed. You will need to restart your computer after installation is complete.";
+            updateprogresscontroller = await this.ShowProgressAsync("Downloading .NET Installer", message, false);
+            updateprogresscontroller.SetIndeterminate();
+            WebClient downloadClient = new WebClient();
+            downloadClient.Headers["user-agent"] = "ALOTInstaller";
+            string temppath = Path.GetTempPath();
+            int downloadProgress = 0;
+            downloadClient.DownloadProgressChanged += (s, e) =>
+            {
+                string downloadedStr = ByteSize.FromBytes(e.BytesReceived).ToString() + " of " + ByteSize.FromBytes(e.TotalBytesToReceive).ToString();
+                updateprogresscontroller.SetMessage(message + "\n\n" + downloadedStr);
+
+                downloadProgress = e.ProgressPercentage;
+                updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
+            };
+            //updateprogresscontroller.Canceled += async (s, e) =>
+            //{
+            //    if (downloadClient != null)
+            //    {
+            //        Log.Information(".NET update was in progress but was canceled.");
+            //        downloadClient.CancelAsync();
+            //        await updateprogresscontroller.CloseAsync();
+            //        FetchManifest();
+            //    }
+            //};
+            string downloadPath = Path.Combine(temppath, "NDP47-KB3186500-Web.exe");
+
+            downloadClient.DownloadFileCompleted += async (sender, args) =>
+            {
+                updateprogresscontroller.SetIndeterminate();
+                updateprogresscontroller.SetMessage("Installing .NET 4.7.1. You will need to restart your computer after installation has completed.");
+                string argx = "/passive";
+                int returncode = Utilities.runProcessAsAdmin(downloadPath, argx);
+                Log.Information(".NET 4.7.1 web installer exit code: " + returncode);
+                if (returncode == 0)
+                {
+                    await updateprogresscontroller.CloseAsync();
+                    await this.ShowMessageAsync("Restart computer to continue", "Restart your system to continue using ALOT Installer.");
+                    Environment.Exit(0);
+                }
+            };
+            //DEBUG ONLY
+            Uri downloadUri = new Uri(net471webinstallerlink);
+            downloadClient.DownloadFileAsync(downloadUri, downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
+        }
+
 
         private async void RunMEMUpdaterGUI()
         {
