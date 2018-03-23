@@ -201,7 +201,7 @@ namespace AlotAddOnGUI
             {
                 InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
             }
-            REPACK_GAME_FILES = Checkbox_RepackGameFiles.IsChecked.Value && INSTALLING_THREAD_GAME == 2;
+            REPACK_GAME_FILES = Checkbox_RepackGameFiles.IsChecked.Value && INSTALLING_THREAD_GAME >= 2;
             SetInstallFlyoutState(true);
 
             //Load Tips
@@ -434,7 +434,7 @@ namespace AlotAddOnGUI
             {
                 args += " -repack";
             }
-            args += " -ipc -alot-mode -new-way";
+            args += " -ipc -alot-mode";
             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
             if (!STAGE_DONE_REACHED)
