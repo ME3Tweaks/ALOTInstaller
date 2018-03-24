@@ -1766,7 +1766,7 @@ namespace AlotAddOnGUI
             long installedRamGB = ramAmountKb / 1048576L;
             if (installedRamGB < 7.98)
             {
-                await this.ShowMessageAsync("System memory is less than 8 GB", "Building and installing textures uses considerable amounts of memory. Installation will be significantly slower on systems with less than 8 GB for Mass Effect 3, or 6 GB for Mass Effect and Mass Effect 2.");
+                await this.ShowMessageAsync("System memory is less than 8 GB", "Building and installing textures uses considerable amounts of memory. Installation will be significantly slower on systems with less than 8 GB of memory.");
             }
             //Debug.WriteLine("Ram Amount, KB: " + ramAmountKb);
         }

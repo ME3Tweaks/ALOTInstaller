@@ -538,9 +538,8 @@ namespace AlotAddOnGUI
                         string installationPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), zf.GameDestinationPath);
 
                         string path = BINARY_DIRECTORY + "7z.exe";
-                        //  string pathWithoutTrailingSlash = BINARY_DIRECTORY.Substring(0, BINARY_DIRECTORY.Length - 1);
                         string extractargs = "x \"" + stagedPath + "\" -aoa -r -o\"" + installationPath + "\"";
-                        int extractcode = Utilities.runProcess(path, args);
+                        int extractcode = Utilities.runProcess(path, extractargs);
                         if (extractcode == 0)
                         {
                             Log.Information("Installed zipfile: " + zf.ChoiceTitle + ", " + stagedPath + " to " + installationPath);
@@ -569,9 +568,9 @@ namespace AlotAddOnGUI
                 }
             }
             //Apply LOD
+            Log.Information("Updating LOD information");
             CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT, CurrentTask));
 
             args = "-apply-lods-gfx ";
@@ -1053,7 +1052,7 @@ namespace AlotAddOnGUI
                                     }
                                     STAGE_COUNT++;
                                     Log.Information("Stage added to install queue: " + param);
-                                    ProgressWeightPercentages.AddTask(task);
+                                    ProgressWeightPercentages.AddTask(task,INSTALLING_THREAD_GAME);
                                     break;
                                 }
                             case "STAGE_WEIGHT":

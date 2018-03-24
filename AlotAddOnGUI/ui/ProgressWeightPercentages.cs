@@ -41,7 +41,7 @@ namespace AlotAddOnGUI.ui
         /// Adds a task to the progress tracker. These tasks must be submitted in order that the program will execute them in. Tasks add to the weight pool and will allocate a progress slot.
         /// </summary>
         /// <param name="task">Job Type. Use one of this classes constants.</param>
-        public static void AddTask(int task)
+        public static void AddTask(int task, int game = 0)
         {
             switch (task)
             {
@@ -54,7 +54,12 @@ namespace AlotAddOnGUI.ui
                     TOTAL_ACTIVE_WEIGHT += WEIGHT_SCAN;
                     break;
                 case JOB_REMOVE:
-                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_REMOVE));
+                    double weightval = WEIGHT_REMOVE;
+                    if (game == 1)
+                    {
+                        weightval *= 2.2;
+                    }
+                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, weightval));
                     TOTAL_ACTIVE_WEIGHT += WEIGHT_REMOVE;
                     break;
                 case JOB_INSTALL:
