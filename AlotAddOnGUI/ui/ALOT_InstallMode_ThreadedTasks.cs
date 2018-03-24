@@ -437,6 +437,9 @@ namespace AlotAddOnGUI
             args += " -ipc -alot-mode";
             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+            //processResult = 0;
+            //STAGE_DONE_REACHED = true;
+
             if (!STAGE_DONE_REACHED)
             {
                 if (processResult != 0)
@@ -515,54 +518,60 @@ namespace AlotAddOnGUI
             bool hasSoftShadowsMEUITM = false;
             foreach (AddonFile af in ADDONFILES_TO_INSTALL)
             {
-                foreach (CopyFile cf in af.CopyFiles)
+                if (af.CopyFiles != null)
                 {
-                    if (cf.IsSelectedForInstallation())
+                    foreach (CopyFile cf in af.CopyFiles)
                     {
-                        CurrentTask = "Installing non-texture file modifications for mods";
-                        InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-                        string stagedPath = getOutputDir(INSTALLING_THREAD_GAME) + af.BuildID + "_" + cf.ID + "_" + Path.GetFileName(cf.InArchivePath);
-                        string installationPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), cf.GameDestinationPath);
-                        File.Copy(stagedPath, installationPath, true);
-                        Log.Information("Installed copyfile: " + cf.ChoiceTitle + ", " + stagedPath + " to " + installationPath);
+                        if (cf.IsSelectedForInstallation())
+                        {
+                            CurrentTask = "Installing non-texture file modifications for mods";
+                            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                            string stagedPath = getOutputDir(INSTALLING_THREAD_GAME) + af.BuildID + "_" + cf.ID + "_" + Path.GetFileName(cf.InArchivePath);
+                            string installationPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), cf.GameDestinationPath);
+                            File.Copy(stagedPath, installationPath, true);
+                            Log.Information("Installed copyfile: " + cf.ChoiceTitle + ", " + stagedPath + " to " + installationPath);
+                        }
                     }
                 }
 
-                foreach (ZipFile zf in af.ZipFiles)
+                if (af.ZipFiles != null)
                 {
-                    if (zf.IsSelectedForInstallation())
+                    foreach (ZipFile zf in af.ZipFiles)
                     {
-                        CurrentTask = "Installing non-texture file modifications for mods";
-                        InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-                        string stagedPath = getOutputDir(INSTALLING_THREAD_GAME) + af.BuildID + "_" + zf.ID + "_" + Path.GetFileName(zf.InArchivePath);
-                        string installationPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), zf.GameDestinationPath);
+                        if (zf.IsSelectedForInstallation())
+                        {
+                            CurrentTask = "Installing non-texture file modifications for mods";
+                            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                            string stagedPath = getOutputDir(INSTALLING_THREAD_GAME) + af.BuildID + "_" + zf.ID + "_" + Path.GetFileName(zf.InArchivePath);
+                            string installationPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), zf.GameDestinationPath);
 
-                        string path = BINARY_DIRECTORY + "7z.exe";
-                        string extractargs = "x \"" + stagedPath + "\" -aoa -r -o\"" + installationPath + "\"";
-                        int extractcode = Utilities.runProcess(path, extractargs);
-                        if (extractcode == 0)
-                        {
-                            Log.Information("Installed zipfile: " + zf.ChoiceTitle + ", " + stagedPath + " to " + installationPath);
-                        }
-                        else
-                        {
-                            Log.Error("Extraction of " + zf.ChoiceTitle + " failed with code " + extractcode);
-                        }
-                        if (INSTALLING_THREAD_GAME == 1 && zf.DeleteShaders)
-                        {
-                            string documents = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                            string localusershaderscache = Path.Combine(documents, @"BioWare\Mass Effect\Published\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
-                            File.Delete(localusershaderscache);
-                            Log.Information("Deleted user localshadercache: " + localusershaderscache);
+                            string path = BINARY_DIRECTORY + "7z.exe";
+                            string extractargs = "x \"" + stagedPath + "\" -aoa -r -o\"" + installationPath + "\"";
+                            int extractcode = Utilities.runProcess(path, extractargs);
+                            if (extractcode == 0)
+                            {
+                                Log.Information("Installed zipfile: " + zf.ChoiceTitle + ", " + stagedPath + " to " + installationPath);
+                            }
+                            else
+                            {
+                                Log.Error("Extraction of " + zf.ChoiceTitle + " failed with code " + extractcode);
+                            }
+                            if (INSTALLING_THREAD_GAME == 1 && zf.DeleteShaders)
+                            {
+                                string documents = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                                string localusershaderscache = Path.Combine(documents, @"BioWare\Mass Effect\Published\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
+                                File.Delete(localusershaderscache);
+                                Log.Information("Deleted user localshadercache: " + localusershaderscache);
 
-                            string gamelocalshadercache = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), @"BioGame\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
-                            File.Delete(gamelocalshadercache);
-                            Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
-                        }
+                                string gamelocalshadercache = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), @"BioGame\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
+                                File.Delete(gamelocalshadercache);
+                                Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
+                            }
 
-                        if (zf.MEUITMSoftShadows)
-                        {
-                            hasSoftShadowsMEUITM = true;
+                            if (zf.MEUITMSoftShadows)
+                            {
+                                hasSoftShadowsMEUITM = true;
+                            }
                         }
                     }
                 }

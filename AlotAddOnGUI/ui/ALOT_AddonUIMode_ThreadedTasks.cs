@@ -1210,6 +1210,8 @@ namespace AlotAddOnGUI
 
                     BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building User Addons for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nDon't close the window until this operation completes."));
                     af.ReadyStatusText = "Building user MEM file from mod files";
+                    af.SetWorking();
+
                     Log.Information("Building User MEM file from staging directory: " + userFileExtractedPath);
                     string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                     string filename = USERFILE_INDEX.ToString("000") + "_UserAddon_" + Path.GetFileNameWithoutExtension(af.UserFilePath) + ".mem";

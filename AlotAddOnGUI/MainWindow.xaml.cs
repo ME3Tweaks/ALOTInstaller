@@ -155,6 +155,7 @@ namespace AlotAddOnGUI
         private List<string> COPY_QUEUE = new List<string>();
         private List<string> MOVE_QUEUE = new List<string>();
         private DateTime bootTime;
+        private DoubleAnimation userfileGameSelectoroFlashingTextAnimation;
         public static bool DEBUG_LOGGING;
 
         public bool ShowME1Files
@@ -221,6 +222,13 @@ namespace AlotAddOnGUI
             HeaderLabel.Text = "Preparing application...";
             AddonFilesLabel.Text = "Please wait";
             bootTime = DateTime.Now;
+
+            userfileGameSelectoroFlashingTextAnimation = new DoubleAnimation();
+            userfileGameSelectoroFlashingTextAnimation.From = 0.3;
+            userfileGameSelectoroFlashingTextAnimation.To = 1;
+            userfileGameSelectoroFlashingTextAnimation.Duration = new Duration(TimeSpan.FromSeconds(.7));
+            userfileGameSelectoroFlashingTextAnimation.RepeatBehavior = RepeatBehavior.Forever;
+            userfileGameSelectoroFlashingTextAnimation.AutoReverse = true;
         }
 
         /// <summary>
@@ -4089,6 +4097,8 @@ namespace AlotAddOnGUI
             else
             {
                 Button_ManualFileME1.IsEnabled = Button_ManualFileME2.IsEnabled = Button_ManualFileME3.IsEnabled = true;
+                // Fading animation for the textblock to show that the userfiles text
+                UserTextures_ManifestFileFlashing.BeginAnimation(TextBlock.OpacityProperty, userfileGameSelectoroFlashingTextAnimation);
             }
         }
 
