@@ -1439,7 +1439,6 @@ namespace AlotAddOnGUI
                 Button_InstallME3.IsEnabled = false;
                 Button_InstallME3.ToolTip = "Mass Effect 3 is not installed. To install textures for ME3 the game must already be installed";
                 Button_InstallME3.Content = "ME3 Not Installed";
-                Button_InstallME3Logger.IsEnabled = false;
             }
             else
             {
@@ -4664,27 +4663,6 @@ namespace AlotAddOnGUI
             if (ListView_Files.SelectedItem != null)
             {
                 ListView_Files.ScrollIntoView(ListView_Files.SelectedItem);
-            }
-        }
-
-        private async void Button_InstallME3Logger_Click(object sender, RoutedEventArgs e)
-        {
-            Log.Information("Installing ME3Logger_truncating.asi...");
-            try
-            {
-                string path = Utilities.GetGamePath(3);
-                string logpath = Path.Combine(path, "Binaries", "Win32", "ME3log.txt");
-                path = Path.Combine(path, "Binaries", "Win32", "asi");
-                Directory.CreateDirectory(path);
-                path = Path.Combine(path, "ME3Logger_truncating.asi");
-                System.IO.File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.ME3Logger_truncating);
-                Log.Information("Installed ME3Logger_truncating.asi...");
-                await this.ShowMessageAsync("ME3Logger installed", "When the MassEffect3.exe process exits, a file named ME3Log.txt will be created at " + logpath + ". The process must be fully exited for this file to be properly written. Please upload this log file to the ALOT Discord if requested.");
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Failed to install me3logger_truncating: " + ex.Message);
-                await this.ShowMessageAsync("Failed to install logger", "Failed to install the ME3Logger asi: " + ex.Message);
             }
         }
     }

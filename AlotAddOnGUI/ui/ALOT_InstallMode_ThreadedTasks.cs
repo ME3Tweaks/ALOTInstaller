@@ -683,6 +683,10 @@ namespace AlotAddOnGUI
             if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
             {
                 Utilities.InstallBinkw32Bypass(INSTALLING_THREAD_GAME);
+                if (INSTALLING_THREAD_GAME == 3)
+                {
+                    Utilities.InstallME3LoggerASI();
+                }
             }
 
             //If MAIN alot file is here, move it back to downloaded_mods

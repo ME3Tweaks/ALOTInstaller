@@ -172,12 +172,6 @@ namespace AlotAddOnGUI.ui
                 case SET_DIAGTASK_ICON_RED:
                     ((Image)tc.Data).Source = new BitmapImage(new Uri(@"../images/redx_large.png", UriKind.Relative));
                     break;
-                case RESTORE_FAILED_COULD_NOT_DELETE_FOLDER:
-                    //await this.ShowMessageAsync("Restore failed", "Could not delete the existing game directory. This is usually due to something open or running from within the game folder. Close other programs and try again.");
-                    return;
-                case UPDATE_ADDONUI_CURRENTTASK:
-                    //AddonFilesLabel.Text = (string)tc.Data;
-                    break;
                 case SET_FULLSCAN_PROGRESS:
                     {
                         int progress = (int)tc.Data;
@@ -865,7 +859,26 @@ namespace AlotAddOnGUI.ui
                     }
                 }
             }
+            if (DIAGNOSTICS_GAME == 3)
+            {
+                string me3logfilepath = Path.Combine(Directory.GetParent(Utilities.GetGameEXEPath(3)).ToString(), "me3log.txt");
+                if (File.Exists(me3logfilepath))
+                {
 
+                    FileInfo fi = new FileInfo(me3logfilepath);
+                    if (fi.Length < 10000)
+                    {
+                        addDiagLine("===Mass Effect 3 last session log");
+                        addDiagLine("Last session log has modification date of " + fi.LastWriteTimeUtc.ToShortDateString());
+                        addDiagLine();
+                        var log = File.ReadAllLines(me3logfilepath);
+                        foreach (string line in log)
+                        {
+                            addDiagLine(line);
+                        }
+                    }
+                }
+            }
             if (pairLog)
             {
                 //program has had issue and log should be linked
@@ -922,7 +935,7 @@ namespace AlotAddOnGUI.ui
             //}
         }
 
-        
+
 
         private string GetLODStr(int gameID, ALOTVersionInfo avi)
         {
@@ -1111,7 +1124,7 @@ namespace AlotAddOnGUI.ui
             return log;
         }
 
-        private void addDiagLine(string v)
+        private void addDiagLine(string v = "")
         {
             if (diagStringBuilder == null)
             {
@@ -1193,7 +1206,7 @@ namespace AlotAddOnGUI.ui
                             case "TASK_PROGRESS":
                             case "OVERALL_PROGRESS": //will be removed in future
                                                      //worker.ReportProgress(0, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
-                            int percentInt = Convert.ToInt32(param);
+                                int percentInt = Convert.ToInt32(param);
                                 if (Context == CONTEXT_FULLMIPMAP_SCAN)
                                 {
                                     worker.ReportProgress(0, new ThreadCommand(SET_FULLSCAN_PROGRESS, percentInt));

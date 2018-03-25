@@ -868,6 +868,27 @@ namespace AlotAddOnGUI
             }
         }
 
+        public static bool InstallME3LoggerASI()
+        {
+            Log.Information("Installing ME3Logger_truncating.asi...");
+            try
+            {
+                string path = Utilities.GetGamePath(3);
+                string logpath = Path.Combine(path, "Binaries", "Win32", "ME3log.txt");
+                path = Path.Combine(path, "Binaries", "Win32", "asi");
+                Directory.CreateDirectory(path);
+                path = Path.Combine(path, "ME3Logger_truncating.asi");
+                System.IO.File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.ME3Logger_truncating);
+                Log.Information("Installed ME3Logger_truncating.asi");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Failed to install me3logger_truncating: " + ex.Message);
+                return false;
+            }
+        }
+
         public static Task<List<string>> Run7zWithProgressForAddonFile(string archive)
         {
             string path = MainWindow.BINARY_DIRECTORY + "7z.exe";
