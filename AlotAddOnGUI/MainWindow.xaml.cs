@@ -370,18 +370,18 @@ namespace AlotAddOnGUI
                                 {
                                     Environment.Exit(1);
                                 }
-                            }
-                            else
-                            {
-                                FetchManifest();
-                                return;
+                                else
+                                {
+                                    FetchManifest();
+                                    return;
+                                }
                             }
 
 
                             bool upgrade = false;
                             bool canCancel = true;
                             Log.Information("Latest release is applicable to us.");
-                            if ((myReleaseAge > 5 || USING_BETA) && !DONT_FORCE_UPGRADES)
+                            if ((myReleaseAge > 5) && !DONT_FORCE_UPGRADES)
                             {
                                 Log.Warning("This is an old release. We are force upgrading this client.");
                                 upgrade = true;
@@ -389,11 +389,10 @@ namespace AlotAddOnGUI
                             }
                             else
                             {
-
                                 string versionInfo = "";
                                 if (latest.Prerelease)
                                 {
-                                    versionInfo += "This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
+                                    versionInfo += " This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
                                 }
                                 int daysAgo = (DateTime.Now - latest.PublishedAt.Value).Days;
                                 string ageStr = "";
