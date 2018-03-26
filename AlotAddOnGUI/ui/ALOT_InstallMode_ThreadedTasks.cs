@@ -439,11 +439,12 @@ namespace AlotAddOnGUI
                 args += " -repack";
             }
             args += " -ipc -alot-mode";
-            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker);
+            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-            //processResult = 0;
-            //STAGE_DONE_REACHED = true;
-
+            /*MEM_INSTALL_TIME_SECONDS = 61;
+            processResult = 0;
+            STAGE_DONE_REACHED = true;
+            */
             if (!STAGE_DONE_REACHED)
             {
                 if (processResult != 0)
@@ -804,7 +805,7 @@ namespace AlotAddOnGUI
             return EXE_DIRECTORY + "Data\\music\\";
         }
 
-        private async void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             int telemetryfailedcode = 1;
             InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
@@ -1005,85 +1006,91 @@ namespace AlotAddOnGUI
             //Installation telemetry
             if (TELEMETRY_IS_FULL_NEW_INSTALL)
             {
-                try
+                BackgroundWorker telemetryworker = new BackgroundWorker();
+                telemetryworker.DoWork += (s, events) =>
                 {
-                    var OS = Environment.OSVersion.Version.ToString();
-                    var memVersionString = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
-                    int memVersionUsed = memVersionString.FileMajorPart;
-                    int installerVersionUsed = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.Build;
-                    int diskType = -3; //Cannot detect due to OS version is -2
-                    var dlcPath = Utilities.GetGamePath(Game);
-                    string pathroot = Path.GetPathRoot(dlcPath);
-                    pathroot = pathroot.Substring(0, 1);
-                    if (pathroot == @"\")
+                    try
                     {
-                        diskType = -2; //-2 = UNC
-                    }
-                    else if (Utilities.IsWindows8OrNewer())
-                    {
-                        diskType = DiskTypeDetector.GetPartitionDiskBackingType(pathroot);
-                    }
+                        var OS = Environment.OSVersion.Version.ToString();
+                        var memVersionString = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
+                        int memVersionUsed = memVersionString.FileMajorPart;
+                        int installerVersionUsed = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.Build;
+                        int diskType = -3; //Cannot detect due to OS version is -2
+                        var dlcPath = Utilities.GetGamePath(Game);
+                        string pathroot = Path.GetPathRoot(dlcPath);
+                        pathroot = pathroot.Substring(0, 1);
+                        if (pathroot == @"\")
+                        {
+                            diskType = -2; //-2 = UNC
+                        }
+                        else if (Utilities.IsWindows8OrNewer())
+                        {
+                            diskType = DiskTypeDetector.GetPartitionDiskBackingType(pathroot);
+                        }
 
-                    var processorName = "Unable to fetch";
-                    uint processorSpeedMhz = 0;
-                    uint processorCoreCount = 0;
-                    var memoryAmount = Utilities.GetInstalledRamAmount() / 1024;
+                        var processorName = "Unable to fetch";
+                        uint processorSpeedMhz = 0;
+                        uint processorCoreCount = 0;
+                        var memoryAmount = Utilities.GetInstalledRamAmount() / 1024;
 
-                    int officialDLCCount = 0;
-                    switch (Game)
-                    {
-                        case 1:
-                            dlcPath = Path.Combine(dlcPath, "DLC");
-                            break;
-                        case 2:
-                        case 3:
-                            dlcPath = Path.Combine(dlcPath, "BIOGame", "DLC");
-                            break;
-                    }
-                    if (Directory.Exists(dlcPath))
-                    {
-                        var directories = Directory.EnumerateDirectories(dlcPath);
-                        foreach (string dir in directories)
+                        int officialDLCCount = 0;
+                        switch (Game)
                         {
-                            string value = Path.GetFileName(dir);
-                            string dlcname = DiagnosticsWindow.InteralGetDLCName(value);
-                            if (dlcname != null) { officialDLCCount++; }
+                            case 1:
+                                dlcPath = Path.Combine(dlcPath, "DLC");
+                                break;
+                            case 2:
+                            case 3:
+                                dlcPath = Path.Combine(dlcPath, "BIOGame", "DLC");
+                                break;
                         }
-                    }
+                        if (Directory.Exists(dlcPath))
+                        {
+                            var directories = Directory.EnumerateDirectories(dlcPath);
+                            foreach (string dir in directories)
+                            {
+                                string value = Path.GetFileName(dir);
+                                string dlcname = DiagnosticsWindow.InteralGetDLCName(value);
+                                if (dlcname != null) { officialDLCCount++; }
+                            }
+                        }
 
-                    ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
-                    foreach (ManagementObject moProcessor in mosProcessor.Get())
-                    {
-                        if (moProcessor["name"] != null)
+                        ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
+                        foreach (ManagementObject moProcessor in mosProcessor.Get())
                         {
-                            processorName = moProcessor["name"].ToString().Trim();
+                            if (moProcessor["name"] != null)
+                            {
+                                processorName = moProcessor["name"].ToString().Trim();
+                            }
+                            if (moProcessor["maxclockspeed"] != null)
+                            {
+                                processorSpeedMhz = (uint)moProcessor["maxclockspeed"];
+                            }
+                            if (moProcessor["numberofcores"] != null)
+                            {
+                                processorCoreCount = (uint)moProcessor["numberofcores"];
+                            }
                         }
-                        if (moProcessor["maxclockspeed"] != null)
-                        {
-                            processorSpeedMhz = (uint)moProcessor["maxclockspeed"];
-                        }
-                        if (moProcessor["numberofcores"] != null)
-                        {
-                            processorCoreCount = (uint)moProcessor["numberofcores"];
-                        }
+                        Log.Information("Sending installation telemetry");
+                        "https://me3tweaks.com/alotinstaller/installationtelemetry.php".PostUrlEncodedAsync(new { game = Game, memversion = memVersionUsed, installerversion = installerVersionUsed, processor = processorName, processor_corecount = processorCoreCount, processor_speed = processorSpeedMhz, memory = memoryAmount, installation_time = MEM_INSTALL_TIME_SECONDS, alladdonfiles = MainWindow.TELEMETRY_ALL_ADDON_FILES ? 1 : 0, officialdlccount = officialDLCCount, disktype = diskType, failed = telemetryfailedcode, os = OS });//.ReceiveString();
+                        Log.Information("Installation telemetry has been submitted");
                     }
-                    Log.Information("Sending installation telemetry");
-                    var response = await "https://me3tweaks.com/alotinstaller/installationtelemetry.php".PostUrlEncodedAsync(new { game = Game, memversion = memVersionUsed, installerversion = installerVersionUsed, processor = processorName, processor_corecount = processorCoreCount, processor_speed = processorSpeedMhz, memory = memoryAmount, installation_time = MEM_INSTALL_TIME_SECONDS, alladdonfiles = MainWindow.TELEMETRY_ALL_ADDON_FILES ? 1 : 0, officialdlccount = officialDLCCount, disktype = diskType, failed = telemetryfailedcode, os = OS }).ReceiveString();
-                    Log.Information("Installation telemetry has been submitted");
-                }
-                catch (FlurlHttpTimeoutException)
-                {
-                    Log.Warning("Timeout occured while attempting to upload installation telemetry.");
-                }
-                catch (Exception ex)
-                {
-                    Log.Error("Error occured while attempting to upload installation telemetry: " + ex.Message);
-                }
+                    catch (FlurlHttpTimeoutException)
+                    {
+                        Log.Warning("Timeout occured while attempting to upload installation telemetry.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("Error occured while attempting to upload installation telemetry: " + ex.Message);
+                    }
+                };
+                telemetryworker.RunWorkerAsync();
             }
             else
             {
                 Log.Information("This is not a full installation, not submitting telemetry");
             }
+
         }
 
         private void RunAndTimeMEMContextBased_Install(string exe, string args, BackgroundWorker installWorker, bool isMainInstall = false)
@@ -1136,6 +1143,9 @@ namespace AlotAddOnGUI
                                     int task = -1;
                                     switch (param)
                                     {
+                                        case "STAGE_PRESCAN":
+                                            task = ProgressWeightPercentages.JOB_PRESCAN;
+                                            break;
                                         case "STAGE_UNPACKDLC":
                                             task = ProgressWeightPercentages.JOB_UNPACK;
                                             break;
@@ -1209,6 +1219,9 @@ namespace AlotAddOnGUI
                                     string task = "";
                                     switch (CURRENT_STAGE_CONTEXT)
                                     {
+                                        case "STAGE_PRESCAN":
+                                            task = "Performing installation prescan";
+                                            break;
                                         case "STAGE_UNPACKDLC":
                                             task = "Unpacking DLC";
                                             break;
