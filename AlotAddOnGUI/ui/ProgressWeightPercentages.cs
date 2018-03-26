@@ -141,7 +141,7 @@ namespace AlotAddOnGUI.ui
 
         internal static void ScaleCurrentTaskWeight(int index, double scale)
         {
-            jobWeightList[index].Value = scale;
+            jobWeightList[index].Value *= scale;
             ScaleWeights();
         }
     }
