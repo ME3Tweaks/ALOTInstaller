@@ -290,6 +290,7 @@ namespace AlotAddOnGUI.ui
         private void PerformDiagnostics(object sender, DoWorkEventArgs e)
         {
             diagStringBuilder = new StringBuilder();
+            string gamePath = Utilities.GetGamePath(DIAGNOSTICS_GAME);
             bool pairLog = false;
             addDiagLine("ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version + " Game Diagnostic");
             addDiagLine("Diagnostic for Mass Effect " + DIAGNOSTICS_GAME);
@@ -297,13 +298,32 @@ namespace AlotAddOnGUI.ui
             var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
             int fileVersion = versInfo.FileMajorPart;
             addDiagLine("Using MassEffectModderNoGui v" + fileVersion);
-            addDiagLine("Game is installed at " + Utilities.GetGamePath(DIAGNOSTICS_GAME));
-
+            addDiagLine("Game is installed at " + gamePath);
+            string pathroot = Path.GetPathRoot(gamePath);
+            pathroot = pathroot.Substring(0, 1);
+            if (pathroot == @"\")
+            {
+                addDiagLine("Installation appears to be on a network drive (first character in path is \\)");
+            }
+            else
+            {
+                if (Utilities.IsWindows8OrNewer())
+                {
+                    int backingType = DiskTypeDetector.GetPartitionDiskBackingType(pathroot);
+                    string type = "Unknown type";
+                    switch (backingType)
+                    {
+                        case 3: type = "Hard disk drive"; break;
+                        case 4: type = "Solid state drive"; break;
+                        default: type += ": " + backingType; break;
+                    }
+                    addDiagLine("Installed on disk type: " + type);
+                }
+            }
             ALOTVersionInfo avi = Utilities.GetInstalledALOTInfo(DIAGNOSTICS_GAME);
             MEMI_FOUND = avi != null;
 
             string exePath = Utilities.GetGameEXEPath(DIAGNOSTICS_GAME);
-            string gamePath = Utilities.GetGamePath(DIAGNOSTICS_GAME);
             if (File.Exists(exePath))
             {
                 versInfo = FileVersionInfo.GetVersionInfo(exePath);

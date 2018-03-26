@@ -1074,7 +1074,6 @@ namespace AlotAddOnGUI
                                 {
                                     double scale = Double.Parse(parameters[1]);
                                     Log.Information("Reweighting stage " + parameters[0] + " by " + parameters[1]);
-
                                     ProgressWeightPercentages.ScaleCurrentTaskWeight(CURRENT_STAGE_NUM - 1, scale);
                                 }
                                 catch (Exception e)

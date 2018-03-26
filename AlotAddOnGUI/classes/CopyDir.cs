@@ -62,6 +62,7 @@ namespace AlotAddOnGUI.classes
                 //calculate number of files
                 total = Directory.GetFiles(source.FullName, "*.*", SearchOption.AllDirectories).Length;
             }
+            worker.ReportProgress(0, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
 
             int numdone = done;
             Directory.CreateDirectory(target.FullName);

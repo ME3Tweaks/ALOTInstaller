@@ -1631,7 +1631,6 @@ namespace AlotAddOnGUI
                 }
             }
 
-            BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, "Restoring game from backup "));
             if (gamePath != null)
             {

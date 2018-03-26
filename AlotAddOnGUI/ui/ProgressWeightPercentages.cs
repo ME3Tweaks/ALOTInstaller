@@ -10,7 +10,7 @@ namespace AlotAddOnGUI.ui
 {
     class ProgressWeightPercentages
     {
-        private const double WEIGHT_UNPACKED = 0.11004021318;
+        private const double WEIGHT_UNPACKDLC = 0.11004021318;
         private const double WEIGHT_SCAN = 0.12055272684;
         private const double WEIGHT_REMOVE = 0.19155062326;
         private const double WEIGHT_INSTALL = 0.31997680866;
@@ -46,8 +46,8 @@ namespace AlotAddOnGUI.ui
             switch (task)
             {
                 case JOB_UNPACK:
-                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_UNPACKED));
-                    TOTAL_ACTIVE_WEIGHT += WEIGHT_UNPACKED;
+                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_UNPACKDLC));
+                    TOTAL_ACTIVE_WEIGHT += WEIGHT_UNPACKDLC;
                     break;
                 case JOB_SCAN:
                     jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_SCAN));

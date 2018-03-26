@@ -105,6 +105,13 @@ namespace AlotAddOnGUI
                .Replace("  ", " ").Trim();
         }
 
+        public static bool IsWindows8OrNewer()
+        {
+            var os = Environment.OSVersion;
+            return os.Platform == PlatformID.Win32NT &&
+                   (os.Version.Major > 6 || (os.Version.Major == 6 && os.Version.Minor >= 2));
+        }
+
         /// <summary> Checks for write access for the given file.
         /// </summary>
         /// <param name="fileName">The filename.</param>
