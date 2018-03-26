@@ -58,9 +58,7 @@ namespace AlotAddOnGUI
         public static  string GetCPUString()
         {
             string str = "";
-
             ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
-
             foreach (ManagementObject moProcessor in mosProcessor.Get())
             {
                 if (str != "")

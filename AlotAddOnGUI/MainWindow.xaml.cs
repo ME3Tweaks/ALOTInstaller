@@ -199,6 +199,8 @@ namespace AlotAddOnGUI
         }
 
         private double _progressBarValue;
+        public static bool TELEMETRY_ALL_ADDON_FILES = false;
+
         public double ProgressBarValue
         {
             get { return _progressBarValue; }
@@ -3031,6 +3033,7 @@ namespace AlotAddOnGUI
 
             if (nummissing == 0)
             {
+                TELEMETRY_ALL_ADDON_FILES = true;
                 return true;
             }
 
@@ -3047,6 +3050,7 @@ namespace AlotAddOnGUI
                 if (result == MessageDialogResult.Affirmative)
                 {
                     Log.Warning("User is continuing build step without all non-optional addon files. If user complains about a high amount of low quality textures this might be why.");
+                    TELEMETRY_ALL_ADDON_FILES = false;
                     return true;
                 }
                 else
@@ -3057,6 +3061,7 @@ namespace AlotAddOnGUI
             }
             else
             {
+                TELEMETRY_ALL_ADDON_FILES = true;
                 return true;
             }
         }

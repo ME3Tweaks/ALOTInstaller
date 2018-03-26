@@ -1330,7 +1330,7 @@ namespace AlotAddOnGUI.ui
             }
         }
 
-        private string InteralGetDLCName(string str)
+        public static string InteralGetDLCName(string str)
         {
             switch (str)
             {

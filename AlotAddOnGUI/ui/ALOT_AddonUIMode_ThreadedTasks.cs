@@ -32,6 +32,7 @@ namespace AlotAddOnGUI
         static Random RANDOM = new Random();
         private int INSTALLING_THREAD_GAME;
         private List<AddonFile> ADDONFILES_TO_BUILD;
+        private int MEM_INSTALL_TIME_SECONDS;
         private List<AddonFile> ADDONFILES_TO_INSTALL;
         public const string UPDATE_CURRENT_STAGE_PROGRESS = "UPDATE_TASK_PROGRESS";
         public const string UPDATE_OVERALL_TASK = "UPDATE_OVERALL_TASK";

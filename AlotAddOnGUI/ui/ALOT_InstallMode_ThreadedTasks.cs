@@ -2,6 +2,7 @@
 using AlotAddOnGUI.music;
 using AlotAddOnGUI.ui;
 using ByteSizeLib;
+using Flurl.Http;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
@@ -16,6 +17,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
@@ -29,6 +31,7 @@ namespace AlotAddOnGUI
     public partial class MainWindow : MetroWindow
     {
         private bool STAGE_DONE_REACHED = false;
+        private bool TELEMETRY_IS_FULL_NEW_INSTALL;
         private const int RESULT_UNPACK_FAILED = -40;
         private const int RESULT_SCAN_REMOVE_FAILED = -41;
         private const int RESULT_ME1LAA_FAILED = -43;
@@ -81,6 +84,7 @@ namespace AlotAddOnGUI
 
         private void InstallALOT(int game, List<AddonFile> filesToInstall)
         {
+            MEM_INSTALL_TIME_SECONDS = 0;
             ADDONFILES_TO_INSTALL = filesToInstall;
             WARN_USER_OF_EXIT = true;
             InstallingOverlay_TopLabel.Text = "Preparing installer";
@@ -341,7 +345,7 @@ namespace AlotAddOnGUI
             Log.Information("This installer session is context based and will run in a single instance.");
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
-
+            TELEMETRY_IS_FULL_NEW_INSTALL = versionInfo == null;
             Log.Information("Setting biogame directory to read-write");
             string biogamepath = Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\BIOGame";
             if (!Directory.Exists(biogamepath))
@@ -708,7 +712,7 @@ namespace AlotAddOnGUI
                                 File.Delete(dest);
                             }
                             File.Move(source, dest);
-                            Log.Information("Moved main alot file back to import library "+DOWNLOADED_MODS_DIRECTORY);
+                            Log.Information("Moved main alot file back to import library " + DOWNLOADED_MODS_DIRECTORY);
                             //Delete original
                             dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotMainFile.Filename;
                             if (File.Exists(dest))
@@ -764,7 +768,7 @@ namespace AlotAddOnGUI
             e.Result = INSTALL_OK;
         }
 
-        private void MusicPlaybackStopped(object sender, StoppedEventArgs e)
+        private void MusicPlaybackStopped(object sender, NAudio.Wave.StoppedEventArgs e)
         {
             if (MusicIsPlaying)
             {
@@ -800,8 +804,9 @@ namespace AlotAddOnGUI
             return EXE_DIRECTORY + "Data\\music\\";
         }
 
-        private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private async void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            int telemetryfailedcode = 1;
             InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
             if (MusicIsPlaying)
             {
@@ -851,6 +856,7 @@ namespace AlotAddOnGUI
                             HeaderLabel.Text = "Installation has completed.";
                             AddonFilesLabel.Text = "Thanks for using ALOT Installer.";
                             InstallingOverlay_Tip.Text = "Do not install any new DLC or mods that add/replace pcc, sfm, or upk files from here on out - doing so will break your game!";
+                            telemetryfailedcode = 0;
                             break;
                         }
                     case RESULT_ME1LAA_FAILED:
@@ -981,6 +987,8 @@ namespace AlotAddOnGUI
                 HeaderLabel.Text = "Installation failed! Check the logs for more detailed information";
                 AddonFilesLabel.Text = "Check the logs for more detailed information.";
             }
+            int Game = INSTALLING_THREAD_GAME;
+            List<AddonFile> addonFilesInstalled = ADDONFILES_TO_INSTALL;
             INSTALLING_THREAD_GAME = 0;
             ADDONFILES_TO_INSTALL = null;
             CURRENT_STAGE_NUM = 0;
@@ -993,9 +1001,92 @@ namespace AlotAddOnGUI
             TaskbarManager.Instance.SetProgressValue(0, 0);
             var helper = new FlashWindowHelper(System.Windows.Application.Current);
             helper.FlashApplicationWindow();
+
+            //Installation telemetry
+            if (TELEMETRY_IS_FULL_NEW_INSTALL)
+            {
+                try
+                {
+                    var OS = Environment.OSVersion.Version.ToString();
+                    var memVersionString = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
+                    int memVersionUsed = memVersionString.FileMajorPart;
+                    int installerVersionUsed = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.Build;
+                    int diskType = -3; //Cannot detect due to OS version is -2
+                    var dlcPath = Utilities.GetGamePath(Game);
+                    string pathroot = Path.GetPathRoot(dlcPath);
+                    pathroot = pathroot.Substring(0, 1);
+                    if (pathroot == @"\")
+                    {
+                        diskType = -2; //-2 = UNC
+                    }
+                    else if (Utilities.IsWindows8OrNewer())
+                    {
+                        diskType = DiskTypeDetector.GetPartitionDiskBackingType(pathroot);
+                    }
+
+                    var processorName = "Unable to fetch";
+                    uint processorSpeedMhz = 0;
+                    uint processorCoreCount = 0;
+                    var memoryAmount = Utilities.GetInstalledRamAmount() / 1024;
+
+                    int officialDLCCount = 0;
+                    switch (Game)
+                    {
+                        case 1:
+                            dlcPath = Path.Combine(dlcPath, "DLC");
+                            break;
+                        case 2:
+                        case 3:
+                            dlcPath = Path.Combine(dlcPath, "BIOGame", "DLC");
+                            break;
+                    }
+                    if (Directory.Exists(dlcPath))
+                    {
+                        var directories = Directory.EnumerateDirectories(dlcPath);
+                        foreach (string dir in directories)
+                        {
+                            string value = Path.GetFileName(dir);
+                            string dlcname = DiagnosticsWindow.InteralGetDLCName(value);
+                            if (dlcname != null) { officialDLCCount++; }
+                        }
+                    }
+
+                    ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
+                    foreach (ManagementObject moProcessor in mosProcessor.Get())
+                    {
+                        if (moProcessor["name"] != null)
+                        {
+                            processorName = moProcessor["name"].ToString().Trim();
+                        }
+                        if (moProcessor["maxclockspeed"] != null)
+                        {
+                            processorSpeedMhz = (uint)moProcessor["maxclockspeed"];
+                        }
+                        if (moProcessor["numberofcores"] != null)
+                        {
+                            processorCoreCount = (uint)moProcessor["numberofcores"];
+                        }
+                    }
+                    Log.Information("Sending installation telemetry");
+                    var response = await "https://me3tweaks.com/alotinstaller/installationtelemetry.php".PostUrlEncodedAsync(new { game = Game, memversion = memVersionUsed, installerversion = installerVersionUsed, processor = processorName, processor_corecount = processorCoreCount, processor_speed = processorSpeedMhz, memory = memoryAmount, installation_time = MEM_INSTALL_TIME_SECONDS, alladdonfiles = MainWindow.TELEMETRY_ALL_ADDON_FILES ? 1 : 0, officialdlccount = officialDLCCount, disktype = diskType, failed = telemetryfailedcode, os = OS }).ReceiveString();
+                    Log.Information("Installation telemetry has been submitted");
+                }
+                catch (FlurlHttpTimeoutException)
+                {
+                    Log.Warning("Timeout occured while attempting to upload installation telemetry.");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Error occured while attempting to upload installation telemetry: " + ex.Message);
+                }
+            }
+            else
+            {
+                Log.Information("This is not a full installation, not submitting telemetry");
+            }
         }
 
-        private void RunAndTimeMEMContextBased_Install(string exe, string args, BackgroundWorker installWorker)
+        private void RunAndTimeMEMContextBased_Install(string exe, string args, BackgroundWorker installWorker, bool isMainInstall = false)
         {
             Stopwatch sw = Stopwatch.StartNew();
 
@@ -1008,6 +1099,10 @@ namespace AlotAddOnGUI
             int minutes = (int)sw.Elapsed.TotalMinutes;
             double fsec = 60 * (sw.Elapsed.TotalMinutes - minutes);
             int sec = (int)fsec;
+            if (isMainInstall)
+            {
+                MEM_INSTALL_TIME_SECONDS = (minutes * 60) + sec;
+            }
             Log.Information("Process complete - finished in " + minutes + " minutes " + sec + " seconds");
         }
 
@@ -1065,7 +1160,7 @@ namespace AlotAddOnGUI
                                     }
                                     STAGE_COUNT++;
                                     Log.Information("Stage added to install queue: " + param);
-                                    ProgressWeightPercentages.AddTask(task,INSTALLING_THREAD_GAME);
+                                    ProgressWeightPercentages.AddTask(task, INSTALLING_THREAD_GAME);
                                     break;
                                 }
                             case "STAGE_WEIGHT":
