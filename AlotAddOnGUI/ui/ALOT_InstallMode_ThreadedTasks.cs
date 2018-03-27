@@ -441,11 +441,11 @@ namespace AlotAddOnGUI
                 args += " -repack";
             }
             args += " -ipc -alot-mode";
-            //RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
-            //processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-            MEM_INSTALL_TIME_SECONDS = 61;
-            processResult = 0;
-            STAGE_DONE_REACHED = true;
+            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
+            processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+            //MEM_INSTALL_TIME_SECONDS = 61;
+            //processResult = 0;
+            //STAGE_DONE_REACHED = true;
             
             if (!STAGE_DONE_REACHED)
             {
