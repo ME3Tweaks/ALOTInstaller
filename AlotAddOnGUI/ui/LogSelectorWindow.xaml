@@ -1,0 +1,21 @@
+﻿<Controls:MetroWindow x:Class="AlotAddOnGUI.ui.LogSelectorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        mc:Ignorable="d"
+        BorderBrush="{DynamicResource AccentColorBrush}"
+        BorderThickness="1"
+        Title="Log Uploader" Height="200" Width="350"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <TextBlock x:Name="LogSelectorHeader" Width="250" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center"><Run Text="Select a log file for upload. In most cases, you will want to use the most recent one."/><LineBreak/><Run/></TextBlock>
+        <ComboBox x:Name="Combobox_LogSelector" 
+                  Controls:TextBoxHelper.UseFloatingWatermark="True"
+                  Controls:TextBoxHelper.Watermark="{Binding Path=WatermarkText,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" 
+                  SelectionChanged="Combobox_LogSelector_SelectionChanged"/>
+        <Button x:Name="Button_SelectLog" Margin="5,20,6,0" Content="Upload log" Width="95" ToolTip="Performs a quick game diagnostic with single file tests.&#10;Should not take longer than a minute to complete.&#10;Select this one if you don't know which one to choose." HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Click="Button_SelectLog_Click"/>
+
+    </StackPanel>
+</Controls:MetroWindow>

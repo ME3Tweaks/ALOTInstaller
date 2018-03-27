@@ -55,7 +55,7 @@ namespace AlotAddOnGUI
             return sb.ToString();
         }
 
-        public static  string GetCPUString()
+        public static string GetCPUString()
         {
             string str = "";
             ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
@@ -117,41 +117,21 @@ namespace AlotAddOnGUI
         public static bool IsDirectoryWritable(string dir)
         {
             var files = Directory.GetFiles(dir);
-            string fileName = "";
-            //if (files.Count() > 0)
-            //{
-            //    fileName = files[0];
-            //}
-            //else
+            try
             {
-                try
-                {
-                    System.IO.File.Create(Path.Combine(dir, "temp_alot.txt")).Close();
-                    System.IO.File.Delete(Path.Combine(dir, "temp_alot.txt"));
-                    return true;
-                }
-                catch (System.UnauthorizedAccessException)
-                {
-                    return false;
-                }
+                System.IO.File.Create(Path.Combine(dir, "temp_alot.txt")).Close();
+                System.IO.File.Delete(Path.Combine(dir, "temp_alot.txt"));
+                return true;
             }
-
-            if ((File.GetAttributes(fileName) & FileAttributes.ReadOnly) != 0)
+            catch (System.UnauthorizedAccessException)
+            {
                 return false;
-
-            // Get the access rules of the specified files (user groups and user names that have access to the file)
-            var rules = File.GetAccessControl(fileName).GetAccessRules(true, true, typeof(System.Security.Principal.SecurityIdentifier));
-
-            // Get the identity of the current user and the groups that the user is in.
-            var groups = WindowsIdentity.GetCurrent().Groups;
-            string sidCurrentUser = WindowsIdentity.GetCurrent().User.Value;
-
-            // Check if writing to the file is explicitly denied for this user or a group the user is in.
-            if (rules.OfType<FileSystemAccessRule>().Any(r => (groups.Contains(r.IdentityReference) || r.IdentityReference.Value == sidCurrentUser) && r.AccessControlType == AccessControlType.Deny && (r.FileSystemRights & FileSystemRights.WriteData) == FileSystemRights.WriteData))
-                return false;
-
-            // Check if writing is allowed
-            return rules.OfType<FileSystemAccessRule>().Any(r => (groups.Contains(r.IdentityReference) || r.IdentityReference.Value == sidCurrentUser) && r.AccessControlType == AccessControlType.Allow && (r.FileSystemRights & FileSystemRights.WriteData) == FileSystemRights.WriteData);
+            } catch (Exception e)
+            {
+                Log.Error("Error checking permissions to folder: " + dir);
+                Log.Error("Directory write test had error that was not UnauthorizedAccess: " + e.Message);
+            }
+            return false;
         }
 
         public static bool IsDirectoryWritable2(string dirPath)
@@ -1260,7 +1240,7 @@ namespace AlotAddOnGUI
             {
                 if (ndpKey != null && ndpKey.GetValue("Release") != null)
                 {
-                    return (int) ndpKey.GetValue("Release");
+                    return (int)ndpKey.GetValue("Release");
                 }
                 else
                 {

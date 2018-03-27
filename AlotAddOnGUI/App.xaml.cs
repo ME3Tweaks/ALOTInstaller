@@ -47,7 +47,7 @@ namespace AlotAddOnGUI
         {
             string[] args = Environment.GetCommandLineArgs();
             string preLogMessages = "";
-            Parsed<Options> parsedItems = null;
+            Parsed<Options> parsedCommandLineArgs = null;
             string loggingBasePath = System.AppDomain.CurrentDomain.BaseDirectory;
             string updateDestinationPath = null;
             if (args.Length > 1)
@@ -56,20 +56,20 @@ namespace AlotAddOnGUI
                 if (result.GetType() == typeof(Parsed<Options>))
                 {
                     //Parsing succeeded - have to do update check to keep logs in order...
-                    parsedItems = (Parsed<Options>)result;
-                    if (parsedItems.Value.UpdateDest != null)
+                    parsedCommandLineArgs = (Parsed<Options>)result;
+                    if (parsedCommandLineArgs.Value.UpdateDest != null)
                     {
-                        if (Directory.Exists(parsedItems.Value.UpdateDest))
+                        if (Directory.Exists(parsedCommandLineArgs.Value.UpdateDest))
                         {
-                            updateDestinationPath = parsedItems.Value.UpdateDest;
+                            updateDestinationPath = parsedCommandLineArgs.Value.UpdateDest;
                             loggingBasePath = updateDestinationPath;
                         }
                         else
                         {
-                            preLogMessages += "Directory doesn't exist for update: " + parsedItems.Value.UpdateDest;
+                            preLogMessages += "Directory doesn't exist for update: " + parsedCommandLineArgs.Value.UpdateDest;
                         }
                     }
-                    if (parsedItems.Value.BootingNewUpdate)
+                    if (parsedCommandLineArgs.Value.BootingNewUpdate)
                     {
                         if (File.Exists("ALOTAddonBuilder.exe"))
                         {
@@ -226,6 +226,13 @@ namespace AlotAddOnGUI
                 Log.Information("Deleting Update Shim ALOTAddonBuilder.exe");
                 File.Delete(loggingBasePath + "ALOTAddonBuilder.exe");
             }
+
+            if (parsedCommandLineArgs != null && parsedCommandLineArgs.Value != null && parsedCommandLineArgs.Value.BootingNewUpdate)
+            {
+                //turn off debug mode
+                Utilities.WriteRegistryKey(Registry.CurrentUser, AlotAddOnGUI.MainWindow.REGISTRY_KEY, AlotAddOnGUI.MainWindow.SETTINGSTR_DEBUGLOGGING, 0);
+            }
+
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
             Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
             string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();

@@ -205,7 +205,9 @@ namespace AlotAddOnGUI
             {
                 InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
             }
-            REPACK_GAME_FILES = Checkbox_RepackGameFiles.IsChecked.Value && INSTALLING_THREAD_GAME >= 2;
+            REPACK_GAME_FILES = Checkbox_RepackGameFiles.IsChecked.Value && ((INSTALLING_THREAD_GAME == 2 && ME2_REPACK_MANIFEST_ENABLED) || (INSTALLING_THREAD_GAME == 3 && ME3_REPACK_MANIFEST_ENABLED));
+            Log.Information("Repack option enabled: " + REPACK_GAME_FILES);
+            //REPACK_GAME_FILES = true;
             SetInstallFlyoutState(true);
 
             //Load Tips

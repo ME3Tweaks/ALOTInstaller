@@ -118,7 +118,7 @@ namespace AlotAddOnGUI
         private List<string> musicpackmirrors;
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
-        private readonly string SETTINGSTR_DEBUGLOGGING = "DebugLogging";
+        public static readonly string SETTINGSTR_DEBUGLOGGING = "DebugLogging";
         private const string SETTINGSTR_DONT_FORCE_UPGRADES = "DontForceUpgrades";
         private const string SETTINGSTR_LIBRARYDIR = "LibraryDir";
         private const string SETTINGSTR_REPACK = "RepackGameFiles";
@@ -150,11 +150,13 @@ namespace AlotAddOnGUI
         private int RefreshesUntilRealRefresh;
         private bool ShowBuildingOnly;
         private WebClient downloadClient;
+        public bool ME2_REPACK_MANIFEST_ENABLED = true;
+        public bool ME3_REPACK_MANIFEST_ENABLED = true;
         private string MANIFEST_LOC = EXE_DIRECTORY + @"Data\manifest.xml";
         private string MANIFEST_BUNDLED_LOC = EXE_DIRECTORY + @"Data\manifest-bundled.xml";
         private List<string> COPY_QUEUE = new List<string>();
         private List<string> MOVE_QUEUE = new List<string>();
-        private DateTime bootTime;
+        public DateTime bootTime;
         private DoubleAnimation userfileGameSelectoroFlashingTextAnimation;
         public static bool DEBUG_LOGGING;
 
@@ -795,13 +797,13 @@ namespace AlotAddOnGUI
                     var upload = await this.ShowMessageAsync("Previous installer session crashed", "The previous installer session crashed. Would you like to upload the log to help the developers fix it?", MessageDialogStyle.AffirmativeAndNegative, mds);
                     if (upload == MessageDialogResult.Affirmative)
                     {
-                        await uploadLatestLog(true);
+                        await uploadLatestLog(true, null);
                         ShowStatus("Crash log uploaded");
                         mds = new MetroDialogSettings();
                         mds.AffirmativeButtonText = "Join Discord";
                         mds.NegativeButtonText = "Decline";
                         mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                        var result = await this.ShowMessageAsync("Join the ALOT Discord to help troubleshoot?", "While crash logs are helpful, they doesn't always tell us everything we need to fix bugs. If we need more information, we would appreciate if you joined the ALOT Discord so we can gather some extra information from you to implement a fix.", MessageDialogStyle.AffirmativeAndNegative, mds);
+                        var result = await this.ShowMessageAsync("Want to help fix this issue?", "We would appreciate if you joined the ALOT Discord server so you can help us reproduce this issue so we can get it fixed.", MessageDialogStyle.AffirmativeAndNegative, mds);
                         if (result == MessageDialogResult.Affirmative)
                         {
                             openWebPage("https://discord.gg/w4Smese");
@@ -2125,6 +2127,20 @@ namespace AlotAddOnGUI
                                  Text = (string)e.Attribute("text"),
                                  ToolTip = (string)e.Attribute("tooltip")
                              }).ToList();
+
+
+                var repackoptions = rootElement.Element("repackoptions");
+                if (repackoptions != null)
+                {
+                    ME2_REPACK_MANIFEST_ENABLED = repackoptions.Attribute("me2repackenabled") != null ? (bool)repackoptions.Attribute("me2repackenabled") : true;
+                    Log.Information("Manifest says ME2 repack option can be used: " + ME2_REPACK_MANIFEST_ENABLED);
+                    ME3_REPACK_MANIFEST_ENABLED = repackoptions.Attribute("me3repackenabled") != null ? (bool)repackoptions.Attribute("me3repackenabled") : false;
+                    Log.Information("Manifest says ME3 repack option can be used: " + ME3_REPACK_MANIFEST_ENABLED);
+                }
+                else
+                {
+                    Log.Information("Manifest does not have repackoptions - using defaults");
+                }
                 linqlist = (from e in rootElement.Elements("addonfile")
                             select new AddonFile
                             {
@@ -4246,108 +4262,119 @@ namespace AlotAddOnGUI
 
         private async void Button_UploadLog_Click(object sender, RoutedEventArgs e)
         {
-            await uploadLatestLog(false);
+            LogSelectorWindow lsw = new LogSelectorWindow(this);
+            lsw.Owner = this;
+            lsw.ShowDialog();
+            string log = lsw.GetSelectedLogText();
+            if (log != null)
+            {
+                await uploadLatestLog(false, log);
+            }
         }
 
-        public async Task<string> uploadLatestLog(bool isPreviousCrashLog, bool openPageWhenFinished = true)
+        public async Task<string> uploadLatestLog(bool isPreviousCrashLog, string log, bool openPageWhenFinished = true)
         {
             Log.Information("Preparing to upload installer log");
-            var directory = new DirectoryInfo("logs");
-            var logfiles = directory.GetFiles("alotinstaller*.txt").OrderByDescending(f => f.LastWriteTime).ToList();
-            if (logfiles.Count() > 0)
+            string zipStaged = EXE_DIRECTORY + "logs\\logfile_forUpload";
+            File.WriteAllText(zipStaged, log);
+            string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
+
+            if (log == null)
             {
-                var currentTime = DateTime.Now;
-                string log = "";
-                if (currentTime.Date != bootTime.Date && logfiles.Count() > 1)
-                {
-                    //we need to do last 2 files
-                    Log.Information("Log file has rolled over since app was booted - including previous days' log.");
-                    File.Copy(logfiles.ElementAt(1).FullName, logfiles.ElementAt(1).FullName + ".tmp");
-                    log = File.ReadAllText(logfiles.ElementAt(1).FullName + ".tmp");
-                    File.Delete(logfiles.ElementAt(1).FullName + ".tmp");
-                    log += "\n";
-                }
-                Log.Information("Staging log file for upload. This is the final log item that should appear in an uploaded log.");
-                File.Copy(logfiles.ElementAt(0).FullName, logfiles.ElementAt(0).FullName + ".tmp");
-                log += File.ReadAllText(logfiles.ElementAt(0).FullName + ".tmp");
-                File.Delete(logfiles.ElementAt(0).FullName + ".tmp");
+                //latest
 
-                string zipStaged = EXE_DIRECTORY + "logs\\logfile_forUpload";
-                File.WriteAllText(zipStaged, log);
-                string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
-
-                //Compress with LZMA for VPS Upload
-                string outfile = "logfile_forUpload.lzma";
-                string args = "e \"" + zipStaged + "\" \"" + outfile + "\" -mt2";
-                Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
-                File.Delete(zipStaged);
-                var lzmalog = File.ReadAllBytes(outfile);
-                ProgressDialogController progresscontroller = await this.ShowProgressAsync("Uploading log", "Log is currently uploading, please wait...", true);
-                progresscontroller.SetIndeterminate();
-                try
+                var directory = new DirectoryInfo("logs");
+                var logfiles = directory.GetFiles("alotinstaller*.txt").OrderByDescending(f => f.LastWriteTime).ToList();
+                if (logfiles.Count() > 0)
                 {
-                    var responseString = await "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "log", CrashLog = isPreviousCrashLog }).ReceiveString();
-                    File.Delete(outfile);
-                    Uri uriResult;
-                    bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
-                        && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-                    if (result)
+                    var currentTime = DateTime.Now;
+                    log = "";
+                    if (currentTime.Date != bootTime.Date && logfiles.Count() > 1)
                     {
-                        //should be valid URL.
-                        //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
-                        //e.Result = responseString;
-                        await progresscontroller.CloseAsync();
-                        Log.Information("Result from server for log upload: " + responseString);
-                        if (openPageWhenFinished)
-                        {
-                            openWebPage(responseString);
-                        }
-                        return responseString;
+                        //we need to do last 2 files
+                        Log.Information("Log file has rolled over since app was booted - including previous days' log.");
+                        File.Copy(logfiles.ElementAt(1).FullName, logfiles.ElementAt(1).FullName + ".tmp");
+                        log = File.ReadAllText(logfiles.ElementAt(1).FullName + ".tmp");
+                        File.Delete(logfiles.ElementAt(1).FullName + ".tmp");
+                        log += "\n";
                     }
-                    else
-                    {
-                        File.Delete(outfile);
-
-                        //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from oversized log uploader: " + responseString));
-                        //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
-                        await progresscontroller.CloseAsync();
-                        Log.Error("Error uploading log. The server responded with: " + responseString);
-                        //e.Result = "Diagnostic complete.";
-                        await this.ShowMessageAsync("Log upload error", "The server rejected the upload. The response was: " + responseString);
-                        //Utilities.OpenAndSelectFileInExplorer(diagfilename);
-                    }
+                    Log.Information("Staging log file for upload. This is the final log item that should appear in an uploaded log.");
+                    File.Copy(logfiles.ElementAt(0).FullName, logfiles.ElementAt(0).FullName + ".tmp");
+                    log += File.ReadAllText(logfiles.ElementAt(0).FullName + ".tmp");
+                    File.Delete(logfiles.ElementAt(0).FullName + ".tmp");
                 }
-                catch (FlurlHttpTimeoutException)
+                else
                 {
-                    // FlurlHttpTimeoutException derives from FlurlHttpException; catch here only
-                    // if you want to handle timeouts as a special case
-                    await progresscontroller.CloseAsync();
-                    Log.Error("Request timed out while uploading log.");
-                    await this.ShowMessageAsync("Log upload timed out", "The log took too long to upload. You will need to upload your log manually.");
-
+                    Log.Information("No logs available, somehow. Canceling upload");
                 }
-                catch (Exception ex)
-                {
-                    // ex.Message contains rich details, inclulding the URL, verb, response status,
-                    // and request and response bodies (if available)
-                    await progresscontroller.CloseAsync();
-                    Log.Error("Handled error uploading log: " + App.FlattenException(ex));
-                    string exmessage = ex.Message;
-                    var index = exmessage.IndexOf("Request body:");
-                    if (index > 0)
-                    {
-                        exmessage = exmessage.Substring(0, index);
-                    }
-                    await this.ShowMessageAsync("Log upload failed", "The log was unable to upload. The error message is: " + exmessage + "You will need to upload your log manually.");
-                }
-                SettingsFlyout.IsOpen = false;
+            }
+            //Compress with LZMA for VPS Upload
+            string outfile = "logfile_forUpload.lzma";
+            string args = "e \"" + zipStaged + "\" \"" + outfile + "\" -mt2";
+            Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
+            File.Delete(zipStaged);
+            var lzmalog = File.ReadAllBytes(outfile);
+            ProgressDialogController progresscontroller = await this.ShowProgressAsync("Uploading log", "Log is currently uploading, please wait...", true);
+            progresscontroller.SetIndeterminate();
+            try
+            {
+                var responseString = await "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "log", CrashLog = isPreviousCrashLog }).ReceiveString();
                 File.Delete(outfile);
+                Uri uriResult;
+                bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
+                    && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+                if (result)
+                {
+                    //should be valid URL.
+                    //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
+                    //e.Result = responseString;
+                    await progresscontroller.CloseAsync();
+                    Log.Information("Result from server for log upload: " + responseString);
+                    if (openPageWhenFinished)
+                    {
+                        openWebPage(responseString);
+                    }
+                    return responseString;
+                }
+                else
+                {
+                    File.Delete(outfile);
+
+                    //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAG_TEXT, "Error from oversized log uploader: " + responseString));
+                    //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_Upload));
+                    await progresscontroller.CloseAsync();
+                    Log.Error("Error uploading log. The server responded with: " + responseString);
+                    //e.Result = "Diagnostic complete.";
+                    await this.ShowMessageAsync("Log upload error", "The server rejected the upload. The response was: " + responseString);
+                    //Utilities.OpenAndSelectFileInExplorer(diagfilename);
+                }
             }
-            else
+            catch (FlurlHttpTimeoutException)
             {
-                Log.Error("No log files were found. User has hit an exceedingly rare case, well done.");
+                // FlurlHttpTimeoutException derives from FlurlHttpException; catch here only
+                // if you want to handle timeouts as a special case
+                await progresscontroller.CloseAsync();
+                Log.Error("Request timed out while uploading log.");
+                await this.ShowMessageAsync("Log upload timed out", "The log took too long to upload. You will need to upload your log manually.");
+
             }
-            return null;
+            catch (Exception ex)
+            {
+                // ex.Message contains rich details, inclulding the URL, verb, response status,
+                // and request and response bodies (if available)
+                await progresscontroller.CloseAsync();
+                Log.Error("Handled error uploading log: " + App.FlattenException(ex));
+                string exmessage = ex.Message;
+                var index = exmessage.IndexOf("Request body:");
+                if (index > 0)
+                {
+                    exmessage = exmessage.Substring(0, index);
+                }
+                await this.ShowMessageAsync("Log upload failed", "The log was unable to upload. The error message is: " + exmessage + "You will need to upload your log manually.");
+            }
+            SettingsFlyout.IsOpen = false;
+            File.Delete(outfile);
+            return "";
         }
 
 

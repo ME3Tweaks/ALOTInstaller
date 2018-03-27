@@ -212,7 +212,7 @@ namespace AlotAddOnGUI.ui
                     TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal);
                     break;
                 case UPLOAD_LINKED_LOG:
-                    LINKEDLOGURL = await ((MainWindow)(Owner)).uploadLatestLog(false, false);
+                    LINKEDLOGURL = await ((MainWindow)(Owner)).uploadLatestLog(false, null, false);
                     ((EventWaitHandle)(tc.Data)).Set();
                     break;
                 case SHOW_DIALOG_BAD_LOD:

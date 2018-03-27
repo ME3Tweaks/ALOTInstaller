@@ -194,6 +194,9 @@
     <Compile Include="ui\DiagnosticsWindow.xaml.cs">
       <DependentUpon>DiagnosticsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ui\LogSelectorWindow.xaml.cs">
+      <DependentUpon>LogSelectorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ui\ProgressBarSmooth.cs" />
     <Compile Include="ui\UpdateAvailableDialog.xaml.cs">
       <DependentUpon>UpdateAvailableDialog.xaml</DependentUpon>
@@ -216,6 +219,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="AddonDownloadAssistant.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ui\LogSelectorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
