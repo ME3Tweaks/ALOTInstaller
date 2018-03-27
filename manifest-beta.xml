@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.0.12">
+<alotaddonmanifest version="5.0.13">
   <repackoptions me2repackenabled="true" me3repackenabled="false"/>
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps."/>
   <tutorial link="https://ianmooreisme.github.io/ALOT-Comparisons/" text="Comparison Screenshots" tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore."/>
-  <addonfile meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC" comparisonslink="http://example.com">
+  <addonfile meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2.7z" size="2974978097" md5="3e33c8e2e3ded44a2c15742fd6dfac07" />
     <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
   <choicefile choicetitle="Asari Face Style">
@@ -162,7 +162,7 @@
     <games me1="true" me2="false" me3="false"/>
   </addonfile>
   <addonfile friendlyname="Better Hair Textures" author="heleuss" optional="true">
-    <file downloadlink="http://heleuss.tumblr.com/post/156937764524/me1-me2-better-hair-textures-oldie-but-goodie" filename="ME2 Better Hair.tpf" size="25923956" md5="57f20a3e21efa375d823dbbe72c1986e" copydirectly="true"/>  
+    <file downloadlink="https://www.dropbox.com/s/stmlo6qfd0567xs/ME2%20Better%20Hair.tpf?dl=0" filename="ME2 Better Hair.tpf" size="25923956" md5="57f20a3e21efa375d823dbbe72c1986e" copydirectly="true"/>  
     <games  me1="false" me2="true" me3="false" />
   </addonfile>
   <addonfile friendlyname="FemShep High Quality textures" author="heleuss" optional="true">
@@ -516,7 +516,7 @@
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFB40CDAE_hovercar_spec.dds" destinationname="HoverCar01_Int_Roof_Spec_Cine_0xFB40CDAE.dds" />
   </addonfile>
   <addonfile friendlyname="Combat Fatigues" author="Ottemis">
-    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/141" filename="HR Combat Fatigues for Texmod-141-1-0.rar" md5="dc5dfe08eb1d0b79adf5e3825eda2476" size="35761921" />
+    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/141" tooltipname="HR Combat Fatigues" filename="HR Combat Fatigues for Texmod-141-1-0.rar" md5="dc5dfe08eb1d0b79adf5e3825eda2476" size="35761921" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x150F70BF_Gellix_Male_diff.dds" destinationname="HMM_ARM_CTHb_Cer_Diff_0x150F70BF.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x1DC7A460_Grissom_Male_spec.dds" destinationname="HMM_ARM_CTHb_Gri_Spec_0x1DC7A460.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x2C128252_Gellix_Fem_Norm.dds" destinationname="HMF_ARM_CTHb_Cer_Norm_0x2C128252.dds" />
@@ -538,13 +538,13 @@
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE11C764C_Gellix_Male_spec.dds" destinationname="HMM_ARM_CTHb_Cer_Spec_0xE11C764C.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE8B022DA_Grissom_Male_Norm.dds" destinationname="HMM_ARM_CTHb_Gri_Norm_0xE8B022DA.dds" />
   </addonfile>
-  <addonfile friendlyname="EDI Alt Outfit Pack" author="Ottemis" processasmodfile="true">
-    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/238" filename="EDI Back Catsuit Outfit-238-1-3.rar" md5="f37cfc23e2468a167bea5b42e03a69bd" size="20913288" />
+  <addonfile friendlyname="EDI Black Catsuit Outfit" author="Ottemis" processasmodfile="true">
+    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/238" tooltipname="EDI Alternate Outfit" filename="EDI Back Catsuit Outfit-238-1-3.rar" md5="f37cfc23e2468a167bea5b42e03a69bd" size="20913288" />
     <packagefile me3="true" sourcename="HMF_ARM_EDId_Diff_0xEDC36D3F_Otte.dds" destinationname="HMF_ARM_EDId_Diff_0xEDC36D3F.dds" />
     <packagefile me3="true" sourcename="HMF_ARM_EDId_Spec_0x6ADA93CE_Otte.dds" destinationname="HMF_ARM_EDId_Spec_0x6ADA93CE.dds" />
   </addonfile>
-  <addonfile friendlyname="EDI From Ashes Outfit ALT version" author="Ottemis" processasmodfile="true">
-    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/273" filename="EDI From Ashes Outfit ALT version-273-1-0.rar" md5="9ca2e61af158f864fe2542c34ce55ae5" size="21642390" />
+  <addonfile friendlyname="EDI From Ashes Outfit" author="Ottemis" processasmodfile="true">
+    <file downloadlink="http://www.nexusmods.com/masseffect3/mods/273" tooltipname="EDI From Ashes Outfit" filename="EDI From Ashes Outfit ALT version-273-1-0.rar" md5="9ca2e61af158f864fe2542c34ce55ae5" size="21642390" />
     <packagefile me3="true" sourcename="HMF_ARM_EDIe_Diff_0x1608E029_Overlay_Otte.dds" destinationname="HMF_ARM_EDIe_Diff_0x1608E029.dds" />
     <packagefile me3="true" sourcename="HMF_ARM_EDIe_Spec_0xAE0C176D_Overlay_Otte.dds" destinationname="HMF_ARM_EDIb_Spec_0xAE0C176D.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds" destinationname="HMF_ARM_EDIb_Norm_0x4C200F45.dds" />
