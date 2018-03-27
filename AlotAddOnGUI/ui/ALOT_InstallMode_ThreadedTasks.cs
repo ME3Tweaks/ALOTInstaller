@@ -441,12 +441,12 @@ namespace AlotAddOnGUI
                 args += " -repack";
             }
             args += " -ipc -alot-mode";
-            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
-            processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-            /*MEM_INSTALL_TIME_SECONDS = 61;
+            //RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
+            //processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+            MEM_INSTALL_TIME_SECONDS = 61;
             processResult = 0;
             STAGE_DONE_REACHED = true;
-            */
+            
             if (!STAGE_DONE_REACHED)
             {
                 if (processResult != 0)
@@ -573,6 +573,30 @@ namespace AlotAddOnGUI
                                 string gamelocalshadercache = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), @"BioGame\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
                                 File.Delete(gamelocalshadercache);
                                 Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
+
+                                
+                            }
+
+                            //MEUITM SPECIFIC FIX
+                            //REMOVE ONCE THIS IS FIXED IN FUTURE MEUITM
+                            if (af == meuitmFile && !zf.MEUITMSoftShadows)
+                            {
+                                //reshade
+                                if (File.Exists(Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\d3d9.ini"))
+                                {
+                                    try
+                                    {
+                                        IniFile shaderConf = new IniFile(Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\d3d9.ini");
+                                        shaderConf.Write("TextureSearchPaths", Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\reshade-shaders\\Textures", "GENERAL");
+                                        shaderConf.Write("EffectSearchPaths", Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\reshade-shaders\\Shaders", "GENERAL");
+                                        shaderConf.Write("PresetFiles", Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\MassEffect.ini", "GENERAL");
+                                        Log.Information("Corrected MEUITM shader ini");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Log.Error("Error fixing MEUITM shader ini: " + ex.Message);
+                                    }
+                                }
                             }
 
                             if (zf.MEUITMSoftShadows)
