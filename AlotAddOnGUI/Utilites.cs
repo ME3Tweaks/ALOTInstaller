@@ -280,7 +280,7 @@ namespace AlotAddOnGUI
             return null;
         }
 
-        private static void WriteDebugLog(string v)
+        public static void WriteDebugLog(string v)
         {
             if (MainWindow.DEBUG_LOGGING)
             {

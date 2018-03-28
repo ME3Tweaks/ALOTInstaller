@@ -1290,7 +1290,14 @@ namespace AlotAddOnGUI
                     async () =>
                     {
                         // Code to run on the GUI thread.
-                        ProgressBarValue = (((double)numdone / addonfiles.Where(p => !p.Optional).Count()) * 100);
+                        int numcurrentfiles = addonfiles.Where(p => !p.Optional).Count();
+                        if (numcurrentfiles != 0)
+                        {
+                            ProgressBarValue = (((double)numdone / numcurrentfiles) * 100);
+                        } else
+                        {
+                            ProgressBarValue = Convert.ToDouble(0);
+                        }
                         string tickerText = "";
                         tickerText += ShowME1Files ? "ME1: " + numME1FilesReady + "/" + numME1Files + " imported" : "ME1: N/A";
                         tickerText += " - ";
