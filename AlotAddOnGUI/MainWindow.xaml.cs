@@ -4275,8 +4275,7 @@ namespace AlotAddOnGUI
         public async Task<string> uploadLatestLog(bool isPreviousCrashLog, string log, bool openPageWhenFinished = true)
         {
             Log.Information("Preparing to upload installer log");
-            string zipStaged = EXE_DIRECTORY + "logs\\logfile_forUpload";
-            File.WriteAllText(zipStaged, log);
+            
             string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
 
             if (log == null)
@@ -4308,6 +4307,9 @@ namespace AlotAddOnGUI
                     Log.Information("No logs available, somehow. Canceling upload");
                 }
             }
+            string zipStaged = EXE_DIRECTORY + "logs\\logfile_forUpload";
+            File.WriteAllText(zipStaged, log);
+
             //Compress with LZMA for VPS Upload
             string outfile = "logfile_forUpload.lzma";
             string args = "e \"" + zipStaged + "\" \"" + outfile + "\" -mt2";

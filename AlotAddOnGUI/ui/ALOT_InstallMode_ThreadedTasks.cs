@@ -309,26 +309,6 @@ namespace AlotAddOnGUI
                     KeyValuePair<string, string> messageStr = (KeyValuePair<string, string>)tc.Data;
                     await this.ShowMessageAsync(messageStr.Key, messageStr.Value);
                     break;
-                case SHOW_DIALOG_YES_NO:
-                    //ThreadCommandDialogOptions tcdo = (ThreadCommandDialogOptions)tc.Data;
-                    //MetroDialogSettings settings = new MetroDialogSettings();
-                    //settings.NegativeButtonText = tcdo.NegativeButtonText;
-                    //settings.AffirmativeButtonText = tcdo.AffirmativeButtonText;
-                    //MessageDialogResult result = await this.ShowMessageAsync(tcdo.title, tcdo.message, MessageDialogStyle.AffirmativeAndNegative, settings);
-                    //if (result == MessageDialogResult.Negative)
-                    //{
-                    //    CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = false;
-                    //}
-                    //else
-                    //{
-                    //    CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = true;
-                    //}
-                    //tcdo.signalHandler.Set();
-                    break;
-                case INCREMENT_COMPLETION_EXTRACTION:
-                    //Interlocked.Increment(ref completed);
-                    //Install_ProgressBar.Value = (completed / (double)ADDONSTOINSTALL_COUNT) * 100;
-                    break;
                 default:
                     Debug.WriteLine("Unknown threadcommand command: " + tc.Command);
                     break;
