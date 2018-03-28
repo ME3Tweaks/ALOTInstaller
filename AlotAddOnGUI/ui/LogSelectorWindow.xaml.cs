@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls;
+﻿using ByteSizeLib;
+using MahApps.Metro.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,6 +24,7 @@ namespace AlotAddOnGUI.ui
     public partial class LogSelectorWindow : MetroWindow, INotifyPropertyChanged
     {
         MainWindow windowRef;
+        private bool UserPressedUpload = false;
         public LogSelectorWindow(MainWindow windowRef)
         {
             this.windowRef = windowRef;
@@ -31,7 +33,7 @@ namespace AlotAddOnGUI.ui
             var logfiles = directory.GetFiles("alotinstaller*.txt").OrderByDescending(f => f.LastWriteTime).ToList();
             foreach (var file in logfiles)
             {
-                Combobox_LogSelector.Items.Add(file);
+                Combobox_LogSelector.Items.Add(new LogItem(file.FullName));
             }
             if (Combobox_LogSelector.Items.Count > 0)
             {
@@ -58,9 +60,11 @@ namespace AlotAddOnGUI.ui
         }
 
         private string _watermarkText;
-        public string WatermarkText {
+        public string WatermarkText
+        {
             get { return _watermarkText; }
-            private set {
+            private set
+            {
                 if (_watermarkText != value)
                 {
                     _watermarkText = value;
@@ -73,16 +77,21 @@ namespace AlotAddOnGUI.ui
 
         public string GetSelectedLogText()
         {
-            string logpath = ((FileInfo)Combobox_LogSelector.SelectedValue).FullName;
-            string temppath = logpath + ".tmp";
-            File.Copy(logpath, temppath);
-            string log = File.ReadAllText(temppath);
-            File.Delete(temppath);
-            return log;
+            if (UserPressedUpload)
+            {
+                string logpath = ((LogItem)Combobox_LogSelector.SelectedValue).filepath;
+                string temppath = logpath + ".tmp";
+                File.Copy(logpath, temppath);
+                string log = File.ReadAllText(temppath);
+                File.Delete(temppath);
+                return log;
+            }
+            return null; //user clicked close X
         }
 
         private void Button_SelectLog_Click(object sender, RoutedEventArgs e)
         {
+            UserPressedUpload = true;
             Close();
         }
 
@@ -96,6 +105,20 @@ namespace AlotAddOnGUI.ui
             var handler = PropertyChanged;
             if (handler != null)
                 handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        class LogItem
+        {
+            public string filepath;
+            public LogItem(string filepath)
+            {
+                this.filepath = filepath;
+            }
+
+            public override string ToString()
+            {
+                return System.IO.Path.GetFileName(filepath) + " - " + ByteSize.FromBytes(new FileInfo(filepath).Length);
+            }
         }
     }
 }
