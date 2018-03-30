@@ -257,7 +257,8 @@ namespace AlotAddOnGUI.ui
             Button_Close.Visibility = Visibility.Visible;
             if (e.Error != null)
             {
-                Log.Error("Error performing diagnostics: " + e);
+                Log.Error("Error performing diagnostics:");
+                Log.Error(App.FlattenException(e.Error));
                 DiagnosticHeader.Text = "Error occured performing diagnostics.";
                 Image_Upload.Source = new BitmapImage(new Uri(@"../images/redx_large.png", UriKind.Relative));
 
