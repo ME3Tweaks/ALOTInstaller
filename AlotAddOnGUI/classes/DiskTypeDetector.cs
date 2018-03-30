@@ -16,25 +16,25 @@ namespace AlotAddOnGUI.classes
         @"\\localhost\ROOT\Microsoft\Windows\Storage",
         $"SELECT DiskNumber FROM MSFT_Partition WHERE DriveLetter='{partitionLetter}'"))
             {
-                var partition = partitionSearcher.Get().Cast<ManagementBaseObject>().Single();
-
-                using (var physicalDiskSearcher = new ManagementObjectSearcher(
-                            @"\\localhost\ROOT\Microsoft\Windows\Storage",
-                            $"SELECT Size, Model, MediaType FROM MSFT_PhysicalDisk WHERE DeviceID='{ partition["DiskNumber"] }'"))
+                try
                 {
-                    try
+                    var partition = partitionSearcher.Get().Cast<ManagementBaseObject>().Single();
+                    using (var physicalDiskSearcher = new ManagementObjectSearcher(
+                                @"\\localhost\ROOT\Microsoft\Windows\Storage",
+                                $"SELECT Size, Model, MediaType FROM MSFT_PhysicalDisk WHERE DeviceID='{ partition["DiskNumber"] }'"))
                     {
                         var physicalDisk = physicalDiskSearcher.Get().Cast<ManagementBaseObject>().Single();
                         return
                             (UInt16)physicalDisk["MediaType"];/*||
                         SSDModelSubstrings.Any(substring => result.Model.ToLower().Contains(substring)); ;*/
 
+
                     }
-                    catch (Exception e)
-                    {
-                        Log.Error("Error reading partition type on " + partitionLetter + ": " + e.Message);
-                        return -1;
-                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Error reading partition type on " + partitionLetter + ": " + e.Message);
+                    return -1;
                 }
             }
         }
