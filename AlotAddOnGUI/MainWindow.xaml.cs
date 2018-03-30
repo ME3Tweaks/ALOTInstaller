@@ -4343,6 +4343,7 @@ namespace AlotAddOnGUI
                     {
                         openWebPage(responseString);
                     }
+                    SettingsFlyout.IsOpen = false;
                     return responseString;
                 }
                 else
