@@ -2164,7 +2164,7 @@ namespace AlotAddOnGUI
                                 Game_ME2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me2") : false,
                                 Game_ME3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me3") : false,
                                 Filename = (string)e.Element("file").Attribute("filename"),
-                                Tooltipname = e.Attribute("tooltipname") != null ? (string)e.Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
+                                Tooltipname = e.Element("file").Attribute("tooltipname") != null ? (string)e.Element("file").Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
                                 DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
                                 ALOTVersion = e.Attribute("alotversion") != null ? Convert.ToInt16((string)e.Attribute("alotversion")) : (short)0,
                                 ALOTUpdateVersion = e.Attribute("alotupdateversion") != null ? Convert.ToByte((string)e.Attribute("alotupdateversion")) : (byte)0,
