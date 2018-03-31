@@ -66,6 +66,7 @@ namespace AlotAddOnGUI
         private int CURRENT_GAME_BUILD = 0; //set when extraction is run/finished
         private int ADDONSTOBUILD_COUNT = 0;
         private bool _preventFileRefresh = false;
+        private int HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = 999; //will be set by manifest
         public bool PreventFileRefresh
         {
             get { return _preventFileRefresh; }
@@ -703,14 +704,19 @@ namespace AlotAddOnGUI
                             continue; //latest release has no assets
                         }
                         int releaseNameInt = Convert.ToInt32(r.TagName);
-                        if (releaseNameInt > fileVersion)
+                        if (!USING_BETA && releaseNameInt > fileVersion && releaseNameInt > HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION && fileVersion != 0)
+                        {
+                            Log.Information("New MEMNOGUI update is available but is not yet approved for stable channel: " + releaseNameInt);
+                            continue;
+                        }
+                        if (releaseNameInt > fileVersion )
                         {
                             latest = r;
                             break;
                         }
                         else
                         {
-                            Log.Information("Latest release available to us is v" + releaseNameInt + " - no update available for us");
+                            Log.Information("Latest release that is available and has been approved for ALOT Installer is v" + releaseNameInt + " - no update available for us");
                             break;
                         }
                     }
@@ -718,21 +724,18 @@ namespace AlotAddOnGUI
                     if (latest != null)
                     {
                         Log.Information("MEMNOGUI update available: " + latest.TagName);
-
                         //there's an update
                         updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder (Cmd Version) is updating (to v" + latest.TagName + "). Please wait...", true);
                         updateprogresscontroller.SetIndeterminate();
                         updateprogresscontroller.Canceled += MEMNoGuiUpdateCanceled;
                         downloadClient = new WebClient();
-
                         downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
-                        downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
+                        downloadClient.Headers["user-agent"] = "ALOTInstaller";
                         string temppath = Path.GetTempPath();
                         downloadClient.DownloadProgressChanged += (s, e) =>
                         {
                             updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
                         };
-
                         downloadClient.DownloadFileCompleted += UnzipProgramUpdate;
                         string downloadPath = temppath + "MEM_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
                         downloadClient.DownloadFileAsync(new Uri(latest.Assets[0].BrowserDownloadUrl), downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
@@ -741,7 +744,6 @@ namespace AlotAddOnGUI
                     {
                         //up to date
                         Log.Information("No updates for MEM NO Gui are available");
-                        PerformPostStartup();
                     }
                 }
             }
@@ -749,7 +751,6 @@ namespace AlotAddOnGUI
             {
                 Log.Error("Error checking for MEMNOGUI update: " + e.Message);
                 ShowStatus("Error checking for MEM (NOGUI) update");
-                PerformPostStartup();
             }
         }
 
@@ -1705,11 +1706,7 @@ namespace AlotAddOnGUI
             readManifest();
 
             Log.Information("readManifest() has completed.");
-            bool? CheckOutputDirectories = Utilities.GetRegistrySettingBool("CheckOutputDirectoriesOnManifestLoad");
-            //if (CheckOutputDirectories != null && CheckOutputDirectories.Value)
-            //{
             CheckOutputDirectoriesForUnpackedSingleFiles();
-            //}
 
             Loading = false;
             Build_ProgressBar.IsIndeterminate = false;
@@ -1717,7 +1714,6 @@ namespace AlotAddOnGUI
             AddonFilesLabel.Text = "Scanning...";
             CheckImportLibrary_Tick(null, null);
 
-            //beta only for now.
             bool? hasShownFirstRun = Utilities.GetRegistrySettingBool("HasRunFirstRun");
             if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
             {
@@ -1726,7 +1722,7 @@ namespace AlotAddOnGUI
             }
             else
             {
-                RunMEMUpdater2();
+                PerformPostStartup();
             }
         }
 
@@ -2135,7 +2131,7 @@ namespace AlotAddOnGUI
                                  ToolTip = (string)e.Attribute("tooltip")
                              }).ToList();
 
-
+                HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("highestapprovedmemversion") == null ? HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("highestapprovedmemversion");
                 var repackoptions = rootElement.Element("repackoptions");
                 if (repackoptions != null)
                 {
@@ -2346,13 +2342,8 @@ namespace AlotAddOnGUI
                 me3status += "Not installed";
             }
             Log.Information(me3status);
-
-            //if (meuitmindex >= 0)
-            //{
-            //    alladdonfiles.RemoveAt(meuitmindex);
-            //}
-
-            ApplyFiltering(); //sets data source and separators            
+            ApplyFiltering(); //sets data source and separators
+            RunMEMUpdater2();
         }
 
         private void ApplyFiltering(bool scrollToBottom = false)
@@ -3959,8 +3950,7 @@ namespace AlotAddOnGUI
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "HasRunFirstRun", true);
             FirstRunFlyout.IsOpen = false;
             SettingsFlyout.IsOpen = true;
-            RunMEMUpdater2();
-
+            PerformPostStartup();
             if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
             {
                 bool me1backedup = Utilities.GetGameBackupPath(1) != null;
