@@ -967,14 +967,14 @@ namespace AlotAddOnGUI
                 try
                 {
                     Utilities.DeleteFilesAndFoldersRecursively(UPDATE_STAGING_MEM_DIR);
+                    File.Delete((string)e.UserState);
                 }
                 catch (Exception ex)
                 {
-                    Log.Error("Could not delete " + UPDATE_STAGING_MEM_DIR + ". We will try again later. Exception message: " + ex.Message);
+                    Log.Error("Could not delete " + UPDATE_STAGING_MEM_DIR + " or " + (string)e.UserState + ". We will try again later. Exception message: " + ex.Message);
                 }
             }
 
-            File.Delete((string)e.UserState);
             if (File.Exists(BINARY_DIRECTORY + "MassEffectModder.exe"))
             {
                 var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
@@ -1294,7 +1294,8 @@ namespace AlotAddOnGUI
                         if (numcurrentfiles != 0)
                         {
                             ProgressBarValue = (((double)numdone / numcurrentfiles) * 100);
-                        } else
+                        }
+                        else
                         {
                             ProgressBarValue = Convert.ToDouble(0);
                         }
@@ -4282,7 +4283,7 @@ namespace AlotAddOnGUI
         public async Task<string> uploadLatestLog(bool isPreviousCrashLog, string log, bool openPageWhenFinished = true)
         {
             Log.Information("Preparing to upload installer log");
-            
+
             string alotInstallerVer = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString();
 
             if (log == null)
