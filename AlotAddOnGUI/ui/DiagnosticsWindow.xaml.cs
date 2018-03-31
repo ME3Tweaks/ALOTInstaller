@@ -827,9 +827,9 @@ namespace AlotAddOnGUI.ui
 
 
             //Get LODs
-            String lodStr = GetLODStr(DIAGNOSTICS_GAME, avi);
-            addDiagLine("===LOD Information");
-            addDiagLine(lodStr);
+            //String lodStr = GetLODStr(DIAGNOSTICS_GAME, avi);
+            //addDiagLine("===LOD Information");
+            //addDiagLine(lodStr);
 
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataBasegamemods));
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_Upload));
