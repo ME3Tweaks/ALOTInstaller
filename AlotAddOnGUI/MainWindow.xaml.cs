@@ -123,6 +123,7 @@ namespace AlotAddOnGUI
         private const string SETTINGSTR_DONT_FORCE_UPGRADES = "DontForceUpgrades";
         private const string SETTINGSTR_LIBRARYDIR = "LibraryDir";
         private const string SETTINGSTR_REPACK = "RepackGameFiles";
+        private const string SETTINGSTR_REPACK_ME3 = "RepackGameFilesME3";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
         public const string SETTINGSTR_BETAMODE = "BetaMode";
         public const string SETTINGSTR_DOWNLOADSFOLDER = "DownloadsFolder";
@@ -2140,6 +2141,18 @@ namespace AlotAddOnGUI
                     Log.Information("Manifest says ME2 repack option can be used: " + ME2_REPACK_MANIFEST_ENABLED);
                     ME3_REPACK_MANIFEST_ENABLED = repackoptions.Attribute("me3repackenabled") != null ? (bool)repackoptions.Attribute("me3repackenabled") : false;
                     Log.Information("Manifest says ME3 repack option can be used: " + ME3_REPACK_MANIFEST_ENABLED);
+                    Checkbox_RepackME2GameFiles.IsEnabled = ME2_REPACK_MANIFEST_ENABLED;
+                    Checkbox_RepackME3GameFiles.IsEnabled = ME3_REPACK_MANIFEST_ENABLED;
+                    if (!ME2_REPACK_MANIFEST_ENABLED)
+                    {
+                        Checkbox_RepackME2GameFiles.IsChecked = false;
+                        Checkbox_RepackME2GameFiles.ToolTip = "Disabled by server manifest";
+                    }
+                    if (!ME3_REPACK_MANIFEST_ENABLED)
+                    {
+                        Checkbox_RepackME3GameFiles.IsChecked = false;
+                        Checkbox_RepackME3GameFiles.ToolTip = "Disabled by server manifest";
+                    }
                 }
                 else
                 {
@@ -3677,8 +3690,10 @@ namespace AlotAddOnGUI
             }
 
             bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? true;
-            Checkbox_RepackGameFiles.IsChecked = repack;
+            Checkbox_RepackME2GameFiles.IsChecked = repack;
 
+            bool repackme3 = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK_ME3) ?? false;
+            Checkbox_RepackME3GameFiles.IsChecked = repackme3;
             if (USING_BETA)
             {
                 ThemeManager.ChangeAppStyle(System.Windows.Application.Current,
@@ -4431,9 +4446,14 @@ namespace AlotAddOnGUI
             dw.ShowDialog();
         }
 
-        private void Checkbox_RepackFiles_Click(object sender, RoutedEventArgs e)
+        private void Checkbox_RepackME2Files_Click(object sender, RoutedEventArgs e)
         {
-            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_REPACK, ((bool)Checkbox_RepackGameFiles.IsChecked ? 1 : 0));
+            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_REPACK, ((bool)Checkbox_RepackME2GameFiles.IsChecked ? 1 : 0));
+        }
+
+        private void Checkbox_RepackME3Files_Click(object sender, RoutedEventArgs e)
+        {
+            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_REPACK_ME3, ((bool)Checkbox_RepackME3GameFiles.IsChecked ? 1 : 0));
         }
 
         private void MainWindow_StateChanged(object sender, EventArgs e)
