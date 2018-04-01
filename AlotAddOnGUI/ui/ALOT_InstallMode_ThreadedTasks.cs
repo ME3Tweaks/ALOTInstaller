@@ -547,14 +547,23 @@ namespace AlotAddOnGUI
                             {
                                 string documents = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
                                 string localusershaderscache = Path.Combine(documents, @"BioWare\Mass Effect\Published\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
-                                File.Delete(localusershaderscache);
-                                Log.Information("Deleted user localshadercache: " + localusershaderscache);
-
+                                if (File.Exists(localusershaderscache))
+                                {
+                                    File.Delete(localusershaderscache);
+                                    Log.Information("Deleted user localshadercache: " + localusershaderscache);
+                                } else
+                                {
+                                    Log.Warning("unable to delete user local shadercache, it does not exist: " + localusershaderscache);
+                                }
                                 string gamelocalshadercache = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), @"BioGame\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
-                                File.Delete(gamelocalshadercache);
-                                Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
-
-                                
+                                if (File.Exists(gamelocalshadercache))
+                                {
+                                    File.Delete(gamelocalshadercache);
+                                    Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
+                                } else
+                                {
+                                    Log.Warning("Unable to delete game localshadercache, it does not exist: " + gamelocalshadercache);
+                                }
                             }
 
                             //MEUITM SPECIFIC FIX
