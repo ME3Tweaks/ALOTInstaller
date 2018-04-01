@@ -31,7 +31,7 @@ namespace AlotAddOnGUI
             Textblock_UpdateText.Text = headertext;
             Textblock_ChangelogText.Text = changelog;
 
-            if (mainWindowRef.USING_BETA)
+            if (MainWindow.USING_BETA)
             {
                 Textblock_UpdateAskText.Text = "You are on the beta channel of ALOT Installer, so you must accept this update.";
                 Button_Later.Visibility = Visibility.Collapsed;
@@ -46,7 +46,7 @@ namespace AlotAddOnGUI
 
         internal bool wasUpdateAccepted()
         {
-            return _updateAccepted || mainWindowRef.USING_BETA;
+            return _updateAccepted || MainWindow.USING_BETA;
         }
 
         private async void Later_Button_Click(object sender, RoutedEventArgs e)

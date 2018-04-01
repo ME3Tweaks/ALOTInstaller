@@ -134,7 +134,7 @@ namespace AlotAddOnGUI
         private bool ERROR_SHOWING = false;
         private int PREBUILT_MEM_INDEX; //will increment to 10 when run
         private bool SHOULD_HAVE_OUTPUT_FILE;
-        public bool USING_BETA { get; private set; }
+        public static bool USING_BETA { get; private set; }
         public bool SOUND_SETTING { get; private set; }
         public StringBuilder BACKGROUND_MEM_STDOUT { get; private set; }
         public int BACKUP_THREAD_GAME { get; private set; }
