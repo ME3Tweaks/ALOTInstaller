@@ -327,6 +327,11 @@ namespace AlotAddOnGUI
             Log.Information("This installer session is context based and will run in a single instance.");
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
+            //bool needsMipMapRemovalPass = false;
+            //if (versionInfo.ALOTVER == 0 && versionInfo.MEUITMVER > 0 && INSTALLING_THREAD_GAME == 1)
+            //{
+             //   needsMipMapRemovalPass = true;
+            //}
             TELEMETRY_IS_FULL_NEW_INSTALL = versionInfo == null;
             Log.Information("Setting biogame directory to read-write");
             string biogamepath = Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\BIOGame";
@@ -495,12 +500,21 @@ namespace AlotAddOnGUI
                     return;
                 }
             }
+            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGES_LABEL));
             overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
             InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
 
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
-            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGES_LABEL));
+            
+            //if (needsMipMapRemovalPass)
+            //{
+            //    InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Removing Empty Mipmaps"));
+            //    args = "-remove-empty-mipmaps " + INSTALLING_THREAD_GAME;
+            //    args += " -ipc";
+            //    RunAndTimeMEM_Install(exe, args, InstallWorker);
+            //    processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+            //}
 
+            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
             //things like soft shadows, reshade
             bool hasSoftShadowsMEUITM = false;
             foreach (AddonFile af in ADDONFILES_TO_INSTALL)

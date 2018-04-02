@@ -2922,6 +2922,16 @@ namespace AlotAddOnGUI
             Loading = false;
             ShowReadyFilesOnly = false;
             ApplyFiltering();
+            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null)
+            {
+                if (CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER == 0 && CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER >= 1)
+                {
+                    Log.Error("MEUITM installed without alot installer, currently this is not supported. It was previously but due to recent changes it no longer is.");
+                    await this.ShowMessageAsync("MEUITM installed using MEUITM Installer", "MEUITM was installed using the MEUITM Installer, which is currently not compatible with ALOT Installer. If you wish to use ALOT with MEUITM you must install both with ALOT Installer. We are working on a fix.");
+                    return false;
+                }
+            }
+
             //Check game has been run at least once
             string configFile = IniSettingsHandler.GetConfigIniPath(game);
             if (game == 1 && !File.Exists(configFile))
