@@ -2922,7 +2922,7 @@ namespace AlotAddOnGUI
             Loading = false;
             ShowReadyFilesOnly = false;
             ApplyFiltering();
-            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null)
+            if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && game == 1)
             {
                 if (CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER == 0 && CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER >= 1)
                 {
