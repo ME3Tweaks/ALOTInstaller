@@ -622,6 +622,29 @@
                     </StackPanel>
                 </Border>
             </Controls:Flyout>
+            <Controls:Flyout Name="MEUITM_Flyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
+                <Border x:Name="MEUITMFlyout_Border">
+                    <Border.Background>
+                        <ImageBrush ImageSource="images/meuitm.jpg" AlignmentY="Center" Stretch="UniformToFill"/>
+                    </Border.Background>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock SnapsToDevicePixels="True" TextWrapping="Wrap" Foreground="White" TextAlignment="Center" FontSize="16" Text="Choose options for MEUITM, then click install to install MEUITM. Alternatively, to install ALOT and its extra textures, switch to ALOT Installer mode.">
+                            <TextBlock.Effect>
+                                <DropShadowEffect
+                                  ShadowDepth="4"
+                                  Direction="330"
+                                  Color="Black"
+                                  Opacity="1"
+                                 BlurRadius="4"/>
+                            </TextBlock.Effect>
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="Switch to ALOT Installer mode" Click="SwitchToALOTMode_Button_Click" HorizontalAlignment="Center" Margin="5" Padding="20,5,20,5"/>
+                            <Button Content="Install MEUITM" Click="InstallMEUITM_Click" HorizontalAlignment="Center" Margin="5" Padding="20,5,20,5"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Controls:Flyout>
         </Controls:FlyoutsControl>
     </Controls:MetroWindow.Flyouts>
 </Controls:MetroWindow>

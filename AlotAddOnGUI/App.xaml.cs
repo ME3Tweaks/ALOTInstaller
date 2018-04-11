@@ -24,6 +24,7 @@ namespace AlotAddOnGUI
     public partial class App : Application
     {
         private static bool POST_STARTUP = false;
+        public static bool BootMEUITMMode = false;
 
         [STAThread]
         public static void Main()
@@ -69,8 +70,14 @@ namespace AlotAddOnGUI
                             preLogMessages += "Directory doesn't exist for update: " + parsedCommandLineArgs.Value.UpdateDest;
                         }
                     }
+                    if (parsedCommandLineArgs.Value.BootMEUITMMode)
+                    {
+                        Log.Information("We are booting into MEUITM mode.");
+                        BootMEUITMMode = true;
+                    }
                     if (parsedCommandLineArgs.Value.BootingNewUpdate)
                     {
+                        Log.Information("Booting an update");
                         if (File.Exists("ALOTAddonBuilder.exe"))
                         {
                             File.Delete("ALOTAddonBuilder.exe");
@@ -204,6 +211,10 @@ namespace AlotAddOnGUI
                 ProcessStartInfo psi = new ProcessStartInfo(updateDestinationPath + System.AppDomain.CurrentDomain.FriendlyName);
                 psi.WorkingDirectory = updateDestinationPath;
                 psi.Arguments = "--completing-update";
+                if (BootMEUITMMode)
+                {
+                    psi.Arguments += " --meuitm-mode"; //pass through
+                }
                 Process.Start(psi);
                 Environment.Exit(0);
                 System.Windows.Application.Current.Shutdown();
@@ -344,6 +355,10 @@ namespace AlotAddOnGUI
         [Option('c', "completing-update",
             HelpText = "Indicates that we are booting a new copy of ALOTInstaller that has just been upgraded")]
         public bool BootingNewUpdate { get; set; }
+
+        [Option('m', "meuitm-mode",
+            HelpText = "Boots ALOT Installer in MEUITM mode.")]
+        public bool BootMEUITMMode { get; set; }
     }
 
 }

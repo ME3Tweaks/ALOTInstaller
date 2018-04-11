@@ -56,6 +56,7 @@ namespace AlotAddOnGUI
         public static string EXE_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory;
         public static string BINARY_DIRECTORY = EXE_DIRECTORY + "Data\\bin\\";
         private bool errorOccured = false;
+        public bool MEUITM_INSTALLER_MODE = true;
         private bool UsingBundledManifest = false;
         private List<string> BlockingMods;
         private AddonFile meuitmFile;
@@ -224,6 +225,11 @@ namespace AlotAddOnGUI
             DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods"; //This will be changed when settings load;
             InitializeComponent();
             LoadSettings();
+            MEUITM_INSTALLER_MODE = App.BootMEUITMMode; //installer state defaults to boot setting
+            if (MEUITM_INSTALLER_MODE)
+            {
+                MEUITM_Flyout.IsOpen = true;
+            }
             Title = "ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             HeaderLabel.Text = "Preparing application...";
             AddonFilesLabel.Text = "Please wait";
@@ -235,6 +241,7 @@ namespace AlotAddOnGUI
             userfileGameSelectoroFlashingTextAnimation.Duration = new Duration(TimeSpan.FromSeconds(.7));
             userfileGameSelectoroFlashingTextAnimation.RepeatBehavior = RepeatBehavior.Forever;
             userfileGameSelectoroFlashingTextAnimation.AutoReverse = true;
+            
         }
 
         /// <summary>
@@ -710,7 +717,7 @@ namespace AlotAddOnGUI
                             Log.Information("New MEMNOGUI update is available but is not yet approved for stable channel: " + releaseNameInt);
                             continue;
                         }
-                        if (releaseNameInt > fileVersion )
+                        if (releaseNameInt > fileVersion)
                         {
                             latest = r;
                             break;
@@ -862,6 +869,10 @@ namespace AlotAddOnGUI
                     string exe = EXE_DIRECTORY + "Update\\" + System.AppDomain.CurrentDomain.FriendlyName;
                     string currentDirNoSlash = EXE_DIRECTORY.Substring(0, EXE_DIRECTORY.Length - 1);
                     args = "--update-dest \"" + currentDirNoSlash + "\"";
+                    if (MEUITM_INSTALLER_MODE)
+                    {
+                        args += " --meuitm-mode"; //pass through meuitm mode
+                    }
                     Utilities.runProcess(exe, args, true);
                     Environment.Exit(0);
                 }
@@ -1326,6 +1337,7 @@ namespace AlotAddOnGUI
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            Utilities.CreateMarkerFile(1, new ALOTVersionInfo(0, 0, 0, 2));
             fadeInItems = new FrameworkElement[] { FirstRun_MainContent, FirstRunText_TitleBeta, FirstRunText_BetaSummary };
             buildOptionCheckboxes = new System.Windows.Controls.CheckBox[] { Checkbox_BuildOptionALOT, Checkbox_BuildOptionALOTUpdate, Checkbox_BuildOptionMEUITM, Checkbox_BuildOptionUser, Checkbox_BuildOptionAddon };
             if (EXE_DIRECTORY.Length > 105)
@@ -4727,6 +4739,18 @@ namespace AlotAddOnGUI
             {
                 ListView_Files.ScrollIntoView(ListView_Files.SelectedItem);
             }
+        }
+
+        private void SwitchToALOTMode_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Log.Information("Exiting MEUITM mode.");
+            MEUITM_INSTALLER_MODE = false;
+            MEUITM_Flyout.IsOpen = false;
+        }
+
+        private void InstallMEUITM_Click(object sender, RoutedEventArgs e)
+        {
+            Log.Error("This is not yet implemented.");
         }
     }
 }
