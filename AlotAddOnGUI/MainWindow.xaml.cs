@@ -1454,7 +1454,7 @@ namespace AlotAddOnGUI
             {
                 Log.Information("ME1 not installed - disabling ME1 install");
                 Button_InstallME1.IsEnabled = false;
-                Button_InstallME1.ToolTip = "Mass Effect is not installed. To install textures for ME1 the game must already be installed";
+                Button_InstallME1.ToolTip = "Mass Effect is not installed. To install textures for ME1 the game must already be installed\nIf you are using steam version of the game, run it once before running ALOT Installer";
                 Button_InstallME1.Content = "ME1 Not Installed";
 
             }
@@ -1469,7 +1469,7 @@ namespace AlotAddOnGUI
             {
                 Log.Information("ME2 not installed - disabling ME2 install");
                 Button_InstallME2.IsEnabled = false;
-                Button_InstallME2.ToolTip = "Mass Effect 2 is not installed. To install textures for ME2 the game must already be installed";
+                Button_InstallME2.ToolTip = "Mass Effect 2 is not installed. To install textures for ME2 the game must already be installed\nIf you are using steam version of the game, run it once before running ALOT Installer";
                 Button_InstallME2.Content = "ME2 Not Installed";
             }
             else

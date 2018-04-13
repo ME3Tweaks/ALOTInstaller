@@ -741,9 +741,12 @@ namespace AlotAddOnGUI.ui
                     if (hasSfarSizeError && MEMI_FOUND)
                     {
                         addDiagLine("[ERROR]" + GetDLCDisplayString(value));
-                        addDiagLine("[ERROR]      SFAR is not unpacked size. Should be 32 bytes, however SFAR is " + ByteSize.FromBytes(sfarsize) + ".");
-                        addDiagLine("[ERROR]      If HQ graphics settings are on (MEMI was found so they should be) this will 99% of the time crash the game. See below for current LOD settings.");
+                        addDiagLine("[ERROR]      SFAR is not the MEM unpacked size. Unpacked DLC by MEM will be 32 bytes, however this SFAR is " + ByteSize.FromBytes(sfarsize) + ".");
+                        addDiagLine("[ERROR]      If HQ graphics settings are on (ALOT/MEUITM was found, so it should be) this will very often be a source of the game crashing.");
+                        addDiagLine("[ERROR]      You may also see this error if you unpacked DLC using ME3Explorer - as an end-user you should not have to use ME3Explorer,");
+                        addDiagLine("[ERROR]      even for AutoTOC. Use MEM instead to avoid the setup wizard issues (Settings->Launch MEM->Mass Effect 3->AutoTOC).");
                     }
+                    
                     else
                     {
                         addDiagLine(GetDLCDisplayString(value));

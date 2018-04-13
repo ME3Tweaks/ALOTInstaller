@@ -15,6 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Runtime.InteropServices;
 
 namespace AlotAddOnGUI
 {
@@ -25,10 +26,14 @@ namespace AlotAddOnGUI
     {
         private static bool POST_STARTUP = false;
         public static bool BootMEUITMMode = false;
+        [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool DeleteFile(string name);
 
         [STAThread]
         public static void Main()
         {
+            UnblockLibFiles();
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
             try
@@ -41,6 +46,19 @@ namespace AlotAddOnGUI
             {
                 OnFatalCrash(e);
                 throw e;
+            }
+        }
+
+        /// <summary>
+        /// Removes ADS streams from files in the lib folder. This prevents startup crash caused by inability for dlls to load from "the internet" if extracted via windows explorer.
+        /// </summary>
+        private static void UnblockLibFiles()
+        {
+            var probingPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "lib");
+            var files = Directory.GetFiles(probingPath);
+            foreach (string file in files)
+            {
+                DeleteFile(file + ":Zone.Identifier");
             }
         }
 
@@ -278,7 +296,7 @@ namespace AlotAddOnGUI
         {
             if (!POST_STARTUP)
             {
-                string errorMessage = string.Format("ALOT Installer has encountered a serious fatal startup crash:\n" + FlattenException(e));
+                string errorMessage = string.Format("ALOT Installer has encountered a fatal startup crash:\n" + FlattenException(e));
                 File.WriteAllText("FATAL_STARTUP_CRASH.txt", errorMessage);
             }
         }
@@ -294,7 +312,7 @@ namespace AlotAddOnGUI
 
             while (exception != null)
             {
-                stringBuilder.AppendLine(exception.Message);
+                stringBuilder.AppendLine(exception.GetType().Name + ": " + exception.Message);
                 stringBuilder.AppendLine(exception.StackTrace);
 
                 exception = exception.InnerException;
@@ -338,10 +356,10 @@ namespace AlotAddOnGUI
             }
             if (File.Exists(newPath))
             {
+
                 var assy = Assembly.LoadFile(newPath);
                 return assy;
             }
-
             return null;
         }
     }
