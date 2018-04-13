@@ -721,7 +721,7 @@ namespace AlotAddOnGUI
                         }
                         if (releaseNameInt > fileVersion)
                         {
-                            if (releaseNameInt == SOAK_APPROVED_STABLE_MEMNOGUIVERSION)
+                            if (releaseNameInt >= SOAK_APPROVED_STABLE_MEMNOGUIVERSION)
                             {
                                 int soakTestReleaseAge = (DateTime.Now - r.PublishedAt.Value).Days;
                                 if (soakTestReleaseAge > SoakThresholds.Length - 1)
@@ -735,6 +735,9 @@ namespace AlotAddOnGUI
                                 {
                                     Log.Information("New MEMNOGUI update is soak testing and has reached the daily soak threshhold of " + threshhold + ". This update is not applicable to us today, threshhold will expand tomorrow.");
                                     continue;
+                                } else
+                                {
+                                    Log.Information("New MEMNOGUI update is available and soaking, this client will participate in this soak test.");
                                 }
                             }
                             latest = r;
