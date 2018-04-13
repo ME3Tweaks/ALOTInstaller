@@ -68,6 +68,8 @@ namespace AlotAddOnGUI
         private int ADDONSTOBUILD_COUNT = 0;
         private bool _preventFileRefresh = false;
         private int HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = 999; //will be set by manifest
+        private int SOAK_APPROVED_STABLE_MEMNOGUIVERSION = -1; //will be set by manifest
+        private int[] SoakThresholds = { 25, 100, 400, 1000, 3000, 100000000 };
         public bool PreventFileRefresh
         {
             get { return _preventFileRefresh; }
@@ -719,6 +721,22 @@ namespace AlotAddOnGUI
                         }
                         if (releaseNameInt > fileVersion)
                         {
+                            if (releaseNameInt == SOAK_APPROVED_STABLE_MEMNOGUIVERSION)
+                            {
+                                int soakTestReleaseAge = (DateTime.Now - r.PublishedAt.Value).Days;
+                                if (soakTestReleaseAge > SoakThresholds.Length - 1)
+                                {
+                                    Log.Information("New MEMNOGUI update is past soak period, accepting this release as an update");
+                                    latest = r;
+                                    break;
+                                }
+                                int threshhold = SoakThresholds[soakTestReleaseAge];
+                                if (r.Assets[0].DownloadCount > threshhold)
+                                {
+                                    Log.Information("New MEMNOGUI update is soak testing and has reached the daily soak threshhold of " + threshhold + ". This update is not applicable to us today, threshhold will expand tomorrow.");
+                                    continue;
+                                }
+                            }
                             latest = r;
                             break;
                         }
@@ -2145,6 +2163,8 @@ namespace AlotAddOnGUI
                              }).ToList();
 
                 HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("highestapprovedmemversion") == null ? HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("highestapprovedmemversion");
+                SOAK_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("soaktestingmemversion") == null ? SOAK_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("soaktestingmemversion");
+
                 var repackoptions = rootElement.Element("repackoptions");
                 if (repackoptions != null)
                 {
