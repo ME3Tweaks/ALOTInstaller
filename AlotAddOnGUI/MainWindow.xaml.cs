@@ -3742,7 +3742,7 @@ namespace AlotAddOnGUI
                 DOWNLOADED_MODS_DIRECTORY = librarydir;
             }
 
-            bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? true;
+            bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? false;
             Checkbox_RepackME2GameFiles.IsChecked = repack;
 
             bool repackme3 = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK_ME3) ?? false;
