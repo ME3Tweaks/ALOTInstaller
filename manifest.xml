@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.0.16">
+<alotaddonmanifest version="5.0.17">
   <highestapprovedmemversion>112</highestapprovedmemversion>
   <soaktestingmemversion>112</soaktestingmemversion>
   <repackoptions me2repackenabled="false" me3repackenabled="false"/>
