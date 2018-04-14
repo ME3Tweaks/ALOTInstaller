@@ -714,14 +714,14 @@ namespace AlotAddOnGUI
                             continue; //latest release has no assets
                         }
                         int releaseNameInt = Convert.ToInt32(r.TagName);
-                        if (!USING_BETA && releaseNameInt > fileVersion && releaseNameInt > HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION && fileVersion != 0)
-                        {
-                            Log.Information("New MEMNOGUI update is available but is not yet approved for stable channel: " + releaseNameInt);
-                            continue;
-                        }
                         if (releaseNameInt > fileVersion)
                         {
-                            if (releaseNameInt >= SOAK_APPROVED_STABLE_MEMNOGUIVERSION)
+                            if (USING_BETA)
+                            {
+                                latest = r;
+                                break;
+                            }   
+                            if (releaseNameInt == SOAK_APPROVED_STABLE_MEMNOGUIVERSION)
                             {
                                 int soakTestReleaseAge = (DateTime.Now - r.PublishedAt.Value).Days;
                                 if (soakTestReleaseAge > SoakThresholds.Length - 1)
@@ -740,6 +740,11 @@ namespace AlotAddOnGUI
                                 {
                                     Log.Information("New MEMNOGUI update is available and soaking, this client will participate in this soak test.");
                                 }
+                            }
+                            if (!USING_BETA && releaseNameInt > HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION && fileVersion != 0)
+                            {
+                                Log.Information("New MEMNOGUI update is available but is not yet approved for stable channel: " + releaseNameInt);
+                                continue;
                             }
                             latest = r;
                             break;
@@ -1332,8 +1337,8 @@ namespace AlotAddOnGUI
                 System.Windows.Application.Current.Dispatcher.Invoke(
                     async () =>
                     {
-                        // Code to run on the GUI thread.
-                        int numcurrentfiles = addonfiles.Where(p => !p.Optional).Count();
+                // Code to run on the GUI thread.
+                int numcurrentfiles = addonfiles.Where(p => !p.Optional).Count();
                         if (numcurrentfiles != 0)
                         {
                             ProgressBarValue = (((double)numdone / numcurrentfiles) * 100);
@@ -1634,8 +1639,8 @@ namespace AlotAddOnGUI
                                     try
                                     {
                                         File.WriteAllText(MANIFEST_LOC, pageSourceCode);
-                                        //Legacy stuff
-                                        if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
+                                //Legacy stuff
+                                if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
                                         {
                                             File.Delete(MANIFEST_LOC);
                                         }
@@ -1695,8 +1700,8 @@ namespace AlotAddOnGUI
                                     Environment.Exit(1);
                                 }
                             }
-                            //do something with results 
-                        };
+                    //do something with results 
+                };
                         webClient.DownloadStringAsync(new Uri(url));
                     }
                     catch (WebException e)
@@ -2176,7 +2181,6 @@ namespace AlotAddOnGUI
 
                 HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("highestapprovedmemversion") == null ? HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("highestapprovedmemversion");
                 SOAK_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("soaktestingmemversion") == null ? SOAK_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("soaktestingmemversion");
-
                 var repackoptions = rootElement.Element("repackoptions");
                 if (repackoptions != null)
                 {
