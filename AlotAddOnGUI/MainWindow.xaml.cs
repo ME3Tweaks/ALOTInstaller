@@ -243,7 +243,7 @@ namespace AlotAddOnGUI
             userfileGameSelectoroFlashingTextAnimation.Duration = new Duration(TimeSpan.FromSeconds(.7));
             userfileGameSelectoroFlashingTextAnimation.RepeatBehavior = RepeatBehavior.Forever;
             userfileGameSelectoroFlashingTextAnimation.AutoReverse = true;
-            
+
         }
 
         /// <summary>
@@ -735,7 +735,8 @@ namespace AlotAddOnGUI
                                 {
                                     Log.Information("New MEMNOGUI update is soak testing and has reached the daily soak threshhold of " + threshhold + ". This update is not applicable to us today, threshhold will expand tomorrow.");
                                     continue;
-                                } else
+                                }
+                                else
                                 {
                                     Log.Information("New MEMNOGUI update is available and soaking, this client will participate in this soak test.");
                                 }
@@ -958,6 +959,14 @@ namespace AlotAddOnGUI
                 var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
                 int fileVersion = versInfo.FileMajorPart;
                 Label_MEMVersion.Content = "MEM Cmd Version: " + fileVersion;
+                if (fileVersion >= 112)
+                {
+                    if (File.Exists(BINARY_DIRECTORY + "MassEffectModderNoGui.pdb"))
+                    {
+                        File.Delete(BINARY_DIRECTORY + "MassEffectModderNoGui.pdb");
+                        Log.Information("Deleted MassEffectModderNoGui.pdb");
+                    }
+                }
             }
             PerformPostStartup();
         }
