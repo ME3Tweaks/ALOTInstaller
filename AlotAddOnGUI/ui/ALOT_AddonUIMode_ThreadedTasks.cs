@@ -248,17 +248,18 @@ namespace AlotAddOnGUI
                                 .ToList();
                             if (moveableFiles.Count() > 0)
                             {
+                                List<PackageFile> packageFiles = af.PackageFiles;
+                                foreach (ChoiceFile cf in af.ChoiceFiles)
+                                {
+                                    Log.Information("Option chosen on " + af + ": Using choicefile " + cf.ChoiceTitle + ": " + cf.GetChosenFile().ChoiceTitle);
+                                    packageFiles.Add(cf.GetChosenFile());
+                                }
                                 //check for copy directly items first, and move them.
                                 foreach (string moveableFile in moveableFiles)
                                 {
                                     string name = Utilities.GetRelativePath(moveableFile, extractpath);
 
-                                    List<PackageFile> packageFiles = af.PackageFiles;
-                                    foreach (ChoiceFile cf in af.ChoiceFiles)
-                                    {
-                                        Log.Information("Option chosen on " + af + ": Using choicefile " + cf.GetChosenFile().DestinationName);
-                                        packageFiles.Add(cf.GetChosenFile());
-                                    }
+
                                     foreach (PackageFile pf in packageFiles)
                                     {
                                         if (pf.SourceName.Equals(name, StringComparison.InvariantCultureIgnoreCase))
