@@ -4,9 +4,9 @@ if (Test-Path "$($PSScriptRoot)\Release\logs") {
     Remove-Item "$($PSScriptRoot)\Release\logs" -Force -Recurse
 }
 
-if (Test-Path "$($PSScriptRoot)\Release\Data\lib\ALOTinstaller.pdb") {
+if (Test-Path "$($PSScriptRoot)\Release\Data\lib\ALOTInstaller.pdb") {
     Write-Host Moving PDB...
-    Move-Item "$($PSScriptRoot)\Release\Data\lib\ALOTinstaller.pdb"  -Destination "$($PSScriptRoot)\Release\ALOTinstaller.pdb" -Force
+    Move-Item "$($PSScriptRoot)\Release\Data\lib\ALOTInstaller.pdb"  -Destination "$($PSScriptRoot)\Release\ALOTInstaller.pdb" -Force
 }
 
 if (Test-Path "$($PSScriptRoot)\Release\ALOTAddonBuilder.exe") {

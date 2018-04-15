@@ -69,7 +69,7 @@ namespace AlotAddOnGUI
         private bool _preventFileRefresh = false;
         private int HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = 999; //will be set by manifest
         private int SOAK_APPROVED_STABLE_MEMNOGUIVERSION = -1; //will be set by manifest
-        private int[] SoakThresholds = { 25, 100, 400, 1000, 3000, 100000000 };
+        private int[] SoakThresholds = { 50, 150, 400, 1000, 3000, 100000000 };
         public bool PreventFileRefresh
         {
             get { return _preventFileRefresh; }
@@ -703,6 +703,7 @@ namespace AlotAddOnGUI
                 if (releases.Count > 0)
                 {
                     //The release we want to check is always the latest, so [0]
+                    Release latestReleaseWithAsset = null;
                     foreach (Release r in releases)
                     {
                         if (!USING_BETA && r.Prerelease)
@@ -713,6 +714,10 @@ namespace AlotAddOnGUI
                         {
                             continue; //latest release has no assets
                         }
+                        if (latestReleaseWithAsset != null)
+                        {
+                            latestReleaseWithAsset = r;
+                        }
                         int releaseNameInt = Convert.ToInt32(r.TagName);
                         if (releaseNameInt > fileVersion)
                         {
@@ -720,7 +725,7 @@ namespace AlotAddOnGUI
                             {
                                 latest = r;
                                 break;
-                            }   
+                            }
                             if (releaseNameInt == SOAK_APPROVED_STABLE_MEMNOGUIVERSION)
                             {
                                 int soakTestReleaseAge = (DateTime.Now - r.PublishedAt.Value).Days;
@@ -739,9 +744,11 @@ namespace AlotAddOnGUI
                                 else
                                 {
                                     Log.Information("New MEMNOGUI update is available and soaking, this client will participate in this soak test.");
+                                    latest = r;
+                                    break;
                                 }
                             }
-                            if (!USING_BETA && releaseNameInt > HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION && fileVersion != 0)
+                            if (!USING_BETA && releaseNameInt > HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION)
                             {
                                 Log.Information("New MEMNOGUI update is available but is not yet approved for stable channel: " + releaseNameInt);
                                 continue;
@@ -754,6 +761,16 @@ namespace AlotAddOnGUI
                             Log.Information("Latest release that is available and has been approved for ALOT Installer is v" + releaseNameInt + " - no update available for us");
                             break;
                         }
+                    }
+
+                    if (fileVersion == 0 && latest == null && latestReleaseWithAsset != null)
+                    {
+                        Log.Information("MEM No Gui does not exist locally, and no applicable version can be found, pulling latest from github");
+                        latest = latestReleaseWithAsset;
+                    }
+                    else if (fileVersion == 0)
+                    {
+                        Log.Error("Cannot pull a copy of MassEffectModderNoGui from server, could not find one with assets. ALOT Installer will have severely limited functionality.");
                     }
 
                     if (latest != null)
@@ -968,8 +985,9 @@ namespace AlotAddOnGUI
                 {
                     if (File.Exists(BINARY_DIRECTORY + "MassEffectModderNoGui.pdb"))
                     {
-                        File.Delete(BINARY_DIRECTORY + "MassEffectModderNoGui.pdb");
-                        Log.Information("Deleted MassEffectModderNoGui.pdb");
+                        //DISABLED DUE TO .NET 4.7.1 not supporting portable pdbs due to update
+                        //File.Delete(BINARY_DIRECTORY + "MassEffectModderNoGui.pdb");
+                        //Log.Information("Deleted MassEffectModderNoGui.pdb");
                     }
                 }
             }
@@ -1337,8 +1355,8 @@ namespace AlotAddOnGUI
                 System.Windows.Application.Current.Dispatcher.Invoke(
                     async () =>
                     {
-                // Code to run on the GUI thread.
-                int numcurrentfiles = addonfiles.Where(p => !p.Optional).Count();
+                        // Code to run on the GUI thread.
+                        int numcurrentfiles = addonfiles.Where(p => !p.Optional).Count();
                         if (numcurrentfiles != 0)
                         {
                             ProgressBarValue = (((double)numdone / numcurrentfiles) * 100);
@@ -1639,8 +1657,8 @@ namespace AlotAddOnGUI
                                     try
                                     {
                                         File.WriteAllText(MANIFEST_LOC, pageSourceCode);
-                                //Legacy stuff
-                                if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
+                                        //Legacy stuff
+                                        if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
                                         {
                                             File.Delete(MANIFEST_LOC);
                                         }
@@ -1700,8 +1718,8 @@ namespace AlotAddOnGUI
                                     Environment.Exit(1);
                                 }
                             }
-                    //do something with results 
-                };
+                            //do something with results 
+                        };
                         webClient.DownloadStringAsync(new Uri(url));
                     }
                     catch (WebException e)
@@ -2309,7 +2327,6 @@ namespace AlotAddOnGUI
                 return;
             }
             linqlist = linqlist.OrderBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList();
-
             if (tutorials.Count > 0)
             {
                 Label_NoTutorials.Visibility = Visibility.Collapsed;
