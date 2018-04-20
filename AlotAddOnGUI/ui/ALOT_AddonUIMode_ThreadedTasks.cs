@@ -294,7 +294,7 @@ namespace AlotAddOnGUI
                                             if (pf.MoveDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD) && name.ToLower().EndsWith(".mem"))
                                             {
                                                 //It's a already built MEM file. Move MEM to build folder
-                                                Log.Information("MoveDirectly on MEM file specified - moving MEM to output: " + fname +" -> "+getOutputDir(CURRENT_GAME_BUILD);
+                                                Log.Information("MoveDirectly on MEM file specified - moving MEM to output: " + fname +" -> "+getOutputDir(CURRENT_GAME_BUILD));
                                                 int fileprefix = Interlocked.Increment(ref PREBUILT_MEM_INDEX);
                                                 string paddedVer = fileprefix.ToString("000");
                                                 string movename = getOutputDir(CURRENT_GAME_BUILD) + paddedVer + "_" + fname;
