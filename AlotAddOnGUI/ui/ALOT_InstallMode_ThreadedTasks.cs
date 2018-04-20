@@ -1052,7 +1052,7 @@ namespace AlotAddOnGUI
                         {
                             diskType = -2; //-2 = UNC
                         }
-                        else if (Utilities.IsWindows8OrNewer())
+                        else if (Utilities.IsWindows10OrNewer())
                         {
                             diskType = DiskTypeDetector.GetPartitionDiskBackingType(pathroot);
                         }

@@ -308,7 +308,7 @@ namespace AlotAddOnGUI.ui
             }
             else
             {
-                if (Utilities.IsWindows8OrNewer())
+                if (Utilities.IsWindows10OrNewer())
                 {
                     int backingType = DiskTypeDetector.GetPartitionDiskBackingType(pathroot);
                     string type = "Unknown type";

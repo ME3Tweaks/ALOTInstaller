@@ -103,11 +103,11 @@ namespace AlotAddOnGUI
                .Replace("  ", " ").Trim();
         }
 
-        public static bool IsWindows8OrNewer()
+        public static bool IsWindows10OrNewer()
         {
             var os = Environment.OSVersion;
             return os.Platform == PlatformID.Win32NT &&
-                   (os.Version.Major > 6 || (os.Version.Major == 6 && os.Version.Minor >= 2));
+                   (os.Version.Major >= 10);
         }
 
         /// <summary> Checks for write access for the given file.
@@ -126,7 +126,8 @@ namespace AlotAddOnGUI
             catch (System.UnauthorizedAccessException)
             {
                 return false;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Log.Error("Error checking permissions to folder: " + dir);
                 Log.Error("Directory write test had error that was not UnauthorizedAccess: " + e.Message);
