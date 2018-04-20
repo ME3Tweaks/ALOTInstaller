@@ -675,7 +675,7 @@ namespace AlotAddOnGUI
             }
             else
             {
-                Log.Error("Error occured: " + e.Error.ToString());
+                Log.Error("Error occured extracting music pack download: " + e.Error.ToString());
             }
         }
 
@@ -883,6 +883,13 @@ namespace AlotAddOnGUI
 
         private async void UnzipSelfUpdate(object sender, AsyncCompletedEventArgs e)
         {
+            if (e.Error != null)
+            {
+                Log.Error("Error during download of ALOTInstaller update:");
+                Log.Error(App.FlattenException(e.Error));
+                Log.Warning("We will proceed with update extraction attempt anyways, it will likely fail.");
+            }
+
             KeyValuePair<ProgressDialogController, string> kp = (KeyValuePair<ProgressDialogController, string>)e.UserState;
             if (e.Cancelled)
             {
@@ -938,6 +945,13 @@ namespace AlotAddOnGUI
             {
                 return; //handled by cancel
             }
+            if (e.Error != null)
+            {
+                Log.Error("Error during download of MEMNOGUI update:");
+                Log.Error(App.FlattenException(e.Error));
+                Log.Warning("We will proceed with update extraction attempt anyways, it will likely fail.");
+            }
+
             KeyValuePair<ProgressDialogController, string> kp = (KeyValuePair<ProgressDialogController, string>)e.UserState;
             kp.Key.SetIndeterminate();
             kp.Key.SetTitle("Extracting MassEffectModderNoGUI Update");
@@ -961,7 +975,7 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("Error extracting MEMNOGUI update:");
                     Log.Error(App.FlattenException(exception));
-                    await this.ShowMessageAsync("MassEffectModderNoGui update failed", "MassEffectModderNoGui update failed to apply. This program is used to install textures and other operations. The update will be attempted when the program is restarted.\nThe error was: " + exception.Message);
+                    await this.ShowMessageAsync("MassEffectModderNoGui update failed", "MassEffectModderNoGui update failed to apply. This program is used to install textures and other operations. The update will be attempted again when the program is restarted.\nThe error was: " + exception.Message);
                 }
             }
             else
@@ -996,7 +1010,12 @@ namespace AlotAddOnGUI
 
         private void UnzipMEMGUIUpdate(object sender, AsyncCompletedEventArgs e)
         {
-
+            if (e.Error != null)
+            {
+                Log.Error("Error during download of MEMGUI update:");
+                Log.Error(App.FlattenException(e.Error));
+                Log.Warning("We will proceed with update extraction attempt anyways, it will likely fail.");
+            }
             //Extract 7z
             string path = BINARY_DIRECTORY + "7z.exe";
             //  string pathWithoutTrailingSlash = BINARY_DIRECTORY.Substring(0, BINARY_DIRECTORY.Length - 1);
