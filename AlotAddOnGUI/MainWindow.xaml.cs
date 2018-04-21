@@ -2601,7 +2601,7 @@ namespace AlotAddOnGUI
                             }
                             continue;
                         }
-                        if (installedInfo.ALOTVER != 0 && installedInfo.ALOTVER != af.ALOTVersion && installedInfo.MEUITMVER > 0)
+                        if (installedInfo.ALOTVER != 0 && installedInfo.ALOTVER != af.ALOTVersion && af.ALOTVersion != 0 && installedInfo.MEUITMVER > 0)
                         {
                             //alot installed same version
                             Log.Warning("ALOT main version " + af.ALOTVersion + " blocked from installing because it is different main version than the currently installed one.");
