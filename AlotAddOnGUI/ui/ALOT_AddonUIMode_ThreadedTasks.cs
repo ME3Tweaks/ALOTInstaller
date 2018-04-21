@@ -268,7 +268,7 @@ namespace AlotAddOnGUI
                                             if (pf.MoveDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTVersion > 0)
                                             {
                                                 //It's an ALOT file. We will move this directly to the output directory.
-                                                Log.Information("ALOT MAIN FILE - moving to output: " + fname);
+                                                Log.Information("ALOT MAIN FILE - moving to output: " + fname + " -> " + getOutputDir(CURRENT_GAME_BUILD));
                                                 string movename = getOutputDir(CURRENT_GAME_BUILD) + "000_" + fname;
                                                 if (File.Exists(movename))
                                                 {
@@ -281,7 +281,7 @@ namespace AlotAddOnGUI
                                             if (pf.MoveDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD) && af.ALOTUpdateVersion > 0)
                                             {
                                                 //It's an ALOT update file. We will move this directly to the output directory.
-                                                Log.Information("ALOT UPDATE FILE - moving to output: " + fname);
+                                                Log.Information("ALOT UPDATE FILE - moving to output: " + fname + " -> " + getOutputDir(CURRENT_GAME_BUILD));
                                                 string movename = getOutputDir(CURRENT_GAME_BUILD) + "001_" + fname;
                                                 if (File.Exists(movename))
                                                 {
@@ -294,7 +294,7 @@ namespace AlotAddOnGUI
                                             if (pf.MoveDirectly && pf.AppliesToGame(CURRENT_GAME_BUILD) && name.ToLower().EndsWith(".mem"))
                                             {
                                                 //It's a already built MEM file. Move MEM to build folder
-                                                Log.Information("MoveDirectly on MEM file specified - moving MEM to output: " + fname);
+                                                Log.Information("MoveDirectly on MEM file specified - moving MEM to output: " + fname +" -> "+getOutputDir(CURRENT_GAME_BUILD));
                                                 int fileprefix = Interlocked.Increment(ref PREBUILT_MEM_INDEX);
                                                 string paddedVer = fileprefix.ToString("000");
                                                 string movename = getOutputDir(CURRENT_GAME_BUILD) + paddedVer + "_" + fname;
@@ -603,6 +603,7 @@ namespace AlotAddOnGUI
 
         private void BuildAddon(object sender, DoWorkEventArgs e)
         {
+            Log.Information("Starting BuildAddon() thread. Performing build prechecks.");
             BlockingMods = new List<string>();
             if (CURRENT_GAME_BUILD < 3)
             {
@@ -638,15 +639,14 @@ namespace AlotAddOnGUI
                 }
             }
             Directory.CreateDirectory(outDir);
-
-
+            Log.Information("Starting Addon Extraction and Build via ExtractAddons()");
             bool result = ExtractAddons((int)e.Argument); //arg is game id.
-
             e.Result = result ? (int)e.Argument : -1; //-1 = Build Error
         }
 
         private bool ExtractAddons(int game)
         {
+            Log.Information("Final output directory: " + getOutputDir(game) + ", exists: " + Directory.Exists(getOutputDir(game)));
             string stagingdirectory = ADDON_FULL_STAGING_DIRECTORY;
             PREBUILT_MEM_INDEX = 9;
             SHOULD_HAVE_OUTPUT_FILE = false; //will set to true later
@@ -830,6 +830,7 @@ namespace AlotAddOnGUI
             TaskbarProgressIndeterminateManaged = true;
             BuildWorker.ReportProgress(0, new ThreadCommand(SET_TASKBAR_INDETERMINATE, true));
             Stopwatch sw = Stopwatch.StartNew();
+            Log.Information("Starting addon extraction in parallel. Number of threads: " + threads);
             KeyValuePair<AddonFile, bool>[] results = ADDONFILES_TO_BUILD.AsParallel().WithDegreeOfParallelism(threads).WithExecutionMode(ParallelExecutionMode.ForceParallelism).Select(ExtractAddon).ToArray();
             sw.Stop();
             TaskbarProgressIndeterminateManaged = false;
