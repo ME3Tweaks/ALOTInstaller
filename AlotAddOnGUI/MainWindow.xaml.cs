@@ -1442,7 +1442,6 @@ namespace AlotAddOnGUI
                 Log.Error("No trilogy games are installed (could not find any using lookups). App won't be able to do anything");
                 await this.ShowMessageAsync("None of the Mass Effect Trilogy games are installed", "ALOT Installer requires at least one of the trilogy games to be installed before you can use it.\n\nIf you're using the Steam version of Mass Effect or Mass Effect 2, you must run the game at least once so the game can be detected.");
                 Log.Error("Exiting due to no games installed");
-
                 Environment.Exit(1);
             }
             Log.Information("At least one game is installed");
@@ -1885,121 +1884,131 @@ namespace AlotAddOnGUI
             bool me1AGEIAKeyNotWritable = false;
             string args = "";
             List<string> directories = new List<string>();
-            if (me1Installed)
+            try
             {
-                string me1SubPath = Path.Combine(me1Path, @"BioGame\CookedPC\Packages");
-                bool me1Writable = Utilities.IsDirectoryWritable(me1Path) && Utilities.IsDirectoryWritable(me1SubPath);
-                if (!me1Writable)
+                if (me1Installed)
                 {
-                    Log.Information("ME1 not writable: " + me1Path);
-                    directories.Add(me1Path);
-                }
-                try
-                {
-                    var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\AGEIA Technologies", true);
-                    if (key != null)
+                    string me1SubPath = Path.Combine(me1Path, @"BioGame\CookedPC\Packages");
+                    bool me1Writable = Utilities.IsDirectoryWritable(me1Path) && Utilities.IsDirectoryWritable(me1SubPath);
+                    if (!me1Writable)
                     {
-                        key.Close();
+                        Log.Information("ME1 not writable: " + me1Path);
+                        directories.Add(me1Path);
                     }
-                    else
+                    try
                     {
-                        Log.Information("ME1 AGEIA Technologies key is not present or is not writable.");
+                        var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\AGEIA Technologies", true);
+                        if (key != null)
+                        {
+                            key.Close();
+                        }
+                        else
+                        {
+                            Log.Information("ME1 AGEIA Technologies key is not present or is not writable.");
+                            me1AGEIAKeyNotWritable = true;
+                        }
+                    }
+                    catch (SecurityException)
+                    {
+                        Log.Information("ME1 AGEIA Technologies key is not writable.");
                         me1AGEIAKeyNotWritable = true;
                     }
                 }
-                catch (SecurityException)
+
+                if (me2Installed)
                 {
-                    Log.Information("ME1 AGEIA Technologies key is not writable.");
-                    me1AGEIAKeyNotWritable = true;
-                }
-            }
-
-            if (me2Installed)
-            {
-                string me2SubPath = Path.Combine(me2Path, @"Binaries");
-                bool me2Writable = Utilities.IsDirectoryWritable(me2Path) && Utilities.IsDirectoryWritable(me2SubPath);
-                if (!me2Writable)
-                {
-
-                    Log.Information("ME2 not writable: " + me2Path);
-                    directories.Add(me2Path);
-
-                }
-            }
-
-            if (me3Installed)
-            {
-                string me3SubPath = Path.Combine(me3Path, @"Binaries");
-                bool me3Writable = Utilities.IsDirectoryWritable(me3Path) && Utilities.IsDirectoryWritable(me3SubPath);
-                if (!me3Writable)
-                {
-
-                    Log.Information("ME3 not writable: " + me3Path);
-                    directories.Add(me3Path);
-                }
-            }
-
-            if (directories.Count() > 0 || me1AGEIAKeyNotWritable)
-            {
-                foreach (String str in directories)
-                {
-                    if (args != "")
+                    string me2SubPath = Path.Combine(me2Path, @"Binaries");
+                    bool me2Writable = Utilities.IsDirectoryWritable(me2Path) && Utilities.IsDirectoryWritable(me2SubPath);
+                    if (!me2Writable)
                     {
-                        args += " ";
-                    }
-                    args += "\"" + str + "\"";
-                }
 
-                if (me1AGEIAKeyNotWritable)
-                {
-                    args += " -create-hklm-reg-key \"SOFTWARE\\WOW6432Node\\AGEIA Technologies\"";
-                }
-                args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" " + args;
-                //need to run write permissions program
-                if (isAdmin)
-                {
-                    string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
-                    int result = Utilities.runProcess(exe, args);
-                    if (result == 0)
-                    {
-                        Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
-                        return true;
-                    }
-                    else
-                    {
-                        Log.Error("Elevated process returned code " + result + ", directories probably aren't writable.");
-                        return false;
+                        Log.Information("ME2 not writable: " + me2Path);
+                        directories.Add(me2Path);
+
                     }
                 }
-                else
+
+                if (me3Installed)
                 {
-                    string message = "Some game folders/registry keys are not writeable by your user account. ALOT Installer will attempt to grant access to these folders/registry with the PermissionsGranter.exe program:\n";
-                    if (required)
+                    string me3SubPath = Path.Combine(me3Path, @"Binaries");
+                    bool me3Writable = Utilities.IsDirectoryWritable(me3Path) && Utilities.IsDirectoryWritable(me3SubPath);
+                    if (!me3Writable)
                     {
-                        message = "Some game paths and registry keys are not writeable by your user account. These need to be writable or ALOT Installer will be unable to install ALOT. Please grant administrative privledges to PermissionsGranter.exe to give your account the necessary privileges to the following:\n";
+
+                        Log.Information("ME3 not writable: " + me3Path);
+                        directories.Add(me3Path);
                     }
+                }
+
+                if (directories.Count() > 0 || me1AGEIAKeyNotWritable)
+                {
                     foreach (String str in directories)
                     {
-                        message += "\n" + str;
+                        if (args != "")
+                        {
+                            args += " ";
+                        }
+                        args += "\"" + str + "\"";
                     }
+
                     if (me1AGEIAKeyNotWritable)
                     {
-                        message += "\nRegistry: HKLM\\SOFTWARE\\WOW6432Node\\AGEIA Technologies (Fixes an ME1 launch issue)";
+                        args += " -create-hklm-reg-key \"SOFTWARE\\WOW6432Node\\AGEIA Technologies\"";
                     }
-                    await this.ShowMessageAsync("Granting permissions to Mass Effect directories", message);
-                    string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
-                    int result = Utilities.runProcessAsAdmin(exe, args);
-                    if (result == 0)
+                    args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" " + args;
+                    //need to run write permissions program
+                    if (isAdmin)
                     {
-                        Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
-                        return true;
+                        string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
+                        int result = Utilities.runProcess(exe, args);
+                        if (result == 0)
+                        {
+                            Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
+                            return true;
+                        }
+                        else
+                        {
+                            Log.Error("Elevated process returned code " + result + ", directories probably aren't writable.");
+                            return false;
+                        }
                     }
                     else
                     {
-                        Log.Error("Elevated process returned code " + result + ", directories probably aren't writable.");
-                        return false;
+                        string message = "Some game folders/registry keys are not writeable by your user account. ALOT Installer will attempt to grant access to these folders/registry with the PermissionsGranter.exe program:\n";
+                        if (required)
+                        {
+                            message = "Some game paths and registry keys are not writeable by your user account. These need to be writable or ALOT Installer will be unable to install ALOT. Please grant administrative privledges to PermissionsGranter.exe to give your account the necessary privileges to the following:\n";
+                        }
+                        foreach (String str in directories)
+                        {
+                            message += "\n" + str;
+                        }
+                        if (me1AGEIAKeyNotWritable)
+                        {
+                            message += "\nRegistry: HKLM\\SOFTWARE\\WOW6432Node\\AGEIA Technologies (Fixes an ME1 launch issue)";
+                        }
+                        await this.ShowMessageAsync("Granting permissions to Mass Effect directories", message);
+                        string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
+                        int result = Utilities.runProcessAsAdmin(exe, args);
+                        if (result == 0)
+                        {
+                            Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
+                            return true;
+                        }
+                        else
+                        {
+                            Log.Error("Elevated process returned code " + result + ", directories probably aren't writable.");
+                            return false;
+                        }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error checking for write privledges. This may be a significant sign that an installed game is not in a good state.");
+                Log.Error(App.FlattenException(e));
+                await this.ShowMessageAsync("Error checking write privileges", "An error occured while checking write privileges to game folders. This may be a sign that the game is in a bad state.\n\nThe error was:\n" + e.Message);
+                return false;
             }
             return true;
         }

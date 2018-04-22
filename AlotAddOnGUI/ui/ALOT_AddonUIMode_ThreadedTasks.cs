@@ -1604,6 +1604,17 @@ namespace AlotAddOnGUI
             string args = "-remove-lods " + BACKUP_THREAD_GAME;
             Utilities.runProcess(exe, args);
 
+            if (BACKUP_THREAD_GAME == 1)
+            {
+                string iniPath = IniSettingsHandler.GetConfigIniPath(1);
+                if (File.Exists(iniPath))
+                {
+                    Log.Information("Reverting Indirect Sound ini fix for ME1");
+                    IniFile engineConf = new IniFile(iniPath);
+                    engineConf.DeleteKey("DeviceName", "ISACTAudio.ISACTAudioDevice");
+                }
+            }
+
             if (Utilities.IsDirectoryWritable(Directory.GetParent(gamePath).FullName))
             {
                 Directory.CreateDirectory(gamePath);
