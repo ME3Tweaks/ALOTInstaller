@@ -375,12 +375,12 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(TargetDir)Downloaded_Mods" mkdir "$(TargetDir)Downloaded_Mods"
+if not exist "$(TargetDir)Data\lib" mkdir "$(TargetDir)Data\lib"
 
 if exist "$(TargetDir)Data\lib"  del /q "$(TargetDir)Data\lib\*.pdb"&gt;NUL
 if exist "$(TargetDir)Data\lib" del /q "$(TargetDir)Data\lib\manifest*.xml"&gt;NUL
 if exist "$(TargetDir)alotinstaller.exe.config" del /q "$(TargetDir)alotinstaller.exe.config"&gt;NUL
 
-if not exist "$(TargetDir)Data\lib" mkdir "$(TargetDir)Data\lib"
 move /Y "$(TargetDir)*.dll" "$(TargetDir)Data\Lib\"
 del /q "$(TargetDir)*.xml"
 del /q "$(TargetDir)MahApps.Metro.IconPacks.Modern.pdb"
@@ -399,8 +399,6 @@ if $(ConfigurationName) == Debug echo DEBUG MODE
 
 if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.cmd" "$(TargetDir)..\ReleaseBuilder.bat" /y)
 if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilder.ps1" "$(TargetDir)..\ReleaseBuilder.ps1" /y)
-if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilderNexus.cmd" "$(TargetDir)..\ReleaseBuilderNexus.bat" /y)
-if $(ConfigurationName) == Release (copy "$(SolutionDir)ReleaseBuilderNexus.ps1" "$(TargetDir)..\ReleaseBuilderNexus.ps1" /y)
 
 if $(ConfigurationName) == Release rmdir /s /q "$(TargetDir)logs
 if $(ConfigurationName) == Debug (exit 0)</PostBuildEvent>
