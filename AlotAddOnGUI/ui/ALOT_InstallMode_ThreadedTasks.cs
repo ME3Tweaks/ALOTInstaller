@@ -617,11 +617,11 @@ namespace AlotAddOnGUI
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT, CurrentTask));
 
             args = "-apply-lods-gfx ";
+            args += INSTALLING_THREAD_GAME;
             if (hasSoftShadowsMEUITM)
             {
                 args += "-soft-shadows-mode ";
             }
-            args += INSTALLING_THREAD_GAME;
             RunAndTimeMEM_Install(exe, args, InstallWorker);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
             if (processResult != 0)
