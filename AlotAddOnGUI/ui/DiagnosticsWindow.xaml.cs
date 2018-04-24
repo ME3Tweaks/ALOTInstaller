@@ -746,7 +746,7 @@ namespace AlotAddOnGUI.ui
                         addDiagLine("[ERROR]      You may also see this error if you unpacked DLC using ME3Explorer - as an end-user you should not have to use ME3Explorer,");
                         addDiagLine("[ERROR]      even for AutoTOC. Use MEM instead to avoid the setup wizard issues (Settings->Launch MEM->Mass Effect 3->AutoTOC).");
                     }
-                    
+
                     else
                     {
                         addDiagLine(GetDLCDisplayString(value));
@@ -996,30 +996,27 @@ namespace AlotAddOnGUI.ui
                         log += "TEXTUREGROUP_Character_Norm=" + engineConf.Read("TEXTUREGROUP_Character_Norm", "TextureLODSettings") + Environment.NewLine;
                         log += "TEXTUREGROUP_Character_Spec=" + engineConf.Read("TEXTUREGROUP_Character_Spec", "TextureLODSettings") + Environment.NewLine;
 
-                        if (!MainWindow.USING_BETA)
+                        if (engineConf.Read("TEXTUREGROUP_Character_1024", "TextureLODSettings") != "(MinLODSize=32,MaxLODSize=1024,LODBias=0)")
                         {
-                            if (engineConf.Read("TEXTUREGROUP_Character_1024", "TextureLODSettings") != "(MinLODSize=32,MaxLODSize=1024,LODBias=0)")
+                            if (avi != null)
                             {
-                                if (avi != null)
-                                {
-                                    log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
-                                }
-                                else
-                                {
-                                    log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have unused mip crashes." + Environment.NewLine;
-                                    log = ShowBadLODDialog(log);
-                                }
+                                log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
                             }
                             else
                             {
-                                if (avi != null)
-                                {
-                                    log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
-                                }
-                                else
-                                {
-                                    log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is vanilla-ish." + Environment.NewLine;
-                                }
+                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have unused mip crashes." + Environment.NewLine;
+                                log = ShowBadLODDialog(log);
+                            }
+                        }
+                        else
+                        {
+                            if (avi != null)
+                            {
+                                log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
+                            }
+                            else
+                            {
+                                log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is vanilla-ish." + Environment.NewLine;
                             }
                         }
                         break;
@@ -1049,30 +1046,27 @@ namespace AlotAddOnGUI.ui
                         log += "TEXTUREGROUP_Character_Diff=" + engineConf.Read("TEXTUREGROUP_Character_Diff", "SystemSettings") + Environment.NewLine;
                         log += "TEXTUREGROUP_Character_Norm=" + engineConf.Read("TEXTUREGROUP_Character_Norm", "SystemSettings") + Environment.NewLine;
                         log += "TEXTUREGROUP_Character_Spec=" + engineConf.Read("TEXTUREGROUP_Character_Spec", "SystemSettings") + Environment.NewLine;
-                        if (!MainWindow.USING_BETA)
+                        if (engineConf.Read("TEXTUREGROUP_Character_1024", "SystemSettings") != "")
                         {
-                            if (engineConf.Read("TEXTUREGROUP_Character_1024", "SystemSettings") != "")
+                            if (avi != null)
                             {
-                                if (avi != null)
-                                {
-                                    log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
-                                }
-                                else
-                                {
-                                    log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
-                                    log = ShowBadLODDialog(log);
-                                }
+                                log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
                             }
                             else
                             {
-                                if (avi != null)
-                                {
-                                    log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
-                                }
-                                else
-                                {
-                                    log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is vanilla-ish." + Environment.NewLine;
-                                }
+                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
+                                log = ShowBadLODDialog(log);
+                            }
+                        }
+                        else
+                        {
+                            if (avi != null)
+                            {
+                                log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
+                            }
+                            else
+                            {
+                                log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is vanilla-ish." + Environment.NewLine;
                             }
                         }
                         break;
@@ -1103,33 +1097,30 @@ namespace AlotAddOnGUI.ui
                         log += "TEXTUREGROUP_Character_Diff=" + engineConf.Read("TEXTUREGROUP_Character_Diff", "SystemSettings") + Environment.NewLine;
                         log += "TEXTUREGROUP_Character_Norm=" + engineConf.Read("TEXTUREGROUP_Character_Norm", "SystemSettings") + Environment.NewLine;
                         log += "TEXTUREGROUP_Character_Spec=" + engineConf.Read("TEXTUREGROUP_Character_Spec", "SystemSettings") + Environment.NewLine;
-                        if (!MainWindow.USING_BETA)
+                        if (engineConf.Read("TEXTUREGROUP_Character_1024", "SystemSettings") != "")
                         {
-                            if (engineConf.Read("TEXTUREGROUP_Character_1024", "SystemSettings") != "")
+                            if (avi != null)
                             {
-                                if (avi != null)
-                                {
-                                    log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
-                                }
-                                else
-                                {
-                                    log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
-                                    log = ShowBadLODDialog(log);
-
-                                }
+                                log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
                             }
                             else
                             {
-                                //HQ LOD MISSING
-                                if (avi != null)
-                                {
-                                    log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
+                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
+                                log = ShowBadLODDialog(log);
 
-                                }
-                                else
-                                {
-                                    log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is probably vanilla-ish." + Environment.NewLine;
-                                }
+                            }
+                        }
+                        else
+                        {
+                            //HQ LOD MISSING
+                            if (avi != null)
+                            {
+                                log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
+
+                            }
+                            else
+                            {
+                                log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is probably vanilla-ish." + Environment.NewLine;
                             }
                         }
                         break;

@@ -426,6 +426,8 @@ namespace AlotAddOnGUI
                 args += " -repack";
             }
             args += " -ipc -alot-mode";
+            
+            //Comment the following 2 lines and uncomment the next 3 to skip installation step and simulate OK
             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
             //MEM_INSTALL_TIME_SECONDS = 61;
@@ -503,17 +505,6 @@ namespace AlotAddOnGUI
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGES_LABEL));
             overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
             InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
-
-            
-            //if (needsMipMapRemovalPass)
-            //{
-            //    InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Removing Empty Mipmaps"));
-            //    args = "-remove-empty-mipmaps " + INSTALLING_THREAD_GAME;
-            //    args += " -ipc";
-            //    RunAndTimeMEM_Install(exe, args, InstallWorker);
-            //    processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-            //}
-
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
             //things like soft shadows, reshade
             bool hasSoftShadowsMEUITM = false;
