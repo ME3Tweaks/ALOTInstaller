@@ -611,7 +611,7 @@ namespace AlotAddOnGUI
             args += INSTALLING_THREAD_GAME;
             if (hasSoftShadowsMEUITM)
             {
-                args += " -soft-shadows-mode ";
+                args += " -soft-shadows-mode -meuitm-mode";
             }
             RunAndTimeMEM_Install(exe, args, InstallWorker);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
