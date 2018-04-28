@@ -540,16 +540,31 @@ namespace AlotAddOnGUI
                                     }
                                     else
                                     {
-
+                                        string sfcError = null;
                                         // Instantiate the delegate using an anonymous method.
                                         SingleFileCopy.ProgressHandlerDel testDelC = (x) =>
                                         {
                                             af.ReadyStatusText = "Staging for installation - " + x.ProgressPercentage + "% (" + ByteSize.FromBytes(x.BytesReceived) + ")";
                                         };
 
-                                        SingleFileCopy sfc = new SingleFileCopy();
-                                        sfc.DownloadFile(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse, testDelC, null);
+                                        SingleFileCopy.ProgressCompleteDel completionDelegate = (x) =>
+                                        {
+                                            if (x.Error != null)
+                                            {
+                                                sfcError = x.Error.Message;
+                                            }
+                                            //af.ReadyStatusText = "Staging for installation - " + x.ProgressPercentage + "% (" + ByteSize.FromBytes(x.BytesReceived) + ")";
+                                        };
 
+                                        SingleFileCopy sfc = new SingleFileCopy();
+                                        sfc.DownloadFile(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse, testDelC, completionDelegate);
+                                        if (sfcError != null)
+                                        {
+                                            ERROR_OCCURED_PLEASE_STOP = true;
+                                            af.ReadyStatusText = "Failed to stage: " + sfcError;
+                                            af.SetError();
+                                            return new KeyValuePair<AddonFile, bool>(af, false);
+                                        }
                                         //File.Copy(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
                                     }
                                     foreach (PackageFile p in af.PackageFiles)
@@ -844,28 +859,36 @@ namespace AlotAddOnGUI
                     Log.Error("Failed to extract " + af.GetFile());
                     if (af.FileMD5 != null && af.FileMD5 != "" && !af.UserFile && !af.IsCurrentlySingleFile())
                     {
-                        Log.Information("MD5 checksumming " + af.GetFile());
-                        af.SetWorking();
-                        af.ReadyStatusText = "Checking file";
-                        BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
-                        BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, "Checking files that failed to extract"));
-                        var md5 = Utilities.CalculateMD5(af.GetFile());
-                        if (md5 != af.FileMD5)
+                        if (af.GetFile() != null)
                         {
-                            af.SetError();
-                            af.ReadyStatusText = "File is corrupt";
-                            Log.Error("Checksum for " + af.FriendlyName + " is wrong. Imported MD5: " + md5 + ", manifest MD5: " + af.FileMD5);
-                            Log.Error("This file cannot be used");
-                            KeyValuePair<string, string> message = new KeyValuePair<string, string>("File for " + af.FriendlyName + " is corrupt", "An error occured extracting " + af.GetFile() + ". This file is corrupt. Delete this file and download a new copy of it.");
-                            BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, message));
-                        }
-                        else
+                            Log.Information("MD5 checksumming " + af.GetFile());
+                            af.SetWorking();
+                            af.ReadyStatusText = "Checking file";
+                            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
+                            BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, "Checking files that failed to extract"));
+                            var md5 = Utilities.CalculateMD5(af.GetFile());
+                            if (md5 != af.FileMD5)
+                            {
+                                af.SetError();
+                                af.ReadyStatusText = "File is corrupt";
+                                Log.Error("Checksum for " + af.FriendlyName + " is wrong. Imported MD5: " + md5 + ", manifest MD5: " + af.FileMD5);
+                                Log.Error("This file cannot be used");
+                                KeyValuePair<string, string> message = new KeyValuePair<string, string>("File for " + af.FriendlyName + " is corrupt", "An error occured extracting " + af.GetFile() + ". This file is corrupt. Delete this file and download a new copy of it.");
+                                BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, message));
+                            }
+                            else
+                            {
+                                af.SetError();
+                                af.ReadyStatusText = "Failed to extract";
+                                Log.Warning("Checksum for " + af.FriendlyName + " is correct, but the file failed to extract. Imported MD5: " + md5 + ", manifest MD5: " + af.FileMD5);
+                                Log.Warning("This file should still be usable - but why did extraction or processing fail?");
+                                KeyValuePair<string, string> message = new KeyValuePair<string, string>(af.FriendlyName + " failed to process", "An error occured extracting or processing " + af.GetFile() + ". This file does not appear to be corrupt. Attempt installation again, and if it continues to fail, come to the ALOT Discord (Settings -> Report an issue) to help troubleshoot this issue.");
+                                BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, message));
+                            }
+                        } else
                         {
-                            af.SetError();
-                            af.ReadyStatusText = "Failed to extract";
-                            Log.Warning("Checksum for " + af.FriendlyName + " is correct, but the file failed to extract. Imported MD5: " + md5 + ", manifest MD5: " + af.FileMD5);
-                            Log.Warning("This file should still be usable - but why did extraction or processing fail?");
-                            KeyValuePair<string, string> message = new KeyValuePair<string, string>(af.FriendlyName + " failed to process", "An error occured extracting or processing " + af.GetFile() + ". This file does not appear to be corrupt. Attempt installation again, and if it continues to fail, come to the ALOT Discord (Settings -> Report an issue) to help troubleshoot this issue.");
+                            Log.Warning("File does not exist, may have failed staging: " + af.FriendlyName + ".");
+                            KeyValuePair<string, string> message = new KeyValuePair<string, string>(af.FriendlyName + " failed to stage", "An error occured staging " + af.GetFile() + ". Try again or come to the ALOT discord server  (Settings -> Report an issue) if this error keeps occuring.");
                             BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, message));
                         }
                         //perform MD5

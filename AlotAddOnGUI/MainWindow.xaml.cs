@@ -4719,10 +4719,6 @@ namespace AlotAddOnGUI
                 SettingsFlyout.IsOpen = false;
                 foreach (AddonFile af in alladdonfiles)
                 {
-                    if (!af.Ready)
-                    {
-                        // Debugger.Break();
-                    }
                     if (!af.UserFile && File.Exists(af.GetFile()))
                     {
                         string name = af.GetFile();
@@ -4730,7 +4726,7 @@ namespace AlotAddOnGUI
                         { //crash may occur in some extreme cases
                             name = Path.GetFileName(name);
                         }
-                        files.Remove(name);
+                        files.Remove(name); //remove manifest file from list of files to remove.
                     }
                 }
 
@@ -4750,12 +4746,27 @@ namespace AlotAddOnGUI
                     if (mdr == MessageDialogResult.Affirmative)
                     {
                         Log.Information("User elected to delete outdated files.");
+                        int numDeleted = 0;
                         foreach (string file in files)
                         {
                             Log.Information("Deleting " + file);
-                            File.Delete(DOWNLOADED_MODS_DIRECTORY + "\\" + file);
+                            try
+                            {
+                                File.Delete(DOWNLOADED_MODS_DIRECTORY + "\\" + file);
+                                numDeleted++;
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error("Error deleting file: " + file);
+                                Log.Error(App.FlattenException(ex));
+                            }
                         }
-                        ShowStatus("Deleted " + files.Count + " file" + (files.Count != 1 ? "s" : ""));
+                        string message = "Deleted " + numDeleted + " file" + (numDeleted != 1 ? "s" : "");
+                        if (numDeleted != files.Count)
+                        {
+                            message += ". Some files could not be deleted, see installer log.";
+                        }
+                        ShowStatus(message);
                     }
                 }
                 else

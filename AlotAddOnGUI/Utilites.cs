@@ -778,6 +778,7 @@ namespace AlotAddOnGUI
                     Log.Error("This file was found when the read-write filescan took place, but is no longer present. The application is going to crash.");
                     Log.Error("Another session may be running, or there may be a bug. Please come to the ALOT Discord so we can analyze this as we cannot reproduce it.");
                 }
+                Utilities.WriteDebugLog("Clearing read-only marker (if any) on file: " + file.FullName);
                 file.Attributes &= ~FileAttributes.ReadOnly;
             }
         }
