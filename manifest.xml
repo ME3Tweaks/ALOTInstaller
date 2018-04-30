@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.0.21">
+<alotaddonmanifest version="5.0.22">
   <highestapprovedmemversion>120</highestapprovedmemversion>
   <soaktestingmemversion>123</soaktestingmemversion>
   <repackoptions me2repackenabled="true" me3repackenabled="true"/>
@@ -94,8 +94,8 @@
     <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" tooltipname="ALOT for ME2 6.0 - Textures" filename="ALOT for ME2 - Textures-68-2018-6-0.zip" unpackedsinglefilename="ALOT_ME2_v6.mem" size="3563362871" md5="c1ed3369c5ba8ae681166b2fb9bc7c14" />
     <packagefile me2="true" sourcename="ALOT_ME2_v6.mem" movedirectly="true" />
   </addonfile>
-  <addonfile appliestomainversion="6" alotupdateversion="7" author="CreeperLava">
-	<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/?tab=files" tooltipname="ALOT for ME2 6.7 - Update" friendlyname="ALOT for ME2 6.7 - Update" filename="ALOT for ME2 6.6 - Update-68-2018-6-7.zip" size="387026628" md5="7b72fd6e1645a50d369fcad3277c9ce9"/>
+  <addonfile appliestomainversion="6" alotupdateversion="7" friendlyname="ALOT for ME2 6.7 - Update" author="CreeperLava">
+	<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/?tab=files" tooltipname="ALOT for ME2 6.7 - Update" filename="ALOT for ME2 6.6 - Update-68-2018-6-7.zip" size="387026628" md5="7b72fd6e1645a50d369fcad3277c9ce9"/>
 	<packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v6.mem" movedirectly="true"/>
   </addonfile>
   <addonfile appliestomainversion="6" alotupdateversion="3" friendlyname="ALOT for ME3 6.3 - Update" author="CreeperLava">
