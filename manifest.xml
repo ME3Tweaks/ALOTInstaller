@@ -128,7 +128,7 @@
     <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Norm_0x413007EA.dds" destinationname="0x413007EA.dds" />
     <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Spec_0x3B912C80.dds" destinationname="0x3B912C80.dds" />
   </addonfile>
-  <addonfile friendlyname="Ashley Complexion Tweak" tooltipname="Ash Complexion Tweak - .MEM" author="Ellise" optional="true">
+  <addonfile friendlyname="Ash Complexion Tweak - .MEM" tooltipname="Ash Complexion Tweak - .MEM" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" filename="el_Ashley Complexion Tweak.7z-569-1-0.7z" md5="e8a4283b6242aff68227bfc8bb145899" size="10154183" />
     <packagefile me3="true" sourcename="el_Ashley Complexion Tweak.mem" movedirectly="true" />
   </addonfile>
