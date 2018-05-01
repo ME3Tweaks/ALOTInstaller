@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotaddonmanifest version="5.0.23">
-  <stageweighting>
+  <stageweights>
 	  <stage name="STAGE_PRESCAN" value="0"/>
 	  <stage name="STAGE_UNPACKDLC" value="0.11004021318"/>
 	  <stage name="STAGE_SCAN" value="0.12055272684"/>
@@ -9,7 +9,7 @@
   	  <stage name="STAGE_REMOVEMIPMAPS" value="0.19155062326" me1scaling="2.5"/>
 	  <stage name="STAGE_REPACK" value="0.09"/>
   	  <stage name="STAGE_MARKERS" value="0.025"/>
-  </stageweighting>
+  </stageweights>
   <repackoptions me2repackenabled="true" me3repackenabled="true"/>
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
