@@ -8,6 +8,7 @@
 	  <stage name="STAGE_SAVING" value="0.25787962804"/>
   	  <stage name="STAGE_REMOVEMIPMAPS" value="0.19155062326"/>
 	  <stage name="STAGE_REPACK" value="0.09"/>
+  	  <stage name="STAGE_MARKERS" value="0.025"/>
   </stageweighting>
   <repackoptions me2repackenabled="true" me3repackenabled="true"/>
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
