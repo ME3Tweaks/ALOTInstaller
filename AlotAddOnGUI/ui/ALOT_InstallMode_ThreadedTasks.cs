@@ -1168,37 +1168,9 @@ namespace AlotAddOnGUI
                         {
                             case "STAGE_ADD":
                                 {
-                                    int task = -1;
-                                    switch (param)
-                                    {
-                                        case "STAGE_PRESCAN":
-                                            task = ProgressWeightPercentages.JOB_PRESCAN;
-                                            break;
-                                        case "STAGE_UNPACKDLC":
-                                            task = ProgressWeightPercentages.JOB_UNPACK;
-                                            break;
-                                        case "STAGE_SCAN":
-                                            task = ProgressWeightPercentages.JOB_SCAN;
-                                            break;
-                                        case "STAGE_INSTALLTEXTURES":
-                                            task = ProgressWeightPercentages.JOB_INSTALL;
-                                            break;
-                                        case "STAGE_SAVING":
-                                            task = ProgressWeightPercentages.JOB_SAVE;
-                                            break;
-                                        case "STAGE_REMOVEMIPMAPS":
-                                            task = ProgressWeightPercentages.JOB_REMOVE;
-                                            break;
-                                        case "STAGE_REPACK":
-                                            task = ProgressWeightPercentages.JOB_REPACK;
-                                            break;
-                                        default:
-                                            Log.Error("UNKNOWN STAGE_ADD PARAM: " + param);
-                                            return;
-                                    }
                                     STAGE_COUNT++;
-                                    Log.Information("Stage added to install queue: " + param);
-                                    ProgressWeightPercentages.AddTask(task, INSTALLING_THREAD_GAME);
+                                    Log.Information("Adding stage added to install stages queue: " + param);
+                                    ProgressWeightPercentages.AddTask(param, INSTALLING_THREAD_GAME);
                                     break;
                                 }
                             case "STAGE_WEIGHT":

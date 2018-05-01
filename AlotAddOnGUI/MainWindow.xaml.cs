@@ -2227,6 +2227,24 @@ namespace AlotAddOnGUI
 
                 HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("highestapprovedmemversion") == null ? HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("highestapprovedmemversion");
                 SOAK_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("soaktestingmemversion") == null ? SOAK_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("soaktestingmemversion");
+
+                if (rootElement.Element("stageweights") != null)
+                {
+                    ProgressWeightPercentages.Weights =
+                        (from stage in rootElement.Element("stageweights").Descendants("stage")
+                         select new ProgressWeight
+                         {
+                             StageName = stage.Attribute("name").Value,
+                             Weight = Convert.ToDouble(stage.Attribute("value").Value),
+                             ME1Scaling = stage.Attribute("me1scaling") != null ? Convert.ToDouble(stage.Attribute("me1scaling").Value) : 1,
+                             ME2Scaling = stage.Attribute("me2scaling") != null ? Convert.ToDouble(stage.Attribute("me2scaling").Value) : 1,
+                             ME3Scaling = stage.Attribute("me3scaling") != null ? Convert.ToDouble(stage.Attribute("me3scaling").Value) : 1
+                         }).ToList();
+                }
+                else
+                {
+                    ProgressWeightPercentages.SetDefaultWeights();
+                }
                 var repackoptions = rootElement.Element("repackoptions");
                 if (repackoptions != null)
                 {

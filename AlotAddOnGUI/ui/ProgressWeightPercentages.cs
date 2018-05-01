@@ -10,15 +10,7 @@ namespace AlotAddOnGUI.ui
 {
     class ProgressWeightPercentages
     {
-        private const double WEIGHT_PRESCAN = 0.01;
-        private const double WEIGHT_UNPACKDLC = 0.11004021318;
-        private const double WEIGHT_SCAN = 0.12055272684;
-        private const double WEIGHT_REMOVE = 0.19155062326;
-        private const double WEIGHT_INSTALL = 0.31997680866;
-        private const double WEIGHT_SAVE = 0.25787962804;
-        private const double WEIGHT_REPACK = 0.0800000;
-        private const double WEIGHT_INSTALLMARKERS = 0.0400000;
-
+        public static List<ProgressWeight> Weights;
         public const int JOB_PRESCAN = 7;
         public const int JOB_UNPACK = 0;
         public const int JOB_SCAN = 1;
@@ -40,50 +32,21 @@ namespace AlotAddOnGUI.ui
         }
 
         /// <summary>
-        /// Adds a task to the progress tracker. These tasks must be submitted in order that the program will execute them in. Tasks add to the weight pool and will allocate a progress slot.
+        /// Adds a task to the progress tracker. These tasks must be submitted in the order that the program will execute them in. Tasks add to the weight pool and will allocate a progress slot.
         /// </summary>
-        /// <param name="task">Job Type. Use one of this classes constants.</param>
-        public static void AddTask(int task, int game = 0)
+        /// <param name="task">Name of stage.</param>
+        public static void AddTask(string stagename, int game = 0)
         {
-            switch (task)
+            ProgressWeight pw = Weights.Where(x => x.StageName == stagename).FirstOrDefault();
+            if (pw != null)
             {
-                case JOB_PRESCAN:
-                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_PRESCAN));
-                    TOTAL_ACTIVE_WEIGHT += WEIGHT_PRESCAN;
-                    break;
-                case JOB_UNPACK:
-                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_UNPACKDLC));
-                    TOTAL_ACTIVE_WEIGHT += WEIGHT_UNPACKDLC;
-                    break;
-                case JOB_SCAN:
-                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_SCAN));
-                    TOTAL_ACTIVE_WEIGHT += WEIGHT_SCAN;
-                    break;
-                case JOB_REMOVE:
-                    double weightval = WEIGHT_REMOVE;
-                    if (game == 1)
-                    {
-                        weightval *= 2.2;
-                    }
-                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, weightval));
-                    TOTAL_ACTIVE_WEIGHT += WEIGHT_REMOVE;
-                    break;
-                case JOB_INSTALL:
-                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_INSTALL));
-                    TOTAL_ACTIVE_WEIGHT += WEIGHT_INSTALL;
-                    break;
-                case JOB_INSTALLMARKERS:
-                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_INSTALLMARKERS));
-                    TOTAL_ACTIVE_WEIGHT += WEIGHT_INSTALLMARKERS;
-                    break;
-                case JOB_SAVE:
-                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_SAVE));
-                    TOTAL_ACTIVE_WEIGHT += WEIGHT_SAVE;
-                    break;
-                case JOB_REPACK:
-                    jobWeightList.Add(new MutableKeyValuePair<int, double>(0, WEIGHT_REPACK));
-                    TOTAL_ACTIVE_WEIGHT += WEIGHT_REPACK;
-                    break;
+                pw.reweightStageForGame(game);
+                jobWeightList.Add(new MutableKeyValuePair<int, double>(0, pw.Weight));
+                TOTAL_ACTIVE_WEIGHT += pw.Weight;
+            }
+            else
+            {
+                Log.Error("Error adding stage for progress: " + stagename + ". Could not find stage in weighting system.");
             }
         }
 
@@ -150,6 +113,51 @@ namespace AlotAddOnGUI.ui
             jobWeightList[index].Value *= scale;
             ScaleWeights();
         }
+
+        internal static void SetDefaultWeights()
+        {
+            Weights = new List<ProgressWeight>();
+            Weights.Add(new ProgressWeight()
+            {
+                StageName = "STAGE_PRESCAN"
+            });
+            Weights.Add(new ProgressWeight()
+            {
+                StageName = "STAGE_UNPACKDLC",
+                Weight = 0.11004021318
+            });
+            Weights.Add(new ProgressWeight()
+            {
+                StageName = "STAGE_SCAN",
+                Weight = 0.12055272684
+            });
+            Weights.Add(new ProgressWeight()
+            {
+                StageName = "STAGE_REMOVE",
+                Weight = 0.19155062326,
+                ME1Scaling = 2.3
+            });
+            Weights.Add(new ProgressWeight()
+            {
+                StageName = "STAGE_INSTALL",
+                Weight = 0.31997680866
+            });
+            Weights.Add(new ProgressWeight()
+            {
+                StageName = "STAGE_SAVE",
+                Weight = 0.25787962804
+            });
+            Weights.Add(new ProgressWeight()
+            {
+                StageName = "STAGE_REPACK",
+                Weight = 0.0800000
+            });
+            Weights.Add(new ProgressWeight()
+            {
+                StageName = "STAGE_INSTALLMARKERS",
+                Weight = 0.0400000
+            });
+        }
     }
 
     public class MutableKeyValuePair<TKey, TValue>
@@ -161,6 +169,34 @@ namespace AlotAddOnGUI.ui
         {
             Key = key;
             Value = value;
+        }
+    }
+
+    [DebuggerDisplay("{StageName} ME1Scaling = {ME1Scaling}, ME2Scaling = {ME2Scaling}, ME3Scaling = {ME3Scaling}, Weight: {Weight}")]
+    public class ProgressWeight
+    {
+        public double ME1Scaling = 1;
+        public double ME2Scaling = 1;
+        public double ME3Scaling = 1;
+        public double Weight = 0;
+        public string StageName = "Stage";
+
+        public void reweightStageForGame(int game)
+        {
+            double scalingVal = 1;
+            switch (game)
+            {
+                case 1:
+                    scalingVal = ME1Scaling;
+                    break;
+                case 2:
+                    scalingVal = ME2Scaling;
+                    break;
+                case 3:
+                    scalingVal = ME3Scaling;
+                    break;
+            }
+            Weight *= scalingVal;
         }
     }
 }
