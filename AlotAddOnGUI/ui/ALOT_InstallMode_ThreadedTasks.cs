@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Management;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -89,14 +90,7 @@ namespace AlotAddOnGUI
             WARN_USER_OF_EXIT = true;
             InstallingOverlay_TopLabel.Text = "Preparing installer";
             InstallWorker = new BackgroundWorker();
-            //if (USING_BETA)
-            //{
             InstallWorker.DoWork += InstallALOTContextBased;
-            //}
-            //else
-            //{
-            // InstallWorker.DoWork += InstallALOT;
-            //}
             InstallWorker.WorkerReportsProgress = true;
             InstallWorker.ProgressChanged += InstallWorker_ProgressChanged;
             InstallWorker.RunWorkerCompleted += InstallCompleted;
@@ -134,7 +128,6 @@ namespace AlotAddOnGUI
                 case 1:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x77, 0, 0, 0));
                     Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Collapsed;
-                    //LODLIMIT = 0;
                     break;
                 case 2:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x55, 0, 0, 0));
@@ -205,9 +198,8 @@ namespace AlotAddOnGUI
             {
                 InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
             }
-            REPACK_GAME_FILES =  ((INSTALLING_THREAD_GAME == 2 && Checkbox_RepackME2GameFiles.IsChecked.Value && ME2_REPACK_MANIFEST_ENABLED) || (INSTALLING_THREAD_GAME == 3 && Checkbox_RepackME3GameFiles.IsChecked.Value && ME3_REPACK_MANIFEST_ENABLED));
+            REPACK_GAME_FILES = ((INSTALLING_THREAD_GAME == 2 && Checkbox_RepackME2GameFiles.IsChecked.Value && ME2_REPACK_MANIFEST_ENABLED) || (INSTALLING_THREAD_GAME == 3 && Checkbox_RepackME3GameFiles.IsChecked.Value && ME3_REPACK_MANIFEST_ENABLED));
             Log.Information("Repack option enabled: " + REPACK_GAME_FILES);
-            //REPACK_GAME_FILES = true;
             SetInstallFlyoutState(true);
 
             //Load Tips
@@ -324,13 +316,27 @@ namespace AlotAddOnGUI
             STAGE_DONE_REACHED = false;
             CurrentTask = "";
             Log.Information("InstallWorker Thread starting for ME" + INSTALLING_THREAD_GAME);
-            Log.Information("This installer session is context based and will run in a single instance.");
+            Log.Information("This installer session is context based and MEMNoGui will run in a single instance.");
+            using (var md5 = MD5.Create())
+            {
+                try
+                {
+                    using (var stream = File.OpenRead(Utilities.GetGameEXEPath(INSTALLING_THREAD_GAME)))
+                    {
+                        Log.Warning("Executable hash: " + BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Could not hash executable: " + ex.Message);
+                }
+            }
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
             //bool needsMipMapRemovalPass = false;
             //if (versionInfo.ALOTVER == 0 && versionInfo.MEUITMVER > 0 && INSTALLING_THREAD_GAME == 1)
             //{
-             //   needsMipMapRemovalPass = true;
+            //   needsMipMapRemovalPass = true;
             //}
             TELEMETRY_IS_FULL_NEW_INSTALL = versionInfo == null;
             Log.Information("Setting biogame directory to read-write");
@@ -426,14 +432,14 @@ namespace AlotAddOnGUI
                 args += " -repack";
             }
             args += " -ipc -alot-mode";
-            
+
             //Comment the following 2 lines and uncomment the next 3 to skip installation step and simulate OK
             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
             //MEM_INSTALL_TIME_SECONDS = 61;
             //processResult = 0;
             //STAGE_DONE_REACHED = true;
-            
+
             if (!STAGE_DONE_REACHED)
             {
                 if (processResult != 0)
@@ -556,7 +562,8 @@ namespace AlotAddOnGUI
                                 {
                                     File.Delete(localusershaderscache);
                                     Log.Information("Deleted user localshadercache: " + localusershaderscache);
-                                } else
+                                }
+                                else
                                 {
                                     Log.Warning("unable to delete user local shadercache, it does not exist: " + localusershaderscache);
                                 }
@@ -565,7 +572,8 @@ namespace AlotAddOnGUI
                                 {
                                     File.Delete(gamelocalshadercache);
                                     Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
-                                } else
+                                }
+                                else
                                 {
                                     Log.Warning("Unable to delete game localshadercache, it does not exist: " + gamelocalshadercache);
                                 }
