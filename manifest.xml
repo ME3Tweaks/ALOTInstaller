@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.0.21">
+<alotaddonmanifest version="5.0.22">
   <highestapprovedmemversion>120</highestapprovedmemversion>
   <soaktestingmemversion>123</soaktestingmemversion>
   <repackoptions me2repackenabled="true" me3repackenabled="true"/>
@@ -7,8 +7,8 @@
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps."/>
   <tutorial link="https://ianmooreisme.github.io/ALOT-Comparisons/" text="Comparison Screenshots" tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore."/>
-  <addonfile meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" tooltipname="MEUITM Anniversary Edition Direct Download" author="CDAMJC">
-    <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" filename="Mass Effect Anniversary Edition Direct Download-1-2.7z" size="2974978097" md5="3e33c8e2e3ded44a2c15742fd6dfac07" />
+  <addonfile meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" author="CDAMJC">
+    <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" tooltipname="MEUITM Anniversary Edition Direct Download" filename="Mass Effect Anniversary Edition Direct Download-1-2.7z" size="2974978097" md5="3e33c8e2e3ded44a2c15742fd6dfac07" />
     <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
   <choicefile choicetitle="Asari Face Style">
     <packagefile me1="true" sourcename="MEUITM\mods\AsariSmooth.mem" movedirectly="true" choicetitle="Smooth"/>
@@ -86,24 +86,24 @@
   <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows"/>
   <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen"/>
   </addonfile>
-  <addonfile alotversion="6" friendlyname="ALOT for ME1 6.0 - Textures" tooltipname="ALOT for ME1 6.0 - Textures" author="CreeperLava">
-    <file downloadlink="https://www.nexusmods.com/masseffect/mods/83?tab=files" filename="ALOT for ME1 - Textures-83-2018-6-0.zip" unpackedsinglefilename="ALOT_ME1_v6.mem" size="448313463" md5="1d0ab6ce0f2ce1940619bf27aade24c2" />
+  <addonfile alotversion="6" friendlyname="ALOT for ME1 6.0 - Textures"  author="CreeperLava">
+    <file downloadlink="https://www.nexusmods.com/masseffect/mods/83?tab=files" tooltipname="ALOT for ME1 6.0 - Textures" filename="ALOT for ME1 - Textures-83-2018-6-0.zip" unpackedsinglefilename="ALOT_ME1_v6.mem" size="448313463" md5="1d0ab6ce0f2ce1940619bf27aade24c2" />
     <packagefile me1="true" sourcename="ALOT_ME1_v6.mem" movedirectly="true" />
   </addonfile>
-  <addonfile alotversion="6" friendlyname="ALOT for ME2 6.0 - Textures" tooltipname="ALOT for ME2 6.0 - Textures" author="CreeperLava">
-    <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 - Textures-68-2018-6-0.zip" unpackedsinglefilename="ALOT_ME2_v6.mem" size="3563362871" md5="c1ed3369c5ba8ae681166b2fb9bc7c14" />
+  <addonfile alotversion="6" friendlyname="ALOT for ME2 6.0 - Textures" author="CreeperLava">
+    <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" tooltipname="ALOT for ME2 6.0 - Textures" filename="ALOT for ME2 - Textures-68-2018-6-0.zip" unpackedsinglefilename="ALOT_ME2_v6.mem" size="3563362871" md5="c1ed3369c5ba8ae681166b2fb9bc7c14" />
     <packagefile me2="true" sourcename="ALOT_ME2_v6.mem" movedirectly="true" />
   </addonfile>
-  <addonfile appliestomainversion="6" alotupdateversion="7" friendlyname="ALOT for ME2 6.7 - Update" tooltipname="ALOT for ME2 6.7 - Update" author="CreeperLava">
-	<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 6.6 - Update-68-2018-6-7.zip" size="387026628" md5="7b72fd6e1645a50d369fcad3277c9ce9"/>
+  <addonfile appliestomainversion="6" alotupdateversion="7" friendlyname="ALOT for ME2 6.7 - Update" author="CreeperLava">
+	<file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/?tab=files" tooltipname="ALOT for ME2 6.7 - Update" filename="ALOT for ME2 6.6 - Update-68-2018-6-7.zip" size="387026628" md5="7b72fd6e1645a50d369fcad3277c9ce9"/>
 	<packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v6.mem" movedirectly="true"/>
   </addonfile>
-  <addonfile appliestomainversion="6" alotupdateversion="3" friendlyname="ALOT for ME3 6.3 - Update" tooltipname="ALOT for ME3 6.3 - Update" author="CreeperLava">
-	<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/?tab=files" filename="ALOT for ME3 6.3 - Update-363-2018-6-3.zip" size="122470426" md5="2b93efb98670d1cf77b15bb4db94a4a5"/>
+  <addonfile appliestomainversion="6" alotupdateversion="3" friendlyname="ALOT for ME3 6.3 - Update" author="CreeperLava">
+	<file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/?tab=files" tooltipname="ALOT for ME3 6.3 - Update" filename="ALOT for ME3 6.3 - Update-363-2018-6-3.zip" size="122470426" md5="2b93efb98670d1cf77b15bb4db94a4a5"/>
 	<packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v6.mem" movedirectly="true"/>
   </addonfile>
-  <addonfile alotversion="6" friendlyname="ALOT for ME3 6.0 - Textures" tooltipname="ALOT for ME3 6.0 - Textures" author="CreeperLava">
-    <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" filename="ALOT for ME3 - Textures-363-2018-6-0.zip" unpackedsinglefilename="ALOT_ME3_v6.mem" size="5789453175" md5="2915d3d37ebe655defb541b974a7fa72" />
+  <addonfile alotversion="6" friendlyname="ALOT for ME3 6.0 - Textures" author="CreeperLava">
+    <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" tooltipname="ALOT for ME3 6.0 - Textures" filename="ALOT for ME3 - Textures-363-2018-6-0.zip" unpackedsinglefilename="ALOT_ME3_v6.mem" size="5789453175" md5="2915d3d37ebe655defb541b974a7fa72" />
     <packagefile me3="true" sourcename="ALOT_ME3_v6.mem" movedirectly="true" />
   </addonfile>
   <addonfile friendlyname="Allers Complexion Tweak" author="Ellise" optional="true">
@@ -128,8 +128,8 @@
     <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Norm_0x413007EA.dds" destinationname="0x413007EA.dds" />
     <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Spec_0x3B912C80.dds" destinationname="0x3B912C80.dds" />
   </addonfile>
-  <addonfile friendlyname="Ashley Complexion Tweak" tooltipname="Ash Complexion Tweak - .MEM" author="Ellise" optional="true">
-    <file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" filename="el_Ashley Complexion Tweak.7z-569-1-0.7z" md5="e8a4283b6242aff68227bfc8bb145899" size="10154183" />
+  <addonfile friendlyname="Ashley Complexion Tweak" author="Ellise" optional="true">
+    <file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" tooltipname="Ash Complexion Tweak - .MEM" filename="el_Ashley Complexion Tweak.7z-569-1-0.7z" md5="e8a4283b6242aff68227bfc8bb145899" size="10154183" />
     <packagefile me3="true" sourcename="el_Ashley Complexion Tweak.mem" movedirectly="true" />
   </addonfile>
   <addonfile friendlyname="Jacob Complexion Tweak" author="Ellise" optional="true">
@@ -183,59 +183,59 @@
     <file downloadlink="https://www.nexusmods.com/masseffect/mods/9" filename="Medium Phoenix Female-9-1-0.rar" md5="bb70d844d5ff871fcdc231fb3d744642" size="17207706" />
     <packagefile me1="true" sourcename="ME1_Med_Phoe_Fem.tpf" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="Miscellaneous textures" tooltipname="Miscellaneous Textures.zip" author="CDAMJC, CreeperLava">
-    <file downloadlink="https://mega.nz/#!NlsnhAjT!AVx8Xof32tQRG-b00AixhLJ16tDKulYcyHvg3xh-tRk" filename="Miscellaneous Textures.zip" size="12211901" md5="3a747c9d9daf7de4c24fde296d76be83" />
+  <addonfile friendlyname="Miscellaneous textures" author="CDAMJC, CreeperLava">
+    <file downloadlink="https://mega.nz/#!NlsnhAjT!AVx8Xof32tQRG-b00AixhLJ16tDKulYcyHvg3xh-tRk" tooltipname="Miscellaneous Textures.zip" filename="Miscellaneous Textures.zip" size="12211901" md5="3a747c9d9daf7de4c24fde296d76be83" />
     <packagefile me1="true" sourcename="MEUITM Fix.mem" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="HR Weapon Textures (CreeperLava)" tooltipname="HR Weapon Textures (CreeperLava).zip" author="TheDarkFalkon, CreeperLava">
-    <file downloadlink="https://mega.nz/#!A90hHL7A!m8Coh6BS8ERZLwe4VNrZjihGt9ZOITZBn6RMSRxd78w" filename="HR Weapon Textures (CreeperLava).zip" size="76446664" md5="6d7f90031e55c396807e742945628040" />
+  <addonfile friendlyname="HR Weapon Textures (CreeperLava)" author="TheDarkFalkon, CreeperLava">
+    <file downloadlink="https://mega.nz/#!A90hHL7A!m8Coh6BS8ERZLwe4VNrZjihGt9ZOITZBn6RMSRxd78w" tooltipname="HR Weapon Textures (CreeperLava).zip" filename="HR Weapon Textures (CreeperLava).zip" size="76446664" md5="6d7f90031e55c396807e742945628040" />
     <packagefile me3="true" sourcename="HR Weapon Textures ME3.mem" movedirectly="true" />
     <packagefile me2="true" sourcename="HR Weapon Textures ME2.mem" movedirectly="true" />
   </addonfile>
-  <addonfile friendlyname="HR Predator Texture" tooltipname="WpnPredator_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#!w093GCyK!9FI05eXXua0V7VaG8vp27miHZfZ26QqGirwB1pfcCw4" filename="WpnPredator_HRv1.5.zip" size="3286846" md5="d52bb74179ba9ea8521f86617a4d35e7" />
+  <addonfile friendlyname="HR Predator Texture" author="TheDarkFalkon">
+    <file downloadlink="https://mega.nz/#!w093GCyK!9FI05eXXua0V7VaG8vp27miHZfZ26QqGirwB1pfcCw4" tooltipname="WpnPredator_HRv1.5.zip" filename="WpnPredator_HRv1.5.zip" size="3286846" md5="d52bb74179ba9ea8521f86617a4d35e7" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0xA4E25886.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x17836EC0.dds" destinationname="WPN_PSTa_Diff_0x17836EC0.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0x7E3D8CAD.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA4E25886.dds" destinationname="WPN_PSTa_Spec_0xA4E25886.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF4295780.dds" destinationname="WPN_PSTa_Tint_0xF4295780.dds" />
   </addonfile>
-  <addonfile friendlyname="HR Shuriken Texture" tooltipname="WpnShuriken_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#!kwdz0AbK!L1vVXdvdkxs3VHXfpTTJcnwDNNcPT2yec5RQExkOi9k" filename="WpnShuriken_HRv1.5.zip" size="3127609" md5="25daf87a0b6deae25506c574d6c9723c" />
+  <addonfile friendlyname="HR Shuriken Texture" author="TheDarkFalkon">
+    <file downloadlink="https://mega.nz/#!kwdz0AbK!L1vVXdvdkxs3VHXfpTTJcnwDNNcPT2yec5RQExkOi9k" tooltipname="WpnShuriken_HRv1.5.zip" filename="WpnShuriken_HRv1.5.zip" size="3127609" md5="25daf87a0b6deae25506c574d6c9723c" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x71A3F10A.dds" destinationname="WPN_PSTc_Diff_0x71A3F10A.dds" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x8F2986F5.dds" destinationname="WPN_PSTc_Spec_0x8F2986F5.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x057B3D5A.dds" destinationname="WPN_PSTc_Tint_0x057B3D5A.dds" />
   </addonfile>
-  <addonfile friendlyname="HR Mantis Texture" tooltipname="WpnMantis_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#!4k8REYTQ!UEbSRrbxx1Y6fjkHSnFHaMSy8W8pThIsjOffdJ0jy70" filename="WpnMantis_HRv1.5.zip" size="3341991" md5="d577e69976cd14495cd8c972a968846f" />
+  <addonfile friendlyname="HR Mantis Texture" author="TheDarkFalkon">
+    <file downloadlink="https://mega.nz/#!4k8REYTQ!UEbSRrbxx1Y6fjkHSnFHaMSy8W8pThIsjOffdJ0jy70" tooltipname="WpnMantis_HRv1.5.zip"  filename="WpnMantis_HRv1.5.zip" size="3341991" md5="d577e69976cd14495cd8c972a968846f" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds" />
   </addonfile>
-  <addonfile friendlyname="HR Katana Texture" tooltipname="WpnKatana_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#!ZgcQFB7Y!mdXAG9Xbthf5K9FN5aUOV4QmnhD3qcdGPtI7NBnJdBs" filename="WpnKatana_HRv1.5.zip" size="2660646" md5="8940f294ac40c1b9cb5699990eee2a0f" />
+  <addonfile friendlyname="HR Katana Texture" author="TheDarkFalkon">
+    <file downloadlink="https://mega.nz/#!ZgcQFB7Y!mdXAG9Xbthf5K9FN5aUOV4QmnhD3qcdGPtI7NBnJdBs" tooltipname="WpnKatana_HRv1.5.zip" filename="WpnKatana_HRv1.5.zip" size="2660646" md5="8940f294ac40c1b9cb5699990eee2a0f" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0x738FAA8B.dds" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0xB0DD05E4.dds" destinationname="WPN_BLSb_Spec_0xB0DD05E4.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE999983A.dds" destinationname="WPN_BLSb_Tint_0xE999983A.dds" />
     <packagefile me2="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0xA56179D6.dds" />
   </addonfile>
-  <addonfile friendlyname="HR Carnifex Texture" tooltipname="WpnCarnifex_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#!JlEFnSIQ!LIblPk7G2vB9gdtgekfXQ6HqteGlzM9U-EaW9iJkG5A" filename="WpnCarnifex_HRv1.5.zip" size="4216670" md5="8064c75754b4e3d6cedad3a0fed6ef29" />
+  <addonfile friendlyname="HR Carnifex Texture" author="TheDarkFalkon">
+    <file downloadlink="https://mega.nz/#!JlEFnSIQ!LIblPk7G2vB9gdtgekfXQ6HqteGlzM9U-EaW9iJkG5A" tooltipname="WpnCarnifex_HRv1.5.zip" filename="WpnCarnifex_HRv1.5.zip" size="4216670" md5="8064c75754b4e3d6cedad3a0fed6ef29" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x073BF3F5.dds" destinationname="WPN_PSTb_Spec_0x073BF3F5.dds" />
     <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x6085274E.dds" destinationname="WPN_PSTb_Diff_0x6085274E.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x809FC86B.dds" destinationname="WPN_PSTb_Tint_0x809FC86B.dds" />
   </addonfile>
-  <addonfile friendlyname="HR Paladin Texture" tooltipname="WpnPaladin_HRv1.5.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#!40UjWa6J!0czjbA-lxW0Rb5yk5HOojS2Zlx78Jc6qRsHxgDpDb3Q" filename="WpnPaladin_HRv1.5.zip" size="2694764" md5="f13bddb44806d106b61bb0c3a80d66d4" />
+  <addonfile friendlyname="HR Paladin Texture" author="TheDarkFalkon">
+    <file downloadlink="https://mega.nz/#!40UjWa6J!0czjbA-lxW0Rb5yk5HOojS2Zlx78Jc6qRsHxgDpDb3Q" tooltipname="WpnPaladin_HRv1.5.zip" filename="WpnPaladin_HRv1.5.zip" size="2694764" md5="f13bddb44806d106b61bb0c3a80d66d4" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x498B35ED.dds" destinationname="WPN_PSTm_Diff_0x498B35ED.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB8151BBB.dds" destinationname="WPN_PSTm_Spec_0xB8151BBB.dds" />
   </addonfile>
-  <addonfile friendlyname="HR Phaeston Texture" tooltipname="WpnPhaeston_HRv1.65.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#!ckkVibAL!AoasulfLSzPFjChIV2J0B9plldCApkHnjJLOCGPvFTs" filename="WpnPhaeston_HRv1.65.zip" size="4286256" md5="92ffcf7ff8635e26cb2d61ce411697ff" />
+  <addonfile friendlyname="HR Phaeston Texture" author="TheDarkFalkon">
+    <file downloadlink="https://mega.nz/#!ckkVibAL!AoasulfLSzPFjChIV2J0B9plldCApkHnjJLOCGPvFTs" tooltipname="WpnPhaeston_HRv1.65.zip" filename="WpnPhaeston_HRv1.65.zip" size="4286256" md5="92ffcf7ff8635e26cb2d61ce411697ff" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA18F8A44.dds" destinationname="WPN_ASLg_Tint_0xA18F8A44.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE1EDE859.dds" destinationname="WPN_ASLg_Diff_0xE1EDE859.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEEFDCFA9.dds" destinationname="WPN_ASLg_Spec_0xEEFDCFA9.dds" />
   </addonfile>
-  <addonfile friendlyname="HR Cain Texture" tooltipname="WpnCain_HRv1.7.zip" author="TheDarkFalkon">
-    <file downloadlink="https://mega.nz/#!Ald1iIQJ!Emkz041FtD4M43HUcU-zx0glyhEBe4a2dU22klCAG_w" filename="WpnCain_HRv1.7.zip" size="4010295" md5="500c968c87ebe44e05f25de5294c3d07" />
+  <addonfile friendlyname="HR Cain Texture" author="TheDarkFalkon">
+    <file downloadlink="https://mega.nz/#!Ald1iIQJ!Emkz041FtD4M43HUcU-zx0glyhEBe4a2dU22klCAG_w" tooltipname="WpnCain_HRv1.7.zip" filename="WpnCain_HRv1.7.zip" size="4010295" md5="500c968c87ebe44e05f25de5294c3d07" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x637DADD4.dds" destinationname="WPN_HVYb_Diff_0x637DADD4.dds" />
     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds" />
   </addonfile>
