@@ -4,9 +4,9 @@
 	  <stage name="STAGE_PRESCAN" value="0"/>
 	  <stage name="STAGE_UNPACKDLC" value="0.11004021318"/>
 	  <stage name="STAGE_SCAN" value="0.12055272684"/>
-	  <stage name="STAGE_INSTALLTEXTURES" value="0.36997680866"/>
+	  <stage name="STAGE_INSTALLTEXTURES" value="0.36997680866" me3scaling="1.1"/>
 	  <stage name="STAGE_SAVING" value="0.25787962804"/>
-  	  <stage name="STAGE_REMOVEMIPMAPS" value="0.19155062326"/>
+  	  <stage name="STAGE_REMOVEMIPMAPS" value="0.19155062326" me1scaling="2.5"/>
 	  <stage name="STAGE_REPACK" value="0.09"/>
   	  <stage name="STAGE_MARKERS" value="0.025"/>
   </stageweighting>
