@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using AlotAddOnGUI.classes;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,15 +11,15 @@ namespace AlotAddOnGUI.ui
 {
     class ProgressWeightPercentages
     {
-        public static List<ProgressWeight> Weights;
-        public const int JOB_PRESCAN = 7;
+        public static List<Stage> Stages;
+        /*public const int JOB_PRESCAN = 7;
         public const int JOB_UNPACK = 0;
         public const int JOB_SCAN = 1;
         public const int JOB_REMOVE = 2;
         public const int JOB_INSTALLMARKERS = 3;
         public const int JOB_INSTALL = 4;
         public const int JOB_SAVE = 5;
-        public const int JOB_REPACK = 6;
+        public const int JOB_REPACK = 6;*/
 
         private static double TOTAL_ACTIVE_WEIGHT = 0;
         private static List<MutableKeyValuePair<int, double>> jobWeightList = new List<MutableKeyValuePair<int, double>>();
@@ -37,7 +38,7 @@ namespace AlotAddOnGUI.ui
         /// <param name="task">Name of stage.</param>
         public static void AddTask(string stagename, int game = 0)
         {
-            ProgressWeight pw = Weights.Where(x => x.StageName == stagename).FirstOrDefault();
+            Stage pw = Stages.Where(x => x.StageName == stagename).FirstOrDefault();
             if (pw != null)
             {
                 pw.reweightStageForGame(game);
@@ -116,43 +117,43 @@ namespace AlotAddOnGUI.ui
 
         internal static void SetDefaultWeights()
         {
-            Weights = new List<ProgressWeight>();
-            Weights.Add(new ProgressWeight()
+            Stages = new List<Stage>();
+            Stages.Add(new Stage()
             {
                 StageName = "STAGE_PRESCAN"
             });
-            Weights.Add(new ProgressWeight()
+            Stages.Add(new Stage()
             {
                 StageName = "STAGE_UNPACKDLC",
                 Weight = 0.11004021318
             });
-            Weights.Add(new ProgressWeight()
+            Stages.Add(new Stage()
             {
                 StageName = "STAGE_SCAN",
                 Weight = 0.12055272684
             });
-            Weights.Add(new ProgressWeight()
+            Stages.Add(new Stage()
             {
                 StageName = "STAGE_REMOVE",
                 Weight = 0.19155062326,
                 ME1Scaling = 2.3
             });
-            Weights.Add(new ProgressWeight()
+            Stages.Add(new Stage()
             {
                 StageName = "STAGE_INSTALL",
                 Weight = 0.31997680866
             });
-            Weights.Add(new ProgressWeight()
+            Stages.Add(new Stage()
             {
                 StageName = "STAGE_SAVE",
                 Weight = 0.25787962804
             });
-            Weights.Add(new ProgressWeight()
+            Stages.Add(new Stage()
             {
                 StageName = "STAGE_REPACK",
                 Weight = 0.0800000
             });
-            Weights.Add(new ProgressWeight()
+            Stages.Add(new Stage()
             {
                 StageName = "STAGE_INSTALLMARKERS",
                 Weight = 0.0400000
@@ -169,34 +170,6 @@ namespace AlotAddOnGUI.ui
         {
             Key = key;
             Value = value;
-        }
-    }
-
-    [DebuggerDisplay("{StageName} ME1Scaling = {ME1Scaling}, ME2Scaling = {ME2Scaling}, ME3Scaling = {ME3Scaling}, Weight: {Weight}")]
-    public class ProgressWeight
-    {
-        public double ME1Scaling = 1;
-        public double ME2Scaling = 1;
-        public double ME3Scaling = 1;
-        public double Weight = 0;
-        public string StageName = "Stage";
-
-        public void reweightStageForGame(int game)
-        {
-            double scalingVal = 1;
-            switch (game)
-            {
-                case 1:
-                    scalingVal = ME1Scaling;
-                    break;
-                case 2:
-                    scalingVal = ME2Scaling;
-                    break;
-                case 3:
-                    scalingVal = ME3Scaling;
-                    break;
-            }
-            Weight *= scalingVal;
         }
     }
 }

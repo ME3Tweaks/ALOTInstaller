@@ -82,6 +82,39 @@ namespace AlotAddOnGUI
                 }
             }
         }
+        private void MusicPlaybackStopped(object sender, NAudio.Wave.StoppedEventArgs e)
+        {
+            if (MusicIsPlaying)
+            {
+                vorbisStream.Position = 0;
+            }
+            else
+            {
+                waveOut.Stop();
+                waveOut.Dispose();
+                waveOut = null;
+            }
+        }
+        private string GetMusicDirectory()
+        {
+            return EXE_DIRECTORY + "Data\\music\\";
+        }
+        private void newTipTimer_Tick(object sender, EventArgs e)
+        {
+            // code goes here
+            if (TIPS_LIST.Count > 1)
+            {
+                string currentTip = InstallingOverlay_Tip.Text;
+                string newTip = InstallingOverlay_Tip.Text;
+
+                while (currentTip == newTip)
+                {
+                    int r = RANDOM.Next(TIPS_LIST.Count);
+                    newTip = TIPS_LIST[r];
+                }
+                InstallingOverlay_Tip.Text = newTip;
+            }
+        }
 
         private void InstallALOT(int game, List<AddonFile> filesToInstall)
         {
@@ -307,7 +340,6 @@ namespace AlotAddOnGUI
             }
         }
 
-
         private void InstallALOTContextBased(object sender, DoWorkEventArgs e)
         {
             CURRENT_STAGE_CONTEXT = null;
@@ -445,69 +477,102 @@ namespace AlotAddOnGUI
                 if (processResult != 0)
                 {
                     Log.Error("MassEffectModderNoGui process exited with non-zero code: " + processResult);
-                    Log.Warning("Application exited with in context: " + CURRENT_STAGE_CONTEXT);
-                    switch (CURRENT_STAGE_CONTEXT)
+                    Log.Warning("Application exited in stage context: " + CURRENT_STAGE_CONTEXT);
+                    Stage stage = ProgressWeightPercentages.Stages.Where(x => x.StageName == CURRENT_STAGE_CONTEXT).FirstOrDefault();
+                    if (stage != null)
                     {
-                        case "STAGE_UNPACKDLC":
-                            Log.Error("MassEffectModderNoGui exited or crashed while unpacking DLC");
-                            e.Result = RESULT_UNPACK_FAILED;
-                            break;
-                        case "STAGE_SCAN":
-                            Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
-                            e.Result = RESULT_SCAN_FAILED;
-                            break;
-                        case "STAGE_INSTALLTEXTURES":
-                            Log.Error("MassEffectModderNoGui exited or crashed while installing textures");
-                            if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+                        //check if it has background errors (handled errors)
+                        if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)//has more than just standard crash failure info
+                        {
+                            if (stage.FailureInfos.Count() > 1) { }
+                            StageFailure sf = stage.FailureInfos.Where(x => BACKGROUND_MEM_PROCESS_ERRORS[0] == x.FailureIPCTrigger).FirstOrDefault();
+                            if (sf != null)
                             {
-                                switch (BACKGROUND_MEM_PROCESS_ERRORS[0])
-                                {
-                                    case ERROR_TEXTURE_MAP_MISSING:
-                                        e.Result = RESULT_TEXTUREINSTALL_NO_TEXTUREMAP;
-                                        break;
-                                    case ERROR_TEXTURE_MAP_WRONG:
-                                        e.Result = RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP;
-                                        break;
-                                    case ERROR_FILE_ADDED:
-                                        e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_ADDED;
-                                        break;
-                                    case ERROR_FILE_REMOVED:
-                                        e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED;
-                                        break;
-                                    default:
-                                        Log.Error("Background MEM errors has item not handled: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
-                                        e.Result = RESULT_TEXTUREINSTALL_FAILED;
-                                        break;
-                                }
+                                //we hit a known failure trigger
+
                             }
-                            else
-                            {
-                                e.Result = RESULT_TEXTUREINSTALL_FAILED;
-                            }
-                            break;
-                        case "STAGE_SAVING":
-                            Log.Error("MassEffectModderNoGui exited or crashed while saving packages");
-                            e.Result = RESULT_SAVING_FAILED;
-                            break;
-                        case "STAGE_REMOVEMIPMAPS":
-                            Log.Error("MassEffectModderNoGui exited or crashed while removing empty mipmaps");
-                            e.Result = RESULT_REMOVE_MIPMAPS_FAILED;
-                            break;
-                        case "STAGE_REPACK":
-                            Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
-                            e.Result = RESULT_REPACK_FAILED;
-                            break;
-                        default:
-                            Log.Error("MEM Exited during unknown stage context: " + STAGE_CONTEXT);
-                            e.Result = RESULT_UNKNOWN_ERROR;
-                            break;
+                        }
+                        else
+                        {
+                            Log.Error("BACKGROUND_MEM_PROCESS_ERRORS contains an unknown item: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
+                            //Unknown trigger
+                        }
+                    }
+                    else
+                    {
+                        //MEM exited without handled error
+
                     }
 
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
-                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
-                    return;
                 }
+                else
+                {
+                    Log.Error("MEM exited during unknown stage context: " + STAGE_CONTEXT);
+                    e.Result = RESULT_UNKNOWN_ERROR;
+                }
+
+                switch (CURRENT_STAGE_CONTEXT)
+                {
+                    case "STAGE_UNPACKDLC":
+                        Log.Error("MassEffectModderNoGui exited or crashed while unpacking DLC");
+                        e.Result = RESULT_UNPACK_FAILED;
+                        break;
+                    case "STAGE_SCAN":
+                        Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
+                        e.Result = RESULT_SCAN_FAILED;
+                        break;
+                    case "STAGE_INSTALLTEXTURES":
+                        Log.Error("MassEffectModderNoGui exited or crashed while installing textures");
+                        if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+                        {
+                            switch (BACKGROUND_MEM_PROCESS_ERRORS[0])
+                            {
+                                case ERROR_TEXTURE_MAP_MISSING:
+                                    e.Result = RESULT_TEXTUREINSTALL_NO_TEXTUREMAP;
+                                    break;
+                                case ERROR_TEXTURE_MAP_WRONG:
+                                    e.Result = RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP;
+                                    break;
+                                case ERROR_FILE_ADDED:
+                                    e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_ADDED;
+                                    break;
+                                case ERROR_FILE_REMOVED:
+                                    e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED;
+                                    break;
+                                default:
+                                    Log.Error("Background MEM errors has item not handled: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
+                                    e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                        }
+                        break;
+                    case "STAGE_SAVING":
+                        Log.Error("MassEffectModderNoGui exited or crashed while saving packages");
+                        e.Result = RESULT_SAVING_FAILED;
+                        break;
+                    case "STAGE_REMOVEMIPMAPS":
+                        Log.Error("MassEffectModderNoGui exited or crashed while removing empty mipmaps");
+                        e.Result = RESULT_REMOVE_MIPMAPS_FAILED;
+                        break;
+                    case "STAGE_REPACK":
+                        Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
+                        e.Result = RESULT_REPACK_FAILED;
+                        break;
+                    default:
+                        Log.Error("MEM Exited during unknown stage context: " + STAGE_CONTEXT);
+                        e.Result = RESULT_UNKNOWN_ERROR;
+                        break;
+                }
+
+                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
+                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
+                return;
             }
+
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGES_LABEL));
             overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
             InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
@@ -621,7 +686,7 @@ namespace AlotAddOnGUI
             {
                 args += " -soft-shadows-mode -meuitm-mode";
             }
-            RunAndTimeMEM_Install(exe, args, InstallWorker);
+            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
             if (processResult != 0)
             {
@@ -635,7 +700,7 @@ namespace AlotAddOnGUI
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
 
                 args = "-apply-me1-laa";
-                RunAndTimeMEM_Install(exe, args, InstallWorker);
+                RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0)
                 {
@@ -795,42 +860,6 @@ namespace AlotAddOnGUI
                 }
             }
             e.Result = INSTALL_OK;
-        }
-
-        private void MusicPlaybackStopped(object sender, NAudio.Wave.StoppedEventArgs e)
-        {
-            if (MusicIsPlaying)
-            {
-                vorbisStream.Position = 0;
-            }
-            else
-            {
-                waveOut.Stop();
-                waveOut.Dispose();
-                waveOut = null;
-            }
-        }
-
-        private void newTipTimer_Tick(object sender, EventArgs e)
-        {
-            // code goes here
-            if (TIPS_LIST.Count > 1)
-            {
-                string currentTip = InstallingOverlay_Tip.Text;
-                string newTip = InstallingOverlay_Tip.Text;
-
-                while (currentTip == newTip)
-                {
-                    int r = RANDOM.Next(TIPS_LIST.Count);
-                    newTip = TIPS_LIST[r];
-                }
-                InstallingOverlay_Tip.Text = newTip;
-            }
-        }
-
-        private string GetMusicDirectory()
-        {
-            return EXE_DIRECTORY + "Data\\music\\";
         }
 
         private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -1044,13 +1073,13 @@ namespace AlotAddOnGUI
                         int memVersionUsed = memVersionString.FileMajorPart;
                         int installerVersionUsed = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.Build;
                         int diskType = -3; //Cannot detect due to OS version is -2
-                        var dlcPath = Utilities.GetGamePath(Game);
+                var dlcPath = Utilities.GetGamePath(Game);
                         string pathroot = Path.GetPathRoot(dlcPath);
                         pathroot = pathroot.Substring(0, 1);
                         if (pathroot == @"\")
                         {
                             diskType = -2; //-2 = UNC
-                        }
+                }
                         else if (Utilities.IsWindows10OrNewer())
                         {
                             diskType = DiskTypeDetector.GetPartitionDiskBackingType(pathroot);
@@ -1101,7 +1130,7 @@ namespace AlotAddOnGUI
                         }
                         Log.Information("Sending installation telemetry");
                         "https://me3tweaks.com/alotinstaller/installationtelemetry.php".PostUrlEncodedAsync(new { game = Game, memversion = memVersionUsed, installerversion = installerVersionUsed, processor = processorName, processor_corecount = processorCoreCount, processor_speed = processorSpeedMhz, memory = memoryAmount, installation_time = MEM_INSTALL_TIME_SECONDS, alladdonfiles = MainWindow.TELEMETRY_ALL_ADDON_FILES ? 1 : 0, officialdlccount = officialDLCCount, disktype = diskType, failed = telemetryfailedcode, os = OS });//.ReceiveString();
-                        Log.Information("Installation telemetry has been submitted");
+                Log.Information("Installation telemetry has been submitted");
                     }
                     catch (FlurlHttpTimeoutException)
                     {
@@ -1124,7 +1153,6 @@ namespace AlotAddOnGUI
         private void RunAndTimeMEMContextBased_Install(string exe, string args, BackgroundWorker installWorker, bool isMainInstall = false)
         {
             Stopwatch sw = Stopwatch.StartNew();
-
             runMEM_InstallContextBased(exe, args, InstallWorker);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {
@@ -1190,8 +1218,8 @@ namespace AlotAddOnGUI
                                 {
                                     if (param == "STAGE_DONE")
                                     {
-                                        //We're done!
-                                        STAGE_DONE_REACHED = true;
+                                //We're done!
+                                STAGE_DONE_REACHED = true;
                                         return;
                                     }
                                     if (CURRENT_STAGE_CONTEXT != null)
@@ -1202,12 +1230,12 @@ namespace AlotAddOnGUI
                                     }
                                     else
                                     {
-                                        //context is null, we are now starting
-                                        ProgressWeightPercentages.ScaleWeights();
+                                //context is null, we are now starting
+                                ProgressWeightPercentages.ScaleWeights();
                                     }
 
-                                    //clear errors so we can context switch error handling
-                                    BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
+                            //clear errors so we can context switch error handling
+                            BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
                                     BACKGROUND_MEM_PROCESS_PARSED_ERRORS = new List<string>();
 
 
@@ -1216,46 +1244,46 @@ namespace AlotAddOnGUI
                                     worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENT_STAGE_PROGRESS, CurrentTaskPercent));
                                     worker.ReportProgress(completed, new ThreadCommand(UPDATE_STAGE_OF_STAGE_LABEL, param));
                                     CURRENT_STAGE_CONTEXT = param;
-                                    string task = "";
-                                    switch (CURRENT_STAGE_CONTEXT)
-                                    {
-                                        case "STAGE_PRESCAN":
-                                            task = "Performing installation prescan";
-                                            break;
-                                        case "STAGE_UNPACKDLC":
-                                            task = "Unpacking DLC";
-                                            break;
-                                        case "STAGE_SCAN":
-                                            task = "Scanning textures";
-                                            break;
-                                        case "STAGE_INSTALLTEXTURES":
-                                            task = "Installing textures";
-                                            break;
-                                        case "STAGE_SAVING":
-                                            task = "Saving packages";
-                                            break;
-                                        case "STAGE_REMOVEMIPMAPS":
-                                            task = "Removing empty mipmaps";
-                                            break;
-                                        case "STAGE_REPACK":
-                                            task = "Repacking game files";
-                                            break;
-                                        default:
-                                            Log.Error("UNKNOWN STAGE_CONTEXT PARAM: " + param);
-                                            return;
-                                    }
-                                    CurrentTask = task;
+                                    Stage stage = ProgressWeightPercentages.Stages.Where(x => x.StageName == CURRENT_STAGE_CONTEXT).FirstOrDefault();
+                                    CurrentTask = stage.TaskName ?? CURRENT_STAGE_CONTEXT;
+
+                            /*switch (CURRENT_STAGE_CONTEXT)
+                            {
+                                case "STAGE_PRESCAN":
+                                    task = "Performing installation prescan";
+                                    break;
+                                case "STAGE_UNPACKDLC":
+                                    task = "Unpacking DLC";
+                                    break;
+                                case "STAGE_SCAN":
+                                    task = "Scanning textures";
+                                    break;
+                                case "STAGE_INSTALLTEXTURES":
+                                    task = "Installing textures";
+                                    break;
+                                case "STAGE_SAVING":
+                                    task = "Saving packages";
+                                    break;
+                                case "STAGE_REMOVEMIPMAPS":
+                                    task = "Removing empty mipmaps";
+                                    break;
+                                case "STAGE_REPACK":
+                                    task = "Repacking game files";
+                                    break;
+                                default:
+                                    Log.Error("UNKNOWN STAGE_CONTEXT PARAM: " + param);
+                                    return;
+                            }
+                            CurrentTask = task;*/
                                     int progressval = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 0);
-                                    worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENTTASK_NAME, task));
-                                    //InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
-                                    //InstallingOverlay_OverallLabel.Text = "(" + progressval.ToString() + "%)";
+                                    worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
                                     break;
                                 }
                             case "PROCESSING_FILE":
                                 Log.Information("MEMNoGui processing file: " + param);
                                 break;
                             case "OVERALL_PROGRESS": //will be removed
-                            case "TASK_PROGRESS":
+                    case "TASK_PROGRESS":
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENT_STAGE_PROGRESS, param));
                                 break;
                             case "SET_STAGE_LABEL":
@@ -1264,22 +1292,25 @@ namespace AlotAddOnGUI
                             case "HIDE_STAGES":
                                 worker.ReportProgress(completed, new ThreadCommand(HIDE_STAGES_LABEL));
                                 break;
-                            case ERROR_TEXTURE_MAP_MISSING:
-                                Log.Fatal("[FATAL]Texture map is missing! We cannot install textures");
-                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_MISSING);
-                                break;
-                            case ERROR_TEXTURE_MAP_WRONG:
-                                Log.Fatal("[FATAL]Texture map is invalid! We cannot install textures");
-                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_WRONG);
-                                break;
-                            case "ERROR_ADDED_FILE":
-                                Log.Error("MEMNoGui detects some game file(s) were added since initial texture installation! This is not supported. Installation aborted");
-                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_ADDED);
-                                break;
-                            case "ERROR_REMOVED_FILE":
-                                Log.Error("MEMNoGui detects some game file(s) were removed since initial texture installation! This is not supported. Installation aborted");
-                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_REMOVED);
-                                break;
+
+                    /*
+                case ERROR_TEXTURE_MAP_MISSING:
+                    Log.Fatal("[FATAL]Texture map is missing! We cannot install textures");
+                    BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_MISSING);
+                    break;
+                case ERROR_TEXTURE_MAP_WRONG:
+                    Log.Fatal("[FATAL]Texture map is invalid! We cannot install textures");
+                    BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_WRONG);
+                    break;
+                case "ERROR_ADDED_FILE":
+                    Log.Error("MEMNoGui detects some game file(s) were added since initial texture installation! This is not supported. Installation aborted");
+                    BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_ADDED);
+                    break;
+                case "ERROR_REMOVED_FILE":
+                    Log.Error("MEMNoGui detects some game file(s) were removed since initial texture installation! This is not supported. Installation aborted");
+                    BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_REMOVED);
+                    break;
+                    */
                             case "ERROR":
                                 Log.Error("Error IPC from MEM: " + param);
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
@@ -1289,125 +1320,32 @@ namespace AlotAddOnGUI
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
                                 break;
                             default:
-                                Log.Information("Unknown IPC command: " + command);
-                                break;
-                        }
-                    }
-                }
-                else
-                {
-                    if (str.Trim() != "")
-                    {
-                        Log.Information("Realtime Process Output: " + str);
-                    }
-                }
-            };
-            BACKGROUND_MEM_PROCESS.Run();
-        }
-
-        private void RunAndTimeMEM_Install(string exe, string args, BackgroundWorker installWorker)
-        {
-            Stopwatch sw = Stopwatch.StartNew();
-
-            runMEM_Install(exe, args, InstallWorker);
-            while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
-            {
-                Thread.Sleep(END_OF_PROCESS_POLL_INTERVAL);
-            }
-            sw.Stop();
-            int minutes = (int)sw.Elapsed.TotalMinutes;
-            double fsec = 60 * (sw.Elapsed.TotalMinutes - minutes);
-            int sec = (int)fsec;
-            Log.Information("Process complete - finished in " + minutes + " minutes " + sec + " seconds");
-        }
-
-        private void RunAndTimeMEM_InstallContextBased(string exe, string args, BackgroundWorker installWorker)
-        {
-            Stopwatch sw = Stopwatch.StartNew();
-            runMEM_InstallContextBased(exe, args, InstallWorker);
-            while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
-            {
-                Thread.Sleep(END_OF_PROCESS_POLL_INTERVAL);
-            }
-            sw.Stop();
-            int minutes = (int)sw.Elapsed.TotalMinutes;
-            double fsec = 60 * (sw.Elapsed.TotalMinutes - minutes);
-            int sec = (int)fsec;
-            Log.Information("Process complete - finished in " + minutes + " minutes " + sec + " seconds");
-        }
-
-        private void runMEM_Install(string exe, string args, BackgroundWorker worker, List<string> acceptedIPC = null)
-        {
-            Debug.WriteLine("Running process: " + exe + " " + args);
-            Log.Information("Running process: " + exe + " " + args);
-
-
-            BACKGROUND_MEM_PROCESS = new ConsoleApp(exe, args);
-            BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
-            BACKGROUND_MEM_PROCESS_PARSED_ERRORS = new List<string>();
-            BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
-            {
-                string str = args2.Line;
-                if (str.StartsWith("[IPC]"))
-                {
-                    string command = str.Substring(5);
-                    int endOfCommand = command.IndexOf(' ');
-                    if (endOfCommand > 0)
-                    {
-                        command = command.Substring(0, endOfCommand);
-                    }
-                    if (acceptedIPC == null || acceptedIPC.Contains(command))
-                    {
-                        string param = str.Substring(endOfCommand + 5).Trim();
-                        switch (command)
-                        {
-                            //worker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
-                            //int percentInt = Convert.ToInt32(param);
-                            //worker.ReportProgress(percentInt);
-                            case "PROCESSING_FILE":
-                            case "PROCESSING_MOD":
-                            case "PROCESSING_TEXTURE_INSTALL":
-                                Log.Information("MEM Reports processing file: " + param);
-                                //worker.ReportProgress(completed, new ThreadCommand(UPDATE_OPERATION_LABEL, param));
-                                break;
-                            case "OVERALL_PROGRESS"://This will be removed later
-                            case "TASK_PROGRESS":
-                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENT_STAGE_PROGRESS, param));
-                                break;
-                            case "PHASE":
-                                Log.Warning("Stage " + CURRENT_STAGE_NUM + " has completed.");
-                                int overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
-                                worker.ReportProgress(completed, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
-                                Interlocked.Increment(ref CURRENT_STAGE_NUM);
-                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_STAGE_OF_STAGE_LABEL));
-                                worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENTTASK_NAME, param));
-
-                                break;
-                            case "HIDE_STAGES":
-                                worker.ReportProgress(completed, new ThreadCommand(HIDE_STAGES_LABEL));
-                                break;
-                            case ERROR_TEXTURE_MAP_MISSING:
-                                Log.Fatal("[FATAL]Texture map is missing! We cannot install textures");
-                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_MISSING);
-                                break;
-                            case ERROR_TEXTURE_MAP_WRONG:
-                                Log.Fatal("[FATAL]Texture map is invalid! We cannot install textures");
-                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_WRONG);
-                                break;
-                            case "ERROR_ADDED_FILE":
-                                Log.Error("MEM detects some game file(s) were added since initial texture installation! This is not supported. Installation aborted");
-                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_ADDED);
-                                break;
-                            case "ERROR_REMOVED_FILE":
-                                Log.Error("MEM detects some game file(s) were removed since initial texture installation! This is not supported. Installation aborted");
-                                BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_REMOVED);
-                                break;
-                            case "ERROR":
-                                Log.Error("Error IPC from MEM: " + param);
-                                BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
-                                break;
-                            default:
-                                Log.Information("Unknown IPC command: " + command);
+                        //check if IPC is a stage failure
+                        StageFailure failure = null;
+                                foreach (Stage stage in ProgressWeightPercentages.Stages)
+                                {
+                                    foreach (StageFailure sf in stage.FailureInfos)
+                                    {
+                                        if (sf.FailureIPCTrigger != null && sf.FailureIPCTrigger == command)
+                                        {
+                                            failure = sf;
+                                            break;
+                                        }
+                                    }
+                                    if (failure != null)
+                                    {
+                                        break;
+                                    }
+                                }
+                                if (failure != null)
+                                {
+                                    Log.Error("A fail condition IPC has been received: " + failure.FailureIPCTrigger + ". " + failure.FailureTopText);
+                                    BACKGROUND_MEM_PROCESS_ERRORS.Add(failure.FailureIPCTrigger);
+                                }
+                                else
+                                {
+                                    Log.Information("Unknown IPC command: " + command);
+                                }
                                 break;
                         }
                     }

@@ -2228,17 +2228,26 @@ namespace AlotAddOnGUI
                 HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("highestapprovedmemversion") == null ? HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("highestapprovedmemversion");
                 SOAK_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("soaktestingmemversion") == null ? SOAK_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("soaktestingmemversion");
 
-                if (rootElement.Element("stageweights") != null)
+                if (rootElement.Element("stages") != null)
                 {
-                    ProgressWeightPercentages.Weights =
-                        (from stage in rootElement.Element("stageweights").Descendants("stage")
-                         select new ProgressWeight
+                    ProgressWeightPercentages.Stages =
+                        (from stage in rootElement.Element("stages").Descendants("stage")
+                         select new Stage
                          {
                              StageName = stage.Attribute("name").Value,
-                             Weight = Convert.ToDouble(stage.Attribute("value").Value),
-                             ME1Scaling = stage.Attribute("me1scaling") != null ? Convert.ToDouble(stage.Attribute("me1scaling").Value) : 1,
-                             ME2Scaling = stage.Attribute("me2scaling") != null ? Convert.ToDouble(stage.Attribute("me2scaling").Value) : 1,
-                             ME3Scaling = stage.Attribute("me3scaling") != null ? Convert.ToDouble(stage.Attribute("me3scaling").Value) : 1
+                             TaskName = stage.Attribute("tasktext").Value,
+                             Weight = Convert.ToDouble(stage.Attribute("weight").Value),
+                             ME1Scaling = stage.Attribute("me1weightscaling") != null ? Convert.ToDouble(stage.Attribute("me1weightscaling").Value) : 1,
+                             ME2Scaling = stage.Attribute("me2weightscaling") != null ? Convert.ToDouble(stage.Attribute("me2weightscaling").Value) : 1,
+                             ME3Scaling = stage.Attribute("me3weightscaling") != null ? Convert.ToDouble(stage.Attribute("me3weightscaling").Value) : 1,
+                             FailureInfos = stage.Elements("failureinfo").Select(z => new StageFailure
+                             {
+                                 FailureIPCTrigger = z.Attribute("ipcerror") != null ? z.Attribute("ipcerror").Value : null,
+                                 FailureBottomText = z.Attribute("failedbottommessage").Value,
+                                 FailureTopText = z.Attribute("failedtopmessage").Value,
+                                 FailureHeaderText = z.Attribute("failedheadermessage").Value,
+                                 FailureResultCode = Convert.ToInt32(z.Attribute("resultcode").Value)
+                             }).ToList()
                          }).ToList();
                 }
                 else
