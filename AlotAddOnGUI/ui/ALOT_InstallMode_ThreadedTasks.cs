@@ -477,7 +477,7 @@ namespace AlotAddOnGUI
                 if (processResult != 0)
                 {
                     Log.Error("MassEffectModderNoGui process exited with non-zero code: " + processResult);
-                    Log.Warning("Application exited in stage context: " + CURRENT_STAGE_CONTEXT);
+                    Log.Warning("MEMNoGui exited in stage context: " + CURRENT_STAGE_CONTEXT);
                     Stage stage = ProgressWeightPercentages.Stages.Where(x => x.StageName == CURRENT_STAGE_CONTEXT).FirstOrDefault();
                     if (stage != null)
                     {
@@ -499,6 +499,9 @@ namespace AlotAddOnGUI
                         {
                             //has output errors but we have no handlers for this trigger
                             Log.Error("BACKGROUND_MEM_PROCESS_ERRORS contains an unknown item: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
+                            e.Result = stage.getDefaultFailure().FailureResultCode;
+                        } else
+                        {
                             e.Result = stage.getDefaultFailure().FailureResultCode;
                         }
                     }
@@ -1036,7 +1039,23 @@ namespace AlotAddOnGUI
                         }
                     default:
                         {
-                            var stagefailure = ProgressWeightPercentages.Stages.Select(stage => stage.FailureInfos.FirstOrDefault(code => code.FailureResultCode == result)).FirstOrDefault();
+                            //this could probably be linq'd
+                            StageFailure stagefailure = null;
+                            foreach (Stage stage in ProgressWeightPercentages.Stages)
+                            {
+                                foreach (StageFailure sf in stage.FailureInfos)
+                                {
+                                    if (sf.FailureResultCode == result)
+                                    {
+                                        stagefailure = sf;
+                                        break;
+                                    }
+                                }
+                                if (stagefailure != null)
+                                {
+                                    break;
+                                }
+                            }
                             if (stagefailure != null)
                             {
                                 InstallingOverlay_TopLabel.Text = stagefailure.FailureTopText;

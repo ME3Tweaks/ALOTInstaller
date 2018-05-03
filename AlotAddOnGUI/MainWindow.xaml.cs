@@ -35,6 +35,7 @@ using System.Xml.Linq;
 using Flurl.Http;
 using System.Windows.Media;
 using System.IO.Compression;
+using System.Globalization;
 
 namespace AlotAddOnGUI
 {
@@ -69,6 +70,7 @@ namespace AlotAddOnGUI
         private bool _preventFileRefresh = false;
         private int HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = 999; //will be set by manifest
         private int SOAK_APPROVED_STABLE_MEMNOGUIVERSION = -1; //will be set by manifest
+        private DateTime SOAK_START_DATE;
         private int[] SoakThresholds = { 50, 150, 400, 1000, 3000, 100000000 };
         public bool PreventFileRefresh
         {
@@ -728,7 +730,9 @@ namespace AlotAddOnGUI
                             }
                             if (releaseNameInt == SOAK_APPROVED_STABLE_MEMNOGUIVERSION)
                             {
-                                int soakTestReleaseAge = (DateTime.Now - r.PublishedAt.Value).Days;
+                                var comparisonAge = SOAK_START_DATE == null ? DateTime.Now - r.PublishedAt.Value : DateTime.Now - SOAK_START_DATE;
+                                var age = DateTime.Now - SOAK_START_DATE;
+                                int soakTestReleaseAge = (comparisonAge).Days;
                                 if (soakTestReleaseAge > SoakThresholds.Length - 1)
                                 {
                                     Log.Information("New MEMNOGUI update is past soak period, accepting this release as an update");
@@ -2226,8 +2230,15 @@ namespace AlotAddOnGUI
                              }).ToList();
 
                 HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("highestapprovedmemversion") == null ? HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("highestapprovedmemversion");
-                SOAK_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("soaktestingmemversion") == null ? SOAK_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("soaktestingmemversion");
+                if (rootElement.Element("soaktestingmemversion") != null)
+                {
+                    SOAK_APPROVED_STABLE_MEMNOGUIVERSION = (int)rootElement.Element("soaktestingmemversion");
+                    SOAK_START_DATE = DateTime.ParseExact(rootElement.Element("soaktestingmemversion").Attribute("soakstartdate").Value,"yyyy-MM-dd",CultureInfo.InvariantCulture);
+                }
+                else
+                {
 
+                }
                 if (rootElement.Element("stages") != null)
                 {
                     ProgressWeightPercentages.Stages =
