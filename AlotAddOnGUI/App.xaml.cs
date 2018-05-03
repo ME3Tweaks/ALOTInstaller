@@ -263,7 +263,14 @@ namespace AlotAddOnGUI
             }
 
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
-            Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
+            try
+            {
+                Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
+            } catch (Exception e)
+            {
+                Log.Error("UNABLE TO GET SYSTEM INFORMATION. This is indiciative that system may not be stable.");
+                Log.Error(App.FlattenException(e));
+            }
             string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
             Utilities.GetAntivirusInfo();
         }
