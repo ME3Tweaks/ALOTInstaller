@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotaddonmanifest version="5.0.23">
+  <soaktestingmemversion soakstartdate="2018-05-03">126</soaktestingmemversion>
   <stages>
 	<!-- -56 is the next error code available-->
 	  <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
-		<failureinfo resultcode="-54" failedtopmessage="Failed to install remaining ALOT markers" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during preinstallation scan. Please see installer log for more info."/>		
+		<failureinfo resultcode="-54" failedtopmessage="Preinstallation scan failed" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during preinstallation scan. Please see installer log for more info."/>		
 	  </stage>
 	  <stage name="STAGE_UNPACKDLC" weight="0.11004021318" tasktext="Unpacking DLC">
 		<failureinfo resultcode="-40" failedtopmessage="Failed to unpack DLC" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during unpacking of DLC SFARs. Please see installer log for more info. The game is in an inconsistent state and may not be functional."/>

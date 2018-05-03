@@ -266,13 +266,14 @@ namespace AlotAddOnGUI
             try
             {
                 Log.Information("System information:\n" + Utilities.GetOperatingSystemInfo());
-            } catch (Exception e)
+                Utilities.GetAntivirusInfo();
+            }
+            catch (Exception e)
             {
-                Log.Error("UNABLE TO GET SYSTEM INFORMATION. This is indiciative that system may not be stable.");
+                Log.Error("UNABLE TO GET SYSTEM INFORMATION OR ANTIVIRUS INFO. This is indiciative that system may not be stable or that WMI is corrupt.");
                 Log.Error(App.FlattenException(e));
             }
-            string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
-            Utilities.GetAntivirusInfo();
+            //string releaseId = Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ReleaseId", "").ToString();
         }
 
         /// <summary>
