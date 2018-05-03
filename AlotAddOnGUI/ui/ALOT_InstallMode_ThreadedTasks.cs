@@ -482,97 +482,107 @@ namespace AlotAddOnGUI
                     if (stage != null)
                     {
                         //check if it has background errors (handled errors)
-                        if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)//has more than just standard crash failure info
+                        if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0 && stage.FailureInfos.Count() > 1)// has more than just standard crash failure info
                         {
-                            if (stage.FailureInfos.Count() > 1) { }
                             StageFailure sf = stage.FailureInfos.Where(x => BACKGROUND_MEM_PROCESS_ERRORS[0] == x.FailureIPCTrigger).FirstOrDefault();
                             if (sf != null)
                             {
                                 //we hit a known failure trigger
-
+                                e.Result = sf.FailureResultCode;
+                            }
+                            else
+                            {
+                                Log.Error("BACKGROUND_MEM_PROCESS_ERRORS contains an unknown item: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
                             }
                         }
-                        else
+                        else if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
                         {
+                            //has output errors but we have no handlers for this trigger
                             Log.Error("BACKGROUND_MEM_PROCESS_ERRORS contains an unknown item: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
-                            //Unknown trigger
+                            e.Result = stage.getDefaultFailure().FailureResultCode;
                         }
                     }
                     else
                     {
                         //MEM exited without handled error
-
-                    }
-
-                }
-                else
-                {
-                    Log.Error("MEM exited during unknown stage context: " + STAGE_CONTEXT);
-                    e.Result = RESULT_UNKNOWN_ERROR;
-                }
-
-                switch (CURRENT_STAGE_CONTEXT)
-                {
-                    case "STAGE_UNPACKDLC":
-                        Log.Error("MassEffectModderNoGui exited or crashed while unpacking DLC");
-                        e.Result = RESULT_UNPACK_FAILED;
-                        break;
-                    case "STAGE_SCAN":
-                        Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
-                        e.Result = RESULT_SCAN_FAILED;
-                        break;
-                    case "STAGE_INSTALLTEXTURES":
-                        Log.Error("MassEffectModderNoGui exited or crashed while installing textures");
-                        if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+                        if (stage != null)
                         {
-                            switch (BACKGROUND_MEM_PROCESS_ERRORS[0])
-                            {
-                                case ERROR_TEXTURE_MAP_MISSING:
-                                    e.Result = RESULT_TEXTUREINSTALL_NO_TEXTUREMAP;
-                                    break;
-                                case ERROR_TEXTURE_MAP_WRONG:
-                                    e.Result = RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP;
-                                    break;
-                                case ERROR_FILE_ADDED:
-                                    e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_ADDED;
-                                    break;
-                                case ERROR_FILE_REMOVED:
-                                    e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED;
-                                    break;
-                                default:
-                                    Log.Error("Background MEM errors has item not handled: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
-                                    e.Result = RESULT_TEXTUREINSTALL_FAILED;
-                                    break;
-                            }
+                            e.Result = stage.getDefaultFailure().FailureResultCode;
                         }
                         else
                         {
-                            e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                            e.Result = RESULT_UNKNOWN_ERROR;
                         }
-                        break;
-                    case "STAGE_SAVING":
-                        Log.Error("MassEffectModderNoGui exited or crashed while saving packages");
-                        e.Result = RESULT_SAVING_FAILED;
-                        break;
-                    case "STAGE_REMOVEMIPMAPS":
-                        Log.Error("MassEffectModderNoGui exited or crashed while removing empty mipmaps");
-                        e.Result = RESULT_REMOVE_MIPMAPS_FAILED;
-                        break;
-                    case "STAGE_REPACK":
-                        Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
-                        e.Result = RESULT_REPACK_FAILED;
-                        break;
-                    default:
-                        Log.Error("MEM Exited during unknown stage context: " + STAGE_CONTEXT);
-                        e.Result = RESULT_UNKNOWN_ERROR;
-                        break;
+                    }
+                    /*
+                    switch (CURRENT_STAGE_CONTEXT)
+                    {
+                        case "STAGE_UNPACKDLC":
+                            Log.Error("MassEffectModderNoGui exited or crashed while unpacking DLC");
+                            e.Result = RESULT_UNPACK_FAILED;
+                            break;
+                        case "STAGE_SCAN":
+                            Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
+                            e.Result = RESULT_SCAN_FAILED;
+                            break;
+                        case "STAGE_INSTALLTEXTURES":
+                            Log.Error("MassEffectModderNoGui exited or crashed while installing textures");
+                            if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+                            {
+                                switch (BACKGROUND_MEM_PROCESS_ERRORS[0])
+                                {
+                                    case ERROR_TEXTURE_MAP_MISSING:
+                                        e.Result = RESULT_TEXTUREINSTALL_NO_TEXTUREMAP;
+                                        break;
+                                    case ERROR_TEXTURE_MAP_WRONG:
+                                        e.Result = RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP;
+                                        break;
+                                    case ERROR_FILE_ADDED:
+                                        e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_ADDED;
+                                        break;
+                                    case ERROR_FILE_REMOVED:
+                                        e.Result = RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED;
+                                        break;
+                                    default:
+                                        Log.Error("Background MEM errors has item not handled: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
+                                        e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                e.Result = RESULT_TEXTUREINSTALL_FAILED;
+                            }
+                            break;
+                        case "STAGE_SAVING":
+                            Log.Error("MassEffectModderNoGui exited or crashed while saving packages");
+                            e.Result = RESULT_SAVING_FAILED;
+                            break;
+                        case "STAGE_REMOVEMIPMAPS":
+                            Log.Error("MassEffectModderNoGui exited or crashed while removing empty mipmaps");
+                            e.Result = RESULT_REMOVE_MIPMAPS_FAILED;
+                            break;
+                        case "STAGE_REPACK":
+                            Log.Error("MassEffectModderNoGui exited or crashed while scanning textures");
+                            e.Result = RESULT_REPACK_FAILED;
+                            break;
+                        default:
+                            Log.Error("MEM Exited during unknown stage context: " + STAGE_CONTEXT);
+                            e.Result = RESULT_UNKNOWN_ERROR;
+                            break;
+                    }*/
                 }
-
+                else
+                {
+                    Log.Error("MEM exited during unknown stage context with code 0: " + STAGE_CONTEXT);
+                    e.Result = RESULT_UNKNOWN_ERROR;
+                }
                 InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
                 InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
                 return;
             }
 
+            //Exited OK, continue installation.
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGES_LABEL));
             overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
             InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
@@ -864,7 +874,7 @@ namespace AlotAddOnGUI
 
         private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            int telemetryfailedcode = 1;
+            int telemetryfailedcode = 1; //will be set 
             InstallingOverlay_MusicButton.Visibility = Visibility.Collapsed;
             if (MusicIsPlaying)
             {
@@ -924,76 +934,78 @@ namespace AlotAddOnGUI
                             HeaderLabel.Text = "ME1 LAA fix failed. ME1 may be unstable.";
                             break;
                         }
-                    case RESULT_SCAN_REMOVE_FAILED:
+                    /*
+                case RESULT_SCAN_REMOVE_FAILED:
+                    {
+                        InstallingOverlay_TopLabel.Text = "Failed to remove empty mipmaps";
+                        InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                        HeaderLabel.Text = "Error occured removing mipmaps from " + gameName;
+                        break;
+                    }
+                case RESULT_TEXTUREINSTALL_FAILED:
+                    {
+                        InstallingOverlay_TopLabel.Text = "Failed to install textures";
+                        InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                        HeaderLabel.Text = "Error occured installing textures for " + gameName;
+                        break;
+                    }
+                case RESULT_TEXTUREINSTALL_NO_TEXTUREMAP:
+                    {
+                        InstallingOverlay_TopLabel.Text = "Failed to install textures";
+                        InstallingOverlay_BottomLabel.Text = "Texture map is missing";
+                        HeaderLabel.Text = "Texture map missing - revert " + gameName + " to an unmodified game to fix.";
+                        break;
+                    }
+                case RESULT_TEXTUREINSTALL_GAME_FILE_ADDED:
+                    {
+                        InstallingOverlay_TopLabel.Text = "Texture installation blocked";
+                        InstallingOverlay_BottomLabel.Text = "Game file(s) were added after initial install\nDo not add game files after initial installation";
+                        HeaderLabel.Text = "Game files were added after initial installation of ALOT or MEUITM - this is not supported. You will need to revert to an unmodified game to fix.";
+                        break;
+                    }
+                case RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED:
+                    {
+                        InstallingOverlay_TopLabel.Text = "Texture installation blocked";
+                        InstallingOverlay_BottomLabel.Text = "Game file(s) were removed after initial install\nDo not remove game files after initial installation";
+                        HeaderLabel.Text = "Game files were removed after initial installation of ALOT or MEUITM - this is not supported. You will need to revert to an unmodified game to fix.";
+                        break;
+                    }
+                case RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP:
+                    {
+                        InstallingOverlay_TopLabel.Text = "Failed to install textures";
+                        InstallingOverlay_BottomLabel.Text = "Texture map is corrupt";
+                        HeaderLabel.Text = "Texture map is corrupt - revert " + gameName + " to an unmodified game to fix.";
+                        break;
+                    }
+                case RESULT_REPACK_FAILED:
+                    {
+                        InstallingOverlay_TopLabel.Text = "Failed to repack game files";
+                        InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                        HeaderLabel.Text = "Failed to repack game files - game may be in an unusable state.";
+                        break;
+                    }
+                case RESULT_UNPACK_FAILED:
+                    {
+                        InstallingOverlay_TopLabel.Text = "Failed to unpack DLCs";
+                        InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                        HeaderLabel.Text = "Failed to unpack DLC. Restore your game to unmodified or DLC will not work.";
+                        break;
+                    }
+                case RESULT_SCAN_FAILED:
+                    {
+                        InstallingOverlay_TopLabel.Text = "Failed to scan textures";
+                        InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                        if (INSTALLING_THREAD_GAME == 3)
                         {
-                            InstallingOverlay_TopLabel.Text = "Failed to remove empty mipmaps";
-                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                            HeaderLabel.Text = "Error occured removing mipmaps from " + gameName;
-                            break;
+                            HeaderLabel.Text = "Failed to scan textures. Any packed DLC has now been unpacked, it may not pass authentication.";
                         }
-                    case RESULT_TEXTUREINSTALL_FAILED:
+                        else
                         {
-                            InstallingOverlay_TopLabel.Text = "Failed to install textures";
-                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                            HeaderLabel.Text = "Error occured installing textures for " + gameName;
-                            break;
+                            HeaderLabel.Text = "Failed to scan textures. Your game has not been modified.";
                         }
-                    case RESULT_TEXTUREINSTALL_NO_TEXTUREMAP:
-                        {
-                            InstallingOverlay_TopLabel.Text = "Failed to install textures";
-                            InstallingOverlay_BottomLabel.Text = "Texture map is missing";
-                            HeaderLabel.Text = "Texture map missing - revert " + gameName + " to an unmodified game to fix.";
-                            break;
-                        }
-                    case RESULT_TEXTUREINSTALL_GAME_FILE_ADDED:
-                        {
-                            InstallingOverlay_TopLabel.Text = "Texture installation blocked";
-                            InstallingOverlay_BottomLabel.Text = "Game file(s) were added after initial install\nDo not add game files after initial installation";
-                            HeaderLabel.Text = "Game files were added after initial installation of ALOT or MEUITM - this is not supported. You will need to revert to an unmodified game to fix.";
-                            break;
-                        }
-                    case RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED:
-                        {
-                            InstallingOverlay_TopLabel.Text = "Texture installation blocked";
-                            InstallingOverlay_BottomLabel.Text = "Game file(s) were removed after initial install\nDo not remove game files after initial installation";
-                            HeaderLabel.Text = "Game files were removed after initial installation of ALOT or MEUITM - this is not supported. You will need to revert to an unmodified game to fix.";
-                            break;
-                        }
-                    case RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP:
-                        {
-                            InstallingOverlay_TopLabel.Text = "Failed to install textures";
-                            InstallingOverlay_BottomLabel.Text = "Texture map is corrupt";
-                            HeaderLabel.Text = "Texture map is corrupt - revert " + gameName + " to an unmodified game to fix.";
-                            break;
-                        }
-                    case RESULT_REPACK_FAILED:
-                        {
-                            InstallingOverlay_TopLabel.Text = "Failed to repack game files";
-                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                            HeaderLabel.Text = "Failed to repack game files - game may be in an unusable state.";
-                            break;
-                        }
-                    case RESULT_UNPACK_FAILED:
-                        {
-                            InstallingOverlay_TopLabel.Text = "Failed to unpack DLCs";
-                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                            HeaderLabel.Text = "Failed to unpack DLC. Restore your game to unmodified or DLC will not work.";
-                            break;
-                        }
-                    case RESULT_SCAN_FAILED:
-                        {
-                            InstallingOverlay_TopLabel.Text = "Failed to scan textures";
-                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                            if (INSTALLING_THREAD_GAME == 3)
-                            {
-                                HeaderLabel.Text = "Failed to scan textures. Any packed DLC has now been unpacked, it may not pass authentication.";
-                            }
-                            else
-                            {
-                                HeaderLabel.Text = "Failed to scan textures. Your game has not been modified.";
-                            }
-                            break;
-                        }
+                        break;
+                    }
+                    */
                     case RESULT_BIOGAME_MISSING:
                         {
                             InstallingOverlay_TopLabel.Text = "BIOGame directory is missing";
@@ -1001,27 +1013,45 @@ namespace AlotAddOnGUI
                             HeaderLabel.Text = "BIOGame directory is missing. This means the installation is completely unusable.\nCheck logs for more information about this.";
                             break;
                         }
-                    case RESULT_REMOVE_MIPMAPS_FAILED:
-                        {
-                            InstallingOverlay_TopLabel.Text = "Failed to remove empty mipmaps";
-                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                            HeaderLabel.Text = "Failed to remove empty mipmaps. Restore your game to unmodified. The game is in an unusable state.";
-                            break;
-                        }
-                    case RESULT_SAVING_FAILED:
-                        {
-                            InstallingOverlay_TopLabel.Text = "Failed to save game packages";
-                            InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                            HeaderLabel.Text = "Failed to save game packages. Restore your game to unmodified. The game is in an unusable state.";
-                            break;
-                        }
+                    /* case RESULT_REMOVE_MIPMAPS_FAILED:
+                         {
+                             InstallingOverlay_TopLabel.Text = "Failed to remove empty mipmaps";
+                             InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                             HeaderLabel.Text = "Failed to remove empty mipmaps. Restore your game to unmodified. The game is in an unusable state.";
+                             break;
+                         }
+                     case RESULT_SAVING_FAILED:
+                         {
+                             InstallingOverlay_TopLabel.Text = "Failed to save game packages";
+                             InstallingOverlay_BottomLabel.Text = "Check the logs for details";
+                             HeaderLabel.Text = "Failed to save game packages. Restore your game to unmodified. The game is in an unusable state.";
+                             break;
+                         }*/
                     case RESULT_UNKNOWN_ERROR:
                         {
                             InstallingOverlay_TopLabel.Text = "Unknown error has occured";
-                            InstallingOverlay_BottomLabel.Text = "Check the logs for more details";
-                            HeaderLabel.Text = "Error occured during installation.";
+                            InstallingOverlay_BottomLabel.Text = "Check installation logs for more details";
+                            HeaderLabel.Text = "An unknown error occured during installation.";
                             break;
                         }
+                    default:
+                        {
+                            var stagefailure = ProgressWeightPercentages.Stages.Select(stage => stage.FailureInfos.FirstOrDefault(code => code.FailureResultCode == result)).FirstOrDefault();
+                            if (stagefailure != null)
+                            {
+                                InstallingOverlay_TopLabel.Text = stagefailure.FailureTopText;
+                                InstallingOverlay_BottomLabel.Text = stagefailure.FailureBottomText;
+                                HeaderLabel.Text = stagefailure.FailureHeaderText;
+                            }
+                            else
+                            {
+                                InstallingOverlay_TopLabel.Text = "Unknown error has occured";
+                                InstallingOverlay_BottomLabel.Text = "Check installation logs for more details";
+                                HeaderLabel.Text = "An unknown error occured during installation.";
+                            }
+                            break;
+                        }
+                        //
                 }
                 if (result != INSTALL_OK)
                 {
@@ -1073,13 +1103,13 @@ namespace AlotAddOnGUI
                         int memVersionUsed = memVersionString.FileMajorPart;
                         int installerVersionUsed = System.Reflection.Assembly.GetEntryAssembly().GetName().Version.Build;
                         int diskType = -3; //Cannot detect due to OS version is -2
-                var dlcPath = Utilities.GetGamePath(Game);
+                        var dlcPath = Utilities.GetGamePath(Game);
                         string pathroot = Path.GetPathRoot(dlcPath);
                         pathroot = pathroot.Substring(0, 1);
                         if (pathroot == @"\")
                         {
                             diskType = -2; //-2 = UNC
-                }
+                        }
                         else if (Utilities.IsWindows10OrNewer())
                         {
                             diskType = DiskTypeDetector.GetPartitionDiskBackingType(pathroot);
@@ -1130,7 +1160,7 @@ namespace AlotAddOnGUI
                         }
                         Log.Information("Sending installation telemetry");
                         "https://me3tweaks.com/alotinstaller/installationtelemetry.php".PostUrlEncodedAsync(new { game = Game, memversion = memVersionUsed, installerversion = installerVersionUsed, processor = processorName, processor_corecount = processorCoreCount, processor_speed = processorSpeedMhz, memory = memoryAmount, installation_time = MEM_INSTALL_TIME_SECONDS, alladdonfiles = MainWindow.TELEMETRY_ALL_ADDON_FILES ? 1 : 0, officialdlccount = officialDLCCount, disktype = diskType, failed = telemetryfailedcode, os = OS });//.ReceiveString();
-                Log.Information("Installation telemetry has been submitted");
+                        Log.Information("Installation telemetry has been submitted");
                     }
                     catch (FlurlHttpTimeoutException)
                     {
@@ -1218,24 +1248,24 @@ namespace AlotAddOnGUI
                                 {
                                     if (param == "STAGE_DONE")
                                     {
-                                //We're done!
-                                STAGE_DONE_REACHED = true;
+                                        //We're done!
+                                        STAGE_DONE_REACHED = true;
                                         return;
                                     }
                                     if (CURRENT_STAGE_CONTEXT != null)
                                     {
-                                        Log.Warning("Stage " + CURRENT_STAGE_NUM + " has completed.");
+                                        Log.Warning("Stage " + CURRENT_STAGE_NUM + " has completed: " + CURRENT_STAGE_CONTEXT);
                                         int overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
                                         worker.ReportProgress(completed, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
                                     }
                                     else
                                     {
-                                //context is null, we are now starting
-                                ProgressWeightPercentages.ScaleWeights();
+                                        //context is null, we are now starting
+                                        ProgressWeightPercentages.ScaleWeights();
                                     }
 
-                            //clear errors so we can context switch error handling
-                            BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
+                                    //clear errors so we can context switch error handling
+                                    BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
                                     BACKGROUND_MEM_PROCESS_PARSED_ERRORS = new List<string>();
 
 
@@ -1245,36 +1275,36 @@ namespace AlotAddOnGUI
                                     worker.ReportProgress(completed, new ThreadCommand(UPDATE_STAGE_OF_STAGE_LABEL, param));
                                     CURRENT_STAGE_CONTEXT = param;
                                     Stage stage = ProgressWeightPercentages.Stages.Where(x => x.StageName == CURRENT_STAGE_CONTEXT).FirstOrDefault();
-                                    CurrentTask = stage.TaskName ?? CURRENT_STAGE_CONTEXT;
+                                    CurrentTask = stage != null ? stage.TaskName : CURRENT_STAGE_CONTEXT;
 
-                            /*switch (CURRENT_STAGE_CONTEXT)
-                            {
-                                case "STAGE_PRESCAN":
-                                    task = "Performing installation prescan";
-                                    break;
-                                case "STAGE_UNPACKDLC":
-                                    task = "Unpacking DLC";
-                                    break;
-                                case "STAGE_SCAN":
-                                    task = "Scanning textures";
-                                    break;
-                                case "STAGE_INSTALLTEXTURES":
-                                    task = "Installing textures";
-                                    break;
-                                case "STAGE_SAVING":
-                                    task = "Saving packages";
-                                    break;
-                                case "STAGE_REMOVEMIPMAPS":
-                                    task = "Removing empty mipmaps";
-                                    break;
-                                case "STAGE_REPACK":
-                                    task = "Repacking game files";
-                                    break;
-                                default:
-                                    Log.Error("UNKNOWN STAGE_CONTEXT PARAM: " + param);
-                                    return;
-                            }
-                            CurrentTask = task;*/
+                                    /*switch (CURRENT_STAGE_CONTEXT)
+                                    {
+                                        case "STAGE_PRESCAN":
+                                            task = "Performing installation prescan";
+                                            break;
+                                        case "STAGE_UNPACKDLC":
+                                            task = "Unpacking DLC";
+                                            break;
+                                        case "STAGE_SCAN":
+                                            task = "Scanning textures";
+                                            break;
+                                        case "STAGE_INSTALLTEXTURES":
+                                            task = "Installing textures";
+                                            break;
+                                        case "STAGE_SAVING":
+                                            task = "Saving packages";
+                                            break;
+                                        case "STAGE_REMOVEMIPMAPS":
+                                            task = "Removing empty mipmaps";
+                                            break;
+                                        case "STAGE_REPACK":
+                                            task = "Repacking game files";
+                                            break;
+                                        default:
+                                            Log.Error("UNKNOWN STAGE_CONTEXT PARAM: " + param);
+                                            return;
+                                    }
+                                    CurrentTask = task;*/
                                     int progressval = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 0);
                                     worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
                                     break;
@@ -1283,7 +1313,7 @@ namespace AlotAddOnGUI
                                 Log.Information("MEMNoGui processing file: " + param);
                                 break;
                             case "OVERALL_PROGRESS": //will be removed
-                    case "TASK_PROGRESS":
+                            case "TASK_PROGRESS":
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENT_STAGE_PROGRESS, param));
                                 break;
                             case "SET_STAGE_LABEL":
@@ -1293,24 +1323,24 @@ namespace AlotAddOnGUI
                                 worker.ReportProgress(completed, new ThreadCommand(HIDE_STAGES_LABEL));
                                 break;
 
-                    /*
-                case ERROR_TEXTURE_MAP_MISSING:
-                    Log.Fatal("[FATAL]Texture map is missing! We cannot install textures");
-                    BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_MISSING);
-                    break;
-                case ERROR_TEXTURE_MAP_WRONG:
-                    Log.Fatal("[FATAL]Texture map is invalid! We cannot install textures");
-                    BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_WRONG);
-                    break;
-                case "ERROR_ADDED_FILE":
-                    Log.Error("MEMNoGui detects some game file(s) were added since initial texture installation! This is not supported. Installation aborted");
-                    BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_ADDED);
-                    break;
-                case "ERROR_REMOVED_FILE":
-                    Log.Error("MEMNoGui detects some game file(s) were removed since initial texture installation! This is not supported. Installation aborted");
-                    BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_REMOVED);
-                    break;
-                    */
+                            /*
+                        case ERROR_TEXTURE_MAP_MISSING:
+                            Log.Fatal("[FATAL]Texture map is missing! We cannot install textures");
+                            BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_MISSING);
+                            break;
+                        case ERROR_TEXTURE_MAP_WRONG:
+                            Log.Fatal("[FATAL]Texture map is invalid! We cannot install textures");
+                            BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_WRONG);
+                            break;
+                        case "ERROR_ADDED_FILE":
+                            Log.Error("MEMNoGui detects some game file(s) were added since initial texture installation! This is not supported. Installation aborted");
+                            BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_ADDED);
+                            break;
+                        case "ERROR_REMOVED_FILE":
+                            Log.Error("MEMNoGui detects some game file(s) were removed since initial texture installation! This is not supported. Installation aborted");
+                            BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_REMOVED);
+                            break;
+                            */
                             case "ERROR":
                                 Log.Error("Error IPC from MEM: " + param);
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
@@ -1320,8 +1350,8 @@ namespace AlotAddOnGUI
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
                                 break;
                             default:
-                        //check if IPC is a stage failure
-                        StageFailure failure = null;
+                                //check if IPC is a stage failure
+                                StageFailure failure = null;
                                 foreach (Stage stage in ProgressWeightPercentages.Stages)
                                 {
                                     foreach (StageFailure sf in stage.FailureInfos)

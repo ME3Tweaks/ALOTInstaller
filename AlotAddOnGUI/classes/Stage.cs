@@ -35,6 +35,15 @@ namespace AlotAddOnGUI.classes
             }
             Weight *= scalingVal;
         }
+
+        /// <summary>
+        /// Gets the default stage failure information, which is used when MEM exits but we have no IPC trigger saying why it exits, which is almost always a crash.
+        /// </summary>
+        /// <returns>Default failure info</returns>
+        public StageFailure getDefaultFailure()
+        {
+            return FailureInfos.Where(x => x.FailureIPCTrigger == null).FirstOrDefault();
+        }
     }
 
     public class StageFailure
