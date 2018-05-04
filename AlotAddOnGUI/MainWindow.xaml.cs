@@ -2232,13 +2232,14 @@ namespace AlotAddOnGUI
                 HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("highestapprovedmemversion") == null ? HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("highestapprovedmemversion");
                 if (rootElement.Element("soaktestingmemversion") != null)
                 {
-                    SOAK_APPROVED_STABLE_MEMNOGUIVERSION = (int)rootElement.Element("soaktestingmemversion");
-                    SOAK_START_DATE = DateTime.ParseExact(rootElement.Element("soaktestingmemversion").Attribute("soakstartdate").Value,"yyyy-MM-dd",CultureInfo.InvariantCulture);
+                    XElement soakElem = rootElement.Element("soaktestingmemversion");
+                    SOAK_APPROVED_STABLE_MEMNOGUIVERSION = (int)soakElem;
+                    if (soakElem.Attribute("soakstartdate") != null)
+                    {
+                        SOAK_START_DATE = DateTime.ParseExact(soakElem.Attribute("soakstartdate").Value, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    }
                 }
-                else
-                {
 
-                }
                 if (rootElement.Element("stages") != null)
                 {
                     ProgressWeightPercentages.Stages =
