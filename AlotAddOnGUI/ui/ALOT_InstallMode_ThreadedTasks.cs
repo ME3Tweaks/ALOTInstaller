@@ -914,6 +914,13 @@ namespace AlotAddOnGUI
             {
                 int result = (int)e.Result;
                 string gameName = "Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+                if (result == INSTALL_OK)
+                {
+                    telemetryfailedcode = 0;
+                } else
+                {
+                    telemetryfailedcode = result;
+                }
                 switch (result)
                 {
                     case INSTALL_OK:
@@ -924,7 +931,6 @@ namespace AlotAddOnGUI
                             HeaderLabel.Text = "Installation has completed.";
                             AddonFilesLabel.Text = "Thanks for using ALOT Installer.";
                             InstallingOverlay_Tip.Text = "Do not install any new DLC or mods that add/replace pcc, sfm, or upk files from here on out - doing so will break your game!";
-                            telemetryfailedcode = 0;
                             break;
                         }
                     case RESULT_ME1LAA_FAILED:
@@ -934,78 +940,6 @@ namespace AlotAddOnGUI
                             HeaderLabel.Text = "ME1 LAA fix failed. ME1 may be unstable.";
                             break;
                         }
-                    /*
-                case RESULT_SCAN_REMOVE_FAILED:
-                    {
-                        InstallingOverlay_TopLabel.Text = "Failed to remove empty mipmaps";
-                        InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                        HeaderLabel.Text = "Error occured removing mipmaps from " + gameName;
-                        break;
-                    }
-                case RESULT_TEXTUREINSTALL_FAILED:
-                    {
-                        InstallingOverlay_TopLabel.Text = "Failed to install textures";
-                        InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                        HeaderLabel.Text = "Error occured installing textures for " + gameName;
-                        break;
-                    }
-                case RESULT_TEXTUREINSTALL_NO_TEXTUREMAP:
-                    {
-                        InstallingOverlay_TopLabel.Text = "Failed to install textures";
-                        InstallingOverlay_BottomLabel.Text = "Texture map is missing";
-                        HeaderLabel.Text = "Texture map missing - revert " + gameName + " to an unmodified game to fix.";
-                        break;
-                    }
-                case RESULT_TEXTUREINSTALL_GAME_FILE_ADDED:
-                    {
-                        InstallingOverlay_TopLabel.Text = "Texture installation blocked";
-                        InstallingOverlay_BottomLabel.Text = "Game file(s) were added after initial install\nDo not add game files after initial installation";
-                        HeaderLabel.Text = "Game files were added after initial installation of ALOT or MEUITM - this is not supported. You will need to revert to an unmodified game to fix.";
-                        break;
-                    }
-                case RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED:
-                    {
-                        InstallingOverlay_TopLabel.Text = "Texture installation blocked";
-                        InstallingOverlay_BottomLabel.Text = "Game file(s) were removed after initial install\nDo not remove game files after initial installation";
-                        HeaderLabel.Text = "Game files were removed after initial installation of ALOT or MEUITM - this is not supported. You will need to revert to an unmodified game to fix.";
-                        break;
-                    }
-                case RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP:
-                    {
-                        InstallingOverlay_TopLabel.Text = "Failed to install textures";
-                        InstallingOverlay_BottomLabel.Text = "Texture map is corrupt";
-                        HeaderLabel.Text = "Texture map is corrupt - revert " + gameName + " to an unmodified game to fix.";
-                        break;
-                    }
-                case RESULT_REPACK_FAILED:
-                    {
-                        InstallingOverlay_TopLabel.Text = "Failed to repack game files";
-                        InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                        HeaderLabel.Text = "Failed to repack game files - game may be in an unusable state.";
-                        break;
-                    }
-                case RESULT_UNPACK_FAILED:
-                    {
-                        InstallingOverlay_TopLabel.Text = "Failed to unpack DLCs";
-                        InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                        HeaderLabel.Text = "Failed to unpack DLC. Restore your game to unmodified or DLC will not work.";
-                        break;
-                    }
-                case RESULT_SCAN_FAILED:
-                    {
-                        InstallingOverlay_TopLabel.Text = "Failed to scan textures";
-                        InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                        if (INSTALLING_THREAD_GAME == 3)
-                        {
-                            HeaderLabel.Text = "Failed to scan textures. Any packed DLC has now been unpacked, it may not pass authentication.";
-                        }
-                        else
-                        {
-                            HeaderLabel.Text = "Failed to scan textures. Your game has not been modified.";
-                        }
-                        break;
-                    }
-                    */
                     case RESULT_BIOGAME_MISSING:
                         {
                             InstallingOverlay_TopLabel.Text = "BIOGame directory is missing";
@@ -1013,20 +947,6 @@ namespace AlotAddOnGUI
                             HeaderLabel.Text = "BIOGame directory is missing. This means the installation is completely unusable.\nCheck logs for more information about this.";
                             break;
                         }
-                    /* case RESULT_REMOVE_MIPMAPS_FAILED:
-                         {
-                             InstallingOverlay_TopLabel.Text = "Failed to remove empty mipmaps";
-                             InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                             HeaderLabel.Text = "Failed to remove empty mipmaps. Restore your game to unmodified. The game is in an unusable state.";
-                             break;
-                         }
-                     case RESULT_SAVING_FAILED:
-                         {
-                             InstallingOverlay_TopLabel.Text = "Failed to save game packages";
-                             InstallingOverlay_BottomLabel.Text = "Check the logs for details";
-                             HeaderLabel.Text = "Failed to save game packages. Restore your game to unmodified. The game is in an unusable state.";
-                             break;
-                         }*/
                     case RESULT_UNKNOWN_ERROR:
                         {
                             InstallingOverlay_TopLabel.Text = "Unknown error has occured";
@@ -1051,7 +971,6 @@ namespace AlotAddOnGUI
                             }
                             break;
                         }
-                        //
                 }
                 if (result != INSTALL_OK)
                 {
