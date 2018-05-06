@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.0.22">
-  <highestapprovedmemversion>120</highestapprovedmemversion>
-  <soaktestingmemversion>123</soaktestingmemversion>
+<alotaddonmanifest version="5.0.23">
+  <highestapprovedmemversion>123</highestapprovedmemversion>
+  <soaktestingmemversion soakstartdate="2018-05-05">126</soaktestingmemversion>
   <repackoptions me2repackenabled="true" me3repackenabled="true"/>
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
