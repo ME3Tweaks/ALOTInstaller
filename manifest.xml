@@ -2,6 +2,37 @@
 <alotaddonmanifest version="5.0.23">
   <highestapprovedmemversion>123</highestapprovedmemversion>
   <soaktestingmemversion soakstartdate="2018-05-05">126</soaktestingmemversion>
+  <stages>
+	<!-- -56 is the next error code available-->
+	  <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
+		<failureinfo resultcode="-54" failedtopmessage="Preinstallation scan failed" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during preinstallation scan. Please see installer log for more info."/>		
+	  </stage>
+	  <stage name="STAGE_UNPACKDLC" weight="0.11004021318" tasktext="Unpacking DLC">
+		<failureinfo resultcode="-40" failedtopmessage="Failed to unpack DLC" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during unpacking of DLC SFARs. Please see installer log for more info. The game is in an inconsistent state and may not be functional."/>
+	  </stage>
+	  <stage name="STAGE_SCAN" weight="0.12055272684" tasktext="Scanning textures">
+		<failureinfo resultcode="-52" failedtopmessage="Failed to scan textures" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during scanning of existing game textures. Please see installer log for more info."/>
+	  </stage>
+	  <stage name="STAGE_INSTALLTEXTURES" weight="0.36997680866" tasktext="Installing textures" me3weightscaling="1.1">
+		<failureinfo ipcerror="ERROR_TEXTURE_MAP_MISSING" resultcode="-44" failedtopmessage="Texture map is missing" failedbottommessage="Check or upload installer log for more information" failedheadermessage="Texture map file is missing - has this game been migrated to a new system or user account?"/>
+		<failureinfo ipcerror="ERROR_TEXTURE_MAP_WRONG" resultcode="-45" failedtopmessage="Texture map is corrupt" failedbottommessage="Check or upload installer log for more information" failedheadermessage="Texture map file is corrupted and unusable - you will need to delete the game and then reinstall so the texture map can be rebuilt."/>
+		<failureinfo ipcerror="ERROR_FILE_ADDED" resultcode="-48" failedtopmessage="Files were added after ALOT was installed" failedbottommessage="Installation aborted" failedheadermessage="Installation of package files after ALOT has been installed is unsupported. Please follow the correct installation directions for ALOT."/>
+		<failureinfo ipcerror="ERROR_FILE_REMOVED" resultcode="-47" failedtopmessage="Files were removed after ALOT was installed" failedbottommessage="Installation aborted" failedheadermessage="Removal of package files after ALOT has been installed is unsupported. Please follow the correct installation directions for ALOT."/> <!-- Is this actually correct/used?-->
+		<failureinfo resultcode="-42" failedtopmessage="Failed to install textures" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during installation of textures. Please see installer log for more info. The game is not in a usable state."/>
+	  </stage>
+	  <stage name="STAGE_SAVING" weight="0.25787962804" tasktext="Saving packages">
+	     <failureinfo resultcode="-49" failedtopmessage="Failed to save packages" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during saving of game packages. Please see installer log for more info. The game is not in a usable state."/>
+	  </stage>
+  	  <stage name="STAGE_REMOVEMIPMAPS" weight="0.19155062326" tasktext="Removing empty mipmaps" me1weightscaling="2.5">
+		<failureinfo resultcode="-50" failedtopmessage="Failed to remove empty mipmaps" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during removal of empty mipmaps. Please see installer log for more info. The game is in an inconsistent state."/>
+	  </stage>
+	  <stage name="STAGE_REPACK" weight="0.09" tasktext="Repacking game files">
+		<failureinfo resultcode="-46" failedtopmessage="Failed to repack game files" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during recompression of game files. Please see installer log for more info. The game is in an inconsistent state."/>
+	  </stage>
+  	  <stage name="STAGE_MARKERS" weight="0.025" tasktext="Installing remaining ALOT markers">
+		<failureinfo resultcode="-55" failedtopmessage="Failed to install remaining ALOT markers" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during application of ALOT markers on non-modded files. Please see installer log for more info. The game is in a functional but texture settings and proper markers have not been applied."/>
+	 </stage>
+  </stages>
   <repackoptions me2repackenabled="true" me3repackenabled="true"/>
   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
