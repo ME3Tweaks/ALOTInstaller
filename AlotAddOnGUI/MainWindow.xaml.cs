@@ -572,7 +572,7 @@ namespace AlotAddOnGUI
             {
                 var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
                 fileVersion = versInfo.FileMajorPart;
-                Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
+                Button_MEM_GUI.Text = "LAUNCH MEM v" + fileVersion;
             }
 
             if (Directory.Exists(UPDATE_STAGING_MEM_DIR))
@@ -1068,7 +1068,7 @@ namespace AlotAddOnGUI
             {
                 var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
                 int fileVersion = versInfo.FileMajorPart;
-                Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
+                Button_MEM_GUI.Text = "LAUNCH MEM v" + fileVersion;
                 ShowStatus("Updated Mass Effect Modder (GUI version) to v" + fileVersion, 3000);
             }
             RunMusicDownloadCheck();
@@ -4039,18 +4039,6 @@ namespace AlotAddOnGUI
 
         }
 
-        private void Button_InstallerLOD4k_Click(object sender, RoutedEventArgs e)
-        {
-            //LODLIMIT = 4;
-            Panel_ME1LODLimit.Visibility = Visibility.Collapsed;
-        }
-
-        private void Button_InstallerLOD2k_Click(object sender, RoutedEventArgs e)
-        {
-            //LODLIMIT = 2;
-            Panel_ME1LODLimit.Visibility = Visibility.Collapsed;
-        }
-
         private void Button_ME12K_Click(object sender, RoutedEventArgs e)
         {
             Log.Information("Using 2K textures for ME1 (button click)");
@@ -4881,6 +4869,12 @@ namespace AlotAddOnGUI
         private void InstallMEUITM_Click(object sender, RoutedEventArgs e)
         {
             Log.Error("This is not yet implemented.");
+        }
+
+        private void Button_Utilities_Click(object sender, RoutedEventArgs e)
+        {
+            Utilities_Flyout.IsOpen = true;
+            SettingsFlyout.IsOpen = false;
         }
     }
 }
