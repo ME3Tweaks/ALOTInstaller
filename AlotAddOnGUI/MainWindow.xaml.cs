@@ -2254,10 +2254,10 @@ namespace AlotAddOnGUI
                          {
                              StageName = stage.Attribute("name").Value,
                              TaskName = stage.Attribute("tasktext").Value,
-                             Weight = Convert.ToDouble(stage.Attribute("weight").Value),
-                             ME1Scaling = stage.Attribute("me1weightscaling") != null ? Convert.ToDouble(stage.Attribute("me1weightscaling").Value) : 1,
-                             ME2Scaling = stage.Attribute("me2weightscaling") != null ? Convert.ToDouble(stage.Attribute("me2weightscaling").Value) : 1,
-                             ME3Scaling = stage.Attribute("me3weightscaling") != null ? Convert.ToDouble(stage.Attribute("me3weightscaling").Value) : 1,
+                             Weight = Convert.ToDouble(stage.Attribute("weight").Value, CultureInfo.InvariantCulture),
+                             ME1Scaling = stage.Attribute("me1weightscaling") != null ? Convert.ToDouble(stage.Attribute("me1weightscaling").Value, CultureInfo.InvariantCulture) : 1,
+                             ME2Scaling = stage.Attribute("me2weightscaling") != null ? Convert.ToDouble(stage.Attribute("me2weightscaling").Value, CultureInfo.InvariantCulture) : 1,
+                             ME3Scaling = stage.Attribute("me3weightscaling") != null ? Convert.ToDouble(stage.Attribute("me3weightscaling").Value, CultureInfo.InvariantCulture) : 1,
                              FailureInfos = stage.Elements("failureinfo").Select(z => new StageFailure
                              {
                                  FailureIPCTrigger = z.Attribute("ipcerror") != null ? z.Attribute("ipcerror").Value : null,
