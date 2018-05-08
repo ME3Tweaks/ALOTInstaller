@@ -309,10 +309,6 @@
                                     <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME1" Content="ME1: Not Installed"/>
                                     <!-- <Button Margin="10,0,0,0" Padding="0,0,0,5" x:Name="Button_ME1_ShowLODOptions" Content="Change texture quality" ToolTip="Change quality of textures for ME1 to suit your performance needs" Style="{StaticResource LinkLabel}" Click="Button_ToggleME1LODPanel"/> -->
                                 </StackPanel>
-                                <StackPanel x:Name="Panel_SettingsME1LOD" Orientation="Horizontal" Visibility="Collapsed">
-                                    <Button x:Name="Button_ME12K" Margin="20,0,5,0" FontSize="12" Content="2K Textures" ToolTip="2K textures are slightly lower quality than 4K textures,&#10;but the engine should not hiccup during cutscenes." Click="Button_ME12K_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                    <Button x:Name="Button_ME14K" FontSize="12" Content="4K Textures" ToolTip="4K textures are higher quality, but the engine&#10;may hiccup during certain cutscenes." Click="Button_ME14K_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                </StackPanel>
                                 <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME2" Content="ME2: Not Installed"/>
                                 <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME3" Content="ME3: Not Installed"/>
 
@@ -347,7 +343,7 @@
                                 <Button x:Name="Button_ViewLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="View installer log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 <Button x:Name="Button_UploadLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Upload installer log" ToolTip="Uploads the latest program log to the ALOT Log Viewing Service" Click="Button_UploadLog_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 <Button x:Name="Button_ReportIssue" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Report an issue" ToolTip="Go to the ALOT discord" Click="Button_ReportIssue_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                <Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" FontWeight="Bold"  Content="Game utilities" Click="Button_Utilities_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Normal" ToolTip="Runs the GUI version of Mass Effect Modder.&#10;You can use this to change game paths and other advanced texture modding."/>
+                                <Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" FontWeight="Bold"  Content="Game utilities" Click="Button_Utilities_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" ToolTip="Opens panel with various useful end-user utilities"/>
                                 <Label HorizontalAlignment="Center" Margin="20,0,20,3" Padding="0,3,0,3" FontWeight="Bold" x:Name="Label_MEMVersion" Content="MEM (NoGUI) Version: TBD" FontSize="12" ToolTip="Version of MassEffectModderNoGui this program is using"/>
                             </StackPanel>
                         </Expander>
@@ -630,7 +626,7 @@
                     </StackPanel>
                 </Border>
             </Controls:Flyout>
-            <Controls:Flyout Name="Utilities_Flyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Collapsed" Position="Bottom" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}">
+            <Controls:Flyout Name="Utilities_Flyout" IsModal="True" SnapsToDevicePixels="True" TitleVisibility="Collapsed" Theme="Accent" CloseButtonVisibility="Collapsed" Position="Bottom" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}">
                 <StackPanel Margin="10">
                     <StackPanel.Resources>
                         <Thickness x:Key="buttonMargin" Top="5" Left="5" Right="5" Bottom ="5"/>
@@ -639,38 +635,39 @@
                     <TextBlock x:Name="Label_Utility" Text="ALOT Installer Utilities" TextAlignment="Center" FontSize="16" Padding="5"/>
                     <!--<TextBlock Text="To add your own files (also known as user files), drop an archive containing properly named TPF, MEM, or DDS files onto the interface and choose the game they apply to. You can also drop TPF, PNG, JPG, BMP, DDS, MOD and MEM files directly." TextWrapping="Wrap" MaxWidth="500" TextAlignment="Center" FontSize="12" Padding="5"></TextBlock>-->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button x:Name="Button_VerifyGameME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_ManualFileME2_Click">
+                        <Button x:Name="Button_VerifyGameME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_VerifyME1_Click"  ToolTip="Verify that Mass Effect is vanilla">
                             <StackPanel>
                                 <Image Source="images/logo_me1.png" Height="{StaticResource imageHeight}"  Margin="{StaticResource buttonMargin}" />
-                                <TextBlock Text="Verify vanilla"  HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="Textblock_VerifyME1" Text="VERIFY VANILLA"  HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        <Button x:Name="Button_VerifyGameME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_ManualFileME2_Click">
+                        <Button x:Name="Button_VerifyGameME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_VerifyME2_Click"  ToolTip="Verify that Mass Effect 2 is vanilla">
                             <StackPanel>
                                 <Image Source="images/logo_me2.png" Height="{StaticResource imageHeight}" Margin="{StaticResource buttonMargin}"/>
-                                <TextBlock Text="Verify vanilla"  HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="Textblock_VerifyME2" Text="VERIFY VANILLA"  HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        <Button x:Name="Button_VerifyGameME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_ManualFileME2_Click">
+                        <Button x:Name="Button_VerifyGameME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_VerifyME3_Click" ToolTip="Verify that Mass Effect 3 is vanilla">
                             <StackPanel>
                                 <Image Source="images/logo_me3.png" Height="{StaticResource imageHeight}" Margin="{StaticResource buttonMargin}"/>
-                                <TextBlock Text="Verify vanilla"  HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="Textblock_VerifyME3" Text="VERIFY VANILLA"  HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        <Button x:Name="Button_AutoTOCME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_ManualFileME1_Click">
+                        <Button x:Name="Button_AutoTOCME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_ME3AutoTOC_Click" ToolTip="Runs AutoTOC on Mass Effect 3, generating a new filesize database.">
                             <StackPanel>
                                 <Image Source="images/logo_me3.png" Height="{StaticResource imageHeight}" Margin="{StaticResource buttonMargin}"/>
-                                <TextBlock Text="AutoTOC" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="Textblock_AutoTOCME3" Text="AUTOTOC" HorizontalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        <Button x:Name="Button_RunMEM" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_MEMVersion_Click">
+                        <Button x:Name="Button_RunMEM" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_MEMVersion_Click" ToolTip="Runs the GUI version of Mass Effect Modder.&#10;You can use this to change game paths and other advanced texture modding.">
                             <StackPanel>
                                 <Image Source="images/logo_mem.png" Height="{StaticResource imageHeight}" Margin="{StaticResource buttonMargin}"/>
-                                <TextBlock x:Name="Button_MEM_GUI" Text="Launch MEM" HorizontalAlignment="Center"/>
+                                <TextBlock x:Name="Button_MEM_GUI" Text="Launch MEM" HorizontalAlignment="Center" />
                             </StackPanel>
                         </Button>
-                        
+
                     </StackPanel>
+                    <Button Width="120" Content="Close utilities" Click="Button_CloseUtilities" Style="{StaticResource AccentedSquareButtonStyle}" HorizontalAlignment="Center" Controls:ControlsHelper.ContentCharacterCasing="Upper" ToolTip="Closes this panel"/>
                 </StackPanel>
             </Controls:Flyout>
         </Controls:FlyoutsControl>

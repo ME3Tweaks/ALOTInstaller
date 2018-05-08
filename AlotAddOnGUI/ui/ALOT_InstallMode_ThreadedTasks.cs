@@ -1243,7 +1243,6 @@ namespace AlotAddOnGUI
                             case "PROCESSING_FILE":
                                 Log.Information("MEMNoGui processing file: " + param);
                                 break;
-                            case "OVERALL_PROGRESS": //will be removed
                             case "TASK_PROGRESS":
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENT_STAGE_PROGRESS, param));
                                 break;

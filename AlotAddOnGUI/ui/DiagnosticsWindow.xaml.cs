@@ -1227,8 +1227,6 @@ namespace AlotAddOnGUI.ui
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("Detected mod: " + param);
                                 break;
                             case "TASK_PROGRESS":
-                            case "OVERALL_PROGRESS": //will be removed in future
-                                                     //worker.ReportProgress(0, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
                                 int percentInt = Convert.ToInt32(param);
                                 if (Context == CONTEXT_FULLMIPMAP_SCAN)
                                 {
