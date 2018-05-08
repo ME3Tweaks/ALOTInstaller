@@ -2391,7 +2391,7 @@ namespace AlotAddOnGUI
             catch (Exception e)
             {
                 Log.Error("Error has occured parsing the XML!");
-                Log.Error(e.Message);
+                Log.Error(App.FlattenException(e));
                 MessageDialogResult result = await this.ShowMessageAsync("Error reading file manifest", "An error occured while reading the manifest file for installation. This may indicate a network failure or a packaging failure by Mgamerz - Please submit an issue to github (http://github.com/mgamerz/alotaddongui/issues) and include the most recent log file from the logs directory.\n\n" + e.Message, MessageDialogStyle.Affirmative);
                 AddonFilesLabel.Text = "Error parsing manifest XML! Check the logs.";
                 return;
