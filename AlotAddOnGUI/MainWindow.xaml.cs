@@ -125,6 +125,8 @@ namespace AlotAddOnGUI
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
         public static readonly string SETTINGSTR_DEBUGLOGGING = "DebugLogging";
+        private readonly string DOT_NET_DOWNLOAD_LINK_WEB = "https://download.microsoft.com/download/3/3/2/332D9665-37D5-467A-84E1-D07101375B8C/NDP472-KB4054531-Web.exe";
+        private readonly string DOT_NET_REQUIRED_VERSION_MANUAL_LINK = "https://docs.microsoft.com/en-us/dotnet/framework/whats-new/index#downloading-and-installing-the-net-framework-472";
         private const int DOT_NET_REQUIRED_VERSION = 461808;
         private const string DOT_NET_REQUIRED_VERSION_HR = "4.7.2";
         private const string SETTINGSTR_DONT_FORCE_UPGRADES = "DontForceUpgrades";
@@ -324,7 +326,7 @@ namespace AlotAddOnGUI
                 }
                 else if (upgradenet == MessageDialogResult.Negative)
                 {
-                    string link = "https://www.microsoft.com/en-us/download/details.aspx?id=56115";
+                    string link = DOT_NET_REQUIRED_VERSION_MANUAL_LINK;
                     openWebPage(link);
                 }
                 else
@@ -550,7 +552,7 @@ namespace AlotAddOnGUI
                     int run = Utilities.runProcessAsAdmin(downloadPath, argx, true, true);
                     if (run == 0)
                     {
-                        Log.Information(".NET 4.7.2 web installer has begun. We will now close ALOT Installer while it runs.");
+                        Log.Information(".NET "+DOT_NET_REQUIRED_VERSION_HR+" web installer has begun. We will now close ALOT Installer while it runs.");
                         await this.ShowMessageAsync("Wait for installation to finish", "Once installation has finished, you may need to restart your system. If prompted to do so, restart your system to continue using ALOT Installer.");
                     }
                     Environment.Exit(0);
@@ -563,7 +565,7 @@ namespace AlotAddOnGUI
                     Environment.Exit(1);
                 }
             };
-            string net471webinstallerlink = "https://download.microsoft.com/download/3/3/2/332D9665-37D5-467A-84E1-D07101375B8C/NDP472-KB4054531-Web.exe";
+            string net471webinstallerlink = DOT_NET_DOWNLOAD_LINK_WEB;
             downloadClient.DownloadFileAsync(new Uri(net471webinstallerlink), downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
         }
 
