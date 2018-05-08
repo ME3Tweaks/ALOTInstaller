@@ -347,7 +347,7 @@ namespace AlotAddOnGUI.ui
                 {
                     using (var stream = File.OpenRead(exePath))
                     {
-                        addDiagLine("Hash: " + BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower());
+                        addDiagLine("[EXEHASH-" + DIAGNOSTICS_GAME + "]" + BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower());
                     }
                 }
                 string d3d9file = Path.GetDirectoryName(exePath) + "\\d3d9.dll";

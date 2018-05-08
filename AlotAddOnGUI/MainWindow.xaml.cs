@@ -35,6 +35,7 @@ using System.Xml.Linq;
 using Flurl.Http;
 using System.Windows.Media;
 using System.IO.Compression;
+using System.Globalization;
 
 namespace AlotAddOnGUI
 {
@@ -69,6 +70,7 @@ namespace AlotAddOnGUI
         private bool _preventFileRefresh = false;
         private int HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = 999; //will be set by manifest
         private int SOAK_APPROVED_STABLE_MEMNOGUIVERSION = -1; //will be set by manifest
+        private DateTime SOAK_START_DATE;
         private int[] SoakThresholds = { 50, 150, 400, 1000, 3000, 100000000 };
         public bool PreventFileRefresh
         {
@@ -570,7 +572,7 @@ namespace AlotAddOnGUI
             {
                 var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
                 fileVersion = versInfo.FileMajorPart;
-                Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
+                Button_MEM_GUI.Text = "LAUNCH MEM v" + fileVersion;
             }
 
             if (Directory.Exists(UPDATE_STAGING_MEM_DIR))
@@ -728,7 +730,9 @@ namespace AlotAddOnGUI
                             }
                             if (releaseNameInt == SOAK_APPROVED_STABLE_MEMNOGUIVERSION)
                             {
-                                int soakTestReleaseAge = (DateTime.Now - r.PublishedAt.Value).Days;
+                                var comparisonAge = SOAK_START_DATE == null ? DateTime.Now - r.PublishedAt.Value : DateTime.Now - SOAK_START_DATE;
+                                var age = DateTime.Now - SOAK_START_DATE;
+                                int soakTestReleaseAge = (comparisonAge).Days;
                                 if (soakTestReleaseAge > SoakThresholds.Length - 1)
                                 {
                                     Log.Information("New MEMNOGUI update is past soak period, accepting this release as an update");
@@ -1064,7 +1068,7 @@ namespace AlotAddOnGUI
             {
                 var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
                 int fileVersion = versInfo.FileMajorPart;
-                Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
+                Button_MEM_GUI.Text = "LAUNCH MEM v" + fileVersion;
                 ShowStatus("Updated Mass Effect Modder (GUI version) to v" + fileVersion, 3000);
             }
             RunMusicDownloadCheck();
@@ -2226,19 +2230,36 @@ namespace AlotAddOnGUI
                              }).ToList();
 
                 HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("highestapprovedmemversion") == null ? HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("highestapprovedmemversion");
-                SOAK_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("soaktestingmemversion") == null ? SOAK_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("soaktestingmemversion");
-
-                if (rootElement.Element("stageweights") != null)
+                if (rootElement.Element("soaktestingmemversion") != null)
                 {
-                    ProgressWeightPercentages.Weights =
-                        (from stage in rootElement.Element("stageweights").Descendants("stage")
-                         select new ProgressWeight
+                    XElement soakElem = rootElement.Element("soaktestingmemversion");
+                    SOAK_APPROVED_STABLE_MEMNOGUIVERSION = (int)soakElem;
+                    if (soakElem.Attribute("soakstartdate") != null)
+                    {
+                        SOAK_START_DATE = DateTime.ParseExact(soakElem.Attribute("soakstartdate").Value, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    }
+                }
+
+                if (rootElement.Element("stages") != null)
+                {
+                    ProgressWeightPercentages.Stages =
+                        (from stage in rootElement.Element("stages").Descendants("stage")
+                         select new Stage
                          {
                              StageName = stage.Attribute("name").Value,
-                             Weight = Convert.ToDouble(stage.Attribute("value").Value),
-                             ME1Scaling = stage.Attribute("me1scaling") != null ? Convert.ToDouble(stage.Attribute("me1scaling").Value) : 1,
-                             ME2Scaling = stage.Attribute("me2scaling") != null ? Convert.ToDouble(stage.Attribute("me2scaling").Value) : 1,
-                             ME3Scaling = stage.Attribute("me3scaling") != null ? Convert.ToDouble(stage.Attribute("me3scaling").Value) : 1
+                             TaskName = stage.Attribute("tasktext").Value,
+                             Weight = Convert.ToDouble(stage.Attribute("weight").Value),
+                             ME1Scaling = stage.Attribute("me1weightscaling") != null ? Convert.ToDouble(stage.Attribute("me1weightscaling").Value) : 1,
+                             ME2Scaling = stage.Attribute("me2weightscaling") != null ? Convert.ToDouble(stage.Attribute("me2weightscaling").Value) : 1,
+                             ME3Scaling = stage.Attribute("me3weightscaling") != null ? Convert.ToDouble(stage.Attribute("me3weightscaling").Value) : 1,
+                             FailureInfos = stage.Elements("failureinfo").Select(z => new StageFailure
+                             {
+                                 FailureIPCTrigger = z.Attribute("ipcerror") != null ? z.Attribute("ipcerror").Value : null,
+                                 FailureBottomText = z.Attribute("failedbottommessage").Value,
+                                 FailureTopText = z.Attribute("failedtopmessage").Value,
+                                 FailureHeaderText = z.Attribute("failedheadermessage").Value,
+                                 FailureResultCode = Convert.ToInt32(z.Attribute("resultcode").Value)
+                             }).ToList()
                          }).ToList();
                 }
                 else
@@ -4018,18 +4039,6 @@ namespace AlotAddOnGUI
 
         }
 
-        private void Button_InstallerLOD4k_Click(object sender, RoutedEventArgs e)
-        {
-            //LODLIMIT = 4;
-            Panel_ME1LODLimit.Visibility = Visibility.Collapsed;
-        }
-
-        private void Button_InstallerLOD2k_Click(object sender, RoutedEventArgs e)
-        {
-            //LODLIMIT = 2;
-            Panel_ME1LODLimit.Visibility = Visibility.Collapsed;
-        }
-
         private void Button_ME12K_Click(object sender, RoutedEventArgs e)
         {
             Log.Information("Using 2K textures for ME1 (button click)");
@@ -4860,6 +4869,12 @@ namespace AlotAddOnGUI
         private void InstallMEUITM_Click(object sender, RoutedEventArgs e)
         {
             Log.Error("This is not yet implemented.");
+        }
+
+        private void Button_Utilities_Click(object sender, RoutedEventArgs e)
+        {
+            Utilities_Flyout.IsOpen = true;
+            SettingsFlyout.IsOpen = false;
         }
     }
 }

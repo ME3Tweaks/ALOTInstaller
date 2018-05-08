@@ -59,7 +59,6 @@ namespace AlotAddOnGUI
         private bool WARN_USER_OF_EXIT = false;
         private List<string> TIPS_LIST;
         private const string SET_OVERALL_PROGRESS = "SET_OVERALL_PROGRESS";
-        private const string HIDE_LOD_LIMIT = "HIDE_LOD_LIMIT";
         Stopwatch stopwatch;
         private string MAINTASK_TEXT;
         private string CURRENT_USER_BUILD_FILE = "";

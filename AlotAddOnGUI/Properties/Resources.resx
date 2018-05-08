@@ -139,4 +139,7 @@
   <data name="tooltiptrayicon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\images\info.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="AutoTOC" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\binkw32\me3\AutoTOC.asi;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

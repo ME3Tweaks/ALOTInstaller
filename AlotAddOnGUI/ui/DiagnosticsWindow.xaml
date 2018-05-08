@@ -54,7 +54,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="8,0,0,0">
                 <Image x:Name="Image_Upload" Source="../images/waiting.png" Height="15"/>
-                <TextBlock x:Name="TextBlock_Upload" Text="Upload diagnostic for analysis" Margin="3"/>
+                <TextBlock x:Name="TextBlock_Upload" Text="Upload diagnostic for viewing" Margin="3"/>
             </StackPanel>
             
             <Button x:Name="Button_Close" Visibility="Hidden" Content="Close" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Margin="8" Click="CloseButton_Click"/>
