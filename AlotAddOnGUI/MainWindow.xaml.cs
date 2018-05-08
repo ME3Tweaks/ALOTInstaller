@@ -2239,7 +2239,10 @@ namespace AlotAddOnGUI
                     SOAK_APPROVED_STABLE_MEMNOGUIVERSION = (int)soakElem;
                     if (soakElem.Attribute("soakstartdate") != null)
                     {
-                        SOAK_START_DATE = DateTime.ParseExact(soakElem.Attribute("soakstartdate").Value, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                        string soakStartDateStr = soakElem.Attribute("soakstartdate").Value;
+                        Log.Information("Reading soak start date: "+soakStartDateStr);
+                        SOAK_START_DATE = DateTime.ParseExact(soakStartDateStr, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                        Log.Information("Soak start date: "+SOAK_START_DATE);
                     }
                 }
 
