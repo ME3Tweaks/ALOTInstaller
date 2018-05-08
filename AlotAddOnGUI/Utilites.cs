@@ -59,48 +59,54 @@ namespace AlotAddOnGUI
         {
             string str = "";
             ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
-            foreach (ManagementObject moProcessor in mosProcessor.Get())
+            try
             {
-                if (str != "")
+                foreach (ManagementObject moProcessor in mosProcessor.Get())
                 {
-                    str += "\n";
-                }
+                    if (str != "")
+                    {
+                        str += "\n";
+                    }
 
-                if (moProcessor["name"] != null)
-                {
-                    str += moProcessor["name"].ToString();
-                    str += "\n";
-                }
-                if (moProcessor["maxclockspeed"] != null)
-                {
-                    str += "Maximum reported clock speed: ";
-                    str += moProcessor["maxclockspeed"].ToString();
-                    str += " Mhz\n";
-                }
-                if (moProcessor["numberofcores"] != null)
-                {
-                    str += "Cores: ";
+                    if (moProcessor["name"] != null)
+                    {
+                        str += moProcessor["name"].ToString();
+                        str += "\n";
+                    }
+                    if (moProcessor["maxclockspeed"] != null)
+                    {
+                        str += "Maximum reported clock speed: ";
+                        str += moProcessor["maxclockspeed"].ToString();
+                        str += " Mhz\n";
+                    }
+                    if (moProcessor["numberofcores"] != null)
+                    {
+                        str += "Cores: ";
 
-                    str += moProcessor["numberofcores"].ToString();
-                    str += "\n";
-                }
-                if (moProcessor["numberoflogicalprocessors"] != null)
-                {
-                    str += "Logical processors: ";
-                    str += moProcessor["numberoflogicalprocessors"].ToString();
-                    str += "\n";
-                }
+                        str += moProcessor["numberofcores"].ToString();
+                        str += "\n";
+                    }
+                    if (moProcessor["numberoflogicalprocessors"] != null)
+                    {
+                        str += "Logical processors: ";
+                        str += moProcessor["numberoflogicalprocessors"].ToString();
+                        str += "\n";
+                    }
 
+                }
+                return str
+                   .Replace("(TM)", "™")
+                   .Replace("(tm)", "™")
+                   .Replace("(R)", "®")
+                   .Replace("(r)", "®")
+                   .Replace("(C)", "©")
+                   .Replace("(c)", "©")
+                   .Replace("    ", " ")
+                   .Replace("  ", " ").Trim();
+            } catch
+            {
+                return "Access denied: Not authorized to get CPU information\n";
             }
-            return str
-               .Replace("(TM)", "™")
-               .Replace("(tm)", "™")
-               .Replace("(R)", "®")
-               .Replace("(r)", "®")
-               .Replace("(C)", "©")
-               .Replace("(c)", "©")
-               .Replace("    ", " ")
-               .Replace("  ", " ").Trim();
         }
 
         public static bool IsWindows10OrNewer()
