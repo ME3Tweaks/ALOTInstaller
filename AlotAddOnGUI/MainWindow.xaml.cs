@@ -125,6 +125,8 @@ namespace AlotAddOnGUI
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
         public static readonly string SETTINGSTR_DEBUGLOGGING = "DebugLogging";
+        private const int DOT_NET_REQUIRED_VERSION = 461808;
+        private const string DOT_NET_REQUIRED_VERSION_HR = "4.7.2";
         private const string SETTINGSTR_DONT_FORCE_UPGRADES = "DontForceUpgrades";
         private const string SETTINGSTR_LIBRARYDIR = "LibraryDir";
         private const string SETTINGSTR_REPACK = "RepackGameFiles";
@@ -304,18 +306,18 @@ namespace AlotAddOnGUI
                     Environment.Exit(1);
                 }
             }
-            Log.Information("Checking for .NET version 4.7.1...");
+            Log.Information("Checking for .NET version " + DOT_NET_REQUIRED_VERSION_HR + "...");
             int netVersion = Utilities.Get45PlusFromRegistry();
-            if (netVersion < 461308)
+            if (netVersion < DOT_NET_REQUIRED_VERSION)
             {
-                Log.Warning(".NET 4.7.1 or greater is not installed.");
-                //.net 4.7.1
+                Log.Warning(".NET " + DOT_NET_REQUIRED_VERSION_HR + " or greater is not installed.");
+                //.net " + DOT_NET_REQUIRED_VERSION_HR + "
                 MetroDialogSettings mds = new MetroDialogSettings();
                 mds.AffirmativeButtonText = "Install";
                 mds.NegativeButtonText = "Manual";
                 mds.FirstAuxiliaryButtonText = "Later";
                 mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                var upgradenet = await this.ShowMessageAsync(".NET upgrade required", "To continue receiving updates you'll need to install Microsoft .NET 4.7.1 or higher. ALOT Installer can do this for you, select Install below to download and run the installer. Alternatively you can manually install .NET 4.7.1 by clicking the Manual button.", MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, mds);
+                var upgradenet = await this.ShowMessageAsync(".NET upgrade required", "To continue receiving updates you'll need to install Microsoft .NET " + DOT_NET_REQUIRED_VERSION_HR + " or higher. ALOT Installer can do this for you, select Install below to download and run the installer. Alternatively you can manually install .NET " + DOT_NET_REQUIRED_VERSION_HR + " by clicking the Manual button.", MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, mds);
                 if (upgradenet == MessageDialogResult.Affirmative)
                 {
                     await UpgradeDotNet();
@@ -327,13 +329,13 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    Log.Warning("User has declined .NET 4.7.1 install.");
+                    Log.Warning("User has declined .NET " + DOT_NET_REQUIRED_VERSION_HR + " install.");
                     PerformUpdateCheck(false);
                 }
             }
             else
             {
-                Log.Information(".NET 4.7.1 or greater is installed.");
+                Log.Information(".NET " + DOT_NET_REQUIRED_VERSION_HR + " or greater is installed.");
                 PerformUpdateCheck(true);
             }
         }
@@ -381,7 +383,7 @@ namespace AlotAddOnGUI
                         {
                             if (!dotNetSatisfiedForUpdate)
                             {
-                                await this.ShowMessageAsync(".NET upgrade required", "An update is available for ALOT Installer, but the new version requires .NET 4.7.1 to be installed before the update. Restart ALOT Installer and choose the Install option at the .NET prompt.");
+                                await this.ShowMessageAsync(".NET upgrade required", "An update is available for ALOT Installer, but the new version requires .NET " + DOT_NET_REQUIRED_VERSION_HR + " to be installed before the update. Restart ALOT Installer and choose the Install option at the .NET prompt.");
                                 Log.Error(".NET update declined but we require an update - exiting.");
                                 if ((myReleaseAge > 5 || USING_BETA) && !DONT_FORCE_UPGRADES)
                                 {
@@ -516,12 +518,12 @@ namespace AlotAddOnGUI
 
         private async Task UpgradeDotNet()
         {
-            Log.Information("Downloading .NET 4.7.1 web-installer");
+            Log.Information("Downloading .NET 4.7.2 web-installer");
             string message = "Installation will begin once the download has completed. You will need to restart your computer after installation is complete.";
             updateprogresscontroller = await this.ShowProgressAsync("Downloading .NET Web Installer", message, false);
             updateprogresscontroller.SetIndeterminate();
             string temppath = Path.GetTempPath();
-            string downloadPath = Path.Combine(temppath, "NDP471-KB4033344-Web.exe");
+            string downloadPath = Path.Combine(temppath, "NDP472-KB4054531-Web.exe");
             WebClient downloadClient = new WebClient();
 
             downloadClient.Headers["user-agent"] = "ALOTInstaller";
@@ -548,7 +550,7 @@ namespace AlotAddOnGUI
                     int run = Utilities.runProcessAsAdmin(downloadPath, argx, true, true);
                     if (run == 0)
                     {
-                        Log.Information(".NET 4.7.1 web installer has begun. We will now close ALOT Installer while it runs.");
+                        Log.Information(".NET 4.7.2 web installer has begun. We will now close ALOT Installer while it runs.");
                         await this.ShowMessageAsync("Wait for installation to finish", "Once installation has finished, you may need to restart your system. If prompted to do so, restart your system to continue using ALOT Installer.");
                     }
                     Environment.Exit(0);
@@ -561,12 +563,13 @@ namespace AlotAddOnGUI
                     Environment.Exit(1);
                 }
             };
-            string net471webinstallerlink = "https://download.microsoft.com/download/8/E/2/8E2BDDE7-F06E-44CC-A145-56C6B9BBE5DD/NDP471-KB4033344-Web.exe";
+            string net471webinstallerlink = "https://download.microsoft.com/download/3/3/2/332D9665-37D5-467A-84E1-D07101375B8C/NDP472-KB4054531-Web.exe";
             downloadClient.DownloadFileAsync(new Uri(net471webinstallerlink), downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
         }
 
         private async void RunMEMUpdaterGUI()
         {
+            Debug.WriteLine("Updating MEM GUI...");
             int fileVersion = 0;
             if (File.Exists(BINARY_DIRECTORY + "MassEffectModder.exe"))
             {
@@ -1003,13 +1006,13 @@ namespace AlotAddOnGUI
                 {
                     if (File.Exists(BINARY_DIRECTORY + "MassEffectModderNoGui.pdb"))
                     {
-                        //DISABLED DUE TO .NET 4.7.1 not supporting portable pdbs due to update
+                        //DISABLED DUE TO .NET " + DOT_NET_REQUIRED_VERSION_HR + " not supporting portable pdbs due to update
                         //File.Delete(BINARY_DIRECTORY + "MassEffectModderNoGui.pdb");
                         //Log.Information("Deleted MassEffectModderNoGui.pdb");
                     }
                 }
             }
-            PerformPostStartup();
+            //PerformPostStartup();
         }
 
         private void UnzipMEMGUIUpdate(object sender, AsyncCompletedEventArgs e)
