@@ -125,6 +125,7 @@ namespace AlotAddOnGUI
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
         public static readonly string SETTINGSTR_DEBUGLOGGING = "DebugLogging";
+        private const string DISCORD_INVITE_LINK = "https://discord.gg/tTePzaa";
         private const string SETTINGSTR_DONT_FORCE_UPGRADES = "DontForceUpgrades";
         private const string SETTINGSTR_LIBRARYDIR = "LibraryDir";
         private const string SETTINGSTR_REPACK = "RepackGameFiles";
@@ -863,11 +864,15 @@ namespace AlotAddOnGUI
                         var result = await this.ShowMessageAsync("Want to help fix this issue?", "We would appreciate if you joined the ALOT Discord server so you can help us reproduce this issue so we can get it fixed.", MessageDialogStyle.AffirmativeAndNegative, mds);
                         if (result == MessageDialogResult.Affirmative)
                         {
-                            openWebPage("https://discord.gg/w4Smese");
+                            openWebPage(DISCORD_INVITE_LINK);
                         }
                     }
 
                 }
+            }
+            if (MEUITM_INSTALLER_MODE) {
+                MEUITM_Flyout_BootPanel.Visibility = Visibility.Collapsed;
+                MEUITM_Flyout_InstallOptionsPanel.Visibility = Visibility.Visible;
             }
             Log.Information("PerformPostStartup() has completed. We are now switching over to user control.");
         }
@@ -3845,7 +3850,7 @@ namespace AlotAddOnGUI
 
         private void Button_ReportIssue_Click(object sender, RoutedEventArgs e)
         {
-            openWebPage("https://discord.gg/w4Smese");
+            openWebPage(DISCORD_INVITE_LINK);
         }
 
         public static void openWebPage(string link)

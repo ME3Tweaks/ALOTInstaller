@@ -628,7 +628,21 @@
                         <ImageBrush ImageSource="images/meuitm.jpg" AlignmentY="Center" Stretch="UniformToFill"/>
                     </Border.Background>
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock SnapsToDevicePixels="True" TextWrapping="Wrap" Foreground="White" TextAlignment="Center" FontSize="16" Text="Choose options for MEUITM, then click install to install MEUITM. Alternatively, to install ALOT and its extra textures, switch to ALOT Installer mode.">
+                        <StackPanel  Name="MEUITM_Flyout_BootPanel" Visibility="Visible">
+                            <Controls:ProgressRing x:Name="MEUITM_Flyout_Loading_Spinner"  IsActive="True" Margin="0,0,0,10" Foreground="Snow" Width="30" Height="30"/>
+                            <TextBlock SnapsToDevicePixels="True" TextWrapping="Wrap" Foreground="White" TextAlignment="Center" FontSize="22" Text="Starting up, please wait">
+                                <TextBlock.Effect>
+                                    <DropShadowEffect
+                                  ShadowDepth="4"
+                                  Direction="330"
+                                  Color="Black"
+                                  Opacity="1"
+                                 BlurRadius="4"/>
+                                </TextBlock.Effect>
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Name="MEUITM_Flyout_InstallOptionsPanel" MaxWidth="600" Visibility="Collapsed">
+                            <TextBlock SnapsToDevicePixels="True" TextWrapping="Wrap" Foreground="White" TextAlignment="Center" FontSize="16" Text="Choose options for MEUITM, then click install to install MEUITM. Alternatively, to install ALOT and its extra textures, switch to ALOT Installer mode.">
                             <TextBlock.Effect>
                                 <DropShadowEffect
                                   ShadowDepth="4"
@@ -641,6 +655,7 @@
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button Content="Switch to ALOT Installer mode" Click="SwitchToALOTMode_Button_Click" HorizontalAlignment="Center" Margin="5" Padding="20,5,20,5"/>
                             <Button Content="Install MEUITM" Click="InstallMEUITM_Click" HorizontalAlignment="Center" Margin="5" Padding="20,5,20,5"/>
+                        </StackPanel>
                         </StackPanel>
                     </StackPanel>
                 </Border>
