@@ -160,15 +160,12 @@ namespace AlotAddOnGUI
             {
                 case 1:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x77, 0, 0, 0));
-                    Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Collapsed;
                     break;
                 case 2:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x55, 0, 0, 0));
-                    Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Collapsed;
                     break;
                 case 3:
                     backgroundShadeBrush = new SolidColorBrush(Color.FromArgb(0x55, 0, 0, 0));
-                    Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Collapsed;
                     break;
             }
             InstallingOverlayFlyout_Border.Background = backgroundShadeBrush;
@@ -275,9 +272,6 @@ namespace AlotAddOnGUI
             {
                 case UPDATE_STAGE_OF_STAGE_LABEL:
                     InstallingOverlay_StageLabel.Text = "Stage " + CURRENT_STAGE_NUM + " of " + STAGE_COUNT;
-                    break;
-                case HIDE_LOD_LIMIT:
-                    Panel_ME1LODLimit.Visibility = System.Windows.Visibility.Collapsed;
                     break;
                 case HIDE_STAGES_LABEL:
                     InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Collapsed;
@@ -524,7 +518,6 @@ namespace AlotAddOnGUI
                     e.Result = RESULT_UNKNOWN_ERROR;
                 }
                 InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
-                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT));
                 return;
             }
 
@@ -634,7 +627,6 @@ namespace AlotAddOnGUI
             Log.Information("Updating LOD information");
             CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_LOD_LIMIT, CurrentTask));
 
             args = "-apply-lods-gfx ";
             args += INSTALLING_THREAD_GAME;
@@ -646,7 +638,8 @@ namespace AlotAddOnGUI
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
             if (processResult != 0)
             {
-                Log.Error("APPLYLOD RETURN CODE WAS NOT 0: " + processResult);
+                Log.Error("Applying lods failed, return code was not 0: " + processResult);
+                Log.Error("Graphics settings may not have been applied to game config files.");
             }
 
             if (INSTALLING_THREAD_GAME == 1)
@@ -739,7 +732,7 @@ namespace AlotAddOnGUI
                 Utilities.InstallBinkw32Bypass(INSTALLING_THREAD_GAME);
                 if (INSTALLING_THREAD_GAME == 3)
                 {
-                    Utilities.InstallME3LoggerASI();
+                    Utilities.InstallME3ASIs();
                 }
             }
 
@@ -1193,7 +1186,6 @@ namespace AlotAddOnGUI
                             case "PROCESSING_FILE":
                                 Log.Information("MEMNoGui processing file: " + param);
                                 break;
-                            case "OVERALL_PROGRESS": //will be removed
                             case "TASK_PROGRESS":
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENT_STAGE_PROGRESS, param));
                                 break;

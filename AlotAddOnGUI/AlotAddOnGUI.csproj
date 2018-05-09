@@ -261,6 +261,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.manifest" />
+    <None Include="binkw32\me3\AutoTOC.asi" />
     <None Include="binkw32\me3\ME3Logger_truncating.asi" />
     <None Include="Data\music\me1.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -292,9 +293,16 @@
     <Content Include="7z\7z.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Data\bin\sevenzipwrapper.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\bin\FullAutoTOC.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="Data\bin\lzma.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="images\logo_mem.png" />
     <Resource Include="images\meuitm.jpg" />
     <Resource Include="images\me1_bg_alt.jpg" />
     <Resource Include="images\me3_bg_alt.jpg" />
@@ -321,7 +329,6 @@
     <Resource Include="images\info.ico" />
     <Resource Include="images\greencheckmark.png" />
     <Resource Include="images\orangedownload.png" />
-    <None Include="ALOTADDON.ico" />
     <Resource Include="ALOTInstallerIcon.ico" />
     <Content Include="binkw32\me1\dsound.dll" />
     <Content Include="binkw32\me2\binkw23.dll" />

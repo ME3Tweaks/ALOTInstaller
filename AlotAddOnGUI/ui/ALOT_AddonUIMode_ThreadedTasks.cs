@@ -59,7 +59,6 @@ namespace AlotAddOnGUI
         private bool WARN_USER_OF_EXIT = false;
         private List<string> TIPS_LIST;
         private const string SET_OVERALL_PROGRESS = "SET_OVERALL_PROGRESS";
-        private const string HIDE_LOD_LIMIT = "HIDE_LOD_LIMIT";
         Stopwatch stopwatch;
         private string MAINTASK_TEXT;
         private string CURRENT_USER_BUILD_FILE = "";
@@ -119,6 +118,7 @@ namespace AlotAddOnGUI
                     }
                 }
             };
+            
             ca.Run();
             return ca;
         }
@@ -1386,7 +1386,7 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void BackupGame(object sender, DoWorkEventArgs e)
+        private void VerifyAndBackupGame(object sender, DoWorkEventArgs e)
         {
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, "Calculating space requirements..."));
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, true));
@@ -1417,7 +1417,7 @@ namespace AlotAddOnGUI
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "-check-game-data-only-vanilla " + BACKUP_THREAD_GAME + " -ipc";
             List<string> acceptedIPC = new List<string>();
-            acceptedIPC.Add("OVERALL_PROGRESS");
+            acceptedIPC.Add("TASK_PROGRESS");
             acceptedIPC.Add("ERROR");
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, "Verifying game data..."));
 
@@ -1513,7 +1513,6 @@ namespace AlotAddOnGUI
                         switch (command)
                         {
                             case "TASK_PROGRESS":
-                            case "OVERALL_PROGRESS":
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
                                 int percentInt = Convert.ToInt32(param);
                                 worker.ReportProgress(percentInt);

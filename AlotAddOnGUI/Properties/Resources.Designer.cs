@@ -63,6 +63,16 @@ namespace AlotAddOnGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] AutoTOC {
+            get {
+                object obj = ResourceManager.GetObject("AutoTOC", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] dsound {
             get {
                 object obj = ResourceManager.GetObject("dsound", resourceCulture);

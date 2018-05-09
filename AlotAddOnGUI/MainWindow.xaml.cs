@@ -125,6 +125,10 @@ namespace AlotAddOnGUI
         private BindingList<AddonFile> alladdonfiles;
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
         public static readonly string SETTINGSTR_DEBUGLOGGING = "DebugLogging";
+        private readonly string DOT_NET_DOWNLOAD_LINK_WEB = "https://download.microsoft.com/download/3/3/2/332D9665-37D5-467A-84E1-D07101375B8C/NDP472-KB4054531-Web.exe";
+        private readonly string DOT_NET_REQUIRED_VERSION_MANUAL_LINK = "https://docs.microsoft.com/en-us/dotnet/framework/whats-new/index#downloading-and-installing-the-net-framework-472";
+        private const int DOT_NET_REQUIRED_VERSION = 461808;
+        private const string DOT_NET_REQUIRED_VERSION_HR = "4.7.2";
         private const string DISCORD_INVITE_LINK = "https://discord.gg/tTePzaa";
         private const string SETTINGSTR_DONT_FORCE_UPGRADES = "DontForceUpgrades";
         private const string SETTINGSTR_LIBRARYDIR = "LibraryDir";
@@ -305,36 +309,36 @@ namespace AlotAddOnGUI
                     Environment.Exit(1);
                 }
             }
-            Log.Information("Checking for .NET version 4.7.1...");
+            Log.Information("Checking for .NET version " + DOT_NET_REQUIRED_VERSION_HR + "...");
             int netVersion = Utilities.Get45PlusFromRegistry();
-            if (netVersion < 461308)
+            if (netVersion < DOT_NET_REQUIRED_VERSION)
             {
-                Log.Warning(".NET 4.7.1 or greater is not installed.");
-                //.net 4.7.1
+                Log.Warning(".NET " + DOT_NET_REQUIRED_VERSION_HR + " or greater is not installed.");
+                //.net " + DOT_NET_REQUIRED_VERSION_HR + "
                 MetroDialogSettings mds = new MetroDialogSettings();
                 mds.AffirmativeButtonText = "Install";
                 mds.NegativeButtonText = "Manual";
                 mds.FirstAuxiliaryButtonText = "Later";
                 mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                var upgradenet = await this.ShowMessageAsync(".NET upgrade required", "To continue receiving updates you'll need to install Microsoft .NET 4.7.1 or higher. ALOT Installer can do this for you, select Install below to download and run the installer. Alternatively you can manually install .NET 4.7.1 by clicking the Manual button.", MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, mds);
+                var upgradenet = await this.ShowMessageAsync(".NET upgrade required", "To continue receiving updates you'll need to install Microsoft .NET " + DOT_NET_REQUIRED_VERSION_HR + " or higher. ALOT Installer can do this for you, select Install below to download and run the installer. Alternatively you can manually install .NET " + DOT_NET_REQUIRED_VERSION_HR + " by clicking the Manual button.", MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, mds);
                 if (upgradenet == MessageDialogResult.Affirmative)
                 {
                     await UpgradeDotNet();
                 }
                 else if (upgradenet == MessageDialogResult.Negative)
                 {
-                    string link = "https://www.microsoft.com/en-us/download/details.aspx?id=56115";
+                    string link = DOT_NET_REQUIRED_VERSION_MANUAL_LINK;
                     openWebPage(link);
                 }
                 else
                 {
-                    Log.Warning("User has declined .NET 4.7.1 install.");
+                    Log.Warning("User has declined .NET " + DOT_NET_REQUIRED_VERSION_HR + " install.");
                     PerformUpdateCheck(false);
                 }
             }
             else
             {
-                Log.Information(".NET 4.7.1 or greater is installed.");
+                Log.Information(".NET " + DOT_NET_REQUIRED_VERSION_HR + " or greater is installed.");
                 PerformUpdateCheck(true);
             }
         }
@@ -382,7 +386,7 @@ namespace AlotAddOnGUI
                         {
                             if (!dotNetSatisfiedForUpdate)
                             {
-                                await this.ShowMessageAsync(".NET upgrade required", "An update is available for ALOT Installer, but the new version requires .NET 4.7.1 to be installed before the update. Restart ALOT Installer and choose the Install option at the .NET prompt.");
+                                await this.ShowMessageAsync(".NET upgrade required", "An update is available for ALOT Installer, but the new version requires .NET " + DOT_NET_REQUIRED_VERSION_HR + " to be installed before the update. Restart ALOT Installer and choose the Install option at the .NET prompt.");
                                 Log.Error(".NET update declined but we require an update - exiting.");
                                 if ((myReleaseAge > 5 || USING_BETA) && !DONT_FORCE_UPGRADES)
                                 {
@@ -517,12 +521,12 @@ namespace AlotAddOnGUI
 
         private async Task UpgradeDotNet()
         {
-            Log.Information("Downloading .NET 4.7.1 web-installer");
+            Log.Information("Downloading .NET 4.7.2 web-installer");
             string message = "Installation will begin once the download has completed. You will need to restart your computer after installation is complete.";
             updateprogresscontroller = await this.ShowProgressAsync("Downloading .NET Web Installer", message, false);
             updateprogresscontroller.SetIndeterminate();
             string temppath = Path.GetTempPath();
-            string downloadPath = Path.Combine(temppath, "NDP471-KB4033344-Web.exe");
+            string downloadPath = Path.Combine(temppath, "NDP472-KB4054531-Web.exe");
             WebClient downloadClient = new WebClient();
 
             downloadClient.Headers["user-agent"] = "ALOTInstaller";
@@ -549,7 +553,7 @@ namespace AlotAddOnGUI
                     int run = Utilities.runProcessAsAdmin(downloadPath, argx, true, true);
                     if (run == 0)
                     {
-                        Log.Information(".NET 4.7.1 web installer has begun. We will now close ALOT Installer while it runs.");
+                        Log.Information(".NET " + DOT_NET_REQUIRED_VERSION_HR + " web installer has begun. We will now close ALOT Installer while it runs.");
                         await this.ShowMessageAsync("Wait for installation to finish", "Once installation has finished, you may need to restart your system. If prompted to do so, restart your system to continue using ALOT Installer.");
                     }
                     Environment.Exit(0);
@@ -562,18 +566,19 @@ namespace AlotAddOnGUI
                     Environment.Exit(1);
                 }
             };
-            string net471webinstallerlink = "https://download.microsoft.com/download/8/E/2/8E2BDDE7-F06E-44CC-A145-56C6B9BBE5DD/NDP471-KB4033344-Web.exe";
+            string net471webinstallerlink = DOT_NET_DOWNLOAD_LINK_WEB;
             downloadClient.DownloadFileAsync(new Uri(net471webinstallerlink), downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
         }
 
         private async void RunMEMUpdaterGUI()
         {
+            Debug.WriteLine("Updating MEM GUI...");
             int fileVersion = 0;
             if (File.Exists(BINARY_DIRECTORY + "MassEffectModder.exe"))
             {
                 var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
                 fileVersion = versInfo.FileMajorPart;
-                Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
+                Button_MEM_GUI.Text = "MEM v" + fileVersion;
             }
 
             if (Directory.Exists(UPDATE_STAGING_MEM_DIR))
@@ -1008,13 +1013,13 @@ namespace AlotAddOnGUI
                 {
                     if (File.Exists(BINARY_DIRECTORY + "MassEffectModderNoGui.pdb"))
                     {
-                        //DISABLED DUE TO .NET 4.7.1 not supporting portable pdbs due to update
+                        //DISABLED DUE TO .NET " + DOT_NET_REQUIRED_VERSION_HR + " not supporting portable pdbs due to update
                         //File.Delete(BINARY_DIRECTORY + "MassEffectModderNoGui.pdb");
                         //Log.Information("Deleted MassEffectModderNoGui.pdb");
                     }
                 }
             }
-            PerformPostStartup();
+            //PerformPostStartup();
         }
 
         private void UnzipMEMGUIUpdate(object sender, AsyncCompletedEventArgs e)
@@ -1073,7 +1078,7 @@ namespace AlotAddOnGUI
             {
                 var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + "MassEffectModder.exe");
                 int fileVersion = versInfo.FileMajorPart;
-                Button_MEM_GUI.Content = "LAUNCH MEM v" + fileVersion;
+                Button_MEM_GUI.Text = "MEM v" + fileVersion;
                 ShowStatus("Updated Mass Effect Modder (GUI version) to v" + fileVersion, 3000);
             }
             RunMusicDownloadCheck();
@@ -1086,7 +1091,7 @@ namespace AlotAddOnGUI
             int result = (int)e.Result;
             Log.Information("BuildCompleted() with result " + result);
             PreventFileRefresh = false;
-            SetBottomButtonAvailability();
+            SetInstallButtonsAvailability();
             Button_Settings.IsEnabled = true;
             Button_DownloadAssistant.IsEnabled = true;
             Build_ProgressBar.IsIndeterminate = false;
@@ -1490,11 +1495,11 @@ namespace AlotAddOnGUI
                     BuildWorker.WorkerReportsProgress = true;
                 }
                 Button_DownloadAssistant.IsEnabled = true;
-                SetBottomButtonAvailability();
+                SetInstallButtonsAvailability();
             }
         }
 
-        private void SetBottomButtonAvailability()
+        private void SetInstallButtonsAvailability()
         {
             string me1Path = Utilities.GetGamePath(1);
             string me2Path = Utilities.GetGamePath(2);
@@ -1515,13 +1520,16 @@ namespace AlotAddOnGUI
                 Button_InstallME1.IsEnabled = false;
                 Button_InstallME1.ToolTip = "Mass Effect is not installed. To install textures for ME1 the game must already be installed\nIf you are using steam version of the game, run it once before running ALOT Installer";
                 Button_InstallME1.Content = "ME1 Not Installed";
-
+                Button_VerifyGameME1.IsEnabled = false;
+                Textblock_VerifyME1.Text = "ME1 NOT INSTALLED";
             }
             else
             {
                 Button_InstallME1.IsEnabled = true;
                 Button_InstallME1.ToolTip = "Click to build and install textures for Mass Effect";
                 Button_InstallME1.Content = "Install for ME1";
+                Button_VerifyGameME1.IsEnabled = true;
+                Textblock_VerifyME1.Text = "VERIFY VANILLA";
             }
 
             if (!me2Installed)
@@ -1530,12 +1538,17 @@ namespace AlotAddOnGUI
                 Button_InstallME2.IsEnabled = false;
                 Button_InstallME2.ToolTip = "Mass Effect 2 is not installed. To install textures for ME2 the game must already be installed\nIf you are using steam version of the game, run it once before running ALOT Installer";
                 Button_InstallME2.Content = "ME2 Not Installed";
+                Button_VerifyGameME2.IsEnabled = false;
+                Textblock_VerifyME2.Text = "ME2 NOT INSTALLED";
+
             }
             else
             {
                 Button_InstallME2.IsEnabled = true;
                 Button_InstallME2.ToolTip = "Click to build and install textures for Mass Effect 2";
                 Button_InstallME2.Content = "Install for ME2";
+                Button_VerifyGameME2.IsEnabled = true;
+                Textblock_VerifyME2.Text = "VERIFY VANILLA";
             }
 
             if (!me3Installed)
@@ -1544,12 +1557,18 @@ namespace AlotAddOnGUI
                 Button_InstallME3.IsEnabled = false;
                 Button_InstallME3.ToolTip = "Mass Effect 3 is not installed. To install textures for ME3 the game must already be installed";
                 Button_InstallME3.Content = "ME3 Not Installed";
+                Textblock_VerifyME3.Text = Textblock_AutoTOCME3.Text = "ME3 NOT INSTALLED";
+                Button_VerifyGameME3.IsEnabled = Button_AutoTOCME3.IsEnabled = false;
+
             }
             else
             {
                 Button_InstallME3.IsEnabled = true;
                 Button_InstallME3.ToolTip = "Click to build and install textures for Mass Effect 3";
                 Button_InstallME3.Content = "Install for ME3";
+                Button_VerifyGameME3.IsEnabled = Button_AutoTOCME3.IsEnabled = true;
+                Textblock_AutoTOCME3.Text = "AUTOTOC";
+                Textblock_VerifyME3.Text = "VERIFY VANILLA";
             }
         }
 
@@ -2241,7 +2260,8 @@ namespace AlotAddOnGUI
                     SOAK_APPROVED_STABLE_MEMNOGUIVERSION = (int)soakElem;
                     if (soakElem.Attribute("soakstartdate") != null)
                     {
-                        SOAK_START_DATE = DateTime.ParseExact(soakElem.Attribute("soakstartdate").Value, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                        string soakStartDateStr = soakElem.Attribute("soakstartdate").Value;
+                        SOAK_START_DATE = DateTime.ParseExact(soakStartDateStr, "yyyy-MM-dd", CultureInfo.InvariantCulture);
                     }
                 }
 
@@ -2253,10 +2273,10 @@ namespace AlotAddOnGUI
                          {
                              StageName = stage.Attribute("name").Value,
                              TaskName = stage.Attribute("tasktext").Value,
-                             Weight = Convert.ToDouble(stage.Attribute("weight").Value),
-                             ME1Scaling = stage.Attribute("me1weightscaling") != null ? Convert.ToDouble(stage.Attribute("me1weightscaling").Value) : 1,
-                             ME2Scaling = stage.Attribute("me2weightscaling") != null ? Convert.ToDouble(stage.Attribute("me2weightscaling").Value) : 1,
-                             ME3Scaling = stage.Attribute("me3weightscaling") != null ? Convert.ToDouble(stage.Attribute("me3weightscaling").Value) : 1,
+                             Weight = Convert.ToDouble(stage.Attribute("weight").Value, CultureInfo.InvariantCulture),
+                             ME1Scaling = stage.Attribute("me1weightscaling") != null ? Convert.ToDouble(stage.Attribute("me1weightscaling").Value, CultureInfo.InvariantCulture) : 1,
+                             ME2Scaling = stage.Attribute("me2weightscaling") != null ? Convert.ToDouble(stage.Attribute("me2weightscaling").Value, CultureInfo.InvariantCulture) : 1,
+                             ME3Scaling = stage.Attribute("me3weightscaling") != null ? Convert.ToDouble(stage.Attribute("me3weightscaling").Value, CultureInfo.InvariantCulture) : 1,
                              FailureInfos = stage.Elements("failureinfo").Select(z => new StageFailure
                              {
                                  FailureIPCTrigger = z.Attribute("ipcerror") != null ? z.Attribute("ipcerror").Value : null,
@@ -2393,7 +2413,7 @@ namespace AlotAddOnGUI
             catch (Exception e)
             {
                 Log.Error("Error has occured parsing the XML!");
-                Log.Error(e.Message);
+                Log.Error(App.FlattenException(e));
                 MessageDialogResult result = await this.ShowMessageAsync("Error reading file manifest", "An error occured while reading the manifest file for installation. This may indicate a network failure or a packaging failure by Mgamerz - Please submit an issue to github (http://github.com/mgamerz/alotaddongui/issues) and include the most recent log file from the logs directory.\n\n" + e.Message, MessageDialogStyle.Affirmative);
                 AddonFilesLabel.Text = "Error parsing manifest XML! Check the logs.";
                 return;
@@ -2985,7 +3005,7 @@ namespace AlotAddOnGUI
                 return;
             }
             BackupWorker = new BackgroundWorker();
-            BackupWorker.DoWork += BackupGame;
+            BackupWorker.DoWork += VerifyAndBackupGame;
             BackupWorker.WorkerReportsProgress = true;
             BackupWorker.ProgressChanged += BackupWorker_ProgressChanged;
             BackupWorker.RunWorkerCompleted += BackupCompleted;
@@ -3026,7 +3046,7 @@ namespace AlotAddOnGUI
             }
             Button_Settings.IsEnabled = true;
             Button_DownloadAssistant.IsEnabled = true;
-            SetBottomButtonAvailability();
+            SetInstallButtonsAvailability();
             PreventFileRefresh = false;
             ValidateGameBackup(BACKUP_THREAD_GAME);
             BACKUP_THREAD_GAME = -1;
@@ -3903,7 +3923,7 @@ namespace AlotAddOnGUI
                 {
                     AddonFilesLabel.Text = "Restore failed! Check the logs. Your game may be in an inconsistent or missing state.";
                 }
-                SetBottomButtonAvailability();
+                SetInstallButtonsAvailability();
                 UpdateALOTStatus();
 
                 foreach (AddonFile af in alladdonfiles)
@@ -3918,7 +3938,7 @@ namespace AlotAddOnGUI
             else
             {
                 AddonFilesLabel.Text = "Restore failed! Check the logs.";
-                SetBottomButtonAvailability();
+                SetInstallButtonsAvailability();
                 UpdateALOTStatus();
             }
 
@@ -3972,6 +3992,7 @@ namespace AlotAddOnGUI
         {
             ShowStatus("Starting MassEffectModder.exe", 3000);
             SettingsFlyout.IsOpen = false;
+            Utilities_Flyout.IsOpen = false;
             string ini = BINARY_DIRECTORY + "Installer.ini";
             if (File.Exists(ini))
             {
@@ -4042,50 +4063,6 @@ namespace AlotAddOnGUI
                 }
             }
 
-        }
-
-        private void Button_InstallerLOD4k_Click(object sender, RoutedEventArgs e)
-        {
-            //LODLIMIT = 4;
-            Panel_ME1LODLimit.Visibility = Visibility.Collapsed;
-        }
-
-        private void Button_InstallerLOD2k_Click(object sender, RoutedEventArgs e)
-        {
-            //LODLIMIT = 2;
-            Panel_ME1LODLimit.Visibility = Visibility.Collapsed;
-        }
-
-        private void Button_ME12K_Click(object sender, RoutedEventArgs e)
-        {
-            Log.Information("Using 2K textures for ME1 (button click)");
-            Panel_SettingsME1LOD.Visibility = Visibility.Collapsed;
-            //Button_ME1_ShowLODOptions.Content = "Using 2K Textures";
-            string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-            string args = "-apply-lods-gfx 1 -limit2k";
-            Utilities.runProcess(exe, args, true);
-        }
-
-        private void Button_ME14K_Click(object sender, RoutedEventArgs e)
-        {
-            Panel_SettingsME1LOD.Visibility = Visibility.Collapsed;
-            //Button_ME1_ShowLODOptions.Content = "Using 4K Textures";
-            Log.Information("Using 4K textures for ME1 (button click)");
-            string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-            string args = "-apply-lods-gfx 1";
-            Utilities.runProcess(exe, args, true);
-        }
-
-        private void Button_ToggleME1LODPanel(object sender, RoutedEventArgs e)
-        {
-            if (Panel_SettingsME1LOD.Visibility == Visibility.Visible)
-            {
-                Panel_SettingsME1LOD.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                Panel_SettingsME1LOD.Visibility = Visibility.Visible;
-            }
         }
 
         private void InstallingOverlayoutFlyout_DoubleClick(object sender, MouseButtonEventArgs e)
@@ -4886,6 +4863,131 @@ namespace AlotAddOnGUI
         private void InstallMEUITM_Click(object sender, RoutedEventArgs e)
         {
             Log.Error("This is not yet implemented.");
+        }
+
+        private void Button_Utilities_Click(object sender, RoutedEventArgs e)
+        {
+            Utilities_Flyout.IsOpen = true;
+            SettingsFlyout.IsOpen = false;
+        }
+
+        private void Button_ME3AutoTOC_Click(object sender, RoutedEventArgs e)
+        {
+            ShowStatus("Performing AutoTOC on Mass Effect 3...", 3000);
+            SettingsFlyout.IsOpen = false;
+            Utilities_Flyout.IsOpen = false;
+            string exe = BINARY_DIRECTORY + "FullAutoTOC.exe";
+            ConsoleApp ca = new ConsoleApp(exe, "\"" + Utilities.GetGamePath(3) + "\"");
+            ca.ConsoleOutput += (o, args2) =>
+            {
+                if (args2.Line != null && args2.Line != "")
+                {
+                    Log.Information("FullAutoTOC output: " + args2.Line);
+                }
+            };
+            ca.Exited += (o, args2) =>
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    ShowStatus("AutoTOC complete", 2000);
+                });
+            };
+            ca.Run();
+        }
+
+        private void Button_VerifyME1_Click(object sender, RoutedEventArgs e)
+        {
+            VerifyGame(1);
+        }
+
+        private void Button_VerifyME2_Click(object sender, RoutedEventArgs e)
+        {
+            VerifyGame(2);
+        }
+
+        private void Button_VerifyME3_Click(object sender, RoutedEventArgs e)
+        {
+            VerifyGame(3);
+        }
+
+        private void VerifyGame(int v)
+        {
+            if (PreventFileRefresh)
+            {
+                return; //double click.
+            }
+            Button_InstallME1.IsEnabled = Button_InstallME2.IsEnabled = Button_InstallME3.IsEnabled = Button_Settings.IsEnabled = Button_DownloadAssistant.IsEnabled = false;
+            BackupWorker = new BackgroundWorker();
+            BackupWorker.DoWork += verifyGame;
+            BackupWorker.WorkerReportsProgress = true;
+            BackupWorker.ProgressChanged += BackupWorker_ProgressChanged;
+            BackupWorker.RunWorkerCompleted += VerifyCompleted;
+            BACKUP_THREAD_GAME = v;
+            SettingsFlyout.IsOpen = false;
+            Utilities_Flyout.IsOpen = false;
+            PreventFileRefresh = true;
+            BackupWorker.RunWorkerAsync();
+        }
+
+        public void verifyGame(object sender, DoWorkEventArgs e) { 
+
+            Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
+            string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
+            string args = "-check-game-data-only-vanilla " + BACKUP_THREAD_GAME + " -ipc";
+            List<string> acceptedIPC = new List<string>();
+            acceptedIPC.Add("TASK_PROGRESS");
+            acceptedIPC.Add("ERROR");
+            BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, "Verifying game data..."));
+
+            runMEM_BackupAndBuild(exe, args, BackupWorker, acceptedIPC);
+            while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+            {
+                Thread.Sleep(250);
+            }
+            int backupVerifyResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+            if (backupVerifyResult != 0)
+            {
+                string modified = "";
+                string gameDir = Utilities.GetGamePath(BACKUP_THREAD_GAME);
+                foreach (String error in BACKGROUND_MEM_PROCESS_ERRORS)
+                {
+                    modified += "\n - " + error.Remove(0, gameDir.Length + 1);
+                }
+                Log.Warning("Game verification failed.");
+                string message = "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has files that do not match what is in the MEM database.\nThe files are listed below." + modified;
+                e.Result = new KeyValuePair<string, string>("Game is modified", message);
+                //Thread resumes
+            }
+            else
+            {
+                Log.Information("Game verification passed - no issues.");
+                string message = "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has passed the vanilla game check.";
+                e.Result = new KeyValuePair<string, string>("Game appears unmodified", message);
+            }
+        }
+
+        private async void VerifyCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.NoProgress, this);
+            var helper = new FlashWindowHelper(System.Windows.Application.Current);
+            AddonFilesLabel.Text = "Verification has completed";
+            // Flashes the window and taskbar 5 times and stays solid 
+            // colored until user focuses the main window
+            helper.FlashApplicationWindow();
+            if (e.Result != null)
+            {
+                KeyValuePair<string, string> result = (KeyValuePair<string, string>)e.Result;
+                await this.ShowMessageAsync(result.Key, result.Value);
+            }
+            PreventFileRefresh = false;
+            SetInstallButtonsAvailability();
+            Button_Settings.IsEnabled = Button_DownloadAssistant.IsEnabled = true;
+            RefreshesUntilRealRefresh = 3;
+        }
+
+        private void Button_CloseUtilities(object sender, RoutedEventArgs e)
+        {
+            Utilities_Flyout.IsOpen = false;
         }
     }
 }

@@ -59,48 +59,54 @@ namespace AlotAddOnGUI
         {
             string str = "";
             ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
-            foreach (ManagementObject moProcessor in mosProcessor.Get())
+            try
             {
-                if (str != "")
+                foreach (ManagementObject moProcessor in mosProcessor.Get())
                 {
-                    str += "\n";
-                }
+                    if (str != "")
+                    {
+                        str += "\n";
+                    }
 
-                if (moProcessor["name"] != null)
-                {
-                    str += moProcessor["name"].ToString();
-                    str += "\n";
-                }
-                if (moProcessor["maxclockspeed"] != null)
-                {
-                    str += "Maximum reported clock speed: ";
-                    str += moProcessor["maxclockspeed"].ToString();
-                    str += " Mhz\n";
-                }
-                if (moProcessor["numberofcores"] != null)
-                {
-                    str += "Cores: ";
+                    if (moProcessor["name"] != null)
+                    {
+                        str += moProcessor["name"].ToString();
+                        str += "\n";
+                    }
+                    if (moProcessor["maxclockspeed"] != null)
+                    {
+                        str += "Maximum reported clock speed: ";
+                        str += moProcessor["maxclockspeed"].ToString();
+                        str += " Mhz\n";
+                    }
+                    if (moProcessor["numberofcores"] != null)
+                    {
+                        str += "Cores: ";
 
-                    str += moProcessor["numberofcores"].ToString();
-                    str += "\n";
-                }
-                if (moProcessor["numberoflogicalprocessors"] != null)
-                {
-                    str += "Logical processors: ";
-                    str += moProcessor["numberoflogicalprocessors"].ToString();
-                    str += "\n";
-                }
+                        str += moProcessor["numberofcores"].ToString();
+                        str += "\n";
+                    }
+                    if (moProcessor["numberoflogicalprocessors"] != null)
+                    {
+                        str += "Logical processors: ";
+                        str += moProcessor["numberoflogicalprocessors"].ToString();
+                        str += "\n";
+                    }
 
+                }
+                return str
+                   .Replace("(TM)", "™")
+                   .Replace("(tm)", "™")
+                   .Replace("(R)", "®")
+                   .Replace("(r)", "®")
+                   .Replace("(C)", "©")
+                   .Replace("(c)", "©")
+                   .Replace("    ", " ")
+                   .Replace("  ", " ").Trim();
+            } catch
+            {
+                return "Access denied: Not authorized to get CPU information\n";
             }
-            return str
-               .Replace("(TM)", "™")
-               .Replace("(tm)", "™")
-               .Replace("(R)", "®")
-               .Replace("(r)", "®")
-               .Replace("(C)", "©")
-               .Replace("(c)", "©")
-               .Replace("    ", " ")
-               .Replace("  ", " ").Trim();
         }
 
         public static bool IsWindows10OrNewer()
@@ -864,25 +870,44 @@ namespace AlotAddOnGUI
             }
         }
 
-        public static bool InstallME3LoggerASI()
+        public static bool InstallME3ASIs()
         {
             Log.Information("Installing ME3Logger_truncating.asi...");
             try
             {
                 string path = Utilities.GetGamePath(3);
-                string logpath = Path.Combine(path, "Binaries", "Win32", "ME3log.txt");
                 path = Path.Combine(path, "Binaries", "Win32", "asi");
                 Directory.CreateDirectory(path);
                 path = Path.Combine(path, "ME3Logger_truncating.asi");
-                System.IO.File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.ME3Logger_truncating);
+                File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.ME3Logger_truncating);
                 Log.Information("Installed ME3Logger_truncating.asi");
-                return true;
             }
             catch (Exception ex)
             {
-                Log.Error("Failed to install me3logger_truncating: " + ex.Message);
+                Log.Error("Failed to install me3logger_truncating.asi: " + ex.Message);
                 return false;
             }
+
+            if (MainWindow.USING_BETA)
+            {
+                Log.Information("Installing AutoTOC.asi...");
+                try
+                {
+                    string path = Utilities.GetGamePath(3);
+                    path = Path.Combine(path, "Binaries", "Win32", "asi");
+                    Directory.CreateDirectory(path);
+                    path = Path.Combine(path, "AutoTOC.asi");
+                    File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.AutoTOC);
+                    Log.Information("Installed AutoTOC.asi");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Failed to install AutoTOC.asi: " + ex.Message);
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public static Task<List<string>> Run7zWithProgressForAddonFile(string archive)
@@ -1259,40 +1284,6 @@ namespace AlotAddOnGUI
                 }
             }
             return 0;
-        }
-
-        // Checking the version using >= will enable forward compatibility.
-        private static string CheckFor45PlusVersion(int releaseKey)
-        {
-            if (releaseKey >= 461308)
-                return "4.7.1 or later";
-            if (releaseKey >= 460798)
-                return "4.7";
-            if (releaseKey >= 394802)
-                return "4.6.2";
-            if (releaseKey >= 394254)
-            {
-                return "4.6.1";
-            }
-            if (releaseKey >= 393295)
-            {
-                return "4.6";
-            }
-            if ((releaseKey >= 379893))
-            {
-                return "4.5.2";
-            }
-            if ((releaseKey >= 378675))
-            {
-                return "4.5.1";
-            }
-            if ((releaseKey >= 378389))
-            {
-                return "4.5";
-            }
-            // This code should never execute. A non-null release key should mean
-            // that 4.5 or later is installed.
-            return "No 4.5 or later version detected";
         }
     }
 }
