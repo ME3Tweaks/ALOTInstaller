@@ -163,7 +163,7 @@
     <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Spec_0x3B912C80.dds" destinationname="0x3B912C80.dds" />
   </addonfile>
   <!-- Temporary addition to the addon, until the MEUITM installer is updated to support -mark-to-convert -->
-  <addonfile friendlyname="Improved Lightmaps and Shadowmaps" author="CDAMJC & CreeperLava">
+  <addonfile friendlyname="Improved Lightmaps and Shadowmaps" author="CDAMJC, CreeperLava">
     <file downloadlink="https://mega.nz/#!A4F2nSqJ!U2nPCFiPzkIKGoQ28qf-z0o3OfY2CZNEmPpQIQp0A40" tooltipname="LightandShadowMaps.mem" filename="LightandShadowMaps.mem" md5="fa5e1856ab632bdf9c1d3b1f6e40096d" size="66653866" />
     <packagefile me1="true" sourcename="LightandShadowMaps.mem" movedirectly="true" />
   </addonfile>
