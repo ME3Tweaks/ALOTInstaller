@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.1.0">
+<alotaddonmanifest version="5.1.1">
   <soaktestingmemversion soakstartdate="2018-05-03">126</soaktestingmemversion>
   <stages>
 	<!-- -56 is the next error code available-->
@@ -165,7 +165,7 @@
   <!-- Temporary addition to the addon, until the MEUITM installer is updated to support -mark-to-convert -->
   <addonfile friendlyname="Improved Lightmaps and Shadowmaps" author="CDAMJC, CreeperLava">
     <file downloadlink="https://mega.nz/#!A4F2nSqJ!U2nPCFiPzkIKGoQ28qf-z0o3OfY2CZNEmPpQIQp0A40" tooltipname="LightandShadowMaps.mem" filename="LightandShadowMaps.mem" md5="fa5e1856ab632bdf9c1d3b1f6e40096d" size="66653866" />
-    <packagefile me1="true" sourcename="LightandShadowMaps.mem" movedirectly="true" />
+    <packagefile me1="true" sourcename="LightandShadowMaps.mem" destinationname="LightandShadowMaps.mem" movedirectly="true" />
   </addonfile>
   <addonfile friendlyname="Ashley Complexion Tweak" author="Ellise" optional="true">
     <file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" tooltipname="Ash Complexion Tweak - .MEM" filename="el_Ashley Complexion Tweak.7z-569-1-0.7z" md5="e8a4283b6242aff68227bfc8bb145899" size="10154183" />
