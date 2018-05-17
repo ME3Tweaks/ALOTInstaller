@@ -103,7 +103,8 @@ namespace AlotAddOnGUI
                    .Replace("(c)", "©")
                    .Replace("    ", " ")
                    .Replace("  ", " ").Trim();
-            } catch
+            }
+            catch
             {
                 return "Access denied: Not authorized to get CPU information\n";
             }
@@ -449,6 +450,68 @@ namespace AlotAddOnGUI
             }
             Uri folderUri = new Uri(folder);
             return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
+        }
+
+        internal static string GetGameSourceByHash(int game, string hash)
+        {
+            List<KeyValuePair<string, string>> list = null;
+            switch (game)
+            {
+                case 1:
+                    list = SUPPORTED_HASHES_ME1;
+                    break;
+                case 2:
+                    list = SUPPORTED_HASHES_ME2;
+                    break;
+                case 3:
+                    list = SUPPORTED_HASHES_ME3;
+                    break;
+            }
+
+            foreach (KeyValuePair<string, string> hashPair in list)
+            {
+                if (hashPair.Key == hash)
+                {
+                    return "$$$Game source: " + hashPair.Value;
+                }
+            }
+            return "~~~Unknown source - this installation is not supported.";
+        }
+
+        public static List<KeyValuePair<string, string>> SUPPORTED_HASHES_ME1 = new List<KeyValuePair<string, string>>();
+        public static List<KeyValuePair<string, string>> SUPPORTED_HASHES_ME2 = new List<KeyValuePair<string, string>>();
+        public static List<KeyValuePair<string, string>> SUPPORTED_HASHES_ME3 = new List<KeyValuePair<string, string>>();
+
+        /// <summary>
+        /// Checks if a hash string is in the list of supported hashes.
+        /// </summary>
+        /// <param name="game">Game ID</param>
+        /// <param name="hash">Executable hash</param>
+        /// <returns>True if found, false otherwise</returns>
+        public static bool CheckIfHashIsSupported(int game, string hash)
+        {
+            List<KeyValuePair<string, string>> list = null;
+            switch (game)
+            {
+                case 1:
+                    list = SUPPORTED_HASHES_ME1;
+                    break;
+                case 2:
+                    list = SUPPORTED_HASHES_ME2;
+                    break;
+                case 3:
+                    list = SUPPORTED_HASHES_ME3;
+                    break;
+            }
+
+            foreach (KeyValuePair<string, string> hashPair in list)
+            {
+                if (hashPair.Key == hash)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static bool GetME1LAAEnabled()

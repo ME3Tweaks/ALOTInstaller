@@ -44,6 +44,7 @@ namespace AlotAddOnGUI.ui
         private const int CONTEXT_NORMAL = 0;
         private const int CONTEXT_FULLMIPMAP_SCAN = 1;
         private const int CONTEXT_REPLACEDFILE_SCAN = 2;
+        private const int CONTEXT_FILEMARKER_SCAN = 3;
         private bool TextureCheck = false;
         private static int DIAGNOSTICS_GAME = 0;
         private static ConsoleApp BACKGROUND_MEM_PROCESS;
@@ -133,7 +134,7 @@ namespace AlotAddOnGUI.ui
             ALOTVersionInfo avi = Utilities.GetInstalledALOTInfo(DIAGNOSTICS_GAME);
             if (avi == null)
             {
-                TextBlock_DataAfter.Text = "Check files are readable";
+                TextBlock_DataAfter.Text = "Check for old files";
                 TextBlock_DataMismatch.Visibility = Visibility.Collapsed;
                 Image_DataMismatch.Visibility = Visibility.Collapsed;
             }
@@ -188,7 +189,7 @@ namespace AlotAddOnGUI.ui
                         }
                         else
                         {
-                            TextBlock_DataAfter.Text = "Checking files are readable " + progress + "%";
+                            TextBlock_DataAfter.Text = "Checking for old files " + progress + "%";
                         }
                         break;
                     }
@@ -290,6 +291,7 @@ namespace AlotAddOnGUI.ui
 
         private void PerformDiagnostics(object sender, DoWorkEventArgs e)
         {
+            bool hashSupported = false; //will set to true on hash check
             diagStringBuilder = new StringBuilder();
             string gamePath = Utilities.GetGamePath(DIAGNOSTICS_GAME);
             bool pairLog = false;
@@ -335,7 +337,7 @@ namespace AlotAddOnGUI.ui
                     bool me1LAAEnabled = Utilities.GetME1LAAEnabled();
                     if (MEMI_FOUND && !me1LAAEnabled)
                     {
-                        addDiagLine(" - DIAG ERROR: Large Address Aware: " + me1LAAEnabled + " - ALOT/MEUITM is installed - this will almost certainly cause crashes");
+                        addDiagLine("[ERROR] -  Large Address Aware: " + me1LAAEnabled + " - ALOT/MEUITM is installed - this being false will almost certainly cause crashes");
                     }
                     else
                     {
@@ -347,7 +349,10 @@ namespace AlotAddOnGUI.ui
                 {
                     using (var stream = File.OpenRead(exePath))
                     {
-                        addDiagLine("[EXEHASH-" + DIAGNOSTICS_GAME + "]" + BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower());
+                        string hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower();
+                        addDiagLine("[EXEHASH-" + DIAGNOSTICS_GAME + "]" + hash);
+                        hashSupported = Utilities.CheckIfHashIsSupported(DIAGNOSTICS_GAME, hash);
+                        addDiagLine(Utilities.GetGameSourceByHash(DIAGNOSTICS_GAME, hash));
                     }
                 }
                 string d3d9file = Path.GetDirectoryName(exePath) + "\\d3d9.dll";
@@ -435,7 +440,14 @@ namespace AlotAddOnGUI.ui
             addDiagLine("===Latest MEMI Marker Information");
             if (avi == null)
             {
-                addDiagLine("ALOT Marker file does not have MEMI tag. ALOT/MEUITM not installed, or at least not installed through an installer.");
+                if (DIAGNOSTICS_GAME != 1)
+                {
+                    addDiagLine("The ALOT installation marker was not detected. ALOT is not installed.");
+                }
+                else
+                {
+                    addDiagLine("The ALOT installation marker was not detected. ALOT and MEUITM are not installed.");
+                }
             }
             else
             {
@@ -487,22 +499,29 @@ namespace AlotAddOnGUI.ui
                     }
                     else
                     {
-                        addDiagLine(" - DIAG ERROR: Texture map file is missing: me" + DIAGNOSTICS_GAME + "map.bin but MEMI tag is present - was game migrated to new system or on different user account?");
+                        addDiagLine("[ERROR] -  Texture map file is missing: me" + DIAGNOSTICS_GAME + "map.bin but MEMI tag is present - was game migrated to new system or on different user account?");
                     }
                     diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_RED, Image_DataMismatch));
                 }
             }
+            //}
+            //else
+            //{
+            //    addDiagLine("===Files added (or removed) after ALOT" + (DIAGNOSTICS_GAME == 1 ? "/MEUITM" : "") + " install");
+            //    addDiagLine("MEMI tag was not found - ALOT/MEUITM not installed, skipping this check.");
+            //    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataMismatch));
+            //}
+
+            if (MEMI_FOUND)
+            {
+                args = "-check-game-data-after " + DIAGNOSTICS_GAME + " -ipc";
+            }
             else
             {
-                addDiagLine("===Files added (or removed) after ALOT" + (DIAGNOSTICS_GAME == 1 ? "/MEUITM" : "") + " install");
-                addDiagLine("MEMI tag was not found - ALOT/MEUITM not installed, skipping this check.");
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataMismatch));
+                args = "-check-for-markers " + DIAGNOSTICS_GAME + " -ipc";
             }
-
-
-            args = "-check-game-data-after " + DIAGNOSTICS_GAME + " -ipc";
             diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
-            Context = CONTEXT_REPLACEDFILE_SCAN;
+            Context = MEMI_FOUND ? CONTEXT_REPLACEDFILE_SCAN : CONTEXT_FILEMARKER_SCAN;
             runMEM_Diagnostics(exe, args, diagnosticsWorker);
             WaitForMEM();
             if (MEMI_FOUND)
@@ -514,7 +533,7 @@ namespace AlotAddOnGUI.ui
             else
             {
                 addDiagLine("===Preinstallation file scan");
-                addDiagLine("This check will make sure all files can be opened for reading.");
+                addDiagLine("This check will make sure all files can be opened for reading and that files that were previously modified by ALOT are not installed.");
                 addDiagLine("");
             }
 
@@ -523,28 +542,31 @@ namespace AlotAddOnGUI.ui
 
                 if (MEMI_FOUND)
                 {
-                    addDiagLine("Diagnostic reports some files appear to have been replaced after textures were installed:");
+                    addDiagLine("[ERROR]Diagnostic reports some files appear to have been added or replaced after ALOT was installed, or could not be read:");
                 }
                 else
                 {
-                    addDiagLine("The following files did not pass the file scan check:");
+                    addDiagLine("[ERROR]The following files did not pass the modification marker check, or could not be read:");
                 }
+
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
-                    if (MEMI_FOUND)
-                    {
-                        addDiagLine(" - DIAG ERROR: " + str);
-                    }
-                    else
-                    {
-                        addDiagLine(" - " + str);
+                    addDiagLine("[ERROR] - " + str);
+                }
 
-                    }
+                if (MEMI_FOUND)
+                {
+                    addDiagLine("[ERROR]Files added or replaced after ALOT has been installed is not supported due to the way the Unreal Engine 3 works.");
+                }
+                else
+                {
+                    addDiagLine("[ERROR]Files that were previously modified by ALOT are most times broken or leftover from a previous ALOT failed installation that did not complete and set the ALOT installation marker.");
+                    addDiagLine("[ERROR]Delete your game installation and reinstall the game, or restore from your backup in the ALOT settings.");
                 }
                 if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
                 {
                     pairLog = true;
-                    addDiagLine("MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                    addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
                 }
             }
             else
@@ -553,17 +575,17 @@ namespace AlotAddOnGUI.ui
                 {
                     if (MEMI_FOUND)
                     {
-                        addDiagLine("Diagnostic reports no files appear to have been replaced after textures were installed.");
+                        addDiagLine("Diagnostic did not find any files that were added or replaced after ALOT installation or have issues reading files.");
                     }
                     else
                     {
-                        addDiagLine("Diagnostic did not have any trouble scanning files.");
+                        addDiagLine("Diagnostic did not find any files from previous installations of ALOT or have issues reading files.");
                     }
                 }
                 else
                 {
                     pairLog = true;
-                    addDiagLine("MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                    addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
                 }
             }
 
@@ -588,12 +610,12 @@ namespace AlotAddOnGUI.ui
                     addDiagLine("Full texture check reported errors:");
                     foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                     {
-                        addDiagLine(" - DIAG ERROR: " + str);
+                        addDiagLine("[ERROR] -  " + str);
                     }
                     if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
                     {
                         pairLog = true;
-                        addDiagLine("MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-textures. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                        addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-textures. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
                     }
                 }
                 else
@@ -605,7 +627,7 @@ namespace AlotAddOnGUI.ui
                     else
                     {
                         pairLog = true;
-                        addDiagLine("MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-textures: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                        addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-textures: " + BACKGROUND_MEM_PROCESS.ExitCode);
                     }
                 }
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_OFF_TASKBAR_PROGRESS));
@@ -625,7 +647,7 @@ namespace AlotAddOnGUI.ui
             string prefix = "";
             if (MEMI_FOUND)
             {
-                prefix = " - DIAG ERROR: ";
+                prefix = "[ERROR] -  ";
             }
             if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
             {
@@ -659,7 +681,7 @@ namespace AlotAddOnGUI.ui
                 addDiagLine("Diagnostic reports the following incompatible mods are installed:");
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
-                    addDiagLine(" - DIAG ERROR: " + str);
+                    addDiagLine("[ERROR] -  " + str);
                 }
             }
             else
@@ -743,8 +765,8 @@ namespace AlotAddOnGUI.ui
                         addDiagLine("[ERROR]" + GetDLCDisplayString(value));
                         addDiagLine("[ERROR]      SFAR is not the MEM unpacked size. Unpacked DLC by MEM will be 32 bytes, however this SFAR is " + ByteSize.FromBytes(sfarsize) + ".");
                         addDiagLine("[ERROR]      If HQ graphics settings are on (ALOT/MEUITM was found, so it should be) this will very often be a source of the game crashing.");
-                        addDiagLine("[ERROR]      You may also see this error if you unpacked DLC using ME3Explorer - as an end-user you should not have to use ME3Explorer,");
-                        addDiagLine("[ERROR]      even for AutoTOC. Use MEM instead to avoid the setup wizard issues (Settings->Launch MEM->Mass Effect 3->AutoTOC).");
+                        addDiagLine("[ERROR]      You may also see this error if you unpacked DLC using ME3Explorer - as an end-user you should never have to use ME3Explorer,");
+                        addDiagLine("[ERROR]      even for AutoTOC. You can run AutoTOC in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
                     }
 
                     else
@@ -753,7 +775,7 @@ namespace AlotAddOnGUI.ui
                     }
                     if (duplicatePriorityStr != "")
                     {
-                        addDiagLine(" - DIAG ERROR: This DLC has the same mount priority as another DLC: " + duplicatePriorityStr);
+                        addDiagLine("[ERROR] -  This DLC has the same mount priority as another DLC: " + duplicatePriorityStr);
                         addDiagLine("[ERROR]     These conflicting DLCs will likely encounter issues as the game will not know which files should be used");
                     }
                 }
@@ -769,7 +791,7 @@ namespace AlotAddOnGUI.ui
                 }
                 else if (!hasUIMod && compatPatchInstalled)
                 {
-                    addDiagLine(" - DIAG ERROR: This installation does not require a UI compatibilty patch but one is installed. This may lead to game crashing.");
+                    addDiagLine("[ERROR] -  This installation does not require a UI compatibilty patch but one is installed. This may lead to game crashing.");
                 }
 
                 if (metadataPresent)
@@ -781,7 +803,7 @@ namespace AlotAddOnGUI.ui
             {
                 if (DIAGNOSTICS_GAME == 3)
                 {
-                    addDiagLine(" - DIAG ERROR: DLC directory is missing: " + dlcPath + ". Mass Effect 3 always has a DLC folder so this should not be missing.");
+                    addDiagLine("[ERROR] -  DLC directory is missing: " + dlcPath + ". Mass Effect 3 always has a DLC folder so this should not be missing.");
                 }
                 else
                 {
@@ -811,7 +833,7 @@ namespace AlotAddOnGUI.ui
                             long size = fi.Length;
                             if (ent.size < size)
                             {
-                                addDiagLine(" - DIAG ERROR: " + filepath + " size is " + size + ", but TOC lists " + ent.size);
+                                addDiagLine("[ERROR] -  " + filepath + " size is " + size + ", but TOC lists " + ent.size);
                                 hadTocError = true;
                             }
                         }
@@ -824,7 +846,8 @@ namespace AlotAddOnGUI.ui
                 else
                 {
                     addDiagLine("[ERROR]Some files are larger than the listed TOC size. This typically won't happen unless you manually installed some files.");
-                    addDiagLine("[ERROR]The game will always hang while loading these files. To fix, open MEM from Settings, go to Mass Effect 3, and choose 'Update TOCs'.");
+                    addDiagLine("[ERROR]The game will always hang while loading these files.");
+                    if (hashSupported) { addDiagLine("[ERROR] You can run AutoTOC in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC."); }
                 }
             }
 
@@ -919,8 +942,8 @@ namespace AlotAddOnGUI.ui
 
 
             string diag = diagStringBuilder.ToString();
-            string hash = Utilities.sha256(diag);
-            diag += hash;
+            string diaghash = Utilities.sha256(diag);
+            diag += diaghash;
 
             string date = DateTime.Now.ToString("yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture);
             string diagfilename = EXE_DIRECTORY + "\\logs\\diagnostic_me" + DIAGNOSTICS_GAME + "_" + date + ".txt";
@@ -1004,7 +1027,7 @@ namespace AlotAddOnGUI.ui
                             }
                             else
                             {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have unused mip crashes." + Environment.NewLine;
+                                log += "[ERROR] -  HQ LOD settings appear to be set but MEMI marker is missing - game will likely have unused mip crashes." + Environment.NewLine;
                                 log = ShowBadLODDialog(log);
                             }
                         }
@@ -1012,7 +1035,7 @@ namespace AlotAddOnGUI.ui
                         {
                             if (avi != null)
                             {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
+                                log += "[ERROR] -  HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
                             }
                             else
                             {
@@ -1054,7 +1077,7 @@ namespace AlotAddOnGUI.ui
                             }
                             else
                             {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
+                                log += "[ERROR] -  HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
                                 log = ShowBadLODDialog(log);
                             }
                         }
@@ -1062,7 +1085,7 @@ namespace AlotAddOnGUI.ui
                         {
                             if (avi != null)
                             {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
+                                log += "[ERROR] -  HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
                             }
                             else
                             {
@@ -1105,7 +1128,7 @@ namespace AlotAddOnGUI.ui
                             }
                             else
                             {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
+                                log += "[ERROR] -  HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
                                 log = ShowBadLODDialog(log);
 
                             }
@@ -1115,7 +1138,7 @@ namespace AlotAddOnGUI.ui
                             //HQ LOD MISSING
                             if (avi != null)
                             {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
+                                log += "[ERROR] -  HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
 
                             }
                             else
@@ -1128,7 +1151,7 @@ namespace AlotAddOnGUI.ui
             }
             else
             {
-                log += " - DIAG ERROR: Could not find LOD config file: " + iniPath;
+                log += "[ERROR] -  Could not find LOD config file: " + iniPath;
 
             }
             return log;
@@ -1232,7 +1255,7 @@ namespace AlotAddOnGUI.ui
                                 {
                                     worker.ReportProgress(0, new ThreadCommand(SET_FULLSCAN_PROGRESS, percentInt));
                                 }
-                                else if (Context == CONTEXT_REPLACEDFILE_SCAN)
+                                else if (Context == CONTEXT_REPLACEDFILE_SCAN || Context == CONTEXT_FILEMARKER_SCAN)
                                 {
                                     worker.ReportProgress(0, new ThreadCommand(SET_REPLACEDFILE_PROGRESS, percentInt));
                                 }
@@ -1240,9 +1263,22 @@ namespace AlotAddOnGUI.ui
                             case "PROCESSING_FILE":
                                 worker.ReportProgress(0, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, param));
                                 break;
+                            case "ERROR_FILEMARKER_FOUND":
+                                Log.Error("File that has ALOT modification marker was found: " + param);
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File has been previously modified by ALOT: " + param);
+                                break;
                             case "ERROR":
-                                Log.Error("IPC ERROR: " + param);
-                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
+                                //will remove context switch if ERROR_FILEMARKER_FOUND is implemented
+                                if (Context == CONTEXT_FILEMARKER_SCAN)
+                                {
+                                    Log.Error("File that has ALOT modification marker was found: " + param);
+                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File has been previously modified by ALOT: " + param);
+                                }
+                                else
+                                {
+                                    Log.Error("IPC ERROR: " + param);
+                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
+                                }
                                 break;
                             case "ERROR_TEXTURE_SCAN_DIAGNOSTIC":
                             case "ERROR_MIPMAPS_NOT_REMOVED":
