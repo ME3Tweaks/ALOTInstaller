@@ -13,7 +13,7 @@
       <stage name="STAGE_SCAN" weight="0.12055272684" tasktext="Scanning textures">
          <failureinfo resultcode="-52" failedtopmessage="Failed to scan textures" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during scanning of existing game textures. Please see installer log for more info." />
       </stage>
-      <stage name="STAGE_INSTALLTEXTURES" weight="0.36997680866" tasktext="Installing textures" me3weightscaling="1.1">
+      <stage name="STAGE_INSTALLTEXTURES" weight="0.6997680866" tasktext="Installing textures" me1weightscaling="0.7">
          <failureinfo ipcerror="ERROR_TEXTURE_MAP_MISSING" resultcode="-44" failedtopmessage="Texture map is missing" failedbottommessage="Check or upload installer log for more information" failedheadermessage="Texture map file is missing - has this game been migrated to a new system or user account?" />
          <failureinfo ipcerror="ERROR_TEXTURE_MAP_WRONG" resultcode="-45" failedtopmessage="Texture map is corrupt" failedbottommessage="Check or upload installer log for more information" failedheadermessage="Texture map file is corrupted and unusable - you will need to delete the game and then reinstall so the texture map can be rebuilt." />
          <failureinfo ipcerror="ERROR_FILE_ADDED" resultcode="-48" failedtopmessage="Files were added after ALOT was installed" failedbottommessage="Installation aborted" failedheadermessage="Installation of package files after ALOT has been installed is unsupported. Please follow the correct installation directions for ALOT." />
