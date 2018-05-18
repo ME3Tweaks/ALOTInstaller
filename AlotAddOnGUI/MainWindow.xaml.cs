@@ -875,7 +875,8 @@ namespace AlotAddOnGUI
 
                 }
             }
-            if (MEUITM_INSTALLER_MODE) {
+            if (MEUITM_INSTALLER_MODE)
+            {
                 MEUITM_Flyout_BootPanel.Visibility = Visibility.Collapsed;
                 MEUITM_Flyout_InstallOptionsPanel.Visibility = Visibility.Visible;
             }
@@ -2262,6 +2263,31 @@ namespace AlotAddOnGUI
                     {
                         string soakStartDateStr = soakElem.Attribute("soakstartdate").Value;
                         SOAK_START_DATE = DateTime.ParseExact(soakStartDateStr, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    }
+                }
+
+                Utilities.SUPPORTED_HASHES_ME1.Clear();
+                Utilities.SUPPORTED_HASHES_ME2.Clear();
+                Utilities.SUPPORTED_HASHES_ME3.Clear();
+
+                if (rootElement.Element("supportedhashes") != null)
+                {
+                    var supportedHashesList = rootElement.Element("supportedhashes").Descendants("supportedhash");
+                    foreach (var item in supportedHashesList)
+                    {
+                        KeyValuePair<string, string> kvp = new KeyValuePair<string, string>(item.Value, (string)item.Attribute("name"));
+                        switch ((string)item.Attribute("game"))
+                        {
+                            case "me1":
+                                Utilities.SUPPORTED_HASHES_ME1.Add(kvp);
+                                break;
+                            case "me2":
+                                Utilities.SUPPORTED_HASHES_ME2.Add(kvp);
+                                break;
+                            case "me3":
+                                Utilities.SUPPORTED_HASHES_ME3.Add(kvp);
+                                break;
+                        }
                     }
                 }
 
@@ -4930,7 +4956,8 @@ namespace AlotAddOnGUI
             BackupWorker.RunWorkerAsync();
         }
 
-        public void verifyGame(object sender, DoWorkEventArgs e) { 
+        public void verifyGame(object sender, DoWorkEventArgs e)
+        {
 
             Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;

@@ -48,6 +48,7 @@ namespace AlotAddOnGUI
         private const int RESULT_UNKNOWN_ERROR = -51;
         private const int RESULT_SCAN_FAILED = -52;
         private const int RESULT_BIOGAME_MISSING = -53;
+        private PerformanceCounter PERFORMANCE_COUNTER = new System.Diagnostics.PerformanceCounter("Memory", "Available MBytes");
 
         private void MusicIcon_Click(object sender, RoutedEventArgs e)
         {
@@ -494,7 +495,8 @@ namespace AlotAddOnGUI
                             //has output errors but we have no handlers for this trigger
                             Log.Error("BACKGROUND_MEM_PROCESS_ERRORS contains an unknown item: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
                             e.Result = stage.getDefaultFailure().FailureResultCode;
-                        } else
+                        }
+                        else
                         {
                             e.Result = stage.getDefaultFailure().FailureResultCode;
                         }
@@ -856,7 +858,8 @@ namespace AlotAddOnGUI
                 if (result == INSTALL_OK)
                 {
                     telemetryfailedcode = 0;
-                } else
+                }
+                else
                 {
                     telemetryfailedcode = result;
                 }
@@ -1087,6 +1090,11 @@ namespace AlotAddOnGUI
                 string str = args2.Line;
                 if (str.StartsWith("[IPC]"))
                 {
+                    if (PERFORMANCE_COUNTER != null)
+                    {
+                        var memoryavailable = PERFORMANCE_COUNTER.NextValue();
+                        Utilities.WriteDebugLog("Available memory: " + memoryavailable + "MB");
+                    }
                     string command = str.Substring(5);
                     int endOfCommand = command.IndexOf(' ');
                     if (endOfCommand > 0)
