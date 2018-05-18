@@ -56,6 +56,7 @@ namespace AlotAddOnGUI.ui
         private bool FIXED_LOD_SETTINGS = false;
         private List<string> AddedFiles = new List<string>();
         private string LINKEDLOGURL;
+        private List<KeyValuePair<string, string>> LODS_INFO = new List<KeyValuePair<string, string>>();
 
         public DiagnosticsWindow()
         {
@@ -830,6 +831,11 @@ namespace AlotAddOnGUI.ui
 
 
             //Get LODs
+            args = "-print-lods " + DIAGNOSTICS_GAME + " -ipc";
+            LODS_INFO.Clear();
+            runMEM_Diagnostics(exe, args, diagnosticsWorker);
+            WaitForMEM();
+
             String lodStr = GetLODStr(DIAGNOSTICS_GAME, avi);
             addDiagLine("===LOD Information");
             addDiagLine(lodStr);
@@ -964,172 +970,57 @@ namespace AlotAddOnGUI.ui
         private string GetLODStr(int gameID, ALOTVersionInfo avi)
         {
             string log = "";
-            string iniPath = IniSettingsHandler.GetConfigIniPath(gameID);
-            if (File.Exists(iniPath))
+            foreach (KeyValuePair<string,string> kvp in LODS_INFO)
             {
-                IniFile engineConf = new IniFile(iniPath);
-                switch (gameID)
-                {
-                    case 1:
-                        log += "TEXTUREGROUP_World=" + engineConf.Read("TEXTUREGROUP_World", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_WorldNormalMap=" + engineConf.Read("TEXTUREGROUP_WorldNormalMap", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_AmbientLightMap=" + engineConf.Read("TEXTUREGROUP_AmbientLightMap", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_LightAndShadowMap=" + engineConf.Read("TEXTUREGROUP_LightAndShadowMap", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_64=" + engineConf.Read("TEXTUREGROUP_Environment_64", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_128=" + engineConf.Read("TEXTUREGROUP_Environment_128", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_256=" + engineConf.Read("TEXTUREGROUP_Environment_256", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_512=" + engineConf.Read("TEXTUREGROUP_Environment_512", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_1024=" + engineConf.Read("TEXTUREGROUP_Environment_1024", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_64=" + engineConf.Read("TEXTUREGROUP_VFX_64", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_128=" + engineConf.Read("TEXTUREGROUP_VFX_128", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_256=" + engineConf.Read("TEXTUREGROUP_VFX_256", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_512" + engineConf.Read("TEXTUREGROUP_VFX_512", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_1024=" + engineConf.Read("TEXTUREGROUP_VFX_1024", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_128=" + engineConf.Read("TEXTUREGROUP_APL_128", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_256=" + engineConf.Read("TEXTUREGROUP_APL_256", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_512=" + engineConf.Read("TEXTUREGROUP_APL_512", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_1024=" + engineConf.Read("TEXTUREGROUP_APL_1024", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_GUI=" + engineConf.Read("TEXTUREGROUP_GUI", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Promotional=" + engineConf.Read("TEXTUREGROUP_Promotional", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_1024=" + engineConf.Read("TEXTUREGROUP_Character_1024", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_Diff=" + engineConf.Read("TEXTUREGROUP_Character_Diff", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_Norm=" + engineConf.Read("TEXTUREGROUP_Character_Norm", "TextureLODSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_Spec=" + engineConf.Read("TEXTUREGROUP_Character_Spec", "TextureLODSettings") + Environment.NewLine;
-
-                        if (engineConf.Read("TEXTUREGROUP_Character_1024", "TextureLODSettings") != "(MinLODSize=32,MaxLODSize=1024,LODBias=0)")
-                        {
-                            if (avi != null)
-                            {
-                                log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
-                            }
-                            else
-                            {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have unused mip crashes." + Environment.NewLine;
-                                log = ShowBadLODDialog(log);
-                            }
-                        }
-                        else
-                        {
-                            if (avi != null)
-                            {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
-                            }
-                            else
-                            {
-                                log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is vanilla-ish." + Environment.NewLine;
-                            }
-                        }
-                        break;
-                    case 2:
-                        log += "TEXTUREGROUP_World=" + engineConf.Read("TEXTUREGROUP_World", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_WorldNormalMap=" + engineConf.Read("TEXTUREGROUP_WorldNormalMap", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_AmbientLightMap=" + engineConf.Read("TEXTUREGROUP_AmbientLightMap", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_LightAndShadowMap=" + engineConf.Read("TEXTUREGROUP_LightAndShadowMap", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_RenderTarget=" + engineConf.Read("TEXTUREGROUP_RenderTarget", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_64=" + engineConf.Read("TEXTUREGROUP_Environment_64", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_128=" + engineConf.Read("TEXTUREGROUP_Environment_128", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_256=" + engineConf.Read("TEXTUREGROUP_Environment_256", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_512=" + engineConf.Read("TEXTUREGROUP_Environment_512", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_1024=" + engineConf.Read("TEXTUREGROUP_Environment_1024", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_64=" + engineConf.Read("TEXTUREGROUP_VFX_64", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_128=" + engineConf.Read("TEXTUREGROUP_VFX_128", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_256=" + engineConf.Read("TEXTUREGROUP_VFX_256", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_512=" + engineConf.Read("TEXTUREGROUP_VFX_512", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_1024=" + engineConf.Read("TEXTUREGROUP_VFX_1024", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_128=" + engineConf.Read("TEXTUREGROUP_APL_128", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_256=" + engineConf.Read("TEXTUREGROUP_APL_256", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_512=" + engineConf.Read("TEXTUREGROUP_APL_512", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_1024=" + engineConf.Read("TEXTUREGROUP_APL_1024", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_UI=" + engineConf.Read("TEXTUREGROUP_UI", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Promotional=" + engineConf.Read("TEXTUREGROUP_Promotional", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_1024=" + engineConf.Read("TEXTUREGROUP_Character_1024", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_Diff=" + engineConf.Read("TEXTUREGROUP_Character_Diff", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_Norm=" + engineConf.Read("TEXTUREGROUP_Character_Norm", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_Spec=" + engineConf.Read("TEXTUREGROUP_Character_Spec", "SystemSettings") + Environment.NewLine;
-                        if (engineConf.Read("TEXTUREGROUP_Character_1024", "SystemSettings") != "")
-                        {
-                            if (avi != null)
-                            {
-                                log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
-                            }
-                            else
-                            {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
-                                log = ShowBadLODDialog(log);
-                            }
-                        }
-                        else
-                        {
-                            if (avi != null)
-                            {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
-                            }
-                            else
-                            {
-                                log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is vanilla-ish." + Environment.NewLine;
-                            }
-                        }
-                        break;
-                    case 3:
-                        log += "TEXTUREGROUP_World=" + engineConf.Read("TEXTUREGROUP_World", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_WorldSpecular=" + engineConf.Read("TEXTUREGROUP_WorldSpecular", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_WorldNormalMap=" + engineConf.Read("TEXTUREGROUP_WorldNormalMap", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_AmbientLightMap=" + engineConf.Read("TEXTUREGROUP_AmbientLightMap", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_ShadowMap=" + engineConf.Read("TEXTUREGROUP_ShadowMap", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_RenderTarget=" + engineConf.Read("TEXTUREGROUP_RenderTarget", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_64=" + engineConf.Read("TEXTUREGROUP_Environment_64", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_128=" + engineConf.Read("TEXTUREGROUP_Environment_128", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_256=" + engineConf.Read("TEXTUREGROUP_Environment_256", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_512=" + engineConf.Read("TEXTUREGROUP_Environment_512", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Environment_1024=" + engineConf.Read("TEXTUREGROUP_Environment_1024", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_64=" + engineConf.Read("TEXTUREGROUP_VFX_64", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_128=" + engineConf.Read("TEXTUREGROUP_VFX_128", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_256=" + engineConf.Read("TEXTUREGROUP_VFX_256", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_512=" + engineConf.Read("TEXTUREGROUP_VFX_512", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_VFX_1024=" + engineConf.Read("TEXTUREGROUP_VFX_1024", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_128=" + engineConf.Read("TEXTUREGROUP_APL_128", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_256=" + engineConf.Read("TEXTUREGROUP_APL_256", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_512=" + engineConf.Read("TEXTUREGROUP_APL_512", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_APL_1024=" + engineConf.Read("TEXTUREGROUP_APL_1024", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_UI=" + engineConf.Read("TEXTUREGROUP_UI", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Promotional=" + engineConf.Read("TEXTUREGROUP_Promotional", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_1024=" + engineConf.Read("TEXTUREGROUP_Character_1024", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_Diff=" + engineConf.Read("TEXTUREGROUP_Character_Diff", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_Norm=" + engineConf.Read("TEXTUREGROUP_Character_Norm", "SystemSettings") + Environment.NewLine;
-                        log += "TEXTUREGROUP_Character_Spec=" + engineConf.Read("TEXTUREGROUP_Character_Spec", "SystemSettings") + Environment.NewLine;
-                        if (engineConf.Read("TEXTUREGROUP_Character_1024", "SystemSettings") != "")
-                        {
-                            if (avi != null)
-                            {
-                                log += "HQ LOD settings appear to be set - game will be able to request higher resolution assets." + Environment.NewLine;
-                            }
-                            else
-                            {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be set but MEMI marker is missing - game will likely have black textures." + Environment.NewLine;
-                                log = ShowBadLODDialog(log);
-
-                            }
-                        }
-                        else
-                        {
-                            //HQ LOD MISSING
-                            if (avi != null)
-                            {
-                                log += " - DIAG ERROR: HQ LOD settings appear to be missing - MEMI tag is present - game will not use new high quality assets!" + Environment.NewLine;
-
-                            }
-                            else
-                            {
-                                log += "HQ LOD settings appear to be missing - MEMI tag is missing so this install is probably vanilla-ish." + Environment.NewLine;
-                            }
-                        }
-                        break;
-                }
+                log += kvp.Key + "=" + kvp.Value;
+                log += "\n";
             }
-            else
+            var LodItems = LODS_INFO.FirstOrDefault(x => x.Key == "TEXTUREGROUP_Character_1024");
+            if (LodItems.IsDefault())
             {
-                log += " - DIAG ERROR: Could not find LOD config file: " + iniPath;
-
+                //not found
+                return "error";
+            }
+            var HQLine = "High quality texture LOD settings appear to be set - game will be able to request higher resolution mips." + Environment.NewLine;
+            var HQSettingsMissingLine = " - DIAG ERROR: High quality texture LOD settings appear to be missing, but a high resolution texture mod appears to be installed. The game will not use these new high quality assets - config file was probably deleted." + Environment.NewLine;
+            var HQVanillaLine = "High quality LOD settings are not set. High quality texture mod flag is not set, so this is a possibly-vanilla installation." + Environment.NewLine;
+            switch (gameID)
+            {
+                case 1:
+                    if (LodItems.Value != "(MinLODSize=32,MaxLODSize=1024,LODBias=0)")
+                    {
+                        //Not Default
+                        if (avi != null) { log += HQLine; }
+                        else
+                        {
+                            log = " - DIAG ERROR: High quality texture LOD settings appear to be set, but the high quality texture mod flag is not - game will likely have unused mip crashes." + Environment.NewLine + log;
+                            log = ShowBadLODDialog(log);
+                        }
+                    }
+                    else
+                    {
+                        if (avi != null) { log = HQSettingsMissingLine + log; }
+                        else { log = HQVanillaLine + log; }
+                    }
+                    break;
+                case 2:
+                case 3:
+                    if (LodItems.Value != "")
+                    {
+                        //Not Default
+                        if (avi != null) { log += HQLine; }
+                        else
+                        {
+                            log = " - DIAG ERROR: High quality texture LOD settings appear to be set, but the high quality texture mod flag is not - game will likely have black textures." + Environment.NewLine + log;
+                            log = ShowBadLODDialog(log);
+                        }
+                    }
+                    else
+                    {
+                        if (avi != null) { log = HQSettingsMissingLine + log; }
+                        else { log = HQVanillaLine + log; }
+                    }
+                    break;
             }
             return log;
         }
@@ -1208,6 +1099,17 @@ namespace AlotAddOnGUI.ui
                                 {
                                     BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File was added after textures scan: " + param + " " + File.GetCreationTimeUtc(gamePath + param));
                                 }
+                                break;
+                            case "LODLINE":
+                                int eqIndex = param.IndexOf('=');
+                                string lodSetting = param.Substring(0, eqIndex);
+                                string lodValue = "";
+                               // if (eqIndex + 1 < param.Length - 1)
+                                //{
+                                    lodValue = param.Substring(eqIndex + 1, param.Length - 1 - eqIndex); //not blank
+                                //}
+                               // param.Substring(eqIndex + 1, param.Length - 1);
+                                LODS_INFO.Add(new KeyValuePair<string, string>(lodSetting, lodValue));
                                 break;
                             case "ERROR_VANILLA_MOD_FILE":
                                 if (MEMI_FOUND)

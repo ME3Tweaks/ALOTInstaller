@@ -4362,6 +4362,7 @@ namespace AlotAddOnGUI
                         BUILD_USER_FILES = Checkbox_BuildOptionUser.IsChecked.Value;
                         BUILD_ALOT_UPDATE = Checkbox_BuildOptionALOTUpdate.IsChecked.Value;
                         BUILD_MEUITM = Checkbox_BuildOptionMEUITM.IsChecked.Value;
+                        TELEMETRY_ALL_ADDON_FILES &= BUILD_ADDON_FILES;
 
                         TaskbarManager.Instance.SetProgressState(TaskbarProgressBarState.Normal, this);
                         BuildWorker.RunWorkerAsync(CURRENT_GAME_BUILD);
