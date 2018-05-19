@@ -439,8 +439,8 @@
                                  BlurRadius="4"/>
                                 </TextBlock.Effect>
                             </TextBlock>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock x:Name="InstallingOverlay_StageLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Stage 3 of 7 (66%)">
+                            <StackPanel x:Name="InstallingOverlay_FullStageOfStageLabel" Visibility="Collapsed" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock x:Name="InstallingOverlay_StageOfStageLabel" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="Stage 3 of 7 (66%)">
                                     <TextBlock.Effect>
                                         <DropShadowEffect
                                   ShadowDepth="4"
@@ -450,7 +450,7 @@
                                  BlurRadius="4"/>
                                     </TextBlock.Effect>
                                 </TextBlock>
-                                <TextBlock x:Name="InstallingOverlay_OverallLabel" Margin="5,0,0,0" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="(0%)">
+                                <TextBlock x:Name="InstallingOverlay_OverallProgressLabel" Margin="5,0,0,0" FontSize="25" FontWeight="Light" HorizontalAlignment="Center"  TextAlignment="Center" Text="(0%)">
                                     <TextBlock.Effect>
                                         <DropShadowEffect
                                   ShadowDepth="4"

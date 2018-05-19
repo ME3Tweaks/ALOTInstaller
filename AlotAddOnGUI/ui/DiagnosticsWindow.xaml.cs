@@ -197,11 +197,11 @@ namespace AlotAddOnGUI.ui
                 case RESET_REPLACEFILE_TEXT:
                     if (MEMI_FOUND)
                     {
-                        TextBlock_DataAfter.Text = "Check for replaced files";
+                        TextBlock_DataAfter.Text = "Check for added/replaced files";
                     }
                     else
                     {
-                        TextBlock_DataAfter.Text = "Check files are readable";
+                        TextBlock_DataAfter.Text = "Check for old files";
                     }
 
                     break;
@@ -226,7 +226,7 @@ namespace AlotAddOnGUI.ui
                     settings.NegativeButtonText = "Don't fix";
                     settings.AffirmativeButtonText = "Fix";
                     settings.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                    MessageDialogResult result = await this.ShowMessageAsync("Texture settings won't work with current installation", "The current texture settings for the game will cause black textures or the game to possibly crash. It is recommended you restore these settings to their unmodified states to prevent this issue. This will not change your game files, only the texture settings.", MessageDialogStyle.AffirmativeAndNegative, settings);
+                    MessageDialogResult result = await this.ShowMessageAsync("Texture settings won't work with current installation", "The current texture settings for the game will cause black textures or the game to possibly crash. It is recommended you restore these settings to their unmodified states to prevent this issue. This will not change your game files, only the texture quality settings.", MessageDialogStyle.AffirmativeAndNegative, settings);
                     if (result == MessageDialogResult.Affirmative)
                     {
                         Log.Information("Removing bad LOD values from game");
@@ -483,6 +483,8 @@ namespace AlotAddOnGUI.ui
                         {
                             addDiagLine(" - " + str);
                         }
+
+
                     }
                     else
                     {
@@ -550,9 +552,19 @@ namespace AlotAddOnGUI.ui
                     addDiagLine("[ERROR]The following files did not pass the modification marker check, or could not be read:");
                 }
 
+                int numSoFar = 0;
                 foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                 {
                     addDiagLine("[ERROR] - " + str);
+                    numSoFar++;
+                    if (numSoFar == 10 && BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count() > 10)
+                    {
+                        addDiagLine("[SUB]");
+                    }
+                }
+                if (numSoFar > 10)
+                {
+                    addDiagLine("[/SUB]");
                 }
 
                 if (MEMI_FOUND)
@@ -609,10 +621,22 @@ namespace AlotAddOnGUI.ui
                 if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
                 {
                     addDiagLine("Full texture check reported errors:");
+
+                    int numSoFar = 0;
                     foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                     {
                         addDiagLine("[ERROR] -  " + str);
+                        numSoFar++;
+                        if (numSoFar == 10 && BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count() > 10)
+                        {
+                            addDiagLine("[SUB]");
+                        }
                     }
+                    if (numSoFar > 10)
+                    {
+                        addDiagLine("[/SUB]");
+                    }
+
                     if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
                     {
                         pairLog = true;
@@ -993,7 +1017,7 @@ namespace AlotAddOnGUI.ui
         private string GetLODStr(int gameID, ALOTVersionInfo avi)
         {
             string log = "";
-            foreach (KeyValuePair<string,string> kvp in LODS_INFO)
+            foreach (KeyValuePair<string, string> kvp in LODS_INFO)
             {
                 log += kvp.Key + "=" + kvp.Value;
                 log += "\n";
@@ -1127,12 +1151,12 @@ namespace AlotAddOnGUI.ui
                                 int eqIndex = param.IndexOf('=');
                                 string lodSetting = param.Substring(0, eqIndex);
                                 string lodValue = "";
-                               // if (eqIndex + 1 < param.Length - 1)
-                                //{
+                                    // if (eqIndex + 1 < param.Length - 1)
+                                    //{
                                     lodValue = param.Substring(eqIndex + 1, param.Length - 1 - eqIndex); //not blank
-                                //}
-                               // param.Substring(eqIndex + 1, param.Length - 1);
-                                LODS_INFO.Add(new KeyValuePair<string, string>(lodSetting, lodValue));
+                                                                                                     //}
+                                                                                                     // param.Substring(eqIndex + 1, param.Length - 1);
+                                    LODS_INFO.Add(new KeyValuePair<string, string>(lodSetting, lodValue));
                                 break;
                             case "ERROR_VANILLA_MOD_FILE":
                                 if (MEMI_FOUND)
@@ -1170,8 +1194,8 @@ namespace AlotAddOnGUI.ui
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File has been previously modified by ALOT: " + param);
                                 break;
                             case "ERROR":
-                                //will remove context switch if ERROR_FILEMARKER_FOUND is implemented
-                                if (Context == CONTEXT_FILEMARKER_SCAN)
+                                    //will remove context switch if ERROR_FILEMARKER_FOUND is implemented
+                                    if (Context == CONTEXT_FILEMARKER_SCAN)
                                 {
                                     Log.Error("File that has ALOT modification marker was found: " + param);
                                     BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File has been previously modified by ALOT: " + param);

@@ -33,6 +33,8 @@ namespace AlotAddOnGUI
     {
         private bool STAGE_DONE_REACHED = false;
         private bool TELEMETRY_IS_FULL_NEW_INSTALL;
+        private const int RESULT_MARKERCHECK_FAILED = -39;
+        // Most of hte following are now controlled by the manifest.
         private const int RESULT_UNPACK_FAILED = -40;
         private const int RESULT_SCAN_REMOVE_FAILED = -41;
         private const int RESULT_ME1LAA_FAILED = -43;
@@ -48,6 +50,9 @@ namespace AlotAddOnGUI
         private const int RESULT_UNKNOWN_ERROR = -51;
         private const int RESULT_SCAN_FAILED = -52;
         private const int RESULT_BIOGAME_MISSING = -53;
+
+        private const string SHOW_ALL_STAGE_LABELS = "SHOW_ALL_STAGE_LABELS";
+        private const string HIDE_STAGE_OF_STAGE_LABEL = "HIDE_STAGE_OF_STAGE_LABEL";
         private PerformanceCounter PERFORMANCE_COUNTER = new System.Diagnostics.PerformanceCounter("Memory", "Available MBytes");
 
         private void MusicIcon_Click(object sender, RoutedEventArgs e)
@@ -148,10 +153,10 @@ namespace AlotAddOnGUI
             HeaderLabel.Text = "Installing MEMs...";
             AddonFilesLabel.Text = "Running in installer mode.";
             InstallingOverlay_Tip.Visibility = System.Windows.Visibility.Visible;
-            InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Visible;
-            InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Visible;
-            InstallingOverlay_OverallLabel.Text = "";
-            InstallingOverlay_StageLabel.Text = "Getting ready";
+            //InstallingOverlay_StageOfStageLabel.Visibility = System.Windows.Visibility.Visible;
+            //InstallingOverlay_OverallProgressLabel.Visibility = System.Windows.Visibility.Visible;
+            InstallingOverlay_OverallProgressLabel.Text = "";
+            InstallingOverlay_StageOfStageLabel.Text = "Getting ready";
             InstallingOverlay_BottomLabel.Text = "Please wait";
             Button_InstallViewLogs.Visibility = System.Windows.Visibility.Collapsed;
 
@@ -256,7 +261,8 @@ namespace AlotAddOnGUI
                     //no tips.
                 }
             }
-            InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Visible;
+            InstallingOverlay_FullStageOfStageLabel.Visibility = System.Windows.Visibility.Collapsed;
+            //InstallingOverlay_OverallProgressLabel.Visibility = System.Windows.Visibility.Visible;
             InstallingOverlay_Tip.Text = "";
             tipticker = new System.Windows.Threading.DispatcherTimer();
             tipticker.Tick += newTipTimer_Tick;
@@ -272,11 +278,20 @@ namespace AlotAddOnGUI
             switch (tc.Command)
             {
                 case UPDATE_STAGE_OF_STAGE_LABEL:
-                    InstallingOverlay_StageLabel.Text = "Stage " + CURRENT_STAGE_NUM + " of " + STAGE_COUNT;
+                    InstallingOverlay_StageOfStageLabel.Text = "Stage " + CURRENT_STAGE_NUM + " of " + STAGE_COUNT;
                     break;
-                case HIDE_STAGES_LABEL:
-                    InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Collapsed;
-                    InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Collapsed;
+                case SHOW_ALL_STAGE_LABELS:
+                    InstallingOverlay_StageOfStageLabel.Visibility = System.Windows.Visibility.Visible;
+                    InstallingOverlay_OverallProgressLabel.Visibility = System.Windows.Visibility.Visible;
+                    InstallingOverlay_FullStageOfStageLabel.Visibility = Visibility.Visible;
+                    break;
+                case HIDE_STAGE_OF_STAGE_LABEL:
+                    InstallingOverlay_FullStageOfStageLabel.Visibility = System.Windows.Visibility.Collapsed;
+                    break;
+                case HIDE_ALL_STAGE_LABELS:
+                    InstallingOverlay_StageOfStageLabel.Visibility = System.Windows.Visibility.Collapsed;
+                    //InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Collapsed;
+                    InstallingOverlay_FullStageOfStageLabel.Visibility = Visibility.Collapsed;
                     break;
                 case SHOW_ORIGIN_FLYOUT:
                     var uriSource = new Uri(@"images/origin/me" + tc.Data + "update.png", UriKind.Relative);
@@ -304,17 +319,20 @@ namespace AlotAddOnGUI
                     }
                     if (((CurrentTaskPercent != oldTaskProgress && CurrentTaskPercent > 0) || CurrentTaskPercent == 0) && CurrentTaskPercent <= 100)
                     {
-                        int progressval = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, CurrentTaskPercent);
                         InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
-                        InstallingOverlay_OverallLabel.Text = "(" + progressval.ToString() + "%)";
-                        TaskbarManager.Instance.SetProgressValue(progressval, 100);
+                        if (CURRENT_STAGE_NUM > 0)
+                        {
+                            int progressval = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, CurrentTaskPercent);
+                            InstallingOverlay_OverallProgressLabel.Text = "(" + progressval.ToString() + "%)";
+                            TaskbarManager.Instance.SetProgressValue(progressval, 100);
+                        }
                     }
                     break;
                 case SET_OVERALL_PROGRESS:
                     //InstallingOverlay_BottomLabel.Text = CurrentTask + " " + CurrentTaskPercent + "%";
                     //TaskbarManager.Instance.SetProgressValue((int)tc.Data, 100);
                     int progress = ProgressWeightPercentages.GetOverallProgress();
-                    InstallingOverlay_OverallLabel.Text = "(" + progress.ToString() + "%)";
+                    InstallingOverlay_OverallProgressLabel.Text = "(" + progress.ToString() + "%)";
                     TaskbarManager.Instance.SetProgressValue(progress, 100);
                     break;
                 case UPDATE_PROGRESSBAR_INDETERMINATE:
@@ -441,376 +459,400 @@ namespace AlotAddOnGUI
             {
                 primary = "texture mods";
             }
+
+
             MAINTASK_TEXT = "Installing " + primary + " for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OVERALL_TASK, MAINTASK_TEXT));
-
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "";
             int processResult = 0;
-            int overallProgress = 0;
-            stopwatch = Stopwatch.StartNew();
-            Log.Information("InstallWorker(): Running MassEffectModderNoGui");
-            CurrentTaskPercent = -1;
-            string outputDir = getOutputDir(INSTALLING_THREAD_GAME, false);
-
-            args = "-install-mods " + INSTALLING_THREAD_GAME + " \"" + outputDir + "\"";
-            if (REPACK_GAME_FILES)
+            if (versionInfo == null)
             {
-                args += " -repack";
-            }
-            args += " -ipc -alot-mode";
-
-            //Comment the following 2 lines and uncomment the next 3 to skip installation step and simulate OK
-            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
-            processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-            //MEM_INSTALL_TIME_SECONDS = 61;
-            //processResult = 0;
-            //STAGE_DONE_REACHED = true;
-
-            if (!STAGE_DONE_REACHED)
-            {
-                if (processResult != 0)
-                {
-                    Log.Error("MassEffectModderNoGui process exited with non-zero code: " + processResult);
-                    Log.Warning("MEMNoGui exited in stage context: " + CURRENT_STAGE_CONTEXT);
-                    Stage stage = ProgressWeightPercentages.Stages.Where(x => x.StageName == CURRENT_STAGE_CONTEXT).FirstOrDefault();
-                    if (stage != null)
-                    {
-                        //check if it has background errors (handled errors)
-                        if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0 && stage.FailureInfos.Count() > 1)// has more than just standard crash failure info
-                        {
-                            StageFailure sf = stage.FailureInfos.Where(x => BACKGROUND_MEM_PROCESS_ERRORS[0] == x.FailureIPCTrigger).FirstOrDefault();
-                            if (sf != null)
-                            {
-                                //we hit a known failure trigger
-                                e.Result = sf.FailureResultCode;
-                            }
-                            else
-                            {
-                                Log.Error("BACKGROUND_MEM_PROCESS_ERRORS contains an unknown item: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
-                            }
-                        }
-                        else if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
-                        {
-                            //has output errors but we have no handlers for this trigger
-                            Log.Error("BACKGROUND_MEM_PROCESS_ERRORS contains an unknown item: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
-                            e.Result = stage.getDefaultFailure().FailureResultCode;
-                        }
-                        else
-                        {
-                            e.Result = stage.getDefaultFailure().FailureResultCode;
-                        }
-                    }
-                    else
-                    {
-                        //MEM exited without handled error
-                        if (stage != null)
-                        {
-                            e.Result = stage.getDefaultFailure().FailureResultCode;
-                        }
-                        else
-                        {
-                            e.Result = RESULT_UNKNOWN_ERROR;
-                        }
-                    }
-                }
-                else
-                {
-                    Log.Error("MEM exited during unknown stage context with code 0: " + STAGE_CONTEXT);
-                    e.Result = RESULT_UNKNOWN_ERROR;
-                }
-                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
-                return;
-            }
-
-            //Exited OK, continue installation.
-            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGES_LABEL));
-            overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
-            InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
-            //things like soft shadows, reshade
-            bool hasSoftShadowsMEUITM = false;
-            foreach (AddonFile af in ADDONFILES_TO_INSTALL)
-            {
-                if (af.CopyFiles != null)
-                {
-                    foreach (CopyFile cf in af.CopyFiles)
-                    {
-                        if (cf.IsSelectedForInstallation())
-                        {
-                            CurrentTask = "Installing non-texture file modifications for mods";
-                            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-                            string stagedPath = getOutputDir(INSTALLING_THREAD_GAME) + af.BuildID + "_" + cf.ID + "_" + Path.GetFileName(cf.InArchivePath);
-                            string installationPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), cf.GameDestinationPath);
-                            File.Copy(stagedPath, installationPath, true);
-                            Log.Information("Installed copyfile: " + cf.ChoiceTitle + ", " + stagedPath + " to " + installationPath);
-                        }
-                    }
-                }
-
-                if (af.ZipFiles != null)
-                {
-                    foreach (ZipFile zf in af.ZipFiles)
-                    {
-                        if (zf.IsSelectedForInstallation())
-                        {
-                            CurrentTask = "Installing non-texture file modifications for mods";
-                            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-                            string stagedPath = getOutputDir(INSTALLING_THREAD_GAME) + af.BuildID + "_" + zf.ID + "_" + Path.GetFileName(zf.InArchivePath);
-                            string installationPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), zf.GameDestinationPath);
-
-                            string path = BINARY_DIRECTORY + "7z.exe";
-                            string extractargs = "x \"" + stagedPath + "\" -aoa -r -o\"" + installationPath + "\"";
-                            int extractcode = Utilities.runProcess(path, extractargs);
-                            if (extractcode == 0)
-                            {
-                                Log.Information("Installed zipfile: " + zf.ChoiceTitle + ", " + stagedPath + " to " + installationPath);
-                            }
-                            else
-                            {
-                                Log.Error("Extraction of " + zf.ChoiceTitle + " failed with code " + extractcode);
-                            }
-                            if (INSTALLING_THREAD_GAME == 1 && zf.DeleteShaders)
-                            {
-                                string documents = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                                string localusershaderscache = Path.Combine(documents, @"BioWare\Mass Effect\Published\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
-                                if (File.Exists(localusershaderscache))
-                                {
-                                    File.Delete(localusershaderscache);
-                                    Log.Information("Deleted user localshadercache: " + localusershaderscache);
-                                }
-                                else
-                                {
-                                    Log.Warning("unable to delete user local shadercache, it does not exist: " + localusershaderscache);
-                                }
-                                string gamelocalshadercache = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), @"BioGame\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
-                                if (File.Exists(gamelocalshadercache))
-                                {
-                                    File.Delete(gamelocalshadercache);
-                                    Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
-                                }
-                                else
-                                {
-                                    Log.Warning("Unable to delete game localshadercache, it does not exist: " + gamelocalshadercache);
-                                }
-                            }
-
-                            //MEUITM SPECIFIC FIX
-                            //REMOVE ONCE THIS IS FIXED IN FUTURE MEUITM
-                            if (af == meuitmFile && !zf.MEUITMSoftShadows)
-                            {
-                                //reshade
-                                if (File.Exists(Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\d3d9.ini"))
-                                {
-                                    try
-                                    {
-                                        IniFile shaderConf = new IniFile(Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\d3d9.ini");
-                                        shaderConf.Write("TextureSearchPaths", Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\reshade-shaders\\Textures", "GENERAL");
-                                        shaderConf.Write("EffectSearchPaths", Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\reshade-shaders\\Shaders", "GENERAL");
-                                        shaderConf.Write("PresetFiles", Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\MassEffect.ini", "GENERAL");
-                                        Log.Information("Corrected MEUITM shader ini");
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Log.Error("Error fixing MEUITM shader ini: " + ex.Message);
-                                    }
-                                }
-                            }
-
-                            if (zf.MEUITMSoftShadows)
-                            {
-                                hasSoftShadowsMEUITM = true;
-                            }
-                        }
-                    }
-                }
-            }
-            //Apply LOD
-            Log.Information("Updating LOD information");
-            CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-
-            args = "-apply-lods-gfx ";
-            args += INSTALLING_THREAD_GAME;
-            if (hasSoftShadowsMEUITM)
-            {
-                args += " -soft-shadows-mode -meuitm-mode";
-            }
-            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
-            processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
-            if (processResult != 0)
-            {
-                Log.Error("Applying lods failed, return code was not 0: " + processResult);
-                Log.Error("Graphics settings may not have been applied to game config files.");
-            }
-
-            if (INSTALLING_THREAD_GAME == 1)
-            {
-                //Apply ME1 LAA
-                CurrentTask = "Installing fixes for Mass Effect";
+                CurrentTask = "Checking existing files for ALOT marker";
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-
-                args = "-apply-me1-laa";
+                args = "-check-for-markers " + INSTALLING_THREAD_GAME + " -ipc";
                 RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-                if (processResult != 0)
+                if (processResult != 0 || BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
                 {
-                    Log.Error("Error setting ME1 to large address aware/bootable: " + processResult);
-                    e.Result = RESULT_ME1LAA_FAILED;
+                    Log.Error("Previous markers were found, or MEM crashed. Aborting installation.");
+                    e.Result = RESULT_MARKERCHECK_FAILED;
+                    while (true)
+                    {
+                        Thread.Sleep(6000);
+                    }
+                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
                     return;
                 }
-                Utilities.RemoveRunAsAdminXPSP3FromME1();
-                Utilities.InstallIndirectSoundFixForME1();
-                string iniPath = IniSettingsHandler.GetConfigIniPath(1);
-                if (File.Exists(iniPath))
+
+                InstallWorker.ReportProgress(completed, new ThreadCommand(SHOW_ALL_STAGE_LABELS));
+
+
+                int overallProgress = 0;
+                stopwatch = Stopwatch.StartNew();
+                Log.Information("InstallWorker(): Running MassEffectModderNoGui");
+                CurrentTaskPercent = -1;
+                string outputDir = getOutputDir(INSTALLING_THREAD_GAME, false);
+
+                args = "-install-mods " + INSTALLING_THREAD_GAME + " \"" + outputDir + "\"";
+                if (REPACK_GAME_FILES)
                 {
-                    IniFile engineConf = new IniFile(iniPath);
-                    engineConf.Write("DeviceName", "Generic Hardware", "ISACTAudio.ISACTAudioDevice");
+                    args += " -repack";
                 }
-            }
-            Utilities.TurnOffOriginAutoUpdate();
+                args += " -ipc -alot-mode";
 
-            //Create/Update Marker File
-            int meuitmFlag = (meuitmFile != null) ? meuitmFile.MEUITMVer : (versionInfo != null ? versionInfo.MEUITMVER : 0);
-            short alotMainVersionFlag = (alotMainFile != null) ? alotMainFile.ALOTVersion : (versionInfo != null ? versionInfo.ALOTVER : (short)0); //we should not see it write 0... hopefully
+                //Comment the following 2 lines and uncomment the next 3 to skip installation step and simulate OK
+                RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
+                processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+                //MEM_INSTALL_TIME_SECONDS = 61;
+                //processResult = 0;
+                //STAGE_DONE_REACHED = true;
 
-            //Update Marker
-            byte updateVersion = 0;
-            if (alotUpdateFile != null)
-            {
-                updateVersion = alotUpdateFile.ALOTUpdateVersion;
-            }
-            else
-            {
-                updateVersion = versionInfo != null ? versionInfo.ALOTUPDATEVER : (byte)0;
-            }
-
-            //Write Marker
-            bool showMarkerFailedMessage = false;
-            ALOTVersionInfo newVersion = new ALOTVersionInfo(alotMainVersionFlag, updateVersion, 0, meuitmFlag);
-            Log.Information("Writing or updating MEMI marker with info: " + newVersion.ToString());
-            try
-            {
-                Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
-                ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
-                if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER || test.MEUITMVER != newVersion.MEUITMVER)
+                if (!STAGE_DONE_REACHED)
                 {
-                    //Marker file written was bad
-                    Log.Error("Marker file was not properly written!");
-                    if (test == null)
+                    if (processResult != 0)
                     {
-                        Log.Error("Marker file does not indicate anything was installed.");
-                    }
-                    else
-                    {
-                        if (test.ALOTVER != newVersion.ALOTVER)
+                        Log.Error("MassEffectModderNoGui process exited with non-zero code: " + processResult);
+                        Log.Warning("MEMNoGui exited in stage context: " + CURRENT_STAGE_CONTEXT);
+                        Stage stage = ProgressWeightPercentages.Stages.Where(x => x.StageName == CURRENT_STAGE_CONTEXT).FirstOrDefault();
+                        if (stage != null)
                         {
-                            Log.Error("Marker file does not show that ALOT was installed, but we detect some version was installed.");
-                        }
-                        if (test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
-                        {
-                            Log.Error("Marker file does not show that ALOT update was applied or installed to our current version");
-                        }
-                        if (test.MEUITMVER != newVersion.MEUITMVER)
-                        {
-                            Log.Error("Marker file does not show that MEUITM was applied or installed to our current installation when it should have been");
-                        }
-                    }
-                    showMarkerFailedMessage = true;
-                }
-                else
-                {
-                    Log.Information("Reading information back from disk, should match above: " + test.ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Marker file was unable to be written due to an exception: " + ex.Message);
-                Log.Error("An error like this occuring could indicate significant other issues");
-            }
-            //Install Binkw32
-            if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
-            {
-                Utilities.InstallBinkw32Bypass(INSTALLING_THREAD_GAME);
-                if (INSTALLING_THREAD_GAME == 3)
-                {
-                    Utilities.InstallME3ASIs();
-                }
-            }
-
-            //If MAIN alot file is here, move it back to downloaded_mods
-            if (alotMainFile != null && alotMainFile.UnpackedSingleFilename != null)
-            {
-                //ALOT was just installed. We are going to move it back to mods folder
-                string extractedName = alotMainFile.UnpackedSingleFilename;
-                string source = getOutputDir(INSTALLING_THREAD_GAME) + "000_" + extractedName;
-                string dest = DOWNLOADED_MODS_DIRECTORY + "\\" + extractedName;
-                if (Path.GetPathRoot(source) == Path.GetPathRoot(dest))
-                {
-                    Log.Information("ALOT MAIN FILE - Unpacked - moving to downloaded_mods from install dir: " + extractedName);
-                    if (File.Exists(source))
-                    {
-                        try
-                        {
-                            if (File.Exists(dest))
+                            //check if it has background errors (handled errors)
+                            if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0 && stage.FailureInfos.Count() > 1)// has more than just standard crash failure info
                             {
-                                File.Delete(dest);
+                                StageFailure sf = stage.FailureInfos.Where(x => BACKGROUND_MEM_PROCESS_ERRORS[0] == x.FailureIPCTrigger).FirstOrDefault();
+                                if (sf != null)
+                                {
+                                    //we hit a known failure trigger
+                                    e.Result = sf.FailureResultCode;
+                                }
+                                else
+                                {
+                                    Log.Error("BACKGROUND_MEM_PROCESS_ERRORS contains an unknown item: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
+                                }
                             }
-                            File.Move(source, dest);
-                            Log.Information("Moved main alot file back to import library " + DOWNLOADED_MODS_DIRECTORY);
-                            //Delete original
-                            dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotMainFile.Filename;
-                            if (File.Exists(dest))
+                            else if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
                             {
-                                Log.Information("Deleting original alot archive file from import library");
-                                File.Delete(dest);
-                                Log.Information("Deleted original alot archive file from import library");
+                                //has output errors but we have no handlers for this trigger
+                                Log.Error("BACKGROUND_MEM_PROCESS_ERRORS contains an unknown item: " + BACKGROUND_MEM_PROCESS_ERRORS[0]);
+                                e.Result = stage.getDefaultFailure().FailureResultCode;
                             }
-                            if (alotMainFile != null)
+                            else
                             {
-                                alotMainFile.Staged = false;
+                                e.Result = stage.getDefaultFailure().FailureResultCode;
                             }
-
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            Log.Error("Exception attempting to move file back! " + ex.Message);
-                            Log.Error("Skipping moving file back.");
+                            //MEM exited without handled error
+                            if (stage != null)
+                            {
+                                e.Result = stage.getDefaultFailure().FailureResultCode;
+                            }
+                            else
+                            {
+                                e.Result = RESULT_UNKNOWN_ERROR;
+                            }
                         }
                     }
                     else
                     {
-                        Log.Error("ALOT MAIN FILE - Unpacked - does not match the singlefilename! Not moving back. " + extractedName);
+                        Log.Error("MEM exited during unknown stage context with code 0: " + STAGE_CONTEXT);
+                        e.Result = RESULT_UNKNOWN_ERROR;
                     }
+                    InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
+                    return;
+                }
+
+                //Exited OK, continue installation.
+                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_ALL_STAGE_LABELS));
+                overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
+                InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Finishing installation"));
+                //things like soft shadows, reshade
+                bool hasSoftShadowsMEUITM = false;
+                foreach (AddonFile af in ADDONFILES_TO_INSTALL)
+                {
+                    if (af.CopyFiles != null)
+                    {
+                        foreach (CopyFile cf in af.CopyFiles)
+                        {
+                            if (cf.IsSelectedForInstallation())
+                            {
+                                CurrentTask = "Installing non-texture file modifications for mods";
+                                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                                string stagedPath = getOutputDir(INSTALLING_THREAD_GAME) + af.BuildID + "_" + cf.ID + "_" + Path.GetFileName(cf.InArchivePath);
+                                string installationPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), cf.GameDestinationPath);
+                                File.Copy(stagedPath, installationPath, true);
+                                Log.Information("Installed copyfile: " + cf.ChoiceTitle + ", " + stagedPath + " to " + installationPath);
+                            }
+                        }
+                    }
+
+                    if (af.ZipFiles != null)
+                    {
+                        foreach (ZipFile zf in af.ZipFiles)
+                        {
+                            if (zf.IsSelectedForInstallation())
+                            {
+                                CurrentTask = "Installing non-texture file modifications for mods";
+                                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                                string stagedPath = getOutputDir(INSTALLING_THREAD_GAME) + af.BuildID + "_" + zf.ID + "_" + Path.GetFileName(zf.InArchivePath);
+                                string installationPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), zf.GameDestinationPath);
+
+                                string path = BINARY_DIRECTORY + "7z.exe";
+                                string extractargs = "x \"" + stagedPath + "\" -aoa -r -o\"" + installationPath + "\"";
+                                int extractcode = Utilities.runProcess(path, extractargs);
+                                if (extractcode == 0)
+                                {
+                                    Log.Information("Installed zipfile: " + zf.ChoiceTitle + ", " + stagedPath + " to " + installationPath);
+                                }
+                                else
+                                {
+                                    Log.Error("Extraction of " + zf.ChoiceTitle + " failed with code " + extractcode);
+                                }
+                                if (INSTALLING_THREAD_GAME == 1 && zf.DeleteShaders)
+                                {
+                                    string documents = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                                    string localusershaderscache = Path.Combine(documents, @"BioWare\Mass Effect\Published\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
+                                    if (File.Exists(localusershaderscache))
+                                    {
+                                        File.Delete(localusershaderscache);
+                                        Log.Information("Deleted user localshadercache: " + localusershaderscache);
+                                    }
+                                    else
+                                    {
+                                        Log.Warning("unable to delete user local shadercache, it does not exist: " + localusershaderscache);
+                                    }
+                                    string gamelocalshadercache = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), @"BioGame\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
+                                    if (File.Exists(gamelocalshadercache))
+                                    {
+                                        File.Delete(gamelocalshadercache);
+                                        Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
+                                    }
+                                    else
+                                    {
+                                        Log.Warning("Unable to delete game localshadercache, it does not exist: " + gamelocalshadercache);
+                                    }
+                                }
+
+                                //MEUITM SPECIFIC FIX
+                                //REMOVE ONCE THIS IS FIXED IN FUTURE MEUITM
+                                if (af == meuitmFile && !zf.MEUITMSoftShadows)
+                                {
+                                    //reshade
+                                    if (File.Exists(Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\d3d9.ini"))
+                                    {
+                                        try
+                                        {
+                                            IniFile shaderConf = new IniFile(Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\d3d9.ini");
+                                            shaderConf.Write("TextureSearchPaths", Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\reshade-shaders\\Textures", "GENERAL");
+                                            shaderConf.Write("EffectSearchPaths", Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\reshade-shaders\\Shaders", "GENERAL");
+                                            shaderConf.Write("PresetFiles", Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\Binaries\\MassEffect.ini", "GENERAL");
+                                            Log.Information("Corrected MEUITM shader ini");
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Log.Error("Error fixing MEUITM shader ini: " + ex.Message);
+                                        }
+                                    }
+                                }
+
+                                if (zf.MEUITMSoftShadows)
+                                {
+                                    hasSoftShadowsMEUITM = true;
+                                }
+                            }
+                        }
+                    }
+                }
+                //Apply LOD
+                Log.Information("Updating LOD information");
+                CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+
+                args = "-apply-lods-gfx ";
+                args += INSTALLING_THREAD_GAME;
+                if (hasSoftShadowsMEUITM)
+                {
+                    args += " -soft-shadows-mode -meuitm-mode";
+                }
+                RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
+                processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
+                if (processResult != 0)
+                {
+                    Log.Error("Applying lods failed, return code was not 0: " + processResult);
+                    Log.Error("Graphics settings may not have been applied to game config files.");
+                }
+
+                if (INSTALLING_THREAD_GAME == 1)
+                {
+                    //Apply ME1 LAA
+                    CurrentTask = "Installing fixes for Mass Effect";
+                    InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+
+                    args = "-apply-me1-laa";
+                    RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
+                    processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+                    if (processResult != 0)
+                    {
+                        Log.Error("Error setting ME1 to large address aware/bootable: " + processResult);
+                        e.Result = RESULT_ME1LAA_FAILED;
+                        return;
+                    }
+                    Utilities.RemoveRunAsAdminXPSP3FromME1();
+                    Utilities.InstallIndirectSoundFixForME1();
+                    string iniPath = IniSettingsHandler.GetConfigIniPath(1);
+                    if (File.Exists(iniPath))
+                    {
+                        IniFile engineConf = new IniFile(iniPath);
+                        engineConf.Write("DeviceName", "Generic Hardware", "ISACTAudio.ISACTAudioDevice");
+                    }
+                }
+                Utilities.TurnOffOriginAutoUpdate();
+
+                //Create/Update Marker File
+                int meuitmFlag = (meuitmFile != null) ? meuitmFile.MEUITMVer : (versionInfo != null ? versionInfo.MEUITMVER : 0);
+                short alotMainVersionFlag = (alotMainFile != null) ? alotMainFile.ALOTVersion : (versionInfo != null ? versionInfo.ALOTVER : (short)0); //we should not see it write 0... hopefully
+
+                //Update Marker
+                byte updateVersion = 0;
+                if (alotUpdateFile != null)
+                {
+                    updateVersion = alotUpdateFile.ALOTUpdateVersion;
                 }
                 else
                 {
-                    Log.Information("ALOT main was copied from import library on another partition or network share. Not moving back.");
+                    updateVersion = versionInfo != null ? versionInfo.ALOTUPDATEVER : (byte)0;
                 }
-            }
 
-            if (showMarkerFailedMessage)
-            {
-                KeyValuePair<string, string> dialog = new KeyValuePair<string, string>("Marker file not properly written", "The 'MEMI Marker' file that ALOT Installer uses to track the installation status of ALOT/MEUITM could not be written. The installation status of ALOT/MEUITM for this game will not be accurate, however installation has completed. Please check the logs for more information.");
-                InstallWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, dialog));
-            }
-
-            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGES_LABEL));
-
-            string taskString = "Installation of " + primary + " for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, taskString));
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, "has completed"));
-            if (INSTALLING_THREAD_GAME == 1 || INSTALLING_THREAD_GAME == 2)
-            {
-                //Check if origin
-                string originTouchupFile = Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\__Installer\\Touchup.exe";
-                if (File.Exists(originTouchupFile))
+                //Write Marker
+                bool showMarkerFailedMessage = false;
+                ALOTVersionInfo newVersion = new ALOTVersionInfo(alotMainVersionFlag, updateVersion, 0, meuitmFlag);
+                Log.Information("Writing or updating MEMI marker with info: " + newVersion.ToString());
+                try
                 {
-                    //origin based
-                    InstallWorker.ReportProgress(0, new ThreadCommand(SHOW_ORIGIN_FLYOUT, INSTALLING_THREAD_GAME));
+                    Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
+                    ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
+                    if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER || test.MEUITMVER != newVersion.MEUITMVER)
+                    {
+                        //Marker file written was bad
+                        Log.Error("Marker file was not properly written!");
+                        if (test == null)
+                        {
+                            Log.Error("Marker file does not indicate anything was installed.");
+                        }
+                        else
+                        {
+                            if (test.ALOTVER != newVersion.ALOTVER)
+                            {
+                                Log.Error("Marker file does not show that ALOT was installed, but we detect some version was installed.");
+                            }
+                            if (test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
+                            {
+                                Log.Error("Marker file does not show that ALOT update was applied or installed to our current version");
+                            }
+                            if (test.MEUITMVER != newVersion.MEUITMVER)
+                            {
+                                Log.Error("Marker file does not show that MEUITM was applied or installed to our current installation when it should have been");
+                            }
+                        }
+                        showMarkerFailedMessage = true;
+                    }
+                    else
+                    {
+                        Log.Information("Reading information back from disk, should match above: " + test.ToString());
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Log.Error("Marker file was unable to be written due to an exception: " + ex.Message);
+                    Log.Error("An error like this occuring could indicate significant other issues");
+                }
+                //Install Binkw32
+                if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
+                {
+                    Utilities.InstallBinkw32Bypass(INSTALLING_THREAD_GAME);
+                    if (INSTALLING_THREAD_GAME == 3)
+                    {
+                        Utilities.InstallME3ASIs();
+                    }
+                }
+
+                //If MAIN alot file is here, move it back to downloaded_mods
+                if (alotMainFile != null && alotMainFile.UnpackedSingleFilename != null)
+                {
+                    //ALOT was just installed. We are going to move it back to mods folder
+                    string extractedName = alotMainFile.UnpackedSingleFilename;
+                    string source = getOutputDir(INSTALLING_THREAD_GAME) + "000_" + extractedName;
+                    string dest = DOWNLOADED_MODS_DIRECTORY + "\\" + extractedName;
+                    if (Path.GetPathRoot(source) == Path.GetPathRoot(dest))
+                    {
+                        Log.Information("ALOT MAIN FILE - Unpacked - moving to downloaded_mods from install dir: " + extractedName);
+                        if (File.Exists(source))
+                        {
+                            try
+                            {
+                                if (File.Exists(dest))
+                                {
+                                    File.Delete(dest);
+                                }
+                                File.Move(source, dest);
+                                Log.Information("Moved main alot file back to import library " + DOWNLOADED_MODS_DIRECTORY);
+                                //Delete original
+                                dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotMainFile.Filename;
+                                if (File.Exists(dest))
+                                {
+                                    Log.Information("Deleting original alot archive file from import library");
+                                    File.Delete(dest);
+                                    Log.Information("Deleted original alot archive file from import library");
+                                }
+                                if (alotMainFile != null)
+                                {
+                                    alotMainFile.Staged = false;
+                                }
+
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Error("Exception attempting to move file back! " + ex.Message);
+                                Log.Error("Skipping moving file back.");
+                            }
+                        }
+                        else
+                        {
+                            Log.Error("ALOT MAIN FILE - Unpacked - does not match the singlefilename! Not moving back. " + extractedName);
+                        }
+                    }
+                    else
+                    {
+                        Log.Information("ALOT main was copied from import library on another partition or network share. Not moving back.");
+                    }
+                }
+
+                if (showMarkerFailedMessage)
+                {
+                    KeyValuePair<string, string> dialog = new KeyValuePair<string, string>("Marker file not properly written", "The 'MEMI Marker' file that ALOT Installer uses to track the installation status of ALOT/MEUITM could not be written. The installation status of ALOT/MEUITM for this game will not be accurate, however installation has completed. Please check the logs for more information.");
+                    InstallWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, dialog));
+                }
+
+                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_ALL_STAGE_LABELS));
+
+                string taskString = "Installation of " + primary + " for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, taskString));
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, "has completed"));
+                if (INSTALLING_THREAD_GAME == 1 || INSTALLING_THREAD_GAME == 2)
+                {
+                    //Check if origin
+                    string originTouchupFile = Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\__Installer\\Touchup.exe";
+                    if (File.Exists(originTouchupFile))
+                    {
+                        //origin based
+                        InstallWorker.ReportProgress(0, new ThreadCommand(SHOW_ORIGIN_FLYOUT, INSTALLING_THREAD_GAME));
+                    }
+                }
+                e.Result = INSTALL_OK;
             }
-            e.Result = INSTALL_OK;
         }
 
         private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -833,10 +875,10 @@ namespace AlotAddOnGUI
 
             WARN_USER_OF_EXIT = false;
             Log.Information("InstallCompleted() with code " + e.Result);
-            InstallingOverlay_OverallLabel.Visibility = System.Windows.Visibility.Collapsed;
+            InstallingOverlay_OverallProgressLabel.Visibility = System.Windows.Visibility.Collapsed;
 
             tipticker.Stop();
-            InstallingOverlay_StageLabel.Visibility = System.Windows.Visibility.Collapsed;
+            InstallingOverlay_FullStageOfStageLabel.Visibility = System.Windows.Visibility.Collapsed;
             Button_InstallViewLogs.Visibility = System.Windows.Visibility.Collapsed;
             switch (INSTALLING_THREAD_GAME)
             {
@@ -887,6 +929,13 @@ namespace AlotAddOnGUI
                             InstallingOverlay_TopLabel.Text = "BIOGame directory is missing";
                             InstallingOverlay_BottomLabel.Text = "Game needs to be reinstalled, see logs";
                             HeaderLabel.Text = "BIOGame directory is missing. This means the installation is completely unusable.\nCheck logs for more information about this.";
+                            break;
+                        }
+                    case RESULT_MARKERCHECK_FAILED:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Previously modified ALOT files found";
+                            InstallingOverlay_BottomLabel.Text = "Game needs to be fully deleted and reinstalled";
+                            HeaderLabel.Text = "Files that were previously modified by ALOT Installer were detected, even though this is a new install.\nThese files will not work and must be removed by deleting the game and reinstalling.\nThese files may exist due to a failed previous installation.";
                             break;
                         }
                     case RESULT_UNKNOWN_ERROR:
@@ -1054,7 +1103,6 @@ namespace AlotAddOnGUI
             {
                 Log.Information("This is not a full installation, not submitting telemetry");
             }
-
         }
 
         private void RunAndTimeMEMContextBased_Install(string exe, string args, BackgroundWorker installWorker, bool isMainInstall = false)
@@ -1076,6 +1124,13 @@ namespace AlotAddOnGUI
             Log.Information("Process complete - finished in " + minutes + " minutes " + sec + " seconds");
         }
 
+        /// <summary>
+        /// Process handler for MEM in install mode. This should not be called directly except by RunAndTimeMEM.
+        /// </summary>
+        /// <param name="exe"></param>
+        /// <param name="args"></param>
+        /// <param name="worker"></param>
+        /// <param name="acceptedIPC"></param>
         private void runMEM_InstallContextBased(string exe, string args, BackgroundWorker worker, List<string> acceptedIPC = null)
         {
             Debug.WriteLine("Running process: " + exe + " " + args);
@@ -1159,34 +1214,6 @@ namespace AlotAddOnGUI
                                     Stage stage = ProgressWeightPercentages.Stages.Where(x => x.StageName == CURRENT_STAGE_CONTEXT).FirstOrDefault();
                                     CurrentTask = stage != null ? stage.TaskName : CURRENT_STAGE_CONTEXT;
 
-                                    /*switch (CURRENT_STAGE_CONTEXT)
-                                    {
-                                        case "STAGE_PRESCAN":
-                                            task = "Performing installation prescan";
-                                            break;
-                                        case "STAGE_UNPACKDLC":
-                                            task = "Unpacking DLC";
-                                            break;
-                                        case "STAGE_SCAN":
-                                            task = "Scanning textures";
-                                            break;
-                                        case "STAGE_INSTALLTEXTURES":
-                                            task = "Installing textures";
-                                            break;
-                                        case "STAGE_SAVING":
-                                            task = "Saving packages";
-                                            break;
-                                        case "STAGE_REMOVEMIPMAPS":
-                                            task = "Removing empty mipmaps";
-                                            break;
-                                        case "STAGE_REPACK":
-                                            task = "Repacking game files";
-                                            break;
-                                        default:
-                                            Log.Error("UNKNOWN STAGE_CONTEXT PARAM: " + param);
-                                            return;
-                                    }
-                                    CurrentTask = task;*/
                                     int progressval = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 0);
                                     worker.ReportProgress(completed, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
                                     break;
@@ -1201,29 +1228,14 @@ namespace AlotAddOnGUI
                                 worker.ReportProgress(completed, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, param));
                                 break;
                             case "HIDE_STAGES":
-                                worker.ReportProgress(completed, new ThreadCommand(HIDE_STAGES_LABEL));
+                                worker.ReportProgress(completed, new ThreadCommand(HIDE_ALL_STAGE_LABELS));
                                 break;
-
-                            /*
-                        case ERROR_TEXTURE_MAP_MISSING:
-                            Log.Fatal("[FATAL]Texture map is missing! We cannot install textures");
-                            BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_MISSING);
-                            break;
-                        case ERROR_TEXTURE_MAP_WRONG:
-                            Log.Fatal("[FATAL]Texture map is invalid! We cannot install textures");
-                            BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_TEXTURE_MAP_WRONG);
-                            break;
-                        case "ERROR_ADDED_FILE":
-                            Log.Error("MEMNoGui detects some game file(s) were added since initial texture installation! This is not supported. Installation aborted");
-                            BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_ADDED);
-                            break;
-                        case "ERROR_REMOVED_FILE":
-                            Log.Error("MEMNoGui detects some game file(s) were removed since initial texture installation! This is not supported. Installation aborted");
-                            BACKGROUND_MEM_PROCESS_ERRORS.Add(ERROR_FILE_REMOVED);
-                            break;
-                            */
+                            case "ERROR_FILEMARKER_FOUND":
+                                Log.Error("File was previously modified by ALOT: " + param);
+                                BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
+                                break;
                             case "ERROR":
-                                Log.Error("Error IPC from MEM: " + param);
+                                Log.Error("ERROR IPC from MEM: " + param);
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
                                 break;
                             case "PROCESSING_TEXTURE_INSTALL":

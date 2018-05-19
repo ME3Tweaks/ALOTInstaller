@@ -87,10 +87,6 @@ namespace AlotAddOnGUI
         public const string REGISTRY_KEY = @"SOFTWARE\ALOTAddon";
         public const string ME3_BACKUP_REGISTRY_KEY = @"SOFTWARE\Mass Effect 3 Mod Manager";
 
-        private BackgroundWorker BuildWorker = new BackgroundWorker();
-        private BackgroundWorker BackupWorker = new BackgroundWorker();
-        private BackgroundWorker InstallWorker = new BackgroundWorker();
-        private BackgroundWorker ImportWorker = new BackgroundWorker();
         public event PropertyChangedEventHandler PropertyChanged;
         List<string> PendingUserFiles = new List<string>();
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -2644,10 +2640,7 @@ namespace AlotAddOnGUI
 
         private async void Button_InstallME2_Click(object sender, RoutedEventArgs e)
         {
-            if (await InstallPrecheck(2))
-            {
-                ShowBuildOptions(2);
-            }
+            InstallPrecheck(2);
         }
 
         private void ShowBuildOptions(int game)
@@ -2999,6 +2992,22 @@ namespace AlotAddOnGUI
                 return;
             }
 
+            if (game == 2 || game == 3)
+            {
+                //Check for Texture2D.tfc
+                var path = Utilities.GetGamePath(game);
+                if (game == 2) { path = Path.Combine(path, "BioGame", "CookedPC", "Texture2D.tfc"); }
+                if (game == 3) { path = Path.Combine(path, "BIOGame", "CookedPCConsole", "Texture2D.tfc"); }
+                if (File.Exists(path))
+                {
+                    Log.Error("Previous installation file found: " + path);
+                    Log.Error("Game was not removed before reinstalltion or was \"fixed\" using a game repair");
+                    string howToFixStr = "You must delete your current game installation game installation (do not uninstall or repair) to fully remove leftover files. You can use the ALOT Installer backup feature to backup a vanilla game once this is done.";
+                    await this.ShowMessageAsync("Leftover files detected", "Files from a previous ALOT installation were detected and will cause installation to fail. " + howToFixStr);
+                    return;
+                }
+            }
+
             var openFolder = new CommonOpenFileDialog();
             openFolder.IsFolderPicker = true;
             openFolder.Title = "Select backup destination";
@@ -3092,199 +3101,6 @@ namespace AlotAddOnGUI
             }
         }
 
-        private async Task<bool> InstallPrecheck(int game)
-        {
-            Log.Information("Running installation precheck for ME" + game);
-            CheckOutputDirectoriesForUnpackedSingleFiles();
-            CheckImportLibrary_Tick(null, null); //get all ready files
-            Loading = true; //prevent 1;
-            ShowME1Files = game == 1;
-            ShowME2Files = game == 2;
-            ShowME3Files = game == 3;
-            Loading = false;
-            ShowReadyFilesOnly = false;
-            ApplyFiltering();
-            //if (CURRENTLY_INSTALLED_ME1_ALOT_INFO != null && game == 1)
-            //{
-            //    if (CURRENTLY_INSTALLED_ME1_ALOT_INFO.ALOTVER == 0 && CURRENTLY_INSTALLED_ME1_ALOT_INFO.MEUITMVER >= 1)
-            //    {
-            //        Log.Error("MEUITM installed without alot installer, currently this is not supported. It was previously but due to recent changes it no longer is.");
-            //        await this.ShowMessageAsync("MEUITM installed using MEUITM Installer", "MEUITM was installed using the MEUITM Installer, which is currently not compatible with ALOT Installer. If you wish to use ALOT with MEUITM you must install both with ALOT Installer. We are working on a fix.");
-            //        return false;
-            //    }
-            //}
-
-            //Check game has been run at least once
-            string configFile = IniSettingsHandler.GetConfigIniPath(game);
-            if (game == 1 && !File.Exists(configFile))
-            {
-                //game has not been run yet.
-                Log.Error("Config file missing for Mass Effect " + game + ". Blocking install");
-                await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " has not been run yet", "Mass Effect" + getGameNumberSuffix(game) + " must be run at least once in order for the game to generate default configuration files for this installer to edit. Start the game, and exit at the main menu to generate them.");
-                return false;
-            }
-
-            int nummissing = 0;
-            bool oneisready = false;
-            ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
-            if (installedInfo == null)
-            {
-                //Check for backup
-                string backupPath = Utilities.GetGameBackupPath(game);
-                if (backupPath == null)
-                {
-                    //No backup
-                    MetroDialogSettings mds = new MetroDialogSettings();
-                    mds.AffirmativeButtonText = "Backup";
-                    mds.NegativeButtonText = "Continue";
-                    mds.FirstAuxiliaryButtonText = "Cancel";
-                    mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                    MessageDialogResult result = await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " not backed up", "You should create a backup of your game before installing ALOT. In the event something goes wrong, you can quickly restore back to an unmodified state. Creating a backup is strongly recommended and should be done on an unmodified game. Create a backup before install?", MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, mds);
-                    if (result == MessageDialogResult.Affirmative)
-                    {
-                        BackupGame(game);
-                        return false;
-                    }
-                    if (result == MessageDialogResult.FirstAuxiliary)
-                    {
-                        return false;
-                    }
-                }
-            }
-            bool blockDueToMissingALOTFile = installedInfo == null; //default value
-            int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
-            bool blockDueToMissingALOTUpdateFile = false; //default value
-            string blockDueToBadImportedFile = null; //default vaule
-            bool manifestHasUpdateAvailable = false;
-            AddonFile alotmainfile = null;
-            foreach (AddonFile af in alladdonfiles)
-            {
-                if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
-                {
-                    if (af.ALOTVersion > 0)
-                    {
-                        alotmainfile = af;
-                    }
-                    if (blockDueToMissingALOTFile)
-                    {
-                        if (af.ALOTVersion > 0 && af.Ready)
-                        {
-                            //Do not block as ALOT file is ready and will be installed
-                            blockDueToMissingALOTFile = false;
-                        }
-                        else if (af.ALOTVersion > 0 && !af.Ready)
-                        {
-                            Log.Warning("Installation for ME" + game + " being blocked: ALOT/MEUITM is not installed currently, and ALOT's main file is not present or ready for use. ALOT must be installed if it's not already done so.");
-                            break;
-                        }
-                    }
-
-                    if (af.ALOTUpdateVersion > installedALOTUpdateVersion)
-                    {
-                        manifestHasUpdateAvailable = true;
-                        if (!af.Ready)
-                        {
-                            blockDueToMissingALOTUpdateFile = true;
-                            Log.Warning("Installation for ME" + game + " being blocked due to ALOT update available, but not ready for installation in the import library.");
-                            break;
-                        }
-                    }
-
-                    if (!af.Ready && !af.Optional)
-                    {
-                        //Check if MEUITM and if MEUITM is installed currently
-                        if (installedInfo != null)
-                        {
-                            if (installedInfo.MEUITMVER > 0 && af.MEUITM)
-                            {
-                                continue; //this this file as meuitm is already installed
-                            }
-                        }
-                        nummissing++;
-                    }
-                    else
-                    {
-                        if (af.Ready && af.Enabled && af.GetFile() != null && File.Exists(af.GetFile()))
-                        {
-                            if (af.GetFile() == null)
-                            {
-                                Debugger.Break();
-                            }
-                            FileInfo fi = new FileInfo(af.GetFile());
-                            if (!af.IsCurrentlySingleFile() && af.FileSize > 0 && af.FileSize != fi.Length)
-                            {
-                                Log.Error(af.GetFile() + " has wrong size: " + fi.Length + ", manifest specifies " + af.FileSize);
-                                blockDueToBadImportedFile = af.GetFile();
-                                break;
-                            }
-                            oneisready = true;
-                        }
-                    }
-                }
-            }
-
-            if (blockDueToMissingALOTFile && alotmainfile != null)
-            {
-                int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
-                ListView_Files.SelectedIndex = alotindex;
-
-                await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + getGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
-                return false;
-            }
-
-            if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable)
-            {
-                if (installedInfo == null)
-                {
-                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation. Drag and drop the archive onto the interface - do not extract it.");
-                }
-                else
-                {
-                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue. Drag and drop the archive onto the interface - do not extract it.");
-                }
-                return false;
-            }
-
-            if (blockDueToBadImportedFile != null)
-            {
-                await this.ShowMessageAsync("Corrupt/Bad file detected", "The file " + blockDueToBadImportedFile + " is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from Download_Mods, it is not usable.");
-                return false;
-            }
-
-            if (nummissing == 0)
-            {
-                TELEMETRY_ALL_ADDON_FILES = true;
-                return true;
-            }
-
-            if (!oneisready)
-            {
-                await this.ShowMessageAsync("No files available for building", "There are no files available or relevant in the Downloaded_Mods folder to install for Mass Effect" + getGameNumberSuffix(game) + ".");
-                return false;
-            }
-            //if alot is already installed we don't need to show missing message, unless installed via MEM directly
-            if (installedInfo == null || installedInfo.ALOTVER == 0)
-            {
-                Log.Information(nummissing + " addon files are missing - prompting user to decline install.");
-                MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " addon are not imported. Addon files add a significant amount of high quality textures from third party artists and are tested to work with ALOT. These files must be imported if you want all of the high quality textures; these files are not included directly in ALOT because of ownership rights.\n\nNot importing these files will significantly degrade the ALOT experience. Are you sure you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
-                if (result == MessageDialogResult.Affirmative)
-                {
-                    Log.Warning("User is continuing build step without all non-optional addon files. If user complains about a high amount of low quality textures this might be why.");
-                    TELEMETRY_ALL_ADDON_FILES = false;
-                    return true;
-                }
-                else
-                {
-                    Log.Information("User has aborted installation due to missing files");
-                    return false;
-                }
-            }
-            else
-            {
-                TELEMETRY_ALL_ADDON_FILES = true;
-                return true;
-            }
-        }
 
 
 
