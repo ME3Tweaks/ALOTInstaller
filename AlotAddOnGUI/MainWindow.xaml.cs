@@ -132,6 +132,7 @@ namespace AlotAddOnGUI
         private const string SETTINGSTR_REPACK_ME3 = "RepackGameFilesME3";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
         public const string SETTINGSTR_BETAMODE = "BetaMode";
+        public const string SETTINGSTR_LAST_BETA_ADVERT_TIME = "LastBetaAdvertisement";
         public const string SETTINGSTR_DOWNLOADSFOLDER = "DownloadsFolder";
         private List<string> BACKGROUND_MEM_PROCESS_ERRORS;
         private List<string> BACKGROUND_MEM_PROCESS_PARSED_ERRORS;
@@ -153,6 +154,7 @@ namespace AlotAddOnGUI
         private List<FrameworkElement> currentFadeInItems = new List<FrameworkElement>();
         private bool ShowReadyFilesOnly = false;
         internal AddonDownloadAssistant DOWNLOAD_ASSISTANT_WINDOW;
+        private DateTimeOffset LAST_BETA_ADVERT_TIME;
         private bool DONT_FORCE_UPGRADES = false;
         public static string DOWNLOADS_FOLDER;
         private int RefreshesUntilRealRefresh;
@@ -356,10 +358,12 @@ namespace AlotAddOnGUI
                     //The release we want to check is always the latest, so [0]
                     Release latest = null;
                     Version latestVer = new Version("0.0.0.0");
+                    bool newHiddenBetaBuildAvailable = false;
                     foreach (Release r in releases)
                     {
                         if (!USING_BETA && r.Prerelease)
                         {
+                            newHiddenBetaBuildAvailable = true;
                             continue;
                         }
                         Version releaseVersion = new Version(r.TagName);
@@ -504,6 +508,12 @@ namespace AlotAddOnGUI
                             AddonFilesLabel.Text = "Application up to date";
                             Log.Information("Application is up to date.");
                             FetchManifest();
+                            if (newHiddenBetaBuildAvailable && LAST_BETA_ADVERT_TIME < (DateTimeOffset.UtcNow.AddDays(-3)))
+                            {
+                                ShowStatus("ALOT Installer beta build is available! You can opt into betas in the settings menu.", 4000);
+                                Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_LAST_BETA_ADVERT_TIME, DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString());
+
+                            }
                         }
                     }
                 }
@@ -3690,6 +3700,8 @@ namespace AlotAddOnGUI
             USING_BETA = Utilities.GetRegistrySettingBool(SETTINGSTR_BETAMODE) ?? false;
             Checkbox_BetaMode.IsChecked = USING_BETA;
 
+            LAST_BETA_ADVERT_TIME = DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(Utilities.GetRegistrySettingString(SETTINGSTR_LAST_BETA_ADVERT_TIME) ?? "0"));
+
             DONT_FORCE_UPGRADES = Utilities.GetRegistrySettingBool(SETTINGSTR_DONT_FORCE_UPGRADES) ?? false;
 
             DOWNLOADS_FOLDER = Utilities.GetRegistrySettingString(SETTINGSTR_DOWNLOADSFOLDER);
@@ -3821,7 +3833,7 @@ namespace AlotAddOnGUI
             bool restart = true;
             if (isEnabling)
             {
-                MessageDialogResult result = await this.ShowMessageAsync("Enabling BETA mode", "Enabling BETA mode will enable the beta manifest as well as beta features and beta updates. These builds are for testing, and may not be stable (and will sometimes outright crash). Unless you're OK with this you should stay in normal mode.\nEnable BETA mode?", MessageDialogStyle.AffirmativeAndNegative);
+                MessageDialogResult result = await this.ShowMessageAsync("Enabling BETA mode", "Enabling BETA mode will enable the beta manifest as well as beta features and beta updates. These builds are for testing, and may not be stable (and will sometimes outright crash). If you use this mode, we would appreciate if you gave feedback on the Discord.\nEnable BETA mode?", MessageDialogStyle.AffirmativeAndNegative);
                 if (result == MessageDialogResult.Negative)
                 {
                     Checkbox_BetaMode.IsChecked = false;

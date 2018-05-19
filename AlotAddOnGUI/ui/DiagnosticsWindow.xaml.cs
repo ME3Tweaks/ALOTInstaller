@@ -870,8 +870,8 @@ namespace AlotAddOnGUI.ui
                 }
                 else
                 {
-                    addDiagLine("[ERROR]Some files are larger than the listed TOC size. This typically won't happen unless you manually installed some files.");
-                    addDiagLine("[ERROR]The game will always hang while loading these files.");
+                    addDiagLine("[ERROR]Some files are larger than the listed TOC size. This typically won't happen unless you manually installed some files or an ALOT installation failed.");
+                    addDiagLine("[ERROR]The game will always hang while loading these files. You can regenerate the TOC files by using AutoTOC. If installation failed due a crash, this won't fix it.");
                     if (hashSupported) { addDiagLine("[ERROR]You can run AutoTOC in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC."); }
                 }
             }
