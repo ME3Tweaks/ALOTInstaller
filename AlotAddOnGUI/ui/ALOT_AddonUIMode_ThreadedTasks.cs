@@ -35,7 +35,6 @@ namespace AlotAddOnGUI
         private BackgroundWorker BackupWorker = new BackgroundWorker();
         private BackgroundWorker InstallWorker = new BackgroundWorker();
         private BackgroundWorker ImportWorker = new BackgroundWorker();
-        private BackgroundWorker PrecheckWorker = new BackgroundWorker();
 
         private int INSTALLING_THREAD_GAME;
         private List<AddonFile> ADDONFILES_TO_BUILD;
@@ -1420,7 +1419,7 @@ namespace AlotAddOnGUI
                 return;
             }
 
-            
+
 
             //verify vanilla
             Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
@@ -1793,11 +1792,44 @@ namespace AlotAddOnGUI
                         howToFixStr = "You must delete your current game installation game installation (do not uninstall or repair) to fully remove leftover files. You can use the ALOT Installer backup feature to backup a vanilla game once this is done.";
                     }
 
-                    await this.ShowMessageAsync("Leftover files detected", "Files from a previous ALOT installation were detected and will cause installation to fail. "+howToFixStr);
+                    await this.ShowMessageAsync("Leftover files detected", "Files from a previous ALOT installation were detected and will cause installation to fail. " + howToFixStr);
                     return false;
                 }
             }
 
+            //Check EXE version
+            string exePath = Utilities.GetGameEXEPath(game);
+            if (!File.Exists(exePath))
+            {
+                Log.Error("Game EXE is missing.");
+                await this.ShowMessageAsync("Game executable missing", "The game executable for Mass Effect" + getGameNumberSuffix(game) + " is missing. Please reinstall the game.");
+                return false;
+            }
+            else if (installedInfo == null)
+            {
+                var fvi = FileVersionInfo.GetVersionInfo(exePath);
+                var exeVersion = new Version($"{fvi.FileMajorPart}.{fvi.FileMinorPart}.{fvi.FileBuildPart}.{fvi.FilePrivatePart}");
+                Version requiredVersion = null;
+                switch (game)
+                {
+                    case 1:
+                        requiredVersion = new Version("1.2.20608.0");
+                        break;
+                    case 2:
+                        requiredVersion = new Version("1.2.1604.0");
+                        break;
+                    case 3:
+                        requiredVersion = new Version("1.5.5427.124");
+                        break;
+                }
+
+                if (exeVersion < requiredVersion)
+                {
+                    Log.Error("Installation blocked: Game executable is not up to date for ME" + game + ": " + requiredVersion + " required, current version is " + exeVersion);
+                    await this.ShowMessageAsync("Game must be updated", "Mass Effect" + getGameNumberSuffix(game) + " is not up to date. ALOT Installer does not work work with old versions of Mass Effect games. You must update Mass Effect" + getGameNumberSuffix(game)+" in order to install ALOT for it.");
+                    return false;
+                }
+            }
 
             int nummissing = 0;
             bool oneisready = false;
@@ -1959,13 +1991,5 @@ namespace AlotAddOnGUI
                 return true;
             }
         }
-
-        private void InstallPrecheck(object sender, DoWorkEventArgs e)
-        {
-            int game = (int)e.Argument;
-
-        }
-
     }
-
 }

@@ -1837,48 +1837,51 @@ namespace AlotAddOnGUI
 
         private void CheckOutputDirectoriesForUnpackedSingleFiles(int game = 0)
         {
-            bool ReImportedFiles = false;
-            foreach (AddonFile af in alladdonfiles)
+            if (Path.GetPathRoot(DOWNLOADED_MODS_DIRECTORY) == Path.GetPathRoot(getOutputDir(1)))
             {
-                if (af.Ready && !af.Staged)
+                bool ReImportedFiles = false;
+                foreach (AddonFile af in alladdonfiles)
                 {
-                    continue;
-                }
-
-                //File is not ready. Might be missing single file...
-                if (af.UnpackedSingleFilename != null)
-                {
-                    int i = 0;
-                    if (af.Game_ME1) i = 1;
-                    if (af.Game_ME2) i = 2;
-                    if (af.Game_ME3) i = 3;
-                    string outputPath = getOutputDir(i);
-
-                    string importedFilePath = DOWNLOADED_MODS_DIRECTORY + "\\" + af.UnpackedSingleFilename;
-                    string outputFilename = outputPath + "000_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
-                    if (File.Exists(outputFilename) && (game == 0 || game == i))
+                    if (af.Ready && !af.Staged)
                     {
+                        continue;
+                    }
 
-                        Log.Information("Re-importing extracted single file: " + outputFilename);
-                        try
+                    //File is not ready. Might be missing single file...
+                    if (af.UnpackedSingleFilename != null)
+                    {
+                        int i = 0;
+                        if (af.Game_ME1) i = 1;
+                        if (af.Game_ME2) i = 2;
+                        if (af.Game_ME3) i = 3;
+                        string outputPath = getOutputDir(i);
+                        string importedFilePath = DOWNLOADED_MODS_DIRECTORY + "\\" + af.UnpackedSingleFilename;
+                        string outputFilename = outputPath + "000_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
+                        if (File.Exists(outputFilename) && (game == 0 || game == i))
                         {
-                            File.Move(outputFilename, importedFilePath);
-                            ReImportedFiles = true;
-                            af.Staged = false;
-                            af.ReadyStatusText = null;
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Error("Failed to reimport file! " + e.Message);
+
+                            Log.Information("Re-importing extracted single file: " + outputFilename);
+                            try
+                            {
+                                File.Delete(importedFilePath);
+                                File.Move(outputFilename, importedFilePath);
+                                ReImportedFiles = true;
+                                af.Staged = false;
+                                af.ReadyStatusText = null;
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error("Failed to reimport file! " + e.Message);
+                            }
                         }
                     }
                 }
-            }
-            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "CheckOutputDirectoriesOnManifestLoad", false);
+                Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "CheckOutputDirectoriesOnManifestLoad", false);
 
-            if (ReImportedFiles)
-            {
-                ShowStatus("Re-imported files due to shutdown during build or install", 3000);
+                if (ReImportedFiles)
+                {
+                    ShowStatus("Re-imported files due to shutdown during build or install", 3000);
+                }
             }
         }
 
@@ -2640,7 +2643,10 @@ namespace AlotAddOnGUI
 
         private async void Button_InstallME2_Click(object sender, RoutedEventArgs e)
         {
-            InstallPrecheck(2);
+            if (await InstallPrecheck(2))
+            {
+                ShowBuildOptions(2);
+            }
         }
 
         private void ShowBuildOptions(int game)
@@ -2652,6 +2658,7 @@ namespace AlotAddOnGUI
             ShowME3Files = game == 3;
             Loading = false;
             ShowReadyFilesOnly = true;
+            PreventFileRefresh = true;
             ApplyFiltering();
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
             bool alotInstalled = installedInfo != null && installedInfo.ALOTVER > 0; //default value
@@ -4229,6 +4236,7 @@ namespace AlotAddOnGUI
         private void Button_BuildAndInstallCancel_Click(object sender, RoutedEventArgs e)
         {
             ShowReadyFilesOnly = false;
+            PreventFileRefresh = false;
             ApplyFiltering();
             WhatToBuildFlyout.IsOpen = false;
             CURRENT_GAME_BUILD = 0;

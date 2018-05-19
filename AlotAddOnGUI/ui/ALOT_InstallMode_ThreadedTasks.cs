@@ -477,10 +477,6 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("Previous markers were found, or MEM crashed. Aborting installation.");
                     e.Result = RESULT_MARKERCHECK_FAILED;
-                    while (true)
-                    {
-                        Thread.Sleep(6000);
-                    }
                     InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
                     return;
                 }
