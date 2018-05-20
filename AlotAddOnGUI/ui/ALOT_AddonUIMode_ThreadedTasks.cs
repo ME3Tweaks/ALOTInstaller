@@ -1776,29 +1776,17 @@ namespace AlotAddOnGUI
             }
 
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
-            if (installedInfo == null && (game == 2 || game == 3))
-            {
-                //Check for Texture2D.tfc
-                var path = Utilities.GetGamePath(game);
-                if (game == 2) { path = Path.Combine(path, "BioGame", "CookedPC", "Texture2D.tfc"); }
-                if (game == 3) { path = Path.Combine(path, "BIOGame", "CookedPCConsole", "Texture2D.tfc"); }
-                if (File.Exists(path))
-                {
-                    Log.Error("Previous installation file found: " + path);
-                    Log.Error("Game was not removed before reinstalltion or was \"fixed\" using a game repair");
-                    string howToFixStr = "You must restore your game using the ALOT Installer restore feature, or delete your game installation(do not uninstall or repair) to fully remove leftover files.";
-                    if (Utilities.GetGameBackupPath(game) == null)
-                    {
-                        howToFixStr = "You must delete your current game installation game installation (do not uninstall or repair) to fully remove leftover files. You can use the ALOT Installer backup feature to backup a vanilla game once this is done.";
-                    }
-
-                    await this.ShowMessageAsync("Leftover files detected", "Files from a previous ALOT installation were detected and will cause installation to fail. " + howToFixStr);
-                    return false;
-                }
-            }
-
             //Check EXE version
             string exePath = Utilities.GetGameEXEPath(game);
+            string gamePath = Utilities.GetGamePath(game);
+
+            if (!Directory.Exists(gamePath))
+            {
+                Log.Error("Game directory is missing: "+gamePath);
+                await this.ShowMessageAsync("Game directory is missing", "The game directory for Mass Effect" + getGameNumberSuffix(game) + " is missing. This may be caused due to modification of the folder while ALOT Installer is running. Please reinstall the game.");
+                return false;
+            }
+
             if (!File.Exists(exePath))
             {
                 Log.Error("Game EXE is missing.");
@@ -1826,10 +1814,32 @@ namespace AlotAddOnGUI
                 if (exeVersion < requiredVersion)
                 {
                     Log.Error("Installation blocked: Game executable is not up to date for ME" + game + ": " + requiredVersion + " required, current version is " + exeVersion);
-                    await this.ShowMessageAsync("Game must be updated", "Mass Effect" + getGameNumberSuffix(game) + " is not up to date. ALOT Installer does not work work with old versions of Mass Effect games. You must update Mass Effect" + getGameNumberSuffix(game)+" in order to install ALOT for it.");
+                    await this.ShowMessageAsync("Game must be updated", "Mass Effect" + getGameNumberSuffix(game) + " is not up to date. ALOT Installer does not work work with old versions of Mass Effect games. You must update Mass Effect" + getGameNumberSuffix(game) + " in order to install ALOT for it.");
                     return false;
                 }
             }
+
+            //Check for Texture2D.tfc
+            if (installedInfo == null && (game == 2 || game == 3))
+            {
+                if (game == 2) { gamePath = Path.Combine(gamePath, "BioGame", "CookedPC", "Texture2D.tfc"); }
+                if (game == 3) { gamePath = Path.Combine(gamePath, "BIOGame", "CookedPCConsole", "Texture2D.tfc"); }
+                if (File.Exists(gamePath))
+                {
+                    Log.Error("Previous installation file found: " + gamePath);
+                    Log.Error("Game was not removed before reinstalltion or was \"fixed\" using a game repair");
+                    string howToFixStr = "You must restore your game using the ALOT Installer restore feature, or delete your game installation(do not uninstall or repair) to fully remove leftover files.";
+                    if (Utilities.GetGameBackupPath(game) == null)
+                    {
+                        howToFixStr = "You must delete your current game installation game installation (do not uninstall or repair) to fully remove leftover files. You can use the ALOT Installer backup feature to backup a vanilla game once this is done.";
+                    }
+
+                    await this.ShowMessageAsync("Leftover files detected", "Files from a previous ALOT installation were detected and will cause installation to fail. " + howToFixStr);
+                    return false;
+                }
+            }
+
+            
 
             int nummissing = 0;
             bool oneisready = false;
