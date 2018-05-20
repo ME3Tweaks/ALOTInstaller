@@ -740,6 +740,7 @@ namespace AlotAddOnGUI.ui
                 Dictionary<int, string> priorities = new Dictionary<int, string>();
                 foreach (string dir in directories)
                 {
+                    bool isCompatPatch = false;
                     string value = Path.GetFileName(dir);
                     if (value == "__metadata")
                     {
@@ -767,7 +768,7 @@ namespace AlotAddOnGUI.ui
                         }
                         if (mountpriority == 31050)
                         {
-                            compatPatchInstalled = true;
+                            compatPatchInstalled = isCompatPatch = true;
                         }
                         if (value != "DLC_CON_XBX" && value != "DLC_CON_UIScaling" && value != "DLC_CON_UIScaling_Shared" && InteralGetDLCName(value) == null)
                         {
@@ -787,7 +788,7 @@ namespace AlotAddOnGUI.ui
                     }
                     if (hasSfarSizeError && MEMI_FOUND)
                     {
-                        addDiagLine("[ERROR]" + GetDLCDisplayString(value));
+                        addDiagLine("[ERROR]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
                         addDiagLine("[ERROR]      SFAR is not the MEM unpacked size. Unpacked DLC by MEM will be 32 bytes, however this SFAR is " + ByteSize.FromBytes(sfarsize) + ".");
                         addDiagLine("[ERROR]      If HQ graphics settings are on (ALOT/MEUITM was found, so it should be) this will very often be a source of the game crashing.");
                         addDiagLine("[ERROR]      You may also see this error if you unpacked DLC using ME3Explorer - as an end-user you should never have to use ME3Explorer,");
@@ -796,12 +797,12 @@ namespace AlotAddOnGUI.ui
 
                     else
                     {
-                        addDiagLine(GetDLCDisplayString(value));
+                        addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
                     }
                     if (duplicatePriorityStr != "")
                     {
                         addDiagLine("[ERROR] -  This DLC has the same mount priority as another DLC: " + duplicatePriorityStr);
-                        addDiagLine("[ERROR]     These conflicting DLCs will likely encounter issues as the game will not know which files should be used");
+                        addDiagLine("[ERROR]    These conflicting DLCs will likely encounter issues as the game will not know which files should be used");
                     }
                 }
 
@@ -828,7 +829,7 @@ namespace AlotAddOnGUI.ui
             {
                 if (DIAGNOSTICS_GAME == 3)
                 {
-                    addDiagLine("[ERROR] -  DLC directory is missing: " + dlcPath + ". Mass Effect 3 always has a DLC folder so this should not be missing.");
+                    addDiagLine("[ERROR]DLC directory is missing: " + dlcPath + ". Mass Effect 3 always has a DLC folder so this should not be missing.");
                 }
                 else
                 {
@@ -836,6 +837,28 @@ namespace AlotAddOnGUI.ui
                 }
             }
 
+            string asidir = Path.Combine(Directory.GetParent(Utilities.GetGameEXEPath(DIAGNOSTICS_GAME)).ToString(), "asi");
+            addDiagLine("===Installed ASI mods");
+            if (Directory.Exists(asidir))
+            {
+                addDiagLine("The follow files are located in the ASI directory:");
+                string[] files = Directory.GetFiles(asidir, "*.asi");
+                if (files.Count() == 0)
+                {
+                    addDiagLine("ASI directory is empty. No ASI mods are installed.");
+                }
+                else
+                {
+                    foreach (string f in files)
+                    {
+                        addDiagLine(" - " + Path.GetFileName(f));
+                    }
+                }
+            }
+            else
+            {
+                addDiagLine("ASI directory does not exist. No ASI mods are installed.");
+            }
             //TOC SIZE CHECK
             if (DIAGNOSTICS_GAME == 3)
             {
@@ -858,7 +881,7 @@ namespace AlotAddOnGUI.ui
                             long size = fi.Length;
                             if (ent.size < size)
                             {
-                                addDiagLine("[ERROR] -  " + filepath + " size is " + size + ", but TOC lists " + ent.size);
+                                addDiagLine("[ERROR] -  " + filepath + " size is " + size + ", but TOC lists " + ent.size + " ("+(ent.size - size)+" bytes)");
                                 hadTocError = true;
                             }
                         }
@@ -1151,12 +1174,12 @@ namespace AlotAddOnGUI.ui
                                 int eqIndex = param.IndexOf('=');
                                 string lodSetting = param.Substring(0, eqIndex);
                                 string lodValue = "";
-                                    // if (eqIndex + 1 < param.Length - 1)
-                                    //{
-                                    lodValue = param.Substring(eqIndex + 1, param.Length - 1 - eqIndex); //not blank
+                                // if (eqIndex + 1 < param.Length - 1)
+                                //{
+                                lodValue = param.Substring(eqIndex + 1, param.Length - 1 - eqIndex); //not blank
                                                                                                      //}
                                                                                                      // param.Substring(eqIndex + 1, param.Length - 1);
-                                    LODS_INFO.Add(new KeyValuePair<string, string>(lodSetting, lodValue));
+                                LODS_INFO.Add(new KeyValuePair<string, string>(lodSetting, lodValue));
                                 break;
                             case "ERROR_VANILLA_MOD_FILE":
                                 if (MEMI_FOUND)
@@ -1194,8 +1217,8 @@ namespace AlotAddOnGUI.ui
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File has been previously modified by ALOT: " + param);
                                 break;
                             case "ERROR":
-                                    //will remove context switch if ERROR_FILEMARKER_FOUND is implemented
-                                    if (Context == CONTEXT_FILEMARKER_SCAN)
+                                //will remove context switch if ERROR_FILEMARKER_FOUND is implemented
+                                if (Context == CONTEXT_FILEMARKER_SCAN)
                                 {
                                     Log.Error("File that has ALOT modification marker was found: " + param);
                                     BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File has been previously modified by ALOT: " + param);
@@ -1252,12 +1275,19 @@ namespace AlotAddOnGUI.ui
         }
 
 
-        private string GetDLCDisplayString(string str)
+        private string GetDLCDisplayString(string str, string forcedName = null)
         {
-            string name = InteralGetDLCName(str);
-            if (name != null)
+            if (forcedName == null)
             {
-                return " - " + str + " (" + name + ")";
+                string name = InteralGetDLCName(str);
+                if (name != null)
+                {
+                    return " - " + str + " (" + name + ")";
+                }
+            }
+            else
+            {
+                return " - " + str + " (" + forcedName + ")";
             }
 
             return "[DLC]" + str;
