@@ -1827,7 +1827,7 @@ namespace AlotAddOnGUI
                 if (File.Exists(gamePath))
                 {
                     Log.Error("Previous installation file found: " + gamePath);
-                    Log.Error("Game was not removed before reinstalltion or was \"fixed\" using a game repair");
+                    Log.Error("Game was not removed before reinstallation or was \"fixed\" using a game repair");
                     string howToFixStr = "You must restore your game using the ALOT Installer restore feature, or delete your game installation(do not uninstall or repair) to fully remove leftover files.";
                     if (Utilities.GetGameBackupPath(game) == null)
                     {
