@@ -1060,7 +1060,7 @@ namespace AlotAddOnGUI.ui
                     if (LodItems.Value != "(MinLODSize=32,MaxLODSize=1024,LODBias=0)")
                     {
                         //Not Default
-                        if (avi != null) { log += HQLine; }
+                        if (avi != null) { log = HQLine + log; }
                         else
                         {
                             log = " - DIAG ERROR: High quality texture LOD settings appear to be set, but the high quality texture mod flag is not - game will likely have unused mip crashes." + Environment.NewLine + log;
