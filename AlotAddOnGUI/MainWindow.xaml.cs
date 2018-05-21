@@ -36,6 +36,7 @@ using Flurl.Http;
 using System.Windows.Media;
 using System.IO.Compression;
 using System.Globalization;
+using System.Management;
 
 namespace AlotAddOnGUI
 {
@@ -1901,8 +1902,50 @@ namespace AlotAddOnGUI
             long installedRamGB = ramAmountKb / 1048576L;
             if (installedRamGB < 7.98)
             {
-                await this.ShowMessageAsync("System memory is less than 8 GB", "Building and installing textures uses considerable amounts of memory. Installation will be significantly slower on systems with less than 8 GB of memory.");
+                await this.ShowMessageAsync("System memory is less than 8 GB", "Building and installing textures uses considerable amounts of memory. Installation will be significantly slower on systems with less than 8 GB of memory. Systems with more than 8GB of memory will see significant speed improvements during installation.");
             }
+            //Check pagefile
+            try
+            {
+                //Current
+                List<string> availablePagefiles = new List<string>();
+                using (var query = new ManagementObjectSearcher("SELECT Caption,AllocatedBaseSize FROM Win32_PageFileUsage"))
+                {
+                    foreach (ManagementBaseObject obj in query.Get())
+                    {
+                        string pagefileName = (string)obj.GetPropertyValue("Caption");
+                        Log.Information("Detected pagefile: " + pagefileName);
+                        availablePagefiles.Add(pagefileName);
+                    }
+                }
+
+                //Max
+                using (var query = new ManagementObjectSearcher("SELECT Caption,MaximumSize FROM Win32_PageFileSetting"))
+                {
+                    foreach (ManagementBaseObject obj in query.Get())
+                    {
+                        string pagefileName = (string)obj.GetPropertyValue("Caption");
+                        uint max = (uint)obj.GetPropertyValue("MaximumSize");
+                        availablePagefiles.Remove(pagefileName);
+                        Log.Warning("Pagefile has been modified by the end user. The maximum page file size on " + pagefileName + " is: " + max + "MB");
+                    }
+                }
+
+                if (availablePagefiles.Count() > 0)
+                {
+                    Log.Information("We have a usable page file - OK");
+                } else
+                {
+                    Log.Error("We have no uncapped or available pagefiles to use! Very high chance application will run out of memory");
+                    await this.ShowMessageAsync("Pagefile is off or size has been capped", "The system pagefile (virtual memory) settings are not currently managed by Windows, or the pagefile is off. ALOT Installer uses large amounts of memory and will very often run out of memory if virtual memory is capped or turned off.");
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error("Unable to check pagefile settings:");
+                Log.Error(App.FlattenException(e));
+            }
+
             //Debug.WriteLine("Ram Amount, KB: " + ramAmountKb);
         }
 
