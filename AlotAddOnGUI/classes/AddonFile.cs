@@ -193,13 +193,13 @@ namespace AlotAddOnGUI.classes
                                 {
                                     return "MEUITM v" + MEUITMVer + " already installed";
                                 }
-                                else if (info.MEUITMVER < MEUITMVer)
-                                {
-                                    return "MEUITM upgrade imported";
-                                }
                                 else if (info.MEUITMVER == 0)
                                 {
                                     return "MEUITM imported";
+                                }
+                                else if (info.MEUITMVER < MEUITMVer)
+                                {
+                                    return "MEUITM upgrade imported";
                                 }
                             }
                             else

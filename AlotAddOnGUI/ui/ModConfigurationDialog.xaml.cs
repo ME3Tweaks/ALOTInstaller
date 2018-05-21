@@ -1,5 +1,6 @@
 ﻿using AlotAddOnGUI.classes;
 using MahApps.Metro.Controls.Dialogs;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,8 +52,14 @@ namespace AlotAddOnGUI
 
 
             //}
-
-            await mainWindowRef.HideMetroDialogAsync(this);
+            try
+            {
+                await mainWindowRef.HideMetroDialogAsync(this);
+            } catch (Exception ex)
+            {
+                Log.Error("Error closing mod dialog:");
+                Log.Error(App.FlattenException(ex));
+            }
         }
 
         private void Combobox_DropdownClosed(object sender, EventArgs e)

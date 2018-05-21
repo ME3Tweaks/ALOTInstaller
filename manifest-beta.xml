@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.1.3">
+<alotaddonmanifest version="5.1.6">
 <!-- This is unused in beta and should not be ported to stable. Make sure when porting to stable that soak test and highest stable are set. -->
    <soaktestingmemversion soakstartdate="2018-05-03">129</soaktestingmemversion> 
    <stages>
@@ -16,8 +16,8 @@
       <stage name="STAGE_INSTALLTEXTURES" weight="0.6997680866" tasktext="Installing textures" me1weightscaling="0.7">
          <failureinfo ipcerror="ERROR_TEXTURE_MAP_MISSING" resultcode="-44" failedtopmessage="Texture map is missing" failedbottommessage="Check or upload installer log for more information" failedheadermessage="Texture map file is missing - has this game been migrated to a new system or user account?" />
          <failureinfo ipcerror="ERROR_TEXTURE_MAP_WRONG" resultcode="-45" failedtopmessage="Texture map is corrupt" failedbottommessage="Check or upload installer log for more information" failedheadermessage="Texture map file is corrupted and unusable - you will need to delete the game and then reinstall so the texture map can be rebuilt." />
-         <failureinfo ipcerror="ERROR_FILE_ADDED" resultcode="-48" failedtopmessage="Files were added after ALOT was installed" failedbottommessage="Installation aborted" failedheadermessage="Installation of package files after ALOT has been installed is unsupported. Please follow the correct installation directions for ALOT." />
-         <failureinfo ipcerror="ERROR_FILE_REMOVED" resultcode="-47" failedtopmessage="Files were removed after ALOT was installed" failedbottommessage="Installation aborted" failedheadermessage="Removal of package files after ALOT has been installed is unsupported. Please follow the correct installation directions for ALOT." />
+         <failureinfo ipcerror="ERROR_ADDED_FILE" resultcode="-48" failedtopmessage="Files were added after ALOT was installed" failedbottommessage="Installation aborted" failedheadermessage="Installation of package files after ALOT has been installed is unsupported. Please follow the correct installation directions for ALOT." />
+         <failureinfo ipcerror="ERROR_REMOVED_FILE" resultcode="-47" failedtopmessage="Files were removed after ALOT was installed" failedbottommessage="Installation aborted" failedheadermessage="Removal of package files after ALOT has been installed is unsupported. Please follow the correct installation directions for ALOT." />
          <!-- Is this actually correct/used?-->
          <failureinfo resultcode="-42" failedtopmessage="Failed to install textures" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during installation of textures. Please see installer log for more info. The game is not in a usable state." />
       </stage>
@@ -41,12 +41,17 @@
    <tutorial link="https://ianmooreisme.github.io/ALOT-Comparisons/" text="Comparison Screenshots" tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore." />
    <!-- Executables with hashes that are not in the list are almost always pirated and are not supported.-->
    <supportedhashes>
+      <supportedhash game="me1" name="Steam">647b93621389709cab8d268379bd4c47</supportedhash>
       <supportedhash game="me1" name="Steam, MEM patched">78ac3d9b4aad1989dae74505ea65aa6c</supportedhash>
       <supportedhash game="me1" name="Origin, MEM patched">2390143503635f3c4cfaed0afe0b8c71</supportedhash>
       <supportedhash game="me1" name="Origin">ff1f894fa1c2dbf4d4b9f0de85c166e5</supportedhash>
+      <supportedhash game="me1" name="DVD">73b76699d4e245c92110a93c54980b78</supportedhash>
+      <supportedhash game="me1" name="DVD, Polish">298c30a399d0959e5e997a9d64b42548</supportedhash>
       <supportedhash game="me2" name="Origin, ME2Game/MassEffect2 swapped">73827026bc9629562c4a3f61a752541c</supportedhash>
       <supportedhash game="me2" name="Origin">32fb31b80804040996ed78d14110b54b</supportedhash>
       <supportedhash game="me2" name="Steam">16f214ce81ba228347bce7b93fb0f37a</supportedhash>
+      <supportedhash game="me2" name="DVD (Alternate)">e26f142d44057628efd086c605623dcf</supportedhash>
+      <supportedhash game="me2" name="DVD">b1d9c44be87acac610dfa9947e114096</supportedhash>
       <supportedhash game="me3" name="Origin">1d09c01c94f01b305f8c25bb56ce9ab4</supportedhash>
       <supportedhash game="me3" name="Origin (Alternate)">90d51c84b278b273e41fbe75682c132e</supportedhash>
    </supportedhashes>
@@ -221,16 +226,27 @@
       <games me1="false" me2="true" me3="false" />
    </addonfile>
    <addonfile friendlyname="FemShep High Quality textures" author="heleuss" optional="true">
-      <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
-      <packagefile me2="true" sourcename="[ME2] KH_femShep_eyes.tpf" movedirectly="true" />
-      <packagefile me2="true" sourcename="[ME2] KH_femShep_eyebrows.tpf" movedirectly="true" />
-      <packagefile me2="true" sourcename="[ME2] KH_femShep_eyelashes.tpf" movedirectly="true" />
-      <packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true" />
-      <packagefile me2="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" movedirectly="true" />
+     <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
+     <packagefile me2="true" sourcename="[ME2] KH_femShep_eyes.tpf" movedirectly="true" />
+	 <packagefile me1="true" sourcename="[ME2] KH_femShep_eyes.tpf" delete="true" />
+     <packagefile me1="true" me2="true" sourcename="[ME2] KH_femShep_eyebrows.tpf" movedirectly="true" />
+     <packagefile me1="true" me2="true" sourcename="[ME2] KH_femShep_eyelashes.tpf" movedirectly="true" />
+     <packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true" />
+     <packagefile me2="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" movedirectly="true" />
+     <packagefile me1="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" delete="true" />
+     <packagefile me1="true" sourcename="HMF_HED_PROBase_Face_Diff_0x9CA124E8.dds" destinationname="0x8F331825.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Frek_Diff_0x2A01319D.dds" destinationname="0x2CC6F67C.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Frek_Norm_0xBA928949.dds" destinationname="0xA5C11535.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Military_Diff_0x9E76BE04.dds" destinationname="0x5B79C364.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Military_Norm_0x35E34BA6.dds" destinationname="0xF6A39457.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Rough_Diff_0xAA133987.dds" destinationname="0x1365F4C4.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Rough_Norm_0x6DB1C814.dds" destinationname="0x999F0526.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROOld1_Face_Diff_0x0DF18845.dds" destinationname="0xED9E4F99.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROOld1_Face_Norm_0xE9EED499.dds" destinationname="0x8B6D4AA7.dds" />
    </addonfile>
    <addonfile friendlyname="BroShep High Quality textures" author="heleuss" optional="true">
-      <file downloadlink="https://www.dropbox.com/s/g6wg6v7uy8y7x15/%5BME2%5D%20broShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] broShep High Quality textures.7z" size="11802235" md5="4a220058d12c0c125a27a1d30bfff937" />
-      <packagefile me2="true" sourcename="[ME2] KH_broShep_face_textures.tpf" movedirectly="true" />
+     <file downloadlink="https://www.dropbox.com/s/g6wg6v7uy8y7x15/%5BME2%5D%20broShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] broShep High Quality textures.7z" size="11802235" md5="4a220058d12c0c125a27a1d30bfff937" />
+     <packagefile me1="true" me2="true" sourcename="[ME2] KH_broShep_face_textures.tpf" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="HR Phoenix Armor" author="Ottemis">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/9" filename="Medium Phoenix Female-9-1-0.rar" md5="bb70d844d5ff871fcdc231fb3d744642" size="17207706" />
@@ -270,13 +286,13 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE999983A.dds" destinationname="WPN_BLSb_Tint_0xE999983A.dds" />
       <packagefile me2="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0xA56179D6.dds" />
    </addonfile>
-   <addonfile friendlyname="HR Carnifex Texture" author="TheDarkFalkon">
+   <addonfile friendlyname="HR Carnifex Texture" author="TheDarkFalkon" optional="true">
       <file downloadlink="https://mega.nz/#!JlEFnSIQ!LIblPk7G2vB9gdtgekfXQ6HqteGlzM9U-EaW9iJkG5A" tooltipname="WpnCarnifex_HRv1.5.zip" filename="WpnCarnifex_HRv1.5.zip" size="4216670" md5="8064c75754b4e3d6cedad3a0fed6ef29" />
       <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x073BF3F5.dds" destinationname="WPN_PSTb_Spec_0x073BF3F5.dds" />
       <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x6085274E.dds" destinationname="WPN_PSTb_Diff_0x6085274E.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x809FC86B.dds" destinationname="WPN_PSTb_Tint_0x809FC86B.dds" />
    </addonfile>
-   <addonfile friendlyname="HR Paladin Texture" author="TheDarkFalkon">
+   <addonfile friendlyname="HR Paladin Texture" author="TheDarkFalkon" optional="true">
       <file downloadlink="https://mega.nz/#!40UjWa6J!0czjbA-lxW0Rb5yk5HOojS2Zlx78Jc6qRsHxgDpDb3Q" tooltipname="WpnPaladin_HRv1.5.zip" filename="WpnPaladin_HRv1.5.zip" size="2694764" md5="f13bddb44806d106b61bb0c3a80d66d4" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x498B35ED.dds" destinationname="WPN_PSTm_Diff_0x498B35ED.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB8151BBB.dds" destinationname="WPN_PSTm_Spec_0xB8151BBB.dds" />
@@ -351,7 +367,6 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0AAE60A2_hahne_sld_norm.dds" destinationname="HMM_ARM_SHPf_Sld_Norm_0x0AAE60A2.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0DD2FAEE_hahne_tor_diff.dds" destinationname="HMM_ARM_SHPf_Tor_Diff_0x0DD2FAEE.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0E371AB7_Rosen_chest_norm.dds" destinationname="HMM_ARM_SHPe_Tor_Norm_0x0E371AB7.dds" />
-      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x12686E6D_N7arm_Male_Tint.dds" destinationname="HMM_ARM_SHPa_Slv_Tint_0x12686E6D.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x127FF465_Kassa_chest_Strp.dds" destinationname="HMM_ARM_SHPb_Tor_Strp_0x127FF465.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x12CE0A29_Serrice_Sld.dds" destinationname="HMM_ARM_SHPc_Sld_Diff_0x12CE0A29.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x183653DB_Kassa_arm_Spec.dds" destinationname="HMM_ARM_SHPb_Slv_Spec_0x183653DB.dds" />
@@ -538,14 +553,12 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6A278A65_table.dds" destinationname="TableCoffee01_Diff_0x6A278A65.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x70ABACED_planter_norm.dds" destinationname="Planter02_S_Norm_0x70ABACED.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x72F75189_planter.dds" destinationname="Planter01a_Diff_0x72F75189.dds" />
-      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7A48D080_treetrunk.dds" destinationname="DreamTree01_Diff_0x87F9B25D.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7A48D080_treetrunk.dds" destinationname="DreamTree01_DiffDreamTree01_Diff_0x7A48D080.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7A700133_hovercar_interior_diff.dds" destinationname="HoverCar01_Int_Diff_Cine_0x7A700133.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7D4BE270_plant-norm.dds" destinationname="FoliageSheet_Norm_0x7D4BE270.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x83F5DD08_plating_arrow.dds" destinationname="Cit_Trims_Diff_0x83F5DD08.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x858741E4_trunknorm.dds" destinationname="DreamTree01_Norm_0x91EAF5D3.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x858741E4_trunknorm.dds" destinationname="DreamTree01_NormDreamTree01_Diff_0x858741E4.dds" />
-      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9107C8CB_keyboard.dds" destinationname="H_keyboard_tex_0x9107C8CB.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x919369D5_laptop1.dds" destinationname="Computer02_Diff_0x919369D5.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x94C513D7_plating.dds" destinationname="PRS_TRIMS02_DIFF_0x94C513D7.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x95405B07_tiles.dds" destinationname="Cit_Floor_05_Diff_0x95405B07.dds" />

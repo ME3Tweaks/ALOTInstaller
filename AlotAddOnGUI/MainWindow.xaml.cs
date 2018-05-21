@@ -36,6 +36,7 @@ using Flurl.Http;
 using System.Windows.Media;
 using System.IO.Compression;
 using System.Globalization;
+using System.Management;
 
 namespace AlotAddOnGUI
 {
@@ -132,6 +133,7 @@ namespace AlotAddOnGUI
         private const string SETTINGSTR_REPACK_ME3 = "RepackGameFilesME3";
         private const string SETTINGSTR_IMPORTASMOVE = "ImportAsMove";
         public const string SETTINGSTR_BETAMODE = "BetaMode";
+        public const string SETTINGSTR_LAST_BETA_ADVERT_TIME = "LastBetaAdvertisement";
         public const string SETTINGSTR_DOWNLOADSFOLDER = "DownloadsFolder";
         private List<string> BACKGROUND_MEM_PROCESS_ERRORS;
         private List<string> BACKGROUND_MEM_PROCESS_PARSED_ERRORS;
@@ -153,6 +155,7 @@ namespace AlotAddOnGUI
         private List<FrameworkElement> currentFadeInItems = new List<FrameworkElement>();
         private bool ShowReadyFilesOnly = false;
         internal AddonDownloadAssistant DOWNLOAD_ASSISTANT_WINDOW;
+        private DateTimeOffset LAST_BETA_ADVERT_TIME;
         private bool DONT_FORCE_UPGRADES = false;
         public static string DOWNLOADS_FOLDER;
         private int RefreshesUntilRealRefresh;
@@ -356,10 +359,12 @@ namespace AlotAddOnGUI
                     //The release we want to check is always the latest, so [0]
                     Release latest = null;
                     Version latestVer = new Version("0.0.0.0");
+                    bool newHiddenBetaBuildAvailable = false;
                     foreach (Release r in releases)
                     {
                         if (!USING_BETA && r.Prerelease)
                         {
+                            newHiddenBetaBuildAvailable = true;
                             continue;
                         }
                         Version releaseVersion = new Version(r.TagName);
@@ -504,6 +509,12 @@ namespace AlotAddOnGUI
                             AddonFilesLabel.Text = "Application up to date";
                             Log.Information("Application is up to date.");
                             FetchManifest();
+                            if (newHiddenBetaBuildAvailable && LAST_BETA_ADVERT_TIME < (DateTimeOffset.UtcNow.AddDays(-3)))
+                            {
+                                ShowStatus("ALOT Installer beta build is available! You can opt into betas in the settings menu.", 4000);
+                                Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_LAST_BETA_ADVERT_TIME, DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString());
+
+                            }
                         }
                     }
                 }
@@ -1837,48 +1848,51 @@ namespace AlotAddOnGUI
 
         private void CheckOutputDirectoriesForUnpackedSingleFiles(int game = 0)
         {
-            bool ReImportedFiles = false;
-            foreach (AddonFile af in alladdonfiles)
+            if (Path.GetPathRoot(DOWNLOADED_MODS_DIRECTORY) == Path.GetPathRoot(getOutputDir(1)))
             {
-                if (af.Ready && !af.Staged)
+                bool ReImportedFiles = false;
+                foreach (AddonFile af in alladdonfiles)
                 {
-                    continue;
-                }
-
-                //File is not ready. Might be missing single file...
-                if (af.UnpackedSingleFilename != null)
-                {
-                    int i = 0;
-                    if (af.Game_ME1) i = 1;
-                    if (af.Game_ME2) i = 2;
-                    if (af.Game_ME3) i = 3;
-                    string outputPath = getOutputDir(i);
-
-                    string importedFilePath = DOWNLOADED_MODS_DIRECTORY + "\\" + af.UnpackedSingleFilename;
-                    string outputFilename = outputPath + "000_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
-                    if (File.Exists(outputFilename) && (game == 0 || game == i))
+                    if (af.Ready && !af.Staged)
                     {
+                        continue;
+                    }
 
-                        Log.Information("Re-importing extracted single file: " + outputFilename);
-                        try
+                    //File is not ready. Might be missing single file...
+                    if (af.UnpackedSingleFilename != null)
+                    {
+                        int i = 0;
+                        if (af.Game_ME1) i = 1;
+                        if (af.Game_ME2) i = 2;
+                        if (af.Game_ME3) i = 3;
+                        string outputPath = getOutputDir(i);
+                        string importedFilePath = DOWNLOADED_MODS_DIRECTORY + "\\" + af.UnpackedSingleFilename;
+                        string outputFilename = outputPath + "000_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
+                        if (File.Exists(outputFilename) && (game == 0 || game == i))
                         {
-                            File.Move(outputFilename, importedFilePath);
-                            ReImportedFiles = true;
-                            af.Staged = false;
-                            af.ReadyStatusText = null;
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Error("Failed to reimport file! " + e.Message);
+
+                            Log.Information("Re-importing extracted single file: " + outputFilename);
+                            try
+                            {
+                                File.Delete(importedFilePath);
+                                File.Move(outputFilename, importedFilePath);
+                                ReImportedFiles = true;
+                                af.Staged = false;
+                                af.ReadyStatusText = null;
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error("Failed to reimport file! " + e.Message);
+                            }
                         }
                     }
                 }
-            }
-            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "CheckOutputDirectoriesOnManifestLoad", false);
+                Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, "CheckOutputDirectoriesOnManifestLoad", false);
 
-            if (ReImportedFiles)
-            {
-                ShowStatus("Re-imported files due to shutdown during build or install", 3000);
+                if (ReImportedFiles)
+                {
+                    ShowStatus("Re-imported files due to shutdown during build or install", 3000);
+                }
             }
         }
 
@@ -1888,8 +1902,50 @@ namespace AlotAddOnGUI
             long installedRamGB = ramAmountKb / 1048576L;
             if (installedRamGB < 7.98)
             {
-                await this.ShowMessageAsync("System memory is less than 8 GB", "Building and installing textures uses considerable amounts of memory. Installation will be significantly slower on systems with less than 8 GB of memory.");
+                await this.ShowMessageAsync("System memory is less than 8 GB", "Building and installing textures uses considerable amounts of memory. Installation will be significantly slower on systems with less than 8 GB of memory. Systems with more than 8GB of memory will see significant speed improvements during installation.");
             }
+            //Check pagefile
+            try
+            {
+                //Current
+                List<string> availablePagefiles = new List<string>();
+                using (var query = new ManagementObjectSearcher("SELECT Caption,AllocatedBaseSize FROM Win32_PageFileUsage"))
+                {
+                    foreach (ManagementBaseObject obj in query.Get())
+                    {
+                        string pagefileName = (string)obj.GetPropertyValue("Caption");
+                        Log.Information("Detected pagefile: " + pagefileName);
+                        availablePagefiles.Add(pagefileName);
+                    }
+                }
+
+                //Max
+                using (var query = new ManagementObjectSearcher("SELECT Caption,MaximumSize FROM Win32_PageFileSetting"))
+                {
+                    foreach (ManagementBaseObject obj in query.Get())
+                    {
+                        string pagefileName = (string)obj.GetPropertyValue("Caption");
+                        uint max = (uint)obj.GetPropertyValue("MaximumSize");
+                        availablePagefiles.Remove(pagefileName);
+                        Log.Warning("Pagefile has been modified by the end user. The maximum page file size on " + pagefileName + " is: " + max + "MB");
+                    }
+                }
+
+                if (availablePagefiles.Count() > 0)
+                {
+                    Log.Information("We have a usable page file - OK");
+                } else
+                {
+                    Log.Error("We have no uncapped or available pagefiles to use! Very high chance application will run out of memory");
+                    await this.ShowMessageAsync("Pagefile is off or size has been capped", "The system pagefile (virtual memory) settings are not currently managed by Windows, or the pagefile is off. ALOT Installer uses large amounts of memory and will very often run out of memory if virtual memory is capped or turned off.");
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error("Unable to check pagefile settings:");
+                Log.Error(App.FlattenException(e));
+            }
+
             //Debug.WriteLine("Ram Amount, KB: " + ramAmountKb);
         }
 
@@ -2640,7 +2696,10 @@ namespace AlotAddOnGUI
 
         private async void Button_InstallME2_Click(object sender, RoutedEventArgs e)
         {
-            InstallPrecheck(2);
+            if (await InstallPrecheck(2))
+            {
+                ShowBuildOptions(2);
+            }
         }
 
         private void ShowBuildOptions(int game)
@@ -2652,6 +2711,7 @@ namespace AlotAddOnGUI
             ShowME3Files = game == 3;
             Loading = false;
             ShowReadyFilesOnly = true;
+            PreventFileRefresh = true;
             ApplyFiltering();
             ALOTVersionInfo installedInfo = Utilities.GetInstalledALOTInfo(game);
             bool alotInstalled = installedInfo != null && installedInfo.ALOTVER > 0; //default value
@@ -3001,7 +3061,7 @@ namespace AlotAddOnGUI
                 if (File.Exists(path))
                 {
                     Log.Error("Previous installation file found: " + path);
-                    Log.Error("Game was not removed before reinstalltion or was \"fixed\" using a game repair");
+                    Log.Error("Game was not removed before reinstallation or was \"fixed\" using a game repair");
                     string howToFixStr = "You must delete your current game installation game installation (do not uninstall or repair) to fully remove leftover files. You can use the ALOT Installer backup feature to backup a vanilla game once this is done.";
                     await this.ShowMessageAsync("Leftover files detected", "Files from a previous ALOT installation were detected and will cause installation to fail. " + howToFixStr);
                     return;
@@ -3683,6 +3743,8 @@ namespace AlotAddOnGUI
             USING_BETA = Utilities.GetRegistrySettingBool(SETTINGSTR_BETAMODE) ?? false;
             Checkbox_BetaMode.IsChecked = USING_BETA;
 
+            LAST_BETA_ADVERT_TIME = DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(Utilities.GetRegistrySettingString(SETTINGSTR_LAST_BETA_ADVERT_TIME) ?? "0"));
+
             DONT_FORCE_UPGRADES = Utilities.GetRegistrySettingBool(SETTINGSTR_DONT_FORCE_UPGRADES) ?? false;
 
             DOWNLOADS_FOLDER = Utilities.GetRegistrySettingString(SETTINGSTR_DOWNLOADSFOLDER);
@@ -3814,7 +3876,7 @@ namespace AlotAddOnGUI
             bool restart = true;
             if (isEnabling)
             {
-                MessageDialogResult result = await this.ShowMessageAsync("Enabling BETA mode", "Enabling BETA mode will enable the beta manifest as well as beta features and beta updates. These builds are for testing, and may not be stable (and will sometimes outright crash). Unless you're OK with this you should stay in normal mode.\nEnable BETA mode?", MessageDialogStyle.AffirmativeAndNegative);
+                MessageDialogResult result = await this.ShowMessageAsync("Enabling BETA mode", "Enabling BETA mode will enable the beta manifest as well as beta features and beta updates. These builds are for testing, and may not be stable (and will sometimes outright crash). If you use this mode, we would appreciate if you gave feedback on the Discord.\nEnable BETA mode?", MessageDialogStyle.AffirmativeAndNegative);
                 if (result == MessageDialogResult.Negative)
                 {
                     Checkbox_BetaMode.IsChecked = false;
@@ -4229,6 +4291,7 @@ namespace AlotAddOnGUI
         private void Button_BuildAndInstallCancel_Click(object sender, RoutedEventArgs e)
         {
             ShowReadyFilesOnly = false;
+            PreventFileRefresh = false;
             ApplyFiltering();
             WhatToBuildFlyout.IsOpen = false;
             CURRENT_GAME_BUILD = 0;
