@@ -53,7 +53,7 @@ namespace AlotAddOnGUI
 
         private const string SHOW_ALL_STAGE_LABELS = "SHOW_ALL_STAGE_LABELS";
         private const string HIDE_STAGE_OF_STAGE_LABEL = "HIDE_STAGE_OF_STAGE_LABEL";
-        private PerformanceCounter PERFORMANCE_COUNTER = new System.Diagnostics.PerformanceCounter("Memory", "Available MBytes");
+        private PerformanceCounter PERFORMANCE_COUNTER;
 
         private void MusicIcon_Click(object sender, RoutedEventArgs e)
         {
@@ -1147,6 +1147,11 @@ namespace AlotAddOnGUI
                 {
                     if (PERFORMANCE_COUNTER != null)
                     {
+                        var memoryavailable = PERFORMANCE_COUNTER.NextValue();
+                        Utilities.WriteDebugLog("Available memory: " + memoryavailable + "MB");
+                    } else
+                    {
+                        PERFORMANCE_COUNTER = new System.Diagnostics.PerformanceCounter("Memory", "Available MBytes");
                         var memoryavailable = PERFORMANCE_COUNTER.NextValue();
                         Utilities.WriteDebugLog("Available memory: " + memoryavailable + "MB");
                     }
