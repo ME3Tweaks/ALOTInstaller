@@ -1915,19 +1915,28 @@ namespace AlotAddOnGUI
                     {
                         string pagefileName = (string)obj.GetPropertyValue("Caption");
                         Log.Information("Detected pagefile: " + pagefileName);
-                        availablePagefiles.Add(pagefileName);
+                        availablePagefiles.Add(pagefileName.ToLower());
                     }
                 }
 
                 //Max
-                using (var query = new ManagementObjectSearcher("SELECT Caption,MaximumSize FROM Win32_PageFileSetting"))
+                using (var query = new ManagementObjectSearcher("SELECT Name,MaximumSize FROM Win32_PageFileSetting"))
                 {
                     foreach (ManagementBaseObject obj in query.Get())
                     {
-                        string pagefileName = (string)obj.GetPropertyValue("Caption");
+                        foreach (PropertyData prop in obj.Properties)
+                        {
+                            Console.WriteLine("{0}: {1}", prop.Name, prop.Value);
+                        }
+
+                        string pagefileName = (string)obj.GetPropertyValue("Name");
                         uint max = (uint)obj.GetPropertyValue("MaximumSize");
-                        availablePagefiles.Remove(pagefileName);
-                        Log.Warning("Pagefile has been modified by the end user. The maximum page file size on " + pagefileName + " is: " + max + "MB");
+                        if (max > 0)
+                        {
+                            // Not system managed
+                            availablePagefiles.RemoveAll(x => Path.GetFullPath(x).Equals(Path.GetFullPath(pagefileName)));
+                            Log.Warning("Pagefile has been modified by the end user. The maximum page file size on " + pagefileName + " is: " + max + "MB");
+                        }
                     }
                 }
 
