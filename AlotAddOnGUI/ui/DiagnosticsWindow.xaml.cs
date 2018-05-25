@@ -881,7 +881,7 @@ namespace AlotAddOnGUI.ui
                             long size = fi.Length;
                             if (ent.size < size)
                             {
-                                addDiagLine("[ERROR] -  " + filepath + " size is " + size + ", but TOC lists " + ent.size + " ("+(ent.size - size)+" bytes)");
+                                addDiagLine("[ERROR] -  " + filepath + " size is " + size + ", but TOC lists " + ent.size + " (" + (ent.size - size) + " bytes)");
                                 hadTocError = true;
                             }
                         }
@@ -1040,6 +1040,12 @@ namespace AlotAddOnGUI.ui
         private string GetLODStr(int gameID, ALOTVersionInfo avi)
         {
             string log = "";
+            string iniPath = IniSettingsHandler.GetConfigIniPath(gameID);
+            if (!File.Exists(iniPath))
+            {
+                return "[ERROR]Game config file is missing: " + iniPath;
+            }
+
             foreach (KeyValuePair<string, string> kvp in LODS_INFO)
             {
                 log += kvp.Key + "=" + kvp.Value;

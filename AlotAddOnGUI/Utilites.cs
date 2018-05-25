@@ -475,7 +475,7 @@ namespace AlotAddOnGUI
                     return "$$$Game source: " + hashPair.Value;
                 }
             }
-            return "~~~Unknown source - this installation is not supported.";
+            return "[ERROR]Unknown source - this installation is not supported.";
         }
 
         public static List<KeyValuePair<string, string>> SUPPORTED_HASHES_ME1 = new List<KeyValuePair<string, string>>();
