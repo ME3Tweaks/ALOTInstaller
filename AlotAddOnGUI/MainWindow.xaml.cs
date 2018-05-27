@@ -362,12 +362,12 @@ namespace AlotAddOnGUI
                     bool newHiddenBetaBuildAvailable = false;
                     foreach (Release r in releases)
                     {
-                        if (!USING_BETA && r.Prerelease)
+                        Version releaseVersion = new Version(r.TagName);
+                        if (!USING_BETA && r.Prerelease && versInfo.Build < releaseVersion.Build)
                         {
                             newHiddenBetaBuildAvailable = true;
                             continue;
                         }
-                        Version releaseVersion = new Version(r.TagName);
                         if (versInfo.Major == releaseVersion.Major && versInfo.Build < releaseVersion.Build)
                         {
                             myReleaseAge++;
