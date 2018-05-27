@@ -1140,7 +1140,8 @@ namespace AlotAddOnGUI
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
-                if (str.StartsWith("[IPC]"))
+                Utilities.WriteDebugLog("MEM INSTALLER OUTPUT: " + args2.Line);
+                if (str.StartsWith("[IPC]")) //needs culture ordinal check??
                 {
                     if (PERFORMANCE_COUNTER != null)
                     {

@@ -302,6 +302,7 @@ namespace AlotAddOnGUI.ui
             var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
             int fileVersion = versInfo.FileMajorPart;
             addDiagLine("Using MassEffectModderNoGui v" + fileVersion);
+            addDiagLine("System culture: " + Thread.CurrentThread.CurrentCulture.Name);
             addDiagLine("Game is installed at " + gamePath);
             string pathroot = Path.GetPathRoot(gamePath);
             pathroot = pathroot.Substring(0, 1);

@@ -52,6 +52,7 @@ namespace AlotAddOnGUI
             sb.AppendLine(GetCPUString());
             long ramInBytes = Utilities.GetInstalledRamAmount();
             sb.AppendLine("System Memory: " + ByteSize.FromKiloBytes(ramInBytes));
+            sb.AppendLine("System Culture: " + Thread.CurrentThread.CurrentCulture.Name);
             return sb.ToString();
         }
 
