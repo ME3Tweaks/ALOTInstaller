@@ -952,23 +952,26 @@ namespace AlotAddOnGUI
                 return false;
             }
 
-            if (MainWindow.USING_BETA)
+            try
             {
-                Log.Information("Installing AutoTOC.asi...");
-                try
+                if (CheckIfHashIsSupported(3, CalculateMD5(Utilities.GetGameEXEPath(3))))
                 {
-                    string path = Utilities.GetGamePath(3);
-                    path = Path.Combine(path, "Binaries", "Win32", "asi");
+                    Log.Information("Installing AutoTOC.asi...");
+                    string path = Path.Combine(Utilities.GetGamePath(3), "Binaries", "Win32", "asi");
                     Directory.CreateDirectory(path);
                     path = Path.Combine(path, "AutoTOC.asi");
                     File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.AutoTOC);
                     Log.Information("Installed AutoTOC.asi");
                 }
-                catch (Exception ex)
+                else
                 {
-                    Log.Error("Failed to install AutoTOC.asi: " + ex.Message);
-                    return false;
+                    Log.Error("Installation is not supported - not installed autotoc asi");
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Failed to install (or doing precheck) for AutoTOC.asi: " + ex.Message);
+                return false;
             }
 
             return true;
