@@ -1143,7 +1143,7 @@ namespace AlotAddOnGUI.ui
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
-                if (str.StartsWith("[IPC]"))
+                if (str.StartsWith("[IPC]", StringComparison.Ordinal))
                 {
                     string command = str.Substring(5);
                     int endOfCommand = command.IndexOf(' ');

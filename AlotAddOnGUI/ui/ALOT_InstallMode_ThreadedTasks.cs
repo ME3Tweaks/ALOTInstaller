@@ -53,7 +53,6 @@ namespace AlotAddOnGUI
 
         private const string SHOW_ALL_STAGE_LABELS = "SHOW_ALL_STAGE_LABELS";
         private const string HIDE_STAGE_OF_STAGE_LABEL = "HIDE_STAGE_OF_STAGE_LABEL";
-        private PerformanceCounter PERFORMANCE_COUNTER;
 
         private void MusicIcon_Click(object sender, RoutedEventArgs e)
         {
@@ -1140,19 +1139,8 @@ namespace AlotAddOnGUI
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
-                Utilities.WriteDebugLog("MEM INSTALLER OUTPUT: " + args2.Line);
-                if (str.StartsWith("[IPC]")) //needs culture ordinal check??
+                if (str.StartsWith("[IPC]", StringComparison.Ordinal)) //needs culture ordinal check??
                 {
-                    if (PERFORMANCE_COUNTER != null)
-                    {
-                        var memoryavailable = PERFORMANCE_COUNTER.NextValue();
-                        Utilities.WriteDebugLog("Available memory: " + memoryavailable + "MB");
-                    } else
-                    {
-                        PERFORMANCE_COUNTER = new System.Diagnostics.PerformanceCounter("Memory", "Available MBytes");
-                        var memoryavailable = PERFORMANCE_COUNTER.NextValue();
-                        Utilities.WriteDebugLog("Available memory: " + memoryavailable + "MB");
-                    }
                     string command = str.Substring(5);
                     int endOfCommand = command.IndexOf(' ');
                     if (endOfCommand > 0)

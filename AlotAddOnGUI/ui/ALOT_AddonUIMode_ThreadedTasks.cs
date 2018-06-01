@@ -1508,7 +1508,7 @@ namespace AlotAddOnGUI
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
-                if (str.StartsWith("[IPC]"))
+                if (str.StartsWith("[IPC]", StringComparison.Ordinal))
                 {
                     string command = str.Substring(5);
                     int endOfCommand = command.IndexOf(' ');
@@ -1569,7 +1569,7 @@ namespace AlotAddOnGUI
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
-                if (str.StartsWith("[IPC]"))
+                if (str.StartsWith("[IPC]", StringComparison.Ordinal))
                 {
                     string command = str.Substring(5);
                     int endOfCommand = command.IndexOf(' ');
@@ -1782,7 +1782,7 @@ namespace AlotAddOnGUI
 
             if (!Directory.Exists(gamePath))
             {
-                Log.Error("Game directory is missing: "+gamePath);
+                Log.Error("Game directory is missing: " + gamePath);
                 await this.ShowMessageAsync("Game directory is missing", "The game directory for Mass Effect" + getGameNumberSuffix(game) + " is missing. This may be caused due to modification of the folder while ALOT Installer is running. Please reinstall the game.");
                 return false;
             }
@@ -1839,7 +1839,7 @@ namespace AlotAddOnGUI
                 }
             }
 
-            
+
 
             int nummissing = 0;
             bool oneisready = false;
