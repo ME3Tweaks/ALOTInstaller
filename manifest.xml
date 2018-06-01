@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotaddonmanifest version="5.0.25">
-   <highestapprovedmemversion>133</highestapprovedmemversion>
+   <highestapprovedmemversion>135</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-05-27">135</soaktestingmemversion>
    <stages>
       <!-- -56 is the next error code available-->
