@@ -798,7 +798,7 @@ namespace AlotAddOnGUI.ui
 
                     else
                     {
-                        addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                        addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibility Pack" : null));
                     }
                     if (duplicatePriorityStr != "")
                     {
@@ -813,8 +813,8 @@ namespace AlotAddOnGUI.ui
                 }
                 else if (hasUIMod && hasNonUIDLCMod && !compatPatchInstalled)
                 {
-                    addDiagLine("This installation may require a UI compatibility patch from Mass Effect 3 Mod Manager due to installation of a UI mod with other mods.");
-                    addDiagLine("In Mass Effect 3 Mod Manager use Mod Management > Check for Custom DLC conflicts to see if you need one.");
+                    addDiagLine("~~~This installation may require a UI compatibility patch from Mass Effect 3 Mod Manager due to installation of a UI mod with other mods.");
+                    addDiagLine("~~~In Mass Effect 3 Mod Manager use Mod Management > Check for Custom DLC conflicts to see if you need one.");
                 }
                 else if (!hasUIMod && compatPatchInstalled)
                 {
@@ -1364,7 +1364,7 @@ namespace AlotAddOnGUI.ui
                 case "DLC_UNC_Moment01": return "Normandy Crash Site";
 
                 //ME3
-                case "DLC_CON_MP1": return "Resugence";
+                case "DLC_CON_MP1": return "Resurgence";
                 case "DLC_CON_MP2": return "Rebellion";
                 case "DLC_CON_MP3": return "Earth";
                 case "DLC_CON_MP4": return "Retaliation";
