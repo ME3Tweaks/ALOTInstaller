@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.1.9">
+<alotaddonmanifest version="5.1.10">
 <!-- This is unused in beta and should not be ported to stable. Make sure when porting to stable that soak test and highest stable are set. -->
    <soaktestingmemversion soakstartdate="2018-05-03">129</soaktestingmemversion> 
    <stages>
@@ -169,11 +169,11 @@
    </addonfile>
    <addonfile friendlyname="ME2 Improved Bun Texture" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/186" filename="ME2 Improved High Bun Textures-186-2-0.zip" size="2434983" md5="db4f29423ad95420da22e9b23c274cee" />
-      <packagefile me1="true" sourcename="ME2 High Bun.tpf" movedirectly="true" />
+      <packagefile me2="true" sourcename="ME2 High Bun.tpf" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="ME2 Improved Scalp Texture" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/186" filename="ME2 Improved Scalp Textures-186-2-0.zip" size="7005828" md5="8f6b1c0d66b347a5d46d273587fb0247" />
-      <packagefile me1="true" sourcename="ME2 Improved Scalp.tpf" movedirectly="true" />
+      <packagefile me2="true" sourcename="ME2 Improved Scalp.tpf" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Allers Complexion Tweak" author="Ellise" optional="true">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_AllersComplexionTweak.7z-580-1-0.7z" md5="d9f3b8f6f63132d86690835a3c766c44" size="8994633" />
