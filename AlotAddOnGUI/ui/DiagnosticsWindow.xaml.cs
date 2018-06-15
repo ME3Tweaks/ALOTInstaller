@@ -779,6 +779,8 @@ namespace AlotAddOnGUI.ui
                         {
                             hasUIMod = true;
                         }
+
+                        //Check for SFAR size not being 32 bytes
                         string sfar = dir + "\\CookedPCConsole\\Default.sfar";
                         if (File.Exists(sfar))
                         {
@@ -789,21 +791,41 @@ namespace AlotAddOnGUI.ui
                     }
                     if (hasSfarSizeError && MEMI_FOUND)
                     {
-                        addDiagLine("[ERROR]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                        addDiagLine("[ERROR]      SFAR is not the MEM unpacked size. Unpacked DLC by MEM will be 32 bytes, however this SFAR is " + ByteSize.FromBytes(sfarsize) + ".");
-                        addDiagLine("[ERROR]      If HQ graphics settings are on (ALOT/MEUITM was found, so it should be) this will very often be a source of the game crashing.");
-                        addDiagLine("[ERROR]      You may also see this error if you unpacked DLC using ME3Explorer - as an end-user you should never have to use ME3Explorer,");
-                        addDiagLine("[ERROR]      even for AutoTOC. You can run AutoTOC in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
+                        if (GetME3ExplorerUnpackedSFARSize(value) == sfarsize)
+                        {
+                            addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                            addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
+                            addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
+                        }
+                        else if (GetPackedSFARSize(value) == sfarsize)
+                        {
+                            addDiagLine("[FATAL]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                            addDiagLine("[ERROR]      SFAR is not unpacked. This DLC was either installed after ALOT was installed or was repaired by Origin.");
+                            addDiagLine("[ERROR]      The game must be restored from backup or deleted. Once reinstalled, ALOT must be installed again.");
+                        }
+                        else
+                        {
+                            addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                            addDiagLine("[ERROR]      SFAR is not the MEM unpacked size, ME3Explorer unpacked size, or packed size. This SFAR is " + ByteSize.FromBytes(sfarsize) + " bytes.");
+                        }
                     }
-
                     else
                     {
-                        addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibility Pack" : null));
+                        if (GetME3ExplorerUnpackedSFARSize(value) == sfarsize)
+                        {
+                            addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                            addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
+                            addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
+                        }
+                        else
+                        {
+                            addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibility Pack" : null));
+                        }
                     }
                     if (duplicatePriorityStr != "")
                     {
-                        addDiagLine("[ERROR] -  This DLC has the same mount priority as another DLC: " + duplicatePriorityStr);
-                        addDiagLine("[ERROR]    These conflicting DLCs will likely encounter issues as the game will not know which files should be used");
+                        addDiagLine("[ERROR] - This DLC has the same mount priority as another DLC: " + duplicatePriorityStr);
+                        addDiagLine("[ERROR]   These conflicting DLCs will likely encounter issues as the game will not know which files should be used");
                     }
                 }
 
@@ -824,6 +846,9 @@ namespace AlotAddOnGUI.ui
                 if (metadataPresent)
                 {
                     addDiagLine("__metadata folder is present");
+                } else
+                {
+                    addDiagLine("~~~__metadata folder is missing");
                 }
             }
             else
@@ -1327,6 +1352,62 @@ namespace AlotAddOnGUI.ui
             else
             {
                 return -1;
+            }
+        }
+
+        public static long GetME3ExplorerUnpackedSFARSize(string str)
+        {
+            switch (str)
+            {
+                case "DLC_CON_MP1": return 8245L;
+                case "DLC_CON_MP2": return 8920L;
+                case "DLC_CON_MP3": return 10727L;
+                case "DLC_CON_MP4": return 16191L;
+                case "DLC_CON_MP5": return 5938L;
+
+                case "DLC_UPD_Patch01": return 1546L;
+                case "DLC_UPD_Patch02": return 1468L;
+                case "DLC_HEN_PR": return 17772L;
+                case "DLC_CON_END": return 18082L;
+                case "DLC_EXP_Pack001": return 31500L;
+                case "DLC_EXP_Pack002": return 62176L;
+                case "DLC_EXP_Pack003": return 42183L;
+                case "DLC_EXP_Pack003_Base": return 51312L;
+                case "DLC_OnlinePassHidCE": return 5464L;
+                case "DLC_CON_APP01": return 4353L;
+                case "DLC_CON_DH1": return 5120L;
+                case "DLC_CON_GUN01": return 3549L;
+                case "DLC_CON_GUN02": return 2743L;
+                default:
+                    return 0;
+            }
+        }
+
+        public static long GetPackedSFARSize(string str)
+        {
+            switch (str)
+            {
+                //ME3
+                case "DLC_CON_MP1": return 220174473L;
+                case "DLC_CON_MP2": return 139851674L;
+                case "DLC_CON_MP3": return 198668075L;
+                case "DLC_CON_MP4": return 441856666L;
+                case "DLC_CON_MP5": return 208777784L;
+                case "DLC_UPD_Patch01": return 208998L;
+                case "DLC_UPD_Patch02": return 302772L;
+                case "DLC_HEN_PR": return 594778936L;
+                case "DLC_CON_END": return 1919137514L;
+                case "DLC_EXP_Pack001": return 1561239503L;
+                case "DLC_EXP_Pack002": return 1849136836L;
+                case "DLC_EXP_Pack003": return 1886013531L;
+                case "DLC_EXP_Pack003_Base": return 1896814656L;
+                case "DLC_OnlinePassHidCE": return 56321927L;
+                case "DLC_CON_APP01": return 53878606L;
+                case "DLC_CON_DH1": return 284862077L;
+                case "DLC_CON_GUN01": return 18708500L;
+                case "DLC_CON_GUN02": return 17134896L;
+                default:
+                    return 0;
             }
         }
 

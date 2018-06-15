@@ -234,10 +234,10 @@ namespace AlotAddOnGUI
             InitializeComponent();
             LoadSettings();
             MEUITM_INSTALLER_MODE = App.BootMEUITMMode; //installer state defaults to boot setting
-            if (MEUITM_INSTALLER_MODE)
-            {
-                MEUITM_Flyout.IsOpen = true;
-            }
+            //if (MEUITM_INSTALLER_MODE)
+            //{
+            //    MEUITM_Flyout.IsOpen = true;
+            //}
             Title = "ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             HeaderLabel.Text = "Preparing application...";
             AddonFilesLabel.Text = "Please wait";
@@ -2605,6 +2605,15 @@ namespace AlotAddOnGUI
 
         private void ApplyFiltering(bool scrollToBottom = false)
         {
+            if (MEUITM_INSTALLER_MODE)
+            {
+                var preVal = Loading;
+                Loading = true;
+                ShowME1Files = true;
+                ShowME2Files = false;
+                ShowME3Files = false;
+                Loading = preVal;
+            }
             BindingList<AddonFile> newList = new BindingList<AddonFile>();
             if (meuitmFile != null)
             {
@@ -2635,7 +2644,14 @@ namespace AlotAddOnGUI
                     bool shouldDisplay = ((af.Game_ME1 && ShowME1Files) || (af.Game_ME2 && ShowME2Files) || (af.Game_ME3 && ShowME3Files));
                     if (shouldDisplay)
                     {
-                        newList.Add(af);
+                        if (MEUITM_INSTALLER_MODE && !af.MEUITM)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            newList.Add(af);
+                        }
                     }
                 }
             }
