@@ -1877,6 +1877,10 @@ namespace AlotAddOnGUI
             {
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
+                    if (af.Game_ME1 && MEUITM_INSTALLER_MODE && !af.MEUITM)
+                    {
+                        continue;
+                    }
                     if (af.ALOTVersion > 0)
                     {
                         alotmainfile = af;
@@ -1939,7 +1943,7 @@ namespace AlotAddOnGUI
                 }
             }
 
-            if (blockDueToMissingALOTFile && alotmainfile != null)
+            if (blockDueToMissingALOTFile && alotmainfile != null && !MEUITM_INSTALLER_MODE)
             {
                 int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
                 ListView_Files.SelectedIndex = alotindex;
@@ -1948,7 +1952,7 @@ namespace AlotAddOnGUI
                 return false;
             }
 
-            if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable)
+            if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable && !MEUITM_INSTALLER_MODE)
             {
                 if (installedInfo == null)
                 {

@@ -1184,7 +1184,7 @@ namespace AlotAddOnGUI
                             break;
                         }
 
-                        if (readyToInstallALOT || currentAlotInfo != null) //not installed
+                        if (readyToInstallALOT || MEUITM_INSTALLER_MODE || currentAlotInfo != null) //not installed
                         {
                             var ready = false;
                             for (int i = 0; i < 4; i++)
