@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.1.8">
+<alotaddonmanifest version="5.1.11">
 <!-- This is unused in beta and should not be ported to stable. Make sure when porting to stable that soak test and highest stable are set. -->
    <soaktestingmemversion soakstartdate="2018-05-03">129</soaktestingmemversion> 
    <stages>
@@ -159,21 +159,13 @@
       <file downloadlink="https://mega.nz/#F!40VXCbjb!547qvMRc2T9Vbpi6D3_fhA" filename="ALOT for ME3 6.4 - Update-363-2018-6-4.zip" size="252621425" md5="03a4b87e4a9c93edd20c9b3989a496b9" />
       <packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v6.mem" movedirectly="true" />
    </addonfile>
-   <addonfile friendlyname="ME1 Improved Bun Texture" author="LiasFfalenn">
-      <file downloadlink="https://www.nexusmods.com/masseffect/mods/2" filename="ME1 Improved High Bun Textures-2-2-0.zip" size="2434983" md5="4587abf0161347fccdd7ef743854f9d6" />
-      <packagefile me1="true" sourcename="ME1 High Bun.tpf" movedirectly="true" />
-   </addonfile>
    <addonfile friendlyname="ME1 Improved Scalp Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
-      <file downloadlink="https://www.nexusmods.com/masseffect/mods/2" filename="ME1 Improved Scalp Textures (MEUITM)-2-2-0.zip" size="8134657" md5="3acd6bd4ef6bf9f41cf57a7a6b4d67e5" />
-      <packagefile me1="true" sourcename="ME1 Improved Scalp CDAMJC Cut.tpf" movedirectly="true" />
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/2" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
+      <packagefile me1="true" sourcename="ME1 Improved Bun Textures (CDAMJC Cut).tpf" movedirectly="true" />
    </addonfile>
-   <addonfile friendlyname="ME2 Improved Bun Texture" author="LiasFfalenn">
-      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/186" filename="ME2 Improved High Bun Textures-186-2-0.zip" size="2434983" md5="db4f29423ad95420da22e9b23c274cee" />
-      <packagefile me1="true" sourcename="ME2 High Bun.tpf" movedirectly="true" />
-   </addonfile>
-   <addonfile friendlyname="ME2 Improved Scalp Texture" author="LiasFfalenn">
-      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/186" filename="ME2 Improved Scalp Textures-186-2-0.zip" size="7005828" md5="8f6b1c0d66b347a5d46d273587fb0247" />
-      <packagefile me1="true" sourcename="ME2 Improved Scalp.tpf" movedirectly="true" />
+   <addonfile friendlyname="ME2 Improved Bun Textures (A.L.O.T.)" author="LiasFfalenn">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/186" filename="ME2 Improved Bun Textures (A.L.O.T.)-186-1-0.zip" size="21032486" md5="d2d65c0e9af23c66806804d68feae800" />
+      <packagefile me2="true" sourcename="ME2 Improved Bun Textures (ALOT).tpf" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Allers Complexion Tweak" author="Ellise" optional="true">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_AllersComplexionTweak.7z-580-1-0.7z" md5="d9f3b8f6f63132d86690835a3c766c44" size="8994633" />
@@ -647,14 +639,14 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAF098936_Female_norm.dds" destinationname="HMM_ARM_CTHi_NORM_0xAF098936.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF750CD22_Female_Blood.dds" destinationname="HMM_ARM_CTHi_Diff_0xF750CD22.dds" />
    </addonfile>
-   <addonfile friendlyname="Garrus Face" author="Ottemis">
+   <addonfile friendlyname="Garrus Alternate Armor" author="Ottemis">
       <file downloadlink="http://www.nexusmods.com/masseffect3/mods/6" tooltipname="ME3 HR Garrus Alternate Armor" filename="ME3 HR Garrus Alternate Armor for Texmod-6-1-0.rar" md5="8307706883e83548e8e6df429b3a95f8" size="50163265" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x00D06559_Gar_alt_norm.dds" destinationname="TUR_ARM_GARb_Norm_0x00D06559.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x06675BBF_Gar_alt_spec.dds" destinationname="TUR_ARM_GARb_Spec_0x06675BBF.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB2650E4C_Gar_alt_diff.dds" destinationname="TUR_ARM_GARb_Diff_0xB2650E4C.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xBC526E87_helm_alt_diff.dds" destinationname="TUR_HGRb_Garrus_Diff_0xBC526E87.dds" />
    </addonfile>
-   <addonfile friendlyname="HR Kai Leng" author="Ottemis">
+   <addonfile friendlyname="Kai Leng" author="Ottemis">
       <file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename="HR Kai Leng-276-1-0.rar" md5="331fe235edc45f9b3b60386522dc35b5" size="29162477" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x123B4AC0_Shadow_Sword_norm.dds" destinationname="WPN_MLEa_Norm_0x123B4AC0.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x819EE45D_shade_kai.dds" destinationname="HMM_ARM_LENGa_Diff_0x819EE45D.dds" />
