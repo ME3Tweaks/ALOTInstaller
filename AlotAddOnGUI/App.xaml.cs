@@ -96,18 +96,11 @@ namespace AlotAddOnGUI
                     if (parsedCommandLineArgs.Value.BootingNewUpdate)
                     {
                         Log.Information("Booting an update");
-                        if (File.Exists("ALOTAddonBuilder.exe"))
+                        foreach (string file in Directory.GetFiles(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "*.pdb", SearchOption.AllDirectories))
                         {
-                            File.Delete("ALOTAddonBuilder.exe");
+                            File.Delete(file);
                         }
-                        if (File.Exists("ALOTAddonBuilder.pdb"))
-                        {
-                            File.Delete("ALOTAddonBuilder.pdb");
-                        }
-                        if (File.Exists("AlotAddonBuilder.exe.config"))
-                        {
-                            File.Delete("AlotAddonBuilder.exe.config");
-                        }
+
                     }
                 }
             }

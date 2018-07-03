@@ -788,40 +788,45 @@ namespace AlotAddOnGUI.ui
                             sfarsize = fi.Length;
                             hasSfarSizeError = sfarsize != propersize;
                         }
-                    }
-                    if (hasSfarSizeError && MEMI_FOUND)
-                    {
-                        if (GetME3ExplorerUnpackedSFARSize(value) == sfarsize)
+
+                        if (hasSfarSizeError && MEMI_FOUND)
                         {
-                            addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                            addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
-                            addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
-                        }
-                        else if (GetPackedSFARSize(value) == sfarsize)
-                        {
-                            addDiagLine("[FATAL]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                            addDiagLine("[ERROR]      SFAR is not unpacked. This DLC was either installed after ALOT was installed or was repaired by Origin.");
-                            addDiagLine("[ERROR]      The game must be restored from backup or deleted. Once reinstalled, ALOT must be installed again.");
-                        }
-                        else
-                        {
-                            addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                            addDiagLine("[ERROR]      SFAR is not the MEM unpacked size, ME3Explorer unpacked size, or packed size. This SFAR is " + ByteSize.FromBytes(sfarsize) + " bytes.");
-                        }
-                    }
-                    else
-                    {
-                        if (GetME3ExplorerUnpackedSFARSize(value) == sfarsize)
-                        {
-                            addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                            addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
-                            addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
+                            if (GetME3ExplorerUnpackedSFARSize(value) == sfarsize)
+                            {
+                                addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                                addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
+                                addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
+                            }
+                            else if (GetPackedSFARSize(value) == sfarsize)
+                            {
+                                addDiagLine("[FATAL]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                                addDiagLine("[ERROR]      SFAR is not unpacked. This DLC was either installed after ALOT was installed or was repaired by Origin.");
+                                addDiagLine("[ERROR]      The game must be restored from backup or deleted. Once reinstalled, ALOT must be installed again.");
+                            }
+                            else
+                            {
+                                addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                                addDiagLine("[ERROR]      SFAR is not the MEM unpacked size, ME3Explorer unpacked size, or packed size. This SFAR is " + ByteSize.FromBytes(sfarsize) + " bytes.");
+                            }
                         }
                         else
                         {
-                            addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibility Pack" : null));
+                            if (GetME3ExplorerUnpackedSFARSize(value) == sfarsize)
+                            {
+                                addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                                addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
+                                addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
+                            }
+                            else
+                            {
+                                addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibility Pack" : null));
+                            }
                         }
+                    } else
+                    {
+                        addDiagLine(GetDLCDisplayString(value));
                     }
+                
                     if (duplicatePriorityStr != "")
                     {
                         addDiagLine("[ERROR] - This DLC has the same mount priority as another DLC: " + duplicatePriorityStr);
@@ -829,26 +834,30 @@ namespace AlotAddOnGUI.ui
                     }
                 }
 
-                if (hasUIMod && hasNonUIDLCMod && compatPatchInstalled)
+                if (DIAGNOSTICS_GAME == 3)
                 {
-                    addDiagLine("This installation requires a UI compatibility patch. This patch appears to be installed.");
-                }
-                else if (hasUIMod && hasNonUIDLCMod && !compatPatchInstalled)
-                {
-                    addDiagLine("~~~This installation may require a UI compatibility patch from Mass Effect 3 Mod Manager due to installation of a UI mod with other mods.");
-                    addDiagLine("~~~In Mass Effect 3 Mod Manager use Mod Management > Check for Custom DLC conflicts to see if you need one.");
-                }
-                else if (!hasUIMod && compatPatchInstalled)
-                {
-                    addDiagLine("[ERROR] -  This installation does not require a UI compatibilty patch but one is installed. This may lead to game crashing.");
-                }
+                    if (hasUIMod && hasNonUIDLCMod && compatPatchInstalled)
+                    {
+                        addDiagLine("This installation requires a UI compatibility patch. This patch appears to be installed.");
+                    }
+                    else if (hasUIMod && hasNonUIDLCMod && !compatPatchInstalled)
+                    {
+                        addDiagLine("~~~This installation may require a UI compatibility patch from Mass Effect 3 Mod Manager due to installation of a UI mod with other mods.");
+                        addDiagLine("~~~In Mass Effect 3 Mod Manager use Mod Management > Check for Custom DLC conflicts to see if you need one.");
+                    }
+                    else if (!hasUIMod && compatPatchInstalled)
+                    {
+                        addDiagLine("[ERROR] -  This installation does not require a UI compatibilty patch but one is installed. This may lead to game crashing.");
+                    }
 
-                if (metadataPresent)
-                {
-                    addDiagLine("__metadata folder is present");
-                } else
-                {
-                    addDiagLine("~~~__metadata folder is missing");
+                    if (metadataPresent)
+                    {
+                        addDiagLine("__metadata folder is present");
+                    }
+                    else
+                    {
+                        addDiagLine("~~~__metadata folder is missing");
+                    }
                 }
             }
             else

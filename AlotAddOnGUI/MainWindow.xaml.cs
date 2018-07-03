@@ -1017,15 +1017,6 @@ namespace AlotAddOnGUI
                 var versInfo = FileVersionInfo.GetVersionInfo(BINARY_DIRECTORY + MEM_EXE_NAME);
                 int fileVersion = versInfo.FileMajorPart;
                 Label_MEMVersion.Content = "MEM Cmd Version: " + fileVersion;
-                if (fileVersion >= 112)
-                {
-                    if (File.Exists(BINARY_DIRECTORY + "MassEffectModderNoGui.pdb"))
-                    {
-                        //DISABLED DUE TO .NET " + DOT_NET_REQUIRED_VERSION_HR + " not supporting portable pdbs due to update
-                        //File.Delete(BINARY_DIRECTORY + "MassEffectModderNoGui.pdb");
-                        //Log.Information("Deleted MassEffectModderNoGui.pdb");
-                    }
-                }
             }
             //PerformPostStartup();
         }

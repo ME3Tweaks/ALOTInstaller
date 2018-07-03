@@ -5,8 +5,18 @@ if (Test-Path "$($PSScriptRoot)\Release\logs") {
 }
 
 if (Test-Path "$($PSScriptRoot)\Release\Data\lib\ALOTInstaller.pdb") {
-    Write-Host Moving PDB...
-    Move-Item "$($PSScriptRoot)\Release\Data\lib\ALOTInstaller.pdb"  -Destination "$($PSScriptRoot)\Release\ALOTInstaller.pdb" -Force
+    Write-Host Removing PDB...
+    Remove-Item "$($PSScriptRoot)\Release\Data\lib\ALOTInstaller.pdb"
+}
+
+if (Test-Path "$($PSScriptRoot)\Release\Data\bin\MassEffectModder.pdb") {
+    Write-Host Removing MEM PDB...
+    Remove-Item "$($PSScriptRoot)\Release\Data\bin\MassEffectModder.pdb"
+}
+
+if (Test-Path "$($PSScriptRoot)\Release\Data\bin\MassEffectModderNoGui.pdb") {
+    Write-Host Removing MEMNoGui PDB...
+    Remove-Item "$($PSScriptRoot)\Release\Data\bin\MassEffectModderNoGui.pdb"
 }
 
 if (Test-Path "$($PSScriptRoot)\Release\ALOTAddonBuilder.exe") {
