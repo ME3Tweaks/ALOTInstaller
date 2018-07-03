@@ -786,19 +786,20 @@ namespace AlotAddOnGUI.ui
                             sfarsize = fi.Length;
                             hasSfarSizeError = sfarsize != propersize;
                         }
-                    }
-                    if (hasSfarSizeError && MEMI_FOUND)
-                    {
-                        addDiagLine("[ERROR]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                        addDiagLine("[ERROR]      SFAR is not the MEM unpacked size. Unpacked DLC by MEM will be 32 bytes, however this SFAR is " + ByteSize.FromBytes(sfarsize) + ".");
-                        addDiagLine("[ERROR]      If HQ graphics settings are on (ALOT/MEUITM was found, so it should be) this will very often be a source of the game crashing.");
-                        addDiagLine("[ERROR]      You may also see this error if you unpacked DLC using ME3Explorer - as an end-user you should never have to use ME3Explorer,");
-                        addDiagLine("[ERROR]      even for AutoTOC. You can run AutoTOC in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
-                    }
 
-                    else
-                    {
-                        addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                        if (hasSfarSizeError && MEMI_FOUND)
+                        {
+                            addDiagLine("[ERROR]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                            addDiagLine("[ERROR]      SFAR is not the MEM unpacked size. Unpacked DLC by MEM will be 32 bytes, however this SFAR is " + ByteSize.FromBytes(sfarsize) + ".");
+                            addDiagLine("[ERROR]      If HQ graphics settings are on (ALOT/MEUITM was found, so it should be) this will very often be a source of the game crashing.");
+                            addDiagLine("[ERROR]      You may also see this error if you unpacked DLC using ME3Explorer - as an end-user you should never have to use ME3Explorer,");
+                            addDiagLine("[ERROR]      even for AutoTOC. You can run AutoTOC in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
+                        }
+
+                        else
+                        {
+                            addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
+                        }
                     }
                     if (duplicatePriorityStr != "")
                     {
