@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.1.11">
+<alotaddonmanifest version="5.1.12">
 <!-- This is unused in beta and should not be ported to stable. Make sure when porting to stable that soak test and highest stable are set. -->
    <soaktestingmemversion soakstartdate="2018-05-03">129</soaktestingmemversion> 
    <stages>
@@ -140,7 +140,7 @@
       <packagefile me1="true" sourcename="ALOT_ME1_v6.mem" movedirectly="true" />
    </addonfile>
    <addonfile appliestomainversion="6" alotupdateversion="1" friendlyname="ALOT for ME1 6.1 - Update" tooltipname="ALOT for ME1 6.1 - Update" author="CreeperLava">
-      <file downloadlink="https://mega.nz/#F!40VXCbjb!547qvMRc2T9Vbpi6D3_fhA" filename="ALOT for ME1 6.1 - Update-83-2018-6-1.zip" size="17620106" md5="acfe1afcfc0e5ea7906882c4e4d193b4" />
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83?tab=files" filename="ALOT for ME1 6.1 - Update-83-2018-6-1.zip" size="139593755" md5="23890dbaf2b717ecb8103c923a58b7a2" />
       <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v6.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="6" friendlyname="ALOT for ME2 6.0 - Textures" tooltipname="ALOT for ME2 6.0 - Textures" author="CreeperLava">
@@ -148,7 +148,7 @@
       <packagefile me2="true" sourcename="ALOT_ME2_v6.mem" movedirectly="true" />
    </addonfile>
    <addonfile appliestomainversion="6" alotupdateversion="8" friendlyname="ALOT for ME2 6.8 - Update" author="CreeperLava">
-      <file downloadlink="https://mega.nz/#F!40VXCbjb!547qvMRc2T9Vbpi6D3_fhA" filename="ALOT for ME2 6.8 - Update-68-2018-6-8.zip" tooltipname="ALOT for ME2 6.8 - Update" size="462582119" md5="ef636873a5c005d359cc987cb6a0c3ad" />
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 6.8 - Update-68-2018-6-8.zip" tooltipname="ALOT for ME2 6.8 - Update" size="659216448" md5="e8ad869df4cef181b806e50c3a8ce963" />
       <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v6.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="6" friendlyname="ALOT for ME3 6.0 - Textures" tooltipname="ALOT for ME3 6.0 - Textures" author="CreeperLava">
@@ -156,7 +156,7 @@
       <packagefile me3="true" sourcename="ALOT_ME3_v6.mem" movedirectly="true" />
    </addonfile>
    <addonfile appliestomainversion="6" alotupdateversion="4" friendlyname="ALOT for ME3 6.4 - Update" tooltipname="ALOT for ME3 6.4 - Update" author="CreeperLava">
-      <file downloadlink="https://mega.nz/#F!40VXCbjb!547qvMRc2T9Vbpi6D3_fhA" filename="ALOT for ME3 6.4 - Update-363-2018-6-4.zip" size="252621425" md5="03a4b87e4a9c93edd20c9b3989a496b9" />
+      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" filename="ALOT for ME3 6.4 - Update-363-2018-6-4.zip" size="1001834111" md5="6dacad0a584e5d1dfbee4aff199ee162" />
       <packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v6.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Scalp Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
