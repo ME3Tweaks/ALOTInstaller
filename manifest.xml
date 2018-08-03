@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.0.25">
+<alotaddonmanifest version="5.2.0">
    <highestapprovedmemversion>137</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-05-27">137</soaktestingmemversion>
    <stages>
@@ -34,12 +34,17 @@
          <failureinfo resultcode="-55" failedtopmessage="Failed to install remaining ALOT markers" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during application of ALOT markers on non-modded files. Please see installer log for more info. The game is in a functional but texture settings and proper markers have not been applied." />
       </stage>
    </stages>
+   <repackoptions me2repackenabled="true" me3repackenabled="true" />
+   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
+   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
+   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps." />
+   <tutorial link="https://ianmooreisme.github.io/ALOT-Comparisons/" text="Comparison Screenshots" tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore." />
    <!-- Executables with hashes that are not in the list are almost always pirated and are not supported.-->
    <supportedhashes>
       <supportedhash game="me1" name="Steam">647b93621389709cab8d268379bd4c47</supportedhash>
       <supportedhash game="me1" name="Steam, MEM patched">78ac3d9b4aad1989dae74505ea65aa6c</supportedhash>
-      <supportedhash game="me1" name="Origin">ff1f894fa1c2dbf4d4b9f0de85c166e5</supportedhash>
       <supportedhash game="me1" name="Origin, MEM patched">2390143503635f3c4cfaed0afe0b8c71</supportedhash>
+      <supportedhash game="me1" name="Origin">ff1f894fa1c2dbf4d4b9f0de85c166e5</supportedhash>
       <supportedhash game="me1" name="DVD">73b76699d4e245c92110a93c54980b78</supportedhash>
       <supportedhash game="me1" name="DVD, Polish">298c30a399d0959e5e997a9d64b42548</supportedhash>
       <supportedhash game="me2" name="Origin, ME2Game/MassEffect2 swapped">73827026bc9629562c4a3f61a752541c</supportedhash>
@@ -50,11 +55,7 @@
       <supportedhash game="me3" name="Origin">1d09c01c94f01b305f8c25bb56ce9ab4</supportedhash>
       <supportedhash game="me3" name="Origin (Alternate)">90d51c84b278b273e41fbe75682c132e</supportedhash>
    </supportedhashes>
-   <repackoptions me2repackenabled="true" me3repackenabled="true" />
-   <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
-   <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
-   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps." />
-   <tutorial link="https://ianmooreisme.github.io/ALOT-Comparisons/" text="Comparison Screenshots" tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore." />
+   <!-- Addon files -->
    <addonfile meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" author="CDAMJC">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" tooltipname="MEUITM Anniversary Edition Direct Download" filename="Mass Effect Anniversary Edition Direct Download-1-2.7z" size="2974978097" md5="3e33c8e2e3ded44a2c15742fd6dfac07" />
       <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
@@ -138,21 +139,33 @@
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83?tab=files" tooltipname="ALOT for ME1 6.0 - Textures" filename="ALOT for ME1 - Textures-83-2018-6-0.zip" unpackedsinglefilename="ALOT_ME1_v6.mem" size="448313463" md5="1d0ab6ce0f2ce1940619bf27aade24c2" />
       <packagefile me1="true" sourcename="ALOT_ME1_v6.mem" movedirectly="true" />
    </addonfile>
-   <addonfile alotversion="6" friendlyname="ALOT for ME2 6.0 - Textures" author="CreeperLava">
-      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" tooltipname="ALOT for ME2 6.0 - Textures" filename="ALOT for ME2 - Textures-68-2018-6-0.zip" unpackedsinglefilename="ALOT_ME2_v6.mem" size="3563362871" md5="c1ed3369c5ba8ae681166b2fb9bc7c14" />
+   <addonfile appliestomainversion="6" alotupdateversion="1" friendlyname="ALOT for ME1 6.1 - Update" tooltipname="ALOT for ME1 6.1 - Update" author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83?tab=files" filename="ALOT for ME1 6.1 - Update-83-2018-6-1.zip" size="139593755" md5="23890dbaf2b717ecb8103c923a58b7a2" />
+      <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v6.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile alotversion="6" friendlyname="ALOT for ME2 6.0 - Textures" tooltipname="ALOT for ME2 6.0 - Textures" author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 - Textures-68-2018-6-0.zip" unpackedsinglefilename="ALOT_ME2_v6.mem" size="3563362871" md5="c1ed3369c5ba8ae681166b2fb9bc7c14" />
       <packagefile me2="true" sourcename="ALOT_ME2_v6.mem" movedirectly="true" />
    </addonfile>
-   <addonfile appliestomainversion="6" alotupdateversion="7" friendlyname="ALOT for ME2 6.7 - Update" author="CreeperLava">
-      <file downloadlink="http://www.nexusmods.com/masseffect2/mods/68/?tab=files" tooltipname="ALOT for ME2 6.7 - Update" filename="ALOT for ME2 6.6 - Update-68-2018-6-7.zip" size="387026628" md5="7b72fd6e1645a50d369fcad3277c9ce9" />
+   <addonfile appliestomainversion="6" alotupdateversion="8" friendlyname="ALOT for ME2 6.8 - Update" author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 6.8 - Update-68-2018-6-8.zip" tooltipname="ALOT for ME2 6.8 - Update" size="659216448" md5="e8ad869df4cef181b806e50c3a8ce963" />
       <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v6.mem" movedirectly="true" />
    </addonfile>
-   <addonfile appliestomainversion="6" alotupdateversion="3" friendlyname="ALOT for ME3 6.3 - Update" author="CreeperLava">
-      <file downloadlink="http://www.nexusmods.com/masseffect3/mods/363/?tab=files" tooltipname="ALOT for ME3 6.3 - Update" filename="ALOT for ME3 6.3 - Update-363-2018-6-3.zip" size="122470426" md5="2b93efb98670d1cf77b15bb4db94a4a5" />
+   <addonfile alotversion="6" friendlyname="ALOT for ME3 6.0 - Textures" tooltipname="ALOT for ME3 6.0 - Textures" author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" filename="ALOT for ME3 - Textures-363-2018-6-0.zip" unpackedsinglefilename="ALOT_ME3_v6.mem" size="5789453175" md5="2915d3d37ebe655defb541b974a7fa72" />
+      <packagefile me3="true" sourcename="ALOT_ME3_v6.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="6" alotupdateversion="4" friendlyname="ALOT for ME3 6.4 - Update" tooltipname="ALOT for ME3 6.4 - Update" author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" filename="ALOT for ME3 6.4 - Update-363-2018-6-4.zip" size="1001834111" md5="6dacad0a584e5d1dfbee4aff199ee162" />
       <packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v6.mem" movedirectly="true" />
    </addonfile>
-   <addonfile alotversion="6" friendlyname="ALOT for ME3 6.0 - Textures" author="CreeperLava">
-      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" tooltipname="ALOT for ME3 6.0 - Textures" filename="ALOT for ME3 - Textures-363-2018-6-0.zip" unpackedsinglefilename="ALOT_ME3_v6.mem" size="5789453175" md5="2915d3d37ebe655defb541b974a7fa72" />
-      <packagefile me3="true" sourcename="ALOT_ME3_v6.mem" movedirectly="true" />
+   <addonfile friendlyname="ME1 Improved Scalp Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/2" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
+      <packagefile me1="true" sourcename="ME1 Improved Bun Textures (CDAMJC Cut).tpf" movedirectly="true" />
+   </addonfile>
+   <addonfile friendlyname="ME2 Improved Bun Textures (A.L.O.T.)" author="LiasFfalenn">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/186" filename="ME2 Improved Bun Textures (A.L.O.T.)-186-1-0.zip" size="21032486" md5="d2d65c0e9af23c66806804d68feae800" />
+      <packagefile me2="true" sourcename="ME2 Improved Bun Textures (ALOT).tpf" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Allers Complexion Tweak" author="Ellise" optional="true">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?" filename="el_AllersComplexionTweak.7z-580-1-0.7z" md5="d9f3b8f6f63132d86690835a3c766c44" size="8994633" />
@@ -175,6 +188,11 @@
       <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Diff_0xCB14400D.dds" destinationname="0xCB14400D.dds" />
       <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Norm_0x413007EA.dds" destinationname="0x413007EA.dds" />
       <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Spec_0x3B912C80.dds" destinationname="0x3B912C80.dds" />
+   </addonfile>
+   <!-- Temporary addition to the addon, until the MEUITM installer is updated to support -mark-to-convert -->
+   <addonfile friendlyname="Improved Lightmaps and Shadowmaps" author="CDAMJC, CreeperLava">
+      <file downloadlink="https://mega.nz/#!ZxtBVZ4I!lAgTwkHhnnuMYGbpNCVGf7sH801DYTWs-l7CYvRE1DY" tooltipname="LightandShadowMaps.zip" filename="LightandShadowMaps.zip" md5="76333a21b63d73d1279f138f82c59825" size="66654044" />
+      <packagefile me1="true" sourcename="LightandShadowMaps.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Ashley Complexion Tweak" author="Ellise" optional="true">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?" tooltipname="Ash Complexion Tweak - .MEM" filename="el_Ashley Complexion Tweak.7z-569-1-0.7z" md5="e8a4283b6242aff68227bfc8bb145899" size="10154183" />
@@ -216,16 +234,27 @@
       <games me1="false" me2="true" me3="false" />
    </addonfile>
    <addonfile friendlyname="FemShep High Quality textures" author="heleuss" optional="true">
-      <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
-      <packagefile me2="true" sourcename="[ME2] KH_femShep_eyes.tpf" movedirectly="true" />
-      <packagefile me2="true" sourcename="[ME2] KH_femShep_eyebrows.tpf" movedirectly="true" />
-      <packagefile me2="true" sourcename="[ME2] KH_femShep_eyelashes.tpf" movedirectly="true" />
-      <packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true" />
-      <packagefile me2="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" movedirectly="true" />
+     <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
+     <packagefile me2="true" sourcename="[ME2] KH_femShep_eyes.tpf" movedirectly="true" />
+	 <packagefile me1="true" sourcename="[ME2] KH_femShep_eyes.tpf" delete="true" />
+     <packagefile me1="true" me2="true" sourcename="[ME2] KH_femShep_eyebrows.tpf" movedirectly="true" />
+     <packagefile me1="true" me2="true" sourcename="[ME2] KH_femShep_eyelashes.tpf" movedirectly="true" />
+     <packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true" />
+     <packagefile me2="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" movedirectly="true" />
+     <packagefile me1="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" delete="true" />
+     <packagefile me1="true" sourcename="HMF_HED_PROBase_Face_Diff_0x9CA124E8.dds" destinationname="0x8F331825.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Frek_Diff_0x2A01319D.dds" destinationname="0x2CC6F67C.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Frek_Norm_0xBA928949.dds" destinationname="0xA5C11535.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Military_Diff_0x9E76BE04.dds" destinationname="0x5B79C364.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Military_Norm_0x35E34BA6.dds" destinationname="0xF6A39457.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Rough_Diff_0xAA133987.dds" destinationname="0x1365F4C4.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Rough_Norm_0x6DB1C814.dds" destinationname="0x999F0526.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROOld1_Face_Diff_0x0DF18845.dds" destinationname="0xED9E4F99.dds" />
+     <packagefile me1="true" sourcename="HMF_HED_PROOld1_Face_Norm_0xE9EED499.dds" destinationname="0x8B6D4AA7.dds" />
    </addonfile>
    <addonfile friendlyname="BroShep High Quality textures" author="heleuss" optional="true">
-      <file downloadlink="https://www.dropbox.com/s/g6wg6v7uy8y7x15/%5BME2%5D%20broShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] broShep High Quality textures.7z" size="11802235" md5="4a220058d12c0c125a27a1d30bfff937" />
-      <packagefile me2="true" sourcename="[ME2] KH_broShep_face_textures.tpf" movedirectly="true" />
+     <file downloadlink="https://www.dropbox.com/s/g6wg6v7uy8y7x15/%5BME2%5D%20broShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] broShep High Quality textures.7z" size="11802235" md5="4a220058d12c0c125a27a1d30bfff937" />
+     <packagefile me1="true" me2="true" sourcename="[ME2] KH_broShep_face_textures.tpf" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="HR Phoenix Armor" author="Ottemis">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/9" filename="Medium Phoenix Female-9-1-0.rar" md5="bb70d844d5ff871fcdc231fb3d744642" size="17207706" />
@@ -265,13 +294,13 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE999983A.dds" destinationname="WPN_BLSb_Tint_0xE999983A.dds" />
       <packagefile me2="true" sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds" destinationname="WPN_BLSb_Diff_0xA56179D6.dds" />
    </addonfile>
-   <addonfile friendlyname="HR Carnifex Texture" author="TheDarkFalkon">
+   <addonfile friendlyname="HR Carnifex Texture" author="TheDarkFalkon" optional="true">
       <file downloadlink="https://mega.nz/#!JlEFnSIQ!LIblPk7G2vB9gdtgekfXQ6HqteGlzM9U-EaW9iJkG5A" tooltipname="WpnCarnifex_HRv1.5.zip" filename="WpnCarnifex_HRv1.5.zip" size="4216670" md5="8064c75754b4e3d6cedad3a0fed6ef29" />
       <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x073BF3F5.dds" destinationname="WPN_PSTb_Spec_0x073BF3F5.dds" />
       <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0x6085274E.dds" destinationname="WPN_PSTb_Diff_0x6085274E.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x809FC86B.dds" destinationname="WPN_PSTb_Tint_0x809FC86B.dds" />
    </addonfile>
-   <addonfile friendlyname="HR Paladin Texture" author="TheDarkFalkon">
+   <addonfile friendlyname="HR Paladin Texture" author="TheDarkFalkon" optional="true">
       <file downloadlink="https://mega.nz/#!40UjWa6J!0czjbA-lxW0Rb5yk5HOojS2Zlx78Jc6qRsHxgDpDb3Q" tooltipname="WpnPaladin_HRv1.5.zip" filename="WpnPaladin_HRv1.5.zip" size="2694764" md5="f13bddb44806d106b61bb0c3a80d66d4" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x498B35ED.dds" destinationname="WPN_PSTm_Diff_0x498B35ED.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB8151BBB.dds" destinationname="WPN_PSTm_Spec_0xB8151BBB.dds" />
@@ -346,7 +375,6 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0AAE60A2_hahne_sld_norm.dds" destinationname="HMM_ARM_SHPf_Sld_Norm_0x0AAE60A2.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0DD2FAEE_hahne_tor_diff.dds" destinationname="HMM_ARM_SHPf_Tor_Diff_0x0DD2FAEE.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0E371AB7_Rosen_chest_norm.dds" destinationname="HMM_ARM_SHPe_Tor_Norm_0x0E371AB7.dds" />
-      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x12686E6D_N7arm_Male_Tint.dds" destinationname="HMM_ARM_SHPa_Slv_Tint_0x12686E6D.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x127FF465_Kassa_chest_Strp.dds" destinationname="HMM_ARM_SHPb_Tor_Strp_0x127FF465.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x12CE0A29_Serrice_Sld.dds" destinationname="HMM_ARM_SHPc_Sld_Diff_0x12CE0A29.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x183653DB_Kassa_arm_Spec.dds" destinationname="HMM_ARM_SHPb_Slv_Spec_0x183653DB.dds" />
@@ -533,14 +561,12 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6A278A65_table.dds" destinationname="TableCoffee01_Diff_0x6A278A65.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x70ABACED_planter_norm.dds" destinationname="Planter02_S_Norm_0x70ABACED.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x72F75189_planter.dds" destinationname="Planter01a_Diff_0x72F75189.dds" />
-      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7A48D080_treetrunk.dds" destinationname="DreamTree01_Diff_0x87F9B25D.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7A48D080_treetrunk.dds" destinationname="DreamTree01_DiffDreamTree01_Diff_0x7A48D080.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7A700133_hovercar_interior_diff.dds" destinationname="HoverCar01_Int_Diff_Cine_0x7A700133.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7D4BE270_plant-norm.dds" destinationname="FoliageSheet_Norm_0x7D4BE270.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x83F5DD08_plating_arrow.dds" destinationname="Cit_Trims_Diff_0x83F5DD08.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x858741E4_trunknorm.dds" destinationname="DreamTree01_Norm_0x91EAF5D3.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x858741E4_trunknorm.dds" destinationname="DreamTree01_NormDreamTree01_Diff_0x858741E4.dds" />
-      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9107C8CB_keyboard.dds" destinationname="H_keyboard_tex_0x9107C8CB.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x919369D5_laptop1.dds" destinationname="Computer02_Diff_0x919369D5.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x94C513D7_plating.dds" destinationname="PRS_TRIMS02_DIFF_0x94C513D7.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x95405B07_tiles.dds" destinationname="Cit_Floor_05_Diff_0x95405B07.dds" />
@@ -613,14 +639,14 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAF098936_Female_norm.dds" destinationname="HMM_ARM_CTHi_NORM_0xAF098936.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF750CD22_Female_Blood.dds" destinationname="HMM_ARM_CTHi_Diff_0xF750CD22.dds" />
    </addonfile>
-   <addonfile friendlyname="Garrus Face" author="Ottemis">
+   <addonfile friendlyname="Garrus Alternate Armor" author="Ottemis">
       <file downloadlink="http://www.nexusmods.com/masseffect3/mods/6" tooltipname="ME3 HR Garrus Alternate Armor" filename="ME3 HR Garrus Alternate Armor for Texmod-6-1-0.rar" md5="8307706883e83548e8e6df429b3a95f8" size="50163265" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x00D06559_Gar_alt_norm.dds" destinationname="TUR_ARM_GARb_Norm_0x00D06559.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x06675BBF_Gar_alt_spec.dds" destinationname="TUR_ARM_GARb_Spec_0x06675BBF.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB2650E4C_Gar_alt_diff.dds" destinationname="TUR_ARM_GARb_Diff_0xB2650E4C.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xBC526E87_helm_alt_diff.dds" destinationname="TUR_HGRb_Garrus_Diff_0xBC526E87.dds" />
    </addonfile>
-   <addonfile friendlyname="HR Kai Leng" author="Ottemis">
+   <addonfile friendlyname="Kai Leng" author="Ottemis">
       <file downloadlink="http://www.nexusmods.com/masseffect3/mods/276" filename="HR Kai Leng-276-1-0.rar" md5="331fe235edc45f9b3b60386522dc35b5" size="29162477" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x123B4AC0_Shadow_Sword_norm.dds" destinationname="WPN_MLEa_Norm_0x123B4AC0.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x819EE45D_shade_kai.dds" destinationname="HMM_ARM_LENGa_Diff_0x819EE45D.dds" />
