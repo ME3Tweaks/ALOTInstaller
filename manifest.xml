@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.2.0">
+<alotaddonmanifest version="5.2.1">
    <highestapprovedmemversion>137</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-05-27">137</soaktestingmemversion>
    <stages>
@@ -140,7 +140,7 @@
       <packagefile me1="true" sourcename="ALOT_ME1_v6.mem" movedirectly="true" />
    </addonfile>
    <addonfile appliestomainversion="6" alotupdateversion="1" friendlyname="ALOT for ME1 6.1 - Update" tooltipname="ALOT for ME1 6.1 - Update" author="CreeperLava">
-      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83?tab=files" filename="ALOT for ME1 6.1 - Update-83-2018-6-1.zip" size="139593755" md5="23890dbaf2b717ecb8103c923a58b7a2" />
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83?tab=files" filename="ALOT for ME1 6.1 - Update-83-2018-6-1.zip" size="34807573" md5="23890dbaf2b717ecb8103c923a58b7a2" />
       <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v6.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="6" friendlyname="ALOT for ME2 6.0 - Textures" tooltipname="ALOT for ME2 6.0 - Textures" author="CreeperLava">
