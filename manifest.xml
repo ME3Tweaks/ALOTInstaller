@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.2.2">
+<alotaddonmanifest version="5.2.3">
    <highestapprovedmemversion>137</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-08-15">140</soaktestingmemversion>
    <stages>
@@ -315,14 +315,6 @@
       <file downloadlink="https://mega.nz/#!Ald1iIQJ!Emkz041FtD4M43HUcU-zx0glyhEBe4a2dU22klCAG_w" tooltipname="WpnCain_HRv1.7.zip" filename="WpnCain_HRv1.7.zip" size="4010295" md5="500c968c87ebe44e05f25de5294c3d07" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x637DADD4.dds" destinationname="WPN_HVYb_Diff_0x637DADD4.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds" />
-   </addonfile>
-   <addonfile friendlyname="HD M-8 Avenger" author="TheDarkFalkon">
-      <file downloadlink="https://onedrive.live.com/?cid=12B53096D995629D&amp;id=12B53096D995629D%21617&amp;parId=12B53096D995629D%21574&amp;o=OneUp" filename="Weapon M-8 Avenger  HD OPTIMIZED 2 by TheDarkFalkon.tpf" size="10213317" md5="6a63926a81cf24c36f3dddd0a43d57d1" />
-      <packagefile me2="true" me3="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0xB3CBFCAB.dds" />
-      <packagefile me2="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_Stack_0x3400C716.dds" />
-      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8BA3F0F1.dds" destinationname="WPN_ASLa_Tint_0x8BA3F0F1.dds" />
-      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB3CBFCAB.dds" destinationname="WPN_ASLa_Diff_0x1843668E.dds" />
-      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB617BCBE.dds" destinationname="WPN_ASLa_Spec_0xB617BCBE.dds" />
    </addonfile>
    <addonfile friendlyname="HR M-92 Mantis" author="TheDarkFalkon">
       <file downloadlink="https://onedrive.live.com/?cid=12B53096D995629D&amp;id=12B53096D995629D%21626&amp;parId=12B53096D995629D%21574&amp;o=OneUp" filename="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf" size="11565964" md5="47ff496f6b46ee2458d2a5f66031cd30" />
