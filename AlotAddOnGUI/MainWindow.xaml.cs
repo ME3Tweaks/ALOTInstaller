@@ -234,10 +234,19 @@ namespace AlotAddOnGUI
             InitializeComponent();
             LoadSettings();
             MEUITM_INSTALLER_MODE = App.BootMEUITMMode; //installer state defaults to boot setting
-            //if (MEUITM_INSTALLER_MODE)
-            //{
-            //    MEUITM_Flyout.IsOpen = true;
-            //}
+
+            if (MEUITM_INSTALLER_MODE)
+            {
+                Button_InstallME2.Visibility = Visibility.Collapsed;
+                Button_InstallME3.Visibility = Visibility.Collapsed;
+                Button_InstallME1.SetValue(Grid.ColumnSpanProperty, 3);
+                Panel_ALOTFiltering.Visibility = Visibility.Collapsed;
+            } else
+            {
+                Button_SwitchToALOTMode.Visibility = Visibility.Collapsed;
+                Panel_ALOTFiltering.Visibility = Visibility.Visible;
+
+            }
             Title = "ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             HeaderLabel.Text = "Preparing application...";
             AddonFilesLabel.Text = "Please wait";
@@ -882,11 +891,11 @@ namespace AlotAddOnGUI
 
                 }
             }
-            if (MEUITM_INSTALLER_MODE)
+          /*  if (MEUITM_INSTALLER_MODE)
             {
                 MEUITM_Flyout_BootPanel.Visibility = Visibility.Collapsed;
                 MEUITM_Flyout_InstallOptionsPanel.Visibility = Visibility.Visible;
-            }
+            } */
             Log.Information("PerformPostStartup() has completed. We are now switching over to user control.");
         }
 
@@ -4779,7 +4788,12 @@ namespace AlotAddOnGUI
         {
             Log.Information("Exiting MEUITM mode.");
             MEUITM_INSTALLER_MODE = false;
-            MEUITM_Flyout.IsOpen = false;
+            Button_SwitchToALOTMode.Visibility = Visibility.Collapsed;
+            Panel_ALOTFiltering.Visibility = Visibility.Visible;
+            Button_InstallME1.SetValue(Grid.ColumnSpanProperty, 1);
+            Button_InstallME2.Visibility = Visibility.Visible;
+            Button_InstallME3.Visibility = Visibility.Visible;
+            SetupButtons();
         }
 
         private void InstallMEUITM_Click(object sender, RoutedEventArgs e)

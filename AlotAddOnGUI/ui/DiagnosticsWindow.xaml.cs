@@ -412,7 +412,15 @@ namespace AlotAddOnGUI.ui
                     //Get Memory
                     string vidKey = @"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\";
                     vidKey += (vidCardIndex - 1).ToString().PadLeft(4, '0');
-                    object returnvalue = Registry.GetValue(vidKey, "HardwareInformation.qwMemorySize", 0L);
+                    object returnvalue = null;
+                    try
+                    {
+                        returnvalue = Registry.GetValue(vidKey, "HardwareInformation.qwMemorySize", 0L);
+                    }
+                    catch (Exception ex)
+                    {
+                        addDiagLine("~~~Warning: Unable to read memory size from registry. Reading from WMI instead (" + ex.GetType().ToString() + ")");
+                    }
                     string displayVal = "Unable to read value from registry";
                     if (returnvalue != null && (long)returnvalue != 0)
                     {
@@ -876,6 +884,28 @@ namespace AlotAddOnGUI.ui
                     }
                 }
 
+                if (DIAGNOSTICS_GAME == 2 || DIAGNOSTICS_GAME == 3)
+                {
+                    addDiagLine("===Texture File Cache (TFC) files");
+                    addDiagLine("The following unpacked TFC files are present in the game directory.");
+                    string[] tfcFiles = Directory.GetFiles(gamePath + "\\BIOGame", "*.tfc", SearchOption.AllDirectories);
+                    if (tfcFiles.Count() > 0)
+                    {
+                        int strOffset = (gamePath + "\\BIOGame").Length;
+                        foreach (string tfc in tfcFiles)
+                        {
+                            FileInfo fi = new FileInfo(tfc);
+                            long tfcSize = fi.Length;
+                            string tfcPath = tfc.Substring(strOffset);
+                            addDiagLine(" - " + tfcPath + ", " + ByteSize.FromBytes(tfcSize));
+                        }
+                    }
+                    else
+                    {
+                        addDiagLine("[ERROR]      No TFC files were found - is this installation broken?");
+                    }
+                }
+
                 string asidir = Path.Combine(Directory.GetParent(Utilities.GetGameEXEPath(DIAGNOSTICS_GAME)).ToString(), "asi");
                 addDiagLine("===Installed ASI mods");
                 if (Directory.Exists(asidir))
@@ -1032,7 +1062,8 @@ namespace AlotAddOnGUI.ui
                 }
 
                 e.Result = saveAndUploadDiag();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 addDiagLine("[ERROR]Exception occured while running diagnostic.");
                 addDiagLine(App.FlattenException(ex));
@@ -1060,7 +1091,9 @@ namespace AlotAddOnGUI.ui
             string args = "e \"" + diagfilename + "\" \"" + outfile + "\" -mt2";
             Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
             var lzmalog = File.ReadAllBytes(outfile);
-            var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag" }).ReceiveString().Result;
+            //string url = "https://vps.me3tweaks.com/alot/logupload2.php".SetQueryParams(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game = DIAGNOSTICS_GAME.ToString() });
+            //var responseString = url.GetStringAsync().Result;
+            var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game=DIAGNOSTICS_GAME.ToString() }).ReceiveString().Result;
             Uri uriResult;
             bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
                 && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);

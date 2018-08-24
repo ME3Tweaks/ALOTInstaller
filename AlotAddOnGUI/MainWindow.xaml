@@ -319,9 +319,12 @@
                                 <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Filtering"/>
                             </Expander.Header>
                             <StackPanel>
+                                <Button Name="Button_SwitchToALOTMode"  Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="Switch to ALOT mode"  Click="SwitchToALOTMode_Button_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                <StackPanel Name="Panel_ALOTFiltering">
                                 <Controls:ToggleSwitch x:Name="Switch_ME1Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect files" OnLabel="Show Mass Effect files" IsChecked="{Binding ShowME1Files}" ToolTip="Toggle showing files for Mass Effect"/>
                                 <Controls:ToggleSwitch x:Name="Switch_ME2Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 2 files" OnLabel="Show Mass Effect 2 files" IsChecked="{Binding ShowME2Files}" ToolTip="Toggle showing files for Mass Effect 2"/>
                                 <Controls:ToggleSwitch x:Name="Switch_ME3Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 3 files" OnLabel="Show Mass Effect 3 files" IsChecked="{Binding ShowME3Files}" ToolTip="Toggle showing files for Mass Effect 3"/>
+                                </StackPanel>
                             </StackPanel>
                         </Expander>
                         <Expander IsExpanded="True" Expanded="Expander_Expanded">
@@ -603,7 +606,7 @@
                     </StackPanel>
                 </Border>
             </Controls:Flyout>
-            <Controls:Flyout Name="MEUITM_Flyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
+           <!-- <Controls:Flyout Name="MEUITM_Flyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
                 <Border x:Name="MEUITMFlyout_Border">
                     <Border.Background>
                         <ImageBrush ImageSource="images/meuitm.jpg" AlignmentY="Center" Stretch="UniformToFill"/>
@@ -640,7 +643,7 @@
                         </StackPanel>
                     </StackPanel>
                 </Border>
-            </Controls:Flyout>
+            </Controls:Flyout>-->
             <Controls:Flyout Name="Utilities_Flyout" IsModal="True" SnapsToDevicePixels="True" TitleVisibility="Collapsed" Theme="Accent" CloseButtonVisibility="Collapsed" Position="Bottom" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}">
                 <StackPanel Margin="10">
                     <StackPanel.Resources>
