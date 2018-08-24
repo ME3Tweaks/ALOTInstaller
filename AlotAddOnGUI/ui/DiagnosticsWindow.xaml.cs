@@ -30,6 +30,8 @@ namespace AlotAddOnGUI.ui
     /// </summary>
     public partial class DiagnosticsWindow : MetroWindow
     {
+        private static bool HASH_SUPPORTED = false; //will set to true on hash check
+
         public const string SHOW_DIALOG_BAD_LOD = "SHOW_DIALOG_BAD_LOD";
         private const string SET_DIAG_TEXT = "SET_DIAG_TEXT";
         private const string SET_DIAGTASK_ICON_WORKING = "SET_DIAGTASK_ICON_WORKING";
@@ -292,7 +294,6 @@ namespace AlotAddOnGUI.ui
 
         private void PerformDiagnostics(object sender, DoWorkEventArgs e)
         {
-            bool hashSupported = false; //will set to true on hash check
             diagStringBuilder = new StringBuilder();
             string gamePath = Utilities.GetGamePath(DIAGNOSTICS_GAME);
             bool pairLog = false;
@@ -356,7 +357,7 @@ namespace AlotAddOnGUI.ui
                         {
                             string hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower();
                             addDiagLine("[EXEHASH-" + DIAGNOSTICS_GAME + "]" + hash);
-                            hashSupported = Utilities.CheckIfHashIsSupported(DIAGNOSTICS_GAME, hash);
+                            HASH_SUPPORTED = Utilities.CheckIfHashIsSupported(DIAGNOSTICS_GAME, hash);
                             addDiagLine(Utilities.GetGameSourceByHash(DIAGNOSTICS_GAME, hash));
                         }
                     }
@@ -963,8 +964,8 @@ namespace AlotAddOnGUI.ui
                     else
                     {
                         addDiagLine("[ERROR]Some files are larger than the listed TOC size. This typically won't happen unless you manually installed some files or an ALOT installation failed.");
-                        addDiagLine("[ERROR]The game will always hang while loading these files." + (hashSupported ? " You can regenerate the TOC files by using AutoTOC. If installation failed due a crash, this won't fix it." : ""));
-                        if (hashSupported) { addDiagLine("[ERROR]You can run AutoTOC in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC."); }
+                        addDiagLine("[ERROR]The game will always hang while loading these files." + (HASH_SUPPORTED ? " You can regenerate the TOC files by using AutoTOC. If installation failed due a crash, this won't fix it." : ""));
+                        if (HASH_SUPPORTED) { addDiagLine("[ERROR]You can run AutoTOC in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC."); }
                     }
                 }
 
@@ -1091,9 +1092,9 @@ namespace AlotAddOnGUI.ui
             string args = "e \"" + diagfilename + "\" \"" + outfile + "\" -mt2";
             Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
             var lzmalog = File.ReadAllBytes(outfile);
-            //string url = "https://vps.me3tweaks.com/alot/logupload2.php".SetQueryParams(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game = DIAGNOSTICS_GAME.ToString() });
+            //string url = "https://vps.me3tweaks.com/alot/logupload2.php".SetQueryParams(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game = DIAGNOSTICS_GAME.ToString(),HashSupported=HASH_SUPPORTED  });
             //var responseString = url.GetStringAsync().Result;
-            var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game=DIAGNOSTICS_GAME.ToString() }).ReceiveString().Result;
+            var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game=DIAGNOSTICS_GAME.ToString(), HashSupported=HASH_SUPPORTED }).ReceiveString().Result;
             Uri uriResult;
             bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
                 && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
