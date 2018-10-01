@@ -241,7 +241,8 @@ namespace AlotAddOnGUI
                 Button_InstallME3.Visibility = Visibility.Collapsed;
                 Button_InstallME1.SetValue(Grid.ColumnSpanProperty, 3);
                 Panel_ALOTFiltering.Visibility = Visibility.Collapsed;
-            } else
+            }
+            else
             {
                 Button_SwitchToALOTMode.Visibility = Visibility.Collapsed;
                 Panel_ALOTFiltering.Visibility = Visibility.Visible;
@@ -891,11 +892,11 @@ namespace AlotAddOnGUI
 
                 }
             }
-          /*  if (MEUITM_INSTALLER_MODE)
-            {
-                MEUITM_Flyout_BootPanel.Visibility = Visibility.Collapsed;
-                MEUITM_Flyout_InstallOptionsPanel.Visibility = Visibility.Visible;
-            } */
+            /*  if (MEUITM_INSTALLER_MODE)
+              {
+                  MEUITM_Flyout_BootPanel.Visibility = Visibility.Collapsed;
+                  MEUITM_Flyout_InstallOptionsPanel.Visibility = Visibility.Visible;
+              } */
             Log.Information("PerformPostStartup() has completed. We are now switching over to user control.");
         }
 
@@ -1943,7 +1944,8 @@ namespace AlotAddOnGUI
                 if (availablePagefiles.Count() > 0)
                 {
                     Log.Information("We have a usable page file - OK");
-                } else
+                }
+                else
                 {
                     Log.Error("We have no uncapped or available pagefiles to use! Very high chance application will run out of memory");
                     await this.ShowMessageAsync("Pagefile is off or size has been capped", "The system pagefile (virtual memory) settings are not currently managed by Windows, or the pagefile is off. ALOT Installer uses large amounts of memory and will very often run out of memory if virtual memory is capped or turned off.");
@@ -3312,13 +3314,11 @@ namespace AlotAddOnGUI
                 }
             }
             Log.Information("Files queued for import checks:");
-            foreach (String file in files)
+            foreach (string file in files)
             {
                 Log.Information(" - " + file);
             }
             List<Tuple<AddonFile, string, string>> filesToImport = new List<Tuple<AddonFile, string, string>>();
-            // Assuming you have one file that you care about, pass it off to whatever
-            // handling code you have defined.
             List<string> noMatchFiles = new List<string>();
             long totalBytes = 0;
             List<string> acceptableUserFiles = new List<string>();
@@ -3343,6 +3343,7 @@ namespace AlotAddOnGUI
                 bool hasMatch = false;
                 foreach (AddonFile af in alladdonfiles)
                 {
+                    if (af.Ready == true) continue; //don't process ready files
                     if (af.UserFile)
                     {
                         if (af.UserFilePath == file && af.Ready)
@@ -3354,37 +3355,36 @@ namespace AlotAddOnGUI
                         continue; //don't check these
                     }
                     bool isUnpackedSingleFile = af.UnpackedSingleFilename != null && af.UnpackedSingleFilename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file); //make sure not folder with same name.
-
-                    if (isUnpackedSingleFile || af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file)) //make sure folder not with same name
+                    bool mainFileExists = af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file);
+                    //This code can be removed when microsoft or nexusmods fixes their %20 bug
+                    bool msEdgeBugFileExists = af.Filename.Equals(fname.Replace("%20", " "), StringComparison.InvariantCultureIgnoreCase) && File.Exists(file);
+                    if (isUnpackedSingleFile || mainFileExists || msEdgeBugFileExists) //make sure folder not with same name
                     {
                         hasMatch = true;
-                        if (af.Ready == false)
+                        //Check size as validation
+                        if (!isUnpackedSingleFile && af.FileSize > 0)
                         {
-                            //Check size as validation
-                            if (!isUnpackedSingleFile && af.FileSize > 0)
+                            FileInfo fi = new FileInfo(file);
+                            if (fi.Length != af.FileSize)
                             {
-                                FileInfo fi = new FileInfo(file);
-                                if (fi.Length != af.FileSize)
-                                {
-                                    Log.Error("File to import has the wrong size: " + file + ", it should have size " + af.FileSize + ", but file to import is size " + fi.Length);
-                                    badSizeFiles.Add(file);
-                                    hasMatch = true;
-                                    continue;
-                                }
+                                Log.Error("File to import has the wrong size: " + file + ", it should have size " + af.FileSize + ", but file to import is size " + fi.Length);
+                                badSizeFiles.Add(file);
+                                hasMatch = true;
+                                continue;
                             }
-
-
-                            //Copy file to directory
-                            string basepath = DOWNLOADED_MODS_DIRECTORY + "\\";
-                            string destination = basepath + ((isUnpackedSingleFile) ? af.UnpackedSingleFilename : af.Filename);
-                            //Log.Information("Copying dragged file to downloaded mods directory: " + file);
-                            //File.Copy(file, destination, true);
-                            filesToImport.Add(Tuple.Create(af, file, destination));
-                            totalBytes += new System.IO.FileInfo(file).Length;
-                            //filesimported.Add(af);
-                            //timer_Tick(null, null);
-                            break;
                         }
+
+
+                        //Copy file to directory
+                        string basepath = DOWNLOADED_MODS_DIRECTORY + "\\";
+                        string destination = basepath + ((isUnpackedSingleFile) ? af.UnpackedSingleFilename : af.Filename);
+                        //Log.Information("Copying dragged file to downloaded mods directory: " + file);
+                        //File.Copy(file, destination, true);
+                        filesToImport.Add(Tuple.Create(af, file, destination));
+                        totalBytes += new System.IO.FileInfo(file).Length;
+                        //filesimported.Add(af);
+                        //timer_Tick(null, null);
+                        break;
                     }
                 }
                 if (!hasMatch)
@@ -4213,14 +4213,28 @@ namespace AlotAddOnGUI
                 }
                 Log.Information("Number of files not ready: " + addonFilesNotReady.Count);
                 string[] files = Directory.GetFiles(DOWNLOADS_FOLDER);
+                var filesImporting = new List<AddonFile>(); //used to prevent duplicate imports when dealing with (1) and %20
                 foreach (string file in files)
                 {
                     string fname = Path.GetFileName(file); //we do not check duplicates with (1) etc
+                    //remove (1) and such
+                    string fnameWithoutExtension = Path.GetFileNameWithoutExtension(file);
+                    if (fnameWithoutExtension.EndsWith(")"))
+                    {
+                        if (fnameWithoutExtension.LastIndexOf("(") >= fnameWithoutExtension.Length - 3)
+                        {
+                            //it's probably a copy
+                            fname = fnameWithoutExtension.Remove(fnameWithoutExtension.LastIndexOf("("), fnameWithoutExtension.LastIndexOf(")") - fnameWithoutExtension.LastIndexOf("(") + 1).Trim() + Path.GetExtension(file);
+                            Log.Information("Import from downloads folder filename corrected to " + fname);
+                        }
+                    }
+
                     foreach (AddonFile af in addonFilesNotReady)
                     {
-                        if (fname == af.Filename)
+                        if (!filesImporting.Contains(af) && (fname == af.Filename || fname.Replace("%20", " ") == af.Filename)) //MSEdge %20 bug
                         {
                             filelist.Add(file);
+                            filesImporting.Add(af);
                             break;
                         }
                     }
