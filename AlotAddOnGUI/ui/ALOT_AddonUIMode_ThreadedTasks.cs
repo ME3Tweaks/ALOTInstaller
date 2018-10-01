@@ -1831,7 +1831,7 @@ namespace AlotAddOnGUI
                     string howToFixStr = "You must restore your game using the ALOT Installer restore feature, or delete your game installation(do not uninstall or repair) to fully remove leftover files.";
                     if (Utilities.GetGameBackupPath(game) == null)
                     {
-                        howToFixStr = "You must delete your current game installation game installation (do not uninstall or repair) to fully remove leftover files. You can use the ALOT Installer backup feature to backup a vanilla game once this is done.";
+                        howToFixStr = "You must delete your current game installation (do not uninstall or repair) to fully remove leftover files. You can use the ALOT Installer backup feature to backup a vanilla game once this is done.";
                     }
 
                     await this.ShowMessageAsync("Leftover files detected", "Files from a previous ALOT installation were detected and will cause installation to fail. " + howToFixStr);

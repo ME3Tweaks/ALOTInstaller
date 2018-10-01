@@ -3087,7 +3087,7 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("Previous installation file found: " + path);
                     Log.Error("Game was not removed before reinstallation or was \"fixed\" using a game repair");
-                    string howToFixStr = "You must delete your current game installation game installation (do not uninstall or repair) to fully remove leftover files. You can use the ALOT Installer backup feature to backup a vanilla game once this is done.";
+                    string howToFixStr = "You must delete your current game installation (do not uninstall or repair) to fully remove leftover files. You can use the ALOT Installer backup feature to backup a vanilla game once this is done.";
                     await this.ShowMessageAsync("Leftover files detected", "Files from a previous ALOT installation were detected and will cause installation to fail. " + howToFixStr);
                     return;
                 }
