@@ -56,11 +56,11 @@
                 <Image x:Name="Image_Upload" Source="../images/waiting.png" Height="15"/>
                 <TextBlock x:Name="TextBlock_Upload" Text="Upload diagnostic for viewing" Margin="3"/>
             </StackPanel>
-            
             <Button x:Name="Button_Close" Visibility="Hidden" Content="Close" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Margin="8" Click="CloseButton_Click"/>
 
         </StackPanel>
         <TextBlock x:Name="DiagnosticHeader" Text="Select which game you are generating diagnostics for." HorizontalAlignment="Center" TextAlignment="Center"/>
+        <TextBox MaxLines="1" Name="ManualLink_Textbox" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" IsReadOnly="True" Visibility="Collapsed"/>
 
     </StackPanel>
 </Controls:MetroWindow>

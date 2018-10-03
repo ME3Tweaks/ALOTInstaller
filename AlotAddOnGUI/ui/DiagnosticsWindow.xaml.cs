@@ -276,7 +276,18 @@ namespace AlotAddOnGUI.ui
                 {
                     Clipboard.SetText((string)e.Result);
                     DiagnosticHeader.Text = "Diagnostic completed.\nLink to the result has been copied to the clipboard.";
-                    System.Diagnostics.Process.Start((string)e.Result);
+                    try
+                    {
+                        System.Diagnostics.Process.Start((string)e.Result);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("Error opening diagnostic result:");
+                        Log.Error(App.FlattenException(ex));
+                        DiagnosticHeader.Text = "Diagnostic completed.\nOpen the following link to view the result.";
+                        ManualLink_Textbox.Text = (string)e.Result;
+                        ManualLink_Textbox.Visibility = Visibility.Visible;
+                    }
                     Image_Upload.Source = new BitmapImage(new Uri(@"../images/greencheckmark.png", UriKind.Relative));
                 }
                 else
@@ -1094,7 +1105,7 @@ namespace AlotAddOnGUI.ui
             var lzmalog = File.ReadAllBytes(outfile);
             //string url = "https://vps.me3tweaks.com/alot/logupload2.php".SetQueryParams(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game = DIAGNOSTICS_GAME.ToString(),HashSupported=HASH_SUPPORTED  });
             //var responseString = url.GetStringAsync().Result;
-            var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game=DIAGNOSTICS_GAME.ToString(), HashSupported=HASH_SUPPORTED }).ReceiveString().Result;
+            var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game = DIAGNOSTICS_GAME.ToString(), HashSupported = HASH_SUPPORTED }).ReceiveString().Result;
             Uri uriResult;
             bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
                 && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
