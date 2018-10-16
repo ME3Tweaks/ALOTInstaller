@@ -990,6 +990,7 @@ namespace AlotAddOnGUI
                 }
                 if (result != INSTALL_OK)
                 {
+                    InstallingOverlay_Tip.Visibility = Visibility.Collapsed;
                     Button_InstallViewLogs.Visibility = System.Windows.Visibility.Visible;
                     Log.Error("Installation result: Error occured");
                     var uriSource = new Uri(@"images/redx_large.png", UriKind.Relative);
