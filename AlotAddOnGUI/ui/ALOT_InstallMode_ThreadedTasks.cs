@@ -50,6 +50,7 @@ namespace AlotAddOnGUI
         private const int RESULT_UNKNOWN_ERROR = -51;
         private const int RESULT_SCAN_FAILED = -52;
         private const int RESULT_BIOGAME_MISSING = -53;
+        private const int RESULT_SET_READWRITE_FAILED = -54;
 
         private const string SHOW_ALL_STAGE_LABELS = "SHOW_ALL_STAGE_LABELS";
         private const string HIDE_STAGE_OF_STAGE_LABEL = "HIDE_STAGE_OF_STAGE_LABEL";
@@ -390,7 +391,12 @@ namespace AlotAddOnGUI
                 e.Result = RESULT_BIOGAME_MISSING;
                 return;
             }
-            Utilities.MakeAllFilesInDirReadWrite(Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\BIOGame");
+            bool filesSetRWOK = Utilities.MakeAllFilesInDirReadWrite(Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\BIOGame");
+            if (!filesSetRWOK)
+            {
+                e.Result = RESULT_SET_READWRITE_FAILED;
+                return;
+            }
             Log.Information("Files being installed in this installation session:");
             AddonFile alotMainFile = null;
             AddonFile alotUpdateFile = null;
@@ -925,6 +931,13 @@ namespace AlotAddOnGUI
                             InstallingOverlay_TopLabel.Text = "BIOGame directory is missing";
                             InstallingOverlay_BottomLabel.Text = "Game needs to be reinstalled, see logs";
                             HeaderLabel.Text = "BIOGame directory is missing. This means the installation is completely unusable.\nCheck logs for more information about this.";
+                            break;
+                        }
+                    case RESULT_SET_READWRITE_FAILED:
+                        {
+                            InstallingOverlay_TopLabel.Text = "Setting files read/write failed";
+                            InstallingOverlay_BottomLabel.Text = "Game may be nested too deep or mod not properly installed";
+                            HeaderLabel.Text = "Error occured setting files to read/write - this is typically a sign that a mod is improperly installed\nor the game is nested too deep in the filesystem. This is due to a limitation in the Windows API.\nReview the log for more information on what the problematic files are.";
                             break;
                         }
                     case RESULT_MARKERCHECK_FAILED:
