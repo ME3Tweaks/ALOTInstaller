@@ -3374,7 +3374,6 @@ namespace AlotAddOnGUI
                             }
                         }
 
-
                         //Copy file to directory
                         string basepath = DOWNLOADED_MODS_DIRECTORY + "\\";
                         string destination = basepath + ((isUnpackedSingleFile) ? af.UnpackedSingleFilename : af.Filename);

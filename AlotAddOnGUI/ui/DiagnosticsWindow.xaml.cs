@@ -1146,7 +1146,7 @@ namespace AlotAddOnGUI.ui
             if (LodItems.IsDefault())
             {
                 //not found
-                return "error";
+                return "Could not find TEXTUREGROUP_Character_1024 in config file.";
             }
             var HQLine = "High quality texture LOD settings appear to be set - game will be able to request higher resolution mips." + Environment.NewLine;
             var HQSettingsMissingLine = " - DIAG ERROR: High quality texture LOD settings appear to be missing, but a high resolution texture mod appears to be installed. The game will not use these new high quality assets - config file was probably deleted." + Environment.NewLine;
