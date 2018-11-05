@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.2.5">
+<alotaddonmanifest version="5.3">
    <highestapprovedmemversion>137</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-09-11">142</soaktestingmemversion>
    <stages>
@@ -137,29 +137,35 @@
       <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows" />
       <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
    </addonfile>
-   <addonfile alotversion="6" friendlyname="ALOT for ME1 6.0 - Textures" author="CreeperLava">
-      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files" tooltipname="ALOT for ME1 6.0 - Textures" filename="ALOT for ME1 - Textures-83-2018-6-0.zip" unpackedsinglefilename="ALOT_ME1_v6.mem" size="448313463" md5="1d0ab6ce0f2ce1940619bf27aade24c2" />
-      <packagefile me1="true" sourcename="ALOT_ME1_v6.mem" movedirectly="true" />
+   <addonfile alotversion="7" friendlyname="ALOT for ME1" author="CreeperLava">
+      <file
+		downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+		tooltipname="ALOT for ME1"
+		filename="ALOT_ME1.mem"
+		copydirectly="true"
+		size="477353338"
+		md5="c16dc8c42139ff6b708c230379b9d2b5" />
+      <games me1="true" me2="false" me3="false" />
    </addonfile>
-   <addonfile appliestomainversion="6" alotupdateversion="1" friendlyname="ALOT for ME1 6.1 - Update" tooltipname="ALOT for ME1 6.1 - Update" author="CreeperLava">
-      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files" filename="ALOT for ME1 6.1 - Update-83-2018-6-1.zip" size="34807573" md5="5581ea6a18aaf69b1702032f89cb37f1" />
-      <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v6.mem" movedirectly="true" />
+   <addonfile alotversion="7" friendlyname="ALOT for ME2" author="CreeperLava">
+      <file
+		downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+		tooltipname="ALOT for ME2"
+		filename="ALOT_ME2.mem"
+		copydirectly="true"
+		size="3685171959"
+		md5="5e4b9df97303bf2fc076c7d702844427" />
+      <games me1="false" me2="true" me3="false" />
    </addonfile>
-   <addonfile alotversion="6" friendlyname="ALOT for ME2 6.0 - Textures" tooltipname="ALOT for ME2 6.0 - Textures" author="CreeperLava">
-      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 - Textures-68-2018-6-0.zip" unpackedsinglefilename="ALOT_ME2_v6.mem" size="3563362871" md5="c1ed3369c5ba8ae681166b2fb9bc7c14" />
-      <packagefile me2="true" sourcename="ALOT_ME2_v6.mem" movedirectly="true" />
-   </addonfile>
-   <addonfile appliestomainversion="6" alotupdateversion="8" friendlyname="ALOT for ME2 6.8 - Update" author="CreeperLava">
-      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 6.8 - Update-68-2018-6-8.zip" tooltipname="ALOT for ME2 6.8 - Update" size="659216448" md5="e8ad869df4cef181b806e50c3a8ce963" />
-      <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v6.mem" movedirectly="true" />
-   </addonfile>
-   <addonfile alotversion="6" friendlyname="ALOT for ME3 6.0 - Textures" tooltipname="ALOT for ME3 6.0 - Textures" author="CreeperLava">
-      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" filename="ALOT for ME3 - Textures-363-2018-6-0.zip" unpackedsinglefilename="ALOT_ME3_v6.mem" size="5789453175" md5="2915d3d37ebe655defb541b974a7fa72" />
-      <packagefile me3="true" sourcename="ALOT_ME3_v6.mem" movedirectly="true" />
-   </addonfile>
-   <addonfile appliestomainversion="6" alotupdateversion="4" friendlyname="ALOT for ME3 6.4 - Update" tooltipname="ALOT for ME3 6.4 - Update" author="CreeperLava">
-      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" filename="ALOT for ME3 6.4 - Update-363-2018-6-4.zip" size="1001834111" md5="6dacad0a584e5d1dfbee4aff199ee162" />
-      <packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v6.mem" movedirectly="true" />
+   <addonfile alotversion="7" friendlyname="ALOT for ME3" author="CreeperLava">
+      <file
+		downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+		tooltipname="ALOT for ME3"
+		filename="ALOT_ME3.mem"
+		copydirectly="true"
+		size="6385264397"
+		md5="729f383c626ed6540a6e94159cd669f3" />
+      <games me1="false" me2="false" me3="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
