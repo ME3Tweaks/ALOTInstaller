@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.3">
+<alotaddonmanifest version="5.3.1">
    <highestapprovedmemversion>137</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-09-11">142</soaktestingmemversion>
    <stages>
@@ -142,7 +142,6 @@
 		downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
 		tooltipname="ALOT for ME1"
 		filename="ALOT_ME1.mem"
-		copydirectly="true"
 		size="477353338"
 		md5="c16dc8c42139ff6b708c230379b9d2b5" />
       <games me1="true" me2="false" me3="false" />
@@ -152,7 +151,6 @@
 		downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
 		tooltipname="ALOT for ME2"
 		filename="ALOT_ME2.mem"
-		copydirectly="true"
 		size="3685171959"
 		md5="5e4b9df97303bf2fc076c7d702844427" />
       <games me1="false" me2="true" me3="false" />
@@ -162,7 +160,6 @@
 		downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
 		tooltipname="ALOT for ME3"
 		filename="ALOT_ME3.mem"
-		copydirectly="true"
 		size="6385264397"
 		md5="729f383c626ed6540a6e94159cd669f3" />
       <games me1="false" me2="false" me3="true" />
