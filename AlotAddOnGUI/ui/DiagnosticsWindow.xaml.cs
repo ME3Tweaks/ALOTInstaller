@@ -995,8 +995,11 @@ namespace AlotAddOnGUI.ui
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_Upload));
 
                 //ME1: LOGS
-                if (DIAGNOSTICS_GAME == 1)
+                if (HASH_SUPPORTED && DIAGNOSTICS_GAME == 1)
                 {
+                    string dsound = gamePath += "\\Binaries\\dsound.dll";
+                    bool dSoundExists = File.Exists(dsound);
+
                     //GET LOGS
                     string logsdir = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + @"\BioWare\Mass Effect\Logs";
                     if (Directory.Exists(logsdir))
@@ -1011,16 +1014,32 @@ namespace AlotAddOnGUI.ui
                             var logLines = File.ReadAllLines(file.FullName);
                             int crashIndex = 0;
                             int index = 0;
+                            string reason = "";
                             foreach (string line in logLines)
                             {
 
                                 if (line.Contains("Critical: appError called"))
                                 {
                                     crashIndex = index;
+                                    reason = "Log file indicates crash occured";
+                                    Log.Information("Found crash in ME1 log " + file.Name + " on line " + index);
+                                    break;
+                                }
+                                if (line.Contains("Uninitialized: Log file closed"))
+                                {
+                                    crashIndex = index;
+                                    reason = "Log file indicates uninitialized device caused application to abort";
                                     Log.Information("Found crash in ME1 log " + file.Name + " on line " + index);
                                     break;
                                 }
                                 index++;
+                            }
+
+                            if (dSoundExists && logLines.Length > 0 && logLines.Last().Contains("Init: Audio Device"))
+                            {
+                                crashIndex = logLines.Length - 1;
+                                reason = "Log file indicates audio device never fully initalized - may be due to dsound.dll in binaries folder.\nRemoving this file may fix the issue";
+                                Log.Information("Found audio device hanging startup in ME1 log " + file.Name + " on line " + index);
                             }
 
                             if (crashIndex > 0)
@@ -1028,6 +1047,7 @@ namespace AlotAddOnGUI.ui
                                 crashIndex = Math.Max(0, crashIndex - 10);
                                 //this log has a crash
                                 addDiagLine("===Mass Effect crash log " + file.Name);
+                                if (reason != "") addDiagLine(reason);
                                 if (crashIndex > 0)
                                 {
                                     addDiagLine("[CRASHLOG]...");
