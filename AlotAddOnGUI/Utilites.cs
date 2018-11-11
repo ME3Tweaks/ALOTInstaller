@@ -835,7 +835,7 @@ namespace AlotAddOnGUI
             return attributes & ~attributesToRemove;
         }
 
-        public static void MakeAllFilesInDirReadWrite(string directory)
+        public static bool MakeAllFilesInDirReadWrite(string directory)
         {
             Log.Information("Marking all files in directory to read-write: " + directory);
             Log.Warning("If the application crashes after this statement, please come to to the ALOT discord - this is an issue we have not yet been able to reproduce and thus can't fix without outside assistance.");
@@ -848,9 +848,24 @@ namespace AlotAddOnGUI
                     Log.Error("This file was found when the read-write filescan took place, but is no longer present. The application is going to crash.");
                     Log.Error("Another session may be running, or there may be a bug. Please come to the ALOT Discord so we can analyze this as we cannot reproduce it.");
                 }
+
                 Utilities.WriteDebugLog("Clearing read-only marker (if any) on file: " + file.FullName);
-                file.Attributes &= ~FileAttributes.ReadOnly;
+                try
+                {
+                    file.Attributes &= ~FileAttributes.ReadOnly;
+                }
+                catch (DirectoryNotFoundException ex)
+                {
+                    if (file.FullName.Length > 260)
+                    {
+                        Log.Error("Path of file is too long - Windows API length limitations for files will cause errors. File: " + file.FullName);
+                        Log.Error("The game is either nested too deep or a mod has been improperly installed causing a filepath to be too long.");
+                        Log.Error(App.FlattenException(ex));
+                    }
+                    return false;
+                }
             }
+            return true;
         }
 
 
