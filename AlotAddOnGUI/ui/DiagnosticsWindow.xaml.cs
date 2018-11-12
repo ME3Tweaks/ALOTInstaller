@@ -369,7 +369,15 @@ namespace AlotAddOnGUI.ui
                             string hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower();
                             addDiagLine("[EXEHASH-" + DIAGNOSTICS_GAME + "]" + hash);
                             HASH_SUPPORTED = Utilities.CheckIfHashIsSupported(DIAGNOSTICS_GAME, hash);
-                            addDiagLine(Utilities.GetGameSourceByHash(DIAGNOSTICS_GAME, hash));
+                            Tuple<bool, string> exeInfo = Utilities.GetRawGameSourceByHash(DIAGNOSTICS_GAME, hash);
+                            if (exeInfo.Item1)
+                            {
+                                addDiagLine("$$$" + exeInfo.Item2);
+                            }
+                            else
+                            {
+                                addDiagLine("[ERROR]" + exeInfo.Item2);
+                            }
                         }
                     }
                     string d3d9file = Path.GetDirectoryName(exePath) + "\\d3d9.dll";

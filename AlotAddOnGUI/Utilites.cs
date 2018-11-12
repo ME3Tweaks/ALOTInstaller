@@ -453,7 +453,7 @@ namespace AlotAddOnGUI
             return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
         }
 
-        internal static string GetGameSourceByHash(int game, string hash)
+        internal static Tuple<bool,string> GetRawGameSourceByHash(int game, string hash)
         {
             List<KeyValuePair<string, string>> list = null;
             switch (game)
@@ -473,10 +473,46 @@ namespace AlotAddOnGUI
             {
                 if (hashPair.Key == hash)
                 {
-                    return "$$$Game source: " + hashPair.Value;
+                    return new Tuple<bool,string>(true,"Game source: " + hashPair.Value);
                 }
             }
-            return "[ERROR]Unknown source - this installation is not supported.";
+            return new Tuple<bool, string>(false, "Unknown source - this installation is not supported.");
+        }
+
+        internal static void LogGameSourceByHash(int game, string hash)
+        {
+            Tuple<bool, string> supportStatus = GetRawGameSourceByHash(game, hash);
+            if (supportStatus.Item1 == true)
+            {
+                //supported
+                Log.Warning("Executable hash: " + hash + ", " + supportStatus.Item2);
+            } else
+            {
+                Log.Fatal("This installation is not supported. Only official copies of the game are supported.");
+                Log.Fatal("Executable hash: " + hash + ", " + supportStatus.Item2);
+            }
+            //List<KeyValuePair<string, string>> list = null;
+            //switch (game)
+            //{
+            //    case 1:
+            //        list = SUPPORTED_HASHES_ME1;
+            //        break;
+            //    case 2:
+            //        list = SUPPORTED_HASHES_ME2;
+            //        break;
+            //    case 3:
+            //        list = SUPPORTED_HASHES_ME3;
+            //        break;
+            //}
+
+            //foreach (KeyValuePair<string, string> hashPair in list)
+            //{
+            //    if (hashPair.Key == hash)
+            //    {
+            //        return "$$$Game source: " + hashPair.Value;
+            //    }
+            //}
+            //return "[ERROR]Unknown source - this installation is not supported.";
         }
 
         public static List<KeyValuePair<string, string>> SUPPORTED_HASHES_ME1 = new List<KeyValuePair<string, string>>();

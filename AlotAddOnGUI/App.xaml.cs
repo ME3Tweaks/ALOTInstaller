@@ -26,6 +26,8 @@ namespace AlotAddOnGUI
     {
         private static bool POST_STARTUP = false;
         public static bool BootMEUITMMode = false;
+        public static string PreloadedME3Path = null;
+
         [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool DeleteFile(string name);
@@ -65,7 +67,7 @@ namespace AlotAddOnGUI
         public App() : base()
         {
             string[] args = Environment.GetCommandLineArgs();
-            string preLogMessages = "";
+            List<string> preLogMessages = new List<string>();
             Parsed<Options> parsedCommandLineArgs = null;
             string loggingBasePath = System.AppDomain.CurrentDomain.BaseDirectory;
             string updateDestinationPath = null;
@@ -85,7 +87,7 @@ namespace AlotAddOnGUI
                         }
                         else
                         {
-                            preLogMessages += "Directory doesn't exist for update: " + parsedCommandLineArgs.Value.UpdateDest;
+                            preLogMessages.Add("Directory doesn't exist for update: " + parsedCommandLineArgs.Value.UpdateDest);
                         }
                     }
                     if (parsedCommandLineArgs.Value.BootMEUITMMode)
@@ -93,14 +95,36 @@ namespace AlotAddOnGUI
                         Log.Information("We are booting into MEUITM mode.");
                         BootMEUITMMode = true;
                     }
+                    if (parsedCommandLineArgs.Value.ME3Path != null && Directory.Exists(parsedCommandLineArgs.Value.ME3Path))
+                    {
+                        PreloadedME3Path = parsedCommandLineArgs.Value.ME3Path;
+                        //get MassEffectModder.ini
+                        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "MassEffectModder");
+                        string _iniPath = Path.Combine(path, "MassEffectModder.ini");
+                        if (!Directory.Exists(path))
+                        {
+                            preLogMessages.Add("Preset ME3 path, ini folder doesn't exist, creating.");
+                            Directory.CreateDirectory(path);
+                        }
+                        if (!File.Exists(_iniPath))
+                        {
+                            preLogMessages.Add("Preset ME3 path, ini doesn't exist, creating.");
+                            File.Create(_iniPath);
+                        }
+
+                        IniFile ini = new IniFile(_iniPath);
+                        ini.Write("ME3", parsedCommandLineArgs.Value.ME3Path, "GameDataPath");
+                        preLogMessages.Add("Wrote preset ME3 path to "+ parsedCommandLineArgs.Value.ME3Path);
+                    }
                     if (parsedCommandLineArgs.Value.BootingNewUpdate)
                     {
                         Log.Information("Booting an update");
+                        preLogMessages.Add("Booting an update.");
                         foreach (string file in Directory.GetFiles(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), "*.pdb", SearchOption.AllDirectories))
                         {
                             File.Delete(file);
                         }
-
                     }
                 }
             }
@@ -114,10 +138,7 @@ namespace AlotAddOnGUI
             POST_STARTUP = true;
             Log.Information("=====================================================");
             Log.Information("Logger Started for ALOT Installer.");
-            if (preLogMessages != "")
-            {
-                Log.Information("Prelogger messages: " + preLogMessages);
-            }
+            preLogMessages.ForEach(x => Log.Information("Prelogger boot message: "+x));
             if (args.Length > 0)
             {
                 string commandlineargs = "";
@@ -378,6 +399,10 @@ namespace AlotAddOnGUI
         [Option('m', "meuitm-mode",
             HelpText = "Boots ALOT Installer in MEUITM mode.")]
         public bool BootMEUITMMode { get; set; }
+
+        [Option("me3path",
+            HelpText = "Sets the path for ME3 when the application boots")]
+        public string ME3Path { get; set; }
     }
 
 }

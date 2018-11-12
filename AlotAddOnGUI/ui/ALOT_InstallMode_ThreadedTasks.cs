@@ -368,7 +368,9 @@ namespace AlotAddOnGUI
                 {
                     using (var stream = File.OpenRead(Utilities.GetGameEXEPath(INSTALLING_THREAD_GAME)))
                     {
-                        Log.Warning("Executable hash: " + BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "").ToLower());
+                        byte[] hashbytes = md5.ComputeHash(stream);
+                        string hashstr = BitConverter.ToString(hashbytes).Replace("-", "").ToLower();
+                        Utilities.LogGameSourceByHash(INSTALLING_THREAD_GAME, hashstr);
                     }
                 }
                 catch (Exception ex)
@@ -804,7 +806,7 @@ namespace AlotAddOnGUI
                             Log.Information("Moved main alot file back to import library " + DOWNLOADED_MODS_DIRECTORY);
                             //Delete original
                             dest = DOWNLOADED_MODS_DIRECTORY + "\\" + alotMainFile.Filename;
-                            if (File.Exists(dest))
+                            if (File.Exists(dest) && Path.GetExtension(source) != Path.GetExtension(dest)) //do not delete if it is same extension as it's mem and mem not 7z and mem
                             {
                                 Log.Information("Deleting original alot archive file from import library");
                                 File.Delete(dest);

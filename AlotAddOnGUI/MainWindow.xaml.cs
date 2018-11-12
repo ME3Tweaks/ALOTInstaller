@@ -898,6 +898,10 @@ namespace AlotAddOnGUI
                   MEUITM_Flyout_InstallOptionsPanel.Visibility = Visibility.Visible;
               } */
             Log.Information("PerformPostStartup() has completed. We are now switching over to user control.");
+            if (App.PreloadedME3Path != null)
+            {
+                ShowStatus("Set ME3 game path to " + App.PreloadedME3Path);
+            }
         }
 
         private void MEMNoGuiUpdateCanceled(object sender, EventArgs e)
