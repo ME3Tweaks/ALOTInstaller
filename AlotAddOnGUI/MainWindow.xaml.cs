@@ -235,6 +235,14 @@ namespace AlotAddOnGUI
             LoadSettings();
             MEUITM_INSTALLER_MODE = App.BootMEUITMMode; //installer state defaults to boot setting
 
+            if (!USING_BETA)
+            {
+                Button_LibraryDir.Visibility = Visibility.Collapsed; //Not for main use right now.
+            } else
+            {
+                Button_LibraryDir.ToolTip = "Click to change downloaded mods library directory.\nIf path is not found at app startup, the default subdirectory of Downloaded_Mods will be used.\n\nLibrary location currently is:\n" + DOWNLOADED_MODS_DIRECTORY;
+            }
+
             if (MEUITM_INSTALLER_MODE)
             {
                 Button_InstallME2.Visibility = Visibility.Collapsed;
@@ -246,8 +254,8 @@ namespace AlotAddOnGUI
             {
                 Button_SwitchToALOTMode.Visibility = Visibility.Collapsed;
                 Panel_ALOTFiltering.Visibility = Visibility.Visible;
-
             }
+
             Title = "ALOT Installer " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             HeaderLabel.Text = "Preparing application...";
             AddonFilesLabel.Text = "Please wait";
@@ -2436,7 +2444,7 @@ namespace AlotAddOnGUI
                                 FileMD5 = (string)e.Element("file").Attribute("md5"),
                                 UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
                                 UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
-                                TorrentFilename = (string) e.Element("file").Attribute("torrentfilename"),
+                                TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
                                 Ready = false,
                                 PackageFiles = e.Elements("packagefile")
                                     .Select(r => new PackageFile
@@ -4966,6 +4974,28 @@ namespace AlotAddOnGUI
         private void Button_CloseUtilities(object sender, RoutedEventArgs e)
         {
             Utilities_Flyout.IsOpen = false;
+        }
+
+        private void ShowSetLibraryDir(object sender, RoutedEventArgs e)
+        {
+            SettingsFlyout.IsOpen = false;
+            var openFolder = new CommonOpenFileDialog();
+            openFolder.IsFolderPicker = true;
+            openFolder.Title = "Select library location";
+            openFolder.AllowNonFileSystemItems = false;
+            openFolder.EnsurePathExists = true;
+            if (openFolder.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                return;
+            }
+            DOWNLOADED_MODS_DIRECTORY = openFolder.FileName;
+            Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_LIBRARYDIR, openFolder.FileName);
+            foreach (AddonFile af in alladdonfiles)
+            {
+                af.Ready = false;
+            }
+            Button_LibraryDir.ToolTip = "Click to change downloaded mods library directory.\nIf path is not found at app startup, the default subdirectory of Downloaded_Mods will be used.\n\nLibrary location currently is:\n" + DOWNLOADED_MODS_DIRECTORY;
+            ShowStatus("Updated library directory - please wait while files refresh...",4000);
         }
     }
 }

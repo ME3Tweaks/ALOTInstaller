@@ -1935,6 +1935,12 @@ namespace AlotAddOnGUI
                                 blockDueToBadImportedFile = af.GetFile();
                                 break;
                             }
+                            if (af.IsCurrentlySingleFile() && af.UnpackedFileSize > 0 && af.UnpackedFileSize != fi.Length)
+                            {
+                                Log.Error(af.GetFile() + " has wrong size: " + fi.Length + ", manifest specifies " + af.FileSize);
+                                blockDueToBadImportedFile = af.GetFile();
+                                break;
+                            }
                             oneisready = true;
                         }
                     }
