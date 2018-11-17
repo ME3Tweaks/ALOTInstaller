@@ -453,23 +453,6 @@ namespace AlotAddOnGUI
             return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
         }
 
-        /// <summary>
-        /// Checks weather a Mass Effect game is running.
-        /// </summary>
-        /// <param name="game">Game ID to cehck</param>
-        /// <returns>True if process is found running, false otherwise.</returns>
-        internal static bool IsGameRunning(int game)
-        {
-            string exename = "MassEffect" + (game > 1 ? game.ToString() : "");
-            var procList = Process.GetProcessesByName(exename);
-            var procList2 = Process.GetProcessesByName("ME2Game");
-            if (game == 2)
-            {
-                return procList.Length > 0 || procList2.Length > 0;
-            }
-            return procList.Length > 0;
-        }
-
         internal static Tuple<bool, string> GetRawGameSourceByHash(int game, string hash)
         {
             List<KeyValuePair<string, string>> list = null;
@@ -1376,14 +1359,8 @@ namespace AlotAddOnGUI
                 Log.Information("Antivirus info: " + virusCheckerName + " with state " + bytes[1].ToString("X2") + " " + bytes[2].ToString("X2") + " " + bytes[3].ToString("X2"));
             }
         }
-
-        public static bool isAntivirusRunning()
-        {
-            return true;
-        }
-
-
-        public static bool isGameRunning(int gameID)
+        
+        public static bool IsGameRunning(int gameID)
         {
             if (gameID == 1)
             {

@@ -1229,11 +1229,11 @@ namespace AlotAddOnGUI
                                 if (buildResult == MessageDialogResult.Affirmative)
                                 {
                                     bool run = true;
-                                    while (Utilities.isGameRunning(CURRENT_GAME_BUILD))
+                                    while (Utilities.IsGameRunning(CURRENT_GAME_BUILD))
                                     {
                                         run = false;
                                         await this.ShowMessageAsync("Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + " is running", "Please close Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + " to continue.");
-                                        if (!Utilities.isGameRunning(CURRENT_GAME_BUILD))
+                                        if (!Utilities.IsGameRunning(CURRENT_GAME_BUILD))
                                         {
                                             run = true;
                                             break;
@@ -2941,7 +2941,7 @@ namespace AlotAddOnGUI
             }
             if (ValidateGameBackup(1))
             {
-                if (Utilities.isGameRunning(1))
+                if (Utilities.IsGameRunning(1))
                 {
                     await this.ShowMessageAsync("Mass Effect" + GetGameNumberSuffix(1) + " is running", "Please close Mass Effect" + GetGameNumberSuffix(1) + " before attempting restore.");
                     return;
@@ -2972,7 +2972,7 @@ namespace AlotAddOnGUI
             }
             if (ValidateGameBackup(2))
             {
-                if (Utilities.isGameRunning(2))
+                if (Utilities.IsGameRunning(2))
                 {
                     await this.ShowMessageAsync("Mass Effect" + GetGameNumberSuffix(2) + " is running", "Please close Mass Effect" + GetGameNumberSuffix(2) + " before attempting restore.");
                     return;
@@ -3005,7 +3005,7 @@ namespace AlotAddOnGUI
             if (ValidateGameBackup(3))
             {
 
-                if (Utilities.isGameRunning(3))
+                if (Utilities.IsGameRunning(3))
                 {
                     await this.ShowMessageAsync("Mass Effect" + GetGameNumberSuffix(3) + " is running", "Please close Mass Effect" + GetGameNumberSuffix(3) + " before attempting restore.");
                     return;
