@@ -90,7 +90,7 @@
         </Label>
         <ProgressBar alotaddonguiui:ProgressBarSmooth.SmoothValue="{Binding ProgressBarValue}" Value="{Binding Path=ProgressBarValue, Mode=OneWay}" Minimum="0" Maximum="100" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true" />
         <ListView Grid.Column="0" Grid.Row="3" Name="ListView_Files" BorderThickness="0" ScrollViewer.PanningMode="VerticalFirst" Loaded="ListView_Files_Loaded" SelectionChanged="ListView_Files_SelectionChanged">
-            <!-- This is what each list item looks like-->
+                <!-- This is what each list item looks like-->
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Grid x:Name="ListItemElement" Background="Transparent">

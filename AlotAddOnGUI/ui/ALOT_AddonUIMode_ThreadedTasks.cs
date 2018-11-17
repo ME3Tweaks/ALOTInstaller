@@ -264,8 +264,6 @@ namespace AlotAddOnGUI
                                 foreach (string moveableFile in moveableFiles)
                                 {
                                     string name = Utilities.GetRelativePath(moveableFile, extractpath);
-
-
                                     foreach (PackageFile pf in packageFiles)
                                     {
                                         if (pf.SourceName.Equals(name, StringComparison.InvariantCultureIgnoreCase))

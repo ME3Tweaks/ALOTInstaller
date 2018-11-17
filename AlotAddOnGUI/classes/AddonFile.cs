@@ -236,6 +236,9 @@ namespace AlotAddOnGUI.classes
         }
         public bool ProcessAsModFile { get; set; }
         public string UnpackedSingleFilename { get; set; }
+        public string ALOTMainPackedFilename { get; set; }
+        public string TorrentFilename { get; set; }
+        public string ALOTArchiveInFilePath { get; set; }
         public string Author { get; set; }
         public string FriendlyName { get; set; }
         public bool Game_ME1 { get; set; }
@@ -280,6 +283,8 @@ namespace AlotAddOnGUI.classes
         public long FileSize { get; internal set; }
         public string BuildID { get; internal set; }
         public string FileMD5 { get; internal set; }
+        public string UnpackedFileMD5 { get; set; }
+        public long UnpackedFileSize { get; set; }
         public bool Optional { get; internal set; }
         private bool _enabled;
         public bool CopyDirectly { get; internal set; }

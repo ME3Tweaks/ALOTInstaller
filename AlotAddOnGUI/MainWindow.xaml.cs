@@ -2434,6 +2434,9 @@ namespace AlotAddOnGUI
                                 UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename") != null ? (string)e.Element("file").Attribute("unpackedsinglefilename") : null,
                                 ALOTMainVersionRequired = e.Attribute("appliestomainversion") != null ? Convert.ToInt16((string)e.Attribute("appliestomainversion")) : (short)0,
                                 FileMD5 = (string)e.Element("file").Attribute("md5"),
+                                UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
+                                UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
+                                TorrentFilename = (string) e.Element("file").Attribute("torrentfilename"),
                                 Ready = false,
                                 PackageFiles = e.Elements("packagefile")
                                     .Select(r => new PackageFile
@@ -3360,9 +3363,10 @@ namespace AlotAddOnGUI
                     }
                     bool isUnpackedSingleFile = af.UnpackedSingleFilename != null && af.UnpackedSingleFilename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file); //make sure not folder with same name.
                     bool mainFileExists = af.Filename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file);
+                    bool torrentFileExists = af.TorrentFilename != null && af.TorrentFilename.Equals(fname, StringComparison.InvariantCultureIgnoreCase) && File.Exists(file);
                     //This code can be removed when microsoft or nexusmods fixes their %20 bug
                     bool msEdgeBugFileExists = af.Filename.Equals(fname.Replace("%20", " "), StringComparison.InvariantCultureIgnoreCase) && File.Exists(file);
-                    if (isUnpackedSingleFile || mainFileExists || msEdgeBugFileExists) //make sure folder not with same name
+                    if (isUnpackedSingleFile || mainFileExists || msEdgeBugFileExists || torrentFileExists) //make sure folder not with same name
                     {
                         hasMatch = true;
                         //Check size as validation
@@ -3372,6 +3376,18 @@ namespace AlotAddOnGUI
                             if (fi.Length != af.FileSize)
                             {
                                 Log.Error("File to import has the wrong size: " + file + ", it should have size " + af.FileSize + ", but file to import is size " + fi.Length);
+                                badSizeFiles.Add(file);
+                                hasMatch = true;
+                                continue;
+                            }
+                        }
+
+                        if (isUnpackedSingleFile && af.UnpackedFileSize > 0)
+                        {
+                            FileInfo fi = new FileInfo(file);
+                            if (fi.Length != af.UnpackedFileSize)
+                            {
+                                Log.Error("Unpacked file to import has the wrong size: " + file + ", it should have size " + af.FileSize + ", but file to import is size " + fi.Length);
                                 badSizeFiles.Add(file);
                                 hasMatch = true;
                                 continue;
@@ -3500,6 +3516,14 @@ namespace AlotAddOnGUI
             }
         }
 
+        /// <summary>
+        /// Imports files into the ALOT Installer library
+        /// </summary>
+        /// <param name="filesToImport">List of addon files that are being improted</param>
+        /// <param name="importedFiles">Files that are currently imported</param>
+        /// <param name="progressController">UI controller for the progress bar</param>
+        /// <param name="processedBytes">How many bytes have been processed</param>
+        /// <param name="totalBytes">How many bytes total will be processed</param>
         private async void ImportFiles(List<Tuple<AddonFile, string, string>> filesToImport, List<string> importedFiles, ProgressDialogController progressController, long processedBytes, long totalBytes)
         {
             PreventFileRefresh = true;
