@@ -453,7 +453,24 @@ namespace AlotAddOnGUI
             return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
         }
 
-        internal static Tuple<bool,string> GetRawGameSourceByHash(int game, string hash)
+        /// <summary>
+        /// Checks weather a Mass Effect game is running.
+        /// </summary>
+        /// <param name="game">Game ID to cehck</param>
+        /// <returns>True if process is found running, false otherwise.</returns>
+        internal static bool IsGameRunning(int game)
+        {
+            string exename = "MassEffect" + (game > 1 ? game.ToString() : "");
+            var procList = Process.GetProcessesByName(exename);
+            var procList2 = Process.GetProcessesByName("ME2Game");
+            if (game == 2)
+            {
+                return procList.Length > 0 || procList2.Length > 0;
+            }
+            return procList.Length > 0;
+        }
+
+        internal static Tuple<bool, string> GetRawGameSourceByHash(int game, string hash)
         {
             List<KeyValuePair<string, string>> list = null;
             switch (game)
@@ -473,7 +490,7 @@ namespace AlotAddOnGUI
             {
                 if (hashPair.Key == hash)
                 {
-                    return new Tuple<bool,string>(true,"Game source: " + hashPair.Value);
+                    return new Tuple<bool, string>(true, "Game source: " + hashPair.Value);
                 }
             }
             return new Tuple<bool, string>(false, "Unknown source - this installation is not supported.");
@@ -486,7 +503,8 @@ namespace AlotAddOnGUI
             {
                 //supported
                 Log.Warning("Executable hash: " + hash + ", " + supportStatus.Item2);
-            } else
+            }
+            else
             {
                 Log.Fatal("This installation is not supported. Only official copies of the game are supported.");
                 Log.Fatal("Executable hash: " + hash + ", " + supportStatus.Item2);

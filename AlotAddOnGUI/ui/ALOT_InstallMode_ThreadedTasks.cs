@@ -468,7 +468,7 @@ namespace AlotAddOnGUI
             }
 
 
-            MAINTASK_TEXT = "Installing " + primary + " for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+            MAINTASK_TEXT = "Installing " + primary + " for Mass Effect" + GetGameNumberSuffix(INSTALLING_THREAD_GAME);
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OVERALL_TASK, MAINTASK_TEXT));
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "";
@@ -673,7 +673,7 @@ namespace AlotAddOnGUI
             }
             //Apply LOD
             Log.Information("Updating LOD information");
-            CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
+            CurrentTask = "Updating Mass Effect" + GetGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
 
             args = "-apply-lods-gfx ";
@@ -843,7 +843,7 @@ namespace AlotAddOnGUI
 
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_ALL_STAGE_LABELS));
 
-            string taskString = "Installation of " + primary + " for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+            string taskString = "Installation of " + primary + " for Mass Effect" + GetGameNumberSuffix(INSTALLING_THREAD_GAME);
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, taskString));
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, "has completed"));
             if (INSTALLING_THREAD_GAME == 1 || INSTALLING_THREAD_GAME == 2)
@@ -900,7 +900,7 @@ namespace AlotAddOnGUI
             if (e.Result != null)
             {
                 int result = (int)e.Result;
-                string gameName = "Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+                string gameName = "Mass Effect" + GetGameNumberSuffix(INSTALLING_THREAD_GAME);
                 if (result == INSTALL_OK)
                 {
                     telemetryfailedcode = 0;

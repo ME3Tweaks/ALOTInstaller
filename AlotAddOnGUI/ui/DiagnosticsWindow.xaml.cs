@@ -1383,6 +1383,11 @@ namespace AlotAddOnGUI.ui
 
         private void FullDiagnostic_Click(object sender, RoutedEventArgs e)
         {
+            if (Utilities.IsGameRunning(DIAGNOSTICS_GAME))
+            {
+                DiagnosticHeader.Text = "Mass Effect" + GetGameNumberSuffix(DIAGNOSTICS_GAME) + " is currently running, close it first.";
+                return;
+            }
             Button_FullDiagnostic.Visibility = Visibility.Collapsed;
             Button_QuickDiagnostic.Visibility = Visibility.Collapsed;
             TextBlock_DiagnosticType.Text = "FULL DIAGNOSTIC";
@@ -1392,6 +1397,11 @@ namespace AlotAddOnGUI.ui
 
         private void QuickDiagnostic_Click(object sender, RoutedEventArgs e)
         {
+            if (Utilities.IsGameRunning(DIAGNOSTICS_GAME))
+            {
+                DiagnosticHeader.Text = "Mass Effect" + GetGameNumberSuffix(DIAGNOSTICS_GAME) + " is currently running, close it first.";
+                return;
+            }
             Button_FullDiagnostic.Visibility = Visibility.Collapsed;
             Button_QuickDiagnostic.Visibility = Visibility.Collapsed;
             TextBlock_DiagnosticType.Text = "QUICK DIAGNOSTIC";

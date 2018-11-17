@@ -1121,7 +1121,7 @@ namespace AlotAddOnGUI
             {
                 case -2:
                     Log.Warning("BuildCompleted result: Blocked due to incompatible mods installed");
-                    HeaderLabel.Text = "Installation blocked due to incompatible mods detected in Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nRestore your game to a compatible state and do not install these mods.";
+                    HeaderLabel.Text = "Installation blocked due to incompatible mods detected in Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nRestore your game to a compatible state and do not install these mods.";
                     AddonFilesLabel.Text = "Installation aborted";
                     string badModsStr = "";
                     foreach (string str in BlockingMods)
@@ -1133,7 +1133,7 @@ namespace AlotAddOnGUI
                     {
                         prefix = "The following mod appears to be installed and is";
                     }
-                    await this.ShowMessageAsync("Incompatible mods detected", prefix + "known to be incompatible with ALOT for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ". Restore your game to an unmodified state, and then install compatible versions of these mods (or do not install them at all)." + badModsStr);
+                    await this.ShowMessageAsync("Incompatible mods detected", prefix + "known to be incompatible with ALOT for Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + ". Restore your game to an unmodified state, and then install compatible versions of these mods (or do not install them at all)." + badModsStr);
                     PreventFileRefresh = false;
                     break;
                 case -1:
@@ -1151,7 +1151,7 @@ namespace AlotAddOnGUI
                         Log.Warning("Error while building and staging, see previous entries in log.");
                         HeaderLabel.Text = "Addon built with errors.\nThe Addon was built but some files did not process correctly and were skipped.\nThe MEM packages for the addon have been placed into the " + MEM_OUTPUT_DISPLAY_DIR + " directory.";
                         AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
-                        await this.ShowMessageAsync("Textures staged for Mass Effect" + getGameNumberSuffix(result) + " with errors", "Some files had errors occur during the build and staging process. These files were skipped. Your game may look strange in some parts if you were to install these textures. You should report this to the developers on Discord (Settings -> Report an issue).");
+                        await this.ShowMessageAsync("Textures staged for Mass Effect" + GetGameNumberSuffix(result) + " with errors", "Some files had errors occur during the build and staging process. These files were skipped. Your game may look strange in some parts if you were to install these textures. You should report this to the developers on Discord (Settings -> Report an issue).");
                     }
                     else
                     {
@@ -1180,7 +1180,7 @@ namespace AlotAddOnGUI
                         if (freeBytes < (ulong)fullsize)
                         {
                             //not enough disk space for build
-                            HeaderLabel.Text = "Not enough free space to install textures for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
+                            HeaderLabel.Text = "Not enough free space to install textures for Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
                             AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
                             await this.ShowMessageAsync("Not enough free space for install", "There is not enough disk space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to install. You will need " + ByteSize.FromBytes(fullsize) + " of free space to install.");
                             errorOccured = false;
@@ -1190,7 +1190,7 @@ namespace AlotAddOnGUI
                         if (ADDONFILES_TO_BUILD.Count == 0)
                         {
                             //bug found
-                            HeaderLabel.Text = "No files selected to install for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
+                            HeaderLabel.Text = "No files selected to install for Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
                             AddonFilesLabel.Text = "This is a bug. Please report this to the developers on Discord.";
                             await this.ShowMessageAsync("No files selected for installation", "No files were selected for installation. This should not be possible - you have found a bug. Please report this to the developers on Discord.");
                             errorOccured = false;
@@ -1232,7 +1232,7 @@ namespace AlotAddOnGUI
                                     while (Utilities.isGameRunning(CURRENT_GAME_BUILD))
                                     {
                                         run = false;
-                                        await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + " is running", "Please close Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + " to continue.");
+                                        await this.ShowMessageAsync("Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + " is running", "Please close Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + " to continue.");
                                         if (!Utilities.isGameRunning(CURRENT_GAME_BUILD))
                                         {
                                             run = true;
@@ -2903,7 +2903,7 @@ namespace AlotAddOnGUI
 
             if (hasOneOption || blockALOTInstallDueToMainVersionDiff)
             {
-                Label_WhatToBuildAndInstall.Text = "Choose what to install for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
+                Label_WhatToBuildAndInstall.Text = "Choose what to install for Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
                 if (blockALOTInstallDueToMainVersionDiff)
                 {
                     string currentString = "(Unknown version)";
@@ -2943,7 +2943,7 @@ namespace AlotAddOnGUI
             {
                 if (Utilities.isGameRunning(1))
                 {
-                    await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(1) + " is running", "Please close Mass Effect" + getGameNumberSuffix(1) + " before attempting restore.");
+                    await this.ShowMessageAsync("Mass Effect" + GetGameNumberSuffix(1) + " is running", "Please close Mass Effect" + GetGameNumberSuffix(1) + " before attempting restore.");
                     return;
                 }
 
@@ -2974,7 +2974,7 @@ namespace AlotAddOnGUI
             {
                 if (Utilities.isGameRunning(2))
                 {
-                    await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(2) + " is running", "Please close Mass Effect" + getGameNumberSuffix(2) + " before attempting restore.");
+                    await this.ShowMessageAsync("Mass Effect" + GetGameNumberSuffix(2) + " is running", "Please close Mass Effect" + GetGameNumberSuffix(2) + " before attempting restore.");
                     return;
                 }
 
@@ -3007,7 +3007,7 @@ namespace AlotAddOnGUI
 
                 if (Utilities.isGameRunning(3))
                 {
-                    await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(3) + " is running", "Please close Mass Effect" + getGameNumberSuffix(3) + " before attempting restore.");
+                    await this.ShowMessageAsync("Mass Effect" + GetGameNumberSuffix(3) + " is running", "Please close Mass Effect" + GetGameNumberSuffix(3) + " before attempting restore.");
                     return;
                 }
                 //Game is backed up
@@ -3190,7 +3190,7 @@ namespace AlotAddOnGUI
             HeaderLabel.Text = PRIMARY_HEADER;
         }
 
-        private string getGameNumberSuffix(int gameNumber)
+        public static string GetGameNumberSuffix(int gameNumber)
         {
             return gameNumber == 1 ? "" : " " + gameNumber;
         }
@@ -3881,7 +3881,7 @@ namespace AlotAddOnGUI
                 if (result)
                 {
                     AddonFilesLabel.Text = "Restore completed.";
-                    await this.ShowMessageAsync("Restore completed", "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has been restored from backup.");
+                    await this.ShowMessageAsync("Restore completed", "Mass Effect" + GetGameNumberSuffix(BACKUP_THREAD_GAME) + " has been restored from backup.");
                 }
                 else
                 {
@@ -4940,14 +4940,14 @@ namespace AlotAddOnGUI
                     modified += "\n - " + error.Remove(0, gameDir.Length + 1);
                 }
                 Log.Warning("Game verification failed.");
-                string message = "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has files that do not match what is in the MEM database.\nThe files are listed below." + modified;
+                string message = "Mass Effect" + GetGameNumberSuffix(BACKUP_THREAD_GAME) + " has files that do not match what is in the MEM database.\nThe files are listed below." + modified;
                 e.Result = new KeyValuePair<string, string>("Game is modified", message);
                 //Thread resumes
             }
             else
             {
                 Log.Information("Game verification passed - no issues.");
-                string message = "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has passed the vanilla game check.";
+                string message = "Mass Effect" + GetGameNumberSuffix(BACKUP_THREAD_GAME) + " has passed the vanilla game check.";
                 e.Result = new KeyValuePair<string, string>("Game appears unmodified", message);
             }
         }
