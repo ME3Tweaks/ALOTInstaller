@@ -137,14 +137,18 @@
       <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows" />
       <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
    </addonfile>
-   <addonfile alotversion="7" friendlyname="ALOT for ME1" author="CreeperLava">
+   <addonfile alotversion="7" friendlyname="ALOT for ME1 - BETA MANIFEST, DEV TESTING - DO NOT USE BETA MODE RIGHT NOW" author="CreeperLava">
       <file
 		downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
-		tooltipname="ALOT for ME1"
-		filename="ALOT_ME1.mem"
-		size="477353338"
-		md5="c16dc8c42139ff6b708c230379b9d2b5" />
-      <games me1="true" me2="false" me3="false" />
+		filename="ALOT for ME1-83-2019-7-0-1541433297.zip"
+		torrentfilename="ALOT_FOR_ME1_TORRENTV.zip"
+		unpackedsinglefilename="ALOT_ME1.mem" 
+		size="501384728" 
+		md5="4fe0c07066251d02bd918121772b99b4" 
+		unpackesize=""
+		unpackedmd5=""
+		tooltipname="ALOT for ME1" />
+        <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="7" friendlyname="ALOT for ME2" author="CreeperLava">
       <file
