@@ -1983,7 +1983,7 @@ namespace AlotAddOnGUI
 
             if (!oneisready)
             {
-                await this.ShowMessageAsync("No files available for building", "There are no files available or relevant in the Downloaded_Mods folder to install for Mass Effect" + GetGameNumberSuffix(game) + ".");
+                await this.ShowMessageAsync("No files available for building", "There are no files available or relevant in the Downloaded_Mods library to install for Mass Effect" + GetGameNumberSuffix(game) + ".");
                 return false;
             }
             //if alot is already installed we don't need to show missing message, unless installed via MEM directly

@@ -3324,7 +3324,7 @@ namespace AlotAddOnGUI
                 if (file.ToLower().StartsWith(basepath.ToLower()))
                 {
                     Log.Information("Cannot import files from downloaded_mods folder.");
-                    ShowStatus("Can't import files from Downloaded_Mods", 5000);
+                    ShowStatus("Can't import files from Downloaded_Mods library", 5000);
                     return;
                 }
             }
@@ -3643,7 +3643,7 @@ namespace AlotAddOnGUI
                 }
 
                 string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods directory.";
+                string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods library.";
 
                 ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
             }
@@ -3698,13 +3698,13 @@ namespace AlotAddOnGUI
                     else
                     {
                         //imports finished
-                        string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods folder.";
+                        string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods library.";
                         foreach (string af in importedFiles)
                         {
                             detailsMessage += "\n - " + af;
                         }
                         string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                        string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods directory.";
+                        string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods library.";
                         ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
 
                     }
@@ -4577,20 +4577,20 @@ namespace AlotAddOnGUI
                         }
 
                         string originalTitle = COPY_QUEUE.Count + " file" + (COPY_QUEUE.Count != 1 ? "s" : "") + " imported";
-                        string originalMessage = COPY_QUEUE.Count + " file" + (COPY_QUEUE.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods directory.";
+                        string originalMessage = COPY_QUEUE.Count + " file" + (COPY_QUEUE.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods library.";
 
                         ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
                         COPY_QUEUE.Clear();
                     }
                     if (MOVE_QUEUE.Count > 0)
                     {
-                        string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods folder.";
+                        string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods library.";
                         foreach (string af in MOVE_QUEUE)
                         {
                             detailsMessage += "\n - " + af;
                         }
                         string originalTitle = MOVE_QUEUE.Count + " file" + (MOVE_QUEUE.Count != 1 ? "s" : "") + " imported";
-                        string originalMessage = MOVE_QUEUE.Count + " file" + (MOVE_QUEUE.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods directory.";
+                        string originalMessage = MOVE_QUEUE.Count + " file" + (MOVE_QUEUE.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods library.";
                         ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
                         MOVE_QUEUE.Clear();
                     }
@@ -4746,7 +4746,7 @@ namespace AlotAddOnGUI
                     mds.AffirmativeButtonText = "Delete";
                     mds.NegativeButtonText = "Keep";
                     mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                    MessageDialogResult mdr = await this.ShowMessageAsync("Found outdated files", "The following files in the Downloaded_Mods folder are no longer listed in the manifest and can be safely deleted: " + list, MessageDialogStyle.AffirmativeAndNegative, mds);
+                    MessageDialogResult mdr = await this.ShowMessageAsync("Found outdated files", "The following files in the Downloaded_Mods library are no longer listed in the manifest and can be safely deleted: " + list, MessageDialogStyle.AffirmativeAndNegative, mds);
                     if (mdr == MessageDialogResult.Affirmative)
                     {
                         Log.Information("User elected to delete outdated files.");
