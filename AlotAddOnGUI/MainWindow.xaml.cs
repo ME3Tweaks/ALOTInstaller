@@ -3813,10 +3813,13 @@ namespace AlotAddOnGUI
                 DOWNLOADS_FOLDER = KnownFolders.GetPath(KnownFolder.Downloads);
             }
 
-            string librarydir = Utilities.GetRegistrySettingString(SETTINGSTR_LIBRARYDIR);
-            if (librarydir != null && Directory.Exists(librarydir))
+            if (USING_BETA)
             {
-                DOWNLOADED_MODS_DIRECTORY = librarydir;
+                string librarydir = Utilities.GetRegistrySettingString(SETTINGSTR_LIBRARYDIR);
+                if (librarydir != null && Directory.Exists(librarydir))
+                {
+                    DOWNLOADED_MODS_DIRECTORY = librarydir;
+                }
             }
 
             bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? false;
