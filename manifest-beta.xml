@@ -137,7 +137,7 @@
       <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows" />
       <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
    </addonfile>
-   <addonfile alotversion="7" friendlyname="ALOT for ME1 - BETA MANIFEST, DEV TESTING - DO NOT USE BETA MODE RIGHT NOW" author="CreeperLava">
+   <addonfile alotversion="7" friendlyname="ALOT for ME1" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
             tooltipname="ALOT for ME1"
             torrentfilename="ALOT for ME1.zip"
