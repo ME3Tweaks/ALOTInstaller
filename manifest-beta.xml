@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.3.3">
+<alotaddonmanifest version="5.3.4">
    <highestapprovedmemversion>142</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-11-11">143</soaktestingmemversion>
    <stages>
@@ -157,11 +157,11 @@
             
             torrentfilename="ALOT for ME2.zip"
             filename="ALOT for ME2-68-2019-7-0-1541433287.zip"
-            size="501384728"
+            size="3709203349"
             md5="8221924d6a34d85e840e9cc55028d3c6"
             
             unpackedsinglefilename="ALOT_ME2.mem"
-            unpackedsize="3709203349"
+            unpackedsize="3685171959"
             unpackedmd5="5e4b9df97303bf2fc076c7d702844427" />
       <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2.mem" movedirectly="true" />
    </addonfile>
