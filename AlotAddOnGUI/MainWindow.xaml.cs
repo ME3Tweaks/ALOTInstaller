@@ -4136,6 +4136,7 @@ namespace AlotAddOnGUI
                 else
                 {
                     //archive is not acceptable
+                    Log.Information("This file is not usable, it contains no acceptable files in it.");
                     UserFileNotAcceptable(v);
                     return;
                 }
