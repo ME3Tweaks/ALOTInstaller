@@ -1029,7 +1029,7 @@ namespace AlotAddOnGUI
             return true;
         }
 
-        public static Task<List<string>> Run7zWithProgressForAddonFile(string archive)
+        public static Task<List<string>> GetArchiveFileListing(string archive)
         {
             string path = MainWindow.BINARY_DIRECTORY + "7z.exe";
             string args = "l \"" + archive + "\"";
