@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.3.1">
+<alotaddonmanifest version="5.3.4">
    <highestapprovedmemversion>142</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-11-11">143</soaktestingmemversion>
    <stages>
@@ -138,31 +138,46 @@
       <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
    </addonfile>
    <addonfile alotversion="7" friendlyname="ALOT for ME1" author="CreeperLava">
-      <file
-		downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
-		tooltipname="ALOT for ME1"
-		filename="ALOT_ME1.mem"
-		size="477353338"
-		md5="c16dc8c42139ff6b708c230379b9d2b5" />
-      <games me1="true" me2="false" me3="false" />
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+            tooltipname="ALOT for ME1"
+            torrentfilename="ALOT for ME1.zip"
+            
+            filename="ALOT for ME1-83-2019-7-0-1541433297.zip"
+            size="501384728"
+            md5="4fe0c07066251d02bd918121772b99b4"
+            
+            unpackedsinglefilename="ALOT_ME1.mem"
+            unpackedsize="477353338"
+            unpackedmd5="c16dc8c42139ff6b708c230379b9d2b5" />
+      <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="7" friendlyname="ALOT for ME2" author="CreeperLava">
-      <file
-		downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
-		tooltipname="ALOT for ME2"
-		filename="ALOT_ME2.mem"
-		size="3685171959"
-		md5="5e4b9df97303bf2fc076c7d702844427" />
-      <games me1="false" me2="true" me3="false" />
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+            tooltipname="ALOT for ME2"
+            
+            torrentfilename="ALOT for ME2.zip"
+            filename="ALOT for ME2-68-2019-7-0-1541433287.zip"
+            size="3709203349"
+            md5="8221924d6a34d85e840e9cc55028d3c6"
+            
+            unpackedsinglefilename="ALOT_ME2.mem"
+            unpackedsize="3685171959"
+            unpackedmd5="5e4b9df97303bf2fc076c7d702844427" />
+      <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="7" friendlyname="ALOT for ME3" author="CreeperLava">
-      <file
-		downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
-		tooltipname="ALOT for ME3"
-		filename="ALOT_ME3.mem"
-		size="6385264397"
-		md5="729f383c626ed6540a6e94159cd669f3" />
-      <games me1="false" me2="false" me3="true" />
+      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+            tooltipname="ALOT for ME3"
+            
+            torrentfilename="ALOT for ME3.zip"
+            filename="ALOT for ME3-363-2019-7-0-1541525909.zip"
+            size="6409295903"
+            md5="d33cd22f1822163c4acabdac8ab0a02f"
+            
+            unpackedsinglefilename="ALOT_ME3.mem"
+            unpackedsize="6385264397"
+            unpackedmd5="729f383c626ed6540a6e94159cd669f3" />
+      <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
@@ -239,27 +254,27 @@
       <games me1="false" me2="true" me3="false" />
    </addonfile>
    <addonfile friendlyname="FemShep High Quality textures" author="heleuss" optional="true">
-     <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
-     <packagefile me2="true" sourcename="[ME2] KH_femShep_eyes.tpf" movedirectly="true" />
-	 <packagefile me1="true" sourcename="[ME2] KH_femShep_eyes.tpf" delete="true" />
-     <packagefile me1="true" me2="true" sourcename="[ME2] KH_femShep_eyebrows.tpf" movedirectly="true" />
-     <packagefile me1="true" me2="true" sourcename="[ME2] KH_femShep_eyelashes.tpf" movedirectly="true" />
-     <packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true" />
-     <packagefile me2="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" movedirectly="true" />
-     <packagefile me1="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" delete="true" />
-     <packagefile me1="true" sourcename="HMF_HED_PROBase_Face_Diff_0x9CA124E8.dds" destinationname="0x8F331825.dds" />
-     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Frek_Diff_0x2A01319D.dds" destinationname="0x2CC6F67C.dds" />
-     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Frek_Norm_0xBA928949.dds" destinationname="0xA5C11535.dds" />
-     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Military_Diff_0x9E76BE04.dds" destinationname="0x5B79C364.dds" />
-     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Military_Norm_0x35E34BA6.dds" destinationname="0xF6A39457.dds" />
-     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Rough_Diff_0xAA133987.dds" destinationname="0x1365F4C4.dds" />
-     <packagefile me1="true" sourcename="HMF_HED_PROCustom_Rough_Norm_0x6DB1C814.dds" destinationname="0x999F0526.dds" />
-     <packagefile me1="true" sourcename="HMF_HED_PROOld1_Face_Diff_0x0DF18845.dds" destinationname="0xED9E4F99.dds" />
-     <packagefile me1="true" sourcename="HMF_HED_PROOld1_Face_Norm_0xE9EED499.dds" destinationname="0x8B6D4AA7.dds" />
+      <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
+      <packagefile me2="true" sourcename="[ME2] KH_femShep_eyes.tpf" movedirectly="true" />
+      <packagefile me1="true" sourcename="[ME2] KH_femShep_eyes.tpf" delete="true" />
+      <packagefile me1="true" me2="true" sourcename="[ME2] KH_femShep_eyebrows.tpf" movedirectly="true" />
+      <packagefile me1="true" me2="true" sourcename="[ME2] KH_femShep_eyelashes.tpf" movedirectly="true" />
+      <packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true" />
+      <packagefile me2="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" movedirectly="true" />
+      <packagefile me1="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" delete="true" />
+      <packagefile me1="true" sourcename="HMF_HED_PROBase_Face_Diff_0x9CA124E8.dds" destinationname="0x8F331825.dds" />
+      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Frek_Diff_0x2A01319D.dds" destinationname="0x2CC6F67C.dds" />
+      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Frek_Norm_0xBA928949.dds" destinationname="0xA5C11535.dds" />
+      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Military_Diff_0x9E76BE04.dds" destinationname="0x5B79C364.dds" />
+      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Military_Norm_0x35E34BA6.dds" destinationname="0xF6A39457.dds" />
+      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Rough_Diff_0xAA133987.dds" destinationname="0x1365F4C4.dds" />
+      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Rough_Norm_0x6DB1C814.dds" destinationname="0x999F0526.dds" />
+      <packagefile me1="true" sourcename="HMF_HED_PROOld1_Face_Diff_0x0DF18845.dds" destinationname="0xED9E4F99.dds" />
+      <packagefile me1="true" sourcename="HMF_HED_PROOld1_Face_Norm_0xE9EED499.dds" destinationname="0x8B6D4AA7.dds" />
    </addonfile>
    <addonfile friendlyname="BroShep High Quality textures" author="heleuss" optional="true">
-     <file downloadlink="https://www.dropbox.com/s/g6wg6v7uy8y7x15/%5BME2%5D%20broShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] broShep High Quality textures.7z" size="11802235" md5="4a220058d12c0c125a27a1d30bfff937" />
-     <packagefile me1="true" me2="true" sourcename="[ME2] KH_broShep_face_textures.tpf" movedirectly="true" />
+      <file downloadlink="https://www.dropbox.com/s/g6wg6v7uy8y7x15/%5BME2%5D%20broShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] broShep High Quality textures.7z" size="11802235" md5="4a220058d12c0c125a27a1d30bfff937" />
+      <packagefile me1="true" me2="true" sourcename="[ME2] KH_broShep_face_textures.tpf" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Miscellaneous textures" author="CDAMJC, CreeperLava">
       <file downloadlink="https://mega.nz/#!NlsnhAjT!AVx8Xof32tQRG-b00AixhLJ16tDKulYcyHvg3xh-tRk" tooltipname="Miscellaneous Textures.zip" filename="Miscellaneous Textures.zip" size="12211901" md5="3a747c9d9daf7de4c24fde296d76be83" />
