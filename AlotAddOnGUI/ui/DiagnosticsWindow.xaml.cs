@@ -1036,7 +1036,7 @@ namespace AlotAddOnGUI.ui
                                 if (line.Contains("Uninitialized: Log file closed"))
                                 {
                                     crashIndex = index;
-                                    reason = "Log file indicates uninitialized device caused application to abort";
+                                    reason = "Log file indicates device never fully initalized - may be due to dsound.dll in binaries folder.\nRemoving this file may fix the issue";
                                     Log.Information("Found crash in ME1 log " + file.Name + " on line " + index);
                                     break;
                                 }

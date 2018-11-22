@@ -706,13 +706,6 @@ namespace AlotAddOnGUI
                     return;
                 }
                 Utilities.RemoveRunAsAdminXPSP3FromME1();
-                Utilities.InstallIndirectSoundFixForME1();
-                string iniPath = IniSettingsHandler.GetConfigIniPath(1);
-                if (File.Exists(iniPath))
-                {
-                    IniFile engineConf = new IniFile(iniPath);
-                    engineConf.Write("DeviceName", "Generic Hardware", "ISACTAudio.ISACTAudioDevice");
-                }
             }
             Utilities.TurnOffOriginAutoUpdate();
 

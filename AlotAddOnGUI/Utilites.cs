@@ -606,26 +606,7 @@ namespace AlotAddOnGUI
             }
             return result;
         }
-
-        public static bool InstallIndirectSoundFixForME1()
-        {
-            Log.Information("Installing indirect sound fix  for Mass Effect");
-            string gamePath = GetGamePath(1);
-            gamePath += "\\Binaries\\";
-            try
-            {
-                File.WriteAllBytes(gamePath + "dsound.dll", AlotAddOnGUI.Properties.Resources.dsound);
-                Log.Information("Installed indrectsound for Mass Effect");
-                return true;
-            }
-            catch (Exception e)
-            {
-                Log.Error("Unable to install indirectsound:");
-                Log.Error(App.FlattenException(e));
-            }
-            return false;
-        }
-
+        
         public static string CalculateMD5(string filename)
         {
             try

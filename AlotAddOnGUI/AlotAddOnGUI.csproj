@@ -331,7 +331,6 @@
     <Resource Include="images\greencheckmark.png" />
     <Resource Include="images\orangedownload.png" />
     <Resource Include="ALOTInstallerIcon.ico" />
-    <Content Include="binkw32\me1\dsound.dll" />
     <Content Include="binkw32\me2\binkw23.dll" />
     <Content Include="binkw32\me2\binkw32.dll" />
     <Content Include="binkw32\me3\binkw23.dll" />
@@ -373,7 +372,9 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="binkw32\me1\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
