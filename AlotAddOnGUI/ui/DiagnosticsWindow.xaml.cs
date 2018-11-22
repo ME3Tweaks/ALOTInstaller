@@ -1020,7 +1020,7 @@ namespace AlotAddOnGUI.ui
                         {
                             Console.WriteLine(file.Name + " " + file.LastWriteTime);
                             var logLines = File.ReadAllLines(file.FullName);
-                            int crashIndex = 0;
+                            int crashIndex = -1;
                             int index = 0;
                             string reason = "";
                             foreach (string line in logLines)
@@ -1036,7 +1036,7 @@ namespace AlotAddOnGUI.ui
                                 if (line.Contains("Uninitialized: Log file closed"))
                                 {
                                     crashIndex = index;
-                                    reason = "Log file indicates device never fully initalized - may be due to dsound.dll in binaries folder.\nRemoving this file may fix the issue";
+                                    reason = "~~~Log file indicates a device never fully initalized";
                                     Log.Information("Found crash in ME1 log " + file.Name + " on line " + index);
                                     break;
                                 }
@@ -1046,11 +1046,11 @@ namespace AlotAddOnGUI.ui
                             if (dSoundExists && logLines.Length > 0 && logLines.Last().Contains("Init: Audio Device"))
                             {
                                 crashIndex = logLines.Length - 1;
-                                reason = "Log file indicates audio device never fully initalized - may be due to dsound.dll in binaries folder.\nRemoving this file may fix the issue";
+                                reason = "~~~Log file indicates audio device never fully initalized - may be due to dsound.dll in binaries folder.\n~~~Removing this file may fix the issue";
                                 Log.Information("Found audio device hanging startup in ME1 log " + file.Name + " on line " + index);
                             }
 
-                            if (crashIndex > 0)
+                            if (crashIndex >= 0)
                             {
                                 crashIndex = Math.Max(0, crashIndex - 10);
                                 //this log has a crash
