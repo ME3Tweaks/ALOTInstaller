@@ -4123,9 +4123,9 @@ namespace AlotAddOnGUI
         private async void LoadUserFileSelection(string v)
         {
             string extension = Path.GetExtension(v.ToLower());
-            if (extension == ".zip" || extension == ".rr" || extension == ".7z")
+            if (extension == ".zip" || extension == ".rar" || extension == ".7z")
             {
-                List<string> files = await Utilities.Run7zWithProgressForAddonFile(v);
+                List<string> files = await Utilities.GetArchiveFileListing(v);
                 if (ArchiveHasValidFiles(files))
                 {
                     UserTextures_Title.Text = "Select which game " + Path.GetFileName(v) + " applies to";
@@ -4136,6 +4136,7 @@ namespace AlotAddOnGUI
                 else
                 {
                     //archive is not acceptable
+                    Log.Information("This file is not usable, it contains no acceptable files in it.");
                     UserFileNotAcceptable(v);
                     return;
                 }
