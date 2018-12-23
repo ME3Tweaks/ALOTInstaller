@@ -1440,7 +1440,8 @@ namespace AlotAddOnGUI
                 string gameDir = Utilities.GetGamePath(BACKUP_THREAD_GAME);
                 foreach (String error in BACKGROUND_MEM_PROCESS_ERRORS)
                 {
-                    modified += "\n - " + error.Remove(0, gameDir.Length + 1);
+                    modified += "\n - " + error;
+                    //.Remove(0, gameDir.Length + 1);
                 }
                 Log.Warning("Backup verification failed. Allowing user to choose to continue or not");
                 ThreadCommandDialogOptions tcdo = new ThreadCommandDialogOptions();

@@ -4941,7 +4941,8 @@ namespace AlotAddOnGUI
                 string gameDir = Utilities.GetGamePath(BACKUP_THREAD_GAME);
                 foreach (String error in BACKGROUND_MEM_PROCESS_ERRORS)
                 {
-                    modified += "\n - " + error.Remove(0, gameDir.Length + 1);
+                    modified += "\n - " + error;
+                    //.Remove(0, gameDir.Length + 1);
                 }
                 Log.Warning("Game verification failed.");
                 string message = "Mass Effect" + GetGameNumberSuffix(BACKUP_THREAD_GAME) + " has files that do not match what is in the MEM database.\nThe files are listed below." + modified;
