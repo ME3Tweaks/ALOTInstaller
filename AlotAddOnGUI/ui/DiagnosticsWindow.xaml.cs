@@ -1310,10 +1310,6 @@ namespace AlotAddOnGUI.ui
                                 if (MEMI_FOUND)
                                 {
                                     string subpath = param;
-                                    if (param.Length > gamePath.Length)
-                                    {
-                                        subpath = subpath.Substring(gamePath.Length);
-                                    }
                                     if (!AddedFiles.Contains(subpath.ToLower()))
                                     {
                                         BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File missing MEM/MEMNOGUI marker was found: " + subpath);
