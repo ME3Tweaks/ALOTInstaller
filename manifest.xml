@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotaddonmanifest version="5.3.7">
-   <highestapprovedmemversion>143</highestapprovedmemversion>
-   <soaktestingmemversion soakstartdate="2018-12-19">153</soaktestingmemversion>
+   <highestapprovedmemversion>153</highestapprovedmemversion>
+   <soaktestingmemversion soakstartdate="2018-12-23">154</soaktestingmemversion>
    <stages>
       <!-- -56 is the next error code available-->
       <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
@@ -48,6 +48,7 @@
       <supportedhash game="me1" name="DVD">73b76699d4e245c92110a93c54980b78</supportedhash>
       <supportedhash game="me1" name="DVD, Polish">298c30a399d0959e5e997a9d64b42548</supportedhash>
       <supportedhash game="me1" name="DVD, Polish, MEM Patched">9a89527800722ec308c01a421bfeb478</supportedhash>
+      <supportedhash game="me1" name="Origin - German">8bba14d838d9c95e10d8ceeb5c958976</supportedhash>
       <supportedhash game="me2" name="Origin, ME2Game/MassEffect2 swapped">73827026bc9629562c4a3f61a752541c</supportedhash>
       <supportedhash game="me2" name="Origin">32fb31b80804040996ed78d14110b54b</supportedhash>
       <supportedhash game="me2" name="Origin - ME2Game">229173ca9057baeb4fd9f0fb2e569051</supportedhash>
