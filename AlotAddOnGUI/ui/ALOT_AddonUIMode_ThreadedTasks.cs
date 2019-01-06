@@ -1839,8 +1839,7 @@ namespace AlotAddOnGUI
             }
 
 
-
-            int nummissing = 0;
+            List<AddonFile> missingRecommendedFiles = new List<AddonFile>();
             bool oneisready = false;
             if (installedInfo == null)
             {
@@ -1919,7 +1918,7 @@ namespace AlotAddOnGUI
                                 continue; //this this file as meuitm is already installed
                             }
                         }
-                        nummissing++;
+                        missingRecommendedFiles.Add(af);
                     }
                     else
                     {
@@ -1976,7 +1975,7 @@ namespace AlotAddOnGUI
                 return false;
             }
 
-            if (nummissing == 0)
+            if (missingRecommendedFiles.Count == 0)
             {
                 TELEMETRY_ALL_ADDON_FILES = true;
                 return true;
@@ -1990,8 +1989,13 @@ namespace AlotAddOnGUI
             //if alot is already installed we don't need to show missing message, unless installed via MEM directly
             if (installedInfo == null || installedInfo.ALOTVER == 0)
             {
-                Log.Information(nummissing + " addon files are missing - prompting user to decline install.");
-                MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + GetGameNumberSuffix(game) + " addon are not imported. Addon files add a significant amount of high quality textures from third party artists and are tested to work with ALOT. These files must be imported if you want all of the high quality textures; these files are not included directly in ALOT because of ownership rights.\n\nNot importing these files will significantly degrade the ALOT experience. Are you sure you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
+                string missing = "";
+                foreach (AddonFile af in missingRecommendedFiles)
+                {
+                    missing += " - " + af.FriendlyName + "\n";
+                }
+                Log.Information(missingRecommendedFiles.Count + " addon files are missing - prompting user to decline install.");
+                MessageDialogResult result = await this.ShowMessageAsync(missingRecommendedFiles.Count + " file" + (missingRecommendedFiles.Count != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + GetGameNumberSuffix(game) + " addon are not imported:\n" + missing + "\nAddon files add a significant amount of high quality textures from third party artists (that cannot be included in the main ALOT file) and are tested to work with ALOT. These files must be imported if you want all of the high quality textures; these files are not included directly in ALOT because of ownership rights.\n\nNot importing these files will significantly degrade the ALOT experience. Are you sure you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
                 if (result == MessageDialogResult.Affirmative)
                 {
                     Log.Warning("User is continuing build step without all non-optional addon files. If user complains about a high amount of low quality textures this might be why.");

@@ -3317,7 +3317,7 @@ namespace AlotAddOnGUI
             if (files.Count() > 0)
             {
                 //don't know how you can drop less than 1 files but whatever
-                //This code is for failsafe in case somehow library file exists but is not detect properly, like user moved file but something is running
+                //This code is for failsafe in case somehow library file exists but is not detected properly, like user moved file but something is running
                 string file = files[0];
                 string basepath = DOWNLOADED_MODS_DIRECTORY + "\\";
 
@@ -3536,7 +3536,7 @@ namespace AlotAddOnGUI
         {
             PreventFileRefresh = true;
             string importingfrom = Path.GetPathRoot(filesToImport[0].Item2);
-            string importingto = Path.GetPathRoot(EXE_DIRECTORY);
+            string importingto = Path.GetPathRoot(DOWNLOADED_MODS_DIRECTORY);
             if (DOWNLOAD_ASSISTANT_WINDOW != null)
             {
                 DOWNLOAD_ASSISTANT_WINDOW.ShowStatus("Importing...");
@@ -3659,6 +3659,7 @@ namespace AlotAddOnGUI
         {
             List<Tuple<AddonFile, string, string>> filesToImport = (List<Tuple<AddonFile, string, string>>)e.Argument;
             List<string> completedItems = new List<string>();
+            List<string> failedItems = new List<string>();
             while (filesToImport.Count > 0)
             {
                 Tuple<AddonFile, string, string> fileToImport = filesToImport[0];
@@ -3668,14 +3669,21 @@ namespace AlotAddOnGUI
                 {
                     File.Delete(fileToImport.Item3);
                 }
-                File.Move(fileToImport.Item2, fileToImport.Item3);
-                Log.Information("Imported via move: " + fileToImport.Item2);
-                completedItems.Add(fileToImport.Item1.FriendlyName);
+                try
+                {
+                    File.Move(fileToImport.Item2, fileToImport.Item3);
+                    Log.Information("Imported via move: " + fileToImport.Item2);
+                    completedItems.Add(fileToImport.Item1.FriendlyName);
+                } catch (IOException ex)
+                {
+                    Log.Error("Unable to move file " + fileToImport.Item2 + " due to IOException: " + ex.Message);
+                    failedItems.Add(fileToImport.Item1.FriendlyName + ": " + ex.Message);
+                }
             }
-            e.Result = completedItems;
+            e.Result = new Tuple<List<string>,List<string>>(completedItems,failedItems);
         }
 
-        private void ImportCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private async void ImportCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e != null)
             {
@@ -3687,7 +3695,10 @@ namespace AlotAddOnGUI
                 else
                 if (e.Result != null)
                 {
-                    List<string> importedFiles = (List<string>)e.Result;
+                    var result = (Tuple<List<string>, List<string>>)e.Result;
+                    List<string> importedFiles = result.Item1;
+                    List<string> failedFiles = result.Item2;
+
                     if (WindowState == WindowState.Minimized)
                     {
                         foreach (string af in importedFiles)
@@ -3698,15 +3709,27 @@ namespace AlotAddOnGUI
                     else
                     {
                         //imports finished
-                        string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods library.";
-                        foreach (string af in importedFiles)
+                        if (failedFiles.Count > 0)
                         {
-                            detailsMessage += "\n - " + af;
+                            string detailsMessage = "The following files were unable to be imported into ALOT Installer.";
+                            foreach (string af in failedFiles)
+                            {
+                                detailsMessage += "\n - " + af;
+                            }
+                            string originalTitle = failedFiles.Count + " file" + (failedFiles.Count != 1 ? "s" : "") + " failed to import";
+                            await this.ShowMessageAsync(originalTitle, detailsMessage);
                         }
-                        string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                        string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods library.";
-                        ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
-
+                        if (importedFiles.Count > 0)
+                        {
+                            string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods library.";
+                            foreach (string af in importedFiles)
+                            {
+                                detailsMessage += "\n - " + af;
+                            }
+                            string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
+                            string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods library.";
+                            ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
+                        }
                     }
                     CheckImportLibrary_Tick(null, null);
                     PreventFileRefresh = false; //allow refresh
@@ -3813,14 +3836,14 @@ namespace AlotAddOnGUI
                 DOWNLOADS_FOLDER = KnownFolders.GetPath(KnownFolder.Downloads);
             }
 
-            if (USING_BETA)
-            {
+            //if (USING_BETA)
+            //{
                 string librarydir = Utilities.GetRegistrySettingString(SETTINGSTR_LIBRARYDIR);
                 if (librarydir != null && Directory.Exists(librarydir))
                 {
                     DOWNLOADED_MODS_DIRECTORY = librarydir;
                 }
-            }
+            //}
 
             bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? false;
             Checkbox_RepackME2GameFiles.IsChecked = repack;
