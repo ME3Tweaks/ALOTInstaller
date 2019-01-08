@@ -211,6 +211,20 @@ namespace AlotAddOnGUI
             }
         }
 
+        private int _progress_max;
+        public int Progressbar_Max
+        {
+            get { return _progress_max; }
+            set
+            {
+                if (value != _progress_max)
+                {
+                    _progress_max = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         private double _progressBarValue;
         public static bool TELEMETRY_ALL_ADDON_FILES = false;
 
@@ -231,6 +245,7 @@ namespace AlotAddOnGUI
         {
             Log.Information("MainWindow() is starting");
             DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods"; //This will be changed when settings load;
+            Progressbar_Max = 100;
             InitializeComponent();
             LoadSettings();
             MEUITM_INSTALLER_MODE = App.BootMEUITMMode; //installer state defaults to boot setting

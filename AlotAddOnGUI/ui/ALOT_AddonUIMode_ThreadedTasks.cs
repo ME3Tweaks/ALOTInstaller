@@ -1475,17 +1475,18 @@ namespace AlotAddOnGUI
                 Log.Information("Creating backup... Only errors will be reported.");
                 try
                 {
-                    CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, -1, 0, ignoredExtensions);
+                    CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, this, -1, 0, ignoredExtensions);
                 }
                 catch (Exception ex)
                 {
                     Log.Error("Error creating backup:");
                     Log.Error(App.FlattenException(ex));
                     BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Backup failed", "Backup of Mass Effect" + GetGameNumberSuffix(BACKUP_THREAD_GAME) + " failed. An error occured during the copy process. The error message was: " + ex.Message + ".\nSome files may have been copied, but this backup is not usable. You can delete the folder you were backing up files into.\nReview the installer log for more information.")));
-
+                    Progressbar_Max = 100;
                     e.Result = null;
                     return;
                 }
+                Progressbar_Max = 100;
                 Log.Information("Backup copy created");
             }
             if (BACKUP_THREAD_GAME == 3)
@@ -1679,7 +1680,8 @@ namespace AlotAddOnGUI
             if (gamePath != null)
             {
                 Log.Information("Copying backup to game directory: " + backupPath + " -> " + gamePath);
-                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(gamePath), BackupWorker, -1, 0);
+                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(gamePath), BackupWorker, this,  -1, 0);
+                Progressbar_Max = 100;
                 Log.Information("Restore of game data has completed");
             }
             if (BACKUP_THREAD_GAME == 3)
