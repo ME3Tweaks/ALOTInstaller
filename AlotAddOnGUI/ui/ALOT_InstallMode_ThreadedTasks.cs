@@ -1189,8 +1189,8 @@ namespace AlotAddOnGUI
                                 {
                                     if (param == "STAGE_DONE")
                                     {
-                                    //We're done!
-                                    STAGE_DONE_REACHED = true;
+                                        //We're done!
+                                        STAGE_DONE_REACHED = true;
                                         return;
                                     }
                                     if (CURRENT_STAGE_CONTEXT != null)
@@ -1201,12 +1201,12 @@ namespace AlotAddOnGUI
                                     }
                                     else
                                     {
-                                    //context is null, we are now starting
-                                    ProgressWeightPercentages.ScaleWeights();
+                                        //context is null, we are now starting
+                                        ProgressWeightPercentages.ScaleWeights();
                                     }
 
-                                //clear errors so we can context switch error handling
-                                BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
+                                    //clear errors so we can context switch error handling
+                                    BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
                                     BACKGROUND_MEM_PROCESS_PARSED_ERRORS = new List<string>();
 
 
@@ -1247,8 +1247,8 @@ namespace AlotAddOnGUI
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
                                 break;
                             default:
-                            //check if IPC is a stage failure
-                            StageFailure failure = null;
+                                //check if IPC is a stage failure
+                                StageFailure failure = null;
                                 foreach (Stage stage in ProgressWeightPercentages.Stages)
                                 {
                                     foreach (StageFailure sf in stage.FailureInfos)
@@ -1266,7 +1266,8 @@ namespace AlotAddOnGUI
                                 }
                                 if (failure != null)
                                 {
-                                    Log.Error("A fail condition IPC has been received: " + failure.FailureIPCTrigger + ". " + failure.FailureTopText);
+                                    Log.Error("A fail condition IPC has been received: " + failure.FailureIPCTrigger + ": " + failure.FailureTopText);
+                                    Log.Error(" >> IPC Command Received: " + str);
                                     BACKGROUND_MEM_PROCESS_ERRORS.Add(failure.FailureIPCTrigger);
                                 }
                                 else
