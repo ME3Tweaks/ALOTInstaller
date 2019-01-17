@@ -253,7 +253,8 @@ namespace AlotAddOnGUI
             if (!USING_BETA)
             {
                 Button_LibraryDir.Visibility = Visibility.Collapsed; //Not for main use right now.
-            } else
+            }
+            else
             {
                 Button_LibraryDir.ToolTip = "Click to change downloaded mods library directory.\nIf path is not found at app startup, the default subdirectory of Downloaded_Mods will be used.\n\nLibrary location currently is:\n" + DOWNLOADED_MODS_DIRECTORY;
             }
@@ -813,14 +814,20 @@ namespace AlotAddOnGUI
                         }
                     }
 
+                    //No local version, no latest, but we have asset available somehwere
                     if (fileVersion == 0 && latest == null && latestReleaseWithAsset != null)
                     {
                         Log.Information("MEM No Gui does not exist locally, and no applicable version can be found, pulling latest from github");
                         latest = latestReleaseWithAsset;
                     }
+                    else if (fileVersion == 0 && latestReleaseWithAsset == null)
+                    {
+                        //No local version, and we have no server version
+                        Log.Error("Cannot pull a copy of MassEffectModderNoGui from server, could not find one with assets. ALOT Installer will have severely limited functionality.");
+                    }
                     else if (fileVersion == 0)
                     {
-                        Log.Error("Cannot pull a copy of MassEffectModderNoGui from server, could not find one with assets. ALOT Installer will have severely limited functionality.");
+                        Log.Information("MEM No Gui does not exist locally. Pulling a copy from Github.");
                     }
 
                     if (latest != null)
@@ -1156,6 +1163,7 @@ namespace AlotAddOnGUI
                     Log.Error("BuildCompleted() got -1 (or default catch all) result.");
                     HeaderLabel.Text = "An error occured while building and staging textures for installation.\nView the log (Settings -> Diagnostics -> View Installer Log) for more information.";
                     AddonFilesLabel.Text = "Staging aborted";
+                    await this.ShowMessageAsync("Error occured while building installation package", "An error occured while building the installation package. You can view the installer log file for more information in the settings menu. You should report this issue to the developers on Discord in the #bugs channel (Settings -> Report an issue).");
                     RefreshesUntilRealRefresh = 4;
                     break;
                 case 1:
@@ -3689,13 +3697,14 @@ namespace AlotAddOnGUI
                     File.Move(fileToImport.Item2, fileToImport.Item3);
                     Log.Information("Imported via move: " + fileToImport.Item2);
                     completedItems.Add(fileToImport.Item1.FriendlyName);
-                } catch (IOException ex)
+                }
+                catch (IOException ex)
                 {
                     Log.Error("Unable to move file " + fileToImport.Item2 + " due to IOException: " + ex.Message);
                     failedItems.Add(fileToImport.Item1.FriendlyName + ": " + ex.Message);
                 }
             }
-            e.Result = new Tuple<List<string>,List<string>>(completedItems,failedItems);
+            e.Result = new Tuple<List<string>, List<string>>(completedItems, failedItems);
         }
 
         private async void ImportCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -3853,11 +3862,11 @@ namespace AlotAddOnGUI
 
             //if (USING_BETA)
             //{
-                string librarydir = Utilities.GetRegistrySettingString(SETTINGSTR_LIBRARYDIR);
-                if (librarydir != null && Directory.Exists(librarydir))
-                {
-                    DOWNLOADED_MODS_DIRECTORY = librarydir;
-                }
+            string librarydir = Utilities.GetRegistrySettingString(SETTINGSTR_LIBRARYDIR);
+            if (librarydir != null && Directory.Exists(librarydir))
+            {
+                DOWNLOADED_MODS_DIRECTORY = librarydir;
+            }
             //}
 
             bool repack = Utilities.GetRegistrySettingBool(SETTINGSTR_REPACK) ?? false;
@@ -5038,7 +5047,7 @@ namespace AlotAddOnGUI
                 af.Ready = false;
             }
             Button_LibraryDir.ToolTip = "Click to change downloaded mods library directory.\nIf path is not found at app startup, the default subdirectory of Downloaded_Mods will be used.\n\nLibrary location currently is:\n" + DOWNLOADED_MODS_DIRECTORY;
-            ShowStatus("Updated library directory - please wait while files refresh...",4000);
+            ShowStatus("Updated library directory - please wait while files refresh...", 4000);
         }
     }
 }

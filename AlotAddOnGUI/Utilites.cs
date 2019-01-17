@@ -20,6 +20,7 @@ using System.Security.Cryptography;
 using SlavaGu.ConsoleAppLauncher;
 using System.ComponentModel;
 using ByteSizeLib;
+using System.Globalization;
 
 namespace AlotAddOnGUI
 {
@@ -1259,6 +1260,22 @@ namespace AlotAddOnGUI
             {
                 return false;
             }
+        }
+
+        public static double GetDouble(string value, double defaultValue)
+        {
+            double result;
+
+            // Try parsing in the current culture
+            if (!double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
+                // Then try in US english
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
+                // Then in neutral language
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            {
+                result = defaultValue;
+            }
+            return result;
         }
 
         public static string sha256(string randomString)

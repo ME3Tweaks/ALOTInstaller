@@ -1176,7 +1176,7 @@ namespace AlotAddOnGUI
                                 string[] parameters = param.Split(' ');
                                 try
                                 {
-                                    double scale = Double.Parse(parameters[1]);
+                                    double scale = Utilities.GetDouble(parameters[1], 1);
                                     Log.Information("Reweighting stage " + parameters[0] + " by " + parameters[1]);
                                     ProgressWeightPercentages.ScaleCurrentTaskWeight(CURRENT_STAGE_NUM - 1, scale);
                                 }

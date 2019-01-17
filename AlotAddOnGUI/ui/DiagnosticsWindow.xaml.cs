@@ -122,13 +122,8 @@ namespace AlotAddOnGUI.ui
 
         private void ShowDiagnosticTypes()
         {
-            DiagnosticHeader.Text = "Select type of diagnostic.";
+            DiagnosticHeader.Text = "Select type of diagnostic.\nQuick diagnostic will cover most cases.";
             ALOTVersionInfo avi = Utilities.GetInstalledALOTInfo(DIAGNOSTICS_GAME);
-            if (avi == null)
-            {
-                Button_FullDiagnostic.IsEnabled = false;
-                Button_FullDiagnostic.ToolTip = "MEMI tag missing - full scan won't provide any useful info";
-            }
             Panel_DiagnosticsTypes.Visibility = Visibility.Visible;
         }
 
@@ -761,6 +756,8 @@ namespace AlotAddOnGUI.ui
 
                 addDiagLine("===Installed DLC");
                 addDiagLine("The following folders are present in the DLC directory:");
+                var unpackedFileExtensions = new List<string>() { ".pcc", ".tlk", ".bin", ".dlc" };
+
                 if (Directory.Exists(dlcPath))
                 {
 
@@ -781,7 +778,8 @@ namespace AlotAddOnGUI.ui
                         }
                         long sfarsize = 0;
                         long propersize = 32L;
-                        bool hasSfarSizeError = false;
+                        long me3expUnpackedSize = GetME3ExplorerUnpackedSFARSize(value);
+                        bool hasSfarSizeErrorMemiFound = false;
                         string duplicatePriorityStr = "";
                         if (DIAGNOSTICS_GAME == 3)
                         {
@@ -812,46 +810,78 @@ namespace AlotAddOnGUI.ui
                             }
 
                             //Check for SFAR size not being 32 bytes
-                            string sfar = dir + "\\CookedPCConsole\\Default.sfar";
+                            string sfar = Path.Combine(dir, "CookedPCConsole", "Default.sfar");
+                            string unpackedDir = Path.Combine(dir, "CookedPCConsole");
                             if (File.Exists(sfar))
                             {
                                 FileInfo fi = new FileInfo(sfar);
                                 sfarsize = fi.Length;
-                                hasSfarSizeError = sfarsize != propersize;
-                            }
+                                hasSfarSizeErrorMemiFound = sfarsize != propersize;
 
-                            if (hasSfarSizeError && MEMI_FOUND)
-                            {
-                                if (GetME3ExplorerUnpackedSFARSize(value) == sfarsize)
+                                var filesInSfarDir = Directory.EnumerateFiles(unpackedDir).ToList();
+                                var hasUnpackedFiles = filesInSfarDir.Any(d => unpackedFileExtensions.Contains(Path.GetExtension(d.ToLower())));
+                                var officialPackedSize = GetPackedSFARSize(value);
+                                if (hasSfarSizeErrorMemiFound && MEMI_FOUND)
                                 {
-                                    addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                                    addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
-                                    addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
-                                }
-                                else if (GetPackedSFARSize(value) == sfarsize)
-                                {
-                                    addDiagLine("[FATAL]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                                    addDiagLine("[ERROR]      SFAR is not unpacked. This DLC was either installed after ALOT was installed or was repaired by Origin.");
-                                    addDiagLine("[ERROR]      The game must be restored from backup or deleted. Once reinstalled, ALOT must be installed again.");
+                                    if (me3expUnpackedSize == sfarsize)
+                                    {
+                                        addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - ME3Explorer mainline unpacked");
+                                        addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
+                                        if (HASH_SUPPORTED)
+                                        {
+                                            addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
+                                        }
+                                    }
+                                    else if (sfarsize >= officialPackedSize && officialPackedSize != 0 && hasUnpackedFiles)
+                                    {
+                                        addDiagLine("[FATAL]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - Packed with unpacked files");
+                                        addDiagLine("[ERROR]      SFAR is not unpacked, but directory contains unpacked files. This DLC was unpacked and then restored.");
+                                        addDiagLine("[ERROR]      This DLC is in an inconsistent state. The game must be restored from backup or deleted. Once reinstalled, ALOT must be installed again.");
+                                    }
+                                    else if (officialPackedSize == sfarsize)
+                                    {
+                                        addDiagLine("[FATAL]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - Packed");
+                                        addDiagLine("[ERROR]      SFAR is not unpacked. This DLC was either installed after ALOT was installed or was attempted to be repaired by Origin.");
+                                        addDiagLine("[ERROR]      The game must be restored from backup or deleted. Once reinstalled, ALOT must be installed again.");
+                                    }
+                                    else
+                                    {
+                                        addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - Unknown SFAR size");
+                                        addDiagLine("[ERROR]      SFAR is not the MEM unpacked size, ME3Explorer unpacked size, or packed size. This SFAR is " + ByteSize.FromBytes(sfarsize) + " bytes.");
+                                    }
                                 }
                                 else
                                 {
-                                    addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                                    addDiagLine("[ERROR]      SFAR is not the MEM unpacked size, ME3Explorer unpacked size, or packed size. This SFAR is " + ByteSize.FromBytes(sfarsize) + " bytes.");
+                                    //ALOT not detected
+                                    if (me3expUnpackedSize == sfarsize)
+                                    {
+                                        addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - ME3Explorer mainline unpacked");
+                                        addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
+                                        if (HASH_SUPPORTED)
+                                        {
+                                            addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
+                                        }
+                                    }
+                                    else if (sfarsize >= officialPackedSize && officialPackedSize != 0 && hasUnpackedFiles)
+                                    {
+                                        addDiagLine("[FATAL]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - Packed with unpacked files");
+                                        addDiagLine("[ERROR]      SFAR is not unpacked, but directory contains unpacked files. This DLC was unpacked and then restored.");
+                                        addDiagLine("[ERROR]      This DLC is in an inconsistent state. The game must be restored from backup or deleted. Once reinstalled, ALOT must be installed again.");
+                                    }
+                                    else if (sfarsize >= officialPackedSize && officialPackedSize != 0)
+                                    {
+                                        addDiagLine(GetDLCDisplayString(value) + " - Packed");
+                                    }
+                                    else
+                                    {
+                                        addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibility Pack" : null));
+                                    }
                                 }
                             }
                             else
                             {
-                                if (GetME3ExplorerUnpackedSFARSize(value) == sfarsize)
-                                {
-                                    addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                                    addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
-                                    addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
-                                }
-                                else
-                                {
-                                    addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibility Pack" : null));
-                                }
+                                //SFAR MISSING
+                                addDiagLine("~~~" + GetDLCDisplayString(value) + " - SFAR missing");
                             }
                         }
                         else

@@ -1680,7 +1680,7 @@ namespace AlotAddOnGUI
             if (gamePath != null)
             {
                 Log.Information("Copying backup to game directory: " + backupPath + " -> " + gamePath);
-                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(gamePath), BackupWorker, this,  -1, 0);
+                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(gamePath), BackupWorker, this, -1, 0);
                 Progressbar_Max = 100;
                 Log.Information("Restore of game data has completed");
             }
@@ -1823,12 +1823,13 @@ namespace AlotAddOnGUI
             //Check for Texture2D.tfc
             if (installedInfo == null && (game == 2 || game == 3))
             {
-                if (game == 2) { gamePath = Path.Combine(gamePath, "BioGame", "CookedPC", "Texture2D.tfc"); }
-                if (game == 3) { gamePath = Path.Combine(gamePath, "BIOGame", "CookedPCConsole", "Texture2D.tfc"); }
-                if (File.Exists(gamePath))
+                string checkPath = gamePath;
+                if (game == 2) { checkPath = Path.Combine(gamePath, "BioGame", "CookedPC", "Texture2D.tfc"); }
+                if (game == 3) { checkPath = Path.Combine(gamePath, "BIOGame", "CookedPCConsole", "Texture2D.tfc"); }
+                if (File.Exists(checkPath))
                 {
-                    Log.Error("Previous installation file found: " + gamePath);
-                    Log.Error("Game was not removed before reinstallation or was \"fixed\" using a game repair");
+                    Log.Error("Previous installation file found: " + checkPath);
+                    Log.Error("Game was not removed before reinstallation or user attempted to \"fix\" using a game repair. Game repair will not remove leftover files - delete your game installation to remove all files and reinstall");
                     string howToFixStr = "You must restore your game using the ALOT Installer restore feature, or delete your game installation(do not uninstall or repair) to fully remove leftover files.";
                     if (Utilities.GetGameBackupPath(game) == null)
                     {
@@ -1840,6 +1841,96 @@ namespace AlotAddOnGUI
                 }
             }
 
+            //Check DLC state
+            if (game == 3 && installedInfo == null)
+            {
+                bool hasInconsistentDLC = false;
+                string inconsistentDLC = "";
+                var dlcPath = Path.Combine(gamePath, "BIOGame", "DLC");
+                if (Directory.Exists(dlcPath))
+                {
+                    var directories = Directory.EnumerateDirectories(dlcPath);
+                    Dictionary<int, string> priorities = new Dictionary<int, string>();
+                    foreach (string dir in directories)
+                    {
+                        string value = Path.GetFileName(dir);
+                        if (value == "__metadata")
+                        {
+                            continue;
+                        }
+                        long sfarsize = 0;
+                        long unpackedSfarSize = 32L;
+
+                        //Check for SFAR size not being 32 bytes
+                        string sfar = Path.Combine(dir, "CookedPCConsole", "Default.sfar");
+                        string unpackedDir = Path.Combine(dir, "CookedPCConsole");
+                        if (File.Exists(sfar))
+                        {
+                            var unpackedFileExtensions = new List<string>() { ".pcc", ".tlk", ".bin", ".dlc" };
+                            var filesInSfarDir = Directory.EnumerateFiles(unpackedDir).ToList();
+                            var hasUnpackedFiles = filesInSfarDir.Any(d => unpackedFileExtensions.Contains(Path.GetExtension(d.ToLower())));
+
+                            long sfarPackedSize = DiagnosticsWindow.GetPackedSFARSize(value);
+                            long me3explorerUnpackedSize = DiagnosticsWindow.GetME3ExplorerUnpackedSFARSize(value);
+
+                            if (sfarPackedSize != 0)
+                            {
+                                FileInfo fi = new FileInfo(sfar);
+                                sfarsize = fi.Length;
+
+                                if (sfarsize == sfarPackedSize && !hasUnpackedFiles)
+                                {
+                                    //OK
+                                    Log.Information("DLC passed precheck (packed): " + value);
+                                    continue;
+                                }
+
+                                if (sfarsize == sfarPackedSize && hasUnpackedFiles)
+                                {
+                                    //Inconsistent - has unpacked but is packed still
+                                    hasInconsistentDLC = true;
+                                    Log.Warning("DLC failed precheck, packed SFAR with unpacked files detected: " + value);
+                                    inconsistentDLC += "\n - " + value + ": DLC packed, but detected unpacked files";
+                                    continue;
+                                }
+
+                                if (sfarsize == me3explorerUnpackedSize)
+                                {
+                                    Log.Error("DLC precheck detects SFAR was unpacked with ME3Explorer mainline: " + value + ". ME3Explorer mainline should never be used to unpack DLC");
+                                    continue;
+                                }
+
+                                if (sfarsize == unpackedSfarSize)
+                                {
+                                    Log.Information("DLC passed precheck (32 bytes unpacked sfar): " + value);
+                                    continue;
+                                }
+
+                                if (sfarsize > sfarPackedSize && hasUnpackedFiles)
+                                {
+                                    //Inconsistent - has appears packed (with injected files) but is packed still
+                                    hasInconsistentDLC = true;
+                                    Log.Warning("DLC failed precheck, packed SFAR (with injected files from Mod Manager) with unpacked files detected: " + value);
+                                    inconsistentDLC += "\n - " + value + ": DLC packed (with injected files), but detected unpacked files";
+                                    continue;
+                                }
+
+                                if (sfarsize != sfarPackedSize)
+                                {
+                                    Log.Warning("DLC SFAR size is unknown for DLC: " + value + " " + sfarsize + " bytes");
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (hasInconsistentDLC)
+                {
+                    await this.ShowMessageAsync("DLC is in inconsistent state", "The following DLC was detected as packed, however unpacked files were detected. These DLCs are in an inconsistent state. You should delete your game installation and reinstall the game to fix these inconsistencies. Origin game repair will not fix this issue.\n" + inconsistentDLC);
+                    return false;
+                }
+            }
 
             List<AddonFile> missingRecommendedFiles = new List<AddonFile>();
             bool oneisready = false;
