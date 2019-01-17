@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.4.1">
+<alotaddonmanifest version="5.4.2">
    <highestapprovedmemversion>157</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-01-13">185</soaktestingmemversion>
    <stages>
@@ -157,7 +157,7 @@
             tooltipname="ALOT for ME2 8.0"
             
             torrentfilename="ALOT for ME2 8.0.zip"
-            filename="ALOT for ME2 8.0-68-2019-8-0-1547737304.zip"
+            filename="ALOT for ME2 8.0-68-2019-8-0-1547754600.zip"
             size="3856102677"
             md5="c1f7de621c00f4740c877a78df244751"
             
