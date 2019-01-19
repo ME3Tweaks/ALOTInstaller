@@ -650,7 +650,7 @@ namespace AlotAddOnGUI.ui
                         addDiagLine("Full texture check reported errors:");
 
                         int numSoFar = 0;
-                        foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                        foreach (string str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                         {
                             addDiagLine("[ERROR] -  " + str);
                             numSoFar++;
@@ -1381,8 +1381,13 @@ namespace AlotAddOnGUI.ui
                                 }
                                 break;
                             case "ERROR_TEXTURE_SCAN_DIAGNOSTIC":
-                            case "ERROR_MIPMAPS_NOT_REMOVED":
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
+                                break;
+                            case "ERROR_MIPMAPS_NOT_REMOVED":
+                                if (MEMI_FOUND)
+                                {
+                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
+                                }
                                 break;
                             case "ERROR_FILE_NOT_COMPATIBLE":
                                 Log.Error("MEM reporting file is not compatible: " + param);

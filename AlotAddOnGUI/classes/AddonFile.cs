@@ -247,7 +247,7 @@ namespace AlotAddOnGUI.classes
         public string Filename { get; set; }
         public string Tooltipname { get; set; }
         public string DownloadLink { get; set; }
-        public List<String> Duplicates { get; set; }
+        public List<string> Duplicates { get; set; }
         public List<PackageFile> PackageFiles { get; set; }
         public List<ChoiceFile> ChoiceFiles { get; set; }
         public List<ZipFile> ZipFiles { get; set; }
