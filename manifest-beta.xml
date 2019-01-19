@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.4.0">
+<alotaddonmanifest version="5.4.4">
    <highestapprovedmemversion>143</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-11-11">144</soaktestingmemversion>
    <stages>
@@ -156,29 +156,29 @@
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
             tooltipname="ALOT for ME2 8.0"
             
-            torrentfilename="ALOT for ME2.zip"
-            filename="ALOT for ME2-68-2019-8-0-1547737304.zip"
-            size="3798817632"
-            md5="15835bdf59def91956289070a6c958e8"
+            torrentfilename="ALOT for ME2 8.0.zip"
+            filename="ALOT for ME2 8.0-68-2019-8-0-1547754600.zip"
+            size="3856102677"
+            md5="c1f7de621c00f4740c877a78df244751"
             
-            unpackedsinglefilename="ALOT_ME2.mem"
+            unpackedsinglefilename="ALOT_ME2_v8.mem"
             unpackedsize="3798817474"
             unpackedmd5="ce4fd0ba9a873b79020426ef912d131c" />
-      <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2.mem" movedirectly="true" />
+      <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v8.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="8" friendlyname="ALOT for ME3 8.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
             tooltipname="ALOT for ME3 8.0"
             
-            torrentfilename="ALOT for ME3.zip"
-            filename="ALOT for ME3-363-2019-8-0-1547740338.zip"
-            size="7184412262"
-            md5="15ec3d25d74993623afb883f9ae042ee"
+            torrentfilename="ALOT for ME3 8.0.zip"
+            filename="ALOT for ME3-363-2019-8-0-1547814254.zip"
+            size="7241697307"
+            md5="350c0d0cf0d8e4f2c7af43b2938f1162"
             
-            unpackedsinglefilename="ALOT_ME3.mem"
+            unpackedsinglefilename="ALOT_ME3_v8.mem"
             unpackedsize="7184411988"
             unpackedmd5="56bd8d2eea76082bc1396a1d4b53c952" />
-      <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3.mem" movedirectly="true" />
+      <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v8.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
