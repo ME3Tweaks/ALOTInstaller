@@ -1405,6 +1405,26 @@ namespace AlotAddOnGUI
                         }
                     }
 
+                    //Check for torrent filename
+                    if (!ready && af.TorrentFilename != null && af.ALOTVersion > 0)
+                    {
+                        var testForTorrentVer = File.Exists(basepath + af.TorrentFilename);
+                        if (testForTorrentVer && new FileInfo(basepath + af.TorrentFilename).Length == af.FileSize)
+                        {
+                            try
+                            {
+                                //Will retry in 5s
+                                Log.Information("Attempting to rename torrent-filename of ALOT file to Nexus-based filename");
+                                File.Move(basepath + af.TorrentFilename, basepath + af.Filename);
+                                Log.Information("Renamed torrent-filename of ALOT file to Nexus-based filename");
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Warning("Error: Unable to move torrent file into correct name in downloaded mods lib: " + ex.ToString());
+                            }
+                        }
+                    }
+
                     if (af.Ready != ready) //status is changing
                     {
                         Log.Information(af.FriendlyName + " changing ready states. Is now ready: " + ready);
