@@ -389,7 +389,7 @@ namespace AlotAddOnGUI
     class Options
     {
         [Option('u', "update-dest",
-          HelpText = "Copies AddonBuilder and everything in the current directory (and subdirectories) into the listed directory, then reboots using the new EXE.")]
+          HelpText = "Copies ALOTInstaller and everything in the current directory (and subdirectories) into the listed directory, then reboots using the new EXE.")]
         public string UpdateDest { get; set; }
 
         [Option('c', "completing-update",

@@ -542,95 +542,98 @@ namespace AlotAddOnGUI.ui
                 //    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataMismatch));
                 //}
 
-                if (MEMI_FOUND)
+                if (!TextureCheck || MEMI_FOUND)
                 {
-                    args = "-check-game-data-after " + DIAGNOSTICS_GAME + " -ipc";
-                }
-                else
-                {
-                    args = "-check-for-markers " + DIAGNOSTICS_GAME + " -ipc";
-                }
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
-                Context = MEMI_FOUND ? CONTEXT_REPLACEDFILE_SCAN : CONTEXT_FILEMARKER_SCAN;
-                runMEM_Diagnostics(exe, args, diagnosticsWorker);
-                WaitForMEM();
-                if (MEMI_FOUND)
-                {
-                    addDiagLine("===Replaced files scan (after textures were installed)");
-                    addDiagLine("This check will detect if files were replaced after textures were installed in an unsupported manner.");
-                    addDiagLine("");
-                }
-                else
-                {
-                    addDiagLine("===Preinstallation file scan");
-                    addDiagLine("This check will make sure all files can be opened for reading and that files that were previously modified by ALOT are not installed.");
-                    addDiagLine("");
-                }
-
-                if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
-                {
-
                     if (MEMI_FOUND)
                     {
-                        addDiagLine("[ERROR]Diagnostic reports some files appear to have been added or replaced after ALOT was installed, or could not be read:");
+                        args = "-check-game-data-after " + DIAGNOSTICS_GAME + " -ipc";
                     }
                     else
                     {
-                        addDiagLine("[ERROR]The following files did not pass the modification marker check, or could not be read:");
+                        args = "-check-for-markers " + DIAGNOSTICS_GAME + " -ipc";
                     }
-
-                    int numSoFar = 0;
-                    foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
-                    {
-                        addDiagLine("[ERROR] - " + str);
-                        numSoFar++;
-                        if (numSoFar == 10 && BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count() > 10)
-                        {
-                            addDiagLine("[SUB]");
-                        }
-                    }
-                    if (numSoFar > 10)
-                    {
-                        addDiagLine("[/SUB]");
-                    }
-
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
+                    Context = MEMI_FOUND ? CONTEXT_REPLACEDFILE_SCAN : CONTEXT_FILEMARKER_SCAN;
+                    runMEM_Diagnostics(exe, args, diagnosticsWorker);
+                    WaitForMEM();
                     if (MEMI_FOUND)
                     {
-                        addDiagLine("[ERROR]Files added or replaced after ALOT has been installed is not supported due to the way the Unreal Engine 3 works.");
+                        addDiagLine("===Replaced files scan (after textures were installed)");
+                        addDiagLine("This check will detect if files were replaced after textures were installed in an unsupported manner.");
+                        addDiagLine("");
                     }
                     else
                     {
-                        addDiagLine("[ERROR]Files that were previously modified by ALOT are most times broken or leftover from a previous ALOT failed installation that did not complete and set the ALOT installation marker.");
-                        addDiagLine("[ERROR]Delete your game installation and reinstall the game, or restore from your backup in the ALOT settings.");
+                        addDiagLine("===Preinstallation file scan");
+                        addDiagLine("This check will make sure all files can be opened for reading and that files that were previously modified by ALOT are not installed.");
+                        addDiagLine("");
                     }
-                    if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
+
+                    if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
                     {
-                        pairLog = true;
-                        addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
-                    }
-                }
-                else
-                {
-                    if (BACKGROUND_MEM_PROCESS.ExitCode != null && BACKGROUND_MEM_PROCESS.ExitCode == 0)
-                    {
+
                         if (MEMI_FOUND)
                         {
-                            addDiagLine("Diagnostic did not find any files that were added or replaced after ALOT installation or have issues reading files.");
+                            addDiagLine("[ERROR]Diagnostic reports some files appear to have been added or replaced after ALOT was installed, or could not be read:");
                         }
                         else
                         {
-                            addDiagLine("Diagnostic did not find any files from previous installations of ALOT or have issues reading files.");
+                            addDiagLine("[ERROR]The following files did not pass the modification marker check, or could not be read:");
+                        }
+
+                        int numSoFar = 0;
+                        foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                        {
+                            addDiagLine("[ERROR] - " + str);
+                            numSoFar++;
+                            if (numSoFar == 10 && BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count() > 10)
+                            {
+                                addDiagLine("[SUB]");
+                            }
+                        }
+                        if (numSoFar > 10)
+                        {
+                            addDiagLine("[/SUB]");
+                        }
+
+                        if (MEMI_FOUND)
+                        {
+                            addDiagLine("[ERROR]Files added or replaced after ALOT has been installed is not supported due to the way the Unreal Engine 3 works.");
+                        }
+                        else
+                        {
+                            addDiagLine("[ERROR]Files that were previously modified by ALOT are most times broken or leftover from a previous ALOT failed installation that did not complete and set the ALOT installation marker.");
+                            addDiagLine("[ERROR]Delete your game installation and reinstall the game, or restore from your backup in the ALOT settings.");
+                        }
+                        if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
+                        {
+                            pairLog = true;
+                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
                         }
                     }
                     else
                     {
-                        pairLog = true;
-                        addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                        if (BACKGROUND_MEM_PROCESS.ExitCode != null && BACKGROUND_MEM_PROCESS.ExitCode == 0)
+                        {
+                            if (MEMI_FOUND)
+                            {
+                                addDiagLine("Diagnostic did not find any files that were added or replaced after ALOT installation or have issues reading files.");
+                            }
+                            else
+                            {
+                                addDiagLine("Diagnostic did not find any files from previous installations of ALOT or have issues reading files.");
+                            }
+                        }
+                        else
+                        {
+                            pairLog = true;
+                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                        }
                     }
-                }
 
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(RESET_REPLACEFILE_TEXT));
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(RESET_REPLACEFILE_TEXT));
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
+                }
                 Context = CONTEXT_NORMAL;
 
                 //FULL CHECK
