@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.4.7">
+<alotaddonmanifest version="5.4.8">
    <highestapprovedmemversion>143</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-11-11">144</soaktestingmemversion>
    <stages>
@@ -165,6 +165,17 @@
             unpackedsize="3798817474"
             unpackedmd5="ce4fd0ba9a873b79020426ef912d131c" />
       <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v8.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="8"
+              alotupdateversion="1"
+              friendlyname="ALOT for ME2 8.1 - Update"
+              tooltipname="ALOT for ME2 8.1 - Update"
+              author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+            filename="ALOT for ME2 8.1 - Update-68-2019-8-1-1548958506.zip"
+            size="863"
+            md5="75d32226d5373a22bd6d51beb2e35ef2" />
+      <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v8.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="8" friendlyname="ALOT for ME3 8.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
