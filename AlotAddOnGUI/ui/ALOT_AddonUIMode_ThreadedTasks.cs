@@ -352,7 +352,7 @@ namespace AlotAddOnGUI
                                 if (tpfFilesList.Count > 0)
                                 {
                                     exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                                    args = "-extract-tpf \"" + extractpath + "\" \"" + extractpath + "\"";
+                                    args = "--extract-tpf --input \"" + extractpath + "\" --output \"" + extractpath + "\"";
                                     Utilities.runProcess(exe, args);
                                 }
                             }
@@ -376,7 +376,8 @@ namespace AlotAddOnGUI
                                     Log.Information("Extracting modfiles in directory: " + extractpath);
 
                                     exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                                    args = "-extract-mod " + CURRENT_GAME_BUILD + " \"" + extractpath + "\" \"" + extractpath + "\"";
+                                    args = "--extract-mod --gameid " + CURRENT_GAME_BUILD +
+                                           " --input \"" + extractpath + "\" --output \"" + extractpath + "\"";
                                     Utilities.runProcess(exe, args);
                                 }
                             }
@@ -470,7 +471,8 @@ namespace AlotAddOnGUI
                             {
                                 Log.Information(prefix + " Extracting AddonFile (TPF)");
                                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                                string args = "-extract-tpf \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\" \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\"";
+                                string args = "--extract-tpf --input \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID +
+                                              "\" --output \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\"";
                                 Utilities.runProcess(exe, args);
 
                                 //Flatten Move files up to folder
@@ -627,7 +629,7 @@ namespace AlotAddOnGUI
             if (CURRENT_GAME_BUILD < 3)
             {
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-detect-bad-mods " + CURRENT_GAME_BUILD + " -ipc";
+                string args = "--detect-bad-mods --gameid " + CURRENT_GAME_BUILD + " --ipc";
                 runMEM_DetectBadMods(exe, args, null);
                 while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
                 {
@@ -929,7 +931,7 @@ namespace AlotAddOnGUI
 
                 Log.Information("Extracting " + tpfFilesList.Count + " TPF files.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-extract-tpf \"" + EXTRACTED_MODS_DIRECTORY + "\" \"" + EXTRACTED_MODS_DIRECTORY + "\"";
+                string args = "--extract-tpf --input \"" + EXTRACTED_MODS_DIRECTORY + "\" --output \"" + EXTRACTED_MODS_DIRECTORY + "\"";
                 Utilities.runProcess(exe, args);
             }
 
@@ -941,7 +943,8 @@ namespace AlotAddOnGUI
 
                 Log.Information("Extracting MOD files.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-extract-mod " + game + " \"" + DOWNLOADED_MODS_DIRECTORY + "\" \"" + EXTRACTED_MODS_DIRECTORY + "\"";
+                string args = "--extract-mod --gameid " + game +
+                              " --input \"" + DOWNLOADED_MODS_DIRECTORY + "\" --output \"" + EXTRACTED_MODS_DIRECTORY + "\"";
                 Utilities.runProcess(exe, args);
             }
 
@@ -1109,7 +1112,9 @@ namespace AlotAddOnGUI
                     Log.Information("Building MEM Package.");
                     string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                     string filename = "002_ALOT_ME" + game + "_Addon.mem";
-                    string args = "-convert-to-mem " + game + " \"" + ADDON_FULL_STAGING_DIRECTORY.TrimEnd('\\') + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
+                    string args = "--convert-to-mem --gameid " + game +
+                                  " --input \"" + ADDON_FULL_STAGING_DIRECTORY.TrimEnd('\\') +
+                                  "\" --output \"" + getOutputDir(game) + filename + "\" --ipc";
 
                     runMEM_BackupAndBuild(exe, args, BuildWorker);
                     while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
@@ -1422,7 +1427,7 @@ namespace AlotAddOnGUI
             //verify vanilla
             Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-            string args = "-check-game-data-only-vanilla " + BACKUP_THREAD_GAME + " -ipc";
+            string args = "--check-game-data-vanilla --gameid " + BACKUP_THREAD_GAME + " --ipc";
             List<string> acceptedIPC = new List<string>();
             acceptedIPC.Add("TASK_PROGRESS");
             acceptedIPC.Add("ERROR");
@@ -1632,7 +1637,7 @@ namespace AlotAddOnGUI
 
             Log.Information("Reverting lod settings");
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-            string args = "-remove-lods " + BACKUP_THREAD_GAME;
+            string args = "--remove-lods --gameid " + BACKUP_THREAD_GAME;
             Utilities.runProcess(exe, args);
 
             if (BACKUP_THREAD_GAME == 1)

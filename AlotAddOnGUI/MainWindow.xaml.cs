@@ -4990,7 +4990,7 @@ namespace AlotAddOnGUI
 
             Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-            string args = "-check-game-data-only-vanilla " + BACKUP_THREAD_GAME + " -ipc";
+            string args = "--check-game-data-vanilla --gameid " + BACKUP_THREAD_GAME + " --ipc";
             List<string> acceptedIPC = new List<string>();
             acceptedIPC.Add("TASK_PROGRESS");
             acceptedIPC.Add("ERROR");
