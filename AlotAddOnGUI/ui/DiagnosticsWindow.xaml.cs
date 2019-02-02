@@ -228,7 +228,7 @@ namespace AlotAddOnGUI.ui
                     {
                         Log.Information("Removing bad LOD values from game");
                         string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                        string args = "-remove-lods " + DIAGNOSTICS_GAME;
+                        string args = "--remove-lods --gameid " + DIAGNOSTICS_GAME;
                         int returncode = Utilities.runProcess(exe, args);
                         if (returncode == 0)
                         {
@@ -489,7 +489,7 @@ namespace AlotAddOnGUI.ui
 
                 //Start diagnostics
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-check-game-data-mismatch " + DIAGNOSTICS_GAME + " -ipc";
+                string args = "--check-game-data-mismatch --gameid " + DIAGNOSTICS_GAME + " --ipc";
                 if (MEMI_FOUND)
                 {
                     bool textureMapFileExists = File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MassEffectModder\me" + DIAGNOSTICS_GAME + "map.bin");
@@ -546,11 +546,11 @@ namespace AlotAddOnGUI.ui
                 {
                     if (MEMI_FOUND)
                     {
-                        args = "-check-game-data-after " + DIAGNOSTICS_GAME + " -ipc";
+                        args = "--check-game-data-after --gameid " + DIAGNOSTICS_GAME + " --ipc";
                     }
                     else
                     {
-                        args = "-check-for-markers " + DIAGNOSTICS_GAME + " -ipc";
+                        args = "--check-for-markers --gameid " + DIAGNOSTICS_GAME + " --ipc";
                     }
                     diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
                     Context = MEMI_FOUND ? CONTEXT_REPLACEDFILE_SCAN : CONTEXT_FILEMARKER_SCAN;
@@ -608,7 +608,7 @@ namespace AlotAddOnGUI.ui
                         if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
                         {
                             pairLog = true;
-                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during --check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
                         }
                     }
                     else
@@ -627,7 +627,7 @@ namespace AlotAddOnGUI.ui
                         else
                         {
                             pairLog = true;
-                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during --check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
                         }
                     }
 
@@ -642,7 +642,7 @@ namespace AlotAddOnGUI.ui
                     addDiagLine("===Full Textures Check");
                     diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_FullCheck));
                     diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_ON_TASKBAR_PROGRESS));
-                    args = "-check-game-data-textures " + DIAGNOSTICS_GAME + " -ipc";
+                    args = "--check-game-data-textures --gameid " + DIAGNOSTICS_GAME + " --ipc";
                     Context = CONTEXT_FULLMIPMAP_SCAN;
                     runMEM_Diagnostics(exe, args, diagnosticsWorker);
                     WaitForMEM();
@@ -670,7 +670,7 @@ namespace AlotAddOnGUI.ui
                         if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
                         {
                             pairLog = true;
-                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-textures. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during --check-game-data-textures. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
                         }
                     }
                     else
@@ -682,7 +682,7 @@ namespace AlotAddOnGUI.ui
                         else
                         {
                             pairLog = true;
-                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-textures: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during --check-game-data-textures: " + BACKGROUND_MEM_PROCESS.ExitCode);
                         }
                     }
                     diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_OFF_TASKBAR_PROGRESS));
@@ -693,7 +693,7 @@ namespace AlotAddOnGUI.ui
                 addDiagLine("Items in this block are only accurate if ALOT is not installed or items have been installed after ALOT.");
                 addDiagLine("If ALOT was installed, detection of mods in this block means you installed items after ALOT was installed, which will break the game.");
 
-                args = "-detect-mods " + DIAGNOSTICS_GAME + " -ipc";
+                args = "--detect-mods --gameid " + DIAGNOSTICS_GAME + " --ipc";
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataBasegamemods));
                 runMEM_Diagnostics(exe, args, diagnosticsWorker);
                 WaitForMEM();
@@ -725,10 +725,10 @@ namespace AlotAddOnGUI.ui
                 }
                 else
                 {
-                    addDiagLine("Diagnostics did not detect any known basegame mods (-detect-mods).");
+                    addDiagLine("Diagnostics did not detect any known basegame mods (--detect-mods).");
                 }
 
-                args = "-detect-bad-mods " + DIAGNOSTICS_GAME + " -ipc";
+                args = "--detect-bad-mods --gameid " + DIAGNOSTICS_GAME + " --ipc";
                 runMEM_Diagnostics(exe, args, diagnosticsWorker);
                 WaitForMEM();
                 if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
@@ -1023,7 +1023,7 @@ namespace AlotAddOnGUI.ui
 
 
                 //Get LODs
-                args = "-print-lods " + DIAGNOSTICS_GAME + " -ipc";
+                args = "--print-lods --gameid " + DIAGNOSTICS_GAME + " --ipc";
                 LODS_INFO.Clear();
                 runMEM_Diagnostics(exe, args, diagnosticsWorker);
                 WaitForMEM();

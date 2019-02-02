@@ -478,7 +478,7 @@ namespace AlotAddOnGUI
                 Log.Information("Checking for previously installed ALOT files...");
                 CurrentTask = "Checking existing files for ALOT marker";
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-                args = "-check-for-markers " + INSTALLING_THREAD_GAME + " -ipc";
+                args = "--check-for-markers --gameid " + INSTALLING_THREAD_GAME + " --ipc";
                 RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0 || BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
@@ -499,12 +499,11 @@ namespace AlotAddOnGUI
             CurrentTaskPercent = -1;
             string outputDir = getOutputDir(INSTALLING_THREAD_GAME, false);
 
-            args = "-install-mods " + INSTALLING_THREAD_GAME + " \"" + outputDir + "\"";
+            args = "--install-mods --gameid " + INSTALLING_THREAD_GAME + " --input \"" + outputDir + "\" --ipc --alot-mode";
             if (REPACK_GAME_FILES)
             {
-                args += " -repack";
+                args += " --repack-mode";
             }
-            args += " -ipc -alot-mode";
 
             //Comment the following 2 lines and uncomment the next 3 to skip installation step and simulate OK
             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
@@ -676,11 +675,10 @@ namespace AlotAddOnGUI
             CurrentTask = "Updating Mass Effect" + GetGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
 
-            args = "-apply-lods-gfx ";
-            args += INSTALLING_THREAD_GAME;
+            args = "--apply-lods-gfx --gameid " + INSTALLING_THREAD_GAME;
             if (hasSoftShadowsMEUITM)
             {
-                args += " -soft-shadows-mode -meuitm-mode";
+                args += " --soft-shadows-mode --meuitm-mode";
             }
             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
@@ -696,7 +694,7 @@ namespace AlotAddOnGUI
                 CurrentTask = "Installing fixes for Mass Effect";
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
 
-                args = "-apply-me1-laa";
+                args = "--apply-me1-laa";
                 RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0)
