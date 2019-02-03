@@ -110,7 +110,7 @@ namespace AlotAddOnGUI
         private const string USER_STAGING_DIR = "USER_STAGING";
         private const string UPDATE_STAGING_MEMNOGUI_DIR = "Data\\UpdateMemNoGui";
         private const string UPDATE_STAGING_MEM_DIR = "Data\\UpdateMem";
-
+        private List<string> PagefileLocations = new List<string>();
         private string ADDON_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\" + ADDON_STAGING_DIR + "\\";
         private string USER_FULL_STAGING_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory + "Data\\" + USER_STAGING_DIR + "\\";
 
@@ -1195,17 +1195,49 @@ namespace AlotAddOnGUI
                                 readyToInstallALOT = true;
                             }
                         }
+
+                        //Disk requirements
                         long fullsize = Utilities.DirSize(new DirectoryInfo(getOutputDir(CURRENT_GAME_BUILD)));
-                        ulong freeBytes, diskSize, totalFreeBytes;
-                        Utilities.GetDiskFreeSpaceEx(Utilities.GetGamePath(CURRENT_GAME_BUILD), out freeBytes, out diskSize, out totalFreeBytes);
-                        Log.Information("We will need around " + ByteSize.FromBytes(fullsize) + " to install this texture set. The free space is " + ByteSize.FromBytes(freeBytes));
+
+                        //Memory requirements
+                        long memorySpaceRequired = 14 * ByteSize.BytesInGigaByte;
+                        long systemMemoryAmount = Utilities.GetInstalledRamAmount();
+
+                        memorySpaceRequired -= systemMemoryAmount;
+                        long fulldiskspaceonsamedrive = memorySpaceRequired + fullsize;
+
+                        bool hasEnoughFreeOnPageDisk = memorySpaceRequired <= 0;
+                        if (!hasEnoughFreeOnPageDisk)
+                        {
+                            foreach (string pageFile in PagefileLocations)
+                            {
+                                bool sameDrive = Path.GetPathRoot(pageFile) == Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD));
+                                ulong xfreeBytes, xdiskSize, xtotalFreeBytes;
+                                Utilities.GetDiskFreeSpaceEx(pageFile, out xfreeBytes, out xdiskSize, out xtotalFreeBytes);
+                                if (xfreeBytes > (sameDrive ? (ulong)fulldiskspaceonsamedrive : (ulong)fullsize))
+                                {
+                                    fullsize = fulldiskspaceonsamedrive;
+                                    hasEnoughFreeOnPageDisk = true;
+                                    Log.Information("We will need around " + ByteSize.FromBytes(fullsize) + " to install this texture set. The free space is " + ByteSize.FromBytes(xfreeBytes));
+                                    break;
+                                }
+
+                            }
+                        }
+                        else
+                        {
+                            Log.Information("System should have enough RAM + Pagefile space for memory requirements");
+                        }
+
+                        Utilities.GetDiskFreeSpaceEx(Utilities.GetGamePath(CURRENT_GAME_BUILD), out ulong freeBytes, out ulong diskSize, out ulong totalFreeBytes);
 
                         if (freeBytes < (ulong)fullsize)
                         {
                             //not enough disk space for build
+                            Log.Error("There is not enough disk space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to install. You will need " + ByteSize.FromBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + ":\\ to install.");
                             HeaderLabel.Text = "Not enough free space to install textures for Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + ".";
                             AddonFilesLabel.Text = "MEM Packages placed in the " + MEM_OUTPUT_DISPLAY_DIR + " folder";
-                            await this.ShowMessageAsync("Not enough free space for install", "There is not enough disk space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to install. You will need " + ByteSize.FromBytes(fullsize) + " of free space to install.");
+                            await this.ShowMessageAsync("Not enough free space for install", "There is not enough disk space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + " to install. You will need " + ByteSize.FromBytes(fullsize) + " of free space on " + Path.GetPathRoot(Utilities.GetGamePath(CURRENT_GAME_BUILD)) + ":\\ to install.");
                             errorOccured = false;
                             break;
                         }
@@ -1964,14 +1996,13 @@ namespace AlotAddOnGUI
             try
             {
                 //Current
-                List<string> availablePagefiles = new List<string>();
                 using (var query = new ManagementObjectSearcher("SELECT Caption,AllocatedBaseSize FROM Win32_PageFileUsage"))
                 {
                     foreach (ManagementBaseObject obj in query.Get())
                     {
                         string pagefileName = (string)obj.GetPropertyValue("Caption");
                         Log.Information("Detected pagefile: " + pagefileName);
-                        availablePagefiles.Add(pagefileName.ToLower());
+                        PagefileLocations.Add(pagefileName.ToLower());
                     }
                 }
 
@@ -1980,23 +2011,18 @@ namespace AlotAddOnGUI
                 {
                     foreach (ManagementBaseObject obj in query.Get())
                     {
-                        foreach (PropertyData prop in obj.Properties)
-                        {
-                            Console.WriteLine("{0}: {1}", prop.Name, prop.Value);
-                        }
-
                         string pagefileName = (string)obj.GetPropertyValue("Name");
                         uint max = (uint)obj.GetPropertyValue("MaximumSize");
                         if (max > 0)
                         {
                             // Not system managed
-                            availablePagefiles.RemoveAll(x => Path.GetFullPath(x).Equals(Path.GetFullPath(pagefileName)));
+                            PagefileLocations.RemoveAll(x => Path.GetFullPath(x).Equals(Path.GetFullPath(pagefileName)));
                             Log.Warning("Pagefile has been modified by the end user. The maximum page file size on " + pagefileName + " is: " + max + "MB");
                         }
                     }
                 }
 
-                if (availablePagefiles.Count() > 0)
+                if (PagefileLocations.Count() > 0)
                 {
                     Log.Information("We have a usable page file - OK");
                 }
@@ -4323,7 +4349,7 @@ namespace AlotAddOnGUI
                 foreach (string file in files)
                 {
                     string fname = Path.GetFileName(file); //we do not check duplicates with (1) etc
-                    //remove (1) and such
+                                                           //remove (1) and such
                     string fnameWithoutExtension = Path.GetFileNameWithoutExtension(file);
                     if (fnameWithoutExtension.EndsWith(")"))
                     {

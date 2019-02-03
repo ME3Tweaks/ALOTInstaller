@@ -1280,7 +1280,13 @@ namespace AlotAddOnGUI
                 {
                     if (str.Trim() != "")
                     {
-                        Log.Information("Realtime Process Output: " + str);
+                        if (str.StartsWith("Exception occured"))
+                        {
+                            Log.Error("MEM process output: " + str);
+                        } else
+                        {
+                            Log.Information("MEM process output: " + str);
+                        }
                     }
                 }
             };
