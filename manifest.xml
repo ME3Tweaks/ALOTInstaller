@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.4.8">
+<alotaddonmanifest version="5.4.9">
    <highestapprovedmemversion>189</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-01-30">192</soaktestingmemversion>
    <stages>
@@ -139,19 +139,19 @@
       <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows" />
       <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
    </addonfile>
-   <addonfile alotversion="7" friendlyname="ALOT for ME1 7.0" author="CreeperLava">
+   <addonfile alotversion="8" friendlyname="ALOT for ME1 8.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
-            tooltipname="ALOT for ME1 7.0"
+            tooltipname="ALOT for ME1 8.0"
             torrentfilename="ALOT for ME1.zip"
             
-            filename="ALOT for ME1-83-2019-7-0-1541433297.zip"
-            size="501384728"
-            md5="4fe0c07066251d02bd918121772b99b4"
+            filename="ALOT for ME1 8.0-83-2019-8-0-1549462658.zip"
+            size="2244140523"
+            md5="1a0ea7fe4dafbceacd39ca5bafe6894f"
             
-            unpackedsinglefilename="ALOT_ME1.mem"
-            unpackedsize="477353338"
-            unpackedmd5="c16dc8c42139ff6b708c230379b9d2b5" />
-      <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1.mem" movedirectly="true" />
+            unpackedsinglefilename="ALOT_ME1_v8.mem"
+            unpackedsize="2213890311"
+            unpackedmd5="e5e386a5b0828002ffb350550cd4814e" />
+      <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v8.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="8" friendlyname="ALOT for ME2 8.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
