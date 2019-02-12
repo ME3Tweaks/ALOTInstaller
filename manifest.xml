@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.4.9">
+<alotaddonmanifest version="5.4.10">
    <highestapprovedmemversion>192</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-02-09">195</soaktestingmemversion>
    <stages>
@@ -142,7 +142,7 @@
    <addonfile alotversion="8" friendlyname="ALOT for ME1 8.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
             tooltipname="ALOT for ME1 8.0"
-            torrentfilename="ALOT for ME1.zip"
+            torrentfilename="ALOT for ME1 8.0.zip"
             
             filename="ALOT for ME1 8.0-83-2019-8-0-1549462658.zip"
             size="2244140523"
