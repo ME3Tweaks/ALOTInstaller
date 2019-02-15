@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.4.10">
+<alotaddonmanifest version="5.4.11">
    <!-- Beta mode doesn't use the highest mem/soak values -->
    <highestapprovedmemversion>143</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-11-11">144</soaktestingmemversion>
@@ -347,7 +347,7 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds" />
    </addonfile>
    <addonfile friendlyname="HR M-92 Mantis" author="TheDarkFalkon">
-      <file downloadlink="https://onedrive.live.com/?cid=12B53096D995629D&amp;id=12B53096D995629D%21626&amp;parId=12B53096D995629D%21574&amp;o=OneUp" filename="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf" size="11565964" md5="47ff496f6b46ee2458d2a5f66031cd30" />
+      <file downloadlink="https://1drv.ms/u/s!Ap-6jpUc4ODbgwc5r2cAvx9K7iFn" filename="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf" size="11565964" md5="47ff496f6b46ee2458d2a5f66031cd30" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x3463B385.dds" />
       <packagefile me2="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x13703FFD.dds" />
    </addonfile>
