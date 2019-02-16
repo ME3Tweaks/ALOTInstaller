@@ -1280,7 +1280,8 @@ namespace AlotAddOnGUI
                 {
                     if (str.Trim() != "")
                     {
-                        if (str.StartsWith("Exception occured"))
+                        if (str.StartsWith("Exception occured") ||
+                            str.StartsWith("Program crashed"))
                         {
                             Log.Error("MEM process output: " + str);
                         } else
