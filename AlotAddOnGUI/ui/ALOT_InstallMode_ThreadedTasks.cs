@@ -1264,9 +1264,17 @@ namespace AlotAddOnGUI
                                 }
                                 if (failure != null)
                                 {
-                                    Log.Error("A fail condition IPC has been received: " + failure.FailureIPCTrigger + ": " + failure.FailureTopText);
-                                    Log.Error(" >> IPC Command Received: " + str);
-                                    BACKGROUND_MEM_PROCESS_ERRORS.Add(failure.FailureIPCTrigger);
+                                    if (failure.Warning)
+                                    {
+                                        Log.Warning("MEM warning IPC received: " + failure.FailureIPCTrigger + ": " + failure.FailureTopText);
+                                        Log.Warning(" >> " + str);
+                                    }
+                                    else
+                                    {
+                                        Log.Error("A fail condition IPC has been received: " + failure.FailureIPCTrigger + ": " + failure.FailureTopText);
+                                        Log.Error(" >> " + str);
+                                        BACKGROUND_MEM_PROCESS_ERRORS.Add(failure.FailureIPCTrigger);
+                                    }
                                 }
                                 else
                                 {

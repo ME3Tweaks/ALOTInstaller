@@ -2453,7 +2453,8 @@ namespace AlotAddOnGUI
                                  FailureBottomText = z.Attribute("failedbottommessage").Value,
                                  FailureTopText = z.Attribute("failedtopmessage").Value,
                                  FailureHeaderText = z.Attribute("failedheadermessage").Value,
-                                 FailureResultCode = Convert.ToInt32(z.Attribute("resultcode").Value)
+                                 FailureResultCode = Convert.ToInt32(z.Attribute("resultcode").Value),
+                                 Warning = z.Attribute("warning") != null ? bool.Parse(z.Attribute("warning").Value) : false
                              }).ToList()
                          }).ToList();
                 }

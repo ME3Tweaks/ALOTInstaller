@@ -53,5 +53,6 @@ namespace AlotAddOnGUI.classes
         public string FailureBottomText;
         public string FailureIPCTrigger;
         public int FailureResultCode;
+        public bool Warning;
     }
 }
