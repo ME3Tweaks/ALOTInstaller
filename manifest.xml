@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.4.9">
+<alotaddonmanifest version="5.4.11">
    <highestapprovedmemversion>192</highestapprovedmemversion>
-   <soaktestingmemversion soakstartdate="2019-02-06">192</soaktestingmemversion>
+   <soaktestingmemversion soakstartdate="2019-02-09">196</soaktestingmemversion>
    <stages>
       <!-- -57 is the next error code available-->
       <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
@@ -12,7 +12,7 @@
       </stage>
       <stage name="STAGE_SCAN" weight="0.12055272684" tasktext="Scanning textures">
          <failureinfo resultcode="-52" failedtopmessage="Failed to scan textures" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during scanning of existing game textures. Please see installer log for more info." />
-         <failureinfo ipcerror="ERROR_REFERENCED_TFC_NOT_FOUND" resultcode="-56" failedtopmessage="Detected incorrectly installed mod or missing dependent DLC" failedbottommessage="A mod is installed incorrectly. Check the installer log for details" failedheadermessage="MassEffectModderNoGui detected an improperly installed mod (e.g. files are not in the correct folder) or a dependent DLC couldn't be found. Check the installer log for more information." />
+         <!-- <failureinfo ipcerror="ERROR_REFERENCED_TFC_NOT_FOUND" warning="true" resultcode="-56" failedtopmessage="Detected incorrectly installed mod or missing dependent DLC" failedbottommessage="A mod is installed incorrectly. Check the installer log for details" failedheadermessage="MassEffectModderNoGui detected an improperly installed mod (e.g. files are not in the correct folder) or a dependent DLC couldn't be found. Check the installer log for more information." /> -->
       </stage>
       <stage name="STAGE_INSTALLTEXTURES" weight="0.36997680866" tasktext="Installing textures" me3weightscaling="1.1">
          <failureinfo ipcerror="ERROR_TEXTURE_MAP_MISSING" resultcode="-44" failedtopmessage="Texture map is missing" failedbottommessage="Check or upload installer log for more information" failedheadermessage="Texture map file is missing - has this game been migrated to a new system or user account?" />
@@ -142,7 +142,7 @@
    <addonfile alotversion="8" friendlyname="ALOT for ME1 8.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
             tooltipname="ALOT for ME1 8.0"
-            torrentfilename="ALOT for ME1.zip"
+            torrentfilename="ALOT for ME1 8.0.zip"
             
             filename="ALOT for ME1 8.0-83-2019-8-0-1549462658.zip"
             size="2244140523"
@@ -346,7 +346,7 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAFE38549.dds" destinationname="WPN_HVYb_Spec_0xAFE38549.dds" />
    </addonfile>
    <addonfile friendlyname="HR M-92 Mantis" author="TheDarkFalkon">
-      <file downloadlink="https://onedrive.live.com/?cid=12B53096D995629D&amp;id=12B53096D995629D%21626&amp;parId=12B53096D995629D%21574&amp;o=OneUp" filename="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf" size="11565964" md5="47ff496f6b46ee2458d2a5f66031cd30" />
+      <file downloadlink="https://1drv.ms/u/s!Ap-6jpUc4ODbgwc5r2cAvx9K7iFn" filename="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf" size="11565964" md5="47ff496f6b46ee2458d2a5f66031cd30" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x3463B385.dds" />
       <packagefile me2="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x13703FFD.dds" />
    </addonfile>
