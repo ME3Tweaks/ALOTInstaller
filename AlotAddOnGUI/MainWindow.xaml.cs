@@ -646,21 +646,32 @@ namespace AlotAddOnGUI
                     int releaseNameInt = Convert.ToInt32(latest.TagName);
                     if (fileVersion < releaseNameInt && latest.Assets.Count > 0)
                     {
-                        //there's an update
-                        //updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder is updating. Please wait...", true);
-                        //updateprogresscontroller.SetIndeterminate();
-                        WebClient downloadClient = new WebClient();
-
-                        downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
-                        downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
-                        string temppath = Path.GetTempPath();
-                        /*downloadClient.DownloadProgressChanged += (s, e) =>
+                        ReleaseAsset asset = null;
+                        foreach (ReleaseAsset a in latest.Assets)
                         {
-                            updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
-                        };*/
-                        downloadClient.DownloadFileCompleted += UnzipMEMGUIUpdate;
-                        string downloadPath = temppath + "MEMGUI_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
-                        downloadClient.DownloadFileAsync(new Uri(latest.Assets[0].BrowserDownloadUrl), downloadPath, downloadPath);
+                            if (a.Name.StartsWith("MassEffectModder-v"))
+                            {
+                                asset = a;
+                            }
+                        }
+                        if (asset != null)
+                        {
+                            //there's an update
+                            //updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder is updating. Please wait...", true);
+                            //updateprogresscontroller.SetIndeterminate();
+                            WebClient downloadClient = new WebClient();
+
+                            downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
+                            downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
+                            string temppath = Path.GetTempPath();
+                            /*downloadClient.DownloadProgressChanged += (s, e) =>
+                            {
+                                updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
+                            };*/
+                            downloadClient.DownloadFileCompleted += UnzipMEMGUIUpdate;
+                            string downloadPath = temppath + "MEMGUI_Update" + Path.GetExtension(asset.BrowserDownloadUrl);
+                            downloadClient.DownloadFileAsync(new Uri(asset.BrowserDownloadUrl), downloadPath, downloadPath);
+                        }
                     }
                     else
                     {
@@ -787,7 +798,22 @@ namespace AlotAddOnGUI
                                     break;
                                 }
                                 int threshhold = SoakThresholds[soakTestReleaseAge];
-                                if (r.Assets[0].DownloadCount > threshhold)
+                                ReleaseAsset asset = null;
+                                foreach (ReleaseAsset a in r.Assets)
+                                {
+                                    if (a.Name.StartsWith("MassEffectModderNoGui-v"))
+                                    {
+                                        asset = a;
+                                    }
+                                }
+
+                                if (asset == null)
+                                {
+                                    Log.Information("New MEMNOGUI update doesn't have any Windows builds.");
+                                    continue;
+                                }
+
+                                if (asset.DownloadCount > threshhold)
                                 {
                                     Log.Information("New MEMNOGUI update is soak testing and has reached the daily soak threshhold of " + threshhold + ". This update is not applicable to us today, threshhold will expand tomorrow.");
                                     continue;
@@ -832,22 +858,37 @@ namespace AlotAddOnGUI
 
                     if (latest != null)
                     {
-                        Log.Information("MEMNOGUI update available: " + latest.TagName);
-                        //there's an update
-                        updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder (Cmd Version) is updating (to v" + latest.TagName + "). Please wait...", true);
-                        updateprogresscontroller.SetIndeterminate();
-                        updateprogresscontroller.Canceled += MEMNoGuiUpdateCanceled;
-                        downloadClient = new WebClient();
-                        downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
-                        downloadClient.Headers["user-agent"] = "ALOTInstaller";
-                        string temppath = Path.GetTempPath();
-                        downloadClient.DownloadProgressChanged += (s, e) =>
+                        ReleaseAsset asset = null;
+                        foreach (ReleaseAsset a in latest.Assets)
                         {
-                            updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
-                        };
-                        downloadClient.DownloadFileCompleted += UnzipProgramUpdate;
-                        string downloadPath = temppath + "MEM_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
-                        downloadClient.DownloadFileAsync(new Uri(latest.Assets[0].BrowserDownloadUrl), downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
+                            if (a.Name.StartsWith("MassEffectModderNoGui-v"))
+                            {
+                                asset = a;
+                            }
+                        }
+                        if (asset != null)
+                        {
+                            Log.Information("MEMNOGUI update available: " + latest.TagName);
+                            //there's an update
+                            updateprogresscontroller = await this.ShowProgressAsync("Installing Update", "Mass Effect Modder (Cmd Version) is updating (to v" + latest.TagName + "). Please wait...", true);
+                            updateprogresscontroller.SetIndeterminate();
+                            updateprogresscontroller.Canceled += MEMNoGuiUpdateCanceled;
+                            downloadClient = new WebClient();
+                            downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
+                            downloadClient.Headers["user-agent"] = "ALOTInstaller";
+                            string temppath = Path.GetTempPath();
+                            downloadClient.DownloadProgressChanged += (s, e) =>
+                            {
+                                updateprogresscontroller.SetProgress((double)e.ProgressPercentage / 100);
+                            };
+                            downloadClient.DownloadFileCompleted += UnzipProgramUpdate;
+                            string downloadPath = temppath + "MEM_Update" + Path.GetExtension(asset.BrowserDownloadUrl);
+                            downloadClient.DownloadFileAsync(new Uri(asset.BrowserDownloadUrl), downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
+                        }
+                        else
+                        {
+                            Log.Information("New MEMNOGUI update doesn't have any Windows builds.");
+                        }
                     }
                     else
                     {
