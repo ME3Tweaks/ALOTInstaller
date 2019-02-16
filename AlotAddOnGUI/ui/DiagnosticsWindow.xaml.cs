@@ -1328,6 +1328,9 @@ namespace AlotAddOnGUI.ui
                                     BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File was added after textures scan: " + param + " " + File.GetCreationTimeUtc(gamePath + param));
                                 }
                                 break;
+                            case "ERROR_REFERENCED_TFC_NOT_FOUND":
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("A referenced TFC was not found: " + param + ". See the next diagnostic message for additional info");
+                                break;
                             case "LODLINE":
                                 int eqIndex = param.IndexOf('=');
                                 string lodSetting = param.Substring(0, eqIndex);
