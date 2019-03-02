@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.5.0">
+<alotaddonmanifest version="5.5.1">
    <!-- Beta mode doesn't use the highest mem/soak values -->
    <highestapprovedmemversion>143</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-11-11">144</soaktestingmemversion>
@@ -140,32 +140,32 @@
       <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows" />
       <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
    </addonfile>
-   <addonfile alotversion="8" friendlyname="ALOT for ME1 8.0" author="CreeperLava">
+   <addonfile alotversion="9" friendlyname="ALOT for ME1 9.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
             tooltipname="ALOT for ME1 9.0"
             torrentfilename="ALOT for ME1 9.0.zip"
             
             filename="ALOT for ME1 9.0.zip"
-            size="3345823186"
-            md5="2eabc4f188272a44c72e8120e32e37b7"
+            size="3335504444"
+            md5="d4ead9fdd1f38a7d29b4a95bef84540e"
             
             unpackedsinglefilename="ALOT_ME1_v9.mem"
-            unpackedsize="3288178592"
-            unpackedmd5="321c8a7f5cca33c6e02313b76e242e11" />
+            unpackedsize="3289221380"
+            unpackedmd5="0423a647885b6fb63f7338f72bd5bba0" />
       <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v9.mem" movedirectly="true" />
    </addonfile>
-   <addonfile alotversion="8" friendlyname="ALOT for ME2 9.0" author="CreeperLava">
+   <addonfile alotversion="9" friendlyname="ALOT for ME2 9.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
             tooltipname="ALOT for ME2 9.0"
             
             torrentfilename="ALOT for ME2 9.0.zip"
             filename="ALOT for ME2 9.0.zip"
-            size="5337872602"
-            md5="d7d25c8471b34b874ee0b58343814df9"
+            size="5333847028"
+            md5="cdce4557dd3d50aeaaccfe9f8f29f01a"
             
             unpackedsinglefilename="ALOT_ME2_v9.mem"
-            unpackedsize="5280227892"
-            unpackedmd5="d97f8debeecd181bfc7e4a3ff25c0a04" />
+            unpackedsize="5287028322"
+            unpackedmd5="a2cbe71de4f8d1c947d5b5e186d47c32" />
       <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v9.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="8" friendlyname="ALOT for ME3 8.0" author="CreeperLava">
