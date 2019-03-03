@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.5.2">
+<alotaddonmanifest version="5.5.3">
    <!-- Beta mode doesn't use the highest mem/soak values -->
    <highestapprovedmemversion>143</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-11-11">144</soaktestingmemversion>
@@ -255,6 +255,19 @@
    <addonfile friendlyname="Better Hair Textures" author="heleuss" optional="true">
       <file downloadlink="https://www.dropbox.com/s/stmlo6qfd0567xs/ME2%20Better%20Hair.tpf?dl=0" filename="ME2 Better Hair.tpf" size="25923956" md5="57f20a3e21efa375d823dbbe72c1986e" copydirectly="true" />
       <games me1="false" me2="true" me3="false" />
+   </addonfile>
+   <addonfile friendlyname="FemShep High Quality textures" author="heleuss" optional="true">
+      <file downloadlink="https://www.mediafire.com/file/v151vbhh7d28kgb/%5BME3%5D+femShep+High+Quality+textures.7z" filename="[ME3] femShep High Quality textures.7z" size="18877523" md5="03d31b6a684a8d498997b03a43e8e53f" />
+      <packagefile me3="true" sourcename="[ME3] KH_femShep_masks.tpf" movedirectly="true" />
+      <packagefile me3="true" sourcename="[ME3] KH_eyes.tpf" movedirectly="true" />
+      <packagefile me3="true" sourcename="[ME3] KH_femShep_brows.tpf" movedirectly="true" />
+      <packagefile me3="true" sourcename="[ME3] KH_femShep_eyelashes.tpf" movedirectly="true" />
+      <packagefile me3="true" sourcename="[ME3] KH_femShep_face_textures.tpf" movedirectly="true" />
+   </addonfile>
+   <addonfile friendlyname="BroShep High Quality textures" author="heleuss" optional="true">
+      <file downloadlink="https://www.mediafire.com/file/nv78t12776lpitf/%5BME3%5D+broShep+High+Quality+textures.7z" filename="[ME3] broShep High Quality textures.7z" size="19853323" md5="e15875a4f2cf147480d35c03cbd8082c" />
+      <packagefile me3="true" sourcename="[ME3] KH_broShep_face_textures.tpf" movedirectly="true" />
+      <packagefile me3="true" sourcename="[ME3] KH_broShep_wrinkle_fix.tpf" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="FemShep High Quality textures" author="heleuss" optional="true">
       <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
