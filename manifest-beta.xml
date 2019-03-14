@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.6.1">
+<alotaddonmanifest version="5.6.2">
    <!-- Beta mode doesn't use the highest mem/soak values -->
    <highestapprovedmemversion>143</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-11-11">144</soaktestingmemversion>
@@ -172,10 +172,10 @@
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
             tooltipname="ALOT for ME3 9.0"
             
-            torrentfilename="ALOT for ME3 9.0 BETA.zip"
-            filename="ALOT for ME3 9.0 BETA.zip"
-            size="9213303571"
-            md5="222bc4ae3530fab7ab135411550f5c4c"
+            torrentfilename="ALOT for ME3 9.0.zip"
+            filename="ALOT for ME3 9.0-363-2019-9-0-1552591688.zip"
+            size="9231699929"
+            md5="8006d09afa06dcea15d02c56f7e05109"
             
             unpackedsinglefilename="ALOT_ME3_v9.mem"
             unpackedsize="9173838019"
