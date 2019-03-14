@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.6.0">
+<alotaddonmanifest version="5.6.1">
    <!-- Beta mode doesn't use the highest mem/soak values -->
    <highestapprovedmemversion>143</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-11-11">144</soaktestingmemversion>
@@ -180,7 +180,7 @@
             unpackedsinglefilename="ALOT_ME3_v9.mem"
             unpackedsize="9173838019"
             unpackedmd5="74c6b7194229640429a4c9fcb4b98f57" />
-      <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v8.mem" movedirectly="true" />
+      <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v9.mem" movedirectly="true" />
    </addonfile>
    <addonfile appliestomainversion="9"
               alotupdateversion="3"
