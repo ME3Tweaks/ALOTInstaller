@@ -193,6 +193,17 @@
             md5="1c30b48990dfed2436796d9000ac663c" />
       <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v9.mem" movedirectly="true" />
    </addonfile>
+   <addonfile appliestomainversion="9"
+              alotupdateversion="1"
+              friendlyname="ALOT for ME2 9.1 - Update"
+              tooltipname="ALOT for ME2 9.1 - Update"
+              author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+            filename="ALOT for ME2 9.1 - Update-68-2019-9-1-1552527329.zip"
+            size="439488129"
+            md5="f6a8e235c487fd366be34f74ca18546e" />
+      <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v9.mem" movedirectly="true" />
+   </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
       <packagefile me1="true" sourcename="ME1 Improved Bun Textures (CDAMJC Cut).tpf" movedirectly="true" />
