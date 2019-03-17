@@ -122,8 +122,10 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void InstallALOT(int game, List<AddonFile> filesToInstall)
+        private void InstallALOT(int game, List<AddonFile> filesToInstall, string sourcePathOverride = null)
         {
+            if (filesToInstall == null) filesToInstall = new List<AddonFile>();
+
             MEM_INSTALL_TIME_SECONDS = 0;
             ADDONFILES_TO_INSTALL = filesToInstall;
             WARN_USER_OF_EXIT = true;
@@ -499,7 +501,11 @@ namespace AlotAddOnGUI
             CurrentTaskPercent = -1;
             string outputDir = getOutputDir(INSTALLING_THREAD_GAME, false);
 
-            args = "--install-mods --gameid " + INSTALLING_THREAD_GAME + " --input \"" + outputDir + "\" --ipc --alot-mode";
+            args = "--install-mods --gameid " + INSTALLING_THREAD_GAME + " --input \"" + (CustomMEMInstallSource ?? outputDir) + "\" --ipc";
+            if (CustomMEMInstallSource == null)
+            {
+                args += " --alot-mode";
+            }
             if (REPACK_GAME_FILES)
             {
                 args += " --repack-mode";
@@ -708,62 +714,65 @@ namespace AlotAddOnGUI
             Utilities.TurnOffOriginAutoUpdate();
 
             //Create/Update Marker File
-            int meuitmFlag = (meuitmFile != null) ? meuitmFile.MEUITMVer : (versionInfo != null ? versionInfo.MEUITMVER : 0);
-            short alotMainVersionFlag = (alotMainFile != null) ? alotMainFile.ALOTVersion : (versionInfo != null ? versionInfo.ALOTVER : (short)0); //we should not see it write 0... hopefully
-
-            //Update Marker
-            byte updateVersion = 0;
-            if (alotUpdateFile != null)
-            {
-                updateVersion = alotUpdateFile.ALOTUpdateVersion;
-            }
-            else
-            {
-                updateVersion = versionInfo != null ? versionInfo.ALOTUPDATEVER : (byte)0;
-            }
-
-            //Write Marker
             bool showMarkerFailedMessage = false;
-            ALOTVersionInfo newVersion = new ALOTVersionInfo(alotMainVersionFlag, updateVersion, 0, meuitmFlag);
-            Log.Information("Writing or updating MEMI marker with info: " + newVersion.ToString());
-            try
+            if (CustomMEMInstallSource == null)
             {
-                Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
-                ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
-                if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER || test.MEUITMVER != newVersion.MEUITMVER)
+                int meuitmFlag = (meuitmFile != null) ? meuitmFile.MEUITMVer : (versionInfo != null ? versionInfo.MEUITMVER : 0);
+                short alotMainVersionFlag = (alotMainFile != null) ? alotMainFile.ALOTVersion : (versionInfo != null ? versionInfo.ALOTVER : (short)0); //we should not see it write 0... hopefully
+
+                //Update Marker
+                byte updateVersion = 0;
+                if (alotUpdateFile != null)
                 {
-                    //Marker file written was bad
-                    Log.Error("Marker file was not properly written!");
-                    if (test == null)
-                    {
-                        Log.Error("Marker file does not indicate anything was installed.");
-                    }
-                    else
-                    {
-                        if (test.ALOTVER != newVersion.ALOTVER)
-                        {
-                            Log.Error("Marker file does not show that ALOT was installed, but we detect some version was installed.");
-                        }
-                        if (test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
-                        {
-                            Log.Error("Marker file does not show that ALOT update was applied or installed to our current version");
-                        }
-                        if (test.MEUITMVER != newVersion.MEUITMVER)
-                        {
-                            Log.Error("Marker file does not show that MEUITM was applied or installed to our current installation when it should have been");
-                        }
-                    }
-                    showMarkerFailedMessage = true;
+                    updateVersion = alotUpdateFile.ALOTUpdateVersion;
                 }
                 else
                 {
-                    Log.Information("Reading information back from disk, should match above: " + test.ToString());
+                    updateVersion = versionInfo != null ? versionInfo.ALOTUPDATEVER : (byte)0;
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Marker file was unable to be written due to an exception: " + ex.Message);
-                Log.Error("An error like this occuring could indicate significant other issues");
+
+                //Write Marker
+                ALOTVersionInfo newVersion = new ALOTVersionInfo(alotMainVersionFlag, updateVersion, 0, meuitmFlag);
+                Log.Information("Writing or updating MEMI marker with info: " + newVersion.ToString());
+                try
+                {
+                    Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
+                    ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
+                    if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER || test.MEUITMVER != newVersion.MEUITMVER)
+                    {
+                        //Marker file written was bad
+                        Log.Error("Marker file was not properly written!");
+                        if (test == null)
+                        {
+                            Log.Error("Marker file does not indicate anything was installed.");
+                        }
+                        else
+                        {
+                            if (test.ALOTVER != newVersion.ALOTVER)
+                            {
+                                Log.Error("Marker file does not show that ALOT was installed, but we detect some version was installed.");
+                            }
+                            if (test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
+                            {
+                                Log.Error("Marker file does not show that ALOT update was applied or installed to our current version");
+                            }
+                            if (test.MEUITMVER != newVersion.MEUITMVER)
+                            {
+                                Log.Error("Marker file does not show that MEUITM was applied or installed to our current installation when it should have been");
+                            }
+                        }
+                        showMarkerFailedMessage = true;
+                    }
+                    else
+                    {
+                        Log.Information("Reading information back from disk, should match above: " + test.ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Marker file was unable to be written due to an exception: " + ex.Message);
+                    Log.Error("An error like this occuring could indicate significant other issues");
+                }
             }
             //Install Binkw32
             if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
@@ -1007,6 +1016,7 @@ namespace AlotAddOnGUI
             int Game = INSTALLING_THREAD_GAME;
             List<AddonFile> addonFilesInstalled = ADDONFILES_TO_INSTALL;
             INSTALLING_THREAD_GAME = 0;
+            CustomMEMInstallSource = null;
             ADDONFILES_TO_INSTALL = null;
             CURRENT_STAGE_NUM = 0;
             PreventFileRefresh = false;
@@ -1292,7 +1302,8 @@ namespace AlotAddOnGUI
                             str.StartsWith("Program crashed"))
                         {
                             Log.Error("MEM process output: " + str);
-                        } else
+                        }
+                        else
                         {
                             Log.Information("MEM process output: " + str);
                         }

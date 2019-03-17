@@ -73,6 +73,7 @@ namespace AlotAddOnGUI
         private int SOAK_APPROVED_STABLE_MEMNOGUIVERSION = -1; //will be set by manifest
         private DateTime SOAK_START_DATE;
         private int[] SoakThresholds = { 50, 150, 400, 1000, 3000, 100000000 };
+        public string CustomMEMInstallSource;
         public bool PreventFileRefresh
         {
             get { return _preventFileRefresh; }
@@ -253,6 +254,7 @@ namespace AlotAddOnGUI
             if (!USING_BETA)
             {
                 Button_LibraryDir.Visibility = Visibility.Collapsed; //Not for main use right now.
+                Button_ManualInstallFolder.Visibility = Visibility.Collapsed;
             }
             else
             {
@@ -4503,9 +4505,11 @@ namespace AlotAddOnGUI
 
         private void Button_BuildAndInstallCancel_Click(object sender, RoutedEventArgs e)
         {
+
             ShowReadyFilesOnly = false;
             PreventFileRefresh = false;
             ApplyFiltering();
+            ManualInstall_Flyout.IsOpen = false;
             WhatToBuildFlyout.IsOpen = false;
             CURRENT_GAME_BUILD = 0;
         }
@@ -5136,6 +5140,48 @@ namespace AlotAddOnGUI
             }
             Button_LibraryDir.ToolTip = "Click to change downloaded mods library directory.\nIf path is not found at app startup, the default subdirectory of Downloaded_Mods will be used.\n\nLibrary location currently is:\n" + DOWNLOADED_MODS_DIRECTORY;
             ShowStatus("Updated library directory - please wait while files refresh...", 4000);
+        }
+
+        private void ManualInstall_Clicked(object sender, RoutedEventArgs e)
+        {
+            var openFolder = new CommonOpenFileDialog();
+            openFolder.IsFolderPicker = true;
+            openFolder.Title = "Select backup destination";
+            openFolder.AllowNonFileSystemItems = false;
+            openFolder.EnsurePathExists = true;
+            if (openFolder.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                return;
+            }
+            string folder = openFolder.FileName;
+            if (Directory.GetFiles(folder,"*.mem").Count() > 0)
+            {
+                SettingsFlyout.IsOpen = false;
+                ManualInstallFlyoutPath_Textblock.Text = openFolder.FileName;
+                CustomMEMInstallSource = openFolder.FileName;
+                ManualInstall_Flyout.IsOpen = true;
+            } else
+            {
+                ShowStatus("No MEM files found " + openFolder.FileName);
+            }
+        }
+
+        private void Button_ManualInstallME1_Click(object sender, RoutedEventArgs e)
+        {
+            ManualInstall_Flyout.IsOpen = false;
+            InstallALOT(1, null, CustomMEMInstallSource);
+        }
+
+        private void Button_ManualInstallME2_Click(object sender, RoutedEventArgs e)
+        {
+            ManualInstall_Flyout.IsOpen = false;
+            InstallALOT(2, null, CustomMEMInstallSource);
+        }
+
+        private void Button_ManualInstallME3_Click(object sender, RoutedEventArgs e)
+        {
+            ManualInstall_Flyout.IsOpen = false;
+            InstallALOT(3, null, CustomMEMInstallSource);
         }
     }
 }
