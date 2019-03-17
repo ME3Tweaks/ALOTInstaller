@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.4.11">
+<alotaddonmanifest version="5.6.3">
    <!-- Beta mode doesn't use the highest mem/soak values -->
    <highestapprovedmemversion>143</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-11-11">144</soaktestingmemversion>
@@ -59,6 +59,7 @@
       <supportedhash game="me2" name="DVD">b1d9c44be87acac610dfa9947e114096</supportedhash>
       <supportedhash game="me3" name="Origin">1d09c01c94f01b305f8c25bb56ce9ab4</supportedhash>
       <supportedhash game="me3" name="Origin (Alternate)">90d51c84b278b273e41fbe75682c132e</supportedhash>
+      <supportedhash game="me3" name="Origin (Russian)">70dc87862da9010aad1acd7d0c2c857b</supportedhash>
    </supportedhashes>
    <!-- Addon files -->
    <addonfile meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" author="CDAMJC">
@@ -140,58 +141,69 @@
       <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows" />
       <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
    </addonfile>
-   <addonfile alotversion="8" friendlyname="ALOT for ME1 8.0" author="CreeperLava">
+   <addonfile alotversion="9" friendlyname="ALOT for ME1 9.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
-            tooltipname="ALOT for ME1 8.0"
-            torrentfilename="ALOT for ME1 8.0.zip"
+            tooltipname="ALOT for ME1 9.0"
+            torrentfilename="ALOT for ME1 9.0.zip"
             
-            filename="ALOT for ME1 8.0-83-2019-8-0-1549462658.zip"
-            size="2244140523"
-            md5="1a0ea7fe4dafbceacd39ca5bafe6894f"
+            filename="ALOT for ME1 9.0-83-2019-9-0-1551626731.zip"
+            size="3378337327"
+            md5="adce822a2f681561c59e3285d5dde043"
             
-            unpackedsinglefilename="ALOT_ME1_v8.mem"
-            unpackedsize="2213890311"
-            unpackedmd5="e5e386a5b0828002ffb350550cd4814e" />
-      <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v8.mem" movedirectly="true" />
+            unpackedsinglefilename="ALOT_ME1_v9.mem"
+            unpackedsize="3332243297"
+            unpackedmd5="33bc662e84ef93baaf34da755cf18388" />
+      <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v9.mem" movedirectly="true" />
    </addonfile>
-   <addonfile alotversion="8" friendlyname="ALOT for ME2 8.0" author="CreeperLava">
+   <addonfile alotversion="9" friendlyname="ALOT for ME2 9.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
-            tooltipname="ALOT for ME2 8.0"
+            tooltipname="ALOT for ME2 9.0"
             
-            torrentfilename="ALOT for ME2 8.0.zip"
-            filename="ALOT for ME2 8.0-68-2019-8-0-1547754600.zip"
-            size="3856102677"
-            md5="c1f7de621c00f4740c877a78df244751"
+            torrentfilename="ALOT for ME2 9.0.zip"
+            filename="ALOT for ME2 9.0-68-2019-9-0-1551626599.zip"
+            size="5337568658"
+            md5="f072b4e186fea1a0636494ece6dcdbb2"
             
-            unpackedsinglefilename="ALOT_ME2_v8.mem"
-            unpackedsize="3798817474"
-            unpackedmd5="ce4fd0ba9a873b79020426ef912d131c" />
-      <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v8.mem" movedirectly="true" />
+            unpackedsinglefilename="ALOT_ME2_v9.mem"
+            unpackedsize="5290783565"
+            unpackedmd5="2e8bda7e148de06542f653de3275f272" />
+      <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v9.mem" movedirectly="true" />
    </addonfile>
-   <addonfile appliestomainversion="8"
+   <addonfile alotversion="9" friendlyname="ALOT for ME3 9.0" author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+            tooltipname="ALOT for ME3 9.0"
+            
+            torrentfilename="ALOT for ME3 9.0.zip"
+            filename="ALOT for ME3 9.0-363-2019-9-0-1552591688.zip"
+            size="9231699929"
+            md5="8006d09afa06dcea15d02c56f7e05109"
+            
+            unpackedsinglefilename="ALOT_ME3_v9.mem"
+            unpackedsize="9173838019"
+            unpackedmd5="74c6b7194229640429a4c9fcb4b98f57" />
+      <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v9.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="9"
+              alotupdateversion="3"
+              friendlyname="ALOT for ME1 9.3 - Update"
+              tooltipname="ALOT for ME1 9.3 - Update"
+              author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+            filename="ALOT for ME1 - Update-83-2019-9-3-1552526716.zip"
+            size="83680758"
+            md5="1c30b48990dfed2436796d9000ac663c" />
+      <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v9.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="9"
               alotupdateversion="1"
-              friendlyname="ALOT for ME2 8.1 - Update"
-              tooltipname="ALOT for ME2 8.1 - Update"
+              friendlyname="ALOT for ME2 9.1 - Update"
+              tooltipname="ALOT for ME2 9.1 - Update"
               author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
-            filename="ALOT for ME2 8.1 - Update-68-2019-8-1-1548958506.zip"
-            size="863"
-            md5="75d32226d5373a22bd6d51beb2e35ef2" />
-      <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v8.mem" movedirectly="true" />
-   </addonfile>
-   <addonfile alotversion="8" friendlyname="ALOT for ME3 8.0" author="CreeperLava">
-      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
-            tooltipname="ALOT for ME3 8.0"
-            
-            torrentfilename="ALOT for ME3 8.0.zip"
-            filename="ALOT for ME3 8.0-363-2019-8-0-1548793957.zip"
-            size="7241697307"
-            md5="350c0d0cf0d8e4f2c7af43b2938f1162"
-            
-            unpackedsinglefilename="ALOT_ME3_v8.mem"
-            unpackedsize="7184411988"
-            unpackedmd5="56bd8d2eea76082bc1396a1d4b53c952" />
-      <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v8.mem" movedirectly="true" />
+            filename="ALOT for ME2 9.1 - Update-68-2019-9-1-1552527329.zip"
+            size="439488129"
+            md5="f6a8e235c487fd366be34f74ca18546e" />
+      <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v9.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
@@ -266,6 +278,19 @@
    <addonfile friendlyname="Better Hair Textures" author="heleuss" optional="true">
       <file downloadlink="https://www.dropbox.com/s/stmlo6qfd0567xs/ME2%20Better%20Hair.tpf?dl=0" filename="ME2 Better Hair.tpf" size="25923956" md5="57f20a3e21efa375d823dbbe72c1986e" copydirectly="true" />
       <games me1="false" me2="true" me3="false" />
+   </addonfile>
+   <addonfile friendlyname="FemShep High Quality textures" author="heleuss" optional="true">
+      <file downloadlink="https://www.mediafire.com/file/v151vbhh7d28kgb/%5BME3%5D+femShep+High+Quality+textures.7z" filename="[ME3] femShep High Quality textures.7z" size="18877523" md5="03d31b6a684a8d498997b03a43e8e53f" />
+      <packagefile me3="true" sourcename="[ME3] KH_femShep_masks.tpf" movedirectly="true" />
+      <packagefile me3="true" sourcename="[ME3] KH_eyes.tpf" movedirectly="true" />
+      <packagefile me3="true" sourcename="[ME3] KH_femShep_brows.tpf" movedirectly="true" />
+      <packagefile me3="true" sourcename="[ME3] KH_femShep_eyelashes.tpf" movedirectly="true" />
+      <packagefile me3="true" sourcename="[ME3] KH_femShep_face_textures.tpf" movedirectly="true" />
+   </addonfile>
+   <addonfile friendlyname="BroShep High Quality textures" author="heleuss" optional="true">
+      <file downloadlink="https://www.mediafire.com/file/nv78t12776lpitf/%5BME3%5D+broShep+High+Quality+textures.7z" filename="[ME3] broShep High Quality textures.7z" size="19853323" md5="e15875a4f2cf147480d35c03cbd8082c" />
+      <packagefile me3="true" sourcename="[ME3] KH_broShep_face_textures.tpf" movedirectly="true" />
+      <packagefile me3="true" sourcename="[ME3] KH_broShep_wrinkle_fix.tpf" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="FemShep High Quality textures" author="heleuss" optional="true">
       <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
