@@ -3222,10 +3222,22 @@ namespace AlotAddOnGUI
 
             if (game == 2 || game == 3)
             {
-                //Check for TexturesMEM00.tfc
+                //Check for Texture2D.tfc
                 var path = Utilities.GetGamePath(game);
-                if (game == 2) { path = Path.Combine(path, "BioGame", "CookedPC", "TexturesMEM00.tfc"); }
-                if (game == 3) { path = Path.Combine(path, "BIOGame", "CookedPCConsole", "TexturesMEM00.tfc"); }
+                if (game == 2) { path = Path.Combine(path, "BioGame", "CookedPC", "Texture2D.tfc"); }
+                if (game == 3) { path = Path.Combine(path, "BIOGame", "CookedPCConsole", "Texture2D.tfc"); }
+                if (File.Exists(path))
+                {
+                    Log.Error("Previous installation file found: " + path);
+                    Log.Error("Game was not removed before reinstallation or was \"fixed\" using a game repair");
+                    string howToFixStr = "You must delete your current game installation (do not uninstall or repair) to fully remove leftover files. You can use the ALOT Installer backup feature to backup a vanilla game once this is done.";
+                    await this.ShowMessageAsync("Leftover files detected", "Files from a previous ALOT installation were detected and will cause installation to fail. " + howToFixStr);
+                    return;
+                }
+
+                //Check for new MEM TextureMEM00.tfc file
+                if (game == 2) { path = Path.Combine(path, "BioGame", "CookedPC", "TextureMEM00.tfc"); }
+                if (game == 3) { path = Path.Combine(path, "BIOGame", "CookedPCConsole", "TextureMEM00.tfc"); }
                 if (File.Exists(path))
                 {
                     Log.Error("Previous installation file found: " + path);
