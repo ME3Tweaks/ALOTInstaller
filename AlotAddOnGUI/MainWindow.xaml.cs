@@ -5146,7 +5146,7 @@ namespace AlotAddOnGUI
         {
             var openFolder = new CommonOpenFileDialog();
             openFolder.IsFolderPicker = true;
-            openFolder.Title = "Select backup destination";
+            openFolder.Title = "Select folder of MEM files";
             openFolder.AllowNonFileSystemItems = false;
             openFolder.EnsurePathExists = true;
             if (openFolder.ShowDialog() != CommonFileDialogResult.Ok)
