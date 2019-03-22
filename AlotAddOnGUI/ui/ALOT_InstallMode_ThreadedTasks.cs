@@ -33,22 +33,12 @@ namespace AlotAddOnGUI
     {
         private bool STAGE_DONE_REACHED = false;
         private bool TELEMETRY_IS_FULL_NEW_INSTALL;
+        private const int RESULT_TEXTURE_EXPORT_FIX_FAILED = -38;
         private const int RESULT_MARKERCHECK_FAILED = -39;
-        // Most of hte following are now controlled by the manifest.
-        private const int RESULT_UNPACK_FAILED = -40;
-        private const int RESULT_SCAN_REMOVE_FAILED = -41;
-        private const int RESULT_ME1LAA_FAILED = -43;
-        private const int RESULT_TEXTUREINSTALL_NO_TEXTUREMAP = -44;
-        private const int RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP = -45;
-        private const int RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED = -47;
-        private const int RESULT_TEXTUREINSTALL_GAME_FILE_ADDED = -48;
-        private const int RESULT_TEXTUREINSTALL_FAILED = -42;
 
-        private const int RESULT_SAVING_FAILED = -49;
-        private const int RESULT_REMOVE_MIPMAPS_FAILED = -50;
-        private const int RESULT_REPACK_FAILED = -46;
+        //Codes should be > -38 (e.g. -37)
+        private const int RESULT_ME1LAA_FAILED = -43;
         private const int RESULT_UNKNOWN_ERROR = -51;
-        private const int RESULT_SCAN_FAILED = -52;
         private const int RESULT_BIOGAME_MISSING = -53;
         private const int RESULT_SET_READWRITE_FAILED = -54;
 
@@ -363,7 +353,6 @@ namespace AlotAddOnGUI
             STAGE_DONE_REACHED = false;
             CurrentTask = "";
             Log.Information("InstallWorker Thread starting for ME" + INSTALLING_THREAD_GAME);
-            Log.Information("This installer session is context based and MEMNoGui will run in a single instance.");
             using (var md5 = MD5.Create())
             {
                 try
@@ -382,11 +371,6 @@ namespace AlotAddOnGUI
             }
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
-            //bool needsMipMapRemovalPass = false;
-            //if (versionInfo.ALOTVER == 0 && versionInfo.MEUITMVER > 0 && INSTALLING_THREAD_GAME == 1)
-            //{
-            //   needsMipMapRemovalPass = true;
-            //}
             TELEMETRY_IS_FULL_NEW_INSTALL = versionInfo == null;
             Log.Information("Setting biogame directory to read-write");
             string biogamepath = Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\BIOGame";
@@ -489,6 +473,31 @@ namespace AlotAddOnGUI
                     e.Result = RESULT_MARKERCHECK_FAILED;
                     InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
                     return;
+                }
+
+                if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
+                {
+                    string dlcPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), "BIOGame", "DLC");
+                    if (Directory.Exists(dlcPath))
+                    {
+                        var directories = Directory.EnumerateDirectories(dlcPath).Where(x => (INSTALLING_THREAD_GAME == 2 ? ME2DLCRequiringTextureExportFixes : ME3DLCRequiringTextureExportFixes).Contains(Path.GetDirectoryName(x).ToLower())).ToList();
+                        foreach (string dir in directories)
+                        {
+                            CurrentTask = "Fixing texture exports in " + dir;
+                            Log.Information("DLC marked for texture exports fix by MEM: " + dir);
+                            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                            args = "--fix-textures-property --gameid " + INSTALLING_THREAD_GAME + " --filter \""+dir+"\" --ipc";
+                            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
+                            processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+                            if (processResult != 0 || BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+                            {
+                                Log.Error("Fixing texture exports failed. Aborting installation.");
+                                e.Result = RESULT_TEXTURE_EXPORT_FIX_FAILED;
+                                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
+                                return;
+                            }
+                        }
+                    }
                 }
             }
 

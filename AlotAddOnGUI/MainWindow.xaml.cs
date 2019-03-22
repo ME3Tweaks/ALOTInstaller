@@ -228,6 +228,8 @@ namespace AlotAddOnGUI
 
         private double _progressBarValue;
         public static bool TELEMETRY_ALL_ADDON_FILES = false;
+        private List<string> ME2DLCRequiringTextureExportFixes;
+        private List<string> ME3DLCRequiringTextureExportFixes;
 
         public double ProgressBarValue
         {
@@ -2529,6 +2531,17 @@ namespace AlotAddOnGUI
                 {
                     Log.Information("Manifest does not have repackoptions - using defaults");
                 }
+
+                if (rootElement.Element("me3dlctexturefixes") != null)
+                {
+                    ME3DLCRequiringTextureExportFixes = rootElement.Elements("me3dlctexturefixes").Descendants("dlc").Select(x => x.Value).ToList();
+                }
+
+                if (rootElement.Element("me2dlctexturefixes") != null)
+                {
+                    ME2DLCRequiringTextureExportFixes = rootElement.Elements("me2dlctexturefixes").Descendants("dlc").Select(x => x.Value).ToList();
+                }
+
                 linqlist = (from e in rootElement.Elements("addonfile")
                             select new AddonFile
                             {
@@ -3209,10 +3222,10 @@ namespace AlotAddOnGUI
 
             if (game == 2 || game == 3)
             {
-                //Check for Texture2D.tfc
+                //Check for TexturesMEM00.tfc
                 var path = Utilities.GetGamePath(game);
-                if (game == 2) { path = Path.Combine(path, "BioGame", "CookedPC", "Texture2D.tfc"); }
-                if (game == 3) { path = Path.Combine(path, "BIOGame", "CookedPCConsole", "Texture2D.tfc"); }
+                if (game == 2) { path = Path.Combine(path, "BioGame", "CookedPC", "TexturesMEM00.tfc"); }
+                if (game == 3) { path = Path.Combine(path, "BIOGame", "CookedPCConsole", "TexturesMEM00.tfc"); }
                 if (File.Exists(path))
                 {
                     Log.Error("Previous installation file found: " + path);
