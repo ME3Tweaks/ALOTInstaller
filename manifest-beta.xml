@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.6.4">
+<alotaddonmanifest version="5.6.5">
    <!-- Beta mode doesn't use the highest mem/soak values -->
    <highestapprovedmemversion>143</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2018-11-11">144</soaktestingmemversion>
@@ -44,10 +44,12 @@
    
    <!-- DLC names matching this in ME3 DLC folders will have MEM texture export fix run over it before installation -->
    <me3dlctexturefixes>
-      <dlc name="BPPack1"/>
-      <dlc name="BPPack2"/>
+      <dlc name="DLC_CON_BPPack1"/>
+      <dlc name="DLC_CON_BPPack2"/>
    </me3dlctexturefixes>
-   
+   <!-- DLC names matching this in ME2 DLC folders will have MEM texture export fix run over it before installation -->
+   <me2dlctexturefixes>
+   </me2dlctexturefixes>
    <!-- Executables with hashes that are not in the list are almost always pirated and are not supported.-->
    <supportedhashes>
       <supportedhash game="me1" name="Steam">647b93621389709cab8d268379bd4c47</supportedhash>
