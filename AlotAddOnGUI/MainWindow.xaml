@@ -529,8 +529,8 @@
             </Controls:Flyout>
             <Controls:Flyout x:Name="ManualInstall_Flyout" IsOpenChanged="UserTextures_Flyout_IsOpenChanged" IsPinned="False" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
                 <StackPanel VerticalAlignment="Top"  HorizontalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
-                    <TextBlock Text="Select which game to install these files to" FontSize="20" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
-                    <TextBlock x:Name="ManualInstallFlyoutPath_Textblock" FontSize="12" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
+                    <TextBlock Text="Select which game to install MEM files to" FontSize="20" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
+                    <TextBlock FontSize="12" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Once you have chosen the path containing MEM files, installation will begin immediately.&#10;Ensure you have installed all content mods before continuing as you will be unable to do so after without breaking the game."/>
                     <StackPanel  Orientation="Vertical" HorizontalAlignment="Center">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                             <Button x:Name="Button_ManualInstallFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualInstallME1_Click">

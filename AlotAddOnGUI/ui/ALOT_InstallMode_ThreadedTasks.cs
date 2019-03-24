@@ -480,7 +480,8 @@ namespace AlotAddOnGUI
                     string dlcPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), "BIOGame", "DLC");
                     if (Directory.Exists(dlcPath))
                     {
-                        var directories = Directory.EnumerateDirectories(dlcPath).Where(x => (INSTALLING_THREAD_GAME == 2 ? ME2DLCRequiringTextureExportFixes : ME3DLCRequiringTextureExportFixes).Contains(Path.GetDirectoryName(x).ToLower())).ToList();
+                        var allfolders = Directory.EnumerateDirectories(dlcPath).Select(x => Path.GetFileName(x).ToUpperInvariant()).ToList();
+                        var directories = (INSTALLING_THREAD_GAME == 2 ? ME2DLCRequiringTextureExportFixes : ME3DLCRequiringTextureExportFixes).Intersect(allfolders).ToList();
                         foreach (string dir in directories)
                         {
                             CurrentTask = "Fixing texture exports in " + dir;
@@ -509,7 +510,6 @@ namespace AlotAddOnGUI
             Log.Information("InstallWorker(): Running MassEffectModderNoGui");
             CurrentTaskPercent = -1;
             string outputDir = getOutputDir(INSTALLING_THREAD_GAME, false);
-
             args = "--install-mods --gameid " + INSTALLING_THREAD_GAME + " --input \"" + (CustomMEMInstallSource ?? outputDir) + "\" --ipc";
             if (CustomMEMInstallSource == null)
             {

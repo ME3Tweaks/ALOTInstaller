@@ -136,6 +136,11 @@ namespace AlotAddOnGUI
         public const string SETTINGSTR_BETAMODE = "BetaMode";
         public const string SETTINGSTR_LAST_BETA_ADVERT_TIME = "LastBetaAdvertisement";
         public const string SETTINGSTR_DOWNLOADSFOLDER = "DownloadsFolder";
+
+        public const string SETTINGSTR_MANUALINSTALLPATH_ME1 = "LastManualInstallPathME1";
+        public const string SETTINGSTR_MANUALINSTALLPATH_ME2 = "LastManualInstallPathME2";
+        public const string SETTINGSTR_MANUALINSTALLPATH_ME3 = "LastManualInstallPathME3";
+
         private List<string> BACKGROUND_MEM_PROCESS_ERRORS;
         private List<string> BACKGROUND_MEM_PROCESS_PARSED_ERRORS;
         private const string SHOW_DIALOG_YES_NO = "SHOW_DIALOG_YES_NO";
@@ -1447,6 +1452,10 @@ namespace AlotAddOnGUI
                     if (af.Game_ME2) numME2Files++;
                     if (af.Game_ME3) numME3Files++;
                     bool ready = File.Exists(basepath + af.Filename);
+                    if (ready != af.Ready)
+                    {
+                        Utilities.WriteDebugLog(af.FriendlyName + " ready state is about to change due to detection/missing file: " + basepath + af.Filename);
+                    }
                     if (af.UserFile)
                     {
                         ready = File.Exists(af.UserFilePath);
@@ -1475,10 +1484,15 @@ namespace AlotAddOnGUI
                             game = 3;
                         }
                         //Check for staged file
-                        ready = File.Exists(getOutputDir(game) + "000_" + af.UnpackedSingleFilename);
+                        string stagedpath = getOutputDir(game) + "000_" + af.UnpackedSingleFilename;
+                        ready = File.Exists(stagedpath);
                         if (ready)
                         {
                             af.Staged = true;
+                        }
+                        if (ready != af.Ready)
+                        {
+                            Utilities.WriteDebugLog(af.FriendlyName + " ready state is about to change due to detection of staged file: " + stagedpath);
                         }
                     }
 
@@ -2534,12 +2548,12 @@ namespace AlotAddOnGUI
 
                 if (rootElement.Element("me3dlctexturefixes") != null)
                 {
-                    ME3DLCRequiringTextureExportFixes = rootElement.Elements("me3dlctexturefixes").Descendants("dlc").Select(x => x.Value).ToList();
+                    ME3DLCRequiringTextureExportFixes = rootElement.Elements("me3dlctexturefixes").Descendants("dlc").Select(x => x.Attribute("name").Value.ToUpperInvariant()).ToList();
                 }
 
                 if (rootElement.Element("me2dlctexturefixes") != null)
                 {
-                    ME2DLCRequiringTextureExportFixes = rootElement.Elements("me2dlctexturefixes").Descendants("dlc").Select(x => x.Value).ToList();
+                    ME2DLCRequiringTextureExportFixes = rootElement.Elements("me2dlctexturefixes").Descendants("dlc").Select(x => x.Attribute("name").Value.ToUpperInvariant()).ToList();
                 }
 
                 linqlist = (from e in rootElement.Elements("addonfile")
@@ -4432,7 +4446,7 @@ namespace AlotAddOnGUI
 
                     foreach (AddonFile af in addonFilesNotReady)
                     {
-                        if (!filesImporting.Contains(af) && (fname == af.Filename || fname.Replace("%20", " ") == af.Filename)) //MSEdge %20 bug
+                        if (!filesImporting.Contains(af) && ((af.TorrentFilename != null && fname == af.TorrentFilename) || fname == af.Filename || fname.Replace("%20", " ") == af.Filename)) //MSEdge %20 bug
                         {
                             filelist.Add(file);
                             filesImporting.Add(af);
@@ -4881,7 +4895,6 @@ namespace AlotAddOnGUI
             if (Directory.Exists(DOWNLOADED_MODS_DIRECTORY))
             {
                 Log.Information("Determining files that are no longer relevant...");
-
                 var files = new DirectoryInfo(DOWNLOADED_MODS_DIRECTORY).GetFiles().Select(o => o.Name).ToList();
                 string list = "";
 
@@ -4895,6 +4908,7 @@ namespace AlotAddOnGUI
                         { //crash may occur in some extreme cases
                             name = Path.GetFileName(name);
                         }
+                        Utilities.WriteDebugLog("File is still relevant: " + name + ", part of " + af.FriendlyName);
                         files.Remove(name); //remove manifest file from list of files to remove.
                     }
                 }
@@ -5167,25 +5181,61 @@ namespace AlotAddOnGUI
             ShowStatus("Updated library directory - please wait while files refresh...", 4000);
         }
 
-        private void ManualInstall_Clicked(object sender, RoutedEventArgs e)
+        private void ManualInstall_ButtonClicked(int game)
         {
             var openFolder = new CommonOpenFileDialog();
             openFolder.IsFolderPicker = true;
-            openFolder.Title = "Select folder of MEM files";
+            openFolder.Title = "Select folder of MEM files ";
             openFolder.AllowNonFileSystemItems = false;
             openFolder.EnsurePathExists = true;
+            string presetpath = null;
+            switch (game)
+            {
+                case 1:
+                    presetpath = Utilities.GetRegistrySettingString(SETTINGSTR_MANUALINSTALLPATH_ME1);
+                    break;
+                case 2:
+                    presetpath = Utilities.GetRegistrySettingString(SETTINGSTR_MANUALINSTALLPATH_ME2);
+                    break;
+                case 3:
+                    presetpath = Utilities.GetRegistrySettingString(SETTINGSTR_MANUALINSTALLPATH_ME3);
+                    break;
+            }
+
+            if (Directory.Exists(presetpath))
+            {
+                openFolder.InitialDirectory = presetpath;
+            }
+
+
             if (openFolder.ShowDialog() != CommonFileDialogResult.Ok)
             {
+                ManualInstall_Flyout.IsOpen = false;
                 return;
             }
             string folder = openFolder.FileName;
-            if (Directory.GetFiles(folder,"*.mem").Count() > 0)
+            if (Directory.GetFiles(folder, "*.mem").Count() > 0)
             {
+                switch (game)
+                {
+                    case 1:
+                        Utilities.WriteRegistryKey(Registry.CurrentUser, MainWindow.REGISTRY_KEY, SETTINGSTR_MANUALINSTALLPATH_ME1, openFolder.FileName);
+                        break;
+                    case 2:
+                        Utilities.WriteRegistryKey(Registry.CurrentUser, MainWindow.REGISTRY_KEY, SETTINGSTR_MANUALINSTALLPATH_ME2, openFolder.FileName);
+                        break;
+                    case 3:
+                        Utilities.WriteRegistryKey(Registry.CurrentUser, MainWindow.REGISTRY_KEY, SETTINGSTR_MANUALINSTALLPATH_ME3, openFolder.FileName);
+                        break;
+                }
+                Log.Information("Manual installation folder chosen: " + openFolder.FileName);
+
                 SettingsFlyout.IsOpen = false;
-                ManualInstallFlyoutPath_Textblock.Text = openFolder.FileName;
                 CustomMEMInstallSource = openFolder.FileName;
-                ManualInstall_Flyout.IsOpen = true;
-            } else
+                ManualInstall_Flyout.IsOpen = false;
+                InstallALOT(game, null, CustomMEMInstallSource);
+            }
+            else
             {
                 ShowStatus("No MEM files found " + openFolder.FileName);
             }
@@ -5193,20 +5243,23 @@ namespace AlotAddOnGUI
 
         private void Button_ManualInstallME1_Click(object sender, RoutedEventArgs e)
         {
-            ManualInstall_Flyout.IsOpen = false;
-            InstallALOT(1, null, CustomMEMInstallSource);
+            ManualInstall_ButtonClicked(1);
         }
 
         private void Button_ManualInstallME2_Click(object sender, RoutedEventArgs e)
         {
-            ManualInstall_Flyout.IsOpen = false;
-            InstallALOT(2, null, CustomMEMInstallSource);
+            ManualInstall_ButtonClicked(2);
         }
 
         private void Button_ManualInstallME3_Click(object sender, RoutedEventArgs e)
         {
-            ManualInstall_Flyout.IsOpen = false;
-            InstallALOT(3, null, CustomMEMInstallSource);
+            ManualInstall_ButtonClicked(3);
+        }
+
+        private void ManualInstall_Clicked(object sender, RoutedEventArgs e)
+        {
+            SettingsFlyout.IsOpen = false;
+            ManualInstall_Flyout.IsOpen = true;
         }
     }
 }

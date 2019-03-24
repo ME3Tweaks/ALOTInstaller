@@ -351,12 +351,23 @@ namespace AlotAddOnGUI
             subkey.SetValue(value, data);
         }
 
+        /// <summary>
+        /// Gets an ALOT registry setting string.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static string GetRegistrySettingString(string name)
         {
             string softwareKey = @"HKEY_CURRENT_USER\" + MainWindow.REGISTRY_KEY;
             return (string)Registry.GetValue(softwareKey, name, null);
         }
 
+        /// <summary>
+        /// Gets a string value frmo the registry from the specified key and value name.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static string GetRegistrySettingString(string key, string name)
         {
             return (string)Registry.GetValue(key, name, null);
@@ -493,28 +504,6 @@ namespace AlotAddOnGUI
                 Log.Fatal("This installation is not supported. Only official copies of the game are supported.");
                 Log.Fatal("Executable hash: " + hash + ", " + supportStatus.Item2);
             }
-            //List<KeyValuePair<string, string>> list = null;
-            //switch (game)
-            //{
-            //    case 1:
-            //        list = SUPPORTED_HASHES_ME1;
-            //        break;
-            //    case 2:
-            //        list = SUPPORTED_HASHES_ME2;
-            //        break;
-            //    case 3:
-            //        list = SUPPORTED_HASHES_ME3;
-            //        break;
-            //}
-
-            //foreach (KeyValuePair<string, string> hashPair in list)
-            //{
-            //    if (hashPair.Key == hash)
-            //    {
-            //        return "$$$Game source: " + hashPair.Value;
-            //    }
-            //}
-            //return "[ERROR]Unknown source - this installation is not supported.";
         }
 
         public static List<KeyValuePair<string, string>> SUPPORTED_HASHES_ME1 = new List<KeyValuePair<string, string>>();
@@ -857,7 +846,7 @@ namespace AlotAddOnGUI
         public static bool MakeAllFilesInDirReadWrite(string directory)
         {
             Log.Information("Marking all files in directory to read-write: " + directory);
-            Log.Warning("If the application crashes after this statement, please come to to the ALOT discord - this is an issue we have not yet been able to reproduce and thus can't fix without outside assistance.");
+            //Log.Warning("If the application crashes after this statement, please come to to the ALOT discord - this is an issue we have not yet been able to reproduce and thus can't fix without outside assistance.");
             var di = new DirectoryInfo(directory);
             foreach (var file in di.GetFiles("*", SearchOption.AllDirectories))
             {
