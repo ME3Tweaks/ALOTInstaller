@@ -126,7 +126,10 @@
                             <Border x:Name="GameIcon_ALOT" Visibility="Collapsed" ToolTip="This file is required on first install" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#991244" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ALOT_Text" FontSize="10"  Text="Required" VerticalAlignment="Center"/>
                             </Border>
-                            <Border x:Name="GameIcon_Optional" Visibility="Collapsed" ToolTip="This file is optional" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#FF156095" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ALOT_Recommended" Visibility="Collapsed" ToolTip="This file is highly recommended for installation with ALOT" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#001144" CornerRadius="2" VerticalAlignment="Center">
+                                <TextBlock x:Name="GameIcon_ALOT_Recommended_Text" FontSize="10"  Text="Recommended" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border x:Name="GameIcon_Optional" Visibility="Collapsed" ToolTip="This file is optional as it strays from vanilla but has no high quality vanilla version available" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#FF156095" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_Optional_Text" FontSize="10"  Text="Optional" VerticalAlignment="Center"/>
                             </Border>
                             <Button x:Name="Button_ConfigureMod" Margin="10,1,0,0" Padding="0,0,0,6" Content="Configure" Style="{StaticResource LinkLabel}" ToolTip="Click to change options for this mod" Click="Button_ConfigureMod_Click"/>
@@ -169,6 +172,13 @@
                         <DataTrigger Binding="{Binding Optional}" Value="True">
                             <Setter TargetName="GameIcon_Optional" Property="Visibility" Value="Visible"/>
                         </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=IsRequiredFile}" Value="False" />
+                                <Condition Binding="{Binding Path=Optional}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="GameIcon_ALOT_Recommended" Property="Visibility" Value="Visible"/>
+                        </MultiDataTrigger>
                         <DataTrigger Binding="{Binding Game_ME1}" Value="False">
                             <Setter TargetName="GameIcon_ME1" Property="Background" Value="Black"/>
                             <Setter TargetName="GameIcon_ME1_Text" Property="Foreground" Value="Gray"/>

@@ -232,6 +232,7 @@ namespace AlotAddOnGUI.classes
             {
                 _readystatustext = value;
                 OnPropertyChanged("ReadyStatusText");
+                OnPropertyChanged("LeftBlockColor"); //ui update for this property
             }
         }
         public bool ProcessAsModFile { get; set; }
