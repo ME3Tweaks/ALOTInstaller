@@ -478,7 +478,7 @@ namespace AlotAddOnGUI
                 if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
                 {
                     string dlcPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), "BIOGame", "DLC");
-                    if (Directory.Exists(dlcPath))
+                    if (Directory.Exists(dlcPath) && ((ME2DLCRequiringTextureExportFixes != null && INSTALLING_THREAD_GAME == 2) || (ME3DLCRequiringTextureExportFixes != null && INSTALLING_THREAD_GAME == 3)))
                     {
                         var allfolders = Directory.EnumerateDirectories(dlcPath).Select(x => Path.GetFileName(x).ToUpperInvariant()).ToList();
                         var directories = (INSTALLING_THREAD_GAME == 2 ? ME2DLCRequiringTextureExportFixes : ME3DLCRequiringTextureExportFixes).Intersect(allfolders).ToList();

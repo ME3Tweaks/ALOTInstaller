@@ -2549,11 +2549,17 @@ namespace AlotAddOnGUI
                 if (rootElement.Element("me3dlctexturefixes") != null)
                 {
                     ME3DLCRequiringTextureExportFixes = rootElement.Elements("me3dlctexturefixes").Descendants("dlc").Select(x => x.Attribute("name").Value.ToUpperInvariant()).ToList();
+                } else
+                {
+                    ME3DLCRequiringTextureExportFixes = new List<string>();
                 }
 
                 if (rootElement.Element("me2dlctexturefixes") != null)
                 {
                     ME2DLCRequiringTextureExportFixes = rootElement.Elements("me2dlctexturefixes").Descendants("dlc").Select(x => x.Attribute("name").Value.ToUpperInvariant()).ToList();
+                } else
+                {
+                    ME2DLCRequiringTextureExportFixes = new List<string>();
                 }
 
                 linqlist = (from e in rootElement.Elements("addonfile")
