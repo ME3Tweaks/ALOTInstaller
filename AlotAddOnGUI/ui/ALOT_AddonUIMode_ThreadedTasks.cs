@@ -699,7 +699,7 @@ namespace AlotAddOnGUI
             }
 
             //compile list of addon files to process
-            foreach (AddonFile af in alladdonfiles)
+            foreach (AddonFile af in AllAddonFiles)
             {
                 if (!af.Enabled)
                 {
@@ -1969,7 +1969,7 @@ namespace AlotAddOnGUI
             string blockDueToBadImportedFile = null; //default vaule
             bool manifestHasUpdateAvailable = false;
             AddonFile alotmainfile = null;
-            foreach (AddonFile af in alladdonfiles)
+            foreach (AddonFile af in AllAddonFiles)
             {
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {

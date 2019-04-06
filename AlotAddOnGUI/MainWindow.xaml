@@ -89,7 +89,7 @@
             <TextBlock x:Name="AddonFilesLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
         </Label>
         <ProgressBar alotaddonguiui:ProgressBarSmooth.SmoothValue="{Binding ProgressBarValue}" Value="{Binding Path=ProgressBarValue, Mode=OneWay}" Minimum="0" Maximum="{Binding Progressbar_Max}" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true" />
-        <ListView Grid.Column="0" Grid.Row="3" Name="ListView_Files" BorderThickness="0" ScrollViewer.PanningMode="VerticalFirst" Loaded="ListView_Files_Loaded" SelectionChanged="ListView_Files_SelectionChanged">
+        <ListView Grid.Column="0" Grid.Row="3" Name="ListView_Files" BorderThickness="0" ScrollViewer.PanningMode="VerticalFirst" Loaded="ListView_Files_Loaded" SelectionChanged="ListView_Files_SelectionChanged" ItemsSource="{Binding DisplayedAddonFiles}" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True">
                 <!-- This is what each list item looks like-->
             <ListView.ItemTemplate>
                 <DataTemplate>
@@ -329,8 +329,11 @@
                                 <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Filtering"/>
                             </Expander.Header>
                             <StackPanel>
-                                <Button Name="Button_SwitchToALOTMode"  Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="Switch to ALOT mode"  Click="SwitchToALOTMode_Button_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                <StackPanel Name="Panel_ALOTFiltering">
+                                <StackPanel Name="StackPanel_SwitchToALOTMode">
+                                    <TextBlock Margin="0,0,0,10" MaxWidth="210" TextAlignment="Center" TextWrapping="WrapWithOverflow" Text="Switch to ALOT mode to install additional textures with MEUITM. ALOT mode is required for installing textures for Mass Effect 2 or 3."/>
+                                    <Button Name="Button_SwitchToALOTMode"  Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="Switch to ALOT mode"  Click="SwitchToALOTMode_Button_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
+                                </StackPanel>
+                                    <StackPanel Name="Panel_ALOTFiltering">
                                 <Controls:ToggleSwitch x:Name="Switch_ME1Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect files" OnLabel="Show Mass Effect files" IsChecked="{Binding ShowME1Files}" ToolTip="Toggle showing files for Mass Effect"/>
                                 <Controls:ToggleSwitch x:Name="Switch_ME2Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 2 files" OnLabel="Show Mass Effect 2 files" IsChecked="{Binding ShowME2Files}" ToolTip="Toggle showing files for Mass Effect 2"/>
                                 <Controls:ToggleSwitch x:Name="Switch_ME3Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 3 files" OnLabel="Show Mass Effect 3 files" IsChecked="{Binding ShowME3Files}" ToolTip="Toggle showing files for Mass Effect 3"/>

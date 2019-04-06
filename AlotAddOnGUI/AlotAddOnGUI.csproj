@@ -164,6 +164,7 @@
     <Compile Include="classes\CopyFile.cs" />
     <Compile Include="classes\DiskTypeDetector.cs" />
     <Compile Include="classes\Extensions.cs" />
+    <Compile Include="classes\ObservableCollectionExtended.cs" />
     <Compile Include="classes\SingleFileCopy.cs" />
     <Compile Include="classes\Stage.cs" />
     <Compile Include="classes\ZipFile.cs" />
