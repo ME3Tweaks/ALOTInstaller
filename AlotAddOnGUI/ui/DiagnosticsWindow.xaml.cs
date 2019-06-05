@@ -85,6 +85,12 @@ namespace AlotAddOnGUI.ui
                 Button_ManualFileME3.ToolTip = "Mass Effect 3 is not installed";
             }
 
+            if (MainWindow.MEUITM_INSTALLER_MODE)
+            {
+                Button_ManualFileME2.Visibility = Button_ManualFileME3.Visibility =
+                            Visibility.Collapsed;
+            }
+
         }
 
         private void Button_DiagnosticsME3_Click(object sender, RoutedEventArgs e)

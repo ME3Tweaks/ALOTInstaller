@@ -59,7 +59,7 @@ namespace AlotAddOnGUI
         public static string EXE_DIRECTORY = System.AppDomain.CurrentDomain.BaseDirectory;
         public static string BINARY_DIRECTORY = EXE_DIRECTORY + "Data\\bin\\";
         private bool errorOccured = false;
-        public bool MEUITM_INSTALLER_MODE = true;
+        public static bool MEUITM_INSTALLER_MODE = true;
         private bool UsingBundledManifest = false;
         private List<string> BlockingMods;
         private AddonFile meuitmFile;
@@ -263,15 +263,19 @@ namespace AlotAddOnGUI
             LoadSettings();
             MEUITM_INSTALLER_MODE = false;
 
-            if (!USING_BETA)
-            {
-                Button_LibraryDir.Visibility = Visibility.Collapsed; //Not for main use right now.
-                Button_ManualInstallFolder.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                Button_LibraryDir.ToolTip = "Click to change downloaded mods library directory.\nIf path is not found at app startup, the default subdirectory of Downloaded_Mods will be used.\n\nLibrary location currently is:\n" + DOWNLOADED_MODS_DIRECTORY;
-            }
+            //if (!USING_BETA)
+            //{
+            //    Button_LibraryDir.Visibility = Visibility.Collapsed; //Not for main use right now.
+            //    Button_ManualInstallFolder.Visibility = Visibility.Collapsed;
+            //}
+            //else
+            //{
+            Button_LibraryDir.ToolTip =
+                "Click to change directory imported texture mods will be stored at.\n" +
+                "This is where data is stored before installation for ALOT Installer.\n" +
+                "If path is not found at app startup, the default subdirectory of Downloaded_Mods will be used.\n\n" +
+                "Library location currently is:\n" + DOWNLOADED_MODS_DIRECTORY;
+            //}
 
             SetUIMode();
 
@@ -302,7 +306,7 @@ namespace AlotAddOnGUI
 
                 Button_InstallME2.Visibility = Button_InstallME3.Visibility = Panel_ALOTFiltering.Visibility =
                 Label_ALOTStatus_ME2.Visibility = Label_ALOTStatus_ME3.Visibility = Button_ME2Backup.Visibility =
-                Button_ME3Backup.Visibility = Checkbox_RepackME2GameFiles.Visibility = Checkbox_RepackME3GameFiles.Visibility =
+                Button_ME3Backup.Visibility = Checkbox_RepackME2GameFiles.Visibility = Checkbox_RepackME3GameFiles.Visibility = Button_DownloadAssistant.Visibility =
                     Visibility.Collapsed;
             }
             else
@@ -313,6 +317,7 @@ namespace AlotAddOnGUI
                 Button_InstallME2.Visibility = Button_InstallME3.Visibility = Panel_ALOTFiltering.Visibility =
                 Label_ALOTStatus_ME2.Visibility = Label_ALOTStatus_ME3.Visibility = Button_ME2Backup.Visibility =
                 Button_ME3Backup.Visibility = Checkbox_RepackME2GameFiles.Visibility = Checkbox_RepackME3GameFiles.Visibility =
+                    Button_DownloadAssistant.Visibility =
                     Visibility.Visible;
 
                 Button_InstallME2.Visibility = Visibility.Visible;
@@ -1873,8 +1878,8 @@ namespace AlotAddOnGUI
                                     try
                                     {
                                         File.WriteAllText(MANIFEST_LOC, pageSourceCode);
-                                    //Legacy stuff
-                                    if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
+                                        //Legacy stuff
+                                        if (File.Exists(EXE_DIRECTORY + @"manifest-new.xml"))
                                         {
                                             File.Delete(MANIFEST_LOC);
                                         }
@@ -1934,8 +1939,8 @@ namespace AlotAddOnGUI
                                     Environment.Exit(1);
                                 }
                             }
-                        //do something with results 
-                    };
+                            //do something with results 
+                        };
                         webClient.DownloadStringAsync(new Uri(url));
                     }
                     catch (WebException e)
@@ -3512,8 +3517,8 @@ namespace AlotAddOnGUI
 
                 if (file.ToLower().StartsWith(basepath.ToLower()))
                 {
-                    Log.Information("Cannot import files from downloaded_mods folder.");
-                    ShowStatus("Can't import files from Downloaded_Mods library", 5000);
+                    Log.Information("Cannot import files from the texture library folder.");
+                    ShowStatus("Can't import files from texture library directory, files already at destination", 5000);
                     return;
                 }
             }
@@ -3832,7 +3837,7 @@ namespace AlotAddOnGUI
                 }
 
                 string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods library.";
+                string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been copied into the texture library.";
 
                 ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
             }
@@ -3911,13 +3916,13 @@ namespace AlotAddOnGUI
                         }
                         if (importedFiles.Count > 0)
                         {
-                            string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods library.";
+                            string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the texture library.";
                             foreach (string af in importedFiles)
                             {
                                 detailsMessage += "\n - " + af;
                             }
                             string originalTitle = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s" : "") + " imported";
-                            string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods library.";
+                            string originalMessage = importedFiles.Count + " file" + (importedFiles.Count != 1 ? "s have" : " has") + " been moved into the texture library.";
                             ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
                         }
                     }
@@ -4793,20 +4798,20 @@ namespace AlotAddOnGUI
                         }
 
                         string originalTitle = COPY_QUEUE.Count + " file" + (COPY_QUEUE.Count != 1 ? "s" : "") + " imported";
-                        string originalMessage = COPY_QUEUE.Count + " file" + (COPY_QUEUE.Count != 1 ? "s have" : " has") + " been copied into the Downloaded_Mods library.";
+                        string originalMessage = COPY_QUEUE.Count + " file" + (COPY_QUEUE.Count != 1 ? "s have" : " has") + " been copied into the texture library.";
 
                         ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
                         COPY_QUEUE.Clear();
                     }
                     if (MOVE_QUEUE.Count > 0)
                     {
-                        string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the Downloaded_Mods library.";
+                        string detailsMessage = "The following files were just imported to ALOT Installer. The files have been moved to the texture library.";
                         foreach (string af in MOVE_QUEUE)
                         {
                             detailsMessage += "\n - " + af;
                         }
                         string originalTitle = MOVE_QUEUE.Count + " file" + (MOVE_QUEUE.Count != 1 ? "s" : "") + " imported";
-                        string originalMessage = MOVE_QUEUE.Count + " file" + (MOVE_QUEUE.Count != 1 ? "s have" : " has") + " been moved into the Downloaded_Mods library.";
+                        string originalMessage = MOVE_QUEUE.Count + " file" + (MOVE_QUEUE.Count != 1 ? "s have" : " has") + " been moved into the texture library.";
                         ShowImportFinishedMessage(originalTitle, originalMessage, detailsMessage);
                         MOVE_QUEUE.Clear();
                     }
@@ -4962,7 +4967,7 @@ namespace AlotAddOnGUI
                     mds.AffirmativeButtonText = "Delete";
                     mds.NegativeButtonText = "Keep";
                     mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                    MessageDialogResult mdr = await this.ShowMessageAsync("Found outdated files", "The following files in the Downloaded_Mods library are no longer listed in the manifest and can be safely deleted: " + list, MessageDialogStyle.AffirmativeAndNegative, mds);
+                    MessageDialogResult mdr = await this.ShowMessageAsync("Found outdated files", "The following files in the texture library are no longer listed in the manifest and can be safely deleted: " + list, MessageDialogStyle.AffirmativeAndNegative, mds);
                     if (mdr == MessageDialogResult.Affirmative)
                     {
                         Log.Information("User elected to delete outdated files.");
@@ -5209,7 +5214,7 @@ namespace AlotAddOnGUI
             {
                 af.Ready = false;
             }
-            Button_LibraryDir.ToolTip = "Click to change downloaded mods library directory.\nIf path is not found at app startup, the default subdirectory of Downloaded_Mods will be used.\n\nLibrary location currently is:\n" + DOWNLOADED_MODS_DIRECTORY;
+            Button_LibraryDir.ToolTip = "Click to change texture library directory.\nIf path is not found at app startup, the default subdirectory of Downloaded_Mods will be used.\n\nLibrary location currently is:\n" + DOWNLOADED_MODS_DIRECTORY;
             ShowStatus("Updated library directory - please wait while files refresh...", 4000);
         }
 
