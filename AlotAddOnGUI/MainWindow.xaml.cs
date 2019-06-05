@@ -416,11 +416,11 @@ namespace AlotAddOnGUI
             Log.Information("Checking for application updates from gitub");
             AddonFilesLabel.Text = "Checking for application updates";
             var versInfo = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
-            var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
+            var client = new GitHubClient(new ProductHeaderValue("ALOTInstaller"));
             try
             {
                 int myReleaseAge = 0;
-                var releases = await client.Repository.Release.GetAll("Mgamerz", "ALOTAddonGUI");
+                var releases = await client.Repository.Release.GetAll("ME3Tweaks", "ALOTInstaller");
                 if (releases.Count > 0)
                 {
                     Log.Information("Fetched application releases from github");
@@ -533,7 +533,7 @@ namespace AlotAddOnGUI
                                 WebClient downloadClient = new WebClient();
 
                                 downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
-                                downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
+                                downloadClient.Headers["user-agent"] = "ALOTInstaller";
                                 string temppath = Path.GetTempPath();
                                 int downloadProgress = 0;
                                 downloadClient.DownloadProgressChanged += (s, e) =>
@@ -559,7 +559,7 @@ namespace AlotAddOnGUI
                                     }
                                 };
                                 downloadClient.DownloadFileCompleted += UnzipSelfUpdate;
-                                string downloadPath = temppath + "ALOTAddonGUI_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
+                                string downloadPath = temppath + "ALOTInstaller_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
                                 //DEBUG ONLY
                                 Uri downloadUri = new Uri(latest.Assets[0].BrowserDownloadUrl);
                                 downloadClient.DownloadFileAsync(downloadUri, downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
@@ -672,7 +672,7 @@ namespace AlotAddOnGUI
 
             try
             {
-                var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
+                var client = new GitHubClient(new ProductHeaderValue("ALOTInstaller"));
                 var user = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModder");
                 if (user.Count > 0)
                 {
@@ -697,7 +697,7 @@ namespace AlotAddOnGUI
                             WebClient downloadClient = new WebClient();
 
                             downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
-                            downloadClient.Headers["user-agent"] = "ALOTAddonGUI";
+                            downloadClient.Headers["user-agent"] = "ALOTInstaller";
                             string temppath = Path.GetTempPath();
                             /*downloadClient.DownloadProgressChanged += (s, e) =>
                             {
@@ -791,7 +791,7 @@ namespace AlotAddOnGUI
                 {
                     Log.Information("We will include prerelease builds as we are in beta mode.");
                 }
-                var client = new GitHubClient(new ProductHeaderValue("ALOTAddonGUI"));
+                var client = new GitHubClient(new ProductHeaderValue("ALOTInstaller"));
                 var releases = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModderNoGui");
                 Log.Information("Fetched MEMNOGui releases from github...");
                 Release latest = null;
@@ -1855,11 +1855,11 @@ namespace AlotAddOnGUI
                     try
                     {
                         //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", MANIFEST_LOC);
-                        string url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest.xml";
+                        string url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/master/manifest.xml";
                         if (USING_BETA)
                         {
                             Log.Information("In BETA mode.");
-                            url = "https://raw.githubusercontent.com/Mgamerz/AlotAddOnGUI/master/manifest-beta.xml";
+                            url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/master/manifest-beta.xml";
                             Title += " BETA MODE";
                         }
                         webClient.DownloadStringCompleted += async (sender, e) =>
@@ -2690,7 +2690,7 @@ namespace AlotAddOnGUI
             {
                 Log.Error("Error has occured parsing the XML!");
                 Log.Error(App.FlattenException(e));
-                MessageDialogResult result = await this.ShowMessageAsync("Error reading file manifest", "An error occured while reading the manifest file for installation. This may indicate a network failure or a packaging failure by Mgamerz - Please submit an issue to github (http://github.com/mgamerz/alotaddongui/issues) and include the most recent log file from the logs directory.\n\n" + e.Message, MessageDialogStyle.Affirmative);
+                MessageDialogResult result = await this.ShowMessageAsync("Error reading file manifest", "An error occured while reading the manifest file for installation. This may indicate a network failure or a packaging failure by Mgamerz - Please submit an issue to github (http://github.com/ME3Tweaks/ALOTInstaller/issues) and include the most recent log file from the logs directory.\n\n" + e.Message, MessageDialogStyle.Affirmative);
                 AddonFilesLabel.Text = "Error parsing manifest XML! Check the logs.";
                 return;
             }
