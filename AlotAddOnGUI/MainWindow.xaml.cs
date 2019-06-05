@@ -1690,7 +1690,6 @@ namespace AlotAddOnGUI
             me1Installed = (me1Path != null);
             me2Installed = (me2Path != null);
             me3Installed = (me3Path != null);
-            me3Installed = false;
             Switch_ME1Filter.IsEnabled = me1Installed;
             Switch_ME2Filter.IsEnabled = me2Installed;
             Switch_ME3Filter.IsEnabled = me3Installed;
