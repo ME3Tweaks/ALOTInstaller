@@ -1251,7 +1251,10 @@ namespace AlotAddOnGUI
                     Log.Information("Building User MEM file from staging directory: " + userFileExtractedPath);
                     string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                     string filename = USERFILE_INDEX.ToString("000") + "_UserAddon_" + Path.GetFileNameWithoutExtension(af.UserFilePath) + ".mem";
-                    string args = "-convert-to-mem " + game + " \"" + userFileExtractedPath + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
+                    string args = "--convert-to-mem --gameid " + game +
+                                  " --input \"" + userFileExtractedPath.TrimEnd('\\') +
+                                  "\" --output \"" + getOutputDir(game) + filename + "\" --ipc";
+
                     CURRENT_USER_BUILD_FILE = af.FriendlyName;
                     runMEM_BackupAndBuild(exe, args, BuildWorker);
                     while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
