@@ -1251,7 +1251,10 @@ namespace AlotAddOnGUI
                     Log.Information("Building User MEM file from staging directory: " + userFileExtractedPath);
                     string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                     string filename = USERFILE_INDEX.ToString("000") + "_UserAddon_" + Path.GetFileNameWithoutExtension(af.UserFilePath) + ".mem";
-                    string args = "-convert-to-mem " + game + " \"" + userFileExtractedPath + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
+                    string args = "--convert-to-mem --gameid " + game +
+                                  " --input \"" + userFileExtractedPath.TrimEnd('\\') +
+                                  "\" --output \"" + getOutputDir(game) + filename + "\" --ipc";
+
                     CURRENT_USER_BUILD_FILE = af.FriendlyName;
                     runMEM_BackupAndBuild(exe, args, BuildWorker);
                     while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
@@ -1990,7 +1993,7 @@ namespace AlotAddOnGUI
                         }
                         else if (af.ALOTVersion > 0 && !af.Ready)
                         {
-                            Log.Warning("Installation for ME" + game + " being blocked: ALOT/MEUITM is not installed currently, and ALOT's main file is not present or ready for use. ALOT must be installed if it's not already done so.");
+                            Log.Warning("Installation for ME" + game + " being blocked: ALOT/MEUITM is not installed currently, and ALOT's main file is not present or ready for use in the textue library. ALOT must be installed if it's not already done so.");
                             break;
                         }
                     }
@@ -2001,7 +2004,7 @@ namespace AlotAddOnGUI
                         if (!af.Ready)
                         {
                             blockDueToMissingALOTUpdateFile = true;
-                            Log.Warning("Installation for ME" + game + " being blocked due to ALOT update available, but not ready for installation in the import library.");
+                            Log.Warning("Installation for ME" + game + " has been blocked due to an ALOT update listed in manifest, but not available in the texture library. ALOT updates must also be imported when installing ALOT.");
                             break;
                         }
                     }
@@ -2081,7 +2084,7 @@ namespace AlotAddOnGUI
 
             if (!oneisready)
             {
-                await this.ShowMessageAsync("No files available for building", "There are no files available or relevant in the Downloaded_Mods library to install for Mass Effect" + GetGameNumberSuffix(game) + ".");
+                await this.ShowMessageAsync("No files available for building", "There are no files available or relevant in the texture library to install for Mass Effect" + GetGameNumberSuffix(game) + ".");
                 return false;
             }
             //if alot is already installed we don't need to show missing message, unless installed via MEM directly

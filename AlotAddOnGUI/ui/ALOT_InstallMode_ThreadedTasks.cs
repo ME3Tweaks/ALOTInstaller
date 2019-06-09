@@ -802,7 +802,7 @@ namespace AlotAddOnGUI
                 string dest = DOWNLOADED_MODS_DIRECTORY + "\\" + extractedName;
                 if (Path.GetPathRoot(source) == Path.GetPathRoot(dest))
                 {
-                    Log.Information("ALOT MAIN FILE - Unpacked - moving to downloaded_mods from install dir: " + extractedName);
+                    Log.Information("ALOT MAIN FILE - Unpacked - moving to texture library from install dir: " + extractedName);
                     if (File.Exists(source))
                     {
                         try
