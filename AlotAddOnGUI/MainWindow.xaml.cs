@@ -2876,7 +2876,7 @@ namespace AlotAddOnGUI
         }
 
         /// <summary>
-        /// Class for passing data between theads
+        /// Class for passing data between threads
         /// </summary>
         public class ThreadCommand
         {
