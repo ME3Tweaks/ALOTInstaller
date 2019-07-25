@@ -9,6 +9,5 @@ namespace AlotAddOnGUI
         public string message;
         public string AffirmativeButtonText;
         public string NegativeButtonText;
-
     }
 }

@@ -513,7 +513,7 @@ namespace AlotAddOnGUI
             args = "--install-mods --gameid " + INSTALLING_THREAD_GAME + " --input \"" + (CustomMEMInstallSource ?? outputDir) + "\" --ipc";
             if (CustomMEMInstallSource == null)
             {
-                args += " --alot-mode";
+                args += " --alot-mode --verify";
             }
             if (REPACK_GAME_FILES)
             {
