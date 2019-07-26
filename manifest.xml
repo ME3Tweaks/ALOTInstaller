@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotaddonmanifest version="5.6.5">
    <highestapprovedmemversion>216</highestapprovedmemversion>
-   <soaktestingmemversion soakstartdate="2019-06-07">216</soaktestingmemversion>
+   <soaktestingmemversion soakstartdate="2019-07-25">217</soaktestingmemversion>
    <stages>
-      <!-- -57 is the next error code available-->
+      <!-- -58 is the next error code available-->
       <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
          <failureinfo resultcode="-54" failedtopmessage="Preinstallation scan failed" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during preinstallation scan. Please see installer log for more info." />
       </stage>
@@ -33,6 +33,9 @@
       </stage>
       <stage name="STAGE_MARKERS" weight="0.025" tasktext="Installing remaining ALOT markers">
          <failureinfo resultcode="-55" failedtopmessage="Failed to install remaining ALOT markers" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during application of ALOT markers on non-modded files. Please see installer log for more info. The game is in a functional but texture settings and proper markers have not been applied." />
+      </stage>
+      <stage name="STAGE_VERIFYTEXTURES" weight="0.05" tasktext="Verifying textures">
+         <failureinfo resultcode="-58" failedtopmessage="Texture verification failed" failedbottommessage="Check or upload installer log for more information" failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code after textures were installed, during the texture verification step. Please see installer log for more info." />
       </stage>
    </stages>
    <repackoptions me2repackenabled="true" me3repackenabled="true" />
