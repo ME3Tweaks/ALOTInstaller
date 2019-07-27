@@ -120,6 +120,8 @@ namespace AlotAddOnGUI
         private bool me3Installed;
         private bool RefreshListOnUserImportClose = false;
         private List<string> musicpackmirrors;
+
+        internal List<ManifestTutorial> AllTutorials { get; private set; } = new List<ManifestTutorial>();
         public ObservableCollectionExtended<AddonFile> DisplayedAddonFiles { get; set; } = new ObservableCollectionExtended<AddonFile>();
         private ObservableCollectionExtended<AddonFile> AllAddonFiles { get; set; } = new ObservableCollectionExtended<AddonFile>();
         private readonly string PRIMARY_HEADER = "Download the listed files for your game as listed below. You can filter per-game in the settings.\nDo not extract or rename any files you download. Drop them onto this interface to import them.";
@@ -328,6 +330,7 @@ namespace AlotAddOnGUI
                 Button_InstallME3.Visibility = Visibility.Visible;
             }
             HeaderLabel.Text = MEUITM_INSTALLER_MODE ? MEUITM_PRIMARY_HEADER : PRIMARY_HEADER;
+            UpdateTutorialPanel();
             ApplyFiltering();
         }
 
@@ -2476,20 +2479,20 @@ namespace AlotAddOnGUI
             List<AddonFile> linqlist = null;
             musicpackmirrors = new List<string>();
 
-            List<ManifestTutorial> tutorials = new List<ManifestTutorial>();
             try
             {
                 XElement rootElement = XElement.Load(MANIFEST_LOC);
                 string version = (string)rootElement.Attribute("version") ?? "";
                 Debug.WriteLine("Manifest version: " + version);
                 musicpackmirrors = rootElement.Elements("musicpackmirror").Select(xe => xe.Value).ToList();
-                tutorials = (from e in rootElement.Elements("tutorial")
+                AllTutorials.AddRange((from e in rootElement.Elements("tutorial")
                              select new ManifestTutorial
                              {
                                  Link = (string)e.Attribute("link"),
                                  Text = (string)e.Attribute("text"),
-                                 ToolTip = (string)e.Attribute("tooltip")
-                             }).ToList();
+                                 ToolTip = (string)e.Attribute("tooltip"),
+                                 MEUITMOnly = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false
+                             }).ToList());
 
                 HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("highestapprovedmemversion") == null ? HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("highestapprovedmemversion");
                 if (rootElement.Element("soaktestingmemversion") != null)
@@ -2705,40 +2708,7 @@ namespace AlotAddOnGUI
                 return;
             }
             linqlist = linqlist.OrderBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList();
-            if (tutorials.Count > 0)
-            {
-                Label_NoTutorials.Visibility = Visibility.Collapsed;
-                foreach (ManifestTutorial tut in tutorials)
-                {
-                    System.Windows.Controls.Button buttonOK = new System.Windows.Controls.Button();
-                    buttonOK.Content = tut.Text;
-                    buttonOK.ToolTip = tut.ToolTip;
-                    buttonOK.Margin = new Thickness(20, 0, 20, 3);
-                    buttonOK.Padding = new Thickness(0, 3, 0, 3);
-                    buttonOK.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
 
-                    buttonOK.Style = (Style)FindResource("AccentedSquareButtonStyle");
-                    ControlsHelper.SetContentCharacterCasing(buttonOK, System.Windows.Controls.CharacterCasing.Upper);
-                    //                    buttonOK.FontSize = 12;
-                    //                    buttonOK.Contr
-                    //Style = "{StaticResource AccentedSquareButtonStyle}" Controls: ControlsHelper.ContentCharacterCasing = "Upper"
-                    buttonOK.Click += async (s, e) =>
-                    {
-                        try
-                        {
-                            Log.Information("Opening URL: " + tut.Link);
-                            System.Diagnostics.Process.Start(tut.Link);
-                        }
-                        catch (Exception other)
-                        {
-                            Log.Error("Exception opening browser - handled. The error was " + other.Message);
-                            System.Windows.Clipboard.SetText(tut.Link);
-                            await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar.");
-                        }
-                    };
-                    StackPanel_ManifestTutorials.Children.Add(buttonOK);
-                }
-            }
 
             AllAddonFiles.ReplaceAll(linqlist);
             DisplayedAddonFiles.ReplaceAll(AllAddonFiles);
@@ -2800,6 +2770,46 @@ namespace AlotAddOnGUI
             Log.Information(me3status);
             ApplyFiltering(); //sets data source and separators
             RunMEMUpdater2();
+        }
+
+        private void UpdateTutorialPanel()
+        {
+            StackPanel_ManifestTutorials.Children.Clear();
+            var tutorials = AllTutorials.Where(x => (!MEUITM_INSTALLER_MODE && !x.MEUITMOnly || MEUITM_INSTALLER_MODE && x.MEUITMOnly)).ToList();
+            if (tutorials.Count > 0)
+            {
+                Label_NoTutorials.Visibility = Visibility.Collapsed;
+                foreach (ManifestTutorial tut in tutorials)
+                {
+                    System.Windows.Controls.Button buttonOK = new System.Windows.Controls.Button();
+                    buttonOK.Content = tut.Text;
+                    buttonOK.ToolTip = tut.ToolTip;
+                    buttonOK.Margin = new Thickness(20, 0, 20, 3);
+                    buttonOK.Padding = new Thickness(0, 3, 0, 3);
+                    buttonOK.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center;
+
+                    buttonOK.Style = (Style)FindResource("AccentedSquareButtonStyle");
+                    ControlsHelper.SetContentCharacterCasing(buttonOK, System.Windows.Controls.CharacterCasing.Upper);
+                    //                    buttonOK.FontSize = 12;
+                    //                    buttonOK.Contr
+                    //Style = "{StaticResource AccentedSquareButtonStyle}" Controls: ControlsHelper.ContentCharacterCasing = "Upper"
+                    buttonOK.Click += async (s, e) =>
+                    {
+                        try
+                        {
+                            Log.Information("Opening URL: " + tut.Link);
+                            System.Diagnostics.Process.Start(tut.Link);
+                        }
+                        catch (Exception other)
+                        {
+                            Log.Error("Exception opening browser - handled. The error was " + other.Message);
+                            System.Windows.Clipboard.SetText(tut.Link);
+                            await this.ShowMessageAsync("Unable to open web browser", "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar.");
+                        }
+                    };
+                    StackPanel_ManifestTutorials.Children.Add(buttonOK);
+                }
+            }
         }
 
         private void ApplyFiltering(bool scrollToBottom = false)
@@ -4874,7 +4884,7 @@ namespace AlotAddOnGUI
                         }
                         break;
                     case 2: //Toggle on/off
-                        if (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0 || !af.Ready || PreventFileRefresh)
+                        if (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0 || !af.Ready || PreventFileRefresh || (af.MEUITM && MEUITM_INSTALLER_MODE))
                         {
                             mi.Visibility = Visibility.Collapsed;
                             break;
