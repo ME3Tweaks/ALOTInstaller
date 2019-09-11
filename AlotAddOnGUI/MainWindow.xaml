@@ -88,8 +88,8 @@
         <Label Grid.Column="0" Grid.Row="1"  HorizontalContentAlignment="Center">
             <TextBlock x:Name="AddonFilesLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
         </Label>
-        <ProgressBar alotaddonguiui:ProgressBarSmooth.SmoothValue="{Binding ProgressBarValue}" Value="{Binding Path=ProgressBarValue, Mode=OneWay}" Minimum="0" Maximum="100" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true" />
-        <ListView Grid.Column="0" Grid.Row="3" Name="ListView_Files" BorderThickness="0" ScrollViewer.PanningMode="VerticalFirst" Loaded="ListView_Files_Loaded" SelectionChanged="ListView_Files_SelectionChanged">
+        <ProgressBar alotaddonguiui:ProgressBarSmooth.SmoothValue="{Binding ProgressBarValue}" Value="{Binding Path=ProgressBarValue, Mode=OneWay}" Minimum="0" Maximum="{Binding Progressbar_Max}" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true" />
+        <ListView Grid.Column="0" Grid.Row="3" Name="ListView_Files" BorderThickness="0" ScrollViewer.PanningMode="VerticalFirst" Loaded="ListView_Files_Loaded" SelectionChanged="ListView_Files_SelectionChanged" ItemsSource="{Binding DisplayedAddonFiles}" VirtualizingPanel.IsVirtualizingWhenGrouping="True" VirtualizingPanel.IsVirtualizing="True">
                 <!-- This is what each list item looks like-->
             <ListView.ItemTemplate>
                 <DataTemplate>
@@ -126,7 +126,10 @@
                             <Border x:Name="GameIcon_ALOT" Visibility="Collapsed" ToolTip="This file is required on first install" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#991244" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_ALOT_Text" FontSize="10"  Text="Required" VerticalAlignment="Center"/>
                             </Border>
-                            <Border x:Name="GameIcon_Optional" Visibility="Collapsed" ToolTip="This file is optional" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#FF156095" CornerRadius="2" VerticalAlignment="Center">
+                            <Border x:Name="GameIcon_ALOT_Recommended" Visibility="Collapsed" ToolTip="This file is highly recommended for installation with ALOT" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#001144" CornerRadius="2" VerticalAlignment="Center">
+                                <TextBlock x:Name="GameIcon_ALOT_Recommended_Text" FontSize="10"  Text="Recommended" VerticalAlignment="Center"/>
+                            </Border>
+                            <Border x:Name="GameIcon_Optional" Visibility="Collapsed" ToolTip="This file is optional as it strays from vanilla but has no high quality vanilla version available" Padding="1" Margin="5,0,0,0" BorderThickness="1" BorderBrush="LightGray" Background="#FF156095" CornerRadius="2" VerticalAlignment="Center">
                                 <TextBlock x:Name="GameIcon_Optional_Text" FontSize="10"  Text="Optional" VerticalAlignment="Center"/>
                             </Border>
                             <Button x:Name="Button_ConfigureMod" Margin="10,1,0,0" Padding="0,0,0,6" Content="Configure" Style="{StaticResource LinkLabel}" ToolTip="Click to change options for this mod" Click="Button_ConfigureMod_Click"/>
@@ -169,6 +172,13 @@
                         <DataTrigger Binding="{Binding Optional}" Value="True">
                             <Setter TargetName="GameIcon_Optional" Property="Visibility" Value="Visible"/>
                         </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=IsRequiredFile}" Value="False" />
+                                <Condition Binding="{Binding Path=Optional}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="GameIcon_ALOT_Recommended" Property="Visibility" Value="Visible"/>
+                        </MultiDataTrigger>
                         <DataTrigger Binding="{Binding Game_ME1}" Value="False">
                             <Setter TargetName="GameIcon_ME1" Property="Background" Value="Black"/>
                             <Setter TargetName="GameIcon_ME1_Text" Property="Foreground" Value="Gray"/>
@@ -304,14 +314,14 @@
                             <Expander.Header>
                                 <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="ALOT Installation Status"/>
                             </Expander.Header>
-                            <StackPanel HorizontalAlignment="Left">
+                            <StackPanel>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                     <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME1" Content="ME1: Not Installed"/>
                                     <!-- <Button Margin="10,0,0,0" Padding="0,0,0,5" x:Name="Button_ME1_ShowLODOptions" Content="Change texture quality" ToolTip="Change quality of textures for ME1 to suit your performance needs" Style="{StaticResource LinkLabel}" Click="Button_ToggleME1LODPanel"/> -->
                                 </StackPanel>
                                 <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME2" Content="ME2: Not Installed"/>
                                 <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME3" Content="ME3: Not Installed"/>
-
+                                <Button Name="Button_ManualInstallFolder"  HorizontalContentAlignment="Center" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="Install MEM files directly"  Click="ManualInstall_Clicked" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" ToolTip="Install MEM files directly to a game. You can use this to install MEM files without having to install ALOT."/>
                             </StackPanel>
                         </Expander>
                         <Expander IsExpanded="True" Expanded="Expander_Expanded">
@@ -319,8 +329,11 @@
                                 <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Filtering"/>
                             </Expander.Header>
                             <StackPanel>
-                                <Button Name="Button_SwitchToALOTMode"  Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="Switch to ALOT mode"  Click="SwitchToALOTMode_Button_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
-                                <StackPanel Name="Panel_ALOTFiltering">
+                                <StackPanel Name="StackPanel_SwitchToALOTMode">
+                                    <TextBlock Margin="0,0,0,10" MaxWidth="210" TextAlignment="Center" TextWrapping="WrapWithOverflow" Text="Switch to ALOT mode to install additional textures with MEUITM. ALOT mode is required for installing textures for Mass Effect 2 or 3."/>
+                                    <Button Name="Button_SwitchToALOTMode"  Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="Switch to ALOT mode"  Click="SwitchToALOTMode_Button_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" ToolTip="Switch to full ALOT Installer mode, enabling support for all 3 games"/>
+                                </StackPanel>
+                                    <StackPanel Name="Panel_ALOTFiltering">
                                 <Controls:ToggleSwitch x:Name="Switch_ME1Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect files" OnLabel="Show Mass Effect files" IsChecked="{Binding ShowME1Files}" ToolTip="Toggle showing files for Mass Effect"/>
                                 <Controls:ToggleSwitch x:Name="Switch_ME2Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 2 files" OnLabel="Show Mass Effect 2 files" IsChecked="{Binding ShowME2Files}" ToolTip="Toggle showing files for Mass Effect 2"/>
                                 <Controls:ToggleSwitch x:Name="Switch_ME3Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 3 files" OnLabel="Show Mass Effect 3 files" IsChecked="{Binding ShowME3Files}" ToolTip="Toggle showing files for Mass Effect 3"/>
@@ -356,7 +369,8 @@
                             </Expander.Header>
                             <StackPanel>
                                 <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowFirstTime" Controls:ControlsHelper.ContentCharacterCasing="Upper" Content="Show Intro Dialog" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Shows the initial instructions screen"/>
-                                <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="CleanupDownloadedMods" Controls:ControlsHelper.ContentCharacterCasing="Upper" Content="Cleanup Downloaded__Mods" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Removes old files from the Downloaded_Mods directory that are no longer in the manifest.&#10;Any files in this folder that you manually added that are not in the manifest will also be deleted."/>
+                                <Button Name="Button_LibraryDir" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowSetLibraryDir" Controls:ControlsHelper.ContentCharacterCasing="Upper" Content="Set texture library location" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Allows you to change where mods are stored before installation"/>
+                                <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="CleanupDownloadedMods" Controls:ControlsHelper.ContentCharacterCasing="Upper" Content="Cleanup Texture Library" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Removes old files from the texture library that are no longer in the manifest.&#10;Any files in this folder that you manually added that are not in the manifest will also be deleted."/>
                                 <CheckBox Margin="5" x:Name="Checkbox_RepackME2GameFiles" Content="Repack ME2 files" Click="Checkbox_RepackME2Files_Click" ToolTip="Repacking game files for ME2 makes installation take longer, but will save some disk space.&#10;This option only has an effect during the initial installation of ALOT. Subsequent installations are not affected." />
                                 <CheckBox Margin="5" x:Name="Checkbox_RepackME3GameFiles" Content="Repack ME3 files" Click="Checkbox_RepackME3Files_Click" ToolTip="Repacking game files for ME3 makes installation take longer, but will save some disk space.&#10;This option only has an effect during the initial installation of ALOT. Subsequent installations are not affected." />
                                 <!--<CheckBox Margin="5" x:Name="Checkbox_RepackGameFiles" Content="Repack ME2 files" Click="Checkbox_RepackFiles_Click" ToolTip="Repacking game files makes installation take longer, but will save some disk space.&#10;This option only has an effect during the initial installation of ALOT. Subsequent installations are not affected." />-->
@@ -388,7 +402,6 @@
                                 <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mass Effect Wiki" ToolTip="This program uses content from the Mass Effect wiki at FANDOM and is licensed under the Creative Commons Attribution-Share Alike License." HorizontalAlignment="Left"/>
                                 <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="ME3Tweaks" ToolTip="Powers the log uploading service to Pastebin" HorizontalAlignment="Left"/>
                                 <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Erik JS" ToolTip="Developer of binkw32 ASI plugins for ME2 and ME3" HorizontalAlignment="Left"/>
-                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="John-Paul Ownby " ToolTip="Developer of IndirectSound. Used to fix audio bugs in Mass Effect" HorizontalAlignment="Left"/>
                                 <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="SirCxyrtyx " ToolTip="Developer of the AutoTOC ASI plugin" HorizontalAlignment="Left"/>
                             </StackPanel>
                         </Expander>
@@ -513,7 +526,7 @@
                             <TextBlock  x:Name="FirstRunText_TitleImport" FontWeight="Light" Margin="0,10,0,0" FontSize="24">How do I import files?</TextBlock>
 
                             <TextBlock  x:Name="FirstRunText_ImportSummary" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Left">
-                            Import files by downloading them, and then using Download Assistant to import them from your downloads folder. You can also drag/drop them onto the main interface, or put them into the Downloaded_Mods directory. Do not rename or unpack any files you download.</TextBlock>
+                            Import files by downloading them, and then using Download Assistant to import them from your downloads folder. You can also drag/drop them onto this window, or put them into the texture library directory. Do not rename or unpack any files you download.</TextBlock>
                             <TextBlock  x:Name="FirstRunText_TitleOKMods" FontWeight="Light" Text="When do I install ALOT or other mods?" FontSize="24" Margin="0,10,0,0"></TextBlock>
                             <TextBlock  x:Name="FirstRunText_OKModsSummary" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Left">Almost all pcc or upk mods (DLC or file replacement mods) are compatible with ALOT as long as you install them before ALOT. 
                             Once ALOT is installed, the only mods that can be installed are other texture mods that do not replace upk, sfm, or pcc files.  
@@ -526,6 +539,28 @@
                         <Button  x:Name="Button_FirstRun_Dismiss" Content="Continue" ToolTip="Acknowledges you read this message" HorizontalAlignment="Left" Margin="0,10,0,0" Click="Button_FirstTimeRunDismiss_Click"/>
                     </StackPanel>
                 </Border>
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="ManualInstall_Flyout" IsOpenChanged="ManualTextures_Flyout_IsOpenChanged" IsPinned="False" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
+                <StackPanel VerticalAlignment="Top"  HorizontalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
+                    <TextBlock Text="Select which game to install MEM files to" FontSize="20" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
+                    <TextBlock FontSize="12" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Once you have chosen the path containing MEM files, installation will begin immediately.&#10;Ensure you have installed all content mods before continuing as you will be unable to do so after without breaking the game."/>
+                    <StackPanel  Orientation="Vertical" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button x:Name="Button_ManualInstallFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualInstallME1_Click">
+                                <Image Source="images/logo_me1.png" Height="40" Margin="10"/>
+                            </Button>
+                            <Button x:Name="Button_ManualInstallFileME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualInstallME2_Click">
+                                <Image Source="images/logo_me2.png" Height="40" Margin="10"/>
+                            </Button>
+                            <Button x:Name="Button_ManualInstallFileME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualInstallME3_Click">
+                                <Image Source="images/logo_me3.png" Height="40" Margin="10"/>
+                            </Button>
+                        </StackPanel>
+                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                        <Button Content="Cancel Install" Margin="5,0,0,0" HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Click="Button_BuildAndInstallCancel_Click" ToolTip="Closes this dialog"/>
+                    </StackPanel>
+                </StackPanel>
             </Controls:Flyout>
             <Controls:Flyout x:Name="UserTextures_Flyout" IsOpenChanged="UserTextures_Flyout_IsOpenChanged" IsPinned="False" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
                 <StackPanel VerticalAlignment="Top"  HorizontalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">

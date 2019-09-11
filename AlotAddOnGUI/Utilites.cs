@@ -20,6 +20,7 @@ using System.Security.Cryptography;
 using SlavaGu.ConsoleAppLauncher;
 using System.ComponentModel;
 using ByteSizeLib;
+using System.Globalization;
 
 namespace AlotAddOnGUI
 {
@@ -350,12 +351,23 @@ namespace AlotAddOnGUI
             subkey.SetValue(value, data);
         }
 
+        /// <summary>
+        /// Gets an ALOT registry setting string.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static string GetRegistrySettingString(string name)
         {
             string softwareKey = @"HKEY_CURRENT_USER\" + MainWindow.REGISTRY_KEY;
             return (string)Registry.GetValue(softwareKey, name, null);
         }
 
+        /// <summary>
+        /// Gets a string value frmo the registry from the specified key and value name.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static string GetRegistrySettingString(string key, string name)
         {
             return (string)Registry.GetValue(key, name, null);
@@ -453,7 +465,7 @@ namespace AlotAddOnGUI
             return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
         }
 
-        internal static Tuple<bool,string> GetRawGameSourceByHash(int game, string hash)
+        internal static Tuple<bool, string> GetRawGameSourceByHash(int game, string hash)
         {
             List<KeyValuePair<string, string>> list = null;
             switch (game)
@@ -473,7 +485,7 @@ namespace AlotAddOnGUI
             {
                 if (hashPair.Key == hash)
                 {
-                    return new Tuple<bool,string>(true,"Game source: " + hashPair.Value);
+                    return new Tuple<bool, string>(true, "Game source: " + hashPair.Value);
                 }
             }
             return new Tuple<bool, string>(false, "Unknown source - this installation is not supported.");
@@ -486,33 +498,12 @@ namespace AlotAddOnGUI
             {
                 //supported
                 Log.Warning("Executable hash: " + hash + ", " + supportStatus.Item2);
-            } else
+            }
+            else
             {
                 Log.Fatal("This installation is not supported. Only official copies of the game are supported.");
                 Log.Fatal("Executable hash: " + hash + ", " + supportStatus.Item2);
             }
-            //List<KeyValuePair<string, string>> list = null;
-            //switch (game)
-            //{
-            //    case 1:
-            //        list = SUPPORTED_HASHES_ME1;
-            //        break;
-            //    case 2:
-            //        list = SUPPORTED_HASHES_ME2;
-            //        break;
-            //    case 3:
-            //        list = SUPPORTED_HASHES_ME3;
-            //        break;
-            //}
-
-            //foreach (KeyValuePair<string, string> hashPair in list)
-            //{
-            //    if (hashPair.Key == hash)
-            //    {
-            //        return "$$$Game source: " + hashPair.Value;
-            //    }
-            //}
-            //return "[ERROR]Unknown source - this installation is not supported.";
         }
 
         public static List<KeyValuePair<string, string>> SUPPORTED_HASHES_ME1 = new List<KeyValuePair<string, string>>();
@@ -605,26 +596,7 @@ namespace AlotAddOnGUI
             }
             return result;
         }
-
-        public static bool InstallIndirectSoundFixForME1()
-        {
-            Log.Information("Installing indirect sound fix  for Mass Effect");
-            string gamePath = GetGamePath(1);
-            gamePath += "\\Binaries\\";
-            try
-            {
-                File.WriteAllBytes(gamePath + "dsound.dll", AlotAddOnGUI.Properties.Resources.dsound);
-                Log.Information("Installed indrectsound for Mass Effect");
-                return true;
-            }
-            catch (Exception e)
-            {
-                Log.Error("Unable to install indirectsound:");
-                Log.Error(App.FlattenException(e));
-            }
-            return false;
-        }
-
+        
         public static string CalculateMD5(string filename)
         {
             try
@@ -874,7 +846,7 @@ namespace AlotAddOnGUI
         public static bool MakeAllFilesInDirReadWrite(string directory)
         {
             Log.Information("Marking all files in directory to read-write: " + directory);
-            Log.Warning("If the application crashes after this statement, please come to to the ALOT discord - this is an issue we have not yet been able to reproduce and thus can't fix without outside assistance.");
+            //Log.Warning("If the application crashes after this statement, please come to to the ALOT discord - this is an issue we have not yet been able to reproduce and thus can't fix without outside assistance.");
             var di = new DirectoryInfo(directory);
             foreach (var file in di.GetFiles("*", SearchOption.AllDirectories))
             {
@@ -1028,7 +1000,7 @@ namespace AlotAddOnGUI
             return true;
         }
 
-        public static Task<List<string>> Run7zWithProgressForAddonFile(string archive)
+        public static Task<List<string>> GetArchiveFileListing(string archive)
         {
             string path = MainWindow.BINARY_DIRECTORY + "7z.exe";
             string args = "l \"" + archive + "\"";
@@ -1279,6 +1251,22 @@ namespace AlotAddOnGUI
             }
         }
 
+        public static double GetDouble(string value, double defaultValue)
+        {
+            double result;
+
+            // Try parsing in the current culture
+            if (!double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
+                // Then try in US english
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
+                // Then in neutral language
+                !double.TryParse(value, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            {
+                result = defaultValue;
+            }
+            return result;
+        }
+
         public static string sha256(string randomString)
         {
             System.Security.Cryptography.SHA256Managed crypt = new System.Security.Cryptography.SHA256Managed();
@@ -1358,14 +1346,8 @@ namespace AlotAddOnGUI
                 Log.Information("Antivirus info: " + virusCheckerName + " with state " + bytes[1].ToString("X2") + " " + bytes[2].ToString("X2") + " " + bytes[3].ToString("X2"));
             }
         }
-
-        public static bool isAntivirusRunning()
-        {
-            return true;
-        }
-
-
-        public static bool isGameRunning(int gameID)
+        
+        public static bool IsGameRunning(int gameID)
         {
             if (gameID == 1)
             {

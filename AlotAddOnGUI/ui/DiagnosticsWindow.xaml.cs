@@ -85,6 +85,12 @@ namespace AlotAddOnGUI.ui
                 Button_ManualFileME3.ToolTip = "Mass Effect 3 is not installed";
             }
 
+            if (MainWindow.MEUITM_INSTALLER_MODE)
+            {
+                Button_ManualFileME2.Visibility = Button_ManualFileME3.Visibility =
+                            Visibility.Collapsed;
+            }
+
         }
 
         private void Button_DiagnosticsME3_Click(object sender, RoutedEventArgs e)
@@ -122,13 +128,8 @@ namespace AlotAddOnGUI.ui
 
         private void ShowDiagnosticTypes()
         {
-            DiagnosticHeader.Text = "Select type of diagnostic.";
+            DiagnosticHeader.Text = "Select type of diagnostic.\nQuick diagnostic will cover most cases.";
             ALOTVersionInfo avi = Utilities.GetInstalledALOTInfo(DIAGNOSTICS_GAME);
-            if (avi == null)
-            {
-                Button_FullDiagnostic.IsEnabled = false;
-                Button_FullDiagnostic.ToolTip = "MEMI tag missing - full scan won't provide any useful info";
-            }
             Panel_DiagnosticsTypes.Visibility = Visibility.Visible;
         }
 
@@ -233,7 +234,7 @@ namespace AlotAddOnGUI.ui
                     {
                         Log.Information("Removing bad LOD values from game");
                         string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                        string args = "-remove-lods " + DIAGNOSTICS_GAME;
+                        string args = "--remove-lods --gameid " + DIAGNOSTICS_GAME;
                         int returncode = Utilities.runProcess(exe, args);
                         if (returncode == 0)
                         {
@@ -494,7 +495,7 @@ namespace AlotAddOnGUI.ui
 
                 //Start diagnostics
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-check-game-data-mismatch " + DIAGNOSTICS_GAME + " -ipc";
+                string args = "--check-game-data-mismatch --gameid " + DIAGNOSTICS_GAME + " --ipc";
                 if (MEMI_FOUND)
                 {
                     bool textureMapFileExists = File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MassEffectModder\me" + DIAGNOSTICS_GAME + "map.bin");
@@ -547,95 +548,98 @@ namespace AlotAddOnGUI.ui
                 //    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataMismatch));
                 //}
 
-                if (MEMI_FOUND)
+                if (!TextureCheck || MEMI_FOUND)
                 {
-                    args = "-check-game-data-after " + DIAGNOSTICS_GAME + " -ipc";
-                }
-                else
-                {
-                    args = "-check-for-markers " + DIAGNOSTICS_GAME + " -ipc";
-                }
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
-                Context = MEMI_FOUND ? CONTEXT_REPLACEDFILE_SCAN : CONTEXT_FILEMARKER_SCAN;
-                runMEM_Diagnostics(exe, args, diagnosticsWorker);
-                WaitForMEM();
-                if (MEMI_FOUND)
-                {
-                    addDiagLine("===Replaced files scan (after textures were installed)");
-                    addDiagLine("This check will detect if files were replaced after textures were installed in an unsupported manner.");
-                    addDiagLine("");
-                }
-                else
-                {
-                    addDiagLine("===Preinstallation file scan");
-                    addDiagLine("This check will make sure all files can be opened for reading and that files that were previously modified by ALOT are not installed.");
-                    addDiagLine("");
-                }
-
-                if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
-                {
-
                     if (MEMI_FOUND)
                     {
-                        addDiagLine("[ERROR]Diagnostic reports some files appear to have been added or replaced after ALOT was installed, or could not be read:");
+                        args = "--check-game-data-after --gameid " + DIAGNOSTICS_GAME + " --ipc";
                     }
                     else
                     {
-                        addDiagLine("[ERROR]The following files did not pass the modification marker check, or could not be read:");
+                        args = "--check-for-markers --gameid " + DIAGNOSTICS_GAME + " --ipc";
                     }
-
-                    int numSoFar = 0;
-                    foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
-                    {
-                        addDiagLine("[ERROR] - " + str);
-                        numSoFar++;
-                        if (numSoFar == 10 && BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count() > 10)
-                        {
-                            addDiagLine("[SUB]");
-                        }
-                    }
-                    if (numSoFar > 10)
-                    {
-                        addDiagLine("[/SUB]");
-                    }
-
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
+                    Context = MEMI_FOUND ? CONTEXT_REPLACEDFILE_SCAN : CONTEXT_FILEMARKER_SCAN;
+                    runMEM_Diagnostics(exe, args, diagnosticsWorker);
+                    WaitForMEM();
                     if (MEMI_FOUND)
                     {
-                        addDiagLine("[ERROR]Files added or replaced after ALOT has been installed is not supported due to the way the Unreal Engine 3 works.");
+                        addDiagLine("===Replaced files scan (after textures were installed)");
+                        addDiagLine("This check will detect if files were replaced after textures were installed in an unsupported manner.");
+                        addDiagLine("");
                     }
                     else
                     {
-                        addDiagLine("[ERROR]Files that were previously modified by ALOT are most times broken or leftover from a previous ALOT failed installation that did not complete and set the ALOT installation marker.");
-                        addDiagLine("[ERROR]Delete your game installation and reinstall the game, or restore from your backup in the ALOT settings.");
+                        addDiagLine("===Preinstallation file scan");
+                        addDiagLine("This check will make sure all files can be opened for reading and that files that were previously modified by ALOT are not installed.");
+                        addDiagLine("");
                     }
-                    if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
+
+                    if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
                     {
-                        pairLog = true;
-                        addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
-                    }
-                }
-                else
-                {
-                    if (BACKGROUND_MEM_PROCESS.ExitCode != null && BACKGROUND_MEM_PROCESS.ExitCode == 0)
-                    {
+
                         if (MEMI_FOUND)
                         {
-                            addDiagLine("Diagnostic did not find any files that were added or replaced after ALOT installation or have issues reading files.");
+                            addDiagLine("[ERROR]Diagnostic reports some files appear to have been added or replaced after ALOT was installed, or could not be read:");
                         }
                         else
                         {
-                            addDiagLine("Diagnostic did not find any files from previous installations of ALOT or have issues reading files.");
+                            addDiagLine("[ERROR]The following files did not pass the modification marker check, or could not be read:");
+                        }
+
+                        int numSoFar = 0;
+                        foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                        {
+                            addDiagLine("[ERROR] - " + str);
+                            numSoFar++;
+                            if (numSoFar == 10 && BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count() > 10)
+                            {
+                                addDiagLine("[SUB]");
+                            }
+                        }
+                        if (numSoFar > 10)
+                        {
+                            addDiagLine("[/SUB]");
+                        }
+
+                        if (MEMI_FOUND)
+                        {
+                            addDiagLine("[ERROR]Files added or replaced after ALOT has been installed is not supported due to the way the Unreal Engine 3 works.");
+                        }
+                        else
+                        {
+                            addDiagLine("[ERROR]Files that were previously modified by ALOT are most times broken or leftover from a previous ALOT failed installation that did not complete and set the ALOT installation marker.");
+                            addDiagLine("[ERROR]Delete your game installation and reinstall the game, or restore from your backup in the ALOT settings.");
+                        }
+                        if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
+                        {
+                            pairLog = true;
+                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during --check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
                         }
                     }
                     else
                     {
-                        pairLog = true;
-                        addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                        if (BACKGROUND_MEM_PROCESS.ExitCode != null && BACKGROUND_MEM_PROCESS.ExitCode == 0)
+                        {
+                            if (MEMI_FOUND)
+                            {
+                                addDiagLine("Diagnostic did not find any files that were added or replaced after ALOT installation or have issues reading files.");
+                            }
+                            else
+                            {
+                                addDiagLine("Diagnostic did not find any files from previous installations of ALOT or have issues reading files.");
+                            }
+                        }
+                        else
+                        {
+                            pairLog = true;
+                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during --check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                        }
                     }
-                }
 
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(RESET_REPLACEFILE_TEXT));
-                diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(RESET_REPLACEFILE_TEXT));
+                    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
+                }
                 Context = CONTEXT_NORMAL;
 
                 //FULL CHECK
@@ -644,7 +648,7 @@ namespace AlotAddOnGUI.ui
                     addDiagLine("===Full Textures Check");
                     diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_FullCheck));
                     diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_ON_TASKBAR_PROGRESS));
-                    args = "-check-game-data-textures " + DIAGNOSTICS_GAME + " -ipc";
+                    args = "--check-game-data-textures --gameid " + DIAGNOSTICS_GAME + " --ipc";
                     Context = CONTEXT_FULLMIPMAP_SCAN;
                     runMEM_Diagnostics(exe, args, diagnosticsWorker);
                     WaitForMEM();
@@ -655,7 +659,7 @@ namespace AlotAddOnGUI.ui
                         addDiagLine("Full texture check reported errors:");
 
                         int numSoFar = 0;
-                        foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
+                        foreach (string str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
                         {
                             addDiagLine("[ERROR] -  " + str);
                             numSoFar++;
@@ -672,7 +676,7 @@ namespace AlotAddOnGUI.ui
                         if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
                         {
                             pairLog = true;
-                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-textures. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during --check-game-data-textures. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
                         }
                     }
                     else
@@ -684,7 +688,7 @@ namespace AlotAddOnGUI.ui
                         else
                         {
                             pairLog = true;
-                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during -check-game-data-textures: " + BACKGROUND_MEM_PROCESS.ExitCode);
+                            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during --check-game-data-textures: " + BACKGROUND_MEM_PROCESS.ExitCode);
                         }
                     }
                     diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_OFF_TASKBAR_PROGRESS));
@@ -695,7 +699,7 @@ namespace AlotAddOnGUI.ui
                 addDiagLine("Items in this block are only accurate if ALOT is not installed or items have been installed after ALOT.");
                 addDiagLine("If ALOT was installed, detection of mods in this block means you installed items after ALOT was installed, which will break the game.");
 
-                args = "-detect-mods " + DIAGNOSTICS_GAME + " -ipc";
+                args = "--detect-mods --gameid " + DIAGNOSTICS_GAME + " --ipc";
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataBasegamemods));
                 runMEM_Diagnostics(exe, args, diagnosticsWorker);
                 WaitForMEM();
@@ -727,10 +731,10 @@ namespace AlotAddOnGUI.ui
                 }
                 else
                 {
-                    addDiagLine("Diagnostics did not detect any known basegame mods (-detect-mods).");
+                    addDiagLine("Diagnostics did not detect any known basegame mods (--detect-mods).");
                 }
 
-                args = "-detect-bad-mods " + DIAGNOSTICS_GAME + " -ipc";
+                args = "--detect-bad-mods --gameid " + DIAGNOSTICS_GAME + " --ipc";
                 runMEM_Diagnostics(exe, args, diagnosticsWorker);
                 WaitForMEM();
                 if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
@@ -761,6 +765,8 @@ namespace AlotAddOnGUI.ui
 
                 addDiagLine("===Installed DLC");
                 addDiagLine("The following folders are present in the DLC directory:");
+                var unpackedFileExtensions = new List<string>() { ".pcc", ".tlk", ".bin", ".dlc" };
+
                 if (Directory.Exists(dlcPath))
                 {
 
@@ -781,7 +787,8 @@ namespace AlotAddOnGUI.ui
                         }
                         long sfarsize = 0;
                         long propersize = 32L;
-                        bool hasSfarSizeError = false;
+                        long me3expUnpackedSize = GetME3ExplorerUnpackedSFARSize(value);
+                        bool hasSfarSizeErrorMemiFound = false;
                         string duplicatePriorityStr = "";
                         if (DIAGNOSTICS_GAME == 3)
                         {
@@ -812,46 +819,78 @@ namespace AlotAddOnGUI.ui
                             }
 
                             //Check for SFAR size not being 32 bytes
-                            string sfar = dir + "\\CookedPCConsole\\Default.sfar";
+                            string sfar = Path.Combine(dir, "CookedPCConsole", "Default.sfar");
+                            string unpackedDir = Path.Combine(dir, "CookedPCConsole");
                             if (File.Exists(sfar))
                             {
                                 FileInfo fi = new FileInfo(sfar);
                                 sfarsize = fi.Length;
-                                hasSfarSizeError = sfarsize != propersize;
-                            }
+                                hasSfarSizeErrorMemiFound = sfarsize != propersize;
 
-                            if (hasSfarSizeError && MEMI_FOUND)
-                            {
-                                if (GetME3ExplorerUnpackedSFARSize(value) == sfarsize)
+                                var filesInSfarDir = Directory.EnumerateFiles(unpackedDir).ToList();
+                                var hasUnpackedFiles = filesInSfarDir.Any(d => unpackedFileExtensions.Contains(Path.GetExtension(d.ToLower())));
+                                var officialPackedSize = GetPackedSFARSize(value);
+                                if (hasSfarSizeErrorMemiFound && MEMI_FOUND)
                                 {
-                                    addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                                    addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
-                                    addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
-                                }
-                                else if (GetPackedSFARSize(value) == sfarsize)
-                                {
-                                    addDiagLine("[FATAL]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                                    addDiagLine("[ERROR]      SFAR is not unpacked. This DLC was either installed after ALOT was installed or was repaired by Origin.");
-                                    addDiagLine("[ERROR]      The game must be restored from backup or deleted. Once reinstalled, ALOT must be installed again.");
+                                    if (me3expUnpackedSize == sfarsize)
+                                    {
+                                        addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - ME3Explorer mainline unpacked");
+                                        addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
+                                        if (HASH_SUPPORTED)
+                                        {
+                                            addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
+                                        }
+                                    }
+                                    else if (sfarsize >= officialPackedSize && officialPackedSize != 0 && hasUnpackedFiles)
+                                    {
+                                        addDiagLine("[FATAL]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - Packed with unpacked files");
+                                        addDiagLine("[ERROR]      SFAR is not unpacked, but directory contains unpacked files. This DLC was unpacked and then restored.");
+                                        addDiagLine("[ERROR]      This DLC is in an inconsistent state. The game must be restored from backup or deleted. Once reinstalled, ALOT must be installed again.");
+                                    }
+                                    else if (officialPackedSize == sfarsize)
+                                    {
+                                        addDiagLine("[FATAL]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - Packed");
+                                        addDiagLine("[ERROR]      SFAR is not unpacked. This DLC was either installed after ALOT was installed or was attempted to be repaired by Origin.");
+                                        addDiagLine("[ERROR]      The game must be restored from backup or deleted. Once reinstalled, ALOT must be installed again.");
+                                    }
+                                    else
+                                    {
+                                        addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - Unknown SFAR size");
+                                        addDiagLine("[ERROR]      SFAR is not the MEM unpacked size, ME3Explorer unpacked size, or packed size. This SFAR is " + ByteSize.FromBytes(sfarsize) + " bytes.");
+                                    }
                                 }
                                 else
                                 {
-                                    addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                                    addDiagLine("[ERROR]      SFAR is not the MEM unpacked size, ME3Explorer unpacked size, or packed size. This SFAR is " + ByteSize.FromBytes(sfarsize) + " bytes.");
+                                    //ALOT not detected
+                                    if (me3expUnpackedSize == sfarsize)
+                                    {
+                                        addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - ME3Explorer mainline unpacked");
+                                        addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
+                                        if (HASH_SUPPORTED)
+                                        {
+                                            addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
+                                        }
+                                    }
+                                    else if (sfarsize >= officialPackedSize && officialPackedSize != 0 && hasUnpackedFiles)
+                                    {
+                                        addDiagLine("[FATAL]" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null) + " - Packed with unpacked files");
+                                        addDiagLine("[ERROR]      SFAR is not unpacked, but directory contains unpacked files. This DLC was unpacked and then restored.");
+                                        addDiagLine("[ERROR]      This DLC is in an inconsistent state. The game must be restored from backup or deleted. Once reinstalled, ALOT must be installed again.");
+                                    }
+                                    else if (sfarsize >= officialPackedSize && officialPackedSize != 0)
+                                    {
+                                        addDiagLine(GetDLCDisplayString(value) + " - Packed");
+                                    }
+                                    else
+                                    {
+                                        addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibility Pack" : null));
+                                    }
                                 }
                             }
                             else
                             {
-                                if (GetME3ExplorerUnpackedSFARSize(value) == sfarsize)
-                                {
-                                    addDiagLine("~~~" + GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibilty Pack" : null));
-                                    addDiagLine("[ERROR]      SFAR has been unpacked with ME3Explorer. SFAR unpacking with ME3Explorer is extremely slow and prone to failure. Do not unpack your DLC with ME3Explorer.");
-                                    addDiagLine("[ERROR]      If you used ME3Explorer for AutoTOC, you can use the one in ALOT Installer by going to Settings -> Game Utilities -> AutoTOC.");
-                                }
-                                else
-                                {
-                                    addDiagLine(GetDLCDisplayString(value, isCompatPatch ? "[MOD] UI Mod Compatibility Pack" : null));
-                                }
+                                //SFAR MISSING
+                                addDiagLine("~~~" + GetDLCDisplayString(value) + " - SFAR missing");
                             }
                         }
                         else
@@ -990,7 +1029,7 @@ namespace AlotAddOnGUI.ui
 
 
                 //Get LODs
-                args = "-print-lods " + DIAGNOSTICS_GAME + " -ipc";
+                args = "--print-lods --gameid " + DIAGNOSTICS_GAME + " --ipc";
                 LODS_INFO.Clear();
                 runMEM_Diagnostics(exe, args, diagnosticsWorker);
                 WaitForMEM();
@@ -1020,7 +1059,7 @@ namespace AlotAddOnGUI.ui
                         {
                             Console.WriteLine(file.Name + " " + file.LastWriteTime);
                             var logLines = File.ReadAllLines(file.FullName);
-                            int crashIndex = 0;
+                            int crashIndex = -1;
                             int index = 0;
                             string reason = "";
                             foreach (string line in logLines)
@@ -1036,7 +1075,7 @@ namespace AlotAddOnGUI.ui
                                 if (line.Contains("Uninitialized: Log file closed"))
                                 {
                                     crashIndex = index;
-                                    reason = "Log file indicates uninitialized device caused application to abort";
+                                    reason = "~~~Log file indicates a device never fully initalized";
                                     Log.Information("Found crash in ME1 log " + file.Name + " on line " + index);
                                     break;
                                 }
@@ -1046,11 +1085,11 @@ namespace AlotAddOnGUI.ui
                             if (dSoundExists && logLines.Length > 0 && logLines.Last().Contains("Init: Audio Device"))
                             {
                                 crashIndex = logLines.Length - 1;
-                                reason = "Log file indicates audio device never fully initalized - may be due to dsound.dll in binaries folder.\nRemoving this file may fix the issue";
+                                reason = "~~~Log file indicates audio device never fully initalized - may be due to dsound.dll in binaries folder.\n~~~Removing this file may fix the issue";
                                 Log.Information("Found audio device hanging startup in ME1 log " + file.Name + " on line " + index);
                             }
 
-                            if (crashIndex > 0)
+                            if (crashIndex >= 0)
                             {
                                 crashIndex = Math.Max(0, crashIndex - 10);
                                 //this log has a crash
@@ -1295,6 +1334,9 @@ namespace AlotAddOnGUI.ui
                                     BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File was added after textures scan: " + param + " " + File.GetCreationTimeUtc(gamePath + param));
                                 }
                                 break;
+                            case "ERROR_REFERENCED_TFC_NOT_FOUND":
+                                BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("A referenced TFC was not found: " + param + ". See the next diagnostic message for additional info");
+                                break;
                             case "LODLINE":
                                 int eqIndex = param.IndexOf('=');
                                 string lodSetting = param.Substring(0, eqIndex);
@@ -1310,10 +1352,6 @@ namespace AlotAddOnGUI.ui
                                 if (MEMI_FOUND)
                                 {
                                     string subpath = param;
-                                    if (param.Length > gamePath.Length)
-                                    {
-                                        subpath = subpath.Substring(gamePath.Length);
-                                    }
                                     if (!AddedFiles.Contains(subpath.ToLower()))
                                     {
                                         BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add("File missing MEM/MEMNOGUI marker was found: " + subpath);
@@ -1355,8 +1393,13 @@ namespace AlotAddOnGUI.ui
                                 }
                                 break;
                             case "ERROR_TEXTURE_SCAN_DIAGNOSTIC":
-                            case "ERROR_MIPMAPS_NOT_REMOVED":
                                 BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
+                                break;
+                            case "ERROR_MIPMAPS_NOT_REMOVED":
+                                if (MEMI_FOUND)
+                                {
+                                    BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Add(param);
+                                }
                                 break;
                             case "ERROR_FILE_NOT_COMPATIBLE":
                                 Log.Error("MEM reporting file is not compatible: " + param);
@@ -1383,6 +1426,11 @@ namespace AlotAddOnGUI.ui
 
         private void FullDiagnostic_Click(object sender, RoutedEventArgs e)
         {
+            if (Utilities.IsGameRunning(DIAGNOSTICS_GAME))
+            {
+                DiagnosticHeader.Text = "Mass Effect" + GetGameNumberSuffix(DIAGNOSTICS_GAME) + " is currently running, close it first.";
+                return;
+            }
             Button_FullDiagnostic.Visibility = Visibility.Collapsed;
             Button_QuickDiagnostic.Visibility = Visibility.Collapsed;
             TextBlock_DiagnosticType.Text = "FULL DIAGNOSTIC";
@@ -1392,6 +1440,11 @@ namespace AlotAddOnGUI.ui
 
         private void QuickDiagnostic_Click(object sender, RoutedEventArgs e)
         {
+            if (Utilities.IsGameRunning(DIAGNOSTICS_GAME))
+            {
+                DiagnosticHeader.Text = "Mass Effect" + GetGameNumberSuffix(DIAGNOSTICS_GAME) + " is currently running, close it first.";
+                return;
+            }
             Button_FullDiagnostic.Visibility = Visibility.Collapsed;
             Button_QuickDiagnostic.Visibility = Visibility.Collapsed;
             TextBlock_DiagnosticType.Text = "QUICK DIAGNOSTIC";

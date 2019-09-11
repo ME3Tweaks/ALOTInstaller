@@ -55,12 +55,13 @@ namespace AlotAddOnGUI.classes
             }
         }
 
-        public static int CopyAll_ProgressBar(DirectoryInfo source, DirectoryInfo target, BackgroundWorker worker, int total, int done, string[] ignoredExtensions = null)
+        public static int CopyAll_ProgressBar(DirectoryInfo source, DirectoryInfo target, BackgroundWorker worker, MainWindow mainWindow, int total, int done, string[] ignoredExtensions = null)
         {
             if (total == -1)
             {
                 //calculate number of files
                 total = Directory.GetFiles(source.FullName, "*.*", SearchOption.AllDirectories).Length;
+                mainWindow.Progressbar_Max = total;
             }
             worker.ReportProgress(0, new ThreadCommand(UPDATE_PROGRESSBAR_INDETERMINATE, false));
 
@@ -84,7 +85,8 @@ namespace AlotAddOnGUI.classes
                     if (skip)
                     {
                         numdone++;
-                        worker.ReportProgress((int)((numdone * 1.0 / total) * 100.0));
+                        mainWindow.ProgressBarValue = numdone;
+                        //worker.ReportProgress((int)((numdone * 1.0 / total) * 100.0));
                         continue;
                     }
                 }
@@ -107,7 +109,8 @@ namespace AlotAddOnGUI.classes
                 }
                 // Log.Information(@"Copying {0}\{1}", target.FullName, fi.Name);
                 numdone++;
-                worker.ReportProgress((int)((numdone * 1.0 / total) * 100.0));
+                mainWindow.ProgressBarValue = numdone;
+                //worker.ReportProgress((int)((numdone * 1.0 / total) * 100.0));
             }
 
             // Copy each subdirectory using recursion.
@@ -115,12 +118,12 @@ namespace AlotAddOnGUI.classes
             {
                 DirectoryInfo nextTargetSubDir =
                     target.CreateSubdirectory(diSourceSubDir.Name);
-                numdone = CopyAll_ProgressBar(diSourceSubDir, nextTargetSubDir, worker, total, numdone);
+                numdone = CopyAll_ProgressBar(diSourceSubDir, nextTargetSubDir, worker, mainWindow, total, numdone);
             }
             return numdone;
         }
 
-        
+
 
         // Output will vary based on the contents of the source directory.
     }

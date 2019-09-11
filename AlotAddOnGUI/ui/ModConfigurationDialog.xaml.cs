@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Documents.Serialization;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -23,9 +24,10 @@ namespace AlotAddOnGUI
     /// </summary>
     public partial class ModConfigurationDialog : CustomDialog
     {
-        private MainWindow mainWindowRef;
+        private readonly MainWindow mainWindowRef;
+        public bool Canceled;
 
-        public ModConfigurationDialog(AddonFile af, MainWindow mainWindow)
+        public ModConfigurationDialog(AddonFile af, MainWindow mainWindow, bool continueMode)
         {
             InitializeComponent();
             Title = af.FriendlyName;
@@ -41,21 +43,26 @@ namespace AlotAddOnGUI
             {
                 Comparison_Button.Visibility = Visibility.Collapsed;
             }
+
+            if (!continueMode)
+            {
+                Cancel_Button.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                Close_Button.Content = "Continue";
+            }
         }
 
 
-        private async void Close_Dialog_Click(object sender, RoutedEventArgs e)
+        private async void CloseContinue_Dialog_Click(object sender, RoutedEventArgs e)
         {
-            //foreach (ChoiceFile cf in ListView_ChoiceFiles.Items)
-            //{
-            //    var row = (System.Windows.Controls.ListViewItem)ListView_ChoiceFiles.ItemContainerGenerator.ContainerFromItem(cf);
-
-
-            //}
             try
             {
+                Log.Information("Closing mod configuration dialog");
                 await mainWindowRef.HideMetroDialogAsync(this);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 Log.Error("Error closing mod dialog:");
                 Log.Error(App.FlattenException(ex));
@@ -75,6 +82,21 @@ namespace AlotAddOnGUI
         private void Comparisons_Click(object sender, RoutedEventArgs e)
         {
             MainWindow.openWebPage(((AddonFile)DataContext).ComparisonsLink);
+        }
+
+        private async void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            Log.Information("User canceling mod configuration in continue mode");
+            try
+            {
+                Canceled = true;
+                await mainWindowRef.HideMetroDialogAsync(this);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error canceling mod dialog:");
+                Log.Error(App.FlattenException(ex));
+            }
         }
     }
 }

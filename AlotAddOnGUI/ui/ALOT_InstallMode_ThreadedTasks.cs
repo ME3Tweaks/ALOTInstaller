@@ -33,22 +33,12 @@ namespace AlotAddOnGUI
     {
         private bool STAGE_DONE_REACHED = false;
         private bool TELEMETRY_IS_FULL_NEW_INSTALL;
+        private const int RESULT_TEXTURE_EXPORT_FIX_FAILED = -38;
         private const int RESULT_MARKERCHECK_FAILED = -39;
-        // Most of hte following are now controlled by the manifest.
-        private const int RESULT_UNPACK_FAILED = -40;
-        private const int RESULT_SCAN_REMOVE_FAILED = -41;
-        private const int RESULT_ME1LAA_FAILED = -43;
-        private const int RESULT_TEXTUREINSTALL_NO_TEXTUREMAP = -44;
-        private const int RESULT_TEXTUREINSTALL_INVALID_TEXTUREMAP = -45;
-        private const int RESULT_TEXTUREINSTALL_GAME_FILE_REMOVED = -47;
-        private const int RESULT_TEXTUREINSTALL_GAME_FILE_ADDED = -48;
-        private const int RESULT_TEXTUREINSTALL_FAILED = -42;
 
-        private const int RESULT_SAVING_FAILED = -49;
-        private const int RESULT_REMOVE_MIPMAPS_FAILED = -50;
-        private const int RESULT_REPACK_FAILED = -46;
+        //Codes should be > -38 (e.g. -37)
+        private const int RESULT_ME1LAA_FAILED = -43;
         private const int RESULT_UNKNOWN_ERROR = -51;
-        private const int RESULT_SCAN_FAILED = -52;
         private const int RESULT_BIOGAME_MISSING = -53;
         private const int RESULT_SET_READWRITE_FAILED = -54;
 
@@ -122,8 +112,10 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void InstallALOT(int game, List<AddonFile> filesToInstall)
+        private void InstallALOT(int game, List<AddonFile> filesToInstall, string sourcePathOverride = null)
         {
+            if (filesToInstall == null) filesToInstall = new List<AddonFile>();
+
             MEM_INSTALL_TIME_SECONDS = 0;
             ADDONFILES_TO_INSTALL = filesToInstall;
             WARN_USER_OF_EXIT = true;
@@ -361,7 +353,6 @@ namespace AlotAddOnGUI
             STAGE_DONE_REACHED = false;
             CurrentTask = "";
             Log.Information("InstallWorker Thread starting for ME" + INSTALLING_THREAD_GAME);
-            Log.Information("This installer session is context based and MEMNoGui will run in a single instance.");
             using (var md5 = MD5.Create())
             {
                 try
@@ -380,11 +371,6 @@ namespace AlotAddOnGUI
             }
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
-            //bool needsMipMapRemovalPass = false;
-            //if (versionInfo.ALOTVER == 0 && versionInfo.MEUITMVER > 0 && INSTALLING_THREAD_GAME == 1)
-            //{
-            //   needsMipMapRemovalPass = true;
-            //}
             TELEMETRY_IS_FULL_NEW_INSTALL = versionInfo == null;
             Log.Information("Setting biogame directory to read-write");
             string biogamepath = Utilities.GetGamePath(INSTALLING_THREAD_GAME) + "\\BIOGame";
@@ -468,7 +454,7 @@ namespace AlotAddOnGUI
             }
 
 
-            MAINTASK_TEXT = "Installing " + primary + " for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+            MAINTASK_TEXT = "Installing " + primary + " for Mass Effect" + GetGameNumberSuffix(INSTALLING_THREAD_GAME);
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OVERALL_TASK, MAINTASK_TEXT));
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "";
@@ -478,7 +464,7 @@ namespace AlotAddOnGUI
                 Log.Information("Checking for previously installed ALOT files...");
                 CurrentTask = "Checking existing files for ALOT marker";
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-                args = "-check-for-markers " + INSTALLING_THREAD_GAME + " -ipc";
+                args = "--check-for-markers --gameid " + INSTALLING_THREAD_GAME + " --ipc";
                 RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0 || BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
@@ -487,6 +473,32 @@ namespace AlotAddOnGUI
                     e.Result = RESULT_MARKERCHECK_FAILED;
                     InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
                     return;
+                }
+
+                if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
+                {
+                    string dlcPath = Path.Combine(Utilities.GetGamePath(INSTALLING_THREAD_GAME), "BIOGame", "DLC");
+                    if (Directory.Exists(dlcPath) && ((ME2DLCRequiringTextureExportFixes != null && INSTALLING_THREAD_GAME == 2) || (ME3DLCRequiringTextureExportFixes != null && INSTALLING_THREAD_GAME == 3)))
+                    {
+                        var allfolders = Directory.EnumerateDirectories(dlcPath).Select(x => Path.GetFileName(x).ToUpperInvariant()).ToList();
+                        var directories = (INSTALLING_THREAD_GAME == 2 ? ME2DLCRequiringTextureExportFixes : ME3DLCRequiringTextureExportFixes).Intersect(allfolders).ToList();
+                        foreach (string dir in directories)
+                        {
+                            CurrentTask = "Fixing texture exports in " + dir;
+                            Log.Information("DLC marked for texture exports fix by MEM: " + dir);
+                            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                            args = "--fix-textures-property --gameid " + INSTALLING_THREAD_GAME + " --filter \""+dir+"\" --ipc";
+                            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
+                            processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+                            if (processResult != 0 || BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+                            {
+                                Log.Error("Fixing texture exports failed. Aborting installation.");
+                                e.Result = RESULT_TEXTURE_EXPORT_FIX_FAILED;
+                                InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_TIPS));
+                                return;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -498,13 +510,15 @@ namespace AlotAddOnGUI
             Log.Information("InstallWorker(): Running MassEffectModderNoGui");
             CurrentTaskPercent = -1;
             string outputDir = getOutputDir(INSTALLING_THREAD_GAME, false);
-
-            args = "-install-mods " + INSTALLING_THREAD_GAME + " \"" + outputDir + "\"";
+            args = "--install-mods --gameid " + INSTALLING_THREAD_GAME + " --input \"" + (CustomMEMInstallSource ?? outputDir) + "\" --ipc";
+            if (CustomMEMInstallSource == null)
+            {
+                args += " --alot-mode --verify";
+            }
             if (REPACK_GAME_FILES)
             {
-                args += " -repack";
+                args += " --repack-mode";
             }
-            args += " -ipc -alot-mode";
 
             //Comment the following 2 lines and uncomment the next 3 to skip installation step and simulate OK
             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
@@ -673,14 +687,13 @@ namespace AlotAddOnGUI
             }
             //Apply LOD
             Log.Information("Updating LOD information");
-            CurrentTask = "Updating Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
+            CurrentTask = "Updating Mass Effect" + GetGameNumberSuffix(INSTALLING_THREAD_GAME) + "'s graphics settings";
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
 
-            args = "-apply-lods-gfx ";
-            args += INSTALLING_THREAD_GAME;
+            args = "--apply-lods-gfx --gameid " + INSTALLING_THREAD_GAME;
             if (hasSoftShadowsMEUITM)
             {
-                args += " -soft-shadows-mode -meuitm-mode";
+                args += " --soft-shadows-mode --meuitm-mode";
             }
             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
@@ -696,7 +709,7 @@ namespace AlotAddOnGUI
                 CurrentTask = "Installing fixes for Mass Effect";
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
 
-                args = "-apply-me1-laa";
+                args = "--apply-me1-laa";
                 RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0)
@@ -706,73 +719,69 @@ namespace AlotAddOnGUI
                     return;
                 }
                 Utilities.RemoveRunAsAdminXPSP3FromME1();
-                Utilities.InstallIndirectSoundFixForME1();
-                string iniPath = IniSettingsHandler.GetConfigIniPath(1);
-                if (File.Exists(iniPath))
-                {
-                    IniFile engineConf = new IniFile(iniPath);
-                    engineConf.Write("DeviceName", "Generic Hardware", "ISACTAudio.ISACTAudioDevice");
-                }
             }
             Utilities.TurnOffOriginAutoUpdate();
 
             //Create/Update Marker File
-            int meuitmFlag = (meuitmFile != null) ? meuitmFile.MEUITMVer : (versionInfo != null ? versionInfo.MEUITMVER : 0);
-            short alotMainVersionFlag = (alotMainFile != null) ? alotMainFile.ALOTVersion : (versionInfo != null ? versionInfo.ALOTVER : (short)0); //we should not see it write 0... hopefully
-
-            //Update Marker
-            byte updateVersion = 0;
-            if (alotUpdateFile != null)
-            {
-                updateVersion = alotUpdateFile.ALOTUpdateVersion;
-            }
-            else
-            {
-                updateVersion = versionInfo != null ? versionInfo.ALOTUPDATEVER : (byte)0;
-            }
-
-            //Write Marker
             bool showMarkerFailedMessage = false;
-            ALOTVersionInfo newVersion = new ALOTVersionInfo(alotMainVersionFlag, updateVersion, 0, meuitmFlag);
-            Log.Information("Writing or updating MEMI marker with info: " + newVersion.ToString());
-            try
+            if (CustomMEMInstallSource == null)
             {
-                Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
-                ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
-                if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER || test.MEUITMVER != newVersion.MEUITMVER)
+                int meuitmFlag = (meuitmFile != null) ? meuitmFile.MEUITMVer : (versionInfo != null ? versionInfo.MEUITMVER : 0);
+                short alotMainVersionFlag = (alotMainFile != null) ? alotMainFile.ALOTVersion : (versionInfo != null ? versionInfo.ALOTVER : (short)0); //we should not see it write 0... hopefully
+
+                //Update Marker
+                byte updateVersion = 0;
+                if (alotUpdateFile != null)
                 {
-                    //Marker file written was bad
-                    Log.Error("Marker file was not properly written!");
-                    if (test == null)
-                    {
-                        Log.Error("Marker file does not indicate anything was installed.");
-                    }
-                    else
-                    {
-                        if (test.ALOTVER != newVersion.ALOTVER)
-                        {
-                            Log.Error("Marker file does not show that ALOT was installed, but we detect some version was installed.");
-                        }
-                        if (test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
-                        {
-                            Log.Error("Marker file does not show that ALOT update was applied or installed to our current version");
-                        }
-                        if (test.MEUITMVER != newVersion.MEUITMVER)
-                        {
-                            Log.Error("Marker file does not show that MEUITM was applied or installed to our current installation when it should have been");
-                        }
-                    }
-                    showMarkerFailedMessage = true;
+                    updateVersion = alotUpdateFile.ALOTUpdateVersion;
                 }
                 else
                 {
-                    Log.Information("Reading information back from disk, should match above: " + test.ToString());
+                    updateVersion = versionInfo != null ? versionInfo.ALOTUPDATEVER : (byte)0;
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Marker file was unable to be written due to an exception: " + ex.Message);
-                Log.Error("An error like this occuring could indicate significant other issues");
+
+                //Write Marker
+                ALOTVersionInfo newVersion = new ALOTVersionInfo(alotMainVersionFlag, updateVersion, 0, meuitmFlag);
+                Log.Information("Writing or updating MEMI marker with info: " + newVersion.ToString());
+                try
+                {
+                    Utilities.CreateMarkerFile(INSTALLING_THREAD_GAME, newVersion);
+                    ALOTVersionInfo test = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
+                    if (test == null || test.ALOTVER != newVersion.ALOTVER || test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER || test.MEUITMVER != newVersion.MEUITMVER)
+                    {
+                        //Marker file written was bad
+                        Log.Error("Marker file was not properly written!");
+                        if (test == null)
+                        {
+                            Log.Error("Marker file does not indicate anything was installed.");
+                        }
+                        else
+                        {
+                            if (test.ALOTVER != newVersion.ALOTVER)
+                            {
+                                Log.Error("Marker file does not show that ALOT was installed, but we detect some version was installed.");
+                            }
+                            if (test.ALOTUPDATEVER != newVersion.ALOTUPDATEVER)
+                            {
+                                Log.Error("Marker file does not show that ALOT update was applied or installed to our current version");
+                            }
+                            if (test.MEUITMVER != newVersion.MEUITMVER)
+                            {
+                                Log.Error("Marker file does not show that MEUITM was applied or installed to our current installation when it should have been");
+                            }
+                        }
+                        showMarkerFailedMessage = true;
+                    }
+                    else
+                    {
+                        Log.Information("Reading information back from disk, should match above: " + test.ToString());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Marker file was unable to be written due to an exception: " + ex.Message);
+                    Log.Error("An error like this occuring could indicate significant other issues");
+                }
             }
             //Install Binkw32
             if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
@@ -793,7 +802,7 @@ namespace AlotAddOnGUI
                 string dest = DOWNLOADED_MODS_DIRECTORY + "\\" + extractedName;
                 if (Path.GetPathRoot(source) == Path.GetPathRoot(dest))
                 {
-                    Log.Information("ALOT MAIN FILE - Unpacked - moving to downloaded_mods from install dir: " + extractedName);
+                    Log.Information("ALOT MAIN FILE - Unpacked - moving to texture library from install dir: " + extractedName);
                     if (File.Exists(source))
                     {
                         try
@@ -843,7 +852,7 @@ namespace AlotAddOnGUI
 
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_ALL_STAGE_LABELS));
 
-            string taskString = "Installation of " + primary + " for Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+            string taskString = "Installation of " + primary + " for Mass Effect" + GetGameNumberSuffix(INSTALLING_THREAD_GAME);
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, taskString));
             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, "has completed"));
             if (INSTALLING_THREAD_GAME == 1 || INSTALLING_THREAD_GAME == 2)
@@ -900,7 +909,7 @@ namespace AlotAddOnGUI
             if (e.Result != null)
             {
                 int result = (int)e.Result;
-                string gameName = "Mass Effect" + getGameNumberSuffix(INSTALLING_THREAD_GAME);
+                string gameName = "Mass Effect" + GetGameNumberSuffix(INSTALLING_THREAD_GAME);
                 if (result == INSTALL_OK)
                 {
                     telemetryfailedcode = 0;
@@ -1016,6 +1025,7 @@ namespace AlotAddOnGUI
             int Game = INSTALLING_THREAD_GAME;
             List<AddonFile> addonFilesInstalled = ADDONFILES_TO_INSTALL;
             INSTALLING_THREAD_GAME = 0;
+            CustomMEMInstallSource = null;
             ADDONFILES_TO_INSTALL = null;
             CURRENT_STAGE_NUM = 0;
             PreventFileRefresh = false;
@@ -1155,6 +1165,10 @@ namespace AlotAddOnGUI
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
+                if (DEBUG_LOGGING)
+                {
+                    Utilities.WriteDebugLog(str);
+                }
                 if (str.StartsWith("[IPC]", StringComparison.Ordinal)) //needs culture ordinal check??
                 {
                     string command = str.Substring(5);
@@ -1179,7 +1193,7 @@ namespace AlotAddOnGUI
                                 string[] parameters = param.Split(' ');
                                 try
                                 {
-                                    double scale = Double.Parse(parameters[1]);
+                                    double scale = Utilities.GetDouble(parameters[1], 1);
                                     Log.Information("Reweighting stage " + parameters[0] + " by " + parameters[1]);
                                     ProgressWeightPercentages.ScaleCurrentTaskWeight(CURRENT_STAGE_NUM - 1, scale);
                                 }
@@ -1192,8 +1206,8 @@ namespace AlotAddOnGUI
                                 {
                                     if (param == "STAGE_DONE")
                                     {
-                                    //We're done!
-                                    STAGE_DONE_REACHED = true;
+                                        //We're done!
+                                        STAGE_DONE_REACHED = true;
                                         return;
                                     }
                                     if (CURRENT_STAGE_CONTEXT != null)
@@ -1204,12 +1218,12 @@ namespace AlotAddOnGUI
                                     }
                                     else
                                     {
-                                    //context is null, we are now starting
-                                    ProgressWeightPercentages.ScaleWeights();
+                                        //context is null, we are now starting
+                                        ProgressWeightPercentages.ScaleWeights();
                                     }
 
-                                //clear errors so we can context switch error handling
-                                BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
+                                    //clear errors so we can context switch error handling
+                                    BACKGROUND_MEM_PROCESS_ERRORS = new List<string>();
                                     BACKGROUND_MEM_PROCESS_PARSED_ERRORS = new List<string>();
 
 
@@ -1250,8 +1264,8 @@ namespace AlotAddOnGUI
                                 BACKGROUND_MEM_PROCESS_ERRORS.Add(param);
                                 break;
                             default:
-                            //check if IPC is a stage failure
-                            StageFailure failure = null;
+                                //check if IPC is a stage failure
+                                StageFailure failure = null;
                                 foreach (Stage stage in ProgressWeightPercentages.Stages)
                                 {
                                     foreach (StageFailure sf in stage.FailureInfos)
@@ -1269,8 +1283,17 @@ namespace AlotAddOnGUI
                                 }
                                 if (failure != null)
                                 {
-                                    Log.Error("A fail condition IPC has been received: " + failure.FailureIPCTrigger + ". " + failure.FailureTopText);
-                                    BACKGROUND_MEM_PROCESS_ERRORS.Add(failure.FailureIPCTrigger);
+                                    if (failure.Warning)
+                                    {
+                                        Log.Warning("MEM warning IPC received: " + failure.FailureIPCTrigger + ": " + failure.FailureTopText);
+                                        Log.Warning(" >> " + str);
+                                    }
+                                    else
+                                    {
+                                        Log.Error("A fail condition IPC has been received: " + failure.FailureIPCTrigger + ": " + failure.FailureTopText);
+                                        Log.Error(" >> " + str);
+                                        BACKGROUND_MEM_PROCESS_ERRORS.Add(failure.FailureIPCTrigger);
+                                    }
                                 }
                                 else
                                 {
@@ -1284,7 +1307,15 @@ namespace AlotAddOnGUI
                 {
                     if (str.Trim() != "")
                     {
-                        Log.Information("Realtime Process Output: " + str);
+                        if (str.StartsWith("Exception occured") ||
+                            str.StartsWith("Program crashed"))
+                        {
+                            Log.Error("MEM process output: " + str);
+                        }
+                        else
+                        {
+                            Log.Information("MEM process output: " + str);
+                        }
                     }
                 }
             };

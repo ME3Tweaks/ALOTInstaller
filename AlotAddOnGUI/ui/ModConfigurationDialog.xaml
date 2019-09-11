@@ -43,12 +43,18 @@
         </ListView>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,10">
             <Button x:Name="Comparison_Button" Content="Comparisons" Controls:ControlsHelper.ContentCharacterCasing="Normal"  Click="Comparisons_Click" HorizontalAlignment="Right" Style="{StaticResource SquareButtonStyle}"
-                BorderThickness="2,2,2,2"
-                Padding="5,6,5,6"
-                Height="35"
-                Width="110"
-                Margin="5,0,5,0"/>
-        <Button x:Name="Close_Button" Content="Close" Click="Close_Dialog_Click" HorizontalAlignment="Right" Style="{StaticResource AccentedDialogSquareButton}"
+                    BorderThickness="2,2,2,2"
+                    Padding="5,6,5,6"
+                    Height="35"
+                    Width="110"
+                    Margin="5,0,5,0"/>
+            <Button x:Name="Cancel_Button" Content="Cancel" Controls:ControlsHelper.ContentCharacterCasing="Normal"  Click="Cancel_Click" HorizontalAlignment="Right" Style="{StaticResource SquareButtonStyle}"
+                    BorderThickness="2,2,2,2"
+                    Padding="5,6,5,6"
+                    Height="35"
+                    Width="90"
+                    Margin="5,0,5,0"/>
+        <Button x:Name="Close_Button" Content="Close" Click="CloseContinue_Dialog_Click" HorizontalAlignment="Right" Style="{StaticResource AccentedDialogSquareButton}"
                 BorderThickness="2,2,2,2"
                 Padding="5,6,5,6"
                 Height="35"

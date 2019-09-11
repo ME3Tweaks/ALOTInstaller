@@ -352,7 +352,7 @@ namespace AlotAddOnGUI
                                 if (tpfFilesList.Count > 0)
                                 {
                                     exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                                    args = "-extract-tpf \"" + extractpath + "\" \"" + extractpath + "\"";
+                                    args = "--extract-tpf --input \"" + extractpath + "\" --output \"" + extractpath + "\"";
                                     Utilities.runProcess(exe, args);
                                 }
                             }
@@ -376,7 +376,8 @@ namespace AlotAddOnGUI
                                     Log.Information("Extracting modfiles in directory: " + extractpath);
 
                                     exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                                    args = "-extract-mod " + CURRENT_GAME_BUILD + " \"" + extractpath + "\" \"" + extractpath + "\"";
+                                    args = "--extract-mod --gameid " + CURRENT_GAME_BUILD +
+                                           " --input \"" + extractpath + "\" --output \"" + extractpath + "\"";
                                     Utilities.runProcess(exe, args);
                                 }
                             }
@@ -470,7 +471,8 @@ namespace AlotAddOnGUI
                             {
                                 Log.Information(prefix + " Extracting AddonFile (TPF)");
                                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                                string args = "-extract-tpf \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\" \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\"";
+                                string args = "--extract-tpf --input \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID +
+                                              "\" --output \"" + EXTRACTED_MODS_DIRECTORY + "\\" + af.BuildID + "\"";
                                 Utilities.runProcess(exe, args);
 
                                 //Flatten Move files up to folder
@@ -707,7 +709,7 @@ namespace AlotAddOnGUI
             }
 
             //compile list of addon files to process
-            foreach (AddonFile af in alladdonfiles)
+            foreach (AddonFile af in AllAddonFiles)
             {
                 if (!af.Enabled)
                 {
@@ -939,7 +941,7 @@ namespace AlotAddOnGUI
 
                 Log.Information("Extracting " + tpfFilesList.Count + " TPF files.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-extract-tpf \"" + EXTRACTED_MODS_DIRECTORY + "\" \"" + EXTRACTED_MODS_DIRECTORY + "\"";
+                string args = "--extract-tpf --input \"" + EXTRACTED_MODS_DIRECTORY + "\" --output \"" + EXTRACTED_MODS_DIRECTORY + "\"";
                 Utilities.runProcess(exe, args);
             }
 
@@ -951,7 +953,8 @@ namespace AlotAddOnGUI
 
                 Log.Information("Extracting MOD files.");
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-extract-mod " + game + " \"" + DOWNLOADED_MODS_DIRECTORY + "\" \"" + EXTRACTED_MODS_DIRECTORY + "\"";
+                string args = "--extract-mod --gameid " + game +
+                              " --input \"" + DOWNLOADED_MODS_DIRECTORY + "\" --output \"" + EXTRACTED_MODS_DIRECTORY + "\"";
                 Utilities.runProcess(exe, args);
             }
 
@@ -1112,14 +1115,16 @@ namespace AlotAddOnGUI
             if (SHOULD_HAVE_OUTPUT_FILE)
             {
                 BuildWorker.ReportProgress(0);
-                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building ALOT Addon for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nThis may take a few minutes."));
+                BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building ALOT Addon for Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nThis may take a few minutes."));
 
                 BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, "Building Addon MEM Package..."));
                 {
                     Log.Information("Building MEM Package.");
                     string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                     string filename = "002_ALOT_ME" + game + "_Addon.mem";
-                    string args = "-convert-to-mem " + game + " \"" + ADDON_FULL_STAGING_DIRECTORY.TrimEnd('\\') + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
+                    string args = "--convert-to-mem --gameid " + game +
+                                  " --input \"" + ADDON_FULL_STAGING_DIRECTORY.TrimEnd('\\') +
+                                  "\" --output \"" + getOutputDir(game) + filename + "\" --ipc";
 
                     runMEM_BackupAndBuild(exe, args, BuildWorker);
                     while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
@@ -1249,14 +1254,17 @@ namespace AlotAddOnGUI
                     }
 
 
-                    BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building User Addons for Mass Effect" + getGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nDon't close the window until this operation completes."));
+                    BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_HEADER_LABEL, "Building User Addons for Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + ".\nDon't close the window until this operation completes."));
                     af.ReadyStatusText = "Building user MEM file from mod files";
                     af.SetWorking();
 
                     Log.Information("Building User MEM file from staging directory: " + userFileExtractedPath);
                     string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                     string filename = USERFILE_INDEX.ToString("000") + "_UserAddon_" + Path.GetFileNameWithoutExtension(af.UserFilePath) + ".mem";
-                    string args = "-convert-to-mem " + game + " \"" + userFileExtractedPath + "\" \"" + getOutputDir(game) + filename + "\" -ipc";
+                    string args = "--convert-to-mem --gameid " + game +
+                                  " --input \"" + userFileExtractedPath.TrimEnd('\\') +
+                                  "\" --output \"" + getOutputDir(game) + filename + "\" --ipc";
+
                     CURRENT_USER_BUILD_FILE = af.FriendlyName;
                     runMEM_BackupAndBuild(exe, args, BuildWorker);
                     while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
@@ -1432,7 +1440,7 @@ namespace AlotAddOnGUI
             //verify vanilla
             Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-            string args = "-check-game-data-only-vanilla " + BACKUP_THREAD_GAME + " -ipc";
+            string args = "--check-game-data-vanilla --gameid " + BACKUP_THREAD_GAME + " --ipc";
             List<string> acceptedIPC = new List<string>();
             acceptedIPC.Add("TASK_PROGRESS");
             acceptedIPC.Add("ERROR");
@@ -1450,13 +1458,14 @@ namespace AlotAddOnGUI
                 string gameDir = Utilities.GetGamePath(BACKUP_THREAD_GAME);
                 foreach (String error in BACKGROUND_MEM_PROCESS_ERRORS)
                 {
-                    modified += "\n - " + error.Remove(0, gameDir.Length + 1);
+                    modified += "\n - " + error;
+                    //.Remove(0, gameDir.Length + 1);
                 }
                 Log.Warning("Backup verification failed. Allowing user to choose to continue or not");
                 ThreadCommandDialogOptions tcdo = new ThreadCommandDialogOptions();
                 tcdo.signalHandler = new EventWaitHandle(false, EventResetMode.AutoReset);
                 tcdo.title = "Game is modified";
-                tcdo.message = "Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " has files that do not match what is in the MEM database.\nYou can continue to back this installation up, but it may not be truly unmodified." + modified;
+                tcdo.message = "Mass Effect" + GetGameNumberSuffix(BACKUP_THREAD_GAME) + " has files that do not match what is in the MEM database.\nYou can continue to back this installation up, but it may not be truly unmodified." + modified;
                 tcdo.NegativeButtonText = "Abort";
                 tcdo.AffirmativeButtonText = "Continue";
                 BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG_YES_NO, tcdo));
@@ -1484,17 +1493,18 @@ namespace AlotAddOnGUI
                 Log.Information("Creating backup... Only errors will be reported.");
                 try
                 {
-                    CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, -1, 0, ignoredExtensions);
+                    CopyDir.CopyAll_ProgressBar(new DirectoryInfo(gamePath), new DirectoryInfo(backupPath), BackupWorker, this, -1, 0, ignoredExtensions);
                 }
                 catch (Exception ex)
                 {
                     Log.Error("Error creating backup:");
                     Log.Error(App.FlattenException(ex));
-                    BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Backup failed", "Backup of Mass Effect" + getGameNumberSuffix(BACKUP_THREAD_GAME) + " failed. An error occured during the copy process. The error message was: " + ex.Message + ".\nSome files may have been copied, but this backup is not usable. You can delete the folder you were backing up files into.\nReview the installer log for more information.")));
-
+                    BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Backup failed", "Backup of Mass Effect" + GetGameNumberSuffix(BACKUP_THREAD_GAME) + " failed. An error occured during the copy process. The error message was: " + ex.Message + ".\nSome files may have been copied, but this backup is not usable. You can delete the folder you were backing up files into.\nReview the installer log for more information.")));
+                    Progressbar_Max = 100;
                     e.Result = null;
                     return;
                 }
+                Progressbar_Max = 100;
                 Log.Information("Backup copy created");
             }
             if (BACKUP_THREAD_GAME == 3)
@@ -1640,7 +1650,7 @@ namespace AlotAddOnGUI
 
             Log.Information("Reverting lod settings");
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-            string args = "-remove-lods " + BACKUP_THREAD_GAME;
+            string args = "--remove-lods --gameid " + BACKUP_THREAD_GAME;
             Utilities.runProcess(exe, args);
 
             if (BACKUP_THREAD_GAME == 1)
@@ -1688,7 +1698,8 @@ namespace AlotAddOnGUI
             if (gamePath != null)
             {
                 Log.Information("Copying backup to game directory: " + backupPath + " -> " + gamePath);
-                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(gamePath), BackupWorker, -1, 0);
+                CopyDir.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(gamePath), BackupWorker, this, -1, 0);
+                Progressbar_Max = 100;
                 Log.Information("Restore of game data has completed");
             }
             if (BACKUP_THREAD_GAME == 3)
@@ -1779,7 +1790,7 @@ namespace AlotAddOnGUI
             {
                 //game has not been run yet.
                 Log.Error("Config file missing for Mass Effect " + game + ". Blocking install");
-                await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " has not been run yet", "Mass Effect" + getGameNumberSuffix(game) + " must be run at least once in order for the game to generate default configuration files for this installer to edit. Start the game, and exit at the main menu to generate them.");
+                await this.ShowMessageAsync("Mass Effect" + GetGameNumberSuffix(game) + " has not been run yet", "Mass Effect" + GetGameNumberSuffix(game) + " must be run at least once in order for the game to generate default configuration files for this installer to edit. Start the game, and exit at the main menu to generate them.");
                 return false;
             }
 
@@ -1791,14 +1802,14 @@ namespace AlotAddOnGUI
             if (!Directory.Exists(gamePath))
             {
                 Log.Error("Game directory is missing: " + gamePath);
-                await this.ShowMessageAsync("Game directory is missing", "The game directory for Mass Effect" + getGameNumberSuffix(game) + " is missing. This may be caused due to modification of the folder while ALOT Installer is running. Please reinstall the game.");
+                await this.ShowMessageAsync("Game directory is missing", "The game directory for Mass Effect" + GetGameNumberSuffix(game) + " is missing. This may be caused due to modification of the folder while ALOT Installer is running. Please reinstall the game.");
                 return false;
             }
 
             if (!File.Exists(exePath))
             {
                 Log.Error("Game EXE is missing.");
-                await this.ShowMessageAsync("Game executable missing", "The game executable for Mass Effect" + getGameNumberSuffix(game) + " is missing. Please reinstall the game.");
+                await this.ShowMessageAsync("Game executable missing", "The game executable for Mass Effect" + GetGameNumberSuffix(game) + " is missing. Please reinstall the game.");
                 return false;
             }
             else if (installedInfo == null)
@@ -1822,7 +1833,7 @@ namespace AlotAddOnGUI
                 if (exeVersion < requiredVersion)
                 {
                     Log.Error("Installation blocked: Game executable is not up to date for ME" + game + ": " + requiredVersion + " required, current version is " + exeVersion);
-                    await this.ShowMessageAsync("Game must be updated", "Mass Effect" + getGameNumberSuffix(game) + " is not up to date. ALOT Installer does not work work with old versions of Mass Effect games. You must update Mass Effect" + getGameNumberSuffix(game) + " in order to install ALOT for it.");
+                    await this.ShowMessageAsync("Game must be updated", "Mass Effect" + GetGameNumberSuffix(game) + " is not up to date. ALOT Installer does not work work with old versions of Mass Effect games. You must update Mass Effect" + GetGameNumberSuffix(game) + " in order to install ALOT for it.");
                     return false;
                 }
             }
@@ -1830,12 +1841,13 @@ namespace AlotAddOnGUI
             //Check for Texture2D.tfc
             if (installedInfo == null && (game == 2 || game == 3))
             {
-                if (game == 2) { gamePath = Path.Combine(gamePath, "BioGame", "CookedPC", "Texture2D.tfc"); }
-                if (game == 3) { gamePath = Path.Combine(gamePath, "BIOGame", "CookedPCConsole", "Texture2D.tfc"); }
-                if (File.Exists(gamePath))
+                string checkPath = gamePath;
+                if (game == 2) { checkPath = Path.Combine(gamePath, "BioGame", "CookedPC", "Texture2D.tfc"); }
+                if (game == 3) { checkPath = Path.Combine(gamePath, "BIOGame", "CookedPCConsole", "Texture2D.tfc"); }
+                if (File.Exists(checkPath))
                 {
-                    Log.Error("Previous installation file found: " + gamePath);
-                    Log.Error("Game was not removed before reinstallation or was \"fixed\" using a game repair");
+                    Log.Error("Previous installation file found: " + checkPath);
+                    Log.Error("Game was not removed before reinstallation or user attempted to \"fix\" using a game repair. Game repair will not remove leftover files - delete your game installation to remove all files and reinstall");
                     string howToFixStr = "You must restore your game using the ALOT Installer restore feature, or delete your game installation(do not uninstall or repair) to fully remove leftover files.";
                     if (Utilities.GetGameBackupPath(game) == null)
                     {
@@ -1847,9 +1859,98 @@ namespace AlotAddOnGUI
                 }
             }
 
+            //Check DLC state
+            if (game == 3 && installedInfo == null)
+            {
+                bool hasInconsistentDLC = false;
+                string inconsistentDLC = "";
+                var dlcPath = Path.Combine(gamePath, "BIOGame", "DLC");
+                if (Directory.Exists(dlcPath))
+                {
+                    var directories = Directory.EnumerateDirectories(dlcPath);
+                    Dictionary<int, string> priorities = new Dictionary<int, string>();
+                    foreach (string dir in directories)
+                    {
+                        string value = Path.GetFileName(dir);
+                        if (value == "__metadata")
+                        {
+                            continue;
+                        }
+                        long sfarsize = 0;
+                        long unpackedSfarSize = 32L;
 
+                        //Check for SFAR size not being 32 bytes
+                        string sfar = Path.Combine(dir, "CookedPCConsole", "Default.sfar");
+                        string unpackedDir = Path.Combine(dir, "CookedPCConsole");
+                        if (File.Exists(sfar))
+                        {
+                            var unpackedFileExtensions = new List<string>() { ".pcc", ".tlk", ".bin", ".dlc" };
+                            var filesInSfarDir = Directory.EnumerateFiles(unpackedDir).ToList();
+                            var hasUnpackedFiles = filesInSfarDir.Any(d => unpackedFileExtensions.Contains(Path.GetExtension(d.ToLower())));
 
-            int nummissing = 0;
+                            long sfarPackedSize = DiagnosticsWindow.GetPackedSFARSize(value);
+                            long me3explorerUnpackedSize = DiagnosticsWindow.GetME3ExplorerUnpackedSFARSize(value);
+
+                            if (sfarPackedSize != 0)
+                            {
+                                FileInfo fi = new FileInfo(sfar);
+                                sfarsize = fi.Length;
+
+                                if (sfarsize == sfarPackedSize && !hasUnpackedFiles)
+                                {
+                                    //OK
+                                    Log.Information("DLC passed precheck (packed): " + value);
+                                    continue;
+                                }
+
+                                if (sfarsize == sfarPackedSize && hasUnpackedFiles)
+                                {
+                                    //Inconsistent - has unpacked but is packed still
+                                    hasInconsistentDLC = true;
+                                    Log.Warning("DLC failed precheck, packed SFAR with unpacked files detected: " + value);
+                                    inconsistentDLC += "\n - " + value + ": DLC packed, but detected unpacked files";
+                                    continue;
+                                }
+
+                                if (sfarsize == me3explorerUnpackedSize)
+                                {
+                                    Log.Error("DLC precheck detects SFAR was unpacked with ME3Explorer mainline: " + value + ". ME3Explorer mainline should never be used to unpack DLC");
+                                    continue;
+                                }
+
+                                if (sfarsize == unpackedSfarSize)
+                                {
+                                    Log.Information("DLC passed precheck (32 bytes unpacked sfar): " + value);
+                                    continue;
+                                }
+
+                                if (sfarsize > sfarPackedSize && hasUnpackedFiles)
+                                {
+                                    //Inconsistent - has appears packed (with injected files) but is packed still
+                                    hasInconsistentDLC = true;
+                                    Log.Warning("DLC failed precheck, packed SFAR (with injected files from Mod Manager) with unpacked files detected: " + value);
+                                    inconsistentDLC += "\n - " + value + ": DLC packed (with injected files), but detected unpacked files";
+                                    continue;
+                                }
+
+                                if (sfarsize != sfarPackedSize)
+                                {
+                                    Log.Warning("DLC SFAR size is unknown for DLC: " + value + " " + sfarsize + " bytes");
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (hasInconsistentDLC)
+                {
+                    await this.ShowMessageAsync("DLC is in inconsistent state", "The following DLC was detected as packed, however unpacked files were detected. These DLCs are in an inconsistent state. You should delete your game installation and reinstall the game to fix these inconsistencies. Origin game repair will not fix this issue.\n" + inconsistentDLC);
+                    return false;
+                }
+            }
+
+            List<AddonFile> missingRecommendedFiles = new List<AddonFile>();
             bool oneisready = false;
             if (installedInfo == null)
             {
@@ -1863,7 +1964,7 @@ namespace AlotAddOnGUI
                     mds.NegativeButtonText = "Continue";
                     mds.FirstAuxiliaryButtonText = "Cancel";
                     mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                    MessageDialogResult result = await this.ShowMessageAsync("Mass Effect" + getGameNumberSuffix(game) + " not backed up", "You should create a backup of your game before installing ALOT. In the event something goes wrong, you can quickly restore back to an unmodified state. Creating a backup is strongly recommended and should be done on an unmodified game. Create a backup before install?", MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, mds);
+                    MessageDialogResult result = await this.ShowMessageAsync("Mass Effect" + GetGameNumberSuffix(game) + " not backed up", "You should create a backup of your game before installing ALOT. In the event something goes wrong, you can quickly restore back to an unmodified state. Creating a backup is strongly recommended and should be done on an unmodified game. Create a backup before install?", MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, mds);
                     if (result == MessageDialogResult.Affirmative)
                     {
                         BackupGame(game);
@@ -1881,7 +1982,7 @@ namespace AlotAddOnGUI
             string blockDueToBadImportedFile = null; //default vaule
             bool manifestHasUpdateAvailable = false;
             AddonFile alotmainfile = null;
-            foreach (AddonFile af in alladdonfiles)
+            foreach (AddonFile af in AllAddonFiles)
             {
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
@@ -1902,7 +2003,7 @@ namespace AlotAddOnGUI
                         }
                         else if (af.ALOTVersion > 0 && !af.Ready)
                         {
-                            Log.Warning("Installation for ME" + game + " being blocked: ALOT/MEUITM is not installed currently, and ALOT's main file is not present or ready for use. ALOT must be installed if it's not already done so.");
+                            Log.Warning("Installation for ME" + game + " being blocked: ALOT/MEUITM is not installed currently, and ALOT's main file is not present or ready for use in the textue library. ALOT must be installed if it's not already done so.");
                             break;
                         }
                     }
@@ -1913,7 +2014,7 @@ namespace AlotAddOnGUI
                         if (!af.Ready)
                         {
                             blockDueToMissingALOTUpdateFile = true;
-                            Log.Warning("Installation for ME" + game + " being blocked due to ALOT update available, but not ready for installation in the import library.");
+                            Log.Warning("Installation for ME" + game + " has been blocked due to an ALOT update listed in manifest, but not available in the texture library. ALOT updates must also be imported when installing ALOT.");
                             break;
                         }
                     }
@@ -1928,7 +2029,7 @@ namespace AlotAddOnGUI
                                 continue; //this this file as meuitm is already installed
                             }
                         }
-                        nummissing++;
+                        missingRecommendedFiles.Add(af);
                     }
                     else
                     {
@@ -1945,6 +2046,12 @@ namespace AlotAddOnGUI
                                 blockDueToBadImportedFile = af.GetFile();
                                 break;
                             }
+                            if (af.IsCurrentlySingleFile() && af.UnpackedFileSize > 0 && af.UnpackedFileSize != fi.Length)
+                            {
+                                Log.Error(af.GetFile() + " has wrong size: " + fi.Length + ", manifest specifies " + af.FileSize);
+                                blockDueToBadImportedFile = af.GetFile();
+                                break;
+                            }
                             oneisready = true;
                         }
                     }
@@ -1956,7 +2063,7 @@ namespace AlotAddOnGUI
                 int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
                 ListView_Files.SelectedIndex = alotindex;
 
-                await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + getGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
+                await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + GetGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
                 return false;
             }
 
@@ -1964,11 +2071,11 @@ namespace AlotAddOnGUI
             {
                 if (installedInfo == null)
                 {
-                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation. Drag and drop the archive onto the interface - do not extract it.");
+                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation. Drag and drop the archive onto the interface - do not extract it.");
                 }
                 else
                 {
-                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + getGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue. Drag and drop the archive onto the interface - do not extract it.");
+                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue. Drag and drop the archive onto the interface - do not extract it.");
                 }
                 return false;
             }
@@ -1979,7 +2086,7 @@ namespace AlotAddOnGUI
                 return false;
             }
 
-            if (nummissing == 0)
+            if (missingRecommendedFiles.Count == 0)
             {
                 TELEMETRY_ALL_ADDON_FILES = true;
                 return true;
@@ -1987,14 +2094,19 @@ namespace AlotAddOnGUI
 
             if (!oneisready)
             {
-                await this.ShowMessageAsync("No files available for building", "There are no files available or relevant in the Downloaded_Mods folder to install for Mass Effect" + getGameNumberSuffix(game) + ".");
+                await this.ShowMessageAsync("No files available for building", "There are no files available or relevant in the texture library to install for Mass Effect" + GetGameNumberSuffix(game) + ".");
                 return false;
             }
             //if alot is already installed we don't need to show missing message, unless installed via MEM directly
             if (installedInfo == null || installedInfo.ALOTVER == 0)
             {
-                Log.Information(nummissing + " addon files are missing - prompting user to decline install.");
-                MessageDialogResult result = await this.ShowMessageAsync(nummissing + " file" + (nummissing != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + getGameNumberSuffix(game) + " addon are not imported. Addon files add a significant amount of high quality textures from third party artists and are tested to work with ALOT. These files must be imported if you want all of the high quality textures; these files are not included directly in ALOT because of ownership rights.\n\nNot importing these files will significantly degrade the ALOT experience. Are you sure you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
+                string missing = "";
+                foreach (AddonFile af in missingRecommendedFiles)
+                {
+                    missing += " - " + af.FriendlyName + "\n";
+                }
+                Log.Information(missingRecommendedFiles.Count + " addon files are missing - prompting user to decline install.");
+                MessageDialogResult result = await this.ShowMessageAsync(missingRecommendedFiles.Count + " file" + (missingRecommendedFiles.Count != 1 ? "s are" : " is") + " missing", "Some files for the Mass Effect" + GetGameNumberSuffix(game) + " addon are not imported:\n" + missing + "\nAddon files add a significant amount of high quality textures from third party artists (that cannot be included in the main ALOT file) and are tested to work with ALOT. These files must be imported if you want all of the high quality textures; these files are not included directly in ALOT because of ownership rights.\n\nNot importing these files will significantly degrade the ALOT experience. Are you sure you want to build the addon without these files?", MessageDialogStyle.AffirmativeAndNegative);
                 if (result == MessageDialogResult.Affirmative)
                 {
                     Log.Warning("User is continuing build step without all non-optional addon files. If user complains about a high amount of low quality textures this might be why.");
