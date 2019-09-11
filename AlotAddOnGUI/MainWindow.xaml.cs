@@ -1241,11 +1241,11 @@ namespace AlotAddOnGUI
                         badModsStr += "\n - " + str;
                     }
                     string prefix = "The following mods appear to be installed and are";
-                    if (BlockingMods.Count != 1)
+                    if (BlockingMods.Count == 1)
                     {
                         prefix = "The following mod appears to be installed and is";
                     }
-                    await this.ShowMessageAsync("Incompatible mods detected", prefix + "known to be incompatible with ALOT for Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + ". Restore your game to an unmodified state, and then install compatible versions of these mods (or do not install them at all)." + badModsStr);
+                    await this.ShowMessageAsync("Incompatible mods detected", prefix + " known to be incompatible with ALOT for Mass Effect" + GetGameNumberSuffix(CURRENT_GAME_BUILD) + ". Restore your game to an unmodified state, and then install compatible versions of these mods if one is available. If one is not available, you cannot install the mod and use ALOT with it." + badModsStr);
                     PreventFileRefresh = false;
                     break;
                 case -1:

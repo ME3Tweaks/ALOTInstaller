@@ -650,7 +650,9 @@ namespace AlotAddOnGUI
                 var peompath = Path.Combine(Utilities.GetGamePath(3),"BIOGame","DLC","DLC_CON_PEOM");
                 if (Directory.Exists(peompath))
                 {
-                    BACKGROUND_MEM_PROCESS_ERRORS.Add("DLC_CON_PEOM (Priority Earth Overhaul Mod)");
+                    Log.Error("Blacklisted mod found: PEOM. This mod is blacklisted due to game hang that will occur when ALOT is installed.");
+                    Log.Error("An update to ALOT Installer will be issued when the issue has been fixed");
+                    BACKGROUND_MEM_PROCESS_ERRORS.Add("DLC_CON_PEOM (Priority Earth Overhaul Mod) is blacklisted temporarily due to a game crash that occurs when ALOT is installed with it. A future update to ALOT Installer will fix this issue.");
                     BlockingMods = BACKGROUND_MEM_PROCESS_ERRORS;
                     e.Result = -2;
                     return;
@@ -2058,27 +2060,27 @@ namespace AlotAddOnGUI
                 }
             }
 
-            if (blockDueToMissingALOTFile && alotmainfile != null && !MEUITM_INSTALLER_MODE)
-            {
-                int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
-                ListView_Files.SelectedIndex = alotindex;
+            //if (blockDueToMissingALOTFile && alotmainfile != null && !MEUITM_INSTALLER_MODE)
+            //{
+            //    int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
+            //    ListView_Files.SelectedIndex = alotindex;
 
-                await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + GetGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
-                return false;
-            }
+            //    await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + GetGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
+            //    return false;
+            //}
 
-            if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable && !MEUITM_INSTALLER_MODE)
-            {
-                if (installedInfo == null)
-                {
-                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation. Drag and drop the archive onto the interface - do not extract it.");
-                }
-                else
-                {
-                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue. Drag and drop the archive onto the interface - do not extract it.");
-                }
-                return false;
-            }
+            //if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable && !MEUITM_INSTALLER_MODE)
+            //{
+            //    if (installedInfo == null)
+            //    {
+            //        await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation. Drag and drop the archive onto the interface - do not extract it.");
+            //    }
+            //    else
+            //    {
+            //        await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue. Drag and drop the archive onto the interface - do not extract it.");
+            //    }
+            //    return false;
+            //}
 
             if (blockDueToBadImportedFile != null)
             {
