@@ -624,24 +624,34 @@ namespace AlotAddOnGUI
         {
             Log.Information("Starting BuildAddon() thread. Performing build prechecks.");
             BlockingMods = new List<string>();
-            if (CURRENT_GAME_BUILD < 3)
+            string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
+            string args = "-detect-bad-mods " + CURRENT_GAME_BUILD + " -ipc";
+            runMEM_DetectBadMods(exe, args, null);
+            while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {
-                string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                string args = "-detect-bad-mods " + CURRENT_GAME_BUILD + " -ipc";
-                runMEM_DetectBadMods(exe, args, null);
-                while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
+                Thread.Sleep(250);
+            }
+            if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
+            {
+                BlockingMods = BACKGROUND_MEM_PROCESS_ERRORS;
+                e.Result = -2;
+                return;
+            }
+            else
+            {
+                Log.Information("No blocking mods were found.");
+            }
+
+            //TEMPORARY FOR PEOM
+            if (CURRENT_GAME_BUILD == 3)
+            {
+                var peompath = Path.Combine(Utilities.GetGamePath(3),"BIOGame","DLC","DLC_CON_PEOM");
+                if (Directory.Exists(peompath))
                 {
-                    Thread.Sleep(250);
-                }
-                if (BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
-                {
+                    BACKGROUND_MEM_PROCESS_ERRORS.Add("DLC_CON_PEOM (Priority Earth Overhaul Mod)");
                     BlockingMods = BACKGROUND_MEM_PROCESS_ERRORS;
                     e.Result = -2;
                     return;
-                }
-                else
-                {
-                    Log.Information("No blocking mods were found.");
                 }
             }
 
