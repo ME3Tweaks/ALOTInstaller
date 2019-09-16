@@ -100,6 +100,10 @@
     <Reference Include="MahApps.Metro.IconPacks.Modern, Version=2.3.0.4, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.Modern.2.3.0\lib\net46\MahApps.Metro.IconPacks.Modern.dll</HintPath>
     </Reference>
+    <Reference Include="ME3ExplorerLib, Version=4.1.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Users\mgame\source\repos\PackageCompactor\PackageCompactor\libs\ME3ExplorerLib.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
     </Reference>
@@ -295,6 +299,9 @@
     <Content Include="7z\7z.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="me3explib\ME3ExplorerLib.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\bin\sevenzipwrapper.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -387,14 +394,18 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist "$(TargetDir)Downloaded_Mods" mkdir "$(TargetDir)Downloaded_Mods"
 if not exist "$(TargetDir)Data\lib" mkdir "$(TargetDir)Data\lib"
-
 if exist "$(TargetDir)Data\lib"  del /q "$(TargetDir)Data\lib\*.pdb"&gt;NUL
 if exist "$(TargetDir)Data\lib" del /q "$(TargetDir)Data\lib\manifest*.xml"&gt;NUL
 if exist "$(TargetDir)alotinstaller.exe.config" del /q "$(TargetDir)alotinstaller.exe.config"&gt;NUL
 
+
+move /Y "$(TargetDir)\me3explib\ME3ExplorerLib.dll" "$(TargetDir)\Data\Lib\"
+rmdir "$(TargetDir)\me3explib\"
 move /Y "$(TargetDir)*.dll" "$(TargetDir)Data\Lib\"
 del /q "$(TargetDir)*.xml"
+del /q "$(TargetDir)errors-scan.txt"
 del /q "$(TargetDir)MahApps.Metro.IconPacks.Modern.pdb"
+del /q "$(TargetDir)Serilog.pdb"
 del /q "$(TargetDir)MahApps.Metro.pdb"
 del /q "$(TargetDir)ControlzEx.pdb"
 if exist "$(TargetDir)memodder" rmdir /s /q "$(TargetDir)memodder"

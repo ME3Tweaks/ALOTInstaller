@@ -31,6 +31,7 @@ namespace AlotAddOnGUI
         [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool DeleteFile(string name);
+        public const string MEMendFileMarker = "ThisIsMEMEndOfFileMarker";
 
         [STAThread]
         public static void Main()
