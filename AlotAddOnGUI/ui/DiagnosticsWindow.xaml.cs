@@ -1170,9 +1170,9 @@ namespace AlotAddOnGUI.ui
             string args = "e \"" + diagfilename + "\" \"" + outfile + "\" -mt2";
             Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
             var lzmalog = File.ReadAllBytes(outfile);
-            //string url = "https://vps.me3tweaks.com/alot/logupload2.php".SetQueryParams(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game = DIAGNOSTICS_GAME.ToString(),HashSupported=HASH_SUPPORTED  });
+            //string url = "https://me3tweaks.com/alot/logupload2.php".SetQueryParams(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game = DIAGNOSTICS_GAME.ToString(),HashSupported=HASH_SUPPORTED  });
             //var responseString = url.GetStringAsync().Result;
-            var responseString = "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game = DIAGNOSTICS_GAME.ToString(), HashSupported = HASH_SUPPORTED }).ReceiveString().Result;
+            var responseString = "https://me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "diag", Game = DIAGNOSTICS_GAME.ToString(), HashSupported = HASH_SUPPORTED }).ReceiveString().Result;
             Uri uriResult;
             bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
                 && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);

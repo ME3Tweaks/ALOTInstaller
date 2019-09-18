@@ -374,7 +374,7 @@ namespace AlotAddOnGUI
                 {
                     Log.Warning("A required tool is missing. Downloading requirements package now.");
                     AddonFilesLabel.Text = "Downloading required application files";
-                    string requiredFilesEndpoint = "https://vps.me3tweaks.com/alot/miscbin.zip".DownloadFileAsync(EXE_DIRECTORY + "Data", "miscbin.zip").Result;
+                    string requiredFilesEndpoint = "https://me3tweaks.com/alot/miscbin.zip".DownloadFileAsync(EXE_DIRECTORY + "Data", "miscbin.zip").Result;
                     System.IO.Compression.ZipFile.ExtractToDirectory(EXE_DIRECTORY + "Data\\miscbin.zip", BINARY_DIRECTORY);
                     File.Delete(EXE_DIRECTORY + "Data\\miscbin.zip");
                 }
@@ -4688,7 +4688,7 @@ namespace AlotAddOnGUI
             progresscontroller.SetIndeterminate();
             try
             {
-                var responseString = await "https://vps.me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "log", CrashLog = isPreviousCrashLog }).ReceiveString();
+                var responseString = await "https://me3tweaks.com/alot/logupload.php".PostUrlEncodedAsync(new { LogData = Convert.ToBase64String(lzmalog), ALOTInstallerVersion = alotInstallerVer, Type = "log", CrashLog = isPreviousCrashLog }).ReceiveString();
                 File.Delete(outfile);
                 Uri uriResult;
                 bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
