@@ -627,7 +627,7 @@ namespace AlotAddOnGUI
             Log.Information("Starting BuildAddon() thread. Performing build prechecks.");
             BlockingMods = new List<string>();
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-            string args = "-detect-bad-mods " + CURRENT_GAME_BUILD + " -ipc";
+            string args = "--detect-bad-mods --gameid " + CURRENT_GAME_BUILD + " --ipc";
             runMEM_DetectBadMods(exe, args, null);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {
