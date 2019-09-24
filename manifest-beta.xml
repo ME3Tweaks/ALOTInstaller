@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.7.2">
+<alotaddonmanifest version="5.7.3">
    <highestapprovedmemversion>216</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-08-09">219</soaktestingmemversion>
    <stages>
@@ -339,6 +339,132 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x3463B385.dds" />
       <packagefile me2="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x13703FFD.dds" />
 	  <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds" />
+   </addonfile>
+   <addonfile friendlyname="Armor Sets Pack for ME3" author="Ottemis">
+      <file downloadlink="http://www.nexusmods.com/masseffect3/mods/134/?tab=files" filename="ME3 HR Armor Sets Pack-134-1-1.rar" md5="eb0e06bc0133533adcd5d42ee12dbf5b" size="199493402" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0281248D_Serrice_chest_male_Tint.dds" destinationname="HMM_ARM_SHPc_Tor_Tint_0x0281248D.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x058009AC_Rosen_legs_Spec.dds" destinationname="HMM_ARM_SHPe_Leg_Spec_0x058009AC.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x05CC6194_armax_slv_strp.dds" destinationname="HMM_ARM_SHPg_Slv_Strp_0x05CC6194.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0AAE60A2_hahne_sld_norm.dds" destinationname="HMM_ARM_SHPf_Sld_Norm_0x0AAE60A2.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0DD2FAEE_hahne_tor_diff.dds" destinationname="HMM_ARM_SHPf_Tor_Diff_0x0DD2FAEE.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x0E371AB7_Rosen_chest_norm.dds" destinationname="HMM_ARM_SHPe_Tor_Norm_0x0E371AB7.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x127FF465_Kassa_chest_Strp.dds" destinationname="HMM_ARM_SHPb_Tor_Strp_0x127FF465.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x12CE0A29_Serrice_Sld.dds" destinationname="HMM_ARM_SHPc_Sld_Diff_0x12CE0A29.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x183653DB_Kassa_arm_Spec.dds" destinationname="HMM_ARM_SHPb_Slv_Spec_0x183653DB.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x193578BF_Rosen_arm_Strp.dds" destinationname="HMM_ARM_SHPe_Slv_Strp_0x193578BF.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x229A781D_ariake_torF_tint.dds" destinationname="HMF_ARM_SHPh_Tor_Tint_0x229A781D.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x245A9DE5_ariake_slv_strp.dds" destinationname="HMM_ARM_SHPh_Slv_Strp_0x245A9DE5.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x25541CC3_Rosen_leg_norm.dds" destinationname="HMM_ARM_SHPe_Leg_Norm_0x25541CC3.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x29898D7A_Kassa_chest_Spec.dds" destinationname="HMM_ARM_SHPb_Tor_Spec_0x29898D7A.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x2B3258B8_Serrice_Leg_Strp.dds" destinationname="HMM_ARM_SHPc_Leg_Strp_0x2B3258B8.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x31EBCF56_Serrice_Tor.dds" destinationname="HMF_ARM_SHPc_Tor_Spec_0x31EBCF56.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3213EF92_armax_torF_spec.dds" destinationname="HMM_ARM_SHPg_Tor_Spec_0x3213EF92.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x37EF5785_Serrice_Tor.dds" destinationname="HMF_ARM_SHPc_Tor_Diff_0x37EF5785.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3A242863_hahne_tor_norm.dds" destinationname="HMM_ARM_SHPf_Tor_Norm_0x3A242863.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3A4770F2_Serrice_leg_Norm.dds" destinationname="HMM_ARM_SHPc_Leg_Norm_0x3A4770F2.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3B2CC670_ariake_slv_tint.dds" destinationname="HMM_ARM_SHPh_Slv_Tint_0x3B2CC670.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3B308725_ariake_torF_diff.dds" destinationname="HMF_ARM_SHPh_Tor_Diff_0x3B308725.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3C08AA05_hahne_sld_tint.dds" destinationname="HMM_ARM_SHPf_Sld_Tint_0x3C08AA05.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3E76B910_ariake_tor_norm.dds" destinationname="HMM_ARM_SHPh_Tor_Norm_0x3E76B910.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x434ED151_ariake_sld_norm.dds" destinationname="HMM_ARM_SHPh_Sld_Norm_0x434ED151.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x45445B8C_hahne_arm_norm.dds" destinationname="HMM_ARM_SHPf_Slv_Norm_0x45445B8C.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4B07A730_Kassa_arm_Norm.dds" destinationname="HMM_ARM_SHPb_Slv_Norm_0x4B07A730.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x4B0BA88B_armax_torF_norm.dds" destinationname="HMM_ARM_SHPg_Tor_Norm_0x4B0BA88B.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x50ECF576_Serrice_Tor_F_Tint.dds" destinationname="HMF_ARM_SHPc_Tor_Tint_0x50ECF576.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x53D1012F_Kassa_leg_Strp.dds" destinationname="HMM_ARM_SHPb_Leg_Strp_0x53D1012F.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x540BB920_hahne_tor_spec.dds" destinationname="HMM_ARM_SHPf_Tor_Spec_0x540BB920.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x546E3A61_hahne_tor_strp.dds" destinationname="HMM_ARM_SHPf_Tor_Strp_0x546E3A61.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x555B831B_armax_sld_tint.dds" destinationname="HMM_ARM_SHPg_Sld_Tint_0x555B831B.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x56B48C7C_ariake_slv_diff.dds" destinationname="HMM_ARM_SHPh_Slv_Diff_0x56B48C7C.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x56C6A935_Serrice_Tor_Strp.dds" destinationname="HMF_ARM_SHPc_Tor_Strp_0x56C6A935.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x581DFD46_armax_slv_norm.dds" destinationname="HMM_ARM_SHPg_Slv_Norm_0x581DFD46.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5ACA77DF_ariake_torF_spec.dds" destinationname="HMF_ARM_SHPh_Tor_Spec_0x5ACA77DF.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5BA06126_ariake_sld_strp.dds" destinationname="HMM_ARM_SHPh_Sld_Strp_0x5BA06126.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5C643794_armax_leg_diff.dds" destinationname="HMM_ARM_SHPg_Leg_Diff_0x5C643794.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5D223318_Kassa_sld_Spec.dds" destinationname="HMM_ARM_SHPb_Sld_Spec_0x5D223318.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x5ECD5D88_armax_sld_spec.dds" destinationname="HMM_ARM_SHPg_Sld_Spec_0x5ECD5D88.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x60D3A871_kassa_leg_norm.dds" destinationname="HMM_ARM_SHPb_Leg_Norm_0x60D3A871.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x64037452_Rosen_helmet.dds" destinationname="HMM_HGR_SHPh_Diff_0x64037452.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6AD00919_Serrice_sld_Norm.dds" destinationname="HMM_ARM_SHPc_Sld_Norm_0x6AD00919.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E9B1E10_Kassa_chest_Tint.dds" destinationname="HMM_ARM_SHPb_Tor_Tint_0x6E9B1E10.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6F11E1DA_Serrice_tor_Male_Norm.dds" destinationname="HMM_ARM_SHPc_Tor_Norm_0x6F11E1DA.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x718C5305_ariake_sld_diff.dds" destinationname="HMM_ARM_SHPh_Sld_Diff_0x718C5305.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x71C47231_arm_ael.dds" destinationname="HMM_ARM_SHPc_Slv_Diff_0x71C47231.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x72E97E78_Serrice_Sld.dds" destinationname="HMM_ARM_SHPc_Sld_Spec_0x72E97E78.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x741E6F78_Serrice_Leg.dds" destinationname="HMM_ARM_SHPc_Leg_Diff_0x741E6F78.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7688D2D7_helmet.dds" destinationname="HMM_HGR_SHPh_Spec_0x7688D2D7.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x789BACCF_Rosen_legs_Diff.dds" destinationname="HMM_ARM_SHPe_Leg_Diff_0x789BACCF.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7C2C96DE_ariake_torM_spec.dds" destinationname="HMM_ARM_SHPh_Tor_Spec_0x7C2C96DE.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7CD56E22_hahne_arm_strp.dds" destinationname="HMM_ARM_SHPf_Slv_Strp_0x7CD56E22.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7D65E36F_Serrice_arm_Norm.dds" destinationname="HMM_ARM_SHPc_Slv_Norm_0x7D65E36F.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x7FDF3ADA_armax_leg_tint.dds" destinationname="HMM_ARM_SHPg_Leg_Tint_0x7FDF3ADA.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8314CB05_armax_torM_tint.dds" destinationname="HMM_ARM_SHPg_Tor_Tint_0x8314CB05.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x84E75509_ariake_sld_tint.dds" destinationname="HMM_ARM_SHPh_Sld_Tint_0x84E75509.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x854CCAB6_armax_leg_strp.dds" destinationname="HMM_ARM_SHPg_Leg_Strp_0x854CCAB6.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8600D59D_Rosen_chest_Diff.dds" destinationname="HMM_ARM_SHPe_Tor_Diff_0x8600D59D.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x865D76DE_Rosen_sld_Spec.dds" destinationname="HMM_ARM_SHPe_Sld_Spec_0x865D76DE.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x86BADE06_armax_torM_spec.dds" destinationname="HMM_ARM_SHPg_Tor_Spec_0x86BADE06.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8782C778_ariake_slv_spec.dds" destinationname="HMM_ARM_SHPh_Slv_Spec_0x8782C778.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x8C20CC16_armax_torM_strp.dds" destinationname="HMM_ARM_SHPg_Tor_Strp_0x8C20CC16.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x90772C01_ariake_torM_tint.dds" destinationname="HMM_ARM_SHPh_Tor_Tint_0x90772C01.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x93D23744_Kassa_sld_Norm.dds" destinationname="HMM_ARM_SHPb_Sld_Norm_0x93D23744.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x94302333_Kassa_chest_Diff.dds" destinationname="HMM_ARM_SHPb_Tor_Diff_0x94302333.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x94F2C9E0_hahne_arm_diff.dds" destinationname="HMM_ARM_SHPf_Slv_Diff_0x94F2C9E0.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x966CB9B4_Serrice_chest_Male_Spec.dds" destinationname="HMM_ARM_SHPc_Tor_Spec_0x966CB9B4.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x992AA222_armax_torF_tint.dds" destinationname="HMM_ARM_SHPg_Tor_Tint_0x992AA222.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9B3343E6_arm_ael.dds" destinationname="HMM_ARM_SHPc_Slv_Spec_0x9B3343E6.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9C4AE5A1_hahne_arm_tint.dds" destinationname="HMM_ARM_SHPf_Slv_Tint_0x9C4AE5A1.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9DD6D962_ariake_leg_strp.dds" destinationname="HMM_ARM_SHPh_Leg_Strp_0x9DD6D962.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x9EB0AA76_Kassa_sld_Strp.dds" destinationname="HMM_ARM_SHPb_Sld_Strp_0x9EB0AA76.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA267DB65_Ariake_torM_diff.dds" destinationname="HMM_ARM_SHPh_Tor_Diff_0xA267DB65.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA3A851AB_hahne_leg_norm.dds" destinationname="HMM_ARM_SHPf_Leg_Norm_0xA3A851AB.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA4B3FBEB_armax_sld_diff.dds" destinationname="HMM_ARM_SHPg_Sld_Diff_0xA4B3FBEB.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xA999302C_Rosen_arm_norm.dds" destinationname="HMM_ARM_SHPe_Slv_Norm_0xA999302C.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAA6ED439_Rosen_leg_Strp.dds" destinationname="HMM_ARM_SHPe_Leg_Strp_0xAA6ED439.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAAA7E029_ariake_torF_strp.dds" destinationname="HMF_ARM_SHPh_Tor_Strp_0xAAA7E029.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAB9E15A7_Serrice_tor_F_norm.dds" destinationname="HMF_ARM_SHPc_Tor_Norm_0xAB9E15A7.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAC0E772E_hahne_sld_diff.dds" destinationname="HMM_ARM_SHPf_Sld_Diff_0xAC0E772E.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xADEC3E54_Serrice_chest_Male_Diff.dds" destinationname="HMM_ARM_SHPc_Tor_Diff_0xADEC3E54.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xAE00CDA9_hahne_arm_spec.dds" destinationname="HMM_ARM_SHPf_Slv_Spec_0xAE00CDA9.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB33F9F76_ariake_slv_norm.dds" destinationname="HMM_ARM_SHPh_Slv_Norm_0xB33F9F76.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB405363A_hahne_leg_tint.dds" destinationname="HMM_ARM_SHPf_Leg_Tint_0xB405363A.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB654B6CD_armax_torM_norm.dds" destinationname="HMM_ARM_SHPg_Tor_Norm_0xB654B6CD.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB6D92E49_armax_leg_norm.dds" destinationname="HMM_ARM_SHPg_Leg_Norm_0xB6D92E49.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xC0918B88_armax_sld_strp.dds" destinationname="HMM_ARM_SHPg_Sld_Strp_0xC0918B88.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xC25D3C40_Kassa_arm_Diff.dds" destinationname="HMM_ARM_SHPb_Slv_Diff_0xC25D3C40.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xC4453983_Rosen_sld_Strp.dds" destinationname="HMM_ARM_SHPe_Sld_Strp_0xC4453983.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xC5B8DCFF_Rosen_arm_Diff.dds" destinationname="HMM_ARM_SHPe_Slv_Diff_0xC5B8DCFF.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xC8726864_Serrice_tor_Male_Strp.dds" destinationname="HMM_ARM_SHPc_Tor_Strp_0xC8726864.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCA4E2AE9_ariake_torM_strp.dds" destinationname="HMM_ARM_SHPh_Tor_Strp_0xCA4E2AE9.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCA8A2960_Kassa_sld_Diff.dds" destinationname="HMM_ARM_SHPb_Sld_Diff_0xCA8A2960.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCB6245DC_hahne_sld_strp.dds" destinationname="HMM_ARM_SHPf_Sld_Strp_0xCB6245DC.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCE37ECF4_armax_torF_strp.dds" destinationname="HMM_ARM_SHPg_Tor_Strp_0xCE37ECF4.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCEA5FA49_ariake_sld_spec.dds" destinationname="HMM_ARM_SHPh_Sld_Spec_0xCEA5FA49.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCEBF2BBE_hahne_tor_tint.dds" destinationname="HMM_ARM_SHPf_Tor_Tint_0xCEBF2BBE.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xCF762691_Kassa_chest_Norm.dds" destinationname="HMM_ARM_SHPb_Tor_Norm_0xCF762691.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD22B7EEC_armax_slv_diff.dds" destinationname="HMM_ARM_SHPg_Slv_Diff_0xD22B7EEC.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD62BDEC9_Rosen_sld_norm.dds" destinationname="HMM_ARM_SHPe_Sld_Norm_0xD62BDEC9.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD6B336DA_hahne_leg_strp.dds" destinationname="HMM_ARM_SHPf_Leg_Strp_0xD6B336DA.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD7C9D0FE_armax_leg_spec.dds" destinationname="HMM_ARM_SHPg_Leg_Spec_0xD7C9D0FE.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD872461D_hahne_leg_spec.dds" destinationname="HMM_ARM_SHPf_Leg_Spec_0xD872461D.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xDC4D44F1_Kassa_arm_Strp.dds" destinationname="HMM_ARM_SHPb_Slv_Strp_0xDC4D44F1.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xDD81E7C4_armax_slv_tint.dds" destinationname="HMM_ARM_SHPg_Slv_Tint_0xDD81E7C4.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xDED775D2_Rosen_chest_spec.dds" destinationname="HMM_ARM_SHPe_Tor_Spec_0xDED775D2.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE2D09524_Serrice_Leg.dds" destinationname="HMM_ARM_SHPc_Leg_Spec_0xE2D09524.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE5C1B2BF_ariake_leg_diff.dds" destinationname="HMM_ARM_SHPh_Leg_Diff_0xE5C1B2BF.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE9B25BD5_Serrice_Slv_Strp.dds" destinationname="HMM_ARM_SHPc_Slv_Strp_0xE9B25BD5.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE9CB127B_Kassa_leg_Diff.dds" destinationname="HMM_ARM_SHPb_Leg_Diff_0xE9CB127B.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xE9EE807A_armax_torM_diff.dds" destinationname="HMM_ARM_SHPg_Tor_Diff_0xE9EE807A.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEA996003_hahne_sld_spec.dds" destinationname="HMM_ARM_SHPf_Sld_Spec_0xEA996003.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xEE8A8D96_Armax_slv_Spec.dds" destinationname="HMM_ARM_SHPg_Slv_Spec_0xEE8A8D96.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF300E2BF_hahne_leg_diff.dds" destinationname="HMM_ARM_SHPf_Leg_Diff_0xF300E2BF.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF695A28F_Rosen_chest_Strp.dds" destinationname="HMM_ARM_SHPe_Tor_Strp_0xF695A28F.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF94D30C6_Rosen_arm_Spec.dds" destinationname="HMM_ARM_SHPe_Slv_Spec_0xF94D30C6.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF987F429_Rosen_sld_Diff.dds" destinationname="HMM_ARM_SHPe_Sld_Diff_0xF987F429.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFA33CE47_Serrice_Sld_Tint.dds" destinationname="HMM_ARM_SHPc_Sld_Tint_0xFA33CE47.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFAA75142_armax_torF_diff.dds" destinationname="HMM_ARM_SHPg_Tor_Diff_0xFAA75142.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFCC43FCB_Serrice_Sld_Strp.dds" destinationname="HMM_ARM_SHPc_Sld_Strp_0xFCC43FCB.dds" />
+      <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xFD90FB39_Kassa_leg_Spec.dds" destinationname="HMM_ARM_SHPb_Leg_Spec_0xFD90FB39.dds" />
    </addonfile>
    <addonfile friendlyname="ME3 HR Alliance Blues - 4096" author="Ottemis">
       <file downloadlink="http://www.nexusmods.com/masseffect3/mods/79/?tab=files" filename="ME3 HR Alliance Blues for Texmod-79-1-0.rar" md5="bb1e1a28b74baf1d851914074cea209d" size="100805205" />
