@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.7.3">
+<alotaddonmanifest version="5.7.4">
    <highestapprovedmemversion>216</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-08-09">219</soaktestingmemversion>
    <stages>
@@ -164,44 +164,44 @@
    <addonfile alotversion="10" friendlyname="ALOT for ME1 10.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
             tooltipname="ALOT for ME1 10.0"
-            torrentfilename="ALOT_ME1.zip"
-            
-            filename="ALOT_ME1.zip"
-            size="3901256396"
-            md5="9d7ab37109900d9d0ae00d2cf12017c7"
+	    
+            torrentfilename="ALOT for ME1.zip"
+            filename="ALOT for ME1.zip"
+            size="3830862431"
+            md5="cdd5bca5e6ce0b30342d6e6d9869d0b8"
             
             unpackedsinglefilename="ALOT_ME1.mem"
-            unpackedsize="3901256238"
-            unpackedmd5="18123f5607681393218f8b5739682b50" />
-      <packagefile me1="true" sourcename="ALOT_ME1.mem" movedirectly="true" />
+            unpackedsize="3788261683"
+            unpackedmd5="60894b2cd034a553af933872c85ff468" />
+      <packagefile me1="true" sourcename="ALOT for ME1/Downloaded_Mods/ALOT_ME1.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="10" friendlyname="ALOT for ME2 10.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
             tooltipname="ALOT for ME2 10.0"
             
-            torrentfilename="ALOT_ME2.zip"
-            filename="ALOT_ME2.zip"
-            size="6090804663"
-            md5="f305faca2a9848d0e41af6cd6f54302d"
+            torrentfilename="ALOT for ME2.zip"
+            filename="ALOT for ME2.zip"
+            size="6142273213"
+            md5="0547fd8e2b1ded7e2add45f94b446ea9"
             
             unpackedsinglefilename="ALOT_ME2.mem"
-            unpackedsize="6090804389"
-            unpackedmd5="00843ce2043dca43bb0e621478068143" />
-      <packagefile me2="true" sourcename="ALOT_ME2.mem" movedirectly="true" />
+            unpackedsize="6099672349"
+            unpackedmd5="d6eee0fc707d6ed277f81c0537ebdca8" />
+      <packagefile me2="true" sourcename="ALOT for ME2/Downloaded_Mods/ALOT_ME2.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="10" friendlyname="ALOT for ME3 10.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
             tooltipname="ALOT for ME3 10.0"
             
-            torrentfilename="ALOT_ME3.zip"
-            filename="ALOT_ME3.zip"
-            size="10014306369"
-            md5="50111f9be51b0a726860149719f11094"
+            torrentfilename="ALOT for ME3.zip"
+            filename="ALOT for ME3.zip"
+            size="10057418084"
+            md5="42179ec9444aafbf645a9181b54d193c"
             
             unpackedsinglefilename="ALOT_ME3.mem"
-            unpackedsize="10014306095"
-            unpackedmd5="37ff60423711718af6391d5b29e26d28" />
-      <packagefile me3="true" sourcename="ALOT_ME3.mem" movedirectly="true" />
+            unpackedsize="10014817220"
+            unpackedmd5="2cb934f84e8874b675dc39c71c1f1036" />
+      <packagefile me3="true" sourcename="ALOT for ME3/Downloaded_Mods/ALOT_ME3.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
