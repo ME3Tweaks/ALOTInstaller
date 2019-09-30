@@ -21,6 +21,7 @@ using SlavaGu.ConsoleAppLauncher;
 using System.ComponentModel;
 using ByteSizeLib;
 using System.Globalization;
+using ME3Explorer.Packages;
 
 namespace AlotAddOnGUI
 {
@@ -596,7 +597,7 @@ namespace AlotAddOnGUI
             }
             return result;
         }
-        
+
         public static string CalculateMD5(string filename)
         {
             try
@@ -954,6 +955,47 @@ namespace AlotAddOnGUI
                         return 0; //standalone
                     }
                 }
+            }
+        }
+
+        internal static void CompactFile(string packageFile)
+        {
+            Log.Information("Loading ME3Explorer library");
+            ME3ExplorerMinified.DLL.Startup();
+
+            Log.Information("Opening package: " + packageFile);
+
+            var package = MEPackageHandler.OpenMEPackage(packageFile);
+            Log.Information("Saving package: " + packageFile);
+
+            package.save();
+            Log.Information("Saved and compacted package: " + packageFile);
+        }
+
+        internal static void TagWithALOTMarker(string packageFile)
+        {
+            try
+            {
+                using (FileStream fs = new FileStream(packageFile, FileMode.Open, FileAccess.ReadWrite))
+                {
+                    fs.SeekEnd();
+                    fs.Seek(-App.MEMendFileMarker.Length, SeekOrigin.Current);
+                    string marker = fs.ReadStringASCII(App.MEMendFileMarker.Length);
+                    if (marker != App.MEMendFileMarker)
+                    {
+                        fs.SeekEnd();
+                        fs.WriteStringASCII(App.MEMendFileMarker);
+                        Log.Information("Re-tagged file with ALOT Marker");
+                    }
+                    else
+                    {
+                        Log.Information("File already tagged with ALOT marker, skipping re-tagging");
+                    }
+                }
+            }
+            catch
+            {
+                Log.Error("Failed to tag file with ALOT marker!");
             }
         }
 
@@ -1346,7 +1388,7 @@ namespace AlotAddOnGUI
                 Log.Information("Antivirus info: " + virusCheckerName + " with state " + bytes[1].ToString("X2") + " " + bytes[2].ToString("X2") + " " + bytes[3].ToString("X2"));
             }
         }
-        
+
         public static bool IsGameRunning(int gameID)
         {
             if (gameID == 1)

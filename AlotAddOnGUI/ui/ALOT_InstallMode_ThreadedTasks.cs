@@ -720,49 +720,36 @@ namespace AlotAddOnGUI
                 }
                 Utilities.RemoveRunAsAdminXPSP3FromME1();
             }
+            else if (INSTALLING_THREAD_GAME == 2)
+            {
+                if (File.Exists("EXPERIMENTAL_FIX_ME2CONTROLLER"))
+                {
+                    string gamePath = Path.Combine(Utilities.GetGamePath(2));
+                    string biopcharPath = Path.Combine(gamePath, "BIOGame", "CookedPC", "BioP_Char.pcc");
+                    if (File.Exists(biopcharPath))
+                    {
+                        Utilities.CompactFile(biopcharPath);
+                        Utilities.TagWithALOTMarker(biopcharPath);
+                    }
+                }
+            }
             else if (INSTALLING_THREAD_GAME == 3)
             {
                 string dlcPath = Path.Combine(Utilities.GetGamePath(3), "BIOGame", "DLC");
 
                 //Fix for PEOM Hammer 505
-                var peomHammer505 = Path.Combine(dlcPath, "DLC_CON_PEOM", "CookedPCConsole", "BioD_PEOM_505_HammerAssault.pcc");
-                if (File.Exists(peomHammer505))
+                if (File.Exists("EXPERIMENTAL_FIX_PEOM"))
                 {
-                    Log.Information("Applying fix to Priority Earth: Overhaul Mod");
-                    CurrentTask = "Applying fix to Priority Earth: Overhaul Mod";
-                    InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-                    //This file needs recompacted to fix unknown engine issue due to MEM modifications to file. Not sure why
-                    Log.Information("Loading ME3Explorer library");
-                    ME3ExplorerMinified.DLL.Startup();
-                    Log.Information("Opening package: " + peomHammer505);
-
-                    var package = MEPackageHandler.OpenMEPackage(peomHammer505);
-                    Log.Information("Saving package: " + peomHammer505);
-
-                    package.save();
-                    Log.Information("Saved and compacted package: " + peomHammer505);
-                    try
+                    var peomHammer505 = Path.Combine(dlcPath, "DLC_CON_PEOM", "CookedPCConsole", "BioD_PEOM_505_HammerAssault.pcc");
+                    if (File.Exists(peomHammer505))
                     {
-                        using (FileStream fs = new FileStream(peomHammer505, FileMode.Open, FileAccess.ReadWrite))
-                        {
-                            fs.SeekEnd();
-                            fs.Seek(-App.MEMendFileMarker.Length, SeekOrigin.Current);
-                            string marker = fs.ReadStringASCII(App.MEMendFileMarker.Length);
-                            if (marker != App.MEMendFileMarker)
-                            {
-                                fs.SeekEnd();
-                                fs.WriteStringASCII(App.MEMendFileMarker);
-                                Log.Information("Re-tagged file with ALOT Marker");
-                            }
-                            else
-                            {
-                                Log.Information("File already tagged with ALOT marker, skipping re-tagging");
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        Log.Error("Failed to tag file with ALOT marker!");
+                        Log.Information("Applying fix to Priority Earth: Overhaul Mod");
+                        CurrentTask = "Applying fix to Priority Earth: Overhaul Mod";
+                        InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                        //This file needs recompacted to fix unknown engine issue due to MEM modifications to file. Not sure why
+                        //This might not actually work, it seems to only work for some users
+                        Utilities.CompactFile(peomHammer505);
+                        Utilities.TagWithALOTMarker(peomHammer505);
                     }
                 }
             }

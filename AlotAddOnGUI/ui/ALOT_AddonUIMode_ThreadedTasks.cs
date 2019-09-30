@@ -645,14 +645,16 @@ namespace AlotAddOnGUI
             }
 
             //TEMPORARY FOR PEOM
-            if (CURRENT_GAME_BUILD == 3)
+
+
+            if (CURRENT_GAME_BUILD == 3 && !File.Exists("EXPERIMENTAL_FIX_PEOM"))
             {
                 var peompath = Path.Combine(Utilities.GetGamePath(3), "BIOGame", "DLC", "DLC_CON_PEOM");
                 if (Directory.Exists(peompath))
                 {
                     Log.Error("Blacklisted mod found: PEOM. This mod is blacklisted due to game hang that will occur when ALOT is installed.");
                     Log.Error("An update to ALOT Installer will be issued when the issue has been fixed");
-                    BACKGROUND_MEM_PROCESS_ERRORS.Add("DLC_CON_PEOM (Priority Earth Overhaul Mod) is blacklisted temporarily due to a game crash that occurs when ALOT is installed with it. A future update to ALOT Installer will fix this issue.");
+                    BACKGROUND_MEM_PROCESS_ERRORS.Add("DLC_CON_PEOM (Priority Earth Overhaul Mod) is blacklisted due to a game crash that occurs when ALOT is installed with it. A future update to ALOT Installer will fix this issue.");
                     BlockingMods = BACKGROUND_MEM_PROCESS_ERRORS;
                     e.Result = -2;
                     return;
