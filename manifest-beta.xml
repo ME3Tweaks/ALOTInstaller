@@ -203,18 +203,6 @@
             unpackedmd5="2cb934f84e8874b675dc39c71c1f1036" />
       <packagefile me3="true" sourcename="ALOT for ME3\Downloaded_Mods\ALOT_ME3.mem" movedirectly="true" />
    </addonfile>
-   <addonfile friendlyname="Experimental Static Lighting Upscale for ME1" author="CreeperLava" optional="true">
-      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME1.mem" size="1206425995" md5="2cd82c029be130399cff50cd159a9cc0" copydirectly="true" />
-      <games me1="true" me2="false" me3="false" />
-   </addonfile>
-   <addonfile friendlyname="Experimental Static Lighting Upscale for ME2" author="CreeperLava" optional="true">
-      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME2.mem" size="109738425" md5="809defd2052e5094b4ea9b246bcbdaf8" copydirectly="true" />
-      <games me1="false" me2="true" me3="false" />
-   </addonfile>
-   <addonfile friendlyname="Experimental Static Lighting Upscale for ME3" author="CreeperLava" optional="true">
-      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME3.mem" size="1583420351" md5="49c50e7db0e10b33077dec79b7d5fd91" copydirectly="true" />
-      <games me1="false" me2="false" me3="true" />
-   </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
       <packagefile me1="true" sourcename="ME1 Improved Bun Textures (CDAMJC Cut).tpf" movedirectly="true" />
