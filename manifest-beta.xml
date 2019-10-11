@@ -204,15 +204,15 @@
       <packagefile me3="true" sourcename="ALOT for ME3\Downloaded_Mods\ALOT_ME3.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Experimental Static Lighting Upscale for ME1" author="CreeperLava" optional="true">
-      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME1.mem" size="6959351010" md5="e91388d9415fa5a8d603a42fe2120358" copydirectly="true" />
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME1.mem" size="6959351010" md5="e91388d9415fa5a8d603a42fe2120358" movedirectly="true" />
       <games me1="true" me2="false" me3="false" />
    </addonfile>
    <addonfile friendlyname="Experimental Static Lighting Upscale for ME2" author="CreeperLava" optional="true">
-      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME2.mem" size="665769669" md5="cf3fe16cede255158312adbfafa277d2" copydirectly="true" />
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME2.mem" size="665769669" md5="cf3fe16cede255158312adbfafa277d2" movedirectly="true" />
       <games me1="false" me2="true" me3="false" />
    </addonfile>
    <addonfile friendlyname="Experimental Static Lighting Upscale for ME3" author="CreeperLava" optional="true">
-      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME3.mem" size="9306255400" md5="63e407bc225f11f539d61fab11e6817f" copydirectly="true" />
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME3.mem" size="9306255400" md5="63e407bc225f11f539d61fab11e6817f" movedirectly="true" />
       <games me1="false" me2="false" me3="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
