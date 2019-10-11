@@ -568,7 +568,12 @@ if exist "$(TargetDir)alotinstaller.exe.config" del /q "$(TargetDir)alotinstalle
 
 
 move /Y "$(TargetDir)\me3explib\ME3ExplorerLib.dll" "$(TargetDir)\Data\Lib\"
+move /Y "$(TargetDir)\ME3ExplorerLib.dll" "$(TargetDir)\Data\Lib\"
+move /Y "$(TargetDir)\x64\e_sqlite3.dll" "$(TargetDir)\Data\Lib\"
 rmdir "$(TargetDir)\me3explib\"
+rmdir /S /Q "$(TargetDir)\runtimes\"
+rmdir  /S /Q "$(TargetDir)\x86\"
+rmdir /S /Q "$(TargetDir)\x64\"
 move /Y "$(TargetDir)*.dll" "$(TargetDir)Data\Lib\"
 del /q "$(TargetDir)*.xml"
 del /q "$(TargetDir)errors-scan.txt"

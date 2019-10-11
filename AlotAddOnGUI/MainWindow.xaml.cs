@@ -993,8 +993,6 @@ namespace AlotAddOnGUI
                 if (crashReport.AppErrorTime.LocalDateTime.Date == DateTime.Today)
                 {
                     var date = crashReport.AppErrorTime.LocalDateTime.Date;
-                    var logfile = Path.Combine(App.LogsDirectory, $"alotinstaller-{date.ToString("yyyyMMdd")}.txt");
-                    var x = await this.ShowMessageAsync("Previous installer session crashed", logfile);
 
                     Log.Information("Crash date: " + crashReport.AppErrorTime.Date.Date + ", today is " + DateTime.Today + ", crash not handled. Prompting to upload");
                     MetroDialogSettings mds = new MetroDialogSettings();
@@ -2934,7 +2932,6 @@ namespace AlotAddOnGUI
 
         private async void Button_InstallME2_Click(object sender, RoutedEventArgs e)
         {
-            Crashes.GenerateTestCrash();
             if (await InstallPrecheck(2))
             {
                 ShowBuildOptions(2);
