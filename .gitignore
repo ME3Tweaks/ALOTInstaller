@@ -245,3 +245,4 @@ ModelManifest.xml
 /TempCache/Downloaded_Mods
 /AlotAddOnGUI/aloticon.png
 /AlotAddOnGUI/bin/x64/ReleaseBuilder.ps1
+/AlotAddOnGUI/classes/APIKeysPrivate.cs

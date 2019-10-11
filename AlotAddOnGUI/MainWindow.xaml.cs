@@ -38,6 +38,8 @@ using System.IO.Compression;
 using System.Globalization;
 using System.Management;
 using System.Collections.ObjectModel;
+using Microsoft.AppCenter.Crashes;
+using Microsoft.AppCenter.Analytics;
 
 namespace AlotAddOnGUI
 {
@@ -259,6 +261,7 @@ namespace AlotAddOnGUI
             DOWNLOADED_MODS_DIRECTORY = EXE_DIRECTORY + "Downloaded_Mods"; //This will be changed when settings load;
             Progressbar_Max = 100;
             InitializeComponent();
+            App.mainWindow = this;
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(ListView_Files.ItemsSource);
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
             view.GroupDescriptions.Add(groupDescription);
@@ -960,35 +963,40 @@ namespace AlotAddOnGUI
             PerformUACCheck();
             UpdateALOTStatus();
             RunMEMUpdaterGUI();
-            string appCrashFile = EXE_DIRECTORY + @"Data\APP_CRASH";
-            string appCrashHandledFile = EXE_DIRECTORY + @"Data\APP_CRASH_HANDLED";
-
-            if (File.Exists(appCrashFile))
+            //string appCrashFile = EXE_DIRECTORY + @"Data\APP_CRASH";
+            //string appCrashHandledFile = EXE_DIRECTORY + @"Data\APP_CRASH_HANDLED";
+            bool didAppCrash = await Crashes.HasCrashedInLastSessionAsync();
+            ErrorReport crashReport = await Crashes.GetLastSessionCrashReportAsync();
+            if (didAppCrash)
             {
-                DateTime crashTime = File.GetCreationTime(appCrashFile);
-                bool hasBeenHandled = false;
-                try
+                //DateTime crashTime = File.GetCreationTime(appCrashFile);
+                //bool hasBeenHandled = false;
+                //try
+                //{
+                //    File.Delete(appCrashFile);
+                //    Log.Warning("Removed APP_CRASH");
+                //    if (File.Exists(appCrashHandledFile))
+                //    {
+                //        hasBeenHandled = true;
+                //        Log.Warning("Removed APP_CRASH_HANDLED - the previous crash has already been handled");
+                //        File.Delete(appCrashHandledFile);
+                //    }
+                //}
+                //catch (Exception e)
+                //{
+                //    Log.Error("Cannot remove APP_CRASH:" + e.Message);
+                //    if (!File.Exists(appCrashHandledFile))
+                //    {
+                //        File.Create(appCrashHandledFile);
+                //    }
+                //}
+                if (crashReport.AppErrorTime.LocalDateTime.Date == DateTime.Today)
                 {
-                    File.Delete(appCrashFile);
-                    Log.Warning("Removed APP_CRASH");
-                    if (File.Exists(appCrashHandledFile))
-                    {
-                        hasBeenHandled = true;
-                        Log.Warning("Removed APP_CRASH_HANDLED - the previous crash has already been handled");
-                        File.Delete(appCrashHandledFile);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.Error("Cannot remove APP_CRASH:" + e.Message);
-                    if (!File.Exists(appCrashHandledFile))
-                    {
-                        File.Create(appCrashHandledFile);
-                    }
-                }
-                if (crashTime.Date == DateTime.Today && !hasBeenHandled)
-                {
-                    Log.Information("Crash date: " + crashTime.Date + ", today is " + DateTime.Today + ", crash not handled. Prompting to upload");
+                    var date = crashReport.AppErrorTime.LocalDateTime.Date;
+                    var logfile = Path.Combine(App.LogsDirectory, $"alotinstaller-{date.ToString("yyyyMMdd")}.txt");
+                    var x = await this.ShowMessageAsync("Previous installer session crashed", logfile);
+
+                    Log.Information("Crash date: " + crashReport.AppErrorTime.Date.Date + ", today is " + DateTime.Today + ", crash not handled. Prompting to upload");
                     MetroDialogSettings mds = new MetroDialogSettings();
                     mds.AffirmativeButtonText = "Upload";
                     mds.NegativeButtonText = "No";
@@ -1017,11 +1025,10 @@ namespace AlotAddOnGUI
                   MEUITM_Flyout_InstallOptionsPanel.Visibility = Visibility.Visible;
               } */
             Log.Information("PerformPostStartup() has completed. We are now switching over to user control.");
-            if (App.PreloadedME3Path != null)
+            if (App.PreloadedME3Path != null || App.PreloadedME2Path != null || App.PreloadedME1Path != null)
             {
-                ShowStatus("Set ME3 game path to " + App.PreloadedME3Path);
+                ShowStatus("Using game paths from Mod Manager");
             }
-
         }
 
         private void MEMNoGuiUpdateCanceled(object sender, EventArgs e)
@@ -2927,6 +2934,7 @@ namespace AlotAddOnGUI
 
         private async void Button_InstallME2_Click(object sender, RoutedEventArgs e)
         {
+            Crashes.GenerateTestCrash();
             if (await InstallPrecheck(2))
             {
                 ShowBuildOptions(2);
@@ -3979,7 +3987,7 @@ namespace AlotAddOnGUI
             }
         }
 
-        private void ShowStatus(string message, int msOpen = 6000)
+        internal void ShowStatus(string message, int msOpen = 6000)
         {
             StatusFlyout.AutoCloseInterval = msOpen;
             StatusLabel.Text = message;
@@ -4045,6 +4053,10 @@ namespace AlotAddOnGUI
 
             USING_BETA = Utilities.GetRegistrySettingBool(SETTINGSTR_BETAMODE) ?? false;
             Checkbox_BetaMode.IsChecked = USING_BETA;
+            Analytics.TrackEvent("Session Type", new Dictionary<string, string>()
+            {
+                ["Type"] = USING_BETA ? "Beta" : "Stable"
+            });
 
             LAST_BETA_ADVERT_TIME = DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(Utilities.GetRegistrySettingString(SETTINGSTR_LAST_BETA_ADVERT_TIME) ?? "0"));
 
