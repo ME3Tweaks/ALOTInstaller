@@ -330,8 +330,7 @@
     </Page>
     <Compile Include="classes\ALOTVersionInfo.cs" />
     <Compile Include="classes\AddonFile.cs" />
-    <Compile Include="classes\APIKeysPrivate.cs" />
-    <Compile Include="classes\APIKeysPublic.cs" />
+    <Compile Include="classes\APIKeysP*.cs" />
     <Compile Include="classes\ConfigurableModInterface.cs" />
     <Compile Include="classes\CopyFile.cs" />
     <Compile Include="classes\DiskTypeDetector.cs" />

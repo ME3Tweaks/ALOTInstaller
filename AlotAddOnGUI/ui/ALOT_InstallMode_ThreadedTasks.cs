@@ -28,6 +28,7 @@ using System.Windows.Navigation;
 using System.Xml.Linq;
 using ME3Explorer.Packages;
 using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 
 namespace AlotAddOnGUI
 {
@@ -586,6 +587,37 @@ namespace AlotAddOnGUI
             }
 
             //Exited OK, continue installation.
+
+
+            //Apply ALOT-verified Mod Manager mods that we support.
+            string gameDirectory = Utilities.GetGamePath(INSTALLING_THREAD_GAME);
+            foreach (var modAddon in ADDONFILES_TO_BUILD.Where(x => x.IsModManagerMod))
+            {
+                InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, 0));
+                CurrentTask = "Installing additional mod";
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, modAddon.FriendlyName));
+                foreach (var extractionRedirect in modAddon.ExtractionRedirects)
+                {
+                    if (extractionRedirect.OptionalRequiredDLC != null)
+                    {
+                        //Check DLC directory for requirement
+                        if (INSTALLING_THREAD_GAME == 1 && !Directory.Exists(Path.Combine(gameDirectory, "DLC", extractionRedirect.OptionalRequiredDLC)))
+                        {
+                            continue;
+                        }
+                        if ((INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3) && !Directory.Exists(Path.Combine(gameDirectory, "BioGame", "DLC", extractionRedirect.OptionalRequiredDLC)))
+                        {
+                            continue;
+                        }
+                    }
+
+                    var destinationPath = Directory.CreateDirectory(Path.Combine(gameDirectory, extractionRedirect.RelativeDestinationDirectory)).FullName;
+
+                }
+            }
+
+            //Final stages
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_ALL_STAGE_LABELS));
             overallProgress = ProgressWeightPercentages.SubmitProgress(CURRENT_STAGE_NUM, 100);
             InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, overallProgress));
@@ -732,6 +764,8 @@ namespace AlotAddOnGUI
                     {
                         Utilities.CompactFile(biopcharPath);
                         Utilities.TagWithALOTMarker(biopcharPath);
+                        Analytics.TrackEvent("Applied ME2Controller compaction fix");
+
                     }
                 }
             }
@@ -752,6 +786,7 @@ namespace AlotAddOnGUI
                         //This might not actually work, it seems to only work for some users
                         Utilities.CompactFile(peomHammer505);
                         Utilities.TagWithALOTMarker(peomHammer505);
+                        Analytics.TrackEvent("Applied PEOM compaction fix");
                     }
                 }
             }
@@ -816,6 +851,7 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("Marker file was unable to be written due to an exception: " + ex.Message);
                     Log.Error("An error like this occuring could indicate significant other issues");
+                    Crashes.TrackError(ex);
                 }
             }
             //Install Binkw32
@@ -1179,6 +1215,37 @@ namespace AlotAddOnGUI
             {
                 Log.Information("This is not a full installation, not submitting telemetry");
             }
+        }
+
+        public ConsoleApp Run7zWithProgressCallback(string args, AddonFile af, Action<int> progressCallback)
+        {
+            Log.Information("Running 7z progress process: 7z " + args);
+            ConsoleApp ca = new ConsoleApp(MainWindow.BINARY_DIRECTORY + "7z.exe", args);
+            ca.ConsoleOutput += (o, args2) =>
+            {
+                if (args2.IsError && args2.Line.Trim() != "" && !args2.Line.Trim().StartsWith("0M"))
+                {
+                    int percentIndex = args2.Line.IndexOf("%");
+                    if (percentIndex > 0)
+                    {
+                        progressCallback?.Invoke(int.Parse(args2.Line.Substring(0, percentIndex)));
+                    }
+                    else
+                    {
+                        Log.Error("StdError from 7z: " + args2.Line.Trim());
+                    }
+                }
+                else
+                {
+                    if (args2.Line.Trim() != "")
+                    {
+                        Log.Information("Realtime Process Output: " + args2.Line);
+                    }
+                }
+            };
+
+            ca.Run();
+            return ca;
         }
 
         private void RunAndTimeMEMContextBased_Install(string exe, string args, BackgroundWorker installWorker, bool isMainInstall = false)

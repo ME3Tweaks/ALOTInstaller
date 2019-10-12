@@ -147,6 +147,11 @@ namespace AlotAddOnGUI
 
             string prefix = "[" + Path.GetFileNameWithoutExtension(fileToUse) + "] ";
             Log.Information(prefix + "Processing extraction on " + fileToUse);
+            if (af.IsModManagerMod)
+            {
+                Log.Information(prefix + " is a mod manager mod. We will process this after installation.");
+                return new KeyValuePair<AddonFile, bool>(af, true);
+            }
             string fileextension = System.IO.Path.GetExtension(fileToUse);
             ulong freeBytes;
             ulong diskSize;
