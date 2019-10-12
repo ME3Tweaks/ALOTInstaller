@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.7.5">
+<alotaddonmanifest version="5.7.7">
    <highestapprovedmemversion>216</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-08-09">219</soaktestingmemversion>
    <stages>
@@ -202,6 +202,18 @@
             unpackedsize="10014817220"
             unpackedmd5="2cb934f84e8874b675dc39c71c1f1036" />
       <packagefile me3="true" sourcename="ALOT for ME3\Downloaded_Mods\ALOT_ME3.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile friendlyname="Experimental Static Lighting Upscale for ME1" author="CreeperLava" optional="true">
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME1.mem" size="6959351010" md5="e91388d9415fa5a8d603a42fe2120358" movedirectly="true" />
+      <games me1="true" me2="false" me3="false" />
+   </addonfile>
+   <addonfile friendlyname="Experimental Static Lighting Upscale for ME2" author="CreeperLava" optional="true">
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME2.mem" size="665769669" md5="cf3fe16cede255158312adbfafa277d2" movedirectly="true" />
+      <games me1="false" me2="true" me3="false" />
+   </addonfile>
+   <addonfile friendlyname="Experimental Static Lighting Upscale for ME3" author="CreeperLava" optional="true">
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME3.mem" size="9306255400" md5="63e407bc225f11f539d61fab11e6817f" movedirectly="true" />
+      <games me1="false" me2="false" me3="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />

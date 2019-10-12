@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Runtime.InteropServices;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 
 namespace AlotAddOnGUI
 {
@@ -26,7 +29,11 @@ namespace AlotAddOnGUI
     {
         private static bool POST_STARTUP = false;
         public static bool BootMEUITMMode = false;
+        public static string PreloadedME1Path = null;
+        public static string PreloadedME2Path = null;
         public static string PreloadedME3Path = null;
+        public static string LogsDirectory;
+        public static MainWindow mainWindow;
 
         [DllImport("kernel32", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -52,6 +59,48 @@ namespace AlotAddOnGUI
             }
         }
 
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            if (APIKeys.HasAppCenterKey)
+            {
+                //Setup App Center
+                Crashes.SendingErrorReport += (object sender, SendingErrorReportEventArgs ea) =>
+                {
+                    // Your code, e.g. to present a custom UI.
+                    mainWindow?.ShowStatus("Uploading crash log");
+                };
+                Crashes.SentErrorReport += (object sender, SentErrorReportEventArgs ea) => {
+                    mainWindow?.ShowStatus("Uploaded crash log");
+                };
+                Crashes.FailedToSendErrorReport += (object sender, FailedToSendErrorReportEventArgs ea) => {
+                    mainWindow?.ShowStatus("Failed to upload crash log");
+                };
+                Crashes.GetErrorAttachments = (ErrorReport report) =>
+                {
+
+                    var attachments = new List<ErrorAttachmentLog>();
+                    // Attach some text.
+                    var date = report.AppErrorTime.LocalDateTime.ToString("yyyyMMdd");
+                    var logfile = Path.Combine(LogsDirectory, $"alotinstaller-{date}.txt");
+                    if (File.Exists(logfile))
+                    {
+                        string log = Utilities.ReadLockedTextFile(logfile);
+                        if (log.Length < ByteSizeLib.ByteSize.BytesInMegaByte * 7)
+                        {
+                            attachments.Add(ErrorAttachmentLog.AttachmentWithText(log, "crashlog.txt"));
+                        }
+                    }
+                    // Attach binary data.
+                    //var fakeImage = System.Text.Encoding.Default.GetBytes("Fake image");
+                    //ErrorAttachmentLog binaryLog = ErrorAttachmentLog.AttachmentWithBinary(fakeImage, "ic_launcher.jpeg", "image/jpeg");
+
+                    return attachments;
+                };
+                AppCenter.Start(APIKeys.AppCenterKey, typeof(Analytics), typeof(Crashes));
+            }
+        }
+
         /// <summary>
         /// Removes ADS streams from files in the lib folder. This prevents startup crash caused by inability for dlls to load from "the internet" if extracted via windows explorer.
         /// </summary>
@@ -70,7 +119,7 @@ namespace AlotAddOnGUI
             string[] args = Environment.GetCommandLineArgs();
             List<string> preLogMessages = new List<string>();
             Parsed<Options> parsedCommandLineArgs = null;
-            string loggingBasePath = System.AppDomain.CurrentDomain.BaseDirectory;
+            string baseDirectory = System.AppDomain.CurrentDomain.BaseDirectory;
             string updateDestinationPath = null;
             if (args.Length > 1)
             {
@@ -84,7 +133,7 @@ namespace AlotAddOnGUI
                         if (Directory.Exists(parsedCommandLineArgs.Value.UpdateDest))
                         {
                             updateDestinationPath = parsedCommandLineArgs.Value.UpdateDest;
-                            loggingBasePath = updateDestinationPath;
+                            baseDirectory = updateDestinationPath;
                         }
                         else
                         {
@@ -95,6 +144,51 @@ namespace AlotAddOnGUI
                     {
                         Log.Information("We are booting into MEUITM mode.");
                         BootMEUITMMode = true;
+                    }
+                    #region Mod Manager pathing
+                    if (parsedCommandLineArgs.Value.ME1Path != null && Directory.Exists(parsedCommandLineArgs.Value.ME1Path))
+                    {
+                        PreloadedME1Path = parsedCommandLineArgs.Value.ME1Path;
+                        //get MassEffectModder.ini
+                        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "MassEffectModder");
+                        string _iniPath = Path.Combine(path, "MassEffectModder.ini");
+                        if (!Directory.Exists(path))
+                        {
+                            preLogMessages.Add("Preset ME1 path, ini folder doesn't exist, creating.");
+                            Directory.CreateDirectory(path);
+                        }
+                        if (!File.Exists(_iniPath))
+                        {
+                            preLogMessages.Add("Preset ME1 path, ini doesn't exist, creating.");
+                            File.Create(_iniPath);
+                        }
+
+                        IniFile ini = new IniFile(_iniPath);
+                        ini.Write("ME1", parsedCommandLineArgs.Value.ME1Path, "GameDataPath");
+                        preLogMessages.Add("Wrote preset ME1 path to " + parsedCommandLineArgs.Value.ME1Path);
+                    }
+                    if (parsedCommandLineArgs.Value.ME2Path != null && Directory.Exists(parsedCommandLineArgs.Value.ME2Path))
+                    {
+                        PreloadedME2Path = parsedCommandLineArgs.Value.ME2Path;
+                        //get MassEffectModder.ini
+                        string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                        "MassEffectModder");
+                        string _iniPath = Path.Combine(path, "MassEffectModder.ini");
+                        if (!Directory.Exists(path))
+                        {
+                            preLogMessages.Add("Preset ME2 path, ini folder doesn't exist, creating.");
+                            Directory.CreateDirectory(path);
+                        }
+                        if (!File.Exists(_iniPath))
+                        {
+                            preLogMessages.Add("Preset ME2 path, ini doesn't exist, creating.");
+                            File.Create(_iniPath);
+                        }
+
+                        IniFile ini = new IniFile(_iniPath);
+                        ini.Write("ME2", parsedCommandLineArgs.Value.ME2Path, "GameDataPath");
+                        preLogMessages.Add("Wrote preset ME2 path to " + parsedCommandLineArgs.Value.ME2Path);
                     }
                     if (parsedCommandLineArgs.Value.ME3Path != null && Directory.Exists(parsedCommandLineArgs.Value.ME3Path))
                     {
@@ -116,8 +210,9 @@ namespace AlotAddOnGUI
 
                         IniFile ini = new IniFile(_iniPath);
                         ini.Write("ME3", parsedCommandLineArgs.Value.ME3Path, "GameDataPath");
-                        preLogMessages.Add("Wrote preset ME3 path to "+ parsedCommandLineArgs.Value.ME3Path);
+                        preLogMessages.Add("Wrote preset ME3 path to " + parsedCommandLineArgs.Value.ME3Path);
                     }
+                    #endregion
                     if (parsedCommandLineArgs.Value.BootingNewUpdate)
                     {
                         Log.Information("Booting an update");
@@ -130,16 +225,16 @@ namespace AlotAddOnGUI
                 }
             }
 
-            Directory.CreateDirectory(loggingBasePath + "\\logs");
+            LogsDirectory = Directory.CreateDirectory(baseDirectory + "\\logs").FullName;
             Log.Logger = new LoggerConfiguration()
                    .MinimumLevel.Debug()
-                .WriteTo.RollingFile(loggingBasePath + "\\logs\\alotinstaller-{Date}.txt", flushToDiskInterval: new TimeSpan(0, 0, 15))
+                .WriteTo.RollingFile(Path.Combine(LogsDirectory, "alotinstaller-{Date}.txt"), flushToDiskInterval: new TimeSpan(0, 0, 15))
               .CreateLogger();
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
             POST_STARTUP = true;
             Log.Information("=====================================================");
             Log.Information("Logger Started for ALOT Installer.");
-            preLogMessages.ForEach(x => Log.Information("Prelogger boot message: "+x));
+            preLogMessages.ForEach(x => Log.Information("Prelogger boot message: " + x));
             if (args.Length > 0)
             {
                 string commandlineargs = "";
@@ -259,22 +354,25 @@ namespace AlotAddOnGUI
             ToolTipService.ShowOnDisabledProperty.OverrideMetadata(
             typeof(Control),
             new FrameworkPropertyMetadata(true));
-            if (Directory.Exists(loggingBasePath + "Update"))
+            if (Directory.Exists(baseDirectory + "Update"))
             {
                 Thread.Sleep(1000);
                 Log.Information("Removing Update directory");
-                Directory.Delete(loggingBasePath + "Update", true);
+                Directory.Delete(baseDirectory + "Update", true);
             }
-            if (File.Exists(loggingBasePath + "ALOTAddonBuilder.exe"))
+            if (File.Exists(baseDirectory + "ALOTAddonBuilder.exe"))
             {
                 Log.Information("Deleting Update Shim ALOTAddonBuilder.exe");
-                File.Delete(loggingBasePath + "ALOTAddonBuilder.exe");
+                File.Delete(baseDirectory + "ALOTAddonBuilder.exe");
             }
 
             if (parsedCommandLineArgs != null && parsedCommandLineArgs.Value != null && parsedCommandLineArgs.Value.BootingNewUpdate)
             {
                 //turn off debug mode
                 Utilities.WriteRegistryKey(Registry.CurrentUser, AlotAddOnGUI.MainWindow.REGISTRY_KEY, AlotAddOnGUI.MainWindow.SETTINGSTR_DEBUGLOGGING, 0);
+                Analytics.TrackEvent("Update Completed", new Dictionary<string, string> {
+                    { "NewVersion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() }
+                });
             }
 
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
@@ -305,10 +403,11 @@ namespace AlotAddOnGUI
             Log.Information("Forcing beta mode off before exiting...");
             Utilities.WriteRegistryKey(Registry.CurrentUser, AlotAddOnGUI.MainWindow.REGISTRY_KEY, AlotAddOnGUI.MainWindow.SETTINGSTR_BETAMODE, 0);
 
-            if (Directory.Exists("Data") && !File.Exists(@"Data\APP_CRASH"))
-            {
-                File.Create(@"Data\APP_CRASH");
-            }
+            //Handled by App Center
+            //if (Directory.Exists("Data") && !File.Exists(@"Data\APP_CRASH"))
+            //{
+            //    File.Create(@"Data\APP_CRASH");
+            //}
         }
 
         /// <summary>
@@ -401,9 +500,16 @@ namespace AlotAddOnGUI
             HelpText = "Boots ALOT Installer in MEUITM mode.")]
         public bool BootMEUITMMode { get; set; }
 
+        [Option("me1path",
+            HelpText = "Sets the path for ME1 when the application boots")]
+        public string ME1Path { get; set; }
+
+        [Option("me2path",
+            HelpText = "Sets the path for ME2 when the application boots")]
+        public string ME2Path { get; set; }
+
         [Option("me3path",
             HelpText = "Sets the path for ME3 when the application boots")]
         public string ME3Path { get; set; }
     }
-
 }

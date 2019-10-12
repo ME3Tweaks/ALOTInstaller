@@ -27,6 +27,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Xml.Linq;
 using ME3Explorer.Packages;
+using Microsoft.AppCenter.Analytics;
 
 namespace AlotAddOnGUI
 {
@@ -370,6 +371,7 @@ namespace AlotAddOnGUI
                     Log.Error("Could not hash executable: " + ex.Message);
                 }
             }
+            Analytics.TrackEvent("Started installation for ME" + INSTALLING_THREAD_GAME);
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
             TELEMETRY_IS_FULL_NEW_INSTALL = versionInfo == null;
@@ -916,6 +918,7 @@ namespace AlotAddOnGUI
                     InstallWorker.ReportProgress(0, new ThreadCommand(SHOW_ORIGIN_FLYOUT, INSTALLING_THREAD_GAME));
                 }
             }
+            Analytics.TrackEvent("Finished installation for ME" + INSTALLING_THREAD_GAME);
             e.Result = INSTALL_OK;
         }
 
