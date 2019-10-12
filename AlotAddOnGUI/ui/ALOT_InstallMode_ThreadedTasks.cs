@@ -304,9 +304,9 @@ namespace AlotAddOnGUI
                     break;
                 case UPDATE_CURRENT_STAGE_PROGRESS:
                     int oldTaskProgress = CurrentTaskPercent;
-                    if (tc.Data is string)
+                    if (tc.Data is string str)
                     {
-                        CurrentTaskPercent = Convert.ToInt32((string)tc.Data);
+                        CurrentTaskPercent = Convert.ToInt32(str);
                     }
                     else
                     {
@@ -524,11 +524,11 @@ namespace AlotAddOnGUI
             }
 
             //Comment the following 2 lines and uncomment the next 3 to skip installation step and simulate OK
-            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
-            processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
-            //MEM_INSTALL_TIME_SECONDS = 61;
-            //processResult = 0;
-            //STAGE_DONE_REACHED = true;
+            //RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
+            //processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+            MEM_INSTALL_TIME_SECONDS = 61;
+            processResult = 0;
+            STAGE_DONE_REACHED = true;
 
             if (!STAGE_DONE_REACHED)
             {
@@ -590,13 +590,29 @@ namespace AlotAddOnGUI
 
 
             //Apply ALOT-verified Mod Manager mods that we support.
+            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_OF_STAGE_LABEL));
+
+
             string gameDirectory = Utilities.GetGamePath(INSTALLING_THREAD_GAME);
             foreach (var modAddon in ADDONFILES_TO_BUILD.Where(x => x.IsModManagerMod))
             {
                 InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, 0));
-                CurrentTask = "Installing additional mod";
-                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, modAddon.FriendlyName));
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Installing " + modAddon.FriendlyName));
+
+                void progressUpdate(int percent)
+                {
+                    InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, "Extracting " + percent + "%"));
+                }
+                var stagingPath = Directory.CreateDirectory(Path.Combine(gameDirectory, "ModExtractStaging")).FullName;
+
+                //progress, overwrite, recursive
+                var extractionProgressApp = Run7zWithProgressCallback($"x -bsp2 \"{modAddon.GetFile()}\" -aoa -r -o\"{stagingPath}\"", modAddon, progressUpdate);
+                while (extractionProgressApp.State == AppState.Running)
+                {
+                    Thread.Sleep(100); //Hacky... but it works
+                }
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, "Installing files"));
+
                 foreach (var extractionRedirect in modAddon.ExtractionRedirects)
                 {
                     if (extractionRedirect.OptionalRequiredDLC != null)
@@ -612,9 +628,34 @@ namespace AlotAddOnGUI
                         }
                     }
 
-                    var destinationPath = Directory.CreateDirectory(Path.Combine(gameDirectory, extractionRedirect.RelativeDestinationDirectory)).FullName;
+                    var rootPath = Path.Combine(stagingPath, extractionRedirect.ArchiveRootPath);
+                    var filesToMove = Directory.GetFiles(rootPath, "*", SearchOption.AllDirectories);
+                    var ingameDestination = Directory.CreateDirectory(Path.Combine(gameDirectory, extractionRedirect.RelativeDestinationDirectory)).FullName;
+                    foreach (var file in filesToMove)
+                    {
+                        string relativePath = file.Substring(rootPath.Length + 1);
+                        string finalDestinationPath = Path.Combine(ingameDestination, relativePath);
+                        if (File.Exists(finalDestinationPath))
+                        {
+                            Log.Information("Deleting existing file before move: " + finalDestinationPath);
+                            File.Delete(finalDestinationPath);
+                        }
 
+                        Log.Information($"Moving staged file into game directory: {file} -> {finalDestinationPath}");
+                        Directory.CreateDirectory(Directory.GetParent(finalDestinationPath).FullName);
+                        File.Move(file, finalDestinationPath);
+                    }
+
+                    if (extractionRedirect.IsDLC)
+                    {
+                        //Write a _metacmm.txt file
+                        var metacmm = Path.Combine(ingameDestination, "_metacmm.txt");
+                        string contents = $"{extractionRedirect.DLCFriendlyName}\n{extractionRedirect.ModVersion}\nALOT Installer {System.Reflection.Assembly.GetEntryAssembly().GetName().Version}\n{Guid.NewGuid().ToString()}";
+                        File.WriteAllText(metacmm, contents);
+                    }
                 }
+
+                Utilities.DeleteFilesAndFoldersRecursively(stagingPath);
             }
 
             //Final stages
@@ -769,27 +810,27 @@ namespace AlotAddOnGUI
                     }
                 }
             }
-            else if (INSTALLING_THREAD_GAME == 3)
-            {
-                string dlcPath = Path.Combine(Utilities.GetGamePath(3), "BIOGame", "DLC");
+            //else if (INSTALLING_THREAD_GAME == 3)
+            //{
+            //    string dlcPath = Path.Combine(Utilities.GetGamePath(3), "BIOGame", "DLC");
 
-                //Fix for PEOM Hammer 505
-                if (File.Exists("EXPERIMENTAL_FIX_PEOM"))
-                {
-                    var peomHammer505 = Path.Combine(dlcPath, "DLC_CON_PEOM", "CookedPCConsole", "BioD_PEOM_505_HammerAssault.pcc");
-                    if (File.Exists(peomHammer505))
-                    {
-                        Log.Information("Applying fix to Priority Earth: Overhaul Mod");
-                        CurrentTask = "Applying fix to Priority Earth: Overhaul Mod";
-                        InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
-                        //This file needs recompacted to fix unknown engine issue due to MEM modifications to file. Not sure why
-                        //This might not actually work, it seems to only work for some users
-                        Utilities.CompactFile(peomHammer505);
-                        Utilities.TagWithALOTMarker(peomHammer505);
-                        Analytics.TrackEvent("Applied PEOM compaction fix");
-                    }
-                }
-            }
+            //    //Fix for PEOM Hammer 505
+            //    if (File.Exists("EXPERIMENTAL_FIX_PEOM"))
+            //    {
+            //        var peomHammer505 = Path.Combine(dlcPath, "DLC_CON_PEOM", "CookedPCConsole", "BioD_PEOM_505_HammerAssault.pcc");
+            //        if (File.Exists(peomHammer505))
+            //        {
+            //            Log.Information("Applying fix to Priority Earth: Overhaul Mod");
+            //            CurrentTask = "Applying fix to Priority Earth: Overhaul Mod";
+            //            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+            //            //This file needs recompacted to fix unknown engine issue due to MEM modifications to file. Not sure why
+            //            //This might not actually work, it seems to only work for some users
+            //            Utilities.CompactFile(peomHammer505);
+            //            Utilities.TagWithALOTMarker(peomHammer505);
+            //            Analytics.TrackEvent("Applied PEOM compaction fix");
+            //        }
+            //    }
+            //}
             Utilities.TurnOffOriginAutoUpdate();
 
             //Create/Update Marker File
@@ -867,7 +908,7 @@ namespace AlotAddOnGUI
                 Log.Information("Installing ME1 DLC enabler asi...");
                 try
                 {
-                    string path = Utilities.GetGamePath(3);
+                    string path = Utilities.GetGamePath(1);
                     path = Directory.CreateDirectory(Path.Combine(path, "Binaries", "asi")).FullName;
                     path = Path.Combine(path, "ME1-DLC-ModEnabler-v1.0.asi");
                     File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.ME1_DLC_ModEnabler_v1_0);
@@ -1225,10 +1266,11 @@ namespace AlotAddOnGUI
             {
                 if (args2.IsError && args2.Line.Trim() != "" && !args2.Line.Trim().StartsWith("0M"))
                 {
-                    int percentIndex = args2.Line.IndexOf("%");
+                    string line = args2.Line.Trim();
+                    int percentIndex = line.IndexOf("%");
                     if (percentIndex > 0)
                     {
-                        progressCallback?.Invoke(int.Parse(args2.Line.Substring(0, percentIndex)));
+                        progressCallback?.Invoke(int.Parse(line.Substring(0, percentIndex)));
                     }
                     else
                     {

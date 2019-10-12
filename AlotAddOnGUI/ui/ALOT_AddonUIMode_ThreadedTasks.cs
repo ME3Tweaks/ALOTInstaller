@@ -150,6 +150,8 @@ namespace AlotAddOnGUI
             if (af.IsModManagerMod)
             {
                 Log.Information(prefix + " is a mod manager mod. We will process this after installation.");
+                af.ReadyStatusText = "Will install after texture installation step";
+                af.SetIdle();
                 return new KeyValuePair<AddonFile, bool>(af, true);
             }
             string fileextension = System.IO.Path.GetExtension(fileToUse);
@@ -621,7 +623,14 @@ namespace AlotAddOnGUI
             }
             else
             {
-                af.ReadyStatusText = "Staged for installation";
+                if (af.IsModManagerMod)
+                {
+                    af.ReadyStatusText = "Will install after texture installation step";
+                }
+                else
+                {
+                    af.ReadyStatusText = "Staged for installation";
+                }
                 af.SetIdle();
             }
             return new KeyValuePair<AddonFile, bool>(af, true);
@@ -651,20 +660,20 @@ namespace AlotAddOnGUI
 
             //TEMPORARY FOR PEOM
 
-
-            if (CURRENT_GAME_BUILD == 3 && !File.Exists("EXPERIMENTAL_FIX_PEOM"))
-            {
-                var peompath = Path.Combine(Utilities.GetGamePath(3), "BIOGame", "DLC", "DLC_CON_PEOM");
-                if (Directory.Exists(peompath))
-                {
-                    Log.Error("Blacklisted mod found: PEOM. This mod is blacklisted due to game hang that will occur when ALOT is installed.");
-                    Log.Error("An update to ALOT Installer will be issued when the issue has been fixed");
-                    BACKGROUND_MEM_PROCESS_ERRORS.Add("DLC_CON_PEOM (Priority Earth Overhaul Mod) is blacklisted due to a game crash that occurs when ALOT is installed with it. A future update to ALOT Installer will fix this issue.");
-                    BlockingMods = BACKGROUND_MEM_PROCESS_ERRORS;
-                    e.Result = -2;
-                    return;
-                }
-            }
+            //Disabled in this build pending testing from users on MEM 221
+            //if (CURRENT_GAME_BUILD == 3 && !File.Exists("EXPERIMENTAL_FIX_PEOM"))
+            //{
+            //    var peompath = Path.Combine(Utilities.GetGamePath(3), "BIOGame", "DLC", "DLC_CON_PEOM");
+            //    if (Directory.Exists(peompath))
+            //    {
+            //        Log.Error("Blacklisted mod found: PEOM. This mod is blacklisted due to game hang that will occur when ALOT is installed.");
+            //        Log.Error("An update to ALOT Installer will be issued when the issue has been fixed");
+            //        BACKGROUND_MEM_PROCESS_ERRORS.Add("DLC_CON_PEOM (Priority Earth Overhaul Mod) is blacklisted due to a game crash that occurs when ALOT is installed with it. A future update to ALOT Installer will fix this issue.");
+            //        BlockingMods = BACKGROUND_MEM_PROCESS_ERRORS;
+            //        e.Result = -2;
+            //        return;
+            //    }
+            //}
 
             string outDir = getOutputDir((int)e.Argument);
             if (Directory.Exists(outDir)) //Prompt for reinstall or rebuild
@@ -1087,7 +1096,14 @@ namespace AlotAddOnGUI
                 }
                 if (!requiresBuild)
                 {
-                    af.ReadyStatusText = "Staged for installation";
+                    if (af.IsModManagerMod)
+                    {
+                        af.ReadyStatusText = "Will install after texture installation step";
+                    }
+                    else
+                    {
+                        af.ReadyStatusText = "Staged for installation";
+                    }
                     af.SetIdle();
                 }
             }
@@ -1116,6 +1132,10 @@ namespace AlotAddOnGUI
 
             foreach (AddonFile af in AddonFilesToSetStatusFor)
             {
+                if (af.IsModManagerMod)
+                {
+                    continue; //We don't process this here
+                }
                 af.ReadyStatusText = "Building into Addon MEM file";
                 af.SetWorking();
             }
@@ -1189,7 +1209,14 @@ namespace AlotAddOnGUI
                         {
                             if (!af.UserFile)
                             {
-                                af.ReadyStatusText = "Built into Addon MEM file";
+                                if (af.IsModManagerMod)
+                                {
+                                    af.ReadyStatusText = "Will install after texture installation step";
+                                }
+                                else
+                                {
+                                    af.ReadyStatusText = "Built into Addon MEM file";
+                                }
                                 af.SetIdle();
                             }
                         }
@@ -2067,33 +2094,33 @@ namespace AlotAddOnGUI
                 }
             }
 
-            if (blockDueToMissingALOTFile && alotmainfile != null && !MEUITM_INSTALLER_MODE)
-            {
-                int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
-                ListView_Files.SelectedIndex = alotindex;
+            //if (blockDueToMissingALOTFile && alotmainfile != null && !MEUITM_INSTALLER_MODE)
+            //{
+            //    int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
+            //    ListView_Files.SelectedIndex = alotindex;
 
-                await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + GetGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
-                return false;
-            }
+            //    await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + GetGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
+            //    return false;
+            //}
 
-            if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable && !MEUITM_INSTALLER_MODE)
-            {
-                if (installedInfo == null)
-                {
-                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation. Drag and drop the archive onto the interface - do not extract it.");
-                }
-                else
-                {
-                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue. Drag and drop the archive onto the interface - do not extract it.");
-                }
-                return false;
-            }
+            //if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable && !MEUITM_INSTALLER_MODE)
+            //{
+            //    if (installedInfo == null)
+            //    {
+            //        await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation. Drag and drop the archive onto the interface - do not extract it.");
+            //    }
+            //    else
+            //    {
+            //        await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue. Drag and drop the archive onto the interface - do not extract it.");
+            //    }
+            //    return false;
+            //}
 
-            if (blockDueToBadImportedFile != null)
-            {
-                await this.ShowMessageAsync("Corrupt/Bad file detected", "The file " + blockDueToBadImportedFile + " is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from Download_Mods, it is not usable.");
-                return false;
-            }
+            //if (blockDueToBadImportedFile != null)
+            //{
+            //    await this.ShowMessageAsync("Corrupt/Bad file detected", "The file " + blockDueToBadImportedFile + " is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from Download_Mods, it is not usable.");
+            //    return false;
+            //}
 
             if (missingRecommendedFiles.Count == 0)
             {

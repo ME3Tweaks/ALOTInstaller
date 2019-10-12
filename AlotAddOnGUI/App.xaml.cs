@@ -44,6 +44,7 @@ namespace AlotAddOnGUI
         public static void Main()
         {
             UnblockLibFiles();
+            Debug.WriteLine("Setting assembly resolve");
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             Directory.SetCurrentDirectory(Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
             try
@@ -55,12 +56,24 @@ namespace AlotAddOnGUI
             catch (Exception e)
             {
                 OnFatalCrash(e);
+                DelayedResolveTrackError(e);
+                //Crashes.TrackError(e);
                 throw e;
             }
         }
 
+        /// <summary>
+        /// This has to be in subroutine because the library resolution code will not have executed by the time the assembly for Crashes is required to be loaded.
+        /// </summary>
+        /// <param name="e"></param>
+        private static void DelayedResolveTrackError(Exception e)
+        {
+            Crashes.TrackError(e);
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
+            Debug.WriteLine("Setting onstartup");
             base.OnStartup(e);
             if (APIKeys.HasAppCenterKey)
             {
@@ -70,10 +83,12 @@ namespace AlotAddOnGUI
                     // Your code, e.g. to present a custom UI.
                     mainWindow?.ShowStatus("Uploading crash log");
                 };
-                Crashes.SentErrorReport += (object sender, SentErrorReportEventArgs ea) => {
+                Crashes.SentErrorReport += (object sender, SentErrorReportEventArgs ea) =>
+                {
                     mainWindow?.ShowStatus("Uploaded crash log");
                 };
-                Crashes.FailedToSendErrorReport += (object sender, FailedToSendErrorReportEventArgs ea) => {
+                Crashes.FailedToSendErrorReport += (object sender, FailedToSendErrorReportEventArgs ea) =>
+                {
                     mainWindow?.ShowStatus("Failed to upload crash log");
                 };
                 Crashes.GetErrorAttachments = (ErrorReport report) =>
@@ -402,6 +417,7 @@ namespace AlotAddOnGUI
             Log.Fatal(st);
             Log.Information("Forcing beta mode off before exiting...");
             Utilities.WriteRegistryKey(Registry.CurrentUser, AlotAddOnGUI.MainWindow.REGISTRY_KEY, AlotAddOnGUI.MainWindow.SETTINGSTR_BETAMODE, 0);
+            Log.CloseAndFlush();
 
             //Handled by App Center
             //if (Directory.Exists("Data") && !File.Exists(@"Data\APP_CRASH"))

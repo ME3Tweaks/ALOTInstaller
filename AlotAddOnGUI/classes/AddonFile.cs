@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace AlotAddOnGUI.classes
 {
@@ -439,5 +440,8 @@ namespace AlotAddOnGUI.classes
         public string RelativeDestinationDirectory { get; set; }
         public string ArchiveRootPath { get; set; }
         public string OptionalRequiredDLC { get; set; }
+        public bool IsDLC { get; internal set; }
+        public string ModVersion { get; internal set; }
+        public string DLCFriendlyName { get; internal set; }
     }
 }

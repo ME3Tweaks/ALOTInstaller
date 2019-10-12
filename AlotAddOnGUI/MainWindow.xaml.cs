@@ -1346,7 +1346,8 @@ namespace AlotAddOnGUI
                             errorOccured = false;
                             break;
                         }
-
+                        //debug
+                        readyToInstallALOT = true;
                         if (readyToInstallALOT || MEUITM_INSTALLER_MODE || currentAlotInfo != null) //not installed
                         {
                             var ready = false;
@@ -2613,7 +2614,7 @@ namespace AlotAddOnGUI
                                 Showing = false,
                                 Enabled = true,
                                 ComparisonsLink = (string)e.Attribute("comparisonslink"),
-                                InstallME1DLCASI = e.Attribute("installme1dlcasi") != null ? (bool)e.Attribute("insatllme1dlcasi") : false,
+                                InstallME1DLCASI = e.Attribute("installme1dlcasi") != null ? (bool)e.Attribute("installme1dlcasi") : false,
                                 FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
                                 CopyDirectly = e.Element("file").Attribute("copydirectly") != null ? (bool)e.Element("file").Attribute("copydirectly") : false,
                                 MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
@@ -2637,13 +2638,16 @@ namespace AlotAddOnGUI
                                 UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
                                 TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
                                 Ready = false,
-                                IsModManagerMod = e.Element("file").Attribute("modmangermod") != null ? (bool)e.Element("file").Attribute("modmangermod") : false,
+                                IsModManagerMod = e.Element("file").Attribute("modmanagermod") != null ? (bool)e.Element("file").Attribute("modmanagermod") : false,
                                 ExtractionRedirects = e.Elements("extractionredirect")
                                     .Select(d => new ExtractionRedirect
                                     {
                                         ArchiveRootPath = (string)d.Attribute("archiverootpath"),
                                         RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
-                                        OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc")
+                                        OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc"),
+                                        DLCFriendlyName = (string)d.Attribute("dlcname"),
+                                        IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
+                                        ModVersion = (string)d.Attribute("version")
                                     }).ToList(),
                                 PackageFiles = e.Elements("packagefile")
                                     .Select(r => new PackageFile

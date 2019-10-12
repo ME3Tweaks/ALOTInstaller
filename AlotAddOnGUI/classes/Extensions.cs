@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,5 +15,17 @@ namespace AlotAddOnGUI.classes
 
             return isDefault;
         }
+
+
+        public static bool RepresentsPackageFilePath(this string path)
+        {
+            string extension = Path.GetExtension(path);
+            if (extension.Equals(".pcc", StringComparison.InvariantCultureIgnoreCase)) return true;
+            if (extension.Equals(".sfm", StringComparison.InvariantCultureIgnoreCase)) return true;
+            if (extension.Equals(".u", StringComparison.InvariantCultureIgnoreCase)) return true;
+            if (extension.Equals(".upk", StringComparison.InvariantCultureIgnoreCase)) return true;
+            return false;
+        }
+
     }
 }

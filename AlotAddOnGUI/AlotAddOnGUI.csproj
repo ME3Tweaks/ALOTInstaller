@@ -599,7 +599,7 @@ if $(ConfigurationName) == Release rmdir /s /q "$(TargetDir)logs
 if $(ConfigurationName) == Debug (exit 0)</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>if $(ConfigurationName) == Debug ("%25ProgramFiles%25\Microsoft Visual Studio\2019\Community\Common7\IDE\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt") ELSE ("%25ProgramFiles%25\Microsoft Visual Studio\2019\Community\Common7\IDE\TextTransform.exe" -a !!revision!true -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt")
+    <PreBuildEvent>::if $(ConfigurationName) == Debug ("%25ProgramFiles%25\Microsoft Visual Studio\2019\Community\Common7\IDE\TextTransform.exe" -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt") ELSE ("%25ProgramFiles%25\Microsoft Visual Studio\2019\Community\Common7\IDE\TextTransform.exe" -a !!revision!true -a !!build!true "$(ProjectDir)Properties\AssemblyInfo.tt")
 if $(ConfigurationName) == Release (copy /Y "$(SolutionDir)manifest.xml" "$(ProjectDir)$(OutDir)manifest-bundled.xml")</PreBuildEvent>
   </PropertyGroup>
   <Target Name="PostBuildMacros">
