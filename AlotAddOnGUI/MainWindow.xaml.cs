@@ -1347,7 +1347,7 @@ namespace AlotAddOnGUI
                             break;
                         }
                         //debug
-                        readyToInstallALOT = true;
+                        //readyToInstallALOT = true;
                         if (readyToInstallALOT || MEUITM_INSTALLER_MODE || currentAlotInfo != null) //not installed
                         {
                             var ready = false;

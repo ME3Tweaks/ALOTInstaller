@@ -2094,33 +2094,33 @@ namespace AlotAddOnGUI
                 }
             }
 
-            //if (blockDueToMissingALOTFile && alotmainfile != null && !MEUITM_INSTALLER_MODE)
-            //{
-            //    int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
-            //    ListView_Files.SelectedIndex = alotindex;
+            if (blockDueToMissingALOTFile && alotmainfile != null && !MEUITM_INSTALLER_MODE)
+            {
+                int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
+                ListView_Files.SelectedIndex = alotindex;
 
-            //    await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + GetGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
-            //    return false;
-            //}
+                await this.ShowMessageAsync("ALOT main file is missing", "ALOT's main file for Mass Effect" + GetGameNumberSuffix(game) + " is not imported. This file must be imported to run the installer when ALOT is not installed.");
+                return false;
+            }
 
-            //if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable && !MEUITM_INSTALLER_MODE)
-            //{
-            //    if (installedInfo == null)
-            //    {
-            //        await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation. Drag and drop the archive onto the interface - do not extract it.");
-            //    }
-            //    else
-            //    {
-            //        await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue. Drag and drop the archive onto the interface - do not extract it.");
-            //    }
-            //    return false;
-            //}
+            if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable && !MEUITM_INSTALLER_MODE)
+            {
+                if (installedInfo == null)
+                {
+                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation. Drag and drop the archive onto the interface - do not extract it.");
+                }
+                else
+                {
+                    await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update available that is not yet applied. This update must be imported in order to continue. Drag and drop the archive onto the interface - do not extract it.");
+                }
+                return false;
+            }
 
-            //if (blockDueToBadImportedFile != null)
-            //{
-            //    await this.ShowMessageAsync("Corrupt/Bad file detected", "The file " + blockDueToBadImportedFile + " is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from Download_Mods, it is not usable.");
-            //    return false;
-            //}
+            if (blockDueToBadImportedFile != null)
+            {
+                await this.ShowMessageAsync("Corrupt/Bad file detected", "The file " + blockDueToBadImportedFile + " is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from Download_Mods, it is not usable.");
+                return false;
+            }
 
             if (missingRecommendedFiles.Count == 0)
             {
