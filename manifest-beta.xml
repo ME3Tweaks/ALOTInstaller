@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.7.7">
-   <highestapprovedmemversion>216</highestapprovedmemversion>
-   <soaktestingmemversion soakstartdate="2019-08-09">219</soaktestingmemversion>
+<alotaddonmanifest version="5.8.0">
+   <highestapprovedmemversion>219</highestapprovedmemversion>
+   <soaktestingmemversion soakstartdate="2019-08-09">221</soaktestingmemversion>
    <stages>
       <!-- -58 is the next error code available-->
       <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
@@ -688,5 +688,11 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E247C12_bulk_spec_s.dds" destinationname="HMM_ARM_SANf_Spec_0x6E247C12.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E443315_bulk_vega_s.dds" destinationname="HMM_ARM_SANf_Diff_0x6E443315.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds" />
+   </addonfile>
+   <addonfile friendlyname="A Lot of Videos - ALOT 10 Beta Test" author="Audemis">
+      <file downloadlink="https://drive.google.com/file/d/18CRKGRaJ1ggMqMpgQ9xXu_QjyMBWuOAk/view?usp=sharing" filename="ALotOfVideos_Beta.7z" md5="37827c5be23b992879a47bf21fee6368" size="1979827713"  modmanagermod="true"/>
+      <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC\Movies"/>
+      <extractionredirect archiverootpath="DLC_MOD_ALOV_BDTS\CookedPC\Movies" relativedestinationdirectory="DLC\DLC_UNC\Movies" optionalrequireddlc="DLC_UNC"/>
+      <games me1="true" me2="false" me3="false" />
    </addonfile>
 </alotaddonmanifest>
