@@ -2486,13 +2486,13 @@ namespace AlotAddOnGUI
                 Debug.WriteLine("Manifest version: " + version);
                 musicpackmirrors = rootElement.Elements("musicpackmirror").Select(xe => xe.Value).ToList();
                 AllTutorials.AddRange((from e in rootElement.Elements("tutorial")
-                             select new ManifestTutorial
-                             {
-                                 Link = (string)e.Attribute("link"),
-                                 Text = (string)e.Attribute("text"),
-                                 ToolTip = (string)e.Attribute("tooltip"),
-                                 MEUITMOnly = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false
-                             }).ToList());
+                                       select new ManifestTutorial
+                                       {
+                                           Link = (string)e.Attribute("link"),
+                                           Text = (string)e.Attribute("text"),
+                                           ToolTip = (string)e.Attribute("tooltip"),
+                                           MEUITMOnly = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false
+                                       }).ToList());
 
                 HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = rootElement.Element("highestapprovedmemversion") == null ? HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION : (int)rootElement.Element("highestapprovedmemversion");
                 if (rootElement.Element("soaktestingmemversion") != null)
@@ -2608,6 +2608,7 @@ namespace AlotAddOnGUI
                                 Showing = false,
                                 Enabled = true,
                                 ComparisonsLink = (string)e.Attribute("comparisonslink"),
+                                InstallME1DLCASI = e.Attribute("installme1dlcasi") != null ? (bool)e.Attribute("insatllme1dlcasi") : false,
                                 FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
                                 CopyDirectly = e.Element("file").Attribute("copydirectly") != null ? (bool)e.Element("file").Attribute("copydirectly") : false,
                                 MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
@@ -2631,6 +2632,14 @@ namespace AlotAddOnGUI
                                 UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
                                 TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
                                 Ready = false,
+                                IsModManagerMod = e.Element("file").Attribute("modmangermod") != null ? (bool)e.Element("file").Attribute("modmangermod") : false,
+                                ExtractionRedirects = e.Elements("extractionredirect")
+                                    .Select(d => new ExtractionRedirect
+                                    {
+                                        ArchiveRootPath = (string)d.Attribute("archiverootpath"),
+                                        RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
+                                        OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc")
+                                    }).ToList(),
                                 PackageFiles = e.Elements("packagefile")
                                     .Select(r => new PackageFile
                                     {
@@ -5036,7 +5045,7 @@ namespace AlotAddOnGUI
             ListView_Files.SelectedIndex = ListView_Files.Items.IndexOf(lvi.DataContext);
             AddonFile af = (AddonFile)lvi.DataContext;
 
-            ModConfigurationDialog mcd = new ModConfigurationDialog(af, this,false);
+            ModConfigurationDialog mcd = new ModConfigurationDialog(af, this, false);
             await this.ShowMetroDialogAsync(mcd);
         }
 

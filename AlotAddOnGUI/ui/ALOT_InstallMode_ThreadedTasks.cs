@@ -817,14 +817,32 @@ namespace AlotAddOnGUI
                 }
             }
             //Install Binkw32
-            if (INSTALLING_THREAD_GAME == 2 || INSTALLING_THREAD_GAME == 3)
+            Utilities.InstallBinkw32Bypass(INSTALLING_THREAD_GAME);
+            if (INSTALLING_THREAD_GAME == 3)
             {
-                Utilities.InstallBinkw32Bypass(INSTALLING_THREAD_GAME);
-                if (INSTALLING_THREAD_GAME == 3)
+                Utilities.InstallME3ASIs();
+            }
+
+            if (INSTALLING_THREAD_GAME == 1 && ADDONFILES_TO_BUILD.Any(x => x.InstallME1DLCASI))
+            {
+                //Install ME1 DLC enabler
+                Log.Information("Installing ME1 DLC enabler asi...");
+                try
                 {
-                    Utilities.InstallME3ASIs();
+                    string path = Utilities.GetGamePath(3);
+                    path = Directory.CreateDirectory(Path.Combine(path, "Binaries", "asi")).FullName;
+                    path = Path.Combine(path, "ME1-DLC-ModEnabler-v1.0.asi");
+                    File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.ME1_DLC_ModEnabler_v1_0);
+                    Log.Information("Installed ME1-DLC-ModEnabler-v1.0.asi");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Failed to ME1 DLC Enable ASI! " + ex.Message);
+                    Crashes.TrackError(ex);
                 }
             }
+
+
 
             //If MAIN alot file is here, move it back to downloaded_mods
             if (alotMainFile != null && alotMainFile.UnpackedSingleFilename != null)

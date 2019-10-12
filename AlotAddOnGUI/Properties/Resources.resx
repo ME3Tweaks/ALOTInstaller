@@ -139,4 +139,13 @@
   <data name="AutoTOC" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\binkw32\me3\AutoTOC.asi;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="me1_binkw23" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\binkw32\me1\binkw23.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="me1_binkw32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\binkw32\me1\binkw32.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="ME1_DLC_ModEnabler_v1_0" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\binkw32\me1\ME1-DLC-ModEnabler-v1.0.asi;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

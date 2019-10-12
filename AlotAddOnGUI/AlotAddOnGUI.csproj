@@ -267,6 +267,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.manifest" />
+    <None Include="binkw32\me1\ME1-DLC-ModEnabler-v1.0.asi" />
     <None Include="binkw32\me3\AutoTOC.asi" />
     <None Include="binkw32\me3\ME3Logger_truncating.asi" />
     <None Include="Data\music\me1.ogg">
@@ -308,6 +309,8 @@
     <None Include="Data\bin\FullAutoTOC.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="binkw32\me1\binkw23.dll" />
+    <None Include="binkw32\me1\binkw32.dll" />
     <Content Include="Data\bin\lzma.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -339,10 +342,10 @@
     <Resource Include="images\greencheckmark.png" />
     <Resource Include="images\orangedownload.png" />
     <Resource Include="ALOTInstallerIcon.ico" />
-    <Content Include="binkw32\me2\binkw23.dll" />
-    <Content Include="binkw32\me2\binkw32.dll" />
-    <Content Include="binkw32\me3\binkw23.dll" />
-    <Content Include="binkw32\me3\binkw32.dll" />
+    <None Include="binkw32\me2\binkw23.dll" />
+    <None Include="binkw32\me2\binkw32.dll" />
+    <None Include="binkw32\me3\binkw23.dll" />
+    <None Include="binkw32\me3\binkw32.dll" />
     <Resource Include="images\me2_bg.jpg" />
     <Resource Include="images\me3_bg.jpg" />
     <Resource Include="images\me1_bg.jpg" />
@@ -380,9 +383,7 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="binkw32\me1\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

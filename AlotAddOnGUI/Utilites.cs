@@ -675,16 +675,17 @@ namespace AlotAddOnGUI
 
         public static bool InstallBinkw32Bypass(int game)
         {
-            if (game == 1)
-            {
-                return false;
-            }
             try
             {
                 Log.Information("Installing binkw32 for Mass Effect " + game);
                 string gamePath = GetGamePath(game);
                 switch (game)
                 {
+                    case 1:
+                        gamePath += "\\Binaries\\";
+                        System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me1_binkw23);
+                        System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me1_binkw32);
+                        break;
                     case 2:
                         gamePath += "\\Binaries\\";
                         System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me2_binkw23);

@@ -249,6 +249,9 @@ namespace AlotAddOnGUI.classes
         public string Tooltipname { get; set; }
         public string DownloadLink { get; set; }
         public List<string> Duplicates { get; set; }
+        public bool IsModManagerMod { get; set; }
+        public List<ExtractionRedirect> ExtractionRedirects { get; set; }
+
         public List<PackageFile> PackageFiles { get; set; }
         public List<ChoiceFile> ChoiceFiles { get; set; }
         public List<ZipFile> ZipFiles { get; set; }
@@ -358,6 +361,7 @@ namespace AlotAddOnGUI.classes
         }
 
         public int MEUITMVer { get; internal set; }
+        public bool InstallME1DLCASI { get; internal set; }
 
         private void OnPropertyChanged(string propertyName)
         {
@@ -428,5 +432,12 @@ namespace AlotAddOnGUI.classes
 
             return null;
         }
+    }
+
+    public class ExtractionRedirect
+    {
+        public string RelativeDestinationDirectory { get; set; }
+        public string ArchiveRootPath { get; set; }
+        public string OptionalRequiredDLC { get; set; }
     }
 }
