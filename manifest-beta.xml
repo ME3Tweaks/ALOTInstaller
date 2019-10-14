@@ -217,6 +217,14 @@
       <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME3.mem" size="9227474432" md5="71e3aec8d976e4319dcc50947490d6d4" movedirectly="true" />
       <games me1="false" me2="false" me3="true" />
    </addonfile>
+   <addonfile friendlyname="Experimental Squad Selection Upscale for ME2" author="CreeperLava" optional="true">
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME2_squad.mem" size="227794392" md5="9ce88177fe7a8e1e6f2c0f71a86358e3" movedirectly="true" />
+      <games me1="false" me2="true" me3="false" />
+   </addonfile>
+   <addonfile friendlyname="Experimental Squad Selection Upscale for ME3" author="CreeperLava" optional="true">
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME3_squad.mem" size="283880217" md5="571fa7bf899516f8a612966c8e5b20ac" movedirectly="true" />
+      <games me1="false" me2="false" me3="true" />
+   </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
       <packagefile me1="true" sourcename="ME1 Improved Bun Textures (CDAMJC Cut).tpf" movedirectly="true" />
