@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.7.7">
-   <highestapprovedmemversion>216</highestapprovedmemversion>
-   <soaktestingmemversion soakstartdate="2019-08-09">219</soaktestingmemversion>
+<alotaddonmanifest version="5.8.3">
+   <highestapprovedmemversion>219</highestapprovedmemversion>
+   <soaktestingmemversion soakstartdate="2019-08-09">221</soaktestingmemversion>
    <stages>
       <!-- -58 is the next error code available-->
       <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
@@ -66,6 +66,8 @@
       <supportedhash game="me1" name="DVD, Polish">298c30a399d0959e5e997a9d64b42548</supportedhash>
       <supportedhash game="me1" name="DVD, Polish, MEM Patched">9a89527800722ec308c01a421bfeb478</supportedhash>
       <supportedhash game="me1" name="Origin - German">8bba14d838d9c95e10d8ceeb5c958976</supportedhash>
+      <supportedhash game="me1" name="Origin, Vanilla, Alternate?">a8d61af97159cb62040c07b94e44299e</supportedhash>
+      <supportedhash game="me1" name="Origin, MEM Patched, Alternate?">b4737d250c00472aeb365c5d769ce6aa</supportedhash>
       <supportedhash game="me2" name="Origin, ME2Game/MassEffect2 swapped">73827026bc9629562c4a3f61a752541c</supportedhash>
       <supportedhash game="me2" name="Origin">32fb31b80804040996ed78d14110b54b</supportedhash>
       <supportedhash game="me2" name="Origin - ME2Game">229173ca9057baeb4fd9f0fb2e569051</supportedhash>
@@ -212,7 +214,15 @@
       <games me1="false" me2="true" me3="false" />
    </addonfile>
    <addonfile friendlyname="Experimental Static Lighting Upscale for ME3" author="CreeperLava" optional="true">
-      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME3.mem" size="9306255400" md5="63e407bc225f11f539d61fab11e6817f" movedirectly="true" />
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME3.mem" size="9227474432" md5="71e3aec8d976e4319dcc50947490d6d4" movedirectly="true" />
+      <games me1="false" me2="false" me3="true" />
+   </addonfile>
+   <addonfile friendlyname="Experimental Squad Selection Upscale for ME2" author="CreeperLava" optional="true">
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME2_squad.mem" size="227794392" md5="9ce88177fe7a8e1e6f2c0f71a86358e3" movedirectly="true" />
+      <games me1="false" me2="true" me3="false" />
+   </addonfile>
+   <addonfile friendlyname="Experimental Squad Selection Upscale for ME3" author="CreeperLava" optional="true">
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME3_squad.mem" size="283880217" md5="571fa7bf899516f8a612966c8e5b20ac" movedirectly="true" />
       <games me1="false" me2="false" me3="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
@@ -244,11 +254,6 @@
       <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Diff_0xCB14400D.dds" destinationname="0xCB14400D.dds" />
       <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Norm_0x413007EA.dds" destinationname="0x413007EA.dds" />
       <packagefile me3="true" sourcename="HMM_HED_PROIllusivemanB_Face_Spec_0x3B912C80.dds" destinationname="0x3B912C80.dds" />
-   </addonfile>
-   <!-- Temporary addition to the addon, until the MEUITM installer is updated to support -mark-to-convert -->
-   <addonfile friendlyname="Improved Lightmaps and Shadowmaps" author="CDAMJC, CreeperLava">
-      <file downloadlink="https://drive.google.com/drive/folders/1ha-PdId0T6O_AgSs-LAEsmpV8ILgCpuc?usp=sharing" tooltipname="LightandShadowMaps.zip" filename="LightandShadowMaps.zip" md5="76333a21b63d73d1279f138f82c59825" size="66654044" />
-      <packagefile me1="true" sourcename="LightandShadowMaps.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Ashley Complexion Tweak" author="Ellise" optional="true">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?tab=files" tooltipname="Ash Complexion Tweak - .MEM" filename="el_Ashley Complexion Tweak.7z-569-1-0.7z" md5="e8a4283b6242aff68227bfc8bb145899" size="10154183" />
@@ -688,5 +693,11 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E247C12_bulk_spec_s.dds" destinationname="HMM_ARM_SANf_Spec_0x6E247C12.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E443315_bulk_vega_s.dds" destinationname="HMM_ARM_SANf_Diff_0x6E443315.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds" />
+   </addonfile>
+   <addonfile friendlyname="A Lot of Videos - ALOT 10 Beta Test" author="Audemus">
+      <file downloadlink="https://drive.google.com/file/d/18CRKGRaJ1ggMqMpgQ9xXu_QjyMBWuOAk/view?usp=sharing" filename="ALotOfVideos_Beta.7z" md5="37827c5be23b992879a47bf21fee6368" size="1979827713"  modmanagermod="true"/>
+      <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC\Movies"/>
+      <extractionredirect archiverootpath="DLC_MOD_ALOV_BDTS\CookedPC\Movies" relativedestinationdirectory="DLC\DLC_UNC\Movies" optionalrequireddlc="DLC_UNC"/>
+      <games me1="true" me2="false" me3="false" />
    </addonfile>
 </alotaddonmanifest>
