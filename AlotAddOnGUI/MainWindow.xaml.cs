@@ -1909,6 +1909,7 @@ namespace AlotAddOnGUI
                                 else
                                 {
                                     Log.Error("Response from server was not valid XML! " + pageSourceCode);
+                                    Crashes.TrackError(new Exception("Invalid XML from server manifest!"));
                                     if (File.Exists(MANIFEST_LOC))
                                     {
                                         Log.Information("Reading cached manifest instead.");
