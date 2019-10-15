@@ -4551,6 +4551,7 @@ namespace AlotAddOnGUI
                 if (filelist.Count > 0)
                 {
                     Log.Information("Found this many files to import from downloads folder:" + filelist.Count);
+                    Analytics.TrackEvent("Imported files with Download Assistant");
 
                     PerformImportOperation(filelist.ToArray(), false);
                 }
@@ -4707,6 +4708,7 @@ namespace AlotAddOnGUI
             Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
             File.Delete(zipStaged);
             var lzmalog = File.ReadAllBytes(outfile);
+            Analytics.TrackEvent("Uploaded log");
             ProgressDialogController progresscontroller = await this.ShowProgressAsync("Uploading log", "Log is currently uploading, please wait...", true);
             progresscontroller.SetIndeterminate();
             try

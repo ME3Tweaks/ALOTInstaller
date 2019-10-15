@@ -22,6 +22,7 @@ using System.Management;
 using Microsoft.Win32;
 using MahApps.Metro.Controls.Dialogs;
 using System.Linq;
+using Microsoft.AppCenter.Analytics;
 
 namespace AlotAddOnGUI.ui
 {
@@ -158,6 +159,11 @@ namespace AlotAddOnGUI.ui
             diagnosticsWorker.DoWork += PerformDiagnostics;
             diagnosticsWorker.RunWorkerCompleted += FinishedDiagnostics;
             diagnosticsWorker.RunWorkerAsync();
+            Analytics.TrackEvent("Ran diagnostic", new Dictionary<string, string>()
+            {
+                { "Game", "ME"+game },
+                {"Type", full ? "Full": "Quick" }
+            });
         }
 
         private async void DiagnosticsProgressChanged(object sender, ProgressChangedEventArgs e)

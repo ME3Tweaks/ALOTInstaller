@@ -526,6 +526,7 @@ namespace AlotAddOnGUI
             //Comment the following 2 lines and uncomment the next 3 to skip installation step and simulate OK
             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+
             //MEM_INSTALL_TIME_SECONDS = 61;
             //processResult = 0;
             //STAGE_DONE_REACHED = true;
@@ -995,6 +996,7 @@ namespace AlotAddOnGUI
                 }
             }
             Analytics.TrackEvent("Finished installation for ME" + INSTALLING_THREAD_GAME);
+
             e.Result = INSTALL_OK;
         }
 
