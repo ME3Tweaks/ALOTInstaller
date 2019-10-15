@@ -1241,6 +1241,10 @@ namespace AlotAddOnGUI
                         Log.Information("Sending installation telemetry");
                         "https://me3tweaks.com/alotinstaller/installationtelemetry.php".PostUrlEncodedAsync(new { game = Game, memversion = memVersionUsed, installerversion = installerVersionUsed, processor = processorName, processor_corecount = processorCoreCount, processor_speed = processorSpeedMhz, memory = memoryAmount, installation_time = MEM_INSTALL_TIME_SECONDS, alladdonfiles = MainWindow.TELEMETRY_ALL_ADDON_FILES ? 1 : 0, officialdlccount = officialDLCCount, disktype = diskType, failed = telemetryfailedcode, os = OS });//.ReceiveString();
                         Log.Information("Installation telemetry has been submitted");
+                        Analytics.TrackEvent("Addon Files Used", new Dictionary<string, string>()
+                        {
+                            {"All addon files (exluding optionals)" ,MainWindow.TELEMETRY_ALL_ADDON_FILES.ToString() },
+                        });
                     }
                     catch (FlurlHttpTimeoutException)
                     {

@@ -4234,6 +4234,8 @@ namespace AlotAddOnGUI
 
             string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
             Utilities.runProcess(exe, "", true);
+            Analytics.TrackEvent("Ran Mass Effect Modder GUI");
+
         }
 
         private void InstallingOverlayFlyout_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -5131,6 +5133,8 @@ namespace AlotAddOnGUI
         private void Button_ME3AutoTOC_Click(object sender, RoutedEventArgs e)
         {
             ShowStatus("Performing AutoTOC on Mass Effect 3...", 3000);
+            Analytics.TrackEvent("Ran autotoc for ME3");
+
             SettingsFlyout.IsOpen = false;
             Utilities_Flyout.IsOpen = false;
             string exe = BINARY_DIRECTORY + "FullAutoTOC.exe";
