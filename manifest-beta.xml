@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.8.3">
+<alotaddonmanifest version="5.8.4">
    <highestapprovedmemversion>219</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-08-09">221</soaktestingmemversion>
    <stages>
@@ -206,7 +206,7 @@
       <packagefile me3="true" sourcename="ALOT for ME3\Downloaded_Mods\ALOT_ME3.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Experimental Static Lighting Upscale for ME1" author="CreeperLava" optional="true">
-      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME1.mem" size="6959351010" md5="e91388d9415fa5a8d603a42fe2120358" movedirectly="true" />
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME1.mem" size="6790435762" md5="8968f3b046dbf6634043e4160e525d6c" movedirectly="true" />
       <games me1="true" me2="false" me3="false" />
    </addonfile>
    <addonfile friendlyname="Experimental Static Lighting Upscale for ME2" author="CreeperLava" optional="true">
@@ -214,7 +214,7 @@
       <games me1="false" me2="true" me3="false" />
    </addonfile>
    <addonfile friendlyname="Experimental Static Lighting Upscale for ME3" author="CreeperLava" optional="true">
-      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME3.mem" size="9227474432" md5="71e3aec8d976e4319dcc50947490d6d4" movedirectly="true" />
+      <file downloadlink="https://mega.nz/#F!B19AwKgB!xi-rjdMFzhDBXOW4CAhi0Q" filename="ME3.mem" size="9048078258" md5="3f6803a73a21c369bd63566e6a984b1d" movedirectly="true" />
       <games me1="false" me2="false" me3="true" />
    </addonfile>
    <addonfile friendlyname="Experimental Squad Selection Upscale for ME2" author="CreeperLava" optional="true">
