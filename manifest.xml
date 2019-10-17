@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotaddonmanifest version="5.6.6">
    <highestapprovedmemversion>221</highestapprovedmemversion>
-   <soaktestingmemversion soakstartdate="2019-10-19">221</soaktestingmemversion>
+   <soaktestingmemversion soakstartdate="2019-10-10">221</soaktestingmemversion>
    <stages>
       <!-- -58 is the next error code available-->
       <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
