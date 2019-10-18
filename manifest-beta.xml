@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="5.8.4">
+<alotaddonmanifest version="5.8.5">
    <highestapprovedmemversion>219</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-08-09">221</soaktestingmemversion>
    <stages>
@@ -167,42 +167,42 @@
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
             tooltipname="ALOT for ME1 10.0"
 	    
-            torrentfilename="ALOT for ME1.zip"
-            filename="ALOT for ME1.zip"
-            size="3830862431"
-            md5="cdd5bca5e6ce0b30342d6e6d9869d0b8"
+            torrentfilename="ALOT for ME1 10.0.zip"
+            filename="ALOT for ME1 10.0.zip"
+            size="3902381524"
+            md5="396d09d8e763efc459306452600f4238"
             
-            unpackedsinglefilename="ALOT_ME1.mem"
-            unpackedsize="3788261683"
-            unpackedmd5="60894b2cd034a553af933872c85ff468" />
+            unpackedsinglefilename="ALOT_ME1_v10.mem"
+            unpackedsize="3841796951"
+            unpackedmd5="c0f2c8f1996a15e158b740d4add8f33d" />
       <packagefile me1="true" sourcename="ALOT for ME1\Downloaded_Mods\ALOT_ME1.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="10" friendlyname="ALOT for ME2 10.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
             tooltipname="ALOT for ME2 10.0"
             
-            torrentfilename="ALOT for ME2.zip"
-            filename="ALOT for ME2.zip"
-            size="6142273213"
-            md5="0547fd8e2b1ded7e2add45f94b446ea9"
+            torrentfilename="ALOT for ME2 10.0.zip"
+            filename="ALOT for ME2 10.0.zip"
+            size="6045928827"
+            md5="c0fdea37607184e112e3b6b7b19438c4"
             
-            unpackedsinglefilename="ALOT_ME2.mem"
-            unpackedsize="6099672349"
-            unpackedmd5="d6eee0fc707d6ed277f81c0537ebdca8" />
+            unpackedsinglefilename="ALOT_ME2_v10.mem"
+            unpackedsize="5985344138"
+            unpackedmd5="35819a83952a0d1b611100d582368b50" />
       <packagefile me2="true" sourcename="ALOT for ME2\Downloaded_Mods\ALOT_ME2.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="10" friendlyname="ALOT for ME3 10.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
             tooltipname="ALOT for ME3 10.0"
             
-            torrentfilename="ALOT for ME3.zip"
-            filename="ALOT for ME3.zip"
-            size="10057418084"
-            md5="42179ec9444aafbf645a9181b54d193c"
+            torrentfilename="ALOT for ME3 10.0.zip"
+            filename="ALOT for ME3 10.0.zip"
+            size="10081288053"
+            md5="1447a1e6fd825d42ec1e7e985e504882"
             
-            unpackedsinglefilename="ALOT_ME3.mem"
-            unpackedsize="10014817220"
-            unpackedmd5="2cb934f84e8874b675dc39c71c1f1036" />
+            unpackedsinglefilename="ALOT_ME3_v10.mem"
+            unpackedsize="10020703364"
+            unpackedmd5="fd767fdd4ccf0ce0f9aa3a19692ecbdd" />
       <packagefile me3="true" sourcename="ALOT for ME3\Downloaded_Mods\ALOT_ME3.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Experimental Static Lighting Upscale for ME1" author="CreeperLava" optional="true">
