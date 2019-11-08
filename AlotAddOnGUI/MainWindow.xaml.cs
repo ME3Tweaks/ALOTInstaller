@@ -1538,7 +1538,7 @@ namespace AlotAddOnGUI
                 }
 
                 //Check for torrent filename
-                if (!ready && af.TorrentFilename != null && af.ALOTVersion > 0)
+                if (!ready && af.TorrentFilename != null/* && af.ALOTVersion > 0*/)
                 {
                     var testForTorrentVer = File.Exists(basepath + af.TorrentFilename);
                     if (testForTorrentVer && new FileInfo(basepath + af.TorrentFilename).Length == af.FileSize)
@@ -1546,9 +1546,9 @@ namespace AlotAddOnGUI
                         try
                         {
                             //Will retry in 5s
-                            Log.Information("Attempting to rename torrent-filename of ALOT file to Nexus-based filename");
+                            Log.Information("Attempting to rename torrent-filename for " + af.FriendlyName + " to Nexus-based filename");
                             File.Move(basepath + af.TorrentFilename, basepath + af.Filename);
-                            Log.Information("Renamed torrent-filename of ALOT file to Nexus-based filename");
+                            Log.Information("Renamed torrent-filename of " + af.FriendlyName + " to Nexus-based filename");
                         }
                         catch (Exception ex)
                         {
