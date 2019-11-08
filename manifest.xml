@@ -212,11 +212,7 @@
             torrentfilename="LightMaps_ME1.zip"
             filename="Improved Static Lighting for ME1-83-2020-10-0-1573101555.zip"
 	    size="6610942066"
-	    md5="2234159c710d77ffd2e8a91fefe975ee"
-	    
-	    unpackedsinglefilename="LightMaps_ME1.mem"
-            unpackedsize="6610941782"
-            unpackedmd5="c7cc9fae7381de825b7943ef9b1a6f89" />
+	    md5="2234159c710d77ffd2e8a91fefe975ee" />
       <packagefile me1="true" sourcename="LightMaps_ME1.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Improved Static Lighting for ME2" author="CreeperLava">
@@ -226,11 +222,7 @@
             torrentfilename="LightMaps_ME2.zip"
             filename="Improved Static Lighting for ME2-68-2020-10-0-1573098585.zip"
 	    size="665769837"
-	    md5="d78abde1cef08b7ce64c70eaa4c46b71"
-	    
-	    unpackedsinglefilename="LightMaps_ME2.mem"
-            unpackedsize="665769669"
-            unpackedmd5="cf3fe16cede255158312adbfafa277d2" />
+	    md5="d78abde1cef08b7ce64c70eaa4c46b71"/>
       <packagefile me2="true" sourcename="LightMaps_ME2.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Improved Static Lighting for ME3" author="CreeperLava">
@@ -240,11 +232,7 @@
             torrentfilename="LightMaps_ME3.zip"
             filename="Improved Static Lighting for ME3-363-2019-10-0-1573144588.zip"
 	    size="9082233367"
-	    md5="33fe926fd3c82d00b886e74b6b87527f"
-	    
-	    unpackedsinglefilename="LightMaps_ME3.mem"
-            unpackedsize="9082233083"
-            unpackedmd5="75530cbe6aa10224a15053b138228c4f" />
+	    md5="33fe926fd3c82d00b886e74b6b87527f" />
       <packagefile me3="true" sourcename="LightMaps_ME3.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
@@ -717,7 +705,7 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds" />
    </addonfile>
    <addonfile friendlyname="A Lot of Videos for ME1" author="Audemus" optional="true">
-      <file downloadlink="https://drive.google.com/open?id=1vpOV6llQBxG6VzqBLiP2ei07cslf2tbo" filename="ME1_ALotofVideos_1.0.7z" md5="3c4db51abbe07e7f31e3e6a855b8c406" size="2493733148"  modmanagermod="true"/>
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files" filename="ME1_ALotofVideos_1.0.7z" md5="3c4db51abbe07e7f31e3e6a855b8c406" size="2493733148"  modmanagermod="true"/>
       <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC\Movies"/>
       <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC\Movies" optionalrequireddlc="DLC_UNC"/>
       <games me1="true" me2="false" me3="false" />
