@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.2">
+<alotaddonmanifest version="6.0.3">
    <highestapprovedmemversion>224</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-11-05">225</soaktestingmemversion>
    <stages>
@@ -241,7 +241,7 @@
               tooltipname="ALOT for ME1 10.1 - Update"
               author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
-            filename="ALOT for ME1 10.1 - Update-83-2020-10-1-1573318956.zip"
+            filename="ALOT for ME1 10.1 - Update-83-2020-10-1-1573318956.7z"
             size="3438682"
             md5="176344816bd4ef344bf8f024cce41c79" />
       <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v10.mem" movedirectly="true" />
