@@ -789,7 +789,6 @@ namespace AlotAddOnGUI
                         Log.Information("Adding AddonFile to build list: " + af.FriendlyName);
                         af.Building = true;
                         ADDONFILES_TO_BUILD.Add(af);
-
                     }
 
                     if (af.MEUITM && BUILD_MEUITM)

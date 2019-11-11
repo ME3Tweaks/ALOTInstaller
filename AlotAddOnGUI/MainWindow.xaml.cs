@@ -1376,7 +1376,7 @@ namespace AlotAddOnGUI
 
                                 mds.NegativeButtonText = "Cancel Install";
                                 mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                                var buildResult = await this.ShowMessageAsync("Ready to install textures", "Textures have been been built and are ready to install.\n\nOnce you press install, you won't be able to install any mods or DLC or you will likely break your game.\n\nPlease make sure you have installed all of your non-texture mods and DLC at this point, as there is no going back once this process has started.\n\nTurn off antivirus real time scanning during installation to avoid issues caused by antivirus programs.", MessageDialogStyle.AffirmativeAndNegative, mds);
+                                var buildResult = await this.ShowMessageAsync("Ready to install textures", "Textures have been prepared and are ready to install.\n\nOnce you press install, you won't be able to install any mods or DLC or you will create broken textures in your game.\n\nEnsure you have installed all of your non-texture mods and DLC at this point, as there is no going back once this process has started.\n\nTurn off antivirus real time scanning during installation to avoid issues caused by antivirus programs.", MessageDialogStyle.AffirmativeAndNegative, mds);
                                 if (buildResult == MessageDialogResult.Affirmative)
                                 {
                                     bool run = true;

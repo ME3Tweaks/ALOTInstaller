@@ -134,6 +134,7 @@ namespace AlotAddOnGUI
 
             //Set BG for this game
             string bgPath = "images/me" + game + "_bg.jpg";
+            if (MEUITM_INSTALLER_MODE) bgPath = "images/meuitm.jpg";
             if (DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
             {
                 bgPath = "images/me" + game + "_bg_alt.jpg";
