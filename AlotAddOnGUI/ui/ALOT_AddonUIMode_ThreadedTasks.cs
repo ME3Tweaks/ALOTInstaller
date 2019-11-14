@@ -280,7 +280,7 @@ namespace AlotAddOnGUI
                                             {
                                                 //It's an ALOT file. We will move this directly to the output directory.
                                                 Log.Information("ALOT MAIN FILE - moving to output: " + fname + " -> " + getOutputDir(CURRENT_GAME_BUILD));
-                                                string movename = getOutputDir(CURRENT_GAME_BUILD) + "000_" + fname;
+                                                string movename = getOutputDir(CURRENT_GAME_BUILD) + ALOT_MEMFILE_NUMBER + "_" + fname;
                                                 if (File.Exists(movename))
                                                 {
                                                     File.Delete(movename);
@@ -539,7 +539,7 @@ namespace AlotAddOnGUI
                                 {
                                     //It's an ALOT file. We will move this directly to the output directory.
                                     Log.Information("ALOT MAIN FILE - Unpacked - moving to output: " + fileToUse);
-                                    string movename = getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse;
+                                    string movename = getOutputDir(CURRENT_GAME_BUILD) + ALOT_MEMFILE_NUMBER + "_" + fileToUse;
                                     if (File.Exists(movename))
                                     {
                                         File.Delete(movename);
@@ -549,7 +549,7 @@ namespace AlotAddOnGUI
                                     af.ReadyStatusText = "Staging for installation";
                                     if (importingfrom == importingto)
                                     {
-                                        File.Move(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse);
+                                        File.Move(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + ALOT_MEMFILE_NUMBER + "_" + fileToUse);
                                     }
                                     else
                                     {
@@ -570,7 +570,7 @@ namespace AlotAddOnGUI
                                         };
 
                                         SingleFileCopy sfc = new SingleFileCopy();
-                                        sfc.DownloadFile(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + "000_" + fileToUse, testDelC, completionDelegate);
+                                        sfc.DownloadFile(DOWNLOADED_MODS_DIRECTORY + "\\" + fileToUse, getOutputDir(CURRENT_GAME_BUILD) + ALOT_MEMFILE_NUMBER + "_" + fileToUse, testDelC, completionDelegate);
                                         if (sfcError != null)
                                         {
                                             ERROR_OCCURED_PLEASE_STOP = true;

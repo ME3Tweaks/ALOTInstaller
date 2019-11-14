@@ -70,6 +70,7 @@ namespace AlotAddOnGUI
         private int completed = 0;
         //private int addonstoinstall = 0;
         private int CURRENT_GAME_BUILD = 0; //set when extraction is run/finished
+        private static readonly string ALOT_MEMFILE_NUMBER = "001";
         private int ADDONSTOBUILD_COUNT = 0;
         private bool _preventFileRefresh = true;
         private int HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = 999; //will be set by manifest
@@ -1525,7 +1526,7 @@ namespace AlotAddOnGUI
                         game = 3;
                     }
                     //Check for staged file
-                    string stagedpath = getOutputDir(game) + "000_" + af.UnpackedSingleFilename;
+                    string stagedpath = getOutputDir(game) + ALOT_MEMFILE_NUMBER + "_" + af.UnpackedSingleFilename;
                     ready = File.Exists(stagedpath);
                     if (ready)
                     {
@@ -2059,7 +2060,7 @@ namespace AlotAddOnGUI
                         if (af.Game_ME3) i = 3;
                         string outputPath = getOutputDir(i);
                         string importedFilePath = DOWNLOADED_MODS_DIRECTORY + "\\" + af.UnpackedSingleFilename;
-                        string outputFilename = outputPath + "000_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
+                        string outputFilename = outputPath + ALOT_MEMFILE_NUMBER + "_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
                         if (File.Exists(outputFilename) && (game == 0 || game == i))
                         {
 
