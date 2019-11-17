@@ -1282,7 +1282,7 @@ namespace AlotAddOnGUI
                         bool readyToInstallALOT = false;
                         foreach (AddonFile af in ADDONFILES_TO_BUILD)
                         {
-                            if (af.ALOTVersion > 0)
+                            if (af.ALOTVersion > 0 || af.MEUITM)
                             {
                                 readyToInstallALOT = true;
                             }
