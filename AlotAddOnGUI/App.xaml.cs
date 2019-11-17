@@ -354,10 +354,6 @@ namespace AlotAddOnGUI
                 ProcessStartInfo psi = new ProcessStartInfo(updateDestinationPath + System.AppDomain.CurrentDomain.FriendlyName);
                 psi.WorkingDirectory = updateDestinationPath;
                 psi.Arguments = "--completing-update";
-                if (BootMEUITMMode)
-                {
-                    psi.Arguments += " --meuitm-mode"; //pass through
-                }
                 Process.Start(psi);
                 Environment.Exit(0);
                 System.Windows.Application.Current.Shutdown();
@@ -513,7 +509,7 @@ namespace AlotAddOnGUI
         public bool BootingNewUpdate { get; set; }
 
         [Option('m', "meuitm-mode",
-            HelpText = "Boots ALOT Installer in MEUITM mode.")]
+            HelpText = "Not used. Kept for legacy purposes for now.")]
         public bool BootMEUITMMode { get; set; }
 
         [Option("me1path",

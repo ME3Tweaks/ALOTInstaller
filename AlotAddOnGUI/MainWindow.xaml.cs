@@ -1081,10 +1081,6 @@ namespace AlotAddOnGUI
                     string exe = EXE_DIRECTORY + "Update\\" + System.AppDomain.CurrentDomain.FriendlyName;
                     string currentDirNoSlash = EXE_DIRECTORY.Substring(0, EXE_DIRECTORY.Length - 1);
                     args = "--update-dest \"" + currentDirNoSlash + "\"";
-                    if (MEUITM_INSTALLER_MODE)
-                    {
-                        args += " --meuitm-mode"; //pass through meuitm mode
-                    }
                     Utilities.runProcess(exe, args, true);
                     Environment.Exit(0);
                 }

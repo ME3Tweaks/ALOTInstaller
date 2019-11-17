@@ -1434,7 +1434,6 @@ namespace AlotAddOnGUI
                 Process[] pname = Process.GetProcessesByName("MassEffect3");
                 return pname.Length > 0;
             }
-
         }
 
         public static int Get45PlusFromRegistry()
