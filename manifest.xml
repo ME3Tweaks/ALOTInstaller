@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.1">
-   <highestapprovedmemversion>224</highestapprovedmemversion>
-   <soaktestingmemversion soakstartdate="2019-11-05">225</soaktestingmemversion>
+<alotaddonmanifest version="6.0.7">
+   <highestapprovedmemversion>225</highestapprovedmemversion>
+   <soaktestingmemversion soakstartdate="2019-11-10">226</soaktestingmemversion>
    <stages>
       <!-- -58 is the next error code available-->
       <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
@@ -234,6 +234,28 @@
 	    size="9082233367"
 	    md5="33fe926fd3c82d00b886e74b6b87527f" />
       <packagefile me3="true" sourcename="LightMaps_ME3.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="10"
+              alotupdateversion="1"
+              friendlyname="ALOT for ME1 10.1 - Update"
+              tooltipname="ALOT for ME1 10.1 - Update"
+              author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+            filename="ALOT for ME1 10.1 - Update-83-2020-10-1-1573318956.7z"
+            size="3438682"
+            md5="176344816bd4ef344bf8f024cce41c79" />
+      <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v10.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="10"
+              alotupdateversion="2"
+              friendlyname="ALOT for ME3 10.2 - Update"
+              tooltipname="ALOT for ME3 10.2 - Update"
+              author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+            filename="ALOT for ME3 10.2 - Update-363-2020-10-2-1573432129.7z"
+            size="115178961"
+            md5="39c6a69062e822bbb9635f654dc7ecec" />
+      <packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v10.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />

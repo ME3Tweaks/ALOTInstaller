@@ -134,6 +134,7 @@ namespace AlotAddOnGUI
 
             //Set BG for this game
             string bgPath = "images/me" + game + "_bg.jpg";
+            if (MEUITM_INSTALLER_MODE) bgPath = "images/meuitm.jpg";
             if (DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
             {
                 bgPath = "images/me" + game + "_bg_alt.jpg";
@@ -928,7 +929,7 @@ namespace AlotAddOnGUI
             {
                 //ALOT was just installed. We are going to move it back to mods folder
                 string extractedName = alotMainFile.UnpackedSingleFilename;
-                string source = getOutputDir(INSTALLING_THREAD_GAME) + "000_" + extractedName;
+                string source = getOutputDir(INSTALLING_THREAD_GAME) + ALOT_MEMFILE_NUMBER + "_" + extractedName;
                 string dest = DOWNLOADED_MODS_DIRECTORY + "\\" + extractedName;
                 if (Path.GetPathRoot(source) == Path.GetPathRoot(dest))
                 {

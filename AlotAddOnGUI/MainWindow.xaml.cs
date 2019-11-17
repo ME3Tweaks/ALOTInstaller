@@ -70,6 +70,7 @@ namespace AlotAddOnGUI
         private int completed = 0;
         //private int addonstoinstall = 0;
         private int CURRENT_GAME_BUILD = 0; //set when extraction is run/finished
+        private static readonly string ALOT_MEMFILE_NUMBER = "001";
         private int ADDONSTOBUILD_COUNT = 0;
         private bool _preventFileRefresh = true;
         private int HIGHEST_APPROVED_STABLE_MEMNOGUIVERSION = 999; //will be set by manifest
@@ -1372,7 +1373,7 @@ namespace AlotAddOnGUI
 
                                 mds.NegativeButtonText = "Cancel Install";
                                 mds.DefaultButtonFocus = MessageDialogResult.Affirmative;
-                                var buildResult = await this.ShowMessageAsync("Ready to install textures", "Textures have been been built and are ready to install.\n\nOnce you press install, you won't be able to install any mods or DLC or you will likely break your game.\n\nPlease make sure you have installed all of your non-texture mods and DLC at this point, as there is no going back once this process has started.\n\nTurn off antivirus real time scanning during installation to avoid issues caused by antivirus programs.", MessageDialogStyle.AffirmativeAndNegative, mds);
+                                var buildResult = await this.ShowMessageAsync("Ready to install textures", "Textures have been prepared and are ready to install.\n\nOnce you press install, you won't be able to install any mods or DLC or you will create broken textures in your game.\n\nEnsure you have installed all of your non-texture mods and DLC at this point, as there is no going back once this process has started.\n\nTurn off antivirus real time scanning during installation to avoid issues caused by antivirus programs.", MessageDialogStyle.AffirmativeAndNegative, mds);
                                 if (buildResult == MessageDialogResult.Affirmative)
                                 {
                                     bool run = true;
@@ -1521,7 +1522,7 @@ namespace AlotAddOnGUI
                         game = 3;
                     }
                     //Check for staged file
-                    string stagedpath = getOutputDir(game) + "000_" + af.UnpackedSingleFilename;
+                    string stagedpath = getOutputDir(game) + ALOT_MEMFILE_NUMBER + "_" + af.UnpackedSingleFilename;
                     ready = File.Exists(stagedpath);
                     if (ready)
                     {
@@ -2055,7 +2056,7 @@ namespace AlotAddOnGUI
                         if (af.Game_ME3) i = 3;
                         string outputPath = getOutputDir(i);
                         string importedFilePath = DOWNLOADED_MODS_DIRECTORY + "\\" + af.UnpackedSingleFilename;
-                        string outputFilename = outputPath + "000_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
+                        string outputFilename = outputPath + ALOT_MEMFILE_NUMBER + "_" + af.UnpackedSingleFilename; //This only will work for ALOT right now. May expand if it becomes more useful.
                         if (File.Exists(outputFilename) && (game == 0 || game == i))
                         {
 
