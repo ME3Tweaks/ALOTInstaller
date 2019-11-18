@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.7">
+<alotaddonmanifest version="6.0.8">
    <highestapprovedmemversion>225</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-11-10">226</soaktestingmemversion>
    <stages>
@@ -81,11 +81,11 @@
    <!-- Addon files -->
    <addonfile meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" author="CDAMJC">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/1"
-            tooltipname="MEUITM Anniversary Edition Direct Download"
-            torrentfilename="MEUITM Anniversary Edition Direct Download.7z"
-            filename="Mass Effect Anniversary Edition Direct Download-1-2.7z"
-            size="2974978097"
-            md5="3e33c8e2e3ded44a2c15742fd6dfac07" />
+            tooltipname="MEUITM Anniversary Edition"
+            torrentfilename="MEUITM.zip"
+            filename="MEUITM Anniversary Edition Direct Download-1-2-1574046168.zip"
+            size="3315410320"
+            md5="cbb97f1b58c89f40a1c43574c738d961" />
       <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
       <choicefile choicetitle="Asari Face Style">
          <packagefile me1="true" sourcename="MEUITM\mods\AsariSmooth.mem" movedirectly="true" choicetitle="Smooth" />
@@ -127,7 +127,7 @@
       <packagefile me1="true" sourcename="MEUITM\mods\Keepers.mem" movedirectly="true" />
       <packagefile me1="true" sourcename="MEUITM\mods\Liaraface.mem" movedirectly="true" />
       <packagefile me1="true" sourcename="MEUITM\mods\LiaraGreenOutfit.mem" movedirectly="true" />
-      <packagefile me1="true" sourcename="MEUITM\mods\lightandshadowmapsdxt.mem" movedirectly="true" />
+      <packagefile me1="true" sourcename="MEUITM\mods\LightandShadowMaps.mem" movedirectly="true" />
       <packagefile me1="true" sourcename="MEUITM\mods\Mako.mem" movedirectly="true" />
       <choicefile choicetitle="N7 Armor Style">
          <packagefile me1="true" sourcename="MEUITM\mods\N7ArmorsNoCF.mem" movedirectly="true" choicetitle="Vanilla" />
