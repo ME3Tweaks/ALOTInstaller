@@ -2012,6 +2012,7 @@ namespace AlotAddOnGUI
                 }
             }
             bool blockDueToMissingALOTFile = installedInfo == null; //default value
+            bool hasMEUITM = installedInfo == null; //defaultvalue, used for determining if we can install without ALOT.
             int installedALOTUpdateVersion = (installedInfo == null) ? 0 : installedInfo.ALOTUPDATEVER;
             bool blockDueToMissingALOTUpdateFile = false; //default value
             string blockDueToBadImportedFile = null; //default vaule
@@ -2019,8 +2020,15 @@ namespace AlotAddOnGUI
             AddonFile alotmainfile = null;
             foreach (AddonFile af in AllAddonFiles)
             {
+
+
+                //Check ALOT file is ready
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
+                    if (af.MEUITM)
+                    {
+                        hasMEUITM = true;
+                    }
                     if (af.Game_ME1 && MEUITM_INSTALLER_MODE && !af.MEUITM)
                     {
                         continue;
@@ -2093,7 +2101,7 @@ namespace AlotAddOnGUI
                 }
             }
 
-            if (blockDueToMissingALOTFile && alotmainfile != null && !MEUITM_INSTALLER_MODE)
+            if (blockDueToMissingALOTFile && (game == 1 && !hasMEUITM) && alotmainfile != null && !MEUITM_INSTALLER_MODE)
             {
                 int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
                 ListView_Files.SelectedIndex = alotindex;
@@ -2102,7 +2110,7 @@ namespace AlotAddOnGUI
                 return false;
             }
 
-            if (blockDueToMissingALOTUpdateFile && manifestHasUpdateAvailable && !MEUITM_INSTALLER_MODE)
+            if (blockDueToMissingALOTUpdateFile && (game == 1 && !hasMEUITM && !blockDueToMissingALOTFile) && manifestHasUpdateAvailable && !MEUITM_INSTALLER_MODE)
             {
                 if (installedInfo == null)
                 {
