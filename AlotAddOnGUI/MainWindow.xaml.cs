@@ -326,10 +326,10 @@ namespace AlotAddOnGUI
                 Button_InstallME2.Visibility = Button_InstallME3.Visibility = Panel_ALOTFiltering.Visibility =
                 Label_ALOTStatus_ME2.Visibility = Label_ALOTStatus_ME3.Visibility = Button_ME2Backup.Visibility =
                 Button_ME3Backup.Visibility = Checkbox_RepackME2GameFiles.Visibility = Checkbox_RepackME3GameFiles.Visibility =
-                Button_DownloadAssistant.Visibility = Button_ManualInstallFolder.Visibility = Button_LibraryDir.Visibility =
+                Button_DownloadAssistant.Visibility = Button_LibraryDir.Visibility =
                 Button_VerifyGameME2.Visibility = Button_VerifyGameME3.Visibility = Button_AutoTOCME3.Visibility =
                     Visibility.Visible;
-
+                Button_ManualInstallFolder.Visibility = USING_BETA ? Visibility.Visible : Visibility.Collapsed;
                 Button_InstallME2.Visibility = Visibility.Visible;
                 Button_InstallME3.Visibility = Visibility.Visible;
             }
@@ -3428,7 +3428,7 @@ namespace AlotAddOnGUI
         /// </summary>
         /// <param name="game">Game number to get path for</param>
         /// <returns></returns>
-        private String getOutputDir(int game, bool trailingSlash = true)
+        private string getOutputDir(int game, bool trailingSlash = true)
         {
             string ret = EXE_DIRECTORY + MEM_OUTPUT_DIR + "\\ME" + game;
             if (trailingSlash)

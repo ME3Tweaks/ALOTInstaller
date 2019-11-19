@@ -244,6 +244,9 @@ namespace AlotAddOnGUI
             Log.Logger = new LoggerConfiguration()
                    .MinimumLevel.Debug()
                 .WriteTo.RollingFile(Path.Combine(LogsDirectory, "alotinstaller-{Date}.txt"), flushToDiskInterval: new TimeSpan(0, 0, 15))
+#if DEBUG
+                   .WriteTo.Debug()
+#endif
               .CreateLogger();
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
             POST_STARTUP = true;

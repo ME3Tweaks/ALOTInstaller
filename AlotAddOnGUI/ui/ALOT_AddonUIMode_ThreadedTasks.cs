@@ -206,7 +206,9 @@ namespace AlotAddOnGUI
                     case ".mod":
                         af.ReadyStatusText = "Copying";
                         af.SetWorking();
-                        File.Copy(extractSource, extractpath + "\\" + Path.GetFileName(extractSource), true);
+                        var dest = extractpath + "\\" + Path.GetFileName(extractSource);
+                        Log.Information("Copying loose image or .mod: " + extractSource + " -> " + dest);
+                        File.Copy(extractSource, dest, true);
                         af.ReadyStatusText = "Waiting for Addon to complete build";
                         af.SetIdle();
                         break;
@@ -293,7 +295,7 @@ namespace AlotAddOnGUI
                                             {
                                                 //It's an ALOT update file. We will move this directly to the output directory.
                                                 Log.Information("ALOT UPDATE FILE - moving to output: " + fname + " -> " + getOutputDir(CURRENT_GAME_BUILD));
-                                                string movename = getOutputDir(CURRENT_GAME_BUILD) + "001_" + fname;
+                                                string movename = getOutputDir(CURRENT_GAME_BUILD) + "002_" + fname;
                                                 if (File.Exists(movename))
                                                 {
                                                     File.Delete(movename);
@@ -307,6 +309,7 @@ namespace AlotAddOnGUI
                                                 //It's a already built MEM file. Move MEM to build folder
                                                 Log.Information("MoveDirectly on MEM file specified - moving MEM to output: " + fname + " -> " + getOutputDir(CURRENT_GAME_BUILD));
                                                 int fileprefix = Interlocked.Increment(ref PREBUILT_MEM_INDEX);
+                                                if (af.MEUITM) fileprefix = 0; //MEUITM is 0
                                                 string paddedVer = fileprefix.ToString("000");
                                                 string movename = getOutputDir(CURRENT_GAME_BUILD) + paddedVer + "_" + fname;
                                                 if (File.Exists(movename))
@@ -1149,7 +1152,7 @@ namespace AlotAddOnGUI
                 {
                     Log.Information("Building MEM Package.");
                     string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
-                    string filename = "002_ALOT_ME" + game + "_Addon.mem";
+                    string filename = "003_ALOT_ME" + game + "_Addon.mem";
                     string args = "--convert-to-mem --gameid " + game +
                                   " --input \"" + ADDON_FULL_STAGING_DIRECTORY.TrimEnd('\\') +
                                   "\" --output \"" + getOutputDir(game) + filename + "\" --ipc";
@@ -2020,8 +2023,6 @@ namespace AlotAddOnGUI
             AddonFile alotmainfile = null;
             foreach (AddonFile af in AllAddonFiles)
             {
-
-
                 //Check ALOT file is ready
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
@@ -2031,10 +2032,12 @@ namespace AlotAddOnGUI
                     }
                     if (af.Game_ME1 && MEUITM_INSTALLER_MODE && !af.MEUITM)
                     {
+                        // do not check any files except MEUITM in MEUITM mode.
                         continue;
                     }
                     if (af.ALOTVersion > 0)
                     {
+                        //set alot main file var
                         alotmainfile = af;
                     }
                     if (blockDueToMissingALOTFile)
@@ -2046,8 +2049,12 @@ namespace AlotAddOnGUI
                         }
                         else if (af.ALOTVersion > 0 && !af.Ready)
                         {
-                            Log.Warning("Installation for ME" + game + " being blocked: ALOT/MEUITM is not installed currently, and ALOT's main file is not present or ready for use in the textue library. ALOT must be installed if it's not already done so.");
-                            break;
+                            //Block due to ALOT file missing and it not being ready.
+                            //TESTING: ME1 restrictions relaxed
+                            if (game != 1)
+                            {
+                                break;
+                            }
                         }
                     }
 
@@ -2057,8 +2064,12 @@ namespace AlotAddOnGUI
                         if (!af.Ready)
                         {
                             blockDueToMissingALOTUpdateFile = true;
-                            Log.Warning("Installation for ME" + game + " has been blocked due to an ALOT update listed in manifest, but not available in the texture library. ALOT updates must also be imported when installing ALOT.");
-                            break;
+
+                            //TESTING: ME1 restrictions relaxed
+                            if (game != 1)
+                            {
+                                break;
+                            }
                         }
                     }
 
@@ -2069,7 +2080,7 @@ namespace AlotAddOnGUI
                         {
                             if (installedInfo.MEUITMVER > 0 && af.MEUITM)
                             {
-                                continue; //this this file as meuitm is already installed
+                                continue; //this file is MEUITM and meuitm is already installed
                             }
                         }
                         missingRecommendedFiles.Add(af);
@@ -2103,6 +2114,7 @@ namespace AlotAddOnGUI
 
             if (blockDueToMissingALOTFile && (game == 1 && !hasMEUITM) && alotmainfile != null && !MEUITM_INSTALLER_MODE)
             {
+                Log.Warning("Installation for ME" + game + " being blocked: ALOT/MEUITM is not installed currently, and ALOT's main file is not present or ready for use in the textue library. ALOT must be installed if it's not already done so.");
                 int alotindex = ListView_Files.Items.IndexOf(alotmainfile);
                 ListView_Files.SelectedIndex = alotindex;
 
@@ -2110,8 +2122,9 @@ namespace AlotAddOnGUI
                 return false;
             }
 
-            if (blockDueToMissingALOTUpdateFile && (game == 1 && !hasMEUITM && !blockDueToMissingALOTFile) && manifestHasUpdateAvailable && !MEUITM_INSTALLER_MODE)
+            if (blockDueToMissingALOTUpdateFile && alotmainfile != null && alotmainfile.Ready && !MEUITM_INSTALLER_MODE)
             {
+                Log.Warning("Installation for ME" + game + " has been blocked due to an ALOT update listed in manifest, but not available in the texture library. ALOT updates must also be imported when installing ALOT.");
                 if (installedInfo == null)
                 {
                     await this.ShowMessageAsync("ALOT update file is missing", "ALOT for Mass Effect" + GetGameNumberSuffix(game) + " has an update file, but it not currently imported. This update must be imported in order to install ALOT for the first time so you have the most up to date installation. Drag and drop the archive onto the interface - do not extract it.");
@@ -2140,8 +2153,15 @@ namespace AlotAddOnGUI
                 await this.ShowMessageAsync("No files available for building", "There are no files available or relevant in the texture library to install for Mass Effect" + GetGameNumberSuffix(game) + ".");
                 return false;
             }
+
+            if (!MEUITM_INSTALLER_MODE && game == 1 && alotmainfile != null && !alotmainfile.Ready && installedInfo == null)
+            {
+                //ME1 Testing: Allow without ALOT or MEUITM
+                return true;
+            }
+
             //if alot is already installed we don't need to show missing message, unless installed via MEM directly
-            if (installedInfo == null || installedInfo.ALOTVER == 0)
+            if (hasMEUITM || alotmainfile != null || installedInfo == null || installedInfo.ALOTVER == 0)
             {
                 string missing = "";
                 foreach (AddonFile af in missingRecommendedFiles)
