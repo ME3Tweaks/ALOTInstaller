@@ -18,6 +18,6 @@ using System.Resources;
 
 // Version informationr(
 [assembly: AssemblyVersion("3.0.570.5548")]
-[assembly: AssemblyFileVersion("3.0.579.5548")]
+[assembly: AssemblyFileVersion("3.0.570.5548")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 
