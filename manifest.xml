@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.8">
+<alotaddonmanifest version="6.0.9">
    <highestapprovedmemversion>225</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-11-10">226</soaktestingmemversion>
    <stages>
@@ -84,8 +84,8 @@
             tooltipname="MEUITM Anniversary Edition"
             torrentfilename="MEUITM.zip"
             filename="MEUITM Anniversary Edition Direct Download-1-2-1574046168.zip"
-            size="3315410320"
-            md5="cbb97f1b58c89f40a1c43574c738d961" />
+            size="3304906568"
+            md5="4befad0f104c665358ec6f5f67a9dd5a" />
       <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
       <choicefile choicetitle="Asari Face Style">
          <packagefile me1="true" sourcename="MEUITM\mods\AsariSmooth.mem" movedirectly="true" choicetitle="Smooth" />

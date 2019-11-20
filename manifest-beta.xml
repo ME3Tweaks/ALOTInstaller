@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.1">
-   <highestapprovedmemversion>224</highestapprovedmemversion>
-   <soaktestingmemversion soakstartdate="2019-11-05">225</soaktestingmemversion>
+<alotaddonmanifest version="6.0.9">
+   <highestapprovedmemversion>225</highestapprovedmemversion>
+   <soaktestingmemversion soakstartdate="2019-11-10">226</soaktestingmemversion>
    <stages>
       <!-- -58 is the next error code available-->
       <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
@@ -81,11 +81,11 @@
    <!-- Addon files -->
    <addonfile meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" author="CDAMJC">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/1"
-            tooltipname="MEUITM Anniversary Edition Direct Download"
-            torrentfilename="MEUITM Anniversary Edition Direct Download.7z"
-            filename="Mass Effect Anniversary Edition Direct Download-1-2.7z"
-            size="2974978097"
-            md5="3e33c8e2e3ded44a2c15742fd6dfac07" />
+            tooltipname="MEUITM Anniversary Edition"
+            torrentfilename="MEUITM.zip"
+            filename="MEUITM Anniversary Edition Direct Download-1-2-1574046168.zip"
+            size="3304906568"
+            md5="4befad0f104c665358ec6f5f67a9dd5a" />
       <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
       <choicefile choicetitle="Asari Face Style">
          <packagefile me1="true" sourcename="MEUITM\mods\AsariSmooth.mem" movedirectly="true" choicetitle="Smooth" />
@@ -127,7 +127,7 @@
       <packagefile me1="true" sourcename="MEUITM\mods\Keepers.mem" movedirectly="true" />
       <packagefile me1="true" sourcename="MEUITM\mods\Liaraface.mem" movedirectly="true" />
       <packagefile me1="true" sourcename="MEUITM\mods\LiaraGreenOutfit.mem" movedirectly="true" />
-      <packagefile me1="true" sourcename="MEUITM\mods\lightandshadowmapsdxt.mem" movedirectly="true" />
+      <packagefile me1="true" sourcename="MEUITM\mods\LightandShadowMaps.mem" movedirectly="true" />
       <packagefile me1="true" sourcename="MEUITM\mods\Mako.mem" movedirectly="true" />
       <choicefile choicetitle="N7 Armor Style">
          <packagefile me1="true" sourcename="MEUITM\mods\N7ArmorsNoCF.mem" movedirectly="true" choicetitle="Vanilla" />
@@ -212,11 +212,7 @@
             torrentfilename="LightMaps_ME1.zip"
             filename="Improved Static Lighting for ME1-83-2020-10-0-1573101555.zip"
 	    size="6610942066"
-	    md5="2234159c710d77ffd2e8a91fefe975ee"
-	    
-	    unpackedsinglefilename="LightMaps_ME1.mem"
-            unpackedsize="6610941782"
-            unpackedmd5="c7cc9fae7381de825b7943ef9b1a6f89" />
+	    md5="2234159c710d77ffd2e8a91fefe975ee" />
       <packagefile me1="true" sourcename="LightMaps_ME1.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Improved Static Lighting for ME2" author="CreeperLava">
@@ -226,11 +222,7 @@
             torrentfilename="LightMaps_ME2.zip"
             filename="Improved Static Lighting for ME2-68-2020-10-0-1573098585.zip"
 	    size="665769837"
-	    md5="d78abde1cef08b7ce64c70eaa4c46b71"
-	    
-	    unpackedsinglefilename="LightMaps_ME2.mem"
-            unpackedsize="665769669"
-            unpackedmd5="cf3fe16cede255158312adbfafa277d2" />
+	    md5="d78abde1cef08b7ce64c70eaa4c46b71"/>
       <packagefile me2="true" sourcename="LightMaps_ME2.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Improved Static Lighting for ME3" author="CreeperLava">
@@ -240,12 +232,30 @@
             torrentfilename="LightMaps_ME3.zip"
             filename="Improved Static Lighting for ME3-363-2019-10-0-1573144588.zip"
 	    size="9082233367"
-	    md5="33fe926fd3c82d00b886e74b6b87527f"
-	    
-	    unpackedsinglefilename="LightMaps_ME3.mem"
-            unpackedsize="9082233083"
-            unpackedmd5="75530cbe6aa10224a15053b138228c4f" />
+	    md5="33fe926fd3c82d00b886e74b6b87527f" />
       <packagefile me3="true" sourcename="LightMaps_ME3.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="10"
+              alotupdateversion="1"
+              friendlyname="ALOT for ME1 10.1 - Update"
+              tooltipname="ALOT for ME1 10.1 - Update"
+              author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+            filename="ALOT for ME1 10.1 - Update-83-2020-10-1-1573318956.7z"
+            size="3438682"
+            md5="176344816bd4ef344bf8f024cce41c79" />
+      <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v10.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="10"
+              alotupdateversion="2"
+              friendlyname="ALOT for ME3 10.2 - Update"
+              tooltipname="ALOT for ME3 10.2 - Update"
+              author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+            filename="ALOT for ME3 10.2 - Update-363-2020-10-2-1573432129.7z"
+            size="115178961"
+            md5="39c6a69062e822bbb9635f654dc7ecec" />
+      <packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v10.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
@@ -717,7 +727,7 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds" />
    </addonfile>
    <addonfile friendlyname="A Lot of Videos for ME1" author="Audemus" optional="true">
-      <file downloadlink="https://drive.google.com/open?id=1vpOV6llQBxG6VzqBLiP2ei07cslf2tbo" filename="ME1_ALotofVideos_1.0.7z" md5="3c4db51abbe07e7f31e3e6a855b8c406" size="2493733148"  modmanagermod="true"/>
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files" filename="ALOV for ME1 1.0-144-1-0-1573147134.7z" md5="3c4db51abbe07e7f31e3e6a855b8c406" size="2493733148"  modmanagermod="true"/>
       <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC\Movies"/>
       <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC\Movies" optionalrequireddlc="DLC_UNC"/>
       <games me1="true" me2="false" me3="false" />
