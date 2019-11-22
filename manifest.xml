@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.9">
+<alotaddonmanifest version="6.0.10">
    <highestapprovedmemversion>226</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-11-20">229</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
@@ -245,6 +245,17 @@
             size="3438682"
             md5="176344816bd4ef344bf8f024cce41c79" />
       <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v10.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="10"
+              alotupdateversion="1"
+              friendlyname="ALOT for ME2 10.1 - Update"
+              tooltipname="ALOT for ME2 10.1 - Update"
+              author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+            filename="ALOT for ME2 10.1 - Update-68-2020-10-1-1574442952"
+            size="11381"
+            md5="ae24db86704599eaae9fc8563c58cd1e" />
+      <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v10.mem" movedirectly="true" />
    </addonfile>
    <addonfile appliestomainversion="10"
               alotupdateversion="2"
