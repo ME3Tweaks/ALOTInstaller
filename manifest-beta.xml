@@ -732,4 +732,14 @@
       <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC\Movies" optionalrequireddlc="DLC_UNC"/>
       <games me1="true" me2="false" me3="false" />
    </addonfile>
+   <addonfile friendlyname="A Lot of Videos for ME2 - 1080p - CURRENTLY TESTING DO NOT USE" author="Audemus" optional="true">
+      <file downloadlink="https://cdn.discordapp.com/attachments/628369833100050432/647978774041985025/A_Lot_of_Videos_ALOV_for_ME2_-_1.0.torrent" filename="ALotofVideosforME2-1080p_1.0.7z" md5="3b57c4d18b7202e5474d6903fade123d" size="5536975468"  modmanagermod="true"/>
+      <extractionredirect archiverootpath="BASEGAME\Movies" relativedestinationdirectory="BIOGame\Movies"/>
+      <extractionredirect archiverootpath="ARRIVAL\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part02\Movies" optionalrequireddlc="DLC_EXP_Part02"/>
+      <extractionredirect archiverootpath="FIREWALKER\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Hammer01\Movies" optionalrequireddlc="DLC_UNC_Hammer01"/>
+      <extractionredirect archiverootpath="KASUMI\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_HEN_MT\Movies" optionalrequireddlc="DLC_HEN_MT"/>
+      <extractionredirect archiverootpath="LOTSB\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part01\Movies" optionalrequireddlc="DLC_EXP_Part01"/>
+      <extractionredirect archiverootpath="OVERLORD\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies" optionalrequireddlc="DLC_UNC_Pack01"/>
+      <games me1="false" me2="true" me3="false" />
+   </addonfile>
 </alotaddonmanifest>
