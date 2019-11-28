@@ -2030,7 +2030,7 @@ namespace AlotAddOnGUI
                     {
                         hasMEUITM = true;
                     }
-                    if (af.Game_ME1 && MEUITM_INSTALLER_MODE && !af.MEUITM)
+                    if (af.Game_ME1 && MEUITM_INSTALLER_MODE && !af.MEUITM && !af.UserFile)
                     {
                         // do not check any files except MEUITM in MEUITM mode.
                         continue;

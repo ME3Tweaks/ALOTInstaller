@@ -2020,8 +2020,8 @@ namespace AlotAddOnGUI
             {
                 //Only MEUITM file was found
                 MEUITM_INSTALLER_MODE = true;
-                SetUIMode();
             }
+            SetUIMode();
 
             bool? hasShownFirstRun = Utilities.GetRegistrySettingBool("HasRunFirstRun");
             if (hasShownFirstRun == null || !(bool)hasShownFirstRun)
@@ -3470,12 +3470,15 @@ namespace AlotAddOnGUI
             if (game == 1 && MEUITM_INSTALLER_MODE)
             {
                 AddonFile meuitm = AllAddonFiles.FirstOrDefault(x => x.MEUITM);
-                ModConfigurationDialog mcd = new ModConfigurationDialog(meuitm, this, true);
-                await this.ShowMetroDialogAsync(mcd);
-                await mcd.WaitUntilUnloadedAsync();
-                if (mcd.Canceled)
+                if (meuitm != null)
                 {
-                    return false;
+                    ModConfigurationDialog mcd = new ModConfigurationDialog(meuitm, this, true);
+                    await this.ShowMetroDialogAsync(mcd);
+                    await mcd.WaitUntilUnloadedAsync();
+                    if (mcd.Canceled)
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -3535,11 +3538,11 @@ namespace AlotAddOnGUI
                     return;
                 }
 
-                if (MEUITM_INSTALLER_MODE)
-                {
-                    ShowStatus("Dropping files on window not supported in MEUITM mode, switch to ALOT mode for this feature");
-                    return;
-                }
+                //if (MEUITM_INSTALLER_MODE)
+                //{
+                //    ShowStatus("Dropping files on window not supported in MEUITM mode, switch to ALOT mode for this feature");
+                //    return;
+                //}
                 // Note that you can have more than one file.
                 string[] files = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
 
@@ -5114,11 +5117,6 @@ namespace AlotAddOnGUI
             Log.Information("Exiting MEUITM mode.");
             MEUITM_INSTALLER_MODE = false;
             SetUIMode();
-        }
-
-        private void InstallMEUITM_Click(object sender, RoutedEventArgs e)
-        {
-            Log.Error("This is not yet implemented.");
         }
 
         private void Button_Utilities_Click(object sender, RoutedEventArgs e)
