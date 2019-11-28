@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.9">
-   <highestapprovedmemversion>225</highestapprovedmemversion>
-   <soaktestingmemversion soakstartdate="2019-11-10">226</soaktestingmemversion>
+<alotaddonmanifest version="6.0.11">
+   <highestapprovedmemversion>226</highestapprovedmemversion>
+   <soaktestingmemversion soakstartdate="2019-11-20">229</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
       <!-- -58 is the next error code available-->
       <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
@@ -41,8 +41,6 @@
    <repackoptions me2repackenabled="true" me3repackenabled="true" />
    <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
    <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
-   <tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps." />
-   <tutorial link="https://ianmooreisme.github.io/ALOT-Comparisons/" text="Comparison Screenshots" tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore." />
    <tutorial meuitm="false" link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps." />
    <tutorial meuitm="false" link="https://ianmooreisme.github.io/ALOT-Comparisons/" text="Comparison Screenshots" tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore." />
    <tutorial meuitm="true" link="https://www.nexusmods.com/masseffect/mods/1" text="MEUITM Installation Guide" tooltip="Tutorial on how to install MEUITM with ALOT Installer." />
@@ -60,6 +58,7 @@
    <supportedhashes>
       <supportedhash game="me1" name="Steam">647b93621389709cab8d268379bd4c47</supportedhash>
       <supportedhash game="me1" name="Steam, MEM patched">78ac3d9b4aad1989dae74505ea65aa6c</supportedhash>
+      <supportedhash game="me1" name="Steam, BioWare signed">fef464b4b92c19ce76add75de6732ccf</supportedhash>
       <supportedhash game="me1" name="Origin, MEM patched">2390143503635f3c4cfaed0afe0b8c71</supportedhash>
       <supportedhash game="me1" name="Origin">ff1f894fa1c2dbf4d4b9f0de85c166e5</supportedhash>
       <supportedhash game="me1" name="DVD">73b76699d4e245c92110a93c54980b78</supportedhash>
@@ -245,6 +244,17 @@
             size="3438682"
             md5="176344816bd4ef344bf8f024cce41c79" />
       <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v10.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="10"
+              alotupdateversion="1"
+              friendlyname="ALOT for ME2 10.1 - Update"
+              tooltipname="ALOT for ME2 10.1 - Update"
+              author="CreeperLava">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+            filename="ALOT for ME2 10.1 - Update-68-2020-10-1-1574442952.zip"
+            size="11381"
+            md5="ae24db86704599eaae9fc8563c58cd1e" />
+      <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v10.mem" movedirectly="true" />
    </addonfile>
    <addonfile appliestomainversion="10"
               alotupdateversion="2"
@@ -731,5 +741,15 @@
       <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC\Movies"/>
       <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC\Movies" optionalrequireddlc="DLC_UNC"/>
       <games me1="true" me2="false" me3="false" />
+   </addonfile>
+   <addonfile friendlyname="A Lot of Videos for ME2 - 1080p" author="Audemus" optional="true">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files" filename="ALOV for ME2 1.0 - 1080p-245-1-0-1574567011.7z" torrentfilename="ALotofVideosforME2-1080p_1.0.7z" md5="3b57c4d18b7202e5474d6903fade123d" size="5536975468"  modmanagermod="true"/>
+      <extractionredirect archiverootpath="BASEGAME\Movies" relativedestinationdirectory="BIOGame\Movies"/>
+      <extractionredirect archiverootpath="ARRIVAL\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part02\Movies" optionalrequireddlc="DLC_EXP_Part02"/>
+      <extractionredirect archiverootpath="FIREWALKER\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Hammer01\Movies" optionalrequireddlc="DLC_UNC_Hammer01"/>
+      <extractionredirect archiverootpath="KASUMI\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_HEN_MT\Movies" optionalrequireddlc="DLC_HEN_MT"/>
+      <extractionredirect archiverootpath="LOTSB\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part01\Movies" optionalrequireddlc="DLC_EXP_Part01"/>
+      <extractionredirect archiverootpath="OVERLORD\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies" optionalrequireddlc="DLC_UNC_Pack01"/>
+      <games me1="false" me2="true" me3="false" />
    </addonfile>
 </alotaddonmanifest>
