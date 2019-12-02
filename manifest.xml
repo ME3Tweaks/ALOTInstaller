@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.11">
+<alotaddonmanifest version="6.0.12">
    <highestapprovedmemversion>226</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-11-20">229</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
@@ -257,14 +257,14 @@
       <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v10.mem" movedirectly="true" />
    </addonfile>
    <addonfile appliestomainversion="10"
-              alotupdateversion="2"
-              friendlyname="ALOT for ME3 10.2 - Update"
-              tooltipname="ALOT for ME3 10.2 - Update"
+              alotupdateversion="3"
+              friendlyname="ALOT for ME3 10.3 - Update"
+              tooltipname="ALOT for ME3 10.3 - Update"
               author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
-            filename="ALOT for ME3 10.2 - Update-363-2020-10-2-1573432129.7z"
-            size="115178961"
-            md5="39c6a69062e822bbb9635f654dc7ecec" />
+            filename="ALOT for ME3 10.3 - Update-363-2020-10-3-1575245349.zip"
+            size="113907531"
+            md5="19b20c48f0fe711ac2eaacaf8f448207" />
       <packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v10.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
