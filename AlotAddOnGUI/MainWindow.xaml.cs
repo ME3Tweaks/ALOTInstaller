@@ -314,7 +314,7 @@ namespace AlotAddOnGUI
                 Button_InstallME2.Visibility = Button_InstallME3.Visibility = Panel_ALOTFiltering.Visibility =
                 Label_ALOTStatus_ME2.Visibility = Label_ALOTStatus_ME3.Visibility = Button_ME2Backup.Visibility =
                 Button_ME3Backup.Visibility = Checkbox_RepackME2GameFiles.Visibility = Checkbox_RepackME3GameFiles.Visibility =
-                Button_ManualInstallFolder.Visibility = Button_DownloadAssistant.Visibility = Button_LibraryDir.Visibility =
+                Button_DownloadAssistant.Visibility = Button_LibraryDir.Visibility =
                 Button_VerifyGameME2.Visibility = Button_VerifyGameME3.Visibility = Button_AutoTOCME3.Visibility =
                     Visibility.Collapsed;
             }
@@ -329,7 +329,6 @@ namespace AlotAddOnGUI
                 Button_DownloadAssistant.Visibility = Button_LibraryDir.Visibility =
                 Button_VerifyGameME2.Visibility = Button_VerifyGameME3.Visibility = Button_AutoTOCME3.Visibility =
                     Visibility.Visible;
-                Button_ManualInstallFolder.Visibility = USING_BETA ? Visibility.Visible : Visibility.Collapsed;
                 Button_InstallME2.Visibility = Visibility.Visible;
                 Button_InstallME3.Visibility = Visibility.Visible;
             }
@@ -4644,7 +4643,6 @@ namespace AlotAddOnGUI
             ShowReadyFilesOnly = false;
             PreventFileRefresh = false;
             ApplyFiltering();
-            ManualInstall_Flyout.IsOpen = false;
             WhatToBuildFlyout.IsOpen = false;
             CURRENT_GAME_BUILD = 0;
         }
@@ -5268,94 +5266,6 @@ namespace AlotAddOnGUI
             }
             Button_LibraryDir.ToolTip = "Click to change texture library directory.\nIf path is not found at app startup, the default subdirectory of Downloaded_Mods will be used.\n\nLibrary location currently is:\n" + DOWNLOADED_MODS_DIRECTORY;
             ShowStatus("Updated library directory - please wait while files refresh...", 4000);
-        }
-
-        private void ManualInstall_ButtonClicked(int game)
-        {
-            var openFolder = new CommonOpenFileDialog();
-            openFolder.IsFolderPicker = true;
-            openFolder.Title = "Select folder of MEM files ";
-            openFolder.AllowNonFileSystemItems = false;
-            openFolder.EnsurePathExists = true;
-            string presetpath = null;
-            switch (game)
-            {
-                case 1:
-                    presetpath = Utilities.GetRegistrySettingString(SETTINGSTR_MANUALINSTALLPATH_ME1);
-                    break;
-                case 2:
-                    presetpath = Utilities.GetRegistrySettingString(SETTINGSTR_MANUALINSTALLPATH_ME2);
-                    break;
-                case 3:
-                    presetpath = Utilities.GetRegistrySettingString(SETTINGSTR_MANUALINSTALLPATH_ME3);
-                    break;
-            }
-
-            if (Directory.Exists(presetpath))
-            {
-                openFolder.InitialDirectory = presetpath;
-            }
-
-
-            if (openFolder.ShowDialog() != CommonFileDialogResult.Ok)
-            {
-                ManualInstall_Flyout.IsOpen = false;
-                return;
-            }
-            string folder = openFolder.FileName;
-            if (Directory.GetFiles(folder, "*.mem").Count() > 0)
-            {
-                switch (game)
-                {
-                    case 1:
-                        Utilities.WriteRegistryKey(Registry.CurrentUser, MainWindow.REGISTRY_KEY, SETTINGSTR_MANUALINSTALLPATH_ME1, openFolder.FileName);
-                        break;
-                    case 2:
-                        Utilities.WriteRegistryKey(Registry.CurrentUser, MainWindow.REGISTRY_KEY, SETTINGSTR_MANUALINSTALLPATH_ME2, openFolder.FileName);
-                        break;
-                    case 3:
-                        Utilities.WriteRegistryKey(Registry.CurrentUser, MainWindow.REGISTRY_KEY, SETTINGSTR_MANUALINSTALLPATH_ME3, openFolder.FileName);
-                        break;
-                }
-                Log.Information("Manual installation folder chosen: " + openFolder.FileName);
-
-                SettingsFlyout.IsOpen = false;
-                CustomMEMInstallSource = openFolder.FileName;
-                ManualInstall_Flyout.IsOpen = false;
-                InstallALOT(game, null, CustomMEMInstallSource);
-            }
-            else
-            {
-                ShowStatus("No MEM files found " + openFolder.FileName);
-            }
-        }
-
-        private void Button_ManualInstallME1_Click(object sender, RoutedEventArgs e)
-        {
-            ManualInstall_ButtonClicked(1);
-        }
-
-        private void Button_ManualInstallME2_Click(object sender, RoutedEventArgs e)
-        {
-            ManualInstall_ButtonClicked(2);
-        }
-
-        private void Button_ManualInstallME3_Click(object sender, RoutedEventArgs e)
-        {
-            ManualInstall_ButtonClicked(3);
-        }
-
-        private void ManualInstall_Clicked(object sender, RoutedEventArgs e)
-        {
-            SettingsFlyout.IsOpen = false;
-            ManualInstall_Flyout.IsOpen = true;
-        }
-
-        private void ManualTextures_Flyout_IsOpenChanged(object sender, RoutedEventArgs e)
-        {
-            Button_ManualInstallFileME1.IsEnabled = ManualInstall_Flyout.IsOpen && Switch_ME1Filter.IsEnabled; //Hack, but we can use this to determine if ME1 is able to be filtered to
-            Button_ManualInstallFileME2.IsEnabled = ManualInstall_Flyout.IsOpen && Switch_ME2Filter.IsEnabled; //Hack, but we can use this to determine if ME2 is able to be filtered to 
-            Button_ManualInstallFileME3.IsEnabled = ManualInstall_Flyout.IsOpen && Switch_ME3Filter.IsEnabled; //Hack, but we can use this to determine if ME3 is able to be filtered to
         }
     }
 }

@@ -325,7 +325,6 @@
                                 </StackPanel>
                                 <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME2" Content="ME2: Not Installed"/>
                                 <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME3" Content="ME3: Not Installed"/>
-                                <Button Name="Button_ManualInstallFolder"  HorizontalContentAlignment="Center" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="Install MEM files directly"  Click="ManualInstall_Clicked" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" ToolTip="Install MEM files directly to a game. You can use this to install MEM files without having to install ALOT."/>
                             </StackPanel>
                         </Expander>
                         <Expander IsExpanded="True" Expanded="Expander_Expanded">
@@ -543,28 +542,6 @@
                         <Button  x:Name="Button_FirstRun_Dismiss" Content="Continue" ToolTip="Acknowledges you read this message" HorizontalAlignment="Left" Margin="0,10,0,0" Click="Button_FirstTimeRunDismiss_Click"/>
                     </StackPanel>
                 </Border>
-            </Controls:Flyout>
-            <Controls:Flyout x:Name="ManualInstall_Flyout" IsOpenChanged="ManualTextures_Flyout_IsOpenChanged" IsPinned="False" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
-                <StackPanel VerticalAlignment="Top"  HorizontalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
-                    <TextBlock Text="Select which game to install MEM files to" FontSize="20" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
-                    <TextBlock FontSize="12" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" Text="Once you have chosen the path containing MEM files, installation will begin immediately.&#10;Ensure you have installed all content mods before continuing as you will be unable to do so after without breaking the game."/>
-                    <StackPanel  Orientation="Vertical" HorizontalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button x:Name="Button_ManualInstallFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualInstallME1_Click">
-                                <Image Source="images/logo_me1.png" Height="40" Margin="10"/>
-                            </Button>
-                            <Button x:Name="Button_ManualInstallFileME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualInstallME2_Click">
-                                <Image Source="images/logo_me2.png" Height="40" Margin="10"/>
-                            </Button>
-                            <Button x:Name="Button_ManualInstallFileME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualInstallME3_Click">
-                                <Image Source="images/logo_me3.png" Height="40" Margin="10"/>
-                            </Button>
-                        </StackPanel>
-                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-                        <Button Content="Cancel Install" Margin="5,0,0,0" HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper" Click="Button_BuildAndInstallCancel_Click" ToolTip="Closes this dialog"/>
-                    </StackPanel>
-                </StackPanel>
             </Controls:Flyout>
             <Controls:Flyout x:Name="UserTextures_Flyout" IsOpenChanged="UserTextures_Flyout_IsOpenChanged" IsPinned="False" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
                 <StackPanel VerticalAlignment="Top"  HorizontalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
