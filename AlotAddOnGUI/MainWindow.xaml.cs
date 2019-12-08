@@ -808,7 +808,7 @@ namespace AlotAddOnGUI
                     Log.Information("We will include prerelease builds as we are in beta mode.");
                 }
                 var client = new GitHubClient(new ProductHeaderValue("ALOTInstaller"));
-                var releases = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModderNoGui");
+                var releases = await client.Repository.Release.GetAll("MassEffectModder", "MassEffectModder");
                 Log.Information("Fetched MEMNOGui releases from github...");
                 Release latest = null;
                 if (releases.Count > 0)
