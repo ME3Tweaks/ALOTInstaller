@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.12">
+<alotaddonmanifest version="6.0.13">
    <highestapprovedmemversion>229</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2019-12-08">403</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
@@ -340,20 +340,10 @@
       <file downloadlink="https://www.dropbox.com/s/sczj9qfxuqxs6zg/%5BME2%5D%20femShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] femShep High Quality textures.7z" size="17029228" md5="76cb09ffae57a2d2ef103b97d8291410" />
       <packagefile me2="true" sourcename="[ME2] KH_femShep_face_textures.tpf" movedirectly="true" />
       <packagefile me2="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" movedirectly="true" />
-      <packagefile me1="true" sourcename="[ME2] KH_femShep_makeup_mask.tpf" delete="true" />
-      <packagefile me1="true" sourcename="HMF_HED_PROBase_Face_Diff_0x9CA124E8.dds" destinationname="0x8F331825.dds" />
-      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Frek_Diff_0x2A01319D.dds" destinationname="0x2CC6F67C.dds" />
-      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Frek_Norm_0xBA928949.dds" destinationname="0xA5C11535.dds" />
-      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Military_Diff_0x9E76BE04.dds" destinationname="0x5B79C364.dds" />
-      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Military_Norm_0x35E34BA6.dds" destinationname="0xF6A39457.dds" />
-      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Rough_Diff_0xAA133987.dds" destinationname="0x1365F4C4.dds" />
-      <packagefile me1="true" sourcename="HMF_HED_PROCustom_Rough_Norm_0x6DB1C814.dds" destinationname="0x999F0526.dds" />
-      <packagefile me1="true" sourcename="HMF_HED_PROOld1_Face_Diff_0x0DF18845.dds" destinationname="0xED9E4F99.dds" />
-      <packagefile me1="true" sourcename="HMF_HED_PROOld1_Face_Norm_0xE9EED499.dds" destinationname="0x8B6D4AA7.dds" />
    </addonfile>
    <addonfile friendlyname="BroShep High Quality textures" author="heleuss" optional="true">
       <file downloadlink="https://www.dropbox.com/s/g6wg6v7uy8y7x15/%5BME2%5D%20broShep%20High%20Quality%20textures.7z?dl=0" filename="[ME2] broShep High Quality textures.7z" size="11802235" md5="4a220058d12c0c125a27a1d30bfff937" />
-      <packagefile me1="true" me2="true" sourcename="[ME2] KH_broShep_face_textures.tpf" movedirectly="true" />
+      <packagefile me2="true" sourcename="[ME2] KH_broShep_face_textures.tpf" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="HR Predator Texture" author="TheDarkFalkon">
       <file downloadlink="https://drive.google.com/drive/folders/1ha-PdId0T6O_AgSs-LAEsmpV8ILgCpuc?usp=sharing" tooltipname="WpnPredator_HRv1.5.zip" filename="WpnPredator_HRv1.5.zip" size="3286846" md5="d52bb74179ba9ea8521f86617a4d35e7" />
