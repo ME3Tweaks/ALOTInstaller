@@ -281,8 +281,19 @@ namespace AlotAddOnGUI.ui
                                     && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
                 if (result)
                 {
-                    Clipboard.SetText((string)e.Result);
-                    DiagnosticHeader.Text = "Diagnostic completed.\nLink to the result has been copied to the clipboard.";
+                    try
+                    {
+                        Clipboard.SetText((string)e.Result);
+                        DiagnosticHeader.Text = "Diagnostic completed.\nLink to the result has been copied to the clipboard.";
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("Error setting data to clipboard: " + ex.Message);
+                        DiagnosticHeader.Text = "Diagnostic completed.\nDiagnosti available at the link below.";
+                        ManualLink_Textbox.Text = (string)e.Result;
+                        ManualLink_Textbox.Visibility = Visibility.Visible;
+                    }
+
                     try
                     {
                         System.Diagnostics.Process.Start((string)e.Result);
