@@ -2642,7 +2642,10 @@ namespace AlotAddOnGUI
                                         ArchiveRootPath = (string)d.Attribute("archiverootpath"),
                                         RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
                                         OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc"),
-                                        DLCFriendlyName = (string)d.Attribute("dlcname"),
+                                        OptionalAnyDLC = (string)d.Attribute("optionalanydlc"),
+                                        OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
+                                        OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
+                                        LoggingName = (string)d.Attribute("dlcname"),
                                         IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
                                         ModVersion = (string)d.Attribute("version")
                                     }).ToList(),

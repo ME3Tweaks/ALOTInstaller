@@ -440,8 +440,11 @@ namespace AlotAddOnGUI.classes
         public string RelativeDestinationDirectory { get; set; }
         public string ArchiveRootPath { get; set; }
         public string OptionalRequiredDLC { get; set; }
+        public string OptionalAnyDLC { get; set; }
         public bool IsDLC { get; internal set; }
         public string ModVersion { get; internal set; }
-        public string DLCFriendlyName { get; internal set; }
+        public string LoggingName { get; internal set; }
+        public string OptionalRequiredFiles { get; set; }
+        public string OptionalRequiredFilesSizes { get; set; }
     }
 }
