@@ -147,9 +147,9 @@ namespace AlotAddOnGUI
 
             string prefix = "[" + Path.GetFileNameWithoutExtension(fileToUse) + "] ";
             Log.Information(prefix + "Processing extraction on " + fileToUse);
-            if (af.IsModManagerMod)
+            if (af.IsModManagerMod && af.PackageFiles.Count == 0)
             {
-                Log.Information(prefix + " is a mod manager mod. We will process this after installation.");
+                Log.Information(prefix + " is a mod manager mod with no package files listed. We will process this after installation.");
                 af.ReadyStatusText = "Will install after texture installation step";
                 af.SetIdle();
                 return new KeyValuePair<AddonFile, bool>(af, true);
@@ -231,7 +231,19 @@ namespace AlotAddOnGUI
 
                             Log.Information(prefix + "Extracting file: " + extractSource);
                             string exe = BINARY_DIRECTORY + "7z.exe";
-                            string args = "x -mmt" + threads + " -bsp2 \"" + extractSource + "\" -aoa -r -o\"" + extractpath + "\"";
+                            string args = $"e -mmt{threads} -bsp2 \"{extractSource}\" -aoa -o\"{extractpath}\" -r";
+                            if (af.IsModManagerMod && af.PackageFiles.Count > 0)
+                            {
+                                //custom extraction code
+                                var filternames = string.Join(" ", af.PackageFiles.Select(x => x.SourceName));
+                                args = $"e -mmt{threads} -bsp2 \"{extractSource}\" -aoa -o\"{extractpath}\" {filternames} -r";
+                            }
+                            //DEBUG ONLY!! Use only for ALOV ME3 mem extract test
+                            //else
+                            //{
+                            //    af.ReadyStatusText = "Skipped";
+                            //    return new KeyValuePair<AddonFile, bool>(af, true);
+                            //}
                             ConsoleApp extractProcess = Run7zWithProgressForAddonFile(args, af);
                             while (extractProcess.State == AppState.Running)
                             {
@@ -626,7 +638,7 @@ namespace AlotAddOnGUI
             }
             else
             {
-                if (af.IsModManagerMod)
+                if (af.IsModManagerMod && af.PackageFiles.Count == 0)
                 {
                     af.ReadyStatusText = "Will install after texture installation step";
                 }
@@ -1098,7 +1110,7 @@ namespace AlotAddOnGUI
                 }
                 if (!requiresBuild)
                 {
-                    if (af.IsModManagerMod)
+                    if (af.IsModManagerMod && af.PackageFiles.Count == 0)
                     {
                         af.ReadyStatusText = "Will install after texture installation step";
                     }
@@ -1134,7 +1146,7 @@ namespace AlotAddOnGUI
 
             foreach (AddonFile af in AddonFilesToSetStatusFor)
             {
-                if (af.IsModManagerMod)
+                if (af.IsModManagerMod && af.PackageFiles.Count == 0)
                 {
                     continue; //We don't process this here
                 }
@@ -1211,7 +1223,7 @@ namespace AlotAddOnGUI
                         {
                             if (!af.UserFile)
                             {
-                                if (af.IsModManagerMod)
+                                if (af.IsModManagerMod && af.PackageFiles.Count == 0)
                                 {
                                     af.ReadyStatusText = "Will install after texture installation step";
                                 }
@@ -2138,7 +2150,7 @@ namespace AlotAddOnGUI
 
             if (blockDueToBadImportedFile != null)
             {
-                await this.ShowMessageAsync("Corrupt/Bad file detected", "The file " + blockDueToBadImportedFile + " is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from Download_Mods, it is not usable.");
+                await this.ShowMessageAsync("Corrupt/Bad file detected", "The file " + blockDueToBadImportedFile + " is not the correct size. This file may be corrupt or the wrong version, or was renamed in an attempt to make the program accept this file. Remove this file from " + DOWNLOADED_MODS_DIRECTORY + ", it is not usable.");
                 return false;
             }
 
