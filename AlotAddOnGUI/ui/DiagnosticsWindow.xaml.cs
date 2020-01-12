@@ -23,6 +23,7 @@ using Microsoft.Win32;
 using MahApps.Metro.Controls.Dialogs;
 using System.Linq;
 using Microsoft.AppCenter.Analytics;
+using AuthenticodeExaminer;
 
 namespace AlotAddOnGUI.ui
 {
@@ -398,6 +399,36 @@ namespace AlotAddOnGUI.ui
                             }
                         }
                     }
+                    //Authenticode
+                    var info = new FileInspector(exePath);
+                    var certOK = info.Validate();
+                    if (certOK == SignatureCheckResult.NoSignature)
+                    {
+                        addDiagLine("[ERROR]This executable is not signed");
+                    }
+                    else
+                    {
+                        if (certOK == SignatureCheckResult.BadDigest)
+                        {
+                            if (DIAGNOSTICS_GAME == 1 && versInfo.ProductName == "Mass_Effect")
+                            {
+                                //Check if this Mass_Effect
+                                addDiagLine("Signature check for this executable skipped as MEM has modified this exe");
+                            }
+                            else
+                            {
+                                addDiagLine("[ERROR]The signature for this executable is not valid. The executable has been modified");
+                                diagPrintSignatures(info);
+                            }
+                        }
+                        else
+                        {
+                            addDiagLine("Signature check for this executable: " + certOK.ToString());
+                            diagPrintSignatures(info);
+                        }
+                    }
+
+
                     string d3d9file = Path.GetDirectoryName(exePath) + "\\d3d9.dll";
                     if (File.Exists(d3d9file))
                     {
@@ -507,6 +538,7 @@ namespace AlotAddOnGUI.ui
                     {
                         addDiagLine("MEUITM: " + avi.MEUITMVER);
                     }
+                    addDiagLine("Latest installation used MEM v" + avi.MEM_VERSION_USED);
                 }
 
 
@@ -1092,25 +1124,18 @@ namespace AlotAddOnGUI.ui
                                 if (line.Contains("Uninitialized: Log file closed"))
                                 {
                                     crashIndex = index;
-                                    reason = "~~~Log file indicates a device never fully initalized";
-                                    Log.Information("Found crash in ME1 log " + file.Name + " on line " + index);
+                                    reason = "~~~Additional log to provide context for log analysis";
+                                    Log.Information("Found possibly relevant item in ME1 log " + file.Name + " on line " + index);
                                     break;
                                 }
                                 index++;
-                            }
-
-                            if (dSoundExists && logLines.Length > 0 && logLines.Last().Contains("Init: Audio Device"))
-                            {
-                                crashIndex = logLines.Length - 1;
-                                reason = "~~~Log file indicates audio device never fully initalized - may be due to dsound.dll in binaries folder.\n~~~Removing this file may fix the issue";
-                                Log.Information("Found audio device hanging startup in ME1 log " + file.Name + " on line " + index);
                             }
 
                             if (crashIndex >= 0)
                             {
                                 crashIndex = Math.Max(0, crashIndex - 10);
                                 //this log has a crash
-                                addDiagLine("===Mass Effect crash log " + file.Name);
+                                addDiagLine("===Mass Effect game log " + file.Name);
                                 if (reason != "") addDiagLine(reason);
                                 if (crashIndex > 0)
                                 {
@@ -1167,6 +1192,29 @@ namespace AlotAddOnGUI.ui
 
             }
             //}
+        }
+
+        private void diagPrintSignatures(FileInspector info)
+        {
+            foreach (var sig in info.GetSignatures())
+            {
+                var signingTime = sig.TimestampSignatures.FirstOrDefault()?.TimestampDateTime?.UtcDateTime;
+                addDiagLine("Executable signed on " + signingTime);
+
+                foreach (var signChain in sig.AdditionalCertificates)
+                {
+                    try
+                    {
+                        var outStr = signChain.Subject.Substring(3); //remove CN=
+                        outStr = outStr.Substring(0, outStr.IndexOf(','));
+                        addDiagLine("Signed by " + outStr);
+                    }
+                    catch
+                    {
+                        addDiagLine("Signed by " + signChain.Subject);
+                    }
+                }
+            }
         }
 
         private string saveAndUploadDiag()

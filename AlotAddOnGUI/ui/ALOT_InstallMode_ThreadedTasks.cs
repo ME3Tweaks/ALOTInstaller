@@ -923,7 +923,7 @@ namespace AlotAddOnGUI
                 }
 
                 //Write Marker
-                ALOTVersionInfo newVersion = new ALOTVersionInfo(alotMainVersionFlag, updateVersion, 0, meuitmFlag);
+                ALOTVersionInfo newVersion = new ALOTVersionInfo(alotMainVersionFlag, updateVersion, 0, meuitmFlag, 0, 0); //versions are 0 as on write it generates them
                 Log.Information("Writing or updating MEMI marker with info: " + newVersion.ToString());
                 try
                 {
