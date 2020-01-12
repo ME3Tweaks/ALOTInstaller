@@ -538,6 +538,7 @@ namespace AlotAddOnGUI.ui
                     {
                         addDiagLine("MEUITM: " + avi.MEUITMVER);
                     }
+                    addDiagLine("Latest installation used MEM v" + avi.MEM_VERSION_USED);
                 }
 
 

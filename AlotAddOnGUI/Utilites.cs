@@ -823,7 +823,8 @@ namespace AlotAddOnGUI
                         {
                             //ALOT has been installed
                             fs.Position = endPos - 8;
-                            int installerVersionUsed = fs.ReadInt32();
+                            short memVersionUsed = fs.ReadInt16();
+                            short installerVersionUsed = fs.ReadInt16();
                             int perGameFinal4Bytes = -20;
                             switch (gameID)
                             {
@@ -849,11 +850,11 @@ namespace AlotAddOnGUI
                                 fs.Position = endPos - 16;
                                 int MEUITMVER = fs.ReadInt32();
 
-                                return new ALOTVersionInfo(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER);
+                                return new ALOTVersionInfo(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER, memVersionUsed, installerVersionUsed);
                             }
                             else
                             {
-                                return new ALOTVersionInfo(0, 0, 0, 0); //MEMI tag but no info we know of
+                                return new ALOTVersionInfo(0, 0, 0, 0, 0, 0); //MEMI tag but no info we know of
                             }
                         }
                     }
