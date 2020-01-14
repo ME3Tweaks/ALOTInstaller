@@ -525,12 +525,12 @@ namespace AlotAddOnGUI
             }
 
             //Comment the following 2 lines and uncomment the next 3 to skip installation step and simulate OK
-            //RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
-            //processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
+            RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
+            processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
 
-            MEM_INSTALL_TIME_SECONDS = 61;
-            processResult = 0;
-            STAGE_DONE_REACHED = true;
+            //MEM_INSTALL_TIME_SECONDS = 61;
+            //processResult = 0;
+            //STAGE_DONE_REACHED = true;
 
             if (!STAGE_DONE_REACHED)
             {
@@ -1318,17 +1318,48 @@ namespace AlotAddOnGUI
                             }
                         }
                         Log.Information("Sending installation telemetry");
-                        "https://me3tweaks.com/alotinstaller/installationtelemetry.php".PostUrlEncodedAsync(new { game = Game, memversion = memVersionUsed, installerversion = installerVersionUsed, processor = processorName, processor_corecount = processorCoreCount, processor_speed = processorSpeedMhz, memory = memoryAmount, installation_time = MEM_INSTALL_TIME_SECONDS, alladdonfiles = MainWindow.TELEMETRY_ALL_ADDON_FILES ? 1 : 0, officialdlccount = officialDLCCount, disktype = diskType, failed = telemetryfailedcode, os = OS });//.ReceiveString();
-                        Log.Information("Installation telemetry has been submitted");
-                        Analytics.TrackEvent("Addon Files Used", new Dictionary<string, string>()
+                        Analytics.TrackEvent("Installed ALOT", new Dictionary<string, string>()
                         {
-                            {"All addon files (exluding optionals)" ,MainWindow.TELEMETRY_ALL_ADDON_FILES.ToString() },
+                            {"Game","ME"+Game },
+                            {"MEM Version", memVersionUsed.ToString() },
+                            {"Installer Version", installerVersionUsed.ToString()},
+                            {"Processor", processorName },
+                            {"Core count", processorCoreCount.ToString() },
+                            {"Prcocessor Speed",  processorSpeedMhz.ToString() },
+                            {"Memory", ByteSize.FromBytes((long)memoryAmount).ToString() },
+                            {"Installation Time", MEM_INSTALL_TIME_SECONDS.ToString() },
+                            {"All Non-optional Addons", MainWindow.TELEMETRY_ALL_ADDON_FILES ? "true" : "false" },
+                            {"Official DLC Count", officialDLCCount.ToString() },
+                            {"Disk Type", diskType.ToString() },
+                            {"Failed", telemetryfailedcode.ToString() }
                         });
+                        /*
+                        "https://me3tweaks.com/alotinstaller/installationtelemetry.php".PostUrlEncodedAsync(new
+                        {
+                            game = Game,
+                            memversion = memVersionUsed,
+                            installerversion = installerVersionUsed,
+                            processor = processorName,
+                            processor_corecount = processorCoreCount,
+                            processor_speed = processorSpeedMhz,
+                            memory = memoryAmount,
+                            installation_time = MEM_INSTALL_TIME_SECONDS,
+                            alladdonfiles = MainWindow.TELEMETRY_ALL_ADDON_FILES ? 1 : 0,
+                            officialdlccount = officialDLCCount,
+                            disktype = diskType,
+                            failed = telemetryfailedcode,
+                            os = OS
+                        });//.ReceiveString();*/
+                        Log.Information("Installation telemetry has been submitted");
+                        //Analytics.TrackEvent("Addon Files Used", new Dictionary<string, string>()
+                        //{
+                        //    {"All addon files (exluding optionals)" ,MainWindow.TELEMETRY_ALL_ADDON_FILES.ToString() },
+                        //});
                     }
-                    catch (FlurlHttpTimeoutException)
-                    {
-                        Log.Warning("Timeout occured while attempting to upload installation telemetry.");
-                    }
+                    //catch (FlurlHttpTimeoutException)
+                    //{
+                    //    Log.Warning("Timeout occured while attempting to upload installation telemetry.");
+                    //}
                     catch (Exception ex)
                     {
                         Log.Error("Error occured while attempting to upload installation telemetry: " + ex.Message);
