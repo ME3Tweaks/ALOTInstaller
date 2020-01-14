@@ -718,13 +718,13 @@ namespace AlotAddOnGUI
                         File.Move(file, finalDestinationPath);
                     }
 
-                    //if (extractionRedirect.IsDLC)
-                    //{
-                    //    //Write a _metacmm.txt file
-                    //    var metacmm = Path.Combine(ingameDestination, "_metacmm.txt");
-                    //    string contents = $"{extractionRedirect.LoggingName}\n{extractionRedirect.ModVersion}\nALOT Installer {System.Reflection.Assembly.GetEntryAssembly().GetName().Version}\n{Guid.NewGuid().ToString()}";
-                    //    File.WriteAllText(metacmm, contents);
-                    //}
+                    if (extractionRedirect.IsDLC)
+                    {
+                        //Write a _metacmm.txt file
+                        var metacmm = Path.Combine(ingameDestination, "_metacmm.txt");
+                        string contents = $"{extractionRedirect.LoggingName}\n{extractionRedirect.ModVersion}\nALOT Installer {System.Reflection.Assembly.GetEntryAssembly().GetName().Version}\n{Guid.NewGuid().ToString()}";
+                        File.WriteAllText(metacmm, contents);
+                    }
                 }
 
                 Utilities.DeleteFilesAndFoldersRecursively(stagingPath);

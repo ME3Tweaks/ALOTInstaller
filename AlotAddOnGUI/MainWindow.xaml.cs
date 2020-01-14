@@ -2645,7 +2645,7 @@ namespace AlotAddOnGUI
                                         OptionalAnyDLC = (string)d.Attribute("optionalanydlc"),
                                         OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
                                         OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
-                                        LoggingName = (string)d.Attribute("dlcname"),
+                                        LoggingName = (string)d.Attribute("loggingname"),
                                         IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
                                         ModVersion = (string)d.Attribute("version")
                                     }).ToList(),
