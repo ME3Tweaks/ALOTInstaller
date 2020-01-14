@@ -695,7 +695,15 @@ namespace AlotAddOnGUI
                     Log.Information("Applying extraction rule: " + extractionRedirect.LoggingName);
                     var rootPath = Path.Combine(stagingPath, extractionRedirect.ArchiveRootPath);
                     var filesToMove = Directory.GetFiles(rootPath, "*", SearchOption.AllDirectories);
-                    var ingameDestination = Directory.CreateDirectory(Path.Combine(gameDirectory, extractionRedirect.RelativeDestinationDirectory)).FullName;
+
+                    var ingameDestination = Path.Combine(gameDirectory, extractionRedirect.RelativeDestinationDirectory);
+                    if (extractionRedirect.IsDLC && Directory.Exists(ingameDestination))
+                    {
+                        //delete first
+                        Utilities.DeleteFilesAndFoldersRecursively(ingameDestination);
+                    }
+                    Directory.CreateDirectory(ingameDestination);
+
                     foreach (var file in filesToMove)
                     {
                         string relativePath = file.Substring(rootPath.Length + 1);
