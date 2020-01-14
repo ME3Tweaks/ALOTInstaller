@@ -12,12 +12,12 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ME3Tweaks")]
 [assembly: AssemblyProduct("ALOT Installer")]
-[assembly: AssemblyCopyright("Copyright © 2017 - 2019 ME3Tweaks")]
+[assembly: AssemblyCopyright("Copyright © 2017 - 2020 ME3Tweaks")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-// Version informationr(
-[assembly: AssemblyVersion("3.0.573.5557")]
-[assembly: AssemblyFileVersion("3.0.573.5557")]
+// Version information
+[assembly: AssemblyVersion("3.0.575.5580")]
+[assembly: AssemblyFileVersion("3.0.575.5580")]
 [assembly: NeutralResourcesLanguageAttribute( "en-US" )]
 
