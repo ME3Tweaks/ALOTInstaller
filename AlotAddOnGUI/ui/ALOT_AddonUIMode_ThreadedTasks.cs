@@ -1495,7 +1495,7 @@ namespace AlotAddOnGUI
             acceptedIPC.Add("TASK_PROGRESS");
             acceptedIPC.Add("ERROR");
             BackupWorker.ReportProgress(completed, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, "Verifying game data..."));
-
+            bool isVanilla = false; //False by default
             runMEM_BackupAndBuild(exe, args, BackupWorker, acceptedIPC);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {
@@ -1530,11 +1530,13 @@ namespace AlotAddOnGUI
                 {
                     Log.Warning("User continuing even with non-vanilla backup.");
                     CONTINUE_BACKUP_EVEN_IF_VERIFY_FAILS = false; //reset
+                    isVanilla = false;
                 }
             }
             else
             {
                 Log.Information("Backup verification passed - no issues.");
+                isVanilla = true;
             }
             string gamePath = Utilities.GetGamePath(BACKUP_THREAD_GAME);
             string[] ignoredExtensions = { ".wav", ".pdf", ".bak" };
@@ -1557,11 +1559,16 @@ namespace AlotAddOnGUI
                 Progressbar_Max = 100;
                 Log.Information("Backup copy created");
             }
-            if (BACKUP_THREAD_GAME == 3)
+
+            if (isVanilla)
             {
-                //Create Mod Manaager vanilla backup marker
+                //Create Mod Manager vanilla backup marker
                 string file = backupPath + "\\cmm_vanilla";
-                File.Create(file);
+                File.WriteAllText(file, $"ALOT Installer {System.Reflection.Assembly.GetEntryAssembly().GetName().Version}");
+            }
+            else
+            {
+                Log.Warning("Not vanilla backup - did not place cmm_vanilla");
             }
             e.Result = backupPath;
         }
@@ -1752,17 +1759,16 @@ namespace AlotAddOnGUI
                 Progressbar_Max = 100;
                 Log.Information("Restore of game data has completed");
             }
-            if (BACKUP_THREAD_GAME == 3)
-            {
-                //Check for cmmvanilla file and remove it present
 
-                string file = gamePath + "\\cmm_vanilla";
-                if (File.Exists(file))
-                {
-                    Log.Information("Removing cmm_vanilla file");
-                    File.Delete(file);
-                }
+            //Check for cmmvanilla file and remove it present
+
+            string file = gamePath + "\\cmm_vanilla";
+            if (File.Exists(file))
+            {
+                Log.Information("Removing cmm_vanilla file from restored target");
+                File.Delete(file);
             }
+
             e.Result = true;
         }
         private async void BuildWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
