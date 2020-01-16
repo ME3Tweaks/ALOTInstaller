@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.14">
-   <highestapprovedmemversion>409</highestapprovedmemversion>
+<alotaddonmanifest version="6.0.15">
+   <highestapprovedmemversion>410</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2020-01-04">410</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
       <!-- -58 is the next error code available-->
@@ -165,7 +165,7 @@
    <addonfile alotversion="10" friendlyname="ALOT for ME1 10.0" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
             tooltipname="ALOT for ME1 10.0"
-	    
+       
             torrentfilename="ALOT for ME1 10.0.zip"
             filename="ALOT for ME1 10.0-83-2019-10-0-1573137383.zip"
             size="3917899517"
@@ -195,43 +195,43 @@
             tooltipname="ALOT for ME3 10.0"
             
             torrentfilename="ALOT for ME3 10.0.zip"
-            filename="ALOT for ME3 10.0-363-2019-10-0-1573146850.zip"
-            size="10110479198"
-            md5="234eacaf6ca6f07b4bddcb4808a0b9bf"
+            filename="me3alot-test.zip"
+            size="2319"
+            md5="a9c9dbfebfa1925fff0c68ee00d84d9f"
             
             unpackedsinglefilename="ALOT_ME3_v10.mem"
-            unpackedsize="10049870343"
-            unpackedmd5="93280c9ed778205448af1afbec951432" />
+            unpackedsize="36"
+            unpackedmd5="5188e4138d7cbaa674905c9328982c09" />
       <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v10.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Improved Static Lighting for ME1" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
-	    tooltipname="Improved Static Lighting for ME1"
+       tooltipname="Improved Static Lighting for ME1"
             
             torrentfilename="LightMaps_ME1.zip"
             filename="Improved Static Lighting for ME1-83-2020-10-0-1573101555.zip"
-	    size="6610942066"
-	    md5="2234159c710d77ffd2e8a91fefe975ee" />
+       size="6610942066"
+       md5="2234159c710d77ffd2e8a91fefe975ee" />
       <packagefile me1="true" sourcename="LightMaps_ME1.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Improved Static Lighting for ME2" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
-	    tooltipname="Improved Static Lighting for ME2"
+       tooltipname="Improved Static Lighting for ME2"
             
             torrentfilename="LightMaps_ME2.zip"
             filename="Improved Static Lighting for ME2-68-2020-10-0-1573098585.zip"
-	    size="665769837"
-	    md5="d78abde1cef08b7ce64c70eaa4c46b71"/>
+       size="665769837"
+       md5="d78abde1cef08b7ce64c70eaa4c46b71"/>
       <packagefile me2="true" sourcename="LightMaps_ME2.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Improved Static Lighting for ME3" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
-	    tooltipname="Improved Static Lighting for ME3"
+       tooltipname="Improved Static Lighting for ME3"
             
             torrentfilename="LightMaps_ME3.zip"
-            filename="Improved Static Lighting for ME3-363-2019-10-0-1573144588.zip"
-	    size="9082233367"
-	    md5="33fe926fd3c82d00b886e74b6b87527f" />
+            filename="me3staticlight.zip"
+       size="178"
+       md5="e72573cf1ec5366010c3ee5b72b5824c" />
       <packagefile me3="true" sourcename="LightMaps_ME3.mem" movedirectly="true" />
    </addonfile>
    <addonfile appliestomainversion="10"
@@ -396,7 +396,7 @@
       <file downloadlink="https://1drv.ms/u/s!Ap-6jpUc4ODbgwc5r2cAvx9K7iFn" filename="Weapon Mantis M-92 HR by TheDarkFalkon v1.0 OPTIMIZED 2.tpf" size="11565964" md5="47ff496f6b46ee2458d2a5f66031cd30" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x3463B385.dds" />
       <packagefile me2="true" sourcename="MASSEFFECT3.EXE_0x3463B385.dds" destinationname="WPN_SNPa_Diff_0x13703FFD.dds" />
-	  <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds" />
+     <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds" destinationname="WPN_SNPa_Tint_0xB2744B1D.dds" />
    </addonfile>
    <addonfile friendlyname="Armor Sets Pack for ME3" author="Ottemis">
       <file downloadlink="http://www.nexusmods.com/masseffect3/mods/134/?tab=files" filename="ME3 HR Armor Sets Pack-134-1-1.rar" md5="eb0e06bc0133533adcd5d42ee12dbf5b" size="199493402" />
@@ -735,13 +735,13 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E443315_bulk_vega_s.dds" destinationname="HMM_ARM_SANf_Diff_0x6E443315.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds" />
    </addonfile>
-   <addonfile friendlyname="A Lot of Videos for ME1" author="Audemus" optional="true">
+   <addonfile friendlyname="A Lot of Videos for ME1" author="Audemus/Mellin" optional="true">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files" filename="ALOV for ME1 1.0-144-1-0-1573147134.7z" md5="3c4db51abbe07e7f31e3e6a855b8c406" size="2493733148"  modmanagermod="true"/>
       <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC\Movies"/>
       <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC\Movies" optionalrequireddlc="DLC_UNC"/>
       <games me1="true" me2="false" me3="false" />
    </addonfile>
-   <addonfile friendlyname="A Lot of Videos for ME2 - 1080p" author="Audemus" optional="true">
+   <addonfile friendlyname="A Lot of Videos for ME2 - 1080p" author="Audemus/Mellin" optional="true">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files" filename="ALOV for ME2 1.0 - 1080p-245-1-0-1574567011.7z" torrentfilename="ALotofVideosforME2-1080p_1.0.7z" md5="3b57c4d18b7202e5474d6903fade123d" size="5536975468"  modmanagermod="true"/>
       <extractionredirect archiverootpath="BASEGAME\Movies" relativedestinationdirectory="BIOGame\Movies"/>
       <extractionredirect archiverootpath="ARRIVAL\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part02\Movies" optionalrequireddlc="DLC_EXP_Part02"/>
@@ -751,4 +751,72 @@
       <extractionredirect archiverootpath="OVERLORD\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies" optionalrequireddlc="DLC_UNC_Pack01"/>
       <games me1="false" me2="true" me3="false" />
    </addonfile>
+   <addonfile friendlyname="A Lot of Videos for ME3 - 1080p" author="Audemus/Mellin" optional="true">
+      <file downloadlink="https://tessatheterror.xyz/index.php/s/9nWxx5Dygy4r4sK" filename="A Lot Of Videos (ALOV) for ME3 - 1080p_1.2.7z" md5="84322f7c30cf091cd0e5fce81550196d" size="16770588544"  modmanagermod="true"/>
+      <extractionredirect archiverootpath="DLC_MOD_ALOV" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV" loggingname="ALOV for ME3 1080p - Core" isdlc="true"/> <!-- main mod -->
+      <extractionredirect archiverootpath="DLC_MOD_ALOV_Patches" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches" optionalanyrequireddlc="DLC_MOD_EGM_Ark;DLC_MOD_EGM;DLC_MOD_EGM_Omg;DLC_CON_PEOM;DLC_EXP_CEMF;DLC_CON_JAM;DLC_CON_MtoC;DLC_CON_LIME;DLC_CON_JtoC" loggingname="ALOV for ME3 1080p - 3rd Party" isdlc="true"/> <!-- patch dlc -->
+
+      <!-- Official DLC -->
+      <extractionredirect archiverootpath="Alternates\LEVIATHAN" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV\Movies" optionalrequireddlc="DLC_EXP_Pack001" loggingname="Leviathan"/>
+      <extractionredirect archiverootpath="Alternates\OMEGA" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV\Movies" optionalrequireddlc="DLC_EXP_Pack002" loggingname="Omega"/>
+      <extractionredirect archiverootpath="Alternates\FROM_ASHES" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV\Movies" optionalrequireddlc="DLC_HEN_PR" loggingname="From Ashes"/>
+      <extractionredirect archiverootpath="Alternates\CITADEL" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV\Movies" optionalrequireddlc="DLC_EXP_Pack003" loggingname="Citadel"/>
+      <extractionredirect archiverootpath="Alternates\EXTENDEDCUT" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV\Movies" optionalrequireddlc="DLC_CON_END" loggingname="Extended Cut"/>
+
+
+      <!-- 3rd party -->
+      
+      <!-- EGM -->
+      <extractionredirect archiverootpath="Patches_Alternates\ARK_MOD" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_MOD_EGM_Ark" loggingname="Ark Mod"/>
+      <extractionredirect archiverootpath="Patches_Alternates\EGM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_MOD_EGM" loggingname="Expanded Galaxy Mod"/>
+      <extractionredirect archiverootpath="Patches_Alternates\OMEGA_HUB" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_MOD_EGM_Omg" loggingname="Omega Hub"/>
+
+      <!-- PEOM -->
+      <extractionredirect archiverootpath="Patches_Alternates\PEOM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_PEOM" loggingname="PEOM"/>
+
+      <!-- CEM Full -->
+      <extractionredirect archiverootpath="Patches_Alternates\CEM_F" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_EXP_CEMF" loggingname="Citadel Epiloge Mod Full"/>
+
+      <!-- JAM  (A?)-->
+      <extractionredirect archiverootpath="Patches_Alternates\JAM_A" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JAM" loggingname="JAM Core"/>
+
+      <!-- LIME to CEM Full -->
+      <extractionredirect archiverootpath="Patches_Alternates\LIME_to_CEM_Full" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LtoC;DLC_EXP_CEMF" loggingname="Lime to CEM Full"/>
+
+      <!-- LIME to CEM Lite -->
+      <extractionredirect archiverootpath="Patches_Alternates\LIME_to_CEM_Lite" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LtoC;DLC_EXP_CEML" loggingname="Lime to CEM Lite"/>
+
+      <!-- JAM to CEM Core MELLIN CHECK -->
+      <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JtoC" loggingname="JAM to CEM Core"/>
+
+      <!-- JAM to CEM Full -->
+      <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM_Full" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JtoC;DLC_EXP_CEMF" loggingname="JAM to CEM Full"/>
+
+      <!-- JAM to CEM Lite -->
+      <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM_Lite" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JtoC;DLC_EXP_CEML" loggingname="JAM to CEM Lite"/>
+
+      <!-- MEHEM to CEM CORE -->
+      <extractionredirect archiverootpath="Patches_Alternates\MEHEM_to_CEM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_MtoC" loggingname="REPLACEME"/>
+
+      <!-- MEHEM/CEM Full -->
+      <extractionredirect archiverootpath="Patches_Alternates\MEHEM_to_CEM_Full" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_MtoC;DLC_EXP_CEMF" loggingname="MEHEM to CEM Full"/>
+      
+      <!-- MEHEM/CEM Lite -->
+      <extractionredirect archiverootpath="Patches_Alternates\MEHEM_to_CEM_Lite" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_MtoC;DLC_EXP_CEML" loggingname="MEHEM to CEM Lite"/>
+      
+      <!-- PEOM to EGM -->
+      <extractionredirect archiverootpath="Patches_Alternates\PEOM_to_EGM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_PEOM;DLC_MOD_EGM" loggingname="PEOM to EGM"/>
+
+      <!-- JAM Version B -->
+      <extractionredirect archiverootpath="Patches_Alternates\JAM_B" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JAM" optionalrequiredfiles="DLC_CON_JAM\Movies\End02_Cit_Flower.bik" loggingname="JAM Version B"/>
+
+      <!-- LIME We Will Prevail version -->
+      <extractionredirect archiverootpath="Patches_Alternates\LIME_WWP" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LIME" optionalrequiredfiles="DLC_CON_LIME\Movies\End03_D_NormandyChaseExt.bik" optionalrequiredfilessizes="32990376" loggingname="LIME WWP"/>
+
+      <!-- LIME We Will Prevail (PLASMAFLOW) -->
+      <extractionredirect archiverootpath="Patches_Alternates\LIME_WWP_FLOW" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LIME" optionalrequiredfiles="DLC_CON_LIME\Movies\End03_D_NormandyChaseExt.bik" optionalrequiredfilessizes="43174424" loggingname="Lime WWP (Plasma)"/>
+      <!-- This package file uses a filename only! Do not use full filepath -->
+      <packagefile me3="true" sourcename="ALOV_ALOT_addon_v1.mem" movedirectly="true" />
+   </addonfile>
 </alotaddonmanifest>
+   
