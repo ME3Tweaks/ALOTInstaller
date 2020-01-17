@@ -231,12 +231,12 @@ namespace AlotAddOnGUI
 
                             Log.Information(prefix + "Extracting file: " + extractSource);
                             string exe = BINARY_DIRECTORY + "7z.exe";
-                            string args = $"e -mmt{threads} -bsp2 \"{extractSource}\" -aoa -o\"{extractpath}\" -r";
+                            string args = $"x -mmt{threads} -bsp2 \"{extractSource}\" -aoa -o\"{extractpath}\" -r";
                             if (af.IsModManagerMod && af.PackageFiles.Count > 0)
                             {
                                 //custom extraction code
                                 var filternames = string.Join(" ", af.PackageFiles.Select(x => x.SourceName));
-                                args = $"e -mmt{threads} -bsp2 \"{extractSource}\" -aoa -o\"{extractpath}\" {filternames} -r";
+                                args = $"x -mmt{threads} -bsp2 \"{extractSource}\" -aoa -o\"{extractpath}\" {filternames} -r";
                             }
                             //DEBUG ONLY!! Use only for ALOV ME3 mem extract test
                             //else

@@ -507,6 +507,8 @@ namespace AlotAddOnGUI
                 }
             }
 
+            applyModManagerMods();
+
             InstallWorker.ReportProgress(completed, new ThreadCommand(SHOW_ALL_STAGE_LABELS));
 
             int overallProgress = 0;
@@ -591,152 +593,7 @@ namespace AlotAddOnGUI
             //Exited OK, continue installation.
 
 
-            //Apply ALOT-verified Mod Manager mods that we support.
-            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_OF_STAGE_LABEL));
-
-
-            string gameDirectory = Utilities.GetGamePath(INSTALLING_THREAD_GAME);
-            foreach (var modAddon in ADDONFILES_TO_BUILD.Where(x => x.IsModManagerMod))
-            {
-                InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, 0));
-                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Installing " + modAddon.FriendlyName));
-
-                void progressUpdate(int percent)
-                {
-                    InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, "Extracting " + percent + "%"));
-                }
-                var stagingPath = Directory.CreateDirectory(Path.Combine(gameDirectory, "ModExtractStaging")).FullName;
-
-                //progress, overwrite, recursive
-                var extractionProgressApp = Run7zWithProgressCallback($"x -bsp2 \"{modAddon.GetFile()}\" -aoa -r -o\"{stagingPath}\"", modAddon, progressUpdate);
-                while (extractionProgressApp.State == AppState.Running)
-                {
-                    Thread.Sleep(100); //Hacky... but it works
-                }
-                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, "Installing files"));
-
-                //Check requirements for this extraction rule to fire.
-                var dlcDirectory = INSTALLING_THREAD_GAME == 1
-                    ? Path.Combine(gameDirectory, "DLC")
-                    : Path.Combine(gameDirectory, "BioGame", "DLC");
-
-                foreach (var extractionRedirect in modAddon.ExtractionRedirects)
-                {
-                    //dlc is required (all in list)
-                    if (extractionRedirect.OptionalRequiredDLC != null)
-                    {
-                        List<string> requiredDlc = extractionRedirect.OptionalRequiredDLC.Split(';').ToList();
-                        List<string> requiredFiles = new List<string>();
-                        List<long> requiredFilesSizes = new List<long>();
-
-
-                        if (extractionRedirect.OptionalRequiredFiles != null)
-                        {
-                            requiredFiles = extractionRedirect.OptionalRequiredFiles.Split(';').ToList();
-                            if (extractionRedirect.OptionalRequiredFilesSizes != null)
-                            {
-                                //parse required sizes list. This can be null which means we don't check the list of file sizes in the list
-                                requiredFilesSizes = extractionRedirect.OptionalRequiredFilesSizes.Split(';').Select(x => long.Parse(x)).ToList();
-                            }
-                        }
-
-                        //check if any required dlc is missing
-                        if (requiredDlc.Any(x => !Directory.Exists(Path.Combine(dlcDirectory, x))))
-                        {
-                            Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. Rule requires all of the DLC: " + extractionRedirect.OptionalRequiredDLC);
-                            continue;
-                        }
-
-                        //Check if any required file is missing
-                        if (requiredFiles.Any(x => !File.Exists(Path.Combine(dlcDirectory, x))))
-                        {
-                            Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. At least one file for this rule was not found: " + extractionRedirect.OptionalRequiredFiles);
-                            continue;
-                        }
-
-                        //Check if any required file size is wrong
-                        if (requiredFilesSizes.Any())
-                        {
-                            bool doNotInstall = false;
-                            for (int i = 0; i < requiredFilesSizes.Count; i++)
-                            {
-                                string file = requiredFiles[i];
-                                long size = requiredFilesSizes[i];
-                                string finalPath = Path.Combine(dlcDirectory, file);
-                                var info = new FileInfo(finalPath);
-                                if (info.Length != size)
-                                {
-                                    Log.Information(extractionRedirect.LoggingName +
-                                                    ": Extraction rule is not applicable to this setup, file size for file " + file + " does not match rule.");
-                                    doNotInstall = true;
-                                    break;
-                                }
-                            }
-
-                            if (doNotInstall)
-                            {
-                                continue;
-                            }
-                        }
-                    }
-
-                    //dlc required (any in list)
-                    if (extractionRedirect.OptionalAnyDLC != null)
-                    {
-                        List<string> anyDLC = extractionRedirect.OptionalAnyDLC.Split(';').ToList();
-                        //check if all dlc is missing
-                        if (anyDLC.All(x => !Directory.Exists(Path.Combine(dlcDirectory, x))))
-                        {
-                            Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. Rule requires at least one of the DLC: " + extractionRedirect.OptionalRequiredDLC);
-                            continue;
-                        }
-                    }
-
-                    Log.Information("Applying extraction rule: " + extractionRedirect.LoggingName);
-                    var rootPath = Path.Combine(stagingPath, extractionRedirect.ArchiveRootPath);
-                    var filesToMove = Directory.GetFiles(rootPath, "*", SearchOption.AllDirectories);
-
-                    var ingameDestination = Path.Combine(gameDirectory, extractionRedirect.RelativeDestinationDirectory);
-                    if (extractionRedirect.IsDLC && Directory.Exists(ingameDestination))
-                    {
-                        //delete first
-                        Utilities.DeleteFilesAndFoldersRecursively(ingameDestination);
-                    }
-                    Directory.CreateDirectory(ingameDestination);
-
-                    foreach (var file in filesToMove)
-                    {
-                        string relativePath = file.Substring(rootPath.Length + 1);
-                        var extension = Path.GetExtension(relativePath);
-                        if (extension.Equals(".pcc", StringComparison.InvariantCultureIgnoreCase) ||
-                            extension.Equals(".tfc", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            Log.Information("Skipping file that that cannot be installed after alot: " + relativePath);
-                            continue;
-                        }
-                        string finalDestinationPath = Path.Combine(ingameDestination, relativePath);
-                        if (File.Exists(finalDestinationPath))
-                        {
-                            Log.Information("Deleting existing file before move: " + finalDestinationPath);
-                            File.Delete(finalDestinationPath);
-                        }
-
-                        Log.Information($"Moving staged file into game directory: {file} -> {finalDestinationPath}");
-                        Directory.CreateDirectory(Directory.GetParent(finalDestinationPath).FullName);
-                        File.Move(file, finalDestinationPath);
-                    }
-
-                    if (extractionRedirect.IsDLC)
-                    {
-                        //Write a _metacmm.txt file
-                        var metacmm = Path.Combine(ingameDestination, "_metacmm.txt");
-                        string contents = $"{extractionRedirect.LoggingName}\n{extractionRedirect.ModVersion}\nALOT Installer {System.Reflection.Assembly.GetEntryAssembly().GetName().Version}\n{Guid.NewGuid().ToString()}";
-                        File.WriteAllText(metacmm, contents);
-                    }
-                }
-
-                Utilities.DeleteFilesAndFoldersRecursively(stagingPath);
-            }
+            
 
             //Final stages
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_ALL_STAGE_LABELS));
@@ -1077,6 +934,155 @@ namespace AlotAddOnGUI
             Analytics.TrackEvent("Finished installation for ME" + INSTALLING_THREAD_GAME);
 
             e.Result = INSTALL_OK;
+        }
+
+        private void applyModManagerMods()
+        {
+            //Apply ALOT-verified Mod Manager mods that we support.
+            InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_STAGE_OF_STAGE_LABEL));
+
+            string gameDirectory = Utilities.GetGamePath(INSTALLING_THREAD_GAME);
+            foreach (var modAddon in ADDONFILES_TO_BUILD.Where(x => x.IsModManagerMod))
+            {
+                InstallWorker.ReportProgress(0, new ThreadCommand(SET_OVERALL_PROGRESS, 0));
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_OVERALL_TASK, "Installing " + modAddon.FriendlyName));
+
+                void progressUpdate(int percent)
+                {
+                    InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, "Extracting " + percent + "%"));
+                }
+                var stagingPath = Directory.CreateDirectory(Path.Combine(gameDirectory, "ModExtractStaging")).FullName;
+
+                //progress, overwrite, recursive
+                var extractionProgressApp = Run7zWithProgressCallback($"x -bsp2 \"{modAddon.GetFile()}\" -aoa -r -o\"{stagingPath}\"", modAddon, progressUpdate);
+                while (extractionProgressApp.State == AppState.Running)
+                {
+                    Thread.Sleep(100); //Hacky... but it works
+                }
+                InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, "Installing files"));
+
+                //Check requirements for this extraction rule to fire.
+                var dlcDirectory = INSTALLING_THREAD_GAME == 1
+                    ? Path.Combine(gameDirectory, "DLC")
+                    : Path.Combine(gameDirectory, "BioGame", "DLC");
+
+                foreach (var extractionRedirect in modAddon.ExtractionRedirects)
+                {
+                    //dlc is required (all in list)
+                    if (extractionRedirect.OptionalRequiredDLC != null)
+                    {
+                        List<string> requiredDlc = extractionRedirect.OptionalRequiredDLC.Split(';').ToList();
+                        List<string> requiredFiles = new List<string>();
+                        List<long> requiredFilesSizes = new List<long>();
+
+
+                        if (extractionRedirect.OptionalRequiredFiles != null)
+                        {
+                            requiredFiles = extractionRedirect.OptionalRequiredFiles.Split(';').ToList();
+                            if (extractionRedirect.OptionalRequiredFilesSizes != null)
+                            {
+                                //parse required sizes list. This can be null which means we don't check the list of file sizes in the list
+                                requiredFilesSizes = extractionRedirect.OptionalRequiredFilesSizes.Split(';').Select(x => long.Parse(x)).ToList();
+                            }
+                        }
+
+                        //check if any required dlc is missing
+                        if (requiredDlc.Any(x => !Directory.Exists(Path.Combine(dlcDirectory, x))))
+                        {
+                            Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. Rule requires all of the DLC: " + extractionRedirect.OptionalRequiredDLC);
+                            continue;
+                        }
+
+                        //Check if any required file is missing
+                        if (requiredFiles.Any(x => !File.Exists(Path.Combine(dlcDirectory, x))))
+                        {
+                            Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. At least one file for this rule was not found: " + extractionRedirect.OptionalRequiredFiles);
+                            continue;
+                        }
+
+                        //Check if any required file size is wrong
+                        if (requiredFilesSizes.Any())
+                        {
+                            bool doNotInstall = false;
+                            for (int i = 0; i < requiredFilesSizes.Count; i++)
+                            {
+                                string file = requiredFiles[i];
+                                long size = requiredFilesSizes[i];
+                                string finalPath = Path.Combine(dlcDirectory, file);
+                                var info = new FileInfo(finalPath);
+                                if (info.Length != size)
+                                {
+                                    Log.Information(extractionRedirect.LoggingName +
+                                                    ": Extraction rule is not applicable to this setup, file size for file " + file + " does not match rule.");
+                                    doNotInstall = true;
+                                    break;
+                                }
+                            }
+
+                            if (doNotInstall)
+                            {
+                                continue;
+                            }
+                        }
+                    }
+
+                    //dlc required (any in list)
+                    if (extractionRedirect.OptionalAnyDLC != null)
+                    {
+                        List<string> anyDLC = extractionRedirect.OptionalAnyDLC.Split(';').ToList();
+                        //check if all dlc is missing
+                        if (anyDLC.All(x => !Directory.Exists(Path.Combine(dlcDirectory, x))))
+                        {
+                            Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. Rule requires at least one of the DLC: " + extractionRedirect.OptionalRequiredDLC);
+                            continue;
+                        }
+                    }
+
+                    Log.Information("Applying extraction rule: " + extractionRedirect.LoggingName);
+                    var rootPath = Path.Combine(stagingPath, extractionRedirect.ArchiveRootPath);
+                    var filesToMove = Directory.GetFiles(rootPath, "*", SearchOption.AllDirectories);
+
+                    var ingameDestination = Path.Combine(gameDirectory, extractionRedirect.RelativeDestinationDirectory);
+                    if (extractionRedirect.IsDLC && Directory.Exists(ingameDestination))
+                    {
+                        //delete first
+                        Utilities.DeleteFilesAndFoldersRecursively(ingameDestination);
+                    }
+                    Directory.CreateDirectory(ingameDestination);
+
+                    foreach (var file in filesToMove)
+                    {
+                        string relativePath = file.Substring(rootPath.Length + 1);
+                        var extension = Path.GetExtension(relativePath);
+                        if (extension.Equals(".pcc", StringComparison.InvariantCultureIgnoreCase) ||
+                            extension.Equals(".tfc", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            Log.Information("Skipping file that that cannot be installed after alot: " + relativePath);
+                            continue;
+                        }
+                        string finalDestinationPath = Path.Combine(ingameDestination, relativePath);
+                        if (File.Exists(finalDestinationPath))
+                        {
+                            Log.Information("Deleting existing file before move: " + finalDestinationPath);
+                            File.Delete(finalDestinationPath);
+                        }
+
+                        Log.Information($"Moving staged file into game directory: {file} -> {finalDestinationPath}");
+                        Directory.CreateDirectory(Directory.GetParent(finalDestinationPath).FullName);
+                        File.Move(file, finalDestinationPath);
+                    }
+
+                    if (extractionRedirect.IsDLC)
+                    {
+                        //Write a _metacmm.txt file
+                        var metacmm = Path.Combine(ingameDestination, "_metacmm.txt");
+                        string contents = $"{extractionRedirect.LoggingName}\n{extractionRedirect.ModVersion}\nALOT Installer {System.Reflection.Assembly.GetEntryAssembly().GetName().Version}\n{Guid.NewGuid().ToString()}";
+                        File.WriteAllText(metacmm, contents);
+                    }
+                }
+
+                Utilities.DeleteFilesAndFoldersRecursively(stagingPath);
+            }
         }
 
         private void InstallCompleted(object sender, RunWorkerCompletedEventArgs e)
