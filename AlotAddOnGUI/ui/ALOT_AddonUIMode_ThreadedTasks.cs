@@ -224,9 +224,9 @@ namespace AlotAddOnGUI
                             {
                                 threads--; //cores - 1
                             }
-                            if (threads > 5)
+                            if (threads > 4)
                             {
-                                threads = 5;
+                                threads = 4;
                             }
 
                             Log.Information(prefix + "Extracting file: " + extractSource);
@@ -236,7 +236,7 @@ namespace AlotAddOnGUI
                             {
                                 //custom extraction code
                                 var filternames = string.Join(" ", af.PackageFiles.Select(x => x.SourceName));
-                                args = $"x -mmt{threads} -bsp2 \"{extractSource}\" -aoa -o\"{extractpath}\" {filternames} -r";
+                                args = $"e -mmt{threads} -bsp2 \"{extractSource}\" -aoa -o\"{extractpath}\" {filternames} -r";
                             }
                             //DEBUG ONLY!! Use only for ALOV ME3 mem extract test
                             //else
