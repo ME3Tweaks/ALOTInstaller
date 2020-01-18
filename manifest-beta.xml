@@ -815,7 +815,7 @@
 
       <!-- LIME We Will Prevail (PLASMAFLOW) -->
       <extractionredirect archiverootpath="Patches_Alternates\LIME_WWP_FLOW" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LIME" optionalrequiredfiles="DLC_CON_LIME\Movies\End03_D_NormandyChaseExt.bik" optionalrequiredfilessizes="43174424" loggingname="Lime WWP (Plasma)"/>
-      <packagefile me3="true" sourcename="alotinstaller\ALOV_ALOT_addon_v1.mem" movedirectly="true" />
+      <packagefile me3="true" sourcename="ALOV_ALOT_addon_v1.mem" movedirectly="true" />
    </addonfile>
 </alotaddonmanifest>
    
