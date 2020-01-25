@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.18">
+<alotaddonmanifest version="6.0.19">
    <highestapprovedmemversion>410</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2020-01-04">410</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
@@ -737,8 +737,8 @@
    </addonfile>
    <addonfile friendlyname="A Lot of Videos for ME1" author="Audemus/Mellin" optional="true">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files" filename="ALOV for ME1 1.1-144-1-1-1579885331.7z" torrentfilename="ALotofVideosforME1_1.1.7z" md5="e2057fdfedb22163f158ad818c5ebd58" size="2340827972"  modmanagermod="true"/>
-      <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC\Movies"/>
-      <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC\Movies" optionalrequireddlc="DLC_UNC"/>
+      <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC"/>
+      <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC" optionalrequireddlc="DLC_UNC"/>
       <games me1="true" me2="false" me3="false" />
    </addonfile>
    <addonfile friendlyname="A Lot of Videos for ME2 - 1080p" author="Audemus/Mellin" optional="true">
