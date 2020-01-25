@@ -508,7 +508,7 @@ namespace AlotAddOnGUI
             }
 
             applyModManagerMods();
-
+            InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OVERALL_TASK, MAINTASK_TEXT));
             InstallWorker.ReportProgress(completed, new ThreadCommand(SHOW_ALL_STAGE_LABELS));
 
             int overallProgress = 0;
