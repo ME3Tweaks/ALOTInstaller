@@ -735,13 +735,13 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0x6E443315_bulk_vega_s.dds" destinationname="HMM_ARM_SANf_Diff_0x6E443315.dds" />
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds" />
    </addonfile>
-   <addonfile friendlyname="A Lot of Videos for ME1" author="Audemus/Mellin" optional="true">
+   <addonfile friendlyname="A Lot of Videos for ME1" author="Audemus/Mellin" optional="true" telemetrytracking="true">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files" filename="ALOV for ME1 1.1-144-1-1-1579885331.7z" torrentfilename="ALotofVideosforME1_1.1.7z" md5="e2057fdfedb22163f158ad818c5ebd58" size="2340827972"  modmanagermod="true"/>
       <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC"/>
       <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC" optionalrequireddlc="DLC_UNC"/>
       <games me1="true" me2="false" me3="false" />
    </addonfile>
-   <addonfile friendlyname="A Lot of Videos for ME2 - 1080p" author="Audemus/Mellin" optional="true">
+   <addonfile friendlyname="A Lot of Videos for ME2 - 1080p" author="Audemus/Mellin" optional="true" telemetrytracking="true">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files" filename="ALOV for ME2 1.1 - 1080p-245-1-1-1579940085.7z" torrentfilename="ALotofVideosforME2-1080p_1.1.7z" md5="700e3f16a21ac277f5285b5a7d751a1c" size="5533430325"  modmanagermod="true"/>
       <extractionredirect archiverootpath="BASEGAME\Movies" relativedestinationdirectory="BIOGame\Movies"/>
       <extractionredirect archiverootpath="ARRIVAL\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part02\Movies" optionalrequireddlc="DLC_EXP_Part02"/>
@@ -751,7 +751,7 @@
       <extractionredirect archiverootpath="OVERLORD\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies" optionalrequireddlc="DLC_UNC_Pack01"/>
       <games me1="false" me2="true" me3="false" />
    </addonfile>
-   <addonfile friendlyname="A Lot of Videos for ME3 - 1080p" author="Audemus/Mellin" optional="true" version="1.2">
+   <addonfile friendlyname="A Lot of Videos for ME3 - 1080p" author="Audemus/Mellin" optional="true" version="1.2" telemetrytracking="true">
       <file downloadlink="https://tessatheterror.xyz/index.php/s/9nWxx5Dygy4r4sK" filename="A Lot Of Videos (ALOV) for ME3 - 1080p_1.2.7z" md5="84322f7c30cf091cd0e5fce81550196d" size="16770588544"  modmanagermod="true"/>
       <extractionredirect archiverootpath="DLC_MOD_ALOV" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV" loggingname="ALOV for ME3 1080p - Core" isdlc="true"/> <!-- main mod -->
       <extractionredirect archiverootpath="DLC_MOD_ALOV_Patches" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches" optionalanyrequireddlc="DLC_MOD_EGM_Ark;DLC_MOD_EGM;DLC_MOD_EGM_Omg;DLC_CON_PEOM;DLC_EXP_CEMF;DLC_CON_JAM;DLC_CON_MtoC;DLC_CON_LIME;DLC_CON_JtoC" loggingname="ALOV for ME3 1080p - 3rd Party" isdlc="true"/> <!-- patch dlc -->
