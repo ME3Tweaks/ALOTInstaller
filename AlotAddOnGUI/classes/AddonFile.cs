@@ -363,6 +363,7 @@ namespace AlotAddOnGUI.classes
 
         public int MEUITMVer { get; internal set; }
         public bool InstallME1DLCASI { get; internal set; }
+        public bool TrackTelemetry { get; internal set; }
 
         private void OnPropertyChanged(string propertyName)
         {

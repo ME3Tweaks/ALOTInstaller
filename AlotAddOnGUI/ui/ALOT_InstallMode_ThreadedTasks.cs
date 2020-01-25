@@ -593,7 +593,7 @@ namespace AlotAddOnGUI
             //Exited OK, continue installation.
 
 
-            
+
 
             //Final stages
             InstallWorker.ReportProgress(0, new ThreadCommand(HIDE_ALL_STAGE_LABELS));
@@ -1339,6 +1339,22 @@ namespace AlotAddOnGUI
                             {"Disk Type", diskType.ToString() },
                             {"Failed", telemetryfailedcode.ToString() }
                         });
+
+                        Dictionary<string, string> telemetryTrackingForManifestFiles = new Dictionary<string, string>();
+                        foreach (var af in AllAddonFiles)
+                        {
+                            if ((af.Game_ME1 && INSTALLING_THREAD_GAME == 1) || (af.Game_ME2 && INSTALLING_THREAD_GAME == 2) || (af.Game_ME3 && INSTALLING_THREAD_GAME == 3) && af.TrackTelemetry)
+                            {
+                                telemetryTrackingForManifestFiles[af.FriendlyName] = addonFilesInstalled.Contains(af) ? "true" : "false";
+                            }
+                        }
+
+                        if (telemetryTrackingForManifestFiles.Any())
+                        {
+                            telemetryTrackingForManifestFiles["Game"] = "ME" + INSTALLING_THREAD_GAME;
+                            Analytics.TrackEvent("Installed game with telemetry tracked files", telemetryTrackingForManifestFiles);
+                        }
+
                         /*
                         "https://me3tweaks.com/alotinstaller/installationtelemetry.php".PostUrlEncodedAsync(new
                         {
@@ -1350,7 +1366,7 @@ namespace AlotAddOnGUI
                             processor_speed = processorSpeedMhz,
                             memory = memoryAmount,
                             installation_time = MEM_INSTALL_TIME_SECONDS,
-                            alladdonfiles = MainWindow.TELEMETRY_ALL_ADDON_FILES ? 1 : 0,
+                            alladdonfiles = MainWindow.TELEMETRY_ALL_ADDON_FILESa ? 1 : 0,
                             officialdlccount = officialDLCCount,
                             disktype = diskType,
                             failed = telemetryfailedcode,

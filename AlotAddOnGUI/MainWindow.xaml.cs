@@ -2610,6 +2610,7 @@ namespace AlotAddOnGUI
                                 AlreadyInstalled = false,
                                 Showing = false,
                                 Enabled = true,
+                                TrackTelemetry = e.Element("telemetrytracking") != null ? (bool)e.Attribute("telemetrytracking") : false,
                                 ComparisonsLink = (string)e.Attribute("comparisonslink"),
                                 InstallME1DLCASI = e.Attribute("installme1dlcasi") != null ? (bool)e.Attribute("installme1dlcasi") : false,
                                 FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
