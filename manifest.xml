@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.14">
-   <highestapprovedmemversion>409</highestapprovedmemversion>
+<alotaddonmanifest version="6.0.15">
+   <highestapprovedmemversion>410</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2020-01-04">410</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
       <!-- -58 is the next error code available-->
@@ -750,5 +750,71 @@
       <extractionredirect archiverootpath="LOTSB\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part01\Movies" optionalrequireddlc="DLC_EXP_Part01"/>
       <extractionredirect archiverootpath="OVERLORD\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies" optionalrequireddlc="DLC_UNC_Pack01"/>
       <games me1="false" me2="true" me3="false" />
+    <addonfile friendlyname="A Lot of Videos for ME3 - 1080p" author="Audemus/Mellin" optional="true" version="1.2" telemetrytracking="true">
+      <file downloadlink="https://tessatheterror.xyz/index.php/s/9nWxx5Dygy4r4sK" filename="A Lot Of Videos (ALOV) for ME3 - 1080p_1.2.7z" md5="84322f7c30cf091cd0e5fce81550196d" size="16770588544"  modmanagermod="true"/>
+      <extractionredirect archiverootpath="DLC_MOD_ALOV" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV" loggingname="ALOV for ME3 1080p - Core" isdlc="true"/> <!-- main mod -->
+      <extractionredirect archiverootpath="DLC_MOD_ALOV_Patches" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches" optionalanyrequireddlc="DLC_MOD_EGM_Ark;DLC_MOD_EGM;DLC_MOD_EGM_Omg;DLC_CON_PEOM;DLC_EXP_CEMF;DLC_CON_JAM;DLC_CON_MtoC;DLC_CON_LIME;DLC_CON_JtoC" loggingname="ALOV for ME3 1080p - 3rd Party" isdlc="true"/> <!-- patch dlc -->
+
+      <!-- Official DLC -->
+      <extractionredirect archiverootpath="Alternates\LEVIATHAN" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV\Movies" optionalrequireddlc="DLC_EXP_Pack001" loggingname="Leviathan"/>
+      <extractionredirect archiverootpath="Alternates\OMEGA" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV\Movies" optionalrequireddlc="DLC_EXP_Pack002" loggingname="Omega"/>
+      <extractionredirect archiverootpath="Alternates\FROM_ASHES" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV\Movies" optionalrequireddlc="DLC_HEN_PR" loggingname="From Ashes"/>
+      <extractionredirect archiverootpath="Alternates\CITADEL" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV\Movies" optionalrequireddlc="DLC_EXP_Pack003" loggingname="Citadel"/>
+      <extractionredirect archiverootpath="Alternates\EXTENDEDCUT" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV\Movies" optionalrequireddlc="DLC_CON_END" loggingname="Extended Cut"/>
+
+
+      <!-- 3rd party -->
+      
+      <!-- EGM -->
+      <extractionredirect archiverootpath="Patches_Alternates\ARK_MOD" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_MOD_EGM_Ark" loggingname="Ark Mod"/>
+      <extractionredirect archiverootpath="Patches_Alternates\EGM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_MOD_EGM" loggingname="Expanded Galaxy Mod"/>
+      <extractionredirect archiverootpath="Patches_Alternates\OMEGA_HUB" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_MOD_EGM_Omg" loggingname="Omega Hub"/>
+
+      <!-- PEOM -->
+      <extractionredirect archiverootpath="Patches_Alternates\PEOM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_PEOM" loggingname="PEOM"/>
+
+      <!-- CEM Full -->
+      <extractionredirect archiverootpath="Patches_Alternates\CEM_F" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_EXP_CEMF" loggingname="Citadel Epiloge Mod Full"/>
+
+      <!-- JAM  (A?)-->
+      <extractionredirect archiverootpath="Patches_Alternates\JAM_A" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JAM" loggingname="JAM Core"/>
+
+      <!-- LIME to CEM Full -->
+      <extractionredirect archiverootpath="Patches_Alternates\LIME_to_CEM_Full" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LtoC;DLC_EXP_CEMF" loggingname="Lime to CEM Full"/>
+
+      <!-- LIME to CEM Lite -->
+      <extractionredirect archiverootpath="Patches_Alternates\LIME_to_CEM_Lite" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LtoC;DLC_EXP_CEML" loggingname="Lime to CEM Lite"/>
+
+      <!-- JAM to CEM Core MELLIN CHECK -->
+      <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JtoC" loggingname="JAM to CEM Core"/>
+
+      <!-- JAM to CEM Full -->
+      <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM_Full" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JtoC;DLC_EXP_CEMF" loggingname="JAM to CEM Full"/>
+
+      <!-- JAM to CEM Lite -->
+      <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM_Lite" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JtoC;DLC_EXP_CEML" loggingname="JAM to CEM Lite"/>
+
+      <!-- MEHEM to CEM CORE -->
+      <extractionredirect archiverootpath="Patches_Alternates\MEHEM_to_CEM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_MtoC" loggingname="REPLACEME"/>
+
+      <!-- MEHEM/CEM Full -->
+      <extractionredirect archiverootpath="Patches_Alternates\MEHEM_to_CEM_Full" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_MtoC;DLC_EXP_CEMF" loggingname="MEHEM to CEM Full"/>
+      
+      <!-- MEHEM/CEM Lite -->
+      <extractionredirect archiverootpath="Patches_Alternates\MEHEM_to_CEM_Lite" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_MtoC;DLC_EXP_CEML" loggingname="MEHEM to CEM Lite"/>
+      
+      <!-- PEOM to EGM -->
+      <extractionredirect archiverootpath="Patches_Alternates\PEOM_to_EGM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_PEOM;DLC_MOD_EGM" loggingname="PEOM to EGM"/>
+
+      <!-- JAM Version B -->
+      <extractionredirect archiverootpath="Patches_Alternates\JAM_B" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JAM" optionalrequiredfiles="DLC_CON_JAM\Movies\End02_Cit_Flower.bik" loggingname="JAM Version B"/>
+
+      <!-- LIME We Will Prevail version -->
+      <extractionredirect archiverootpath="Patches_Alternates\LIME_WWP" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LIME" optionalrequiredfiles="DLC_CON_LIME\Movies\End03_D_NormandyChaseExt.bik" optionalrequiredfilessizes="32990376" loggingname="LIME WWP"/>
+
+      <!-- LIME We Will Prevail (PLASMAFLOW) -->
+      <extractionredirect archiverootpath="Patches_Alternates\LIME_WWP_FLOW" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LIME" optionalrequiredfiles="DLC_CON_LIME\Movies\End03_D_NormandyChaseExt.bik" optionalrequiredfilessizes="43174424" loggingname="Lime WWP (Plasma)"/>
+      <packagefile me3="true" sourcename="ALOV_ALOT_addon_v1.mem" movedirectly="true" />
+   </addonfile>
    </addonfile>
 </alotaddonmanifest>
