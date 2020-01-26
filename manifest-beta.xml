@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.19">
+<alotaddonmanifest version="6.0.20">
    <highestapprovedmemversion>410</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2020-01-04">410</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
@@ -752,7 +752,7 @@
       <games me1="false" me2="true" me3="false" />
    </addonfile>
    <addonfile friendlyname="A Lot of Videos for ME3 - 1080p" author="Audemus/Mellin" optional="true" version="1.2" telemetrytracking="true">
-      <file downloadlink="https://tessatheterror.xyz/index.php/s/9nWxx5Dygy4r4sK" filename="A Lot Of Videos (ALOV) for ME3 - 1080p_1.2.7z" md5="84322f7c30cf091cd0e5fce81550196d" size="16770588544"  modmanagermod="true"/>
+      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files" filename="A Lot Of Videos (ALOV) for ME3 - 1080p_1.2.7z" md5="84322f7c30cf091cd0e5fce81550196d" size="16770588544"  modmanagermod="true"/>
       <extractionredirect archiverootpath="DLC_MOD_ALOV" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV" loggingname="ALOV for ME3 1080p - Core" isdlc="true"/> <!-- main mod -->
       <extractionredirect archiverootpath="DLC_MOD_ALOV_Patches" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches" optionalanyrequireddlc="DLC_MOD_EGM_Ark;DLC_MOD_EGM;DLC_MOD_EGM_Omg;DLC_CON_PEOM;DLC_EXP_CEMF;DLC_CON_JAM;DLC_CON_MtoC;DLC_CON_LIME;DLC_CON_JtoC" loggingname="ALOV for ME3 1080p - 3rd Party" isdlc="true"/> <!-- patch dlc -->
 
