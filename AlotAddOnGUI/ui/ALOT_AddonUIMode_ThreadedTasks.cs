@@ -2038,9 +2038,10 @@ namespace AlotAddOnGUI
             bool blockDueToMissingALOTUpdateFile = false; //default value
             string blockDueToBadImportedFile = null; //default vaule
             bool manifestHasUpdateAvailable = false;
-            AddonFile alotmainfile = null;
+            AddonFile alotmainfile = AllAddonFiles.FirstOrDefault(x => x.ALOTVersion > 0 && (x.Game_ME1 && game == 1) || (x.Game_ME2 && game == 2) || (x.Game_ME3 && game == 3));
             foreach (AddonFile af in AllAddonFiles)
             {
+                if (af.UserFile) Debugger.Break();
                 //Check ALOT file is ready
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
@@ -2052,11 +2053,6 @@ namespace AlotAddOnGUI
                     {
                         // do not check any files except MEUITM in MEUITM mode.
                         continue;
-                    }
-                    if (af.ALOTVersion > 0)
-                    {
-                        //set alot main file var
-                        alotmainfile = af;
                     }
                     if (blockDueToMissingALOTFile)
                     {
@@ -2071,12 +2067,12 @@ namespace AlotAddOnGUI
                             //TESTING: ME1 restrictions relaxed
                             if (game != 1)
                             {
-                                break;
+                                break; //should this be a break? what if the alot version is not relevant to installation?
                             }
                         }
                     }
 
-                    if (af.ALOTUpdateVersion > installedALOTUpdateVersion)
+                    if (af.ALOTUpdateVersion > installedALOTUpdateVersion && (installedInfo == null || installedInfo.ALOTVER == alotmainfile.ALOTVersion))
                     {
                         manifestHasUpdateAvailable = true;
                         if (!af.Ready)
@@ -2127,6 +2123,10 @@ namespace AlotAddOnGUI
                             oneisready = true;
                         }
                     }
+                }
+                else
+                {
+                    Debug.WriteLine("File that we are prechecking doesn't set the game: "+af.FriendlyName);
                 }
             }
 
