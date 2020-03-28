@@ -60,7 +60,7 @@ namespace AlotAddOnGUI.classes
 
                     if (info != null)
                     {
-                        if (ALOTVersion > 0 && (ALOTVersion != info.ALOTVER && (info.MEUITMVER == 0 || info.ALOTVER > 0)))
+                        if (ALOTVersion > 0 && ALOTVersion != info.ALOTVER && info.ALOTVER != 0)
                         {
                             return "images/greycheckmark.png";
                         }
@@ -126,29 +126,34 @@ namespace AlotAddOnGUI.classes
                         info = MainWindow.CURRENTLY_INSTALLED_ME3_ALOT_INFO;
                     }
 
-                    //Major Upgrade, including on unknown versinos
+                    //Major Upgrade, including on unknown versions
                     if (ALOTVersion > 0)
                     {
                         if (info != null)
                         {
-                            if (ALOTVersion > info.ALOTVER && (info.ALOTVER != 0 || info.ALOTVER == 0 && info.MEUITMVER == 0)) //me1 issue - we cannot detect 5.0 with no meuitm
+                            if (ALOTVersion != 0)
+                                Debug.WriteLine("i");
+                            if (ALOTVersion > info.ALOTVER && info.ALOTVER != 0) //ALOT was prevoiusly installed and its version does not match
                             {
                                 //newer version of ALOT is available
                                 return "Restore to unmodified to install upgrade";
                             }
-
-                            if (ALOTVersion > info.ALOTVER && info.ALOTVER == 0 && info.MEUITMVER > 0) //me1 issue - we cannot detect 5.0 with no meuitm
-                            {
-                                //alot not installed, meuitm installed. This could also be 5.0 with MEUITM but... :(
-                                return "ALOT main file imported";
-                            }
-                            if (ALOTVersion == info.ALOTVER)
+                            //else if (ALOTVersion > info.ALOTVER && info.ALOTVER == 0 && info.MEUITMVER > 0) //me1 issue - we cannot detect 5.0 with no meuitm
+                            //{
+                            //    //alot not installed, meuitm installed. This could also be 5.0 with MEUITM but... :(
+                            //    return "ALOT main file imported";
+                            //}
+                            else if (ALOTVersion == info.ALOTVER)
                             {
                                 return "Already installed";
                             }
-                            if (ALOTVersion == info.ALOTVER)
+                            else if (ALOTVersion == info.ALOTVER)
                             {
                                 return "Newer major version of ALOT already installed";
+                            }
+                            else
+                            {
+                                return "ALOT main file imported";
                             }
                         }
                         else
@@ -240,7 +245,7 @@ namespace AlotAddOnGUI.classes
         public string UnpackedSingleFilename { get; set; }
         public string ALOTMainPackedFilename { get; set; }
         public string TorrentFilename { get; set; }
-        public string ALOTArchiveInFilePath { get; set; }
+        public string ALOTArchiveInFilePath { get; set; }   
         public string Author { get; set; }
         public string FriendlyName { get; set; }
         public bool Game_ME1 { get; set; }
@@ -331,7 +336,7 @@ namespace AlotAddOnGUI.classes
                     //Major Upgrade, including on unknown versions
                     if (info != null)
                     {
-                        if (ALOTVersion > 0 && (ALOTVersion != info.ALOTVER && info.MEUITMVER == 0) || (ALOTVersion != info.ALOTVER && ALOTVersion != 0 && info.MEUITMVER != 0))
+                        if (ALOTVersion > 0 && (ALOTVersion != info.ALOTVER && info.ALOTVER != 0))
                         {
                             //Disabled
                             return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
@@ -413,9 +418,9 @@ namespace AlotAddOnGUI.classes
         {
             if (!UserFile)
             {
-                if (UnpackedSingleFilename != null && File.Exists(Path.Combine(MainWindow.DOWNLOADED_MODS_DIRECTORY,UnpackedSingleFilename)))
+                if (UnpackedSingleFilename != null && File.Exists(Path.Combine(MainWindow.DOWNLOADED_MODS_DIRECTORY, UnpackedSingleFilename)))
                 {
-                    return Path.Combine(MainWindow.DOWNLOADED_MODS_DIRECTORY,UnpackedSingleFilename);
+                    return Path.Combine(MainWindow.DOWNLOADED_MODS_DIRECTORY, UnpackedSingleFilename);
                 }
 
                 if (File.Exists(Path.Combine(MainWindow.DOWNLOADED_MODS_DIRECTORY, Filename)))
