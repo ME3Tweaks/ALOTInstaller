@@ -3019,17 +3019,17 @@ namespace AlotAddOnGUI
                     }
                     if (installedInfo != null && (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0))
                     {
-                        if (installedInfo.ALOTVER == 0 && installedInfo.MEUITMVER == 0)
-                        {
-                            //alot 5.0 or unable to find version
-                            Log.Warning("ALOT main version " + af.ALOTVersion + " blocked from installing because we are unable to detect version information for ALOT. This is typically from old 5.0 or lower installations which is not supported.");
-                            blockALOTInstallDueToMainVersionDiff = true;
-                            if (af.ALOTVersion > 0)
-                            {
-                                installingALOTver = af.ALOTVersion;
-                            }
-                            continue;
-                        }
+                        //if (installedInfo.ALOTVER == 0 && installedInfo.MEUITMVER == 0)
+                        //{
+                        //    //alot 5.0 or unable to find version
+                        //    Log.Warning("ALOT main version " + af.ALOTVersion + " blocked from installing because we are unable to detect version information for ALOT. This is typically from old 5.0 or lower installations which is not supported.");
+                        //    blockALOTInstallDueToMainVersionDiff = true;
+                        //    if (af.ALOTVersion > 0)
+                        //    {
+                        //        installingALOTver = af.ALOTVersion;
+                        //    }
+                        //    continue;
+                        //}
                         if (installedInfo.ALOTVER != 0 && installedInfo.ALOTVER != af.ALOTVersion && af.ALOTVersion != 0 && installedInfo.MEUITMVER > 0)
                         {
                             //alot installed same version
