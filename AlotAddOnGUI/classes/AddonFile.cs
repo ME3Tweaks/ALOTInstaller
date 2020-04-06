@@ -159,7 +159,7 @@ namespace AlotAddOnGUI.classes
 
                     if (ALOTUpdateVersion > 0)
                     {
-                        if (info != null)
+                        if (info != null && info.ALOTVER > 0)
                         {
                             if (ALOTMainVersionRequired == info.ALOTVER)
                             {

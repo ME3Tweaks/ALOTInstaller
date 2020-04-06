@@ -348,6 +348,7 @@
                                 <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Backup &amp; Restore"/>
                             </Expander.Header>
                             <StackPanel>
+                                <TextBlock MaxWidth="210" TextAlignment="Center" Text="Hover over buttons for more info" TextWrapping="Wrap"/>
                                 <Button x:Name="Button_ME1Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME1: Not Backed Up" Click="Button_ME1Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 <Button x:Name="Button_ME2Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME2: Not Backed Up" Click="Button_ME2Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
                                 <Button x:Name="Button_ME3Backup" Margin="20,0,20,0" FontSize="12" Padding="0,3,0,3" Content="ME3: Not Backed Up" Click="Button_ME3Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}" Controls:ControlsHelper.ContentCharacterCasing="Upper"/>
@@ -402,8 +403,8 @@
                                 <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mgamerz" ToolTip="Complained a bunch and then made this suave UI." HorizontalAlignment="Left"/>
                                 <TextBlock Margin="20,0,0,0" Padding="0,0,0,2" Text="Other Credits" HorizontalAlignment="Left"/>
 
-                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mass Effect Wiki" ToolTip="This program uses content from the Mass Effect wiki at FANDOM and is licensed under the Creative Commons Attribution-Share Alike License." HorizontalAlignment="Left"/>
-                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="ME3Tweaks" ToolTip="Powers the log uploading service to Pastebin" HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mass Effect Wiki" ToolTip="This program uses content from the Mass Effect wiki at FANDOM that is licensed under the Creative Commons Attribution-Share Alike License." HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="ME3Tweaks" ToolTip="Powers the log uploading and viewing service" HorizontalAlignment="Left"/>
                                 <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Erik JS" ToolTip="Developer of binkw32 ASI plugins for ME2 and ME3" HorizontalAlignment="Left"/>
                                 <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="SirCxyrtyx " ToolTip="Developer of the AutoTOC ASI plugin" HorizontalAlignment="Left"/>
                             </StackPanel>

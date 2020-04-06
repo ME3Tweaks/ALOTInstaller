@@ -297,7 +297,6 @@ namespace AlotAddOnGUI
             userfileGameSelectoroFlashingTextAnimation.Duration = new Duration(TimeSpan.FromSeconds(.7));
             userfileGameSelectoroFlashingTextAnimation.RepeatBehavior = RepeatBehavior.Forever;
             userfileGameSelectoroFlashingTextAnimation.AutoReverse = true;
-
         }
 
         /// <summary>
@@ -1609,6 +1608,15 @@ namespace AlotAddOnGUI
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+
+            OperatingSystem os = Environment.OSVersion;
+            //Windows 8 update 1
+            if (os.Version < new Version("6.3.9600"))
+            {
+                Log.Fatal("This version of Windows is not supported!");
+                await this.ShowMessageAsync("Unsupported operating system", "This software is not supported on your current version of Windows. ALOT Installer may or may not work. Upgrade to a supported version of Windows to ensure application compatibility.");
+            }
+
             fadeInItems = new FrameworkElement[] { FirstRun_MainContent, FirstRunText_TitleBeta, FirstRunText_BetaSummary };
             buildOptionCheckboxes = new System.Windows.Controls.CheckBox[] { Checkbox_BuildOptionALOT, Checkbox_BuildOptionALOTUpdate, Checkbox_BuildOptionMEUITM, Checkbox_BuildOptionUser, Checkbox_BuildOptionAddon };
             if (EXE_DIRECTORY.Length > 105)
@@ -2335,7 +2343,7 @@ namespace AlotAddOnGUI
                     }
                     else
                     {
-                        me1ver = "Installed, unable to detect version";
+                        me1ver = "Texture modded";
                     }
                 }
             }
@@ -2352,7 +2360,7 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    me2ver = "Installed, unable to detect version";
+                    me2ver = "Texture modded";
                 }
             }
             else
@@ -2368,7 +2376,7 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    me3ver = "Installed, unable to detect version";
+                    me3ver = "Texture modded";
                 }
             }
             else
