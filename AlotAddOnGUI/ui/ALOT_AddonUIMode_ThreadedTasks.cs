@@ -744,11 +744,11 @@ namespace AlotAddOnGUI
             //compile list of addon files to process
             foreach (AddonFile af in AllAddonFiles)
             {
-                if (!af.Enabled)
+                if (af.IsDisabled)
                 {
                     continue;
                 }
-                if (af.Ready && (game == 1 && af.Game_ME1 || game == 2 && af.Game_ME2 || game == 3 && af.Game_ME3))
+                if (af.IsReady && (game == 1 && af.Game_ME1 || game == 2 && af.Game_ME2 || game == 3 && af.Game_ME3))
                 {
                     if (CurrentGameALOTInfo != null)
                     {
@@ -792,7 +792,7 @@ namespace AlotAddOnGUI
                         }
                     }
 
-                    if (af.UserFile && af.Enabled && BUILD_USER_FILES)
+                    if (af.UserFile && af.IsReady && BUILD_USER_FILES)
                     {
                         Log.Information("Adding User to build list: " + af.FriendlyName);
                         af.Building = true;
@@ -815,7 +815,7 @@ namespace AlotAddOnGUI
 
                     if ((af.ALOTVersion > 0 && BUILD_ALOT) || af.ALOTUpdateVersion > 0)
                     {
-                        if (af.Enabled)
+                        if (!af.IsDisabled)
                         {
                             ADDONFILES_TO_BUILD.Add(af);
                             af.Building = true;
@@ -2038,7 +2038,7 @@ namespace AlotAddOnGUI
             bool blockDueToMissingALOTUpdateFile = false; //default value
             string blockDueToBadImportedFile = null; //default vaule
             bool manifestHasUpdateAvailable = false;
-            AddonFile alotmainfile = AllAddonFiles.FirstOrDefault(x => x.ALOTVersion > 0 && (x.Game_ME1 && game == 1) || (x.Game_ME2 && game == 2) || (x.Game_ME3 && game == 3));
+            AddonFile alotmainfile = AllAddonFiles.FirstOrDefault(x => x.ALOTVersion > 0 && ((x.Game_ME1 && game == 1) || (x.Game_ME2 && game == 2) || (x.Game_ME3 && game == 3)));
             foreach (AddonFile af in AllAddonFiles)
             {
                 if (af.UserFile) Debugger.Break();
@@ -2056,12 +2056,12 @@ namespace AlotAddOnGUI
                     }
                     if (blockDueToMissingALOTFile)
                     {
-                        if (af.ALOTVersion > 0 && af.Ready)
+                        if (af.ALOTVersion > 0 && af.IsReady)
                         {
                             //Do not block as ALOT file is ready and will be installed
                             blockDueToMissingALOTFile = false;
                         }
-                        else if (af.ALOTVersion > 0 && !af.Ready)
+                        else if (af.ALOTVersion > 0 && !af.IsReady)
                         {
                             //Block due to ALOT file missing and it not being ready.
                             //TESTING: ME1 restrictions relaxed
@@ -2075,7 +2075,7 @@ namespace AlotAddOnGUI
                     if (af.ALOTUpdateVersion > installedALOTUpdateVersion && (installedInfo == null || installedInfo.ALOTVER == alotmainfile.ALOTVersion))
                     {
                         manifestHasUpdateAvailable = true;
-                        if (!af.Ready)
+                        if (!af.IsReady)
                         {
                             blockDueToMissingALOTUpdateFile = true;
 
@@ -2087,7 +2087,7 @@ namespace AlotAddOnGUI
                         }
                     }
 
-                    if (!af.Ready && !af.Optional)
+                    if (!af.IsReady && !af.Optional)
                     {
                         //Check if MEUITM and if MEUITM is installed currently
                         if (installedInfo != null)
@@ -2101,7 +2101,7 @@ namespace AlotAddOnGUI
                     }
                     else
                     {
-                        if (af.Ready && af.Enabled && af.GetFile() != null && File.Exists(af.GetFile()))
+                        if (af.IsReady && af.GetFile() != null && File.Exists(af.GetFile()))
                         {
                             if (af.GetFile() == null)
                             {
@@ -2140,7 +2140,7 @@ namespace AlotAddOnGUI
                 return false;
             }
 
-            if (blockDueToMissingALOTUpdateFile && alotmainfile != null && alotmainfile.Ready && !MEUITM_INSTALLER_MODE)
+            if (blockDueToMissingALOTUpdateFile && alotmainfile != null && alotmainfile.IsReady && !MEUITM_INSTALLER_MODE)
             {
                 Log.Warning("Installation for ME" + game + " has been blocked due to an ALOT update listed in manifest, but not available in the texture library. ALOT updates must also be imported when installing ALOT.");
                 if (installedInfo == null)
@@ -2172,9 +2172,9 @@ namespace AlotAddOnGUI
                 return false;
             }
 
-            if (!MEUITM_INSTALLER_MODE && game == 1 && alotmainfile != null && !alotmainfile.Ready && installedInfo == null)
+            if (!MEUITM_INSTALLER_MODE && alotmainfile != null && !alotmainfile.IsReady && installedInfo == null)
             {
-                //ME1 Testing: Allow without ALOT or MEUITM
+                //Testing: Allow installation without ALOT main
                 return true;
             }
 

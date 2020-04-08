@@ -83,7 +83,7 @@ namespace AlotAddOnGUI
             List<AddonFile> readyFiles = new List<AddonFile>();
             foreach (AddonFile af in missingAddonFiles)
             {
-                if (af.Ready)
+                if (af.IsReady)
                 {
                     readyFiles.Add(af);
                 }

@@ -889,7 +889,7 @@ namespace AlotAddOnGUI
                             }
                             if (alotMainFile != null)
                             {
-                                alotMainFile.Staged = false;
+                                alotMainFile.State = AddonFile.FileState.Ready; //turn off staged
                             }
 
                         }

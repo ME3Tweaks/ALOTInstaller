@@ -21,15 +21,30 @@ namespace AlotAddOnGUI.classes
         public short ALOTMainVersionRequired { get; set; }
         public string ComparisonsLink { get; set; }
 
-        public bool IsRequiredFile
+        public enum FileState
         {
-            get { return ALOTVersion > 0 || ALOTUpdateVersion > 0; }
+            NotReady, //not available
+            ManualDisabled, //disabled by user
+            AutoDisabled, //disabled by program (e.g. conflicting update and installed)
+            Ready, //ready to install
+            Processing,
+            WaitingForProcessing,
+            Staged //staged for install
         }
-        public bool IsALOTUpdate
-        {
-            get { return ALOTUpdateVersion > 0; }
-        }
-        private string _readystatustext;
+
+        public FileState State;
+
+        /// <summary>
+        /// Is a file with ALOTVErsion of ALOTUpdateVersion set
+        /// </summary>
+        public bool IsALOTRequiredFile => ALOTVersion > 0 || ALOTUpdateVersion > 0;
+
+        /// <summary>
+        /// Has ALOTUpdateVersion > 0
+        /// </summary>
+        public bool IsALOTUpdate => ALOTUpdateVersion > 0;
+
+        //private string _readystatustext;
         private string _readyiconpath;
 
         public string ReadyIconPath
@@ -40,7 +55,8 @@ namespace AlotAddOnGUI.classes
                 {
                     return _readyiconpath;
                 }
-                else if ((ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM) && Ready)
+
+                if ((ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM) && IsReady)
                 {
                     //Get current info
                     ALOTVersionInfo info = null;
@@ -58,9 +74,9 @@ namespace AlotAddOnGUI.classes
                     }
 
 
-                    if (info != null)
+                    if (info != null && info.ALOTVER > 0)
                     {
-                        if (ALOTVersion > 0 && ALOTVersion != info.ALOTVER && info.ALOTVER != 0)
+                        if (ALOTVersion != info.ALOTVER)
                         {
                             return "images/greycheckmark.png";
                         }
@@ -72,18 +88,16 @@ namespace AlotAddOnGUI.classes
                     }
                 }
                 //Not ALOT
-                if (Ready && Enabled)
+                if (IsReady)
                 {
                     return "images/greencheckmark.png";
                 }
-                else if (Ready && !Enabled)
+                if (IsDisabled)
                 {
                     return "images/greycheckmark.png";
                 }
-                else
-                {
-                    return "images/orangedownload.png";
-                }
+             
+                return "images/orangedownload.png";
             }
 
             set
@@ -97,19 +111,19 @@ namespace AlotAddOnGUI.classes
         {
             get
             {
-                if (_readystatustext != null)
+                //if (_readystatustext != null)
+                //{
+                //    return _readystatustext;
+                //}
+                if (State == FileState.ManualDisabled)
                 {
-                    return _readystatustext;
+                    return "Disabled, will not install";
                 }
-                if (!Enabled)
-                {
-                    return "Disabled";
-                }
-                if (Staged)
+                if (State == FileState.Staged)
                 {
                     return "File staged for installation";
                 }
-                if (ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM)
+                if (IsALOTRequiredFile || MEUITM)
                 {
                     //Get current info
                     ALOTVersionInfo info = null;
@@ -136,7 +150,7 @@ namespace AlotAddOnGUI.classes
                             if (ALOTVersion > info.ALOTVER && info.ALOTVER != 0) //ALOT was prevoiusly installed and its version does not match
                             {
                                 //newer version of ALOT is available
-                                return "Restore to unmodified to install upgrade";
+                                return "Restore to unmodified to install new version of ALOT";
                             }
                             //else if (ALOTVersion > info.ALOTVER && info.ALOTVER == 0 && info.MEUITMVER > 0) //me1 issue - we cannot detect 5.0 with no meuitm
                             //{
@@ -191,7 +205,7 @@ namespace AlotAddOnGUI.classes
 
                     if (MEUITM)
                     {
-                        if (Ready)
+                        if (IsReady)
                         {
                             if (info != null)
                             {
@@ -232,11 +246,11 @@ namespace AlotAddOnGUI.classes
                 {
                     return "MEUITM is imported";
                 }
-                return "Addon file is imported";
+                return "Addon file is imported (addon files are not tracked as installed or not)";
             }
             set
             {
-                _readystatustext = value;
+                //_readystatustext = value;
                 OnPropertyChanged("ReadyStatusText");
                 OnPropertyChanged("LeftBlockColor"); //ui update for this property
             }
@@ -245,7 +259,7 @@ namespace AlotAddOnGUI.classes
         public string UnpackedSingleFilename { get; set; }
         public string ALOTMainPackedFilename { get; set; }
         public string TorrentFilename { get; set; }
-        public string ALOTArchiveInFilePath { get; set; }   
+        public string ALOTArchiveInFilePath { get; set; }
         public string Author { get; set; }
         public string FriendlyName { get; set; }
         public bool Game_ME1 { get; set; }
@@ -263,32 +277,25 @@ namespace AlotAddOnGUI.classes
         public List<ZipFile> ZipFiles { get; set; }
         public List<CopyFile> CopyFiles { get; set; }
 
-        public string DownloadAssistantString
-        {
-            get
-            {
+        public string DownloadAssistantString => " - File title: " + Tooltipname;
 
-                return " - File title: " + Tooltipname;
-            }
-        }
+        //public bool Ready
+        //{
 
-        public bool Ready
-        {
-
-            get { return m_ready; }
-            set
-            {
-                m_ready = value;
-                OnPropertyChanged("LeftBlockColor"); //ui update for tihs property
-                OnPropertyChanged("ReadyIconPath");
-                OnPropertyChanged("Ready");
-            }
-        }
+        //    get { return m_ready; }
+        //    set
+        //    {
+        //        m_ready = value;
+        //        OnPropertyChanged("LeftBlockColor"); //ui update for tihs property
+        //        OnPropertyChanged("ReadyIconPath");
+        //        OnPropertyChanged("Ready");
+        //    }
+        //}
 
         public bool UserFile { get; internal set; }
         public string UserFilePath { get; internal set; }
         public bool MEUITM { get; internal set; }
-        public bool Staged { get; internal set; }
+        //public bool Staged { get; internal set; }
         public bool Building { get; internal set; }
         public long FileSize { get; internal set; }
         public string BuildID { get; internal set; }
@@ -299,16 +306,16 @@ namespace AlotAddOnGUI.classes
         private bool _enabled;
         public bool CopyDirectly { get; internal set; }
 
-        public bool Enabled
-        {
-            get { return _enabled; }
-            internal set
-            {
-                _enabled = value;
-                OnPropertyChanged("LeftBlockColor"); //ui update for tihs property
-                OnPropertyChanged("ReadyIconPath"); //ui update for tihs property
-            }
-        }
+        //public bool Enabled
+        //{
+        //    get { return _enabled; }
+        //    internal set
+        //    {
+        //        _enabled = value;
+        //        OnPropertyChanged("LeftBlockColor"); //ui update for tihs property
+        //        OnPropertyChanged("ReadyIconPath"); //ui update for tihs property
+        //    }
+        //}
 
         public bool AlreadyInstalled { get; set; }
 
@@ -316,7 +323,7 @@ namespace AlotAddOnGUI.classes
         {
             get
             {
-                if ((ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM) && Ready)
+                if ((ALOTUpdateVersion > 0 || ALOTVersion > 0 || MEUITM) && State >= FileState.Ready)
                 {
                     //Get current info
                     ALOTVersionInfo info = null;
@@ -334,9 +341,9 @@ namespace AlotAddOnGUI.classes
                     }
 
                     //Major Upgrade, including on unknown versions
-                    if (info != null)
+                    if (info != null && ALOTVersion > 0)
                     {
-                        if (ALOTVersion > 0 && (ALOTVersion != info.ALOTVER && info.ALOTVER != 0))
+                        if (ALOTVersion != info.ALOTVER)
                         {
                             //Disabled
                             return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
@@ -349,11 +356,11 @@ namespace AlotAddOnGUI.classes
                     }
                 }
 
-                if (Ready && Enabled)
+                if (State >= FileState.Ready)
                 {
                     return Color.FromRgb((byte)0x31, (byte)0xae, (byte)0x90);
                 }
-                else if (Ready || !Enabled)
+                else if (IsDisabled)
                 {
                     //Disabled
                     return Color.FromRgb((byte)0x60, (byte)0x60, (byte)0x60);
@@ -365,6 +372,8 @@ namespace AlotAddOnGUI.classes
             }
 
         }
+
+        public bool IsDisabled => State == FileState.AutoDisabled || State == FileState.ManualDisabled;
 
         public int MEUITMVer { get; internal set; }
         public bool InstallME1DLCASI { get; internal set; }
@@ -401,7 +410,7 @@ namespace AlotAddOnGUI.classes
 
         internal bool IsCurrentlySingleFile()
         {
-            if (Ready)
+            if (IsReady)
             {
                 if (!UserFile)
                 {
@@ -414,6 +423,9 @@ namespace AlotAddOnGUI.classes
 
             return false;
         }
+
+        public bool IsReady => State >= FileState.Ready;
+
         internal string GetFile()
         {
             if (!UserFile)

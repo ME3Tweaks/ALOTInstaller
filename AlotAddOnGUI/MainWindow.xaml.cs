@@ -1488,20 +1488,20 @@ namespace AlotAddOnGUI
                 if (af.Game_ME2) numME2Files++;
                 if (af.Game_ME3) numME3Files++;
                 bool ready = File.Exists(basepath + af.Filename);
-                if (ready != af.Ready)
+                if (ready != af.IsReady)
                 {
                     Utilities.WriteDebugLog(af.FriendlyName + " ready state is about to change due to detection/missing file: " + basepath + af.Filename);
                 }
                 if (af.UserFile)
                 {
                     ready = File.Exists(af.UserFilePath);
-                    af.Staged = false;
+                    //af.Staged = false;
                 }
                 else if (!ready && af.UnpackedSingleFilename != null)
                 {
                     //Check for single file
                     ready = File.Exists(basepath + af.UnpackedSingleFilename);
-                    af.Staged = false;
+                    //af.Staged = false;
                 }
 
                 if (!ready && af.UnpackedSingleFilename != null && af.ALOTVersion > 0)
@@ -1524,9 +1524,9 @@ namespace AlotAddOnGUI
                     ready = File.Exists(stagedpath);
                     if (ready)
                     {
-                        af.Staged = true;
+                        af.State = AddonFile.FileState.Staged;
                     }
-                    if (ready != af.Ready)
+                    if (ready != af.IsReady)
                     {
                         Utilities.WriteDebugLog(af.FriendlyName + " ready state is about to change due to detection of staged file: " + stagedpath);
                     }
@@ -1552,31 +1552,32 @@ namespace AlotAddOnGUI
                     }
                 }
 
-                if (af.Ready != ready) //status is changing
+                if (af.IsReady != ready) //status is changing
                 {
                     Log.Information(af.FriendlyName + " changing ready states. Is now ready: " + ready);
-                    af.Ready = ready;
+                    af.State = ready ? AddonFile.FileState.Ready : AddonFile.FileState.NotReady;
                     af.ReadyStatusText = null;
                     af.ReadyIconPath = null;
-                    if (!af.Ready && af.UserFile)
+                    if (!af.IsReady && af.UserFile)
                     {
                         newUnreadyUserFiles.Add(af);
                     }
                 }
-                if (af.Ready)
+                if (af.IsReady)
                 {
                     if (af.Game_ME1) numME1FilesReady++;
                     if (af.Game_ME2) numME2FilesReady++;
                     if (af.Game_ME3) numME3FilesReady++;
                 }
-                else
-                {
-                    af.Staged = false;
-                }
+                //else
+                //{
+                //    af.Staged = false;
+                //}
                 numdone += ready && !af.Optional ? 1 : 0;
 
             }
-            int numcurrentfiles = DisplayedAddonFiles.Where(p => !p.Optional).Count();
+
+            int numcurrentfiles = DisplayedAddonFiles.Count(p => !p.Optional);
             if (numcurrentfiles != 0)
             {
                 ProgressBarValue = (((double)numdone / numcurrentfiles) * 100);
@@ -2022,7 +2023,7 @@ namespace AlotAddOnGUI
             CheckImportLibrary_Tick(null, null);
 
             //Check if this is MEUITM installer mode
-            var readyfiles = AllAddonFiles.Where(x => x.Ready && !x.UserFile).ToList();
+            var readyfiles = AllAddonFiles.Where(x => x.IsReady && !x.UserFile).ToList();
             if (readyfiles.Count == 1 && readyfiles[0].MEUITM)
             {
                 //Only MEUITM file was found
@@ -2049,7 +2050,7 @@ namespace AlotAddOnGUI
                 bool ReImportedFiles = false;
                 foreach (AddonFile af in AllAddonFiles)
                 {
-                    if (af.Ready && !af.Staged)
+                    if (af.IsReady && af.State != AddonFile.FileState.Staged)
                     {
                         continue;
                     }
@@ -2073,7 +2074,7 @@ namespace AlotAddOnGUI
                                 File.Delete(importedFilePath);
                                 File.Move(outputFilename, importedFilePath);
                                 ReImportedFiles = true;
-                                af.Staged = false;
+                                af.State = AddonFile.FileState.Ready; //change to ready from staged
                                 af.ReadyStatusText = null;
                             }
                             catch (Exception e)
@@ -2617,7 +2618,7 @@ namespace AlotAddOnGUI
                             {
                                 AlreadyInstalled = false,
                                 Showing = false,
-                                Enabled = true,
+                                State = AddonFile.FileState.NotReady,
                                 TrackTelemetry = e.Element("telemetrytracking") != null ? (bool)e.Attribute("telemetrytracking") : false,
                                 ComparisonsLink = (string)e.Attribute("comparisonslink"),
                                 InstallME1DLCASI = e.Attribute("installme1dlcasi") != null ? (bool)e.Attribute("installme1dlcasi") : false,
@@ -2643,7 +2644,6 @@ namespace AlotAddOnGUI
                                 UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
                                 UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
                                 TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
-                                Ready = false,
                                 IsModManagerMod = e.Element("file").Attribute("modmanagermod") != null ? (bool)e.Element("file").Attribute("modmanagermod") : false,
                                 ExtractionRedirects = e.Elements("extractionredirect")
                                     .Select(d => new ExtractionRedirect
@@ -2875,8 +2875,8 @@ namespace AlotAddOnGUI
                 }
                 else
                 {
-                    if ((!af.Ready || !af.Enabled) && ShowReadyFilesOnly)
-                    { continue; }
+                    if (!af.IsReady && ShowReadyFilesOnly)
+                        continue;
                     bool shouldDisplay = ((af.Game_ME1 && ShowME1Files) || (af.Game_ME2 && ShowME2Files) || (af.Game_ME3 && ShowME3Files));
                     if (shouldDisplay)
                     {
@@ -2906,7 +2906,7 @@ namespace AlotAddOnGUI
                 List<AddonFile> notReadyAddonFiles = new List<AddonFile>();
                 foreach (AddonFile af in DisplayedAddonFiles)
                 {
-                    if (!af.Ready && !af.UserFile)
+                    if (!af.IsReady && !af.UserFile)
                     {
                         notReadyAddonFiles.Add(af);
                     }
@@ -3006,13 +3006,13 @@ namespace AlotAddOnGUI
             bool hasAddonFile = false;
             foreach (AddonFile af in DisplayedAddonFiles)
             {
-                if (!af.Enabled)
+                if (!af.IsReady)
                 {
                     continue;
                 }
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
-                    if (af.UserFile && af.Ready)
+                    if (af.UserFile && af.IsReady)
                     {
                         hasApplicableUserFile = true;
                         continue;
@@ -3607,10 +3607,10 @@ namespace AlotAddOnGUI
                 bool hasMatch = false;
                 foreach (AddonFile af in AllAddonFiles)
                 {
-                    if (af.Ready == true) continue; //don't process ready files
+                    if (af.IsReady) continue; //don't process ready files
                     if (af.UserFile)
                     {
-                        if (af.UserFilePath == file && af.Ready)
+                        if (af.UserFilePath == file)
                         {
                             alreadyImportedFiles.Add(file);
                             hasMatch = true;
@@ -4372,7 +4372,7 @@ namespace AlotAddOnGUI
                     break;
             }
             af.ChoiceFiles = new List<ChoiceFile>();
-            af.Enabled = true;
+            af.State = AddonFile.FileState.Ready;
             af.UserFile = true;
             af.DownloadLink = "http://example.com";
             af.Author = "User Supplied Files (ME" + game + ")";
@@ -4527,7 +4527,7 @@ namespace AlotAddOnGUI
                 List<AddonFile> addonFilesNotReady = new List<AddonFile>();
                 foreach (AddonFile af in AllAddonFiles)
                 {
-                    if (!af.Ready)
+                    if (!af.IsReady)
                     {
                         addonFilesNotReady.Add(af);
                     }
@@ -4793,7 +4793,7 @@ namespace AlotAddOnGUI
                 List<AddonFile> notReadyAddonFiles = new List<AddonFile>();
                 foreach (AddonFile af in DisplayedAddonFiles)
                 {
-                    if (!af.Ready && !af.UserFile)
+                    if (!af.IsReady && !af.UserFile)
                     {
                         notReadyAddonFiles.Add(af);
                     }
@@ -4915,26 +4915,26 @@ namespace AlotAddOnGUI
                         }
                         break;
                     case 1:
-                        if (!af.Ready || PreventFileRefresh)
+                        if (!af.IsReady || PreventFileRefresh)
                         {
                             mi.Visibility = Visibility.Collapsed;
                         }
                         break;
                     case 2: //Toggle on/off
-                        if (af.ALOTVersion > 0 || af.ALOTUpdateVersion > 0 || !af.Ready || PreventFileRefresh || (af.MEUITM && MEUITM_INSTALLER_MODE))
+                        if (af.IsALOTRequiredFile || !af.IsReady || PreventFileRefresh || (af.MEUITM && MEUITM_INSTALLER_MODE))
                         {
                             mi.Visibility = Visibility.Collapsed;
                             break;
                         }
-                        if (af.Enabled)
+                        if (af.State == AddonFile.FileState.Ready)
                         {
-                            mi.Header = "Disable file";
+                            mi.Header = "Prevent this file from installing";
                             mi.ToolTip = "Click to disable file for this session.\nThis file will not be processed when staging files for installation.";
                             mi.ToolTip = "Prevents this file from being used for installation";
                         }
                         else
                         {
-                            mi.Header = "Enable file";
+                            mi.Header = "Enable this file for installing";
                             mi.ToolTip = "Allows this file to be used for installation";
                         }
                         break;
@@ -4960,17 +4960,14 @@ namespace AlotAddOnGUI
             var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
             AddonFile af = (AddonFile)row.DataContext;
 
-            if (af.Ready)
+            if (af.IsReady)
             {
-                af.Enabled = !af.Enabled;
-                if (!af.Enabled)
-                {
-                    af.ReadyStatusText = "Disabled";
-                }
-                else
-                {
-                    af.ReadyStatusText = null;
-                }
+                af.State = AddonFile.FileState.ManualDisabled;
+                af.ReadyStatusText = "Disabled";
+            }
+            else
+            {
+                af.State = AddonFile.FileState.Ready;
             }
         }
 
@@ -4979,7 +4976,7 @@ namespace AlotAddOnGUI
             var rowIndex = ListView_Files.SelectedIndex;
             var row = (System.Windows.Controls.ListViewItem)ListView_Files.ItemContainerGenerator.ContainerFromIndex(rowIndex);
             AddonFile af = (AddonFile)row.DataContext;
-            if (af.Ready)
+            if (af.IsReady)
             {
                 Utilities.OpenAndSelectFileInExplorer(af.GetFile());
             }
@@ -5274,10 +5271,13 @@ namespace AlotAddOnGUI
             Utilities.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY, SETTINGSTR_LIBRARYDIR, openFolder.FileName);
             foreach (AddonFile af in AllAddonFiles)
             {
-                af.Ready = false;
+                if (!af.UserFile)
+                {
+                    af.State = AddonFile.FileState.NotReady;
+                }
             }
             Button_LibraryDir.ToolTip = "Click to change texture library directory.\nIf path is not found at app startup, the default subdirectory of Downloaded_Mods will be used.\n\nLibrary location currently is:\n" + DOWNLOADED_MODS_DIRECTORY;
-            ShowStatus("Updated library directory - please wait while files refresh...", 4000);
+            ShowStatus("Updated library directory - please wait while file states refresh...", 4000);
         }
     }
 }
