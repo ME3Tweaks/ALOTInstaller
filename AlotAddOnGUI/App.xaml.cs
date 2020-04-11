@@ -39,6 +39,8 @@ namespace AlotAddOnGUI
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool DeleteFile(string name);
         public const string MEMendFileMarker = "ThisIsMEMEndOfFileMarker";
+        //Windows 8.1 Update 1
+        public static readonly Version MIN_SUPPORTED_OS = new Version("6.3.9600");
 
         [STAThread]
         public static void Main()

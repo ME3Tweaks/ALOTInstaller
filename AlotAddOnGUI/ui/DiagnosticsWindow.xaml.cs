@@ -459,8 +459,22 @@ namespace AlotAddOnGUI.ui
                 {
                     verLine += " " + releaseId;
                 }
-                addDiagLine(verLine);
-                addDiagLine("Version " + osBuildVersion);
+
+                if (os.Version < App.MIN_SUPPORTED_OS)
+                {
+                    addDiagLine("[FATAL]This operating system is not supported");
+                    addDiagLine("[FATAL]Upgrade to a supported operating system if you want support");
+                }
+
+                addDiagLine(os.Version < App.MIN_SUPPORTED_OS ? "[ERROR]" + verLine : verLine);
+                if (os.Version < App.MIN_SUPPORTED_OS)
+                {
+                    addDiagLine("[ERROR]Version " + osBuildVersion);
+                }
+                else
+                {
+                    addDiagLine("Version " + osBuildVersion);
+                }
                 addDiagLine("");
                 addDiagLine("Processors");
                 addDiagLine(Utilities.GetCPUString());

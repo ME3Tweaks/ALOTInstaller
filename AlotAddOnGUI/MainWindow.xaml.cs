@@ -1609,6 +1609,13 @@ namespace AlotAddOnGUI
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            OperatingSystem os = Environment.OSVersion;
+            if (os.Version < App.MIN_SUPPORTED_OS)
+            {
+                Log.Fatal("This version of Windows is not supported!");
+                await this.ShowMessageAsync("Unsupported operating system", "This software is not supported on your current version of Windows. ALOT Installer may or may not work. Upgrade to a supported version of Windows to ensure application compatibility.");
+            }
+
             fadeInItems = new FrameworkElement[] { FirstRun_MainContent, FirstRunText_TitleBeta, FirstRunText_BetaSummary };
             buildOptionCheckboxes = new System.Windows.Controls.CheckBox[] { Checkbox_BuildOptionALOT, Checkbox_BuildOptionALOTUpdate, Checkbox_BuildOptionMEUITM, Checkbox_BuildOptionUser, Checkbox_BuildOptionAddon };
             if (EXE_DIRECTORY.Length > 105)
