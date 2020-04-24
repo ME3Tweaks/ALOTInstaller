@@ -114,6 +114,7 @@ namespace AlotAddOnGUI
 
                     return attachments;
                 };
+                //AppCenter.LogLevel = LogLevel.Verbose;
                 AppCenter.Start(APIKeys.AppCenterKey, typeof(Analytics), typeof(Crashes));
             }
         }
@@ -486,6 +487,7 @@ namespace AlotAddOnGUI
         private static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             var probingPath = AppDomain.CurrentDomain.BaseDirectory + @"Data\lib";
+            Debug.WriteLine("Trying to load assembly: " + args.Name);
             var assyName = new AssemblyName(args.Name);
 
             var newPath = Path.Combine(probingPath, assyName.Name);
