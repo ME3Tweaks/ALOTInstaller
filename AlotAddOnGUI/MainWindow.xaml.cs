@@ -242,6 +242,7 @@ namespace AlotAddOnGUI
         public static bool TELEMETRY_ALL_ADDON_FILES = false;
         private List<string> ME2DLCRequiringTextureExportFixes;
         private List<string> ME3DLCRequiringTextureExportFixes;
+        public static readonly string MEM_DEBUG_LOG_PARAM = "--debug-logs";
 
         public double ProgressBarValue
         {
@@ -5200,6 +5201,10 @@ namespace AlotAddOnGUI
             Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "--check-game-data-vanilla --gameid " + BACKUP_THREAD_GAME + " --ipc";
+            if (MainWindow.DEBUG_LOGGING)
+            {
+                args += " " + MEM_DEBUG_LOG_PARAM;
+            }
             List<string> acceptedIPC = new List<string>();
             acceptedIPC.Add("TASK_PROGRESS");
             acceptedIPC.Add("ERROR");

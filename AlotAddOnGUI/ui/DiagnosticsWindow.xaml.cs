@@ -559,6 +559,10 @@ namespace AlotAddOnGUI.ui
                 //Start diagnostics
                 string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
                 string args = "--check-game-data-mismatch --gameid " + DIAGNOSTICS_GAME + " --ipc";
+                if (MainWindow.DEBUG_LOGGING)
+                {
+                    args += " " + MEM_DEBUG_LOG_PARAM;
+                }
                 if (MEMI_FOUND)
                 {
                     bool textureMapFileExists = File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\MassEffectModder\me" + DIAGNOSTICS_GAME + "map.bin");
@@ -620,6 +624,10 @@ namespace AlotAddOnGUI.ui
                     else
                     {
                         args = "--check-for-markers --gameid " + DIAGNOSTICS_GAME + " --ipc";
+                    }
+                    if (MainWindow.DEBUG_LOGGING)
+                    {
+                        args += " " + MEM_DEBUG_LOG_PARAM;
                     }
                     diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataAfter));
                     Context = MEMI_FOUND ? CONTEXT_REPLACEDFILE_SCAN : CONTEXT_FILEMARKER_SCAN;
@@ -712,6 +720,10 @@ namespace AlotAddOnGUI.ui
                     diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_FullCheck));
                     diagnosticsWorker.ReportProgress(0, new ThreadCommand(TURN_ON_TASKBAR_PROGRESS));
                     args = "--check-game-data-textures --gameid " + DIAGNOSTICS_GAME + " --ipc";
+                    if (MainWindow.DEBUG_LOGGING)
+                    {
+                        args += " " + MEM_DEBUG_LOG_PARAM;
+                    }
                     Context = CONTEXT_FULLMIPMAP_SCAN;
                     runMEM_Diagnostics(exe, args, diagnosticsWorker);
                     WaitForMEM();
@@ -763,6 +775,10 @@ namespace AlotAddOnGUI.ui
                 addDiagLine("If ALOT was installed, detection of mods in this block means you installed items after ALOT was installed, which will break the game.");
 
                 args = "--detect-mods --gameid " + DIAGNOSTICS_GAME + " --ipc";
+                if (MainWindow.DEBUG_LOGGING)
+                {
+                    args += " " + MEM_DEBUG_LOG_PARAM;
+                }
                 diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_WORKING, Image_DataBasegamemods));
                 runMEM_Diagnostics(exe, args, diagnosticsWorker);
                 WaitForMEM();
@@ -1093,6 +1109,10 @@ namespace AlotAddOnGUI.ui
 
                 //Get LODs
                 args = "--print-lods --gameid " + DIAGNOSTICS_GAME + " --ipc";
+                if (MainWindow.DEBUG_LOGGING)
+                {
+                    args += " " + MEM_DEBUG_LOG_PARAM;
+                }
                 LODS_INFO.Clear();
                 runMEM_Diagnostics(exe, args, diagnosticsWorker);
                 WaitForMEM();

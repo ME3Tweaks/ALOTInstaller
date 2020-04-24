@@ -657,6 +657,10 @@ namespace AlotAddOnGUI
             BlockingMods = new List<string>();
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "--detect-bad-mods --gameid " + CURRENT_GAME_BUILD + " --ipc";
+            if (MainWindow.DEBUG_LOGGING)
+            {
+                args += " " + MEM_DEBUG_LOG_PARAM;
+            }
             runMEM_DetectBadMods(exe, args, null);
             while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
             {
@@ -1168,7 +1172,10 @@ namespace AlotAddOnGUI
                     string args = "--convert-to-mem --gameid " + game +
                                   " --input \"" + ADDON_FULL_STAGING_DIRECTORY.TrimEnd('\\') +
                                   "\" --output \"" + getOutputDir(game) + filename + "\" --ipc";
-
+                    if (MainWindow.DEBUG_LOGGING)
+                    {
+                        args += " " + MEM_DEBUG_LOG_PARAM;
+                    }
                     runMEM_BackupAndBuild(exe, args, BuildWorker);
                     while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
                     {
@@ -1314,9 +1321,13 @@ namespace AlotAddOnGUI
                     string args = "--convert-to-mem --gameid " + game +
                                   " --input \"" + userFileExtractedPath.TrimEnd('\\') +
                                   "\" --output \"" + getOutputDir(game) + filename + "\" --ipc";
-
+                    if (MainWindow.DEBUG_LOGGING)
+                    {
+                        args += " " + MEM_DEBUG_LOG_PARAM;
+                    }
                     CURRENT_USER_BUILD_FILE = af.FriendlyName;
                     runMEM_BackupAndBuild(exe, args, BuildWorker);
+
                     while (BACKGROUND_MEM_PROCESS.State == AppState.Running)
                     {
                         Thread.Sleep(250);
@@ -1491,6 +1502,10 @@ namespace AlotAddOnGUI
             Log.Information("Verifying game: Mass Effect " + BACKUP_THREAD_GAME);
             string exe = BINARY_DIRECTORY + MEM_EXE_NAME;
             string args = "--check-game-data-vanilla --gameid " + BACKUP_THREAD_GAME + " --ipc";
+            if (MainWindow.DEBUG_LOGGING)
+            {
+                args += " " + MEM_DEBUG_LOG_PARAM;
+            }
             List<string> acceptedIPC = new List<string>();
             acceptedIPC.Add("TASK_PROGRESS");
             acceptedIPC.Add("ERROR");

@@ -470,6 +470,10 @@ namespace AlotAddOnGUI
                 CurrentTask = "Checking existing files for ALOT marker";
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
                 args = "--check-for-markers --gameid " + INSTALLING_THREAD_GAME + " --ipc";
+                if (MainWindow.DEBUG_LOGGING)
+                {
+                    args += " " + MEM_DEBUG_LOG_PARAM;
+                }
                 RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0 || BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
@@ -493,6 +497,10 @@ namespace AlotAddOnGUI
                             Log.Information("DLC marked for texture exports fix by MEM: " + dir);
                             InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
                             args = "--fix-textures-property --gameid " + INSTALLING_THREAD_GAME + " --filter \"" + dir + "\" --ipc";
+                            if (MainWindow.DEBUG_LOGGING)
+                            {
+                                args += " " + MEM_DEBUG_LOG_PARAM;
+                            }
                             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
                             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                             if (processResult != 0 || BACKGROUND_MEM_PROCESS_ERRORS.Count > 0)
@@ -525,7 +533,10 @@ namespace AlotAddOnGUI
             {
                 args += " --repack-mode";
             }
-
+            if (MainWindow.DEBUG_LOGGING)
+            {
+                args += " " + MEM_DEBUG_LOG_PARAM;
+            }
             //Comment the following 2 lines and uncomment the next 3 to skip installation step and simulate OK
             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, true);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
@@ -707,6 +718,10 @@ namespace AlotAddOnGUI
             {
                 args += " --soft-shadows-mode --meuitm-mode";
             }
+            if (MainWindow.DEBUG_LOGGING)
+            {
+                args += " " + MEM_DEBUG_LOG_PARAM;
+            }
             RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
             processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 6000;
             if (processResult != 0)
@@ -722,6 +737,10 @@ namespace AlotAddOnGUI
                 InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
 
                 args = "--apply-me1-laa";
+                if (MainWindow.DEBUG_LOGGING)
+                {
+                    args += " " + MEM_DEBUG_LOG_PARAM;
+                }
                 RunAndTimeMEMContextBased_Install(exe, args, InstallWorker, false);
                 processResult = BACKGROUND_MEM_PROCESS.ExitCode ?? 1;
                 if (processResult != 0)
