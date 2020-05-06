@@ -736,7 +736,7 @@
       <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds" destinationname="James3Glow_0xD76F9B1D.dds" />
    </addonfile>
    <addonfile friendlyname="A Lot of Videos for ME1" author="Audemus/Mellin" optional="true" telemetrytracking="true">
-      <file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files" filename="ALOV for ME1 1.1-144-1-1-1579885331.7z" torrentfilename="ALotofVideosforME1_1.1.7z" md5="e2057fdfedb22163f158ad818c5ebd58" size="2340827972"  modmanagermod="true"/>
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files" filename="ALOV for ME1 2.0 - (1080p)-144-2-0-1588778391.7z" torrentfilename="ALotofVideosforME1_2.0_1080p.7z" md5="b34bdca7eb5bf8fb0dd8d4e72b3b8c89" size="1743147975"  modmanagermod="true"/>
       <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC"/>
       <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC" optionalrequireddlc="DLC_UNC"/>
       <games me1="true" me2="false" me3="false" />
