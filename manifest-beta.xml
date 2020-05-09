@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.25">
+<alotaddonmanifest version="6.0.26">
    <highestapprovedmemversion>411</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2020-04-29">412</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
@@ -319,14 +319,6 @@
    <addonfile friendlyname="Zaeed Complexion Tweak" author="Ellise" optional="true">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/579/?tab=files" filename="Zaeed Complexion Tweak 1.0-579-1-0.7z" size="13561527" md5="e1ff127784ed88d5a1ef6ad2edaaa11a" />
       <packagefile me3="true" sourcename="el_ZaeedComplexionTweak_1.tpf" movedirectly="true" />
-   </addonfile>
-   <addonfile friendlyname="Better Hair Textures" author="heleuss" optional="true">
-      <file downloadlink="https://www.dropbox.com/s/enyzgfewu9sk4lp/ME1_Better%20Hair.tpf?dl=0" filename="ME1_Better Hair.tpf" size="27879592" md5="3817491d7842a65b7fb6736fc6f1dfa1" copydirectly="true" />
-      <games me1="true" me2="false" me3="false" />
-   </addonfile>
-   <addonfile friendlyname="Better Hair Textures" author="heleuss" optional="true">
-      <file downloadlink="https://www.dropbox.com/s/stmlo6qfd0567xs/ME2%20Better%20Hair.tpf?dl=0" filename="ME2 Better Hair.tpf" size="25923956" md5="57f20a3e21efa375d823dbbe72c1986e" copydirectly="true" />
-      <games me1="false" me2="true" me3="false" />
    </addonfile>
    <addonfile friendlyname="FemShep High Quality textures" author="heleuss" optional="true">
       <file downloadlink="https://www.mediafire.com/file/v151vbhh7d28kgb/%5BME3%5D+femShep+High+Quality+textures.7z" filename="[ME3] femShep High Quality textures.7z" size="18877523" md5="03d31b6a684a8d498997b03a43e8e53f" />
