@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.0.24">
+<alotaddonmanifest version="6.0.25">
    <highestapprovedmemversion>411</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2020-04-29">412</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
@@ -266,14 +266,6 @@
             size="113907531"
             md5="19b20c48f0fe711ac2eaacaf8f448207" />
       <packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v10.mem" movedirectly="true" />
-   </addonfile>
-   <addonfile friendlyname="ME1 Improved Bun Texture (A.L.O.T. - CDAMJC Cut)" author="LiasFfalenn">
-      <file downloadlink="https://www.nexusmods.com/masseffect/mods/2/?tab=files" filename="ME1 Improved Bun Textures (A.L.O.T. - CDAMJC Cut)-2-2-0.zip" size="21032500 " md5="db0d9c93b37e8d9156bf6abb49e4c3bd" />
-      <packagefile me1="true" sourcename="ME1 Improved Bun Textures (CDAMJC Cut).tpf" movedirectly="true" />
-   </addonfile>
-   <addonfile friendlyname="ME2 Improved Bun Textures (A.L.O.T.)" author="LiasFfalenn">
-      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/186/?tab=files" filename="ME2 Improved Bun Textures (A.L.O.T.)-186-1-0.zip" size="21032486" md5="d2d65c0e9af23c66806804d68feae800" />
-      <packagefile me2="true" sourcename="ME2 Improved Bun Textures (ALOT).tpf" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Allers Complexion Tweak" author="Ellise" optional="true">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/580/?tab=files" filename="el_AllersComplexionTweak.7z-580-1-0.7z" md5="d9f3b8f6f63132d86690835a3c766c44" size="8994633" />
