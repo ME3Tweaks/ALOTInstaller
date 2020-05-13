@@ -849,11 +849,11 @@ namespace AlotAddOnGUI
                                 //unused for now
                                 fs.Position = endPos - 16;
                                 int MEUITMVER = fs.ReadInt32();
-
                                 return new ALOTVersionInfo(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER, memVersionUsed, installerVersionUsed);
                             }
                             else
                             {
+                                Log.Information("Returning blank ALOTVersionInfo. Installer version used doesn't match final 4 or version < 10.");
                                 return new ALOTVersionInfo(0, 0, 0, 0, 0, 0); //MEMI tag but no info we know of
                             }
                         }

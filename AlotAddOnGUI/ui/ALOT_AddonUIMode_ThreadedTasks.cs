@@ -99,6 +99,10 @@ namespace AlotAddOnGUI
             ConsoleApp ca = new ConsoleApp(MainWindow.BINARY_DIRECTORY + "7z.exe", args);
             ca.ConsoleOutput += (o, args2) =>
             {
+                if (MainWindow.DEBUG_LOGGING)
+                {
+                    Log.Debug(args2.Line);
+                }
                 if (args2.IsError && args2.Line.Trim() != "" && !args2.Line.Trim().StartsWith("0M"))
                 {
                     int percentIndex = args2.Line.IndexOf("%");
@@ -2056,7 +2060,7 @@ namespace AlotAddOnGUI
             AddonFile alotmainfile = AllAddonFiles.FirstOrDefault(x => x.ALOTVersion > 0 && (x.Game_ME1 && game == 1) || (x.Game_ME2 && game == 2) || (x.Game_ME3 && game == 3));
             foreach (AddonFile af in AllAddonFiles)
             {
-                if (af.UserFile) Debugger.Break();
+                //if (af.UserFile) Debugger.Break();
                 //Check ALOT file is ready
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
@@ -2120,7 +2124,7 @@ namespace AlotAddOnGUI
                         {
                             if (af.GetFile() == null)
                             {
-                                Debugger.Break();
+                                //Debugger.Break();
                             }
                             FileInfo fi = new FileInfo(af.GetFile());
                             if (!af.IsCurrentlySingleFile() && af.FileSize > 0 && af.FileSize != fi.Length)
