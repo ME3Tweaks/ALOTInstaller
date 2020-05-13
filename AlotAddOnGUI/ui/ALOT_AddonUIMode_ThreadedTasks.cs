@@ -2041,7 +2041,7 @@ namespace AlotAddOnGUI
             AddonFile alotmainfile = AllAddonFiles.FirstOrDefault(x => x.ALOTVersion > 0 && ((x.Game_ME1 && game == 1) || (x.Game_ME2 && game == 2) || (x.Game_ME3 && game == 3)));
             foreach (AddonFile af in AllAddonFiles)
             {
-                if (af.UserFile) Debugger.Break();
+                if (af.UserFile && System.Diagnostics.Debugger.IsAttached) Debugger.Break();
                 //Check ALOT file is ready
                 if ((af.Game_ME1 && game == 1) || (af.Game_ME2 && game == 2) || (af.Game_ME3 && game == 3))
                 {
@@ -2103,7 +2103,7 @@ namespace AlotAddOnGUI
                     {
                         if (af.IsReady && af.GetFile() != null && File.Exists(af.GetFile()))
                         {
-                            if (af.GetFile() == null)
+                            if (af.GetFile() == null && System.Diagnostics.Debugger.IsAttached)
                             {
                                 Debugger.Break();
                             }
