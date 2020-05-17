@@ -1484,10 +1484,7 @@ namespace AlotAddOnGUI
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
-                if (DEBUG_LOGGING)
-                {
-                    Utilities.WriteDebugLog(str);
-                }
+                Utilities.WriteDebugLog(str);
                 if (str.StartsWith("[IPC]", StringComparison.Ordinal)) //needs culture ordinal check??
                 {
                     string command = str.Substring(5);

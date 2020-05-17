@@ -1399,6 +1399,7 @@ namespace AlotAddOnGUI.ui
             BACKGROUND_MEM_PROCESS.ConsoleOutput += (o, args2) =>
             {
                 string str = args2.Line;
+                Utilities.WriteDebugLog(str);
                 if (str.StartsWith("[IPC]", StringComparison.Ordinal))
                 {
                     string command = str.Substring(5);
