@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.2.0">
+<alotaddonmanifest version="6.2.1">
    <highestapprovedmemversion>411</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2020-04-29">412</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
