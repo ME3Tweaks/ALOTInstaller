@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.1.2">
+<alotaddonmanifest version="6.2.0">
    <highestapprovedmemversion>411</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2020-04-29">412</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
@@ -162,46 +162,46 @@
       <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows" />
       <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
    </addonfile>
-   <addonfile alotversion="11" friendlyname="ALOT for ME1 11.0 BETA" author="ALOT">
-      <file downloadlink="https://mega.nz/folder/40c1xaRL#f5Hg2rrX6cQK7Pavq8GW2Q"
-            tooltipname="ALOT for ME1 11.0 BETA"
+   <addonfile alotversion="11" friendlyname="ALOT for ME1 11.0" author="ALOT">
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+            tooltipname="ALOT for ME1 11.0"
 	    
-            torrentfilename="ALOT_ME1.zip"
-            filename="ALOT_ME1.zip"
-            size="4266402014"
-            md5="08b93f7be53227dde5c002fb86149b44"
+            torrentfilename="ALOT for ME1.zip"
+            filename="ALOT for ME1 11.0-83-2020-11-1591229529.zip"
+            size="4293992409"
+            md5="8066a931b6e0ff7c4f007984c3a76e50"
             
-            unpackedsinglefilename="ALOT_ME1.mem"
-            unpackedsize="4176072055"
-            unpackedmd5="8a82c9255c2c11561fa330503106360c" />
+            unpackedsinglefilename="ALOT_ME1_v11.mem"
+            unpackedsize="4203662462"
+            unpackedmd5="7d50bee890c3545e12a70cba8350e2be" />
       <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1.mem" movedirectly="true" />
    </addonfile>
-   <addonfile alotversion="11" friendlyname="ALOT for ME2 11.0 BETA" author="ALOT">
-      <file downloadlink="https://mega.nz/folder/40c1xaRL#f5Hg2rrX6cQK7Pavq8GW2Q"
-            tooltipname="ALOT for ME2 11.0 BETA"
+   <addonfile alotversion="11" friendlyname="ALOT for ME2 11.0" author="ALOT">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+            tooltipname="ALOT for ME2 11.0"
             
-            torrentfilename="ALOT_ME2.zip"
-            filename="ALOT_ME2.zip"
-            size="6472027034"
-            md5="891d9232157205bcec659f25f90ac390"
+            torrentfilename="ALOT for ME2.zip"
+            filename="ALOT for ME2 11.0-68-2020-11-1591228690.zip"
+            size="6478711287"
+            md5="972a69975cc2e474e3781290a43ecd82"
             
-            unpackedsinglefilename="ALOT_ME2.mem"
-            unpackedsize="6381696979"
-            unpackedmd5="082a5b0c5c81f053d0236a1c3d7303eb" />
+            unpackedsinglefilename="ALOT_ME2_v11.mem"
+            unpackedsize="6388381224"
+            unpackedmd5="42d42abcf3d8702140218cfc4574dc35" />
       <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2.mem" movedirectly="true" />
    </addonfile>
-   <addonfile alotversion="11" friendlyname="ALOT for ME3 11.0 BETA" author="ALOT">
-      <file downloadlink="https://mega.nz/folder/40c1xaRL#f5Hg2rrX6cQK7Pavq8GW2Q"
-            tooltipname="ALOT for ME3 11.0 BETA"
+   <addonfile alotversion="11" friendlyname="ALOT for ME3 11.0" author="ALOT">
+      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+            tooltipname="ALOT for ME3 11.0"
             
-            torrentfilename="ALOT_ME3.zip"
-            filename="ALOT_ME3.zip"
-            size="9115597185"
-            md5="49ffa84437525db72a4ed29bf32e8948"
+            torrentfilename="ALOT for ME3.zip"
+            filename="ALOT for ME3 11.0-363-2020-11-1591212660.zip"
+            size="9153130765"
+            md5="cc72e1dd98ef96089533245618557a1a"
             
-            unpackedsinglefilename="ALOT_ME3.mem"
-            unpackedsize="9025267130"
-            unpackedmd5="a9437689ee07eef4b008d89120053b73" />
+            unpackedsinglefilename="ALOT_ME3_v11.mem"
+            unpackedsize="9062800702"
+            unpackedmd5="ca1632d7f1f6d9fd22ad410641c8aae7" />
       <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Improved Static Lighting for ME1" author="CreeperLava">
