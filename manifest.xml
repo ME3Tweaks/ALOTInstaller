@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.1.2">
+<alotaddonmanifest version="6.2.1">
    <highestapprovedmemversion>415</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2020-05-14">415</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
@@ -174,7 +174,7 @@
             unpackedsinglefilename="ALOT_ME1_v11.mem"
             unpackedsize="4203662462"
             unpackedmd5="7d50bee890c3545e12a70cba8350e2be" />
-      <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1.mem" movedirectly="true" />
+      <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v11.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="11" friendlyname="ALOT for ME2 11.0" author="ALOT">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
@@ -188,7 +188,7 @@
             unpackedsinglefilename="ALOT_ME2_v11.mem"
             unpackedsize="6388381224"
             unpackedmd5="42d42abcf3d8702140218cfc4574dc35" />
-      <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2.mem" movedirectly="true" />
+      <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v11.mem" movedirectly="true" />
    </addonfile>
    <addonfile alotversion="11" friendlyname="ALOT for ME3 11.0" author="ALOT">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
@@ -202,7 +202,7 @@
             unpackedsinglefilename="ALOT_ME3_v11.mem"
             unpackedsize="9062800702"
             unpackedmd5="ca1632d7f1f6d9fd22ad410641c8aae7" />
-      <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3.mem" movedirectly="true" />
+      <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v11.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Improved Static Lighting for ME1" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
