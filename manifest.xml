@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.2.2">
+<alotaddonmanifest version="6.2.3">
    <highestapprovedmemversion>415</highestapprovedmemversion>
    <soaktestingmemversion soakstartdate="2020-05-14">415</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
@@ -208,7 +208,7 @@
               alotupdateversion="1"
               friendlyname="ALOT for ME1 11.1 - Update"
               tooltipname="ALOT for ME1 11.1 - Update"
-              author="CreeperLava">
+              author="ALOT">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
             filename="ALOT for ME 11.0 - Update-83-2020-11-1-1591653251.zip"
             size="68399573"
