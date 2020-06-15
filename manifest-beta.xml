@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<alotaddonmanifest version="6.2.1">
-   <highestapprovedmemversion>411</highestapprovedmemversion>
-   <soaktestingmemversion soakstartdate="2020-04-29">412</soaktestingmemversion> <!-- YYYY-MM-DD-->
+<alotaddonmanifest version="6.2.6">
+   <highestapprovedmemversion>415</highestapprovedmemversion>
+   <soaktestingmemversion soakstartdate="2020-06-14">417</soaktestingmemversion> <!-- YYYY-MM-DD-->
    <stages>
       <!-- -58 is the next error code available-->
       <stage name="STAGE_PRESCAN" weight="0" tasktext="Performing installation prescan">
@@ -203,6 +203,39 @@
             unpackedsize="9062800702"
             unpackedmd5="ca1632d7f1f6d9fd22ad410641c8aae7" />
       <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v11.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="11"
+              alotupdateversion="1"
+              friendlyname="ALOT for ME1 11.1 - Update"
+              tooltipname="ALOT for ME1 11.1 - Update"
+              author="ALOT">
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+            filename="ALOT for ME1 11.0 - Update-83-2020-11-1-1591653251.zip"
+            size="68399573"
+            md5="118987417fc41fc6e2f68d316aa57395" />
+      <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v11.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="11"
+              alotupdateversion="1"
+              friendlyname="ALOT for ME2 11.1 - Update"
+              tooltipname="ALOT for ME2 11.1 - Update"
+              author="ALOT">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+            filename="ALOT for ME2 11.1 - Update-68-2020-11-1-1592240377.zip"
+            size="234813"
+            md5="6fdb227c271d5a3acbc8a5997641a345" />
+      <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v11.mem" movedirectly="true" />
+   </addonfile>
+   <addonfile appliestomainversion="11"
+              alotupdateversion="1"
+              friendlyname="ALOT for ME3 11.1 - Update"
+              tooltipname="ALOT for ME3 11.1 - Update"
+              author="ALOT">
+      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+            filename="ALOT for ME3 11.1 - Update-363-2020-11-1-1592240372.zip"
+            size="3083186"
+            md5="dfd162d0053d73f7e7be48a83271eb5e" />
+      <packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v11.mem" movedirectly="true" />
    </addonfile>
    <addonfile friendlyname="Improved Static Lighting for ME1" author="CreeperLava">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
