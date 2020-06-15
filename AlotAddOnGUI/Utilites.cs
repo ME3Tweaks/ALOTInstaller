@@ -825,6 +825,8 @@ namespace AlotAddOnGUI
                             fs.Position = endPos - 8;
                             short memVersionUsed = fs.ReadInt16();
                             short installerVersionUsed = fs.ReadInt16();
+                            fs.Position -= 4; //roll back so we can read this whole thing
+                            int preMemi4Bytes = fs.ReadInt32();
                             int perGameFinal4Bytes = -20;
                             switch (gameID)
                             {
@@ -839,7 +841,7 @@ namespace AlotAddOnGUI
                                     break;
                             }
 
-                            if (installerVersionUsed >= 10 && installerVersionUsed != perGameFinal4Bytes) //default bytes before 178 MEMI Format
+                            if (preMemi4Bytes != perGameFinal4Bytes) //default bytes before 178 MEMI Format. 
                             {
                                 fs.Position = endPos - 12;
                                 short ALOTVER = fs.ReadInt16();
