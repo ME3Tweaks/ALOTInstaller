@@ -517,7 +517,8 @@ namespace AlotAddOnGUI
             }
 
             applyModManagerMods();
-            if (INSTALLING_THREAD_GAME == 3)
+            // Apply hackett convo fix if game is ME3 and game is not already texture modded (scan has not yet taken place)
+            if (INSTALLING_THREAD_GAME == 3 && versionInfo == null)
             {
                 fixME3MarsHackettStreamingStates(InstallWorker);
             }
