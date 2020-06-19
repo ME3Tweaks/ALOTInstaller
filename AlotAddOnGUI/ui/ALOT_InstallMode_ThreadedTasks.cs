@@ -1473,7 +1473,7 @@ namespace AlotAddOnGUI
         private void fixME3MarsHackettStreamingStates(BackgroundWorker worker)
         {
             CurrentTask = "Fixing Post-Mars conversation memory issue";
-            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+            //InstallWorker?.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
             Log.Information("Fixing post-mars hackett cutscene memory issue");
             ME3ExplorerMinified.DLL.Startup();
             #region BioA_CitHub fix
@@ -1484,6 +1484,7 @@ namespace AlotAddOnGUI
                 {
                     var bioa_cithub = MEPackageHandler.OpenMEPackage(bioa_cithubPath);
                     var trigStream1 = bioa_cithub.getUExport(8);
+                    var propsT = trigStream1.GetProperties();
                     var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
                     // Clear preloading
                     Log.Information("Clear LoadChunkNames from BioA_CitHub");
@@ -1517,7 +1518,7 @@ namespace AlotAddOnGUI
                     }
 
                     trigStream2.WriteProperty(streamStates);
-
+                    Log.Information("Saving package: " + bioa_cithubPath);
                     bioa_cithub.save();
                 }
             }
@@ -1547,6 +1548,7 @@ namespace AlotAddOnGUI
                     }
 
                     trigStream1.WriteProperty(streamStates);
+                    Log.Information("Saving package: " + biod_cithubPath);
                     biod_cithub.save();
                 }
             }
