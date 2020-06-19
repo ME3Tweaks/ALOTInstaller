@@ -27,6 +27,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Xml.Linq;
 using ME3Explorer.Packages;
+using ME3Explorer.Unreal;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
 
@@ -516,6 +517,10 @@ namespace AlotAddOnGUI
             }
 
             applyModManagerMods();
+            if (INSTALLING_THREAD_GAME == 3)
+            {
+                fixME3MarsHackettStreamingStates(InstallWorker);
+            }
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OVERALL_TASK, MAINTASK_TEXT));
             InstallWorker.ReportProgress(completed, new ThreadCommand(SHOW_ALL_STAGE_LABELS));
 
@@ -1463,6 +1468,90 @@ namespace AlotAddOnGUI
                 MEM_INSTALL_TIME_SECONDS = (minutes * 60) + sec;
             }
             Log.Information("Process complete - finished in " + minutes + " minutes " + sec + " seconds");
+        }
+
+        private void fixME3MarsHackettStreamingStates(BackgroundWorker worker)
+        {
+            CurrentTask = "Fixing Post-Mars conversation memory issue";
+            InstallWorker.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+            Log.Information("Fixing post-mars hackett cutscene memory issue");
+            ME3ExplorerMinified.DLL.Startup();
+            #region BioA_CitHub fix
+
+            {
+                var bioa_cithubPath = Path.Combine(Utilities.GetGamePath(3), "BioGame", "CookedPCConsole", "BioA_CitHub.pcc");
+                if (File.Exists(bioa_cithubPath))
+                {
+                    var bioa_cithub = MEPackageHandler.OpenMEPackage(bioa_cithubPath);
+                    var trigStream1 = bioa_cithub.getUExport(8);
+                    var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
+                    // Clear preloading
+                    Log.Information("Clear LoadChunkNames from BioA_CitHub");
+                    streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
+
+                    // Clear visible asset
+                    var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
+                    for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                    {
+                        if (visibleChunkNames[i].Value == "BioA_CitHub_Dock_Det")
+                        {
+                            Log.Information("Remove BioA_CitHub_Dock_Det from BioA_CitHub VisibleChunkNames(8)");
+                            visibleChunkNames.RemoveAt(i);
+                        }
+                    }
+
+                    trigStream1.WriteProperty(streamStates);
+
+                    var trigStream2 = bioa_cithub.getUExport(15);
+                    streamStates = trigStream2.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
+
+                    // Cleanup visible assets
+                    visibleChunkNames = streamStates[0].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
+                    for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                    {
+                        if (visibleChunkNames[i].Value == "BioA_Nor_204Conference" || visibleChunkNames[i].Value == "BioA_Nor_204WarRoom")
+                        {
+                            Log.Information("Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(15)");
+                            visibleChunkNames.RemoveAt(i);
+                        }
+                    }
+
+                    trigStream2.WriteProperty(streamStates);
+
+                    bioa_cithub.save();
+                }
+            }
+
+            #endregion
+            #region BioD_CitHub fix
+            {
+                var biod_cithubPath = Path.Combine(Utilities.GetGamePath(3), "BioGame", "CookedPCConsole", "BioD_CitHub.pcc");
+                if (File.Exists(biod_cithubPath))
+                {
+                    var biod_cithub = MEPackageHandler.OpenMEPackage(biod_cithubPath);
+                    var trigStream1 = biod_cithub.getUExport(162);
+                    var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
+                    // Clear preloading
+                    Log.Information("Clear LoadChunkNames from BioD_CitHub");
+                    streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
+
+                    // Clear visible asset
+                    var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
+                    for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                    {
+                        if (visibleChunkNames[i].Value == "BioH_Marine" || visibleChunkNames[i].Value == "BioD_CitHub_Dock")
+                        {
+                            Log.Information("Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(8)");
+                            visibleChunkNames.RemoveAt(i);
+                        }
+                    }
+
+                    trigStream1.WriteProperty(streamStates);
+                    biod_cithub.save();
+                }
+            }
+            #endregion
+            Log.Information("Finished fixing post-mars hackett cutscene memory issue");
         }
 
         /// <summary>
