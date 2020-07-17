@@ -1037,9 +1037,17 @@ namespace AlotAddOnGUI
                 string path = Utilities.GetGamePath(3);
                 path = Path.Combine(path, "Binaries", "Win32", "asi");
                 Directory.CreateDirectory(path);
-                path = Path.Combine(path, "ME3Logger_truncating.asi");
-                File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.ME3Logger_truncating);
-                Log.Information("Installed ME3Logger_truncating.asi");
+                var asis = Directory.GetFiles(path, "*.asi");
+                if (!asis.Any(x => Path.GetFileName(x).Contains("truncating", StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    path = Path.Combine(path, "ME3Logger_truncating.asi");
+                    File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.ME3Logger_truncating);
+                    Log.Information("Installed ME3Logger_truncating.asi");
+                }
+                else
+                {
+                    Log.Information("Skipped install, found existing asi with name 'truncating' in it.");
+                }
             }
             catch (Exception ex)
             {
@@ -1054,13 +1062,23 @@ namespace AlotAddOnGUI
                     Log.Information("Installing AutoTOC.asi...");
                     string path = Path.Combine(Utilities.GetGamePath(3), "Binaries", "Win32", "asi");
                     Directory.CreateDirectory(path);
-                    path = Path.Combine(path, "AutoTOC.asi");
-                    File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.AutoTOC);
-                    Log.Information("Installed AutoTOC.asi");
+
+                    var asis = Directory.GetFiles(path, "*.asi");
+                    if (!asis.Any(x => Path.GetFileName(x).Contains("autotoc", StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        path = Path.Combine(path, "AutoTOC.asi");
+                        File.WriteAllBytes(path, AlotAddOnGUI.Properties.Resources.AutoTOC);
+                        Log.Information("Installed AutoTOC.asi");
+                    }
+                    else
+                    {
+                        Log.Information("Skipped install, found existing asi with name 'autotoc' in it.");
+                    }
+
                 }
                 else
                 {
-                    Log.Error("Installation is not supported - not installed autotoc asi");
+                    Log.Error("Installation is not supported - not installing autotoc asi");
                 }
             }
             catch (Exception ex)
