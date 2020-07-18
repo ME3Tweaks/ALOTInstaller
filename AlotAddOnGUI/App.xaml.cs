@@ -244,8 +244,7 @@ namespace AlotAddOnGUI
             }
 
             LogsDirectory = Directory.CreateDirectory(baseDirectory + "\\logs").FullName;
-            Log.Logger = new LoggerConfiguration()
-                   .MinimumLevel.Debug()
+            Log.Logger = new LoggerConfiguration().MinimumLevel.Debug()
                 .WriteTo.RollingFile(Path.Combine(LogsDirectory, "alotinstaller-{Date}.txt"), flushToDiskInterval: new TimeSpan(0, 0, 15))
 #if DEBUG
                    .WriteTo.Debug()
