@@ -16,6 +16,46 @@ namespace ALOTInstallerCore.Objects
     public sealed class ManifestFile : InstallerFile, INotifyPropertyChanged
     {
 
+        /// <summary>
+        /// Loading indicator that this is an ME3 file. On setting this, it will set the bit in ApplicableGames. Do not use this variable, use ApplicableGames instead.
+        /// </summary>
+        internal bool m_me3
+        {
+            set
+            {
+                if (value)
+                    ApplicableGames |= ApplicableGame.ME3;
+                else
+                    ApplicableGames &= ~ApplicableGame.ME3;
+            }
+        }
+        /// <summary>
+        /// Loading indicator that this is an ME2 file. On setting this, it will set the bit in ApplicableGames. Do not use this variable, use ApplicableGames instead.
+        /// </summary>
+        internal bool m_me2
+        {
+            set
+            {
+                if (value)
+                    ApplicableGames |= ApplicableGame.ME2;
+                else
+                    ApplicableGames &= ~ApplicableGame.ME2;
+            }
+        }
+        /// <summary>
+        /// Loading indicator that this is an ME1 file. On setting this, it will set the bit in ApplicableGames. Do not use this variable, use ApplicableGames instead.
+        /// </summary>
+        internal bool m_me1
+        {
+            set
+            {
+                if (value)
+                    ApplicableGames |= ApplicableGame.ME1;
+                else
+                    ApplicableGames &= ~ApplicableGame.ME1;
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         //        private bool m_ready;
@@ -287,6 +327,7 @@ namespace ALOTInstallerCore.Objects
         public string FileMD5 { get; internal set; }
         public string UnpackedFileMD5 { get; set; }
         public long UnpackedFileSize { get; set; }
+        public RecommendationType Recommendation { get; set; }
         //        public bool Optional { get; internal set; }
         //        private bool _enabled;
         //        public bool CopyDirectly { get; internal set; }
@@ -358,7 +399,10 @@ namespace ALOTInstallerCore.Objects
 
         //        }
 
-        public int MEUITMVer { get; internal set; }
+        public TextureModInstallationInfo MEUITMVer { get; set; }
+        public TextureModInstallationInfo ALOTVersion { get; set; }
+        public bool IsModManagerMod { get; internal set; }
+
         //        public bool InstallME1DLCASI { get; internal set; }
         //        public bool TrackTelemetry { get; internal set; }
 

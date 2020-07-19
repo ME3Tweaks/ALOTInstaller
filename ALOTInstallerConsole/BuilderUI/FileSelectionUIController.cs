@@ -74,6 +74,14 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             fv.Add(FilenameTextBlock);
 
+            AppliesToGamesTextBlock = new Label("")
+            {
+                Width = Dim.Fill(),
+                Height = 1,
+                Y = y++
+            };
+            fv.Add(AppliesToGamesTextBlock);
+
             ExpectedFileSizeTextBlock = new Label("")
             {
                 Width = Dim.Fill(),
@@ -143,14 +151,37 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             Add(changeModeButton);
 
-            Button installButton = new Button("Install ALOT")
+            Button installButton = new Button("Install")
             {
-                X = Pos.Right(this) - 19,
+                X = Pos.Right(this) - 14,
                 Y = Pos.Bottom(this) - 3,
                 Height = 1,
-                Width = 16
+                Width = 12,
+                Clicked = InstallButton_Click
             };
             Add(installButton);
+        }
+
+        private void InstallButton_Click()
+        {
+            // Perform precheck here
+            List<string> paths = new List<string>();
+            //paths.Add(Locations.GetGamePath(MEGame.ME1));
+            paths.Add("Abort");
+            var n = MessageBox.Query("Select game", "Select which game to install for.", paths.Select(x => (ustring)x.ToString()).ToArray());
+            if (n == 0)
+            {
+                // continue
+
+
+            }
+            // Precheck done
+            n = MessageBox.Query("Warning", "Once you install texture mods, you will not be able to further install mods that contain .pcc, .u, .upk or .sfm files without breaking textures in the game. Please make sure you have all of your DLC and non-texture mods installed now, as you will not be able to safely install them later.", "OK", "Abort install");
+            if (n == 0)
+            {
+                // continue
+
+            }
         }
 
         private void Settings_Clicked()
@@ -162,8 +193,8 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void ChangeMode_Clicked()
         {
-            var str = Program.ManifestModes.Keys.Select(x=>(ustring) x.ToString()).ToArray();
-            var n = MessageBox.Query(50, 7, "Mode selector", "Select a mode for ALOT Installer.",str);
+            var str = Program.ManifestModes.Keys.Select(x => (ustring)x.ToString()).ToArray();
+            var n = MessageBox.Query(50, 7, "Mode selector", "Select a mode for ALOT Installer.", str);
             Program.CurrentManifestPackage = Program.ManifestModes[Program.ManifestModes.Keys.ToList()[n]];
             dataSource.InstallerFiles.Clear();
             dataSource.InstallerFiles.AddRange(Program.CurrentManifestPackage.ManifestFiles);
@@ -188,6 +219,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void UpdateDisplayedManifestFile(ManifestFile mf)
         {
+            AppliesToGamesTextBlock.Text = "Applies to: " + string.Join(' ', mf.SupportedGames());
             ReadyTextBlock.Text = "Ready: " + mf.Ready.ToString();
             AuthorTextBlock.Text = "Author: " + mf.Author;
             FilenameTextBlock.Text = "Filename: " + mf.Filename;
@@ -196,11 +228,12 @@ namespace ALOTInstallerConsole.BuilderUI
 
             // Unpacked
             UnpackedFilenameTextBlock.Text = "Unpacked filename: " + (mf.UnpackedSingleFilename != null ? mf.UnpackedSingleFilename : "N/A");
-            UnpackedFilesizeTextBlock.Text = "Unpacked file size: " + (mf.UnpackedFileSize != null ? mf.UnpackedFileSize.ToString() : "N/A");
+            UnpackedFilesizeTextBlock.Text = "Unpacked file size: " + (mf.UnpackedFileSize > 0 ? mf.UnpackedFileSize.ToString() : "N/A");
             UnpackedFileHashTextBlock.Text = "Unpacked file MD5: " + (mf.UnpackedFileMD5 != null ? mf.UnpackedFileMD5 : "N/A");
         }
 
         public Label AuthorTextBlock { get; set; }
+        public Label AppliesToGamesTextBlock { get; private set; }
 
         public override void BeginFlow()
         {
@@ -222,8 +255,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 container.Move(col, line);
 
                 InstallerFile instF = InstallerFiles[item];
-                // Equivalent to an interpolated string like $"{Scenarios[item].Name, -widtestname}"; if such a thing were possible
-                RenderUstr(driver, instF.Ready ? "✓" : "X", 1, 0, 2);
+                RenderUstr(driver, instF.Ready ? "*" : " ", 1, 0, 2);
                 RenderUstr(driver, instF.FriendlyName, 4, 0, 48);
             }
 

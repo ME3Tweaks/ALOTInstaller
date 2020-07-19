@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Microsoft.Win32;     //This namespace is used to work with Registry editor.
 using System.IO;
-using AlotAddOnGUI.classes;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Serilog;
@@ -19,6 +18,7 @@ using System.Security.Cryptography;
 using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
+using ALOTInstallerCore.Objects;
 
 namespace ALOTInstallerCore
 {

@@ -53,7 +53,7 @@ namespace ALOTInstallerCore.Startup
             try
             {
                 //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", MANIFEST_LOC);
-                string url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/master/manifest.xml";
+                string url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/ALOT-v4/manifest.xml";
                 //if (USING_BETA)
                 //{
                 //    Log.Information("In BETA mode.");
@@ -61,13 +61,15 @@ namespace ALOTInstallerCore.Startup
                 //    Title += " BETA MODE";
                 //}
 
-                var fetchedManfiest = webClient.DownloadString(new Uri(url));
-                if (Utilities.TestXMLIsValid(fetchedManfiest))
+                //var fetchedManifest = webClient.DownloadString(new Uri(url));
+                var fetchedManifest = File.ReadAllText(@"C:\Users\Mgamerz\source\repos\AlotAddOnGUI\manifest.xml");
+
+                if (Utilities.TestXMLIsValid(fetchedManifest))
                 {
                     Log.Information("Manifest fetched.");
                     try
                     {
-                        File.WriteAllText(Locations.GetCachedManifestPath(), fetchedManfiest);
+                        File.WriteAllText(Locations.GetCachedManifestPath(), fetchedManifest);
                     }
                     catch (Exception ex)
                     {
@@ -76,12 +78,12 @@ namespace ALOTInstallerCore.Startup
                         //UsingBundledManifest = true;
                     }
                     setCurrentOperationCallback?.Invoke("Parsing installer manifest");
-                    returnValue = ParseManifest(false, fetchedManfiest);
+                    returnValue = ParseManifest(false, fetchedManifest);
                     //ManifestDownloaded();
                 }
                 else
                 {
-                    Log.Error("Response from server was not valid XML! " + fetchedManfiest);
+                    Log.Error("Response from server was not valid XML! " + fetchedManifest);
                     //Crashes.TrackError(new Exception("Invalid XML from server manifest!"));
                     if (File.Exists(Locations.GetCachedManifestPath()))
                     {
@@ -261,107 +263,113 @@ namespace ALOTInstallerCore.Startup
                 }
 
                 mp.ManifestFiles.AddRange((from e in rootElement.Elements("addonfile")
-                                    select new ManifestFile()
-                                    {
-                                        //AlreadyInstalled = false,
-                                        //Showing = false,
-                                        //Enabled = true,
-                                        //TrackTelemetry = e.Element("telemetrytracking") != null ? (bool)e.Attribute("telemetrytracking") : false,
-                                        //ComparisonsLink = (string)e.Attribute("comparisonslink"),
-                                        //InstallME1DLCASI = e.Attribute("installme1dlcasi") != null ? (bool)e.Attribute("installme1dlcasi") : false,
-                                        FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
-                                        //CopyDirectly = e.Element("file").Attribute("copydirectly") != null ? (bool)e.Element("file").Attribute("copydirectly") : false,
-                                        //MEUITM = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false,
-                                        MEUITMVer = e.Attribute("meuitmver") != null ? Convert.ToInt32((string)e.Attribute("meuitmver")) : 0,
-                                        //ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
-                                        Author = (string)e.Attribute("author"),
-                                        FriendlyName = (string)e.Attribute("friendlyname"),
-                                        //Optional = e.Attribute("optional") != null ? (bool)e.Attribute("optional") : false,
-                                        //Game_ME1 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me1") : false,
-                                        //Game_ME2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me2") : false,
-                                        //Game_ME3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me3") : false,
-                                        Filename = (string)e.Element("file").Attribute("filename"),
-                                        Tooltipname = e.Element("file").Attribute("tooltipname") != null ? (string)e.Element("file").Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
-                                        DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
-                                        //ALOTVersion = e.Attribute("alotversion") != null ? Convert.ToInt16((string)e.Attribute("alotversion")) : (short)0,
-                                        //ALOTUpdateVersion = e.Attribute("alotupdateversion") != null ? Convert.ToByte((string)e.Attribute("alotupdateversion")) : (byte)0,
-                                        UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename") != null ? (string)e.Element("file").Attribute("unpackedsinglefilename") : null,
-                                        //ALOTMainVersionRequired = e.Attribute("appliestomainversion") != null ? Convert.ToInt16((string)e.Attribute("appliestomainversion")) : (short)0,
-                                        FileMD5 = (string)e.Element("file").Attribute("md5"),
-                                        UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
-                                        UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
-                                        TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
-                                        //Ready = false,
-                                        //IsModManagerMod = e.Element("file").Attribute("modmanagermod") != null ? (bool)e.Element("file").Attribute("modmanagermod") : false,
-                                        //ExtractionRedirects = e.Elements("extractionredirect")
-                                        //    .Select(d => new ExtractionRedirect
-                                        //    {
-                                        //        ArchiveRootPath = (string)d.Attribute("archiverootpath"),
-                                        //        RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
-                                        //        OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc"),
-                                        //        OptionalAnyDLC = (string)d.Attribute("optionalanydlc"),
-                                        //        OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
-                                        //        OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
-                                        //        LoggingName = (string)d.Attribute("loggingname"),
-                                        //        IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
-                                        //        ModVersion = (string)d.Attribute("version")
-                                        //    }).ToList(),
-                                        //PackageFiles = e.Elements("packagefile")
-                                        //    .Select(r => new PackageFile
-                                        //    {
-                                        //        ChoiceTitle = "", //unused in this block
-                                        //        SourceName = (string)r.Attribute("sourcename"),
-                                        //        DestinationName = (string)r.Attribute("destinationname"),
-                                        //        TPFSource = (string)r.Attribute("tpfsource"),
-                                        //        MoveDirectly = r.Attribute("movedirectly") != null ? true : false,
-                                        //        CopyDirectly = r.Attribute("copydirectly") != null ? true : false,
-                                        //        Delete = r.Attribute("delete") != null ? true : false,
-                                        //        ME1 = r.Attribute("me1") != null ? true : false,
-                                        //        ME2 = r.Attribute("me2") != null ? true : false,
-                                        //        ME3 = r.Attribute("me3") != null ? true : false,
-                                        //        Processed = false
-                                        //    }).ToList(),
-                                        //ChoiceFiles = e.Elements("choicefile")
-                                        //    .Select(q => new ChoiceFile
-                                        //    {
-                                        //        ChoiceTitle = (string)q.Attribute("choicetitle"),
-                                        //        Choices = q.Elements("packagefile").Select(c => new PackageFile
-                                        //        {
-                                        //            ChoiceTitle = (string)c.Attribute("choicetitle"),
-                                        //            SourceName = (string)c.Attribute("sourcename"),
-                                        //            DestinationName = (string)c.Attribute("destinationname"),
-                                        //            TPFSource = (string)c.Attribute("tpfsource"),
-                                        //            MoveDirectly = c.Attribute("movedirectly") != null ? true : false,
-                                        //            CopyDirectly = c.Attribute("copydirectly") != null ? true : false,
-                                        //            Delete = c.Attribute("delete") != null ? true : false,
-                                        //            ME1 = c.Attribute("me1") != null ? true : false,
-                                        //            ME2 = c.Attribute("me2") != null ? true : false,
-                                        //            ME3 = c.Attribute("me3") != null ? true : false,
-                                        //            Processed = false
-                                        //        }).ToList()
-                                        //    }).ToList(),
-                                        //ZipFiles = e.Elements("zipfile")
-                                        //    .Select(q => new classes.ZipFile
-                                        //    {
-                                        //        ChoiceTitle = (string)q.Attribute("choicetitle"),
-                                        //        Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
-                                        //        DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
-                                        //        InArchivePath = q.Attribute("inarchivepath").Value,
-                                        //        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
-                                        //        DeleteShaders = q.Attribute("deleteshaders") != null ? (bool)q.Attribute("deleteshaders") : false, //me1 only
-                                        //        MEUITMSoftShadows = q.Attribute("meuitmsoftshadows") != null ? (bool)q.Attribute("meuitmsoftshadows") : false, //me1,meuitm only
-                                        //    }).ToList(),
-                                        //CopyFiles = e.Elements("copyfile")
-                                        //    .Select(q => new CopyFile
-                                        //    {
-                                        //        ChoiceTitle = (string)q.Attribute("choicetitle"),
-                                        //        Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
-                                        //        DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
-                                        //        InArchivePath = q.Attribute("inarchivepath").Value,
-                                        //        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
-                                        //    }
-                                        //).ToList(),
-                                    }).OrderBy(p => p.Priority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName));
+                                           select new ManifestFile()
+                                           {
+                                               //AlreadyInstalled = false,
+                                               //Showing = false,
+                                               //Enabled = true,
+                                               //TrackTelemetry = e.Element("telemetrytracking") != null ? (bool)e.Attribute("telemetrytracking") : false,
+                                               //ComparisonsLink = (string)e.Attribute("comparisonslink"),
+                                               //InstallME1DLCASI = e.Attribute("installme1dlcasi") != null ? (bool)e.Attribute("installme1dlcasi") : false,
+                                               FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
+                                               //CopyDirectly = e.Element("file").Attribute("copydirectly") != null ? (bool)e.Element("file").Attribute("copydirectly") : false,
+
+                                               // MEUITM, ALOT
+                                               MEUITMVer = e.Attribute("meuitmver") != null ? new TextureModInstallationInfo(0, 0, 0, Convert.ToInt32((string)e.Attribute("meuitmver"))) : null,
+                                               ALOTVersion = e.Attribute("alotversion") != null ? new TextureModInstallationInfo(
+                                                   Convert.ToInt16((string)e.Attribute("alotversion")),
+                                                   (string)e.Attribute("alotupdateversion") != null ? Convert.ToByte((string)e.Attribute("alotupdateversion")) : (byte)0,
+                                                   0, 0) : null,
+                                               //ALOTUpdateVersion = e.Attribute("alotupdateversion") != null ? Convert.ToByte((string)e.Attribute("alotupdateversion")) : (byte)0,
+                                               //ALOTMainVersionRequired = e.Attribute("appliestomainversion") != null ? Convert.ToInt16((string)e.Attribute("appliestomainversion")) : (short)0,
+
+
+                                               //ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
+                                               Author = (string)e.Attribute("author"),
+                                               FriendlyName = (string)e.Attribute("friendlyname"),
+                                               //Optional = e.Attribute("optional") != null ? (bool)e.Attribute("optional") : false,
+                                               m_me1 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me1") : false,
+                                               m_me2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me2") : false,
+                                               m_me3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me3") : false,
+                                               Filename = (string)e.Element("file").Attribute("filename"),
+                                               Tooltipname = e.Element("file").Attribute("tooltipname") != null ? (string)e.Element("file").Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
+                                               DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
+                                               UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename") != null ? (string)e.Element("file").Attribute("unpackedsinglefilename") : null,
+                                               FileMD5 = (string)e.Element("file").Attribute("md5"),
+                                               UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
+                                               UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
+                                               TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
+                                               Priority = e.Attribute("priority") != null ? Convert.ToInt32((string)e.Attribute("priority")) : 5,
+                                               IsModManagerMod = e.Element("file").Attribute("modmanagermod") != null ? (bool)e.Element("file").Attribute("modmanagermod") : false,
+                                               //ExtractionRedirects = e.Elements("extractionredirect")
+                                               //    .Select(d => new ExtractionRedirect
+                                               //    {
+                                               //        ArchiveRootPath = (string)d.Attribute("archiverootpath"),
+                                               //        RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
+                                               //        OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc"),
+                                               //        OptionalAnyDLC = (string)d.Attribute("optionalanydlc"),
+                                               //        OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
+                                               //        OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
+                                               //        LoggingName = (string)d.Attribute("loggingname"),
+                                               //        IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
+                                               //        ModVersion = (string)d.Attribute("version")
+                                               //    }).ToList(),
+                                               PackageFiles = e.Elements("packagefile")
+                                                   .Select(r => new ManifestSubFile
+                                                   {
+                                                       ChoiceTitle = "", //unused in this block
+                                                       SourceName = (string)r.Attribute("sourcename"),
+                                                       DestinationName = (string)r.Attribute("destinationname"),
+                                                       TPFSource = (string)r.Attribute("tpfsource"),
+                                                       MoveDirectly = r.Attribute("movedirectly") != null ? true : false,
+                                                       CopyDirectly = r.Attribute("copydirectly") != null ? true : false,
+                                                       Delete = r.Attribute("delete") != null ? true : false,
+                                                       m_me1 = r.Attribute("me1") != null ? true : false,
+                                                       m_me2 = r.Attribute("me2") != null ? true : false,
+                                                       m_me3 = r.Attribute("me3") != null ? true : false,
+                                                       Processed = false
+                                                   }).ToList(),
+                                               //ChoiceFiles = e.Elements("choicefile")
+                                               //    .Select(q => new ChoiceFile
+                                               //    {
+                                               //        ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                               //        Choices = q.Elements("packagefile").Select(c => new PackageFile
+                                               //        {
+                                               //            ChoiceTitle = (string)c.Attribute("choicetitle"),
+                                               //            SourceName = (string)c.Attribute("sourcename"),
+                                               //            DestinationName = (string)c.Attribute("destinationname"),
+                                               //            TPFSource = (string)c.Attribute("tpfsource"),
+                                               //            MoveDirectly = c.Attribute("movedirectly") != null ? true : false,
+                                               //            CopyDirectly = c.Attribute("copydirectly") != null ? true : false,
+                                               //            Delete = c.Attribute("delete") != null ? true : false,
+                                               //            ME1 = c.Attribute("me1") != null ? true : false,
+                                               //            ME2 = c.Attribute("me2") != null ? true : false,
+                                               //            ME3 = c.Attribute("me3") != null ? true : false,
+                                               //            Processed = false
+                                               //        }).ToList()
+                                               //    }).ToList(),
+                                               //ZipFiles = e.Elements("zipfile")
+                                               //    .Select(q => new classes.ZipFile
+                                               //    {
+                                               //        ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                               //        Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
+                                               //        DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
+                                               //        InArchivePath = q.Attribute("inarchivepath").Value,
+                                               //        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
+                                               //        DeleteShaders = q.Attribute("deleteshaders") != null ? (bool)q.Attribute("deleteshaders") : false, //me1 only
+                                               //        MEUITMSoftShadows = q.Attribute("meuitmsoftshadows") != null ? (bool)q.Attribute("meuitmsoftshadows") : false, //me1,meuitm only
+                                               //    }).ToList(),
+                                               //CopyFiles = e.Elements("copyfile")
+                                               //    .Select(q => new CopyFile
+                                               //    {
+                                               //        ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                               //        Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
+                                               //        DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
+                                               //        InArchivePath = q.Attribute("inarchivepath").Value,
+                                               //        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
+                                               //    }
+                                               //).ToList(),
+                                           }).OrderBy(p => p.Priority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName));
                 if (!version.Equals(""))
                 {
                     Log.Information("Manifest version: " + version);
@@ -386,26 +394,21 @@ namespace ALOTInstallerCore.Startup
             }
 
             //int meuitmindex = -1;
-            //foreach (AddonFile af in DisplayedAddonFiles)
-            //{
-            //    //Set Game
-            //    foreach (PackageFile pf in af.PackageFiles)
-            //    {
-            //        //Damn I did not think this one through very well
-            //        af.Game_ME1 |= pf.ME1;
-            //        af.Game_ME2 |= pf.ME2;
-            //        af.Game_ME3 |= pf.ME3;
-            //        if (!af.Game_ME1 && !af.Game_ME2 && !af.Game_ME3)
-            //        {
-            //            af.Game_ME1 = af.Game_ME2 = af.Game_ME3 = true; //if none is set, then its set to all
-            //        }
-            //        if (af.MEUITM)
-            //        {
-            //            meuitmindex = AllAddonFiles.IndexOf(af);
-            //            meuitmFile = af;
-            //        }
-            //    }
-            //}
+            //Set Game
+            foreach (ManifestFile mf in mp.ManifestFiles)
+            {
+                foreach (var msf in mf.PackageFiles)
+                {
+                    //Damn I did not think this one through very well
+
+                    mf.ApplicableGames |= msf.ApplicableGames;
+
+                }
+                if (mf.ApplicableGames == ApplicableGame.None)
+                {
+                    mf.ApplicableGames = ApplicableGame.ME1 | ApplicableGame.ME2 | ApplicableGame.ME3;
+                }
+            }
 
             return mp;
         }

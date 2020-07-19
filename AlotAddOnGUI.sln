@@ -15,8 +15,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ALOTInstallerConsole", "ALO
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Terminal.Gui", "gui.cs\Terminal.Gui\Terminal.Gui.csproj", "{B5865ACF-8535-4D8C-86C9-53F34A3557F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetCoreIssueDemo", "NetCoreIssueDemo\NetCoreIssueDemo.csproj", "{8DA7B84D-BD20-448C-B669-BADD9FF0EFBB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,14 +61,6 @@ Global
 		{B5865ACF-8535-4D8C-86C9-53F34A3557F7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B5865ACF-8535-4D8C-86C9-53F34A3557F7}.Release|x64.ActiveCfg = Release|Any CPU
 		{B5865ACF-8535-4D8C-86C9-53F34A3557F7}.Release|x64.Build.0 = Release|Any CPU
-		{8DA7B84D-BD20-448C-B669-BADD9FF0EFBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8DA7B84D-BD20-448C-B669-BADD9FF0EFBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8DA7B84D-BD20-448C-B669-BADD9FF0EFBB}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{8DA7B84D-BD20-448C-B669-BADD9FF0EFBB}.Debug|x64.Build.0 = Debug|Any CPU
-		{8DA7B84D-BD20-448C-B669-BADD9FF0EFBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8DA7B84D-BD20-448C-B669-BADD9FF0EFBB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8DA7B84D-BD20-448C-B669-BADD9FF0EFBB}.Release|x64.ActiveCfg = Release|Any CPU
-		{8DA7B84D-BD20-448C-B669-BADD9FF0EFBB}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
