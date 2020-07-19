@@ -15,11 +15,17 @@ namespace ALOTInstallerCore.Startup
 {
     public class OnlineContent
     {
+        public enum ManifestMode
+        {
+            None,
+            MEUITM,
+            ALOT
+        }
         public class ManifestPackage
         {
             public List<string> MusicPackMirrors;
             //public List<ManifestTutorial> Tutorials;
-            public List<ManifestFile> ManifestFiles;
+            public List<InstallerFile> ManifestFiles = new List<InstallerFile>(60);
             //public List<InstallerStage> Stages;
             public int HighestApprovedMEMVersion;
             public int SoakingMEMVersion;
@@ -254,7 +260,7 @@ namespace ALOTInstallerCore.Startup
                     mp.ME2DLCsNeedingTextureFixes = new List<string>();
                 }
 
-                mp.ManifestFiles = (from e in rootElement.Elements("addonfile")
+                mp.ManifestFiles.AddRange((from e in rootElement.Elements("addonfile")
                                     select new ManifestFile()
                                     {
                                         //AlreadyInstalled = false,
@@ -355,7 +361,7 @@ namespace ALOTInstallerCore.Startup
                                         //        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
                                         //    }
                                         //).ToList(),
-                                    }).OrderBy(p => p.Priority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList();
+                                    }).OrderBy(p => p.Priority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName));
                 if (!version.Equals(""))
                 {
                     Log.Information("Manifest version: " + version);

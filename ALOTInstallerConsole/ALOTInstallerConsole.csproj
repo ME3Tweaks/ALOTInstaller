@@ -3,6 +3,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <StartupObject>ALOTInstallerConsole.Program</StartupObject>
+    <Authors>Mgamerz</Authors>
+    <Company>ME3Tweaks</Company>
+    <Product>ALOT Installer Console</Product>
+    <Version>4.0.0.0</Version>
+    <Description>Texture installer for the Mass Effect Trilogy</Description>
+    <Copyright>2020</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

@@ -28,8 +28,9 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 if (b.Error == null)
                 {
-                    BuilderUIController bui = new BuilderUIController();
-                    bui.SetManifestPackage(b.Result as OnlineContent.ManifestPackage);
+                    Program.CurrentManifestPackage = b.Result as OnlineContent.ManifestPackage;
+                    Program.ManifestModes[OnlineContent.ManifestMode.ALOT] = b.Result as OnlineContent.ManifestPackage;
+                    FileSelectionUIController bui = new FileSelectionUIController();
                     bui.SetupUI();
                     Program.SwapToNewView(bui);
                 }

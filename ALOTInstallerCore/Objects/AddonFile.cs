@@ -250,8 +250,7 @@ namespace ALOTInstallerCore.Objects
 
         //        public string ALOTArchiveInFilePath { get; set; }
         public string Author { get; set; }
-        public string FriendlyName { get; set; }
-        public string Filename { get; set; }
+        
         public string Tooltipname { get; set; }
 
         public string DownloadLink { get; set; }
@@ -273,25 +272,17 @@ namespace ALOTInstallerCore.Objects
         //            }
         //        }
 
-        //        public bool Ready
-        //        {
-
-        //            get { return m_ready; }
-        //            set
-        //            {
-        //                m_ready = value;
-        //                OnPropertyChanged("LeftBlockColor"); //ui update for tihs property
-        //                OnPropertyChanged("ReadyIconPath");
-        //                OnPropertyChanged("Ready");
-        //            }
-        //        }
+        /// <summary>
+        /// Indicates that this file is available to be installed (file resides on disk)
+        /// </summary>
 
         //        public bool UserFile { get; internal set; }
         //        public string UserFilePath { get; internal set; }
         //        public bool MEUITM { get; internal set; }
         //        public bool Staged { get; internal set; }
         //        public bool Building { get; internal set; }
-        public long FileSize { get; internal set; }
+        
+
         public string BuildID { get; internal set; }
         public string FileMD5 { get; internal set; }
         public string UnpackedFileMD5 { get; set; }
@@ -442,6 +433,15 @@ namespace ALOTInstallerCore.Objects
         //        }
         //    }
         public override string ToString() => FriendlyName;
+        public override bool UpdateReadyStatus()
+        {
+            if (File.Exists(Filename))
+            {
+
+            }
+
+            return true;
+        }
     }
 
     public class ExtractionRedirect
