@@ -10,6 +10,7 @@
     <Version>4.0.0.0</Version>
     <Description>Texture installer for the Mass Effect Trilogy</Description>
     <Copyright>2020</Copyright>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
