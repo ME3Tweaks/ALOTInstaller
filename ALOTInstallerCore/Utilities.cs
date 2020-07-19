@@ -63,6 +63,12 @@ namespace ALOTInstallerCore
             return "";
         }
 
+        /// <summary>
+        /// Gets the folder of the current program that is running this library.
+        /// </summary>
+        /// <returns></returns>
+        internal static string GetExecutingAssemblyFolder() => Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
         public static string GetCPUString()
         {
 #if WINDOWS
@@ -359,76 +365,11 @@ namespace ALOTInstallerCore
             return !Directory.EnumerateFileSystemEntries(path).Any();
         }
 
-#if WINDOWS
-
-        internal static void WriteRegistryKey(RegistryKey subkey, string subpath, string value, string data)
-        {
-
-            int i = 0;
-            string[] subkeys = subpath.Split('\\');
-            while (i < subkeys.Length)
-            {
-                subkey = subkey.CreateSubKey(subkeys[i]);
-                i++;
-            }
-            subkey.SetValue(value, data);
-        }
-
-        internal static void WriteRegistryKey(RegistryKey subkey, string subpath, string value, bool data)
-        {
-
-            WriteRegistryKey(subkey, subpath, value, data ? 1 : 0);
-}
-
-        internal static void WriteRegistryKey(RegistryKey subkey, string subpath, string value, int data)
-        {
-
-            int i = 0;
-            string[] subkeys = subpath.Split('\\');
-            while (i < subkeys.Length)
-            {
-                subkey = subkey.CreateSubKey(subkeys[i]);
-                i++;
-            }
-            subkey.SetValue(value, data);
-        }
-
         /// <summary>
-        /// Gets an ALOT registry setting string.
+        /// Link to the ALOT Discord
         /// </summary>
-        /// <param name="name"></param>
         /// <returns></returns>
-        public static string GetRegistrySettingString(string name)
-        {
-            string softwareKey = @"HKEY_CURRENT_USER\" + MainWindow.REGISTRY_KEY;
-            return (string)Registry.GetValue(softwareKey, name, null);
-        }
-
-        /// <summary>
-        /// Gets a string value frmo the registry from the specified key and value name.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public static string GetRegistrySettingString(string key, string name)
-        {
-
-            return (string)Registry.GetValue(key, name, null);
-        }
-
-        public static bool? GetRegistrySettingBool(string name)
-        {
-
-            string softwareKey = @"HKEY_CURRENT_USER\" + MainWindow.REGISTRY_KEY;
-
-            int? value = (int?)Registry.GetValue(softwareKey, name, null);
-            if (value != null)
-            {
-                return value > 0;
-            }
-            return null;
-        }
-#endif
+        public static string DiscordInviteLink { get; } = "https://discord.gg/tTePzaa";
 
         public static string GetGameBackupPath(int game)
         {

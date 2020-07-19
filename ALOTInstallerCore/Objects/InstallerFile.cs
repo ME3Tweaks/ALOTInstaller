@@ -61,6 +61,6 @@ namespace ALOTInstallerCore.Objects
         /// Refreshes the Ready status for this file.
         /// </summary>
         /// <returns></returns>
-        public abstract bool UpdateReadyStatus();
+        public abstract void UpdateReadyStatus();
     }
 }

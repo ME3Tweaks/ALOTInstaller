@@ -14,15 +14,29 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private Label startupStatusLabel;
 
+        #endregion
         public override void BeginFlow()
         {
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += (a, b) =>
             {
-                b.Result = OnlineContent.FetchALOTManifest((x) => Application.MainLoop.Invoke(() =>
+                var manifestFiles = OnlineContent.FetchALOTManifest((x) => Application.MainLoop.Invoke(() =>
                 {
                     startupStatusLabel.Text = x;
                 }));
+
+                // Load the ready state while we are still in background thread
+                Application.MainLoop.Invoke(() =>
+                {
+                    startupStatusLabel.Text = "Checking texture library";
+                });
+
+                foreach (var v in manifestFiles.ManifestFiles)
+                {
+                    v.UpdateReadyStatus();
+                }
+
+                b.Result = manifestFiles;
             };
             bw.RunWorkerCompleted += (a, b) =>
             {
@@ -41,8 +55,6 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             bw.RunWorkerAsync();
         }
-
-        #endregion
 
         public override void SetupUI()
         {

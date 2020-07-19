@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ALOTInstallerCore.Helpers;
 using Serilog;
 
 namespace ALOTInstallerCore
@@ -10,6 +11,8 @@ namespace ALOTInstallerCore
     /// </summary>
     public static class Hook
     {
+        private static bool startedUp;
+
         /// <summary>
         /// Sets the Logger that will be used by Serilog to perform logging to disk.
         /// </summary>
@@ -17,6 +20,20 @@ namespace ALOTInstallerCore
         public static void SetLogger(ILogger logger)
         {
             Log.Logger = logger;
+        }
+
+        public enum Platform
+        {
+            Windows,
+            Linux,
+            MacOS
+        }
+
+        public static void Startup(Platform platform)
+        {
+            if (startedUp) return;
+            startedUp = true;
+            Locations.LoadLocations(platform);
         }
     }
 }

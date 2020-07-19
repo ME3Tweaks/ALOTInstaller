@@ -250,7 +250,7 @@ namespace ALOTInstallerCore.Objects
 
         //        public string ALOTArchiveInFilePath { get; set; }
         public string Author { get; set; }
-        
+
         public string Tooltipname { get; set; }
 
         public string DownloadLink { get; set; }
@@ -281,7 +281,7 @@ namespace ALOTInstallerCore.Objects
         //        public bool MEUITM { get; internal set; }
         //        public bool Staged { get; internal set; }
         //        public bool Building { get; internal set; }
-        
+
 
         public string BuildID { get; internal set; }
         public string FileMD5 { get; internal set; }
@@ -433,14 +433,25 @@ namespace ALOTInstallerCore.Objects
         //        }
         //    }
         public override string ToString() => FriendlyName;
-        public override bool UpdateReadyStatus()
+        public override void UpdateReadyStatus()
         {
-            if (File.Exists(Filename))
+            var filePathMain = Path.Combine(ALOTInstallerCore.Helpers.Locations.TextureLibraryLocation, Filename);
+            if (File.Exists(filePathMain) && new FileInfo(filePathMain).Length == FileSize)
             {
-
+                Ready = true;
+                return;
             }
-
-            return true;
+            if (UnpackedSingleFilename != null && UnpackedFileSize > 0 && UnpackedFileMD5 != null)
+            {
+                // This file supports unpacked mode
+                var filePathUnpacked = Path.Combine(ALOTInstallerCore.Helpers.Locations.TextureLibraryLocation, UnpackedSingleFilename);
+                if (File.Exists(filePathUnpacked) && new FileInfo(filePathUnpacked).Length == UnpackedFileSize)
+                {
+                    Ready = true;
+                    return;
+                }
+            }
+            Ready = false;
         }
     }
 

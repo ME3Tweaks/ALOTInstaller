@@ -14,17 +14,21 @@ namespace ALOTInstallerConsole
         static void Main(string[] args)
         {
             SetupLogger();
+            //Initialize ALOT Installer library
 #if WINDOWS
-Hook.
-
+            Hook.Startup(Hook.Platform.Windows);
+#elif LINUX
+            Hook.Startup(Hook.Platform.Linux);
+#elif MACOS
+            Hook.Startup(Hook.Platform.MacOS);
+#else
+            throw new Exception("Platform not specificed at build time!"); THIS TEXT WILL MAKE THE BUILD FAIL. DO NOT EDIT ME
 #endif
-
             Application.Init();
             ManifestModes[OnlineContent.ManifestMode.None] = new OnlineContent.ManifestPackage(); //blank
             var startupUI = new BuilderUI.StartupUIController();
             startupUI.SetupUI();
-            startupUI.BeginFlow();
-            Application.Run(startupUI);
+            Program.SwapToNewView(startupUI);
         }
 
 
@@ -38,7 +42,7 @@ Hook.
             var logsDir = Directory.CreateDirectory(Path.Combine(Locations.AppDataFolder(), "Logs")).FullName;
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
-                .WriteTo.RollingFile(Path.Combine(logsDir, "alotinstallerconsole-{Date}.txt"), flushToDiskInterval: new TimeSpan(0, 0, 15))
+                .WriteTo.File(Path.Combine(logsDir, "alotinstallerconsole-{Date}.txt"), rollingInterval: RollingInterval.Day, flushToDiskInterval: new TimeSpan(0, 0, 15))
 #if DEBUG
                 .WriteTo.Debug()
 #endif
@@ -49,6 +53,7 @@ Hook.
         public static void SwapToNewView(UIController controller)
         {
             Application.RequestStop();
+            controller.BeginFlow();
             Application.Run(controller);
         }
 

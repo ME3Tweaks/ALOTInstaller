@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Startup;
 using NStack;
@@ -203,6 +204,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
         public override void BeginFlow()
         {
+            TextureLibrary.SetupLibraryWatcher();
         }
 
         internal class InstallerFileDataSource : IListDataSource

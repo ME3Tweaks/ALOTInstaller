@@ -8,10 +8,12 @@ namespace ALOTInstallerConsole
     public abstract class UIController : Window
     {
         /// <summary>
-        /// Indicates that this UI has been closed and disposed of and should no longer be used.
+        /// Sets up the controller's UI. This should be called before swapping to it
         /// </summary>
-        public bool Disposed;
         public abstract void SetupUI();
+        /// <summary>
+        /// This method will be called right before the UI is attached, but after the prevoius one has been removed.
+        /// </summary>
         public abstract void BeginFlow();
     }
 }
