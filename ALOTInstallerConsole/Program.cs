@@ -14,16 +14,6 @@ namespace ALOTInstallerConsole
         static void Main(string[] args)
         {
             SetupLogger();
-            //Initialize ALOT Installer library
-#if WINDOWS
-            Hook.Startup(Hook.Platform.Windows);
-#elif LINUX
-            Hook.Startup(Hook.Platform.Linux);
-#elif MACOS
-            Hook.Startup(Hook.Platform.MacOS);
-#else
-            throw new Exception("Platform not specificed at build time!"); THIS TEXT WILL MAKE THE BUILD FAIL. DO NOT EDIT ME
-#endif
             Application.Init();
             ManifestModes[OnlineContent.ManifestMode.None] = new OnlineContent.ManifestPackage(); //blank
             var startupUI = new BuilderUI.StartupUIController();

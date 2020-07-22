@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Startup;
 using NStack;
@@ -156,7 +157,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 X = Pos.Right(this) - 14,
                 Y = Pos.Bottom(this) - 3,
                 Height = 1,
-                Width = 12,
+                Width = 11,
                 Clicked = InstallButton_Click
             };
             Add(installButton);
@@ -166,21 +167,107 @@ namespace ALOTInstallerConsole.BuilderUI
         {
             // Perform precheck here
             List<string> paths = new List<string>();
-            //paths.Add(Locations.GetGamePath(MEGame.ME1));
+            if (Locations.ME1Target != null) paths.Add("ME1");
+            if (Locations.ME2Target != null) paths.Add("ME2");
+            if (Locations.ME3Target != null) paths.Add("ME3");
             paths.Add("Abort");
-            var n = MessageBox.Query("Select game", "Select which game to install for.", paths.Select(x => (ustring)x.ToString()).ToArray());
-            if (n == 0)
-            {
-                // continue
+            var selectedIndex = MessageBox.Query("Select game", "Select which game to install for.", paths.Select(x => (ustring)x.ToString()).ToArray());
+            if (paths[selectedIndex] == "Abort" || selectedIndex < 0) return;
 
+            GameTarget target = null;
+            if (paths[selectedIndex] == "ME1") target = Locations.ME1Target;
+            if (paths[selectedIndex] == "ME2") target = Locations.ME2Target;
+            if (paths[selectedIndex] == "ME3") target = Locations.ME3Target;
 
-            }
             // Precheck done
-            n = MessageBox.Query("Warning", "Once you install texture mods, you will not be able to further install mods that contain .pcc, .u, .upk or .sfm files without breaking textures in the game. Please make sure you have all of your DLC and non-texture mods installed now, as you will not be able to safely install them later.", "OK", "Abort install");
-            if (n == 0)
-            {
-                // continue
+            int warningResponse = MessageBox.Query("Warning", "Once you install texture mods, you will not be able to further install mods that contain .pcc, .u, .upk or .sfm files without breaking textures in the game. Please make sure you have all of your DLC and non-texture mods installed now, as you will not be able to safely install them later.", "OK", "Abort install");
+            if (warningResponse != 0) return; //abort
 
+            // Show options
+            if (Program.CurrentManifestPackage.ManifestFiles.Any())
+            {
+                bool buildAndInstall = false;
+                var buildAndInstallButton = new Button("Build & Install")
+                {
+                    Clicked = () =>
+                    {
+                        Application.RequestStop();
+                        buildAndInstall = true;
+                    }
+                };
+                var cancelButton = new Button("Cancel")
+                {
+                    Clicked = () => Application.RequestStop()
+                };
+
+                int y = 0;
+                CheckBox alotCheckbox = new CheckBox("ALOT")
+                {
+                    X = 1,
+                    Y = y++,
+                    Width = 30,
+                    Height = 1
+                };
+                CheckBox alotUpdate = new CheckBox("ALOT Update")
+                {
+                    X = 1,
+                    Y = y++,
+                    Width = 30,
+                    Height = 1
+                };
+                CheckBox meuitmCheckbox = new CheckBox("MEUITM")
+                {
+                    X = 1,
+                    Y = y++,
+                    Width = 30,
+                    Height = 1
+                };
+                CheckBox addonCheckBox = new CheckBox("ALOT Addon")
+                {
+                    X = 1,
+                    Y = y++,
+                    Width = 30,
+                    Height = 1
+                };
+                CheckBox userFilesCheckBox = new CheckBox("User files")
+                {
+                    X = 1,
+                    Y = y++,
+                    Width = 30,
+                    Height = 1
+                };
+                var whatToBuildDialog = new Dialog("Choose items to install", buildAndInstallButton, cancelButton)
+                {
+                    Height = 10,
+                    Width = 40
+                };
+
+                whatToBuildDialog.Add(alotCheckbox);
+                whatToBuildDialog.Add(alotUpdate);
+                if (target.Game == Enums.MEGame.ME1)
+                {
+                    whatToBuildDialog.Add(meuitmCheckbox);
+                }
+                whatToBuildDialog.Add(addonCheckBox);
+                whatToBuildDialog.Add(userFilesCheckBox);
+                Application.Run(whatToBuildDialog);
+
+                if (buildAndInstall)
+                {
+                    var builderUI = new BuilderUI.BuilderUIController();
+                    builderUI.SetOptionsPackage(new InstallOptionsPackage()
+                    {
+                        InstallTarget = target,
+                        AllInstallerFiles = dataSource.InstallerFiles,
+                        InstallALOT = alotCheckbox.Checked,
+                        InstallALOTUpdate = alotCheckbox.Checked,
+                        InstallMEUITM = meuitmCheckbox.Checked,
+                        InstallALOTAddon = addonCheckBox.Checked,
+                        InstallUserfiles = userFilesCheckBox.Checked
+                    });
+                    builderUI.SetupUI();
+                    Program.SwapToNewView(builderUI);
+                }
             }
         }
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ALOTInstallerCore.Objects
 {
-    class Enums
+    public class Enums
     {
         /// <summary>
         /// Reference to a game. Defaults to unknown.
@@ -16,5 +16,7 @@ namespace ALOTInstallerCore.Objects
             ME2,
             ME3
         }
+
+        public static readonly MEGame[] AllGames = new[] { MEGame.ME1, MEGame.ME2, MEGame.ME3 };
     }
 }

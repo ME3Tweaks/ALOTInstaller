@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Startup;
 using Terminal.Gui;
 
@@ -26,7 +27,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = 25,
                 Height = 1
             });
-            me1PathField = new TextField()
+            me1PathField = new TextField(Locations.ME1Target?.TargetPath ?? "")
             {
                 X = 2,
                 Y = y,
@@ -54,7 +55,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = 25,
                 Height = 1
             });
-            me2PathField = new TextField()
+            me2PathField = new TextField(Locations.ME2Target?.TargetPath ?? "")
             {
                 X = 2,
                 Y = y,
@@ -83,7 +84,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = 1
             });
 
-            me3PathField = new TextField()
+            me3PathField = new TextField(Locations.ME3Target?.TargetPath ?? "")
             {
                 X = 2,
                 Y = y,
@@ -133,7 +134,7 @@ namespace ALOTInstallerConsole.BuilderUI
             Application.Run(selector);
             if (selector.FilePaths.Any())
             {
-                me3PathField.Text = selector.FilePaths.First();
+                UITools.SetText(me3PathField, selector.FilePaths.First());
                 // COMMIT CHANGE HERE
             }
         }

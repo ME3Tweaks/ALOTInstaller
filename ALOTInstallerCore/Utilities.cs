@@ -29,6 +29,7 @@ namespace ALOTInstallerCore
         /// </summary>
         public const uint MEMI_TAG = 0x494D454D;
 
+
 #if WINDOWS
         public const int WIN32_EXCEPTION_ELEVATED_CODE = -98763;
         [DllImport("kernel32.dll")]
@@ -68,6 +69,68 @@ namespace ALOTInstallerCore
         /// </summary>
         /// <returns></returns>
         internal static string GetExecutingAssemblyFolder() => Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+        private static Stream GetResourceStream(string assemblyResource)
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var res = assembly.GetManifestResourceNames();
+            return assembly.GetManifestResourceStream(assemblyResource);
+        }
+
+
+        internal static MemoryStream ExtractInternalFileToStream(string internalResourceName)
+        {
+            Log.Information("Extracting embedded file: " + internalResourceName + " to memory");
+#if DEBUG
+            var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+#endif
+            using Stream stream = Utilities.GetResourceStream(internalResourceName);
+            MemoryStream ms = new MemoryStream();
+            stream.CopyTo(ms);
+            ms.Position = 0;
+            return ms;
+        }
+
+        /// <summary>
+        /// Extracts an embedded file from this assembly. 
+        /// </summary>
+        /// <param name="internalResourceName"></param>
+        /// <param name="destination"></param>
+        /// <param name="overwrite"></param>
+        /// <returns></returns>
+        internal static string ExtractInternalFile(string internalResourceName, string destination, bool overwrite)
+        {
+            Log.Information("Extracting embedded file: " + internalResourceName + " to " + destination);
+#if DEBUG
+            var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+#endif
+            if (!File.Exists(destination) || overwrite || new FileInfo(destination).Length == 0)
+            {
+
+                using (Stream stream = Utilities.GetResourceStream(internalResourceName))
+                {
+                    if (File.Exists(destination))
+                    {
+                        FileInfo fi = new FileInfo(destination);
+                        if (fi.IsReadOnly)
+                        {
+                            fi.IsReadOnly = false; //clear read only. might happen on some binkw32 in archives, maybe
+                        }
+                    }
+
+                    using (var file = new FileStream(destination, FileMode.Create, FileAccess.Write))
+                    {
+                        stream.CopyTo(file);
+                    }
+                }
+            }
+            else
+            {
+                Log.Warning("File already exists. Not overwriting file.");
+            }
+
+            return destination;
+        }
 
         public static string GetCPUString()
         {
@@ -1053,6 +1116,89 @@ namespace ALOTInstallerCore
 #endif
         }
 
+
+        public static bool CreateDirectoryWithWritePermission(string directoryPath, bool forcePermissions = false)
+        {
+            if (!forcePermissions && Directory.Exists(Directory.GetParent(directoryPath).FullName) && Utilities.IsDirectoryWritable(Directory.GetParent(directoryPath).FullName))
+            {
+                Directory.CreateDirectory(directoryPath);
+                return true;
+            }
+
+            try
+            {
+                //try first without admin.
+                if (forcePermissions) throw new UnauthorizedAccessException(); //just go to the alternate case.
+                Directory.CreateDirectory(directoryPath);
+                return true;
+            }
+            catch (UnauthorizedAccessException uae)
+            {
+                //Must have admin rights.
+                Log.Information("We need admin rights to create this directory");
+
+#if WINDOWS
+                string exe = GetCachedExecutablePath("PermissionsGranter.exe");
+                try
+                {
+                    Utilities.ExtractInternalFile("MassEffectModManagerCore.modmanager.me3tweaks.PermissionsGranter.exe", exe, true);
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Error extracting PermissionsGranter.exe: " + e.Message);
+
+                    Log.Information("Retrying with appdata temp directory instead.");
+                    try
+                    {
+                        exe = Path.Combine(Path.GetTempPath(), "PermissionsGranter");
+                        Utilities.ExtractInternalFile("MassEffectModManagerCore.modmanager.me3tweaks.PermissionsGranter.exe", exe, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error("Retry failed! Unable to make this directory writable due to inability to extract PermissionsGranter.exe. Reason: " + ex.Message);
+                        return false;
+                    }
+                }
+
+                string args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" -create-directory \"" + directoryPath.TrimEnd('\\') + "\"";
+                try
+                {
+                    int result = Utilities.RunProcess(exe, args, waitForProcess: true, requireAdmin: true, noWindow: true);
+                    if (result == 0)
+                    {
+                        Log.Information("Elevated process returned code 0, restore directory is hopefully writable now.");
+                        return true;
+                    }
+                    else
+                    {
+                        Log.Error("Elevated process returned code " + result + ", directory likely is not writable");
+                        return false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    if (e is Win32Exception w32e)
+                    {
+                        if (w32e.NativeErrorCode == 1223)
+                        {
+                            //Admin canceled.
+                            return false;
+                        }
+                    }
+
+                    Log.Error("Error creating directory with PermissionsGranter: " + e.Message);
+                    return false;
+
+                }
+
+#else
+                //TODO: UNIX HANDLING OF THIS, SUDO?
+                return false;
+#endif
+            }
+        }
+
+
         public static bool InstallME3ASIs()
         {
 #if WINDOWS
@@ -1467,14 +1613,14 @@ namespace ALOTInstallerCore
 #endif
         }
 
-        public static bool IsGameRunning(int gameID)
+        public static bool IsGameRunning(Enums.MEGame game)
         {
-            if (gameID == 1)
+            if (game == Enums.MEGame.ME1)
             {
                 Process[] pname = Process.GetProcessesByName("MassEffect");
                 return pname.Length > 0;
             }
-            if (gameID == 2)
+            if (game == Enums.MEGame.ME2)
             {
                 Process[] pname = Process.GetProcessesByName("MassEffect2");
                 Process[] pname2 = Process.GetProcessesByName("ME2Game");

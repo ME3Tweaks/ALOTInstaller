@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using ALOTInstallerCore.ModManager.GameINI;
+using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
+using ALOTInstallerCore.Objects;
 using static ALOTInstallerCore.Hook;
 
 namespace ALOTInstallerCore.Helpers
@@ -31,6 +34,7 @@ namespace ALOTInstallerCore.Helpers
                     }
                     break;
             }
+            LoadGamePaths();
         }
 
         private static void LoadLocationsWin64()
@@ -39,10 +43,116 @@ namespace ALOTInstallerCore.Helpers
             if (librarydir != null && Directory.Exists(librarydir))
             {
                 TextureLibraryLocation = librarydir;
-            } else
+            }
+            else
             {
                 TextureLibraryLocation = Path.Combine(Utilities.GetExecutingAssemblyFolder(), "Downloaded_Mods");
                 Directory.CreateDirectory(TextureLibraryLocation); //Create to ensure existence
+            }
+        }
+
+        public static GameTarget ME1Target { get; private set; }
+        public static GameTarget ME2Target { get; private set; }
+        public static GameTarget ME3Target { get; private set; }
+
+        private static void LoadGamePaths()
+        {
+            //Read config file.
+            string path = null;
+            string mempath = null;
+
+            // MIGHT NEED CHANGED ON LINUX
+            string inipath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MassEffectModder");
+            inipath = Path.Combine(inipath, "MassEffectModder.ini");
+            DuplicatingIni configIni = null;
+            if (File.Exists(inipath))
+            {
+                configIni = DuplicatingIni.LoadIni(inipath);
+            }
+
+            if (configIni != null)
+            {
+                foreach (var game in Enums.AllGames)
+                {
+                    string key = game.ToString();
+                    path = configIni["GameDataPath"][key]?.Value;
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        GameTarget gt = new GameTarget(game, path, false);
+                        var failedValidationReason = gt.ValidateTarget();
+                        if (failedValidationReason == null)
+                        {
+                            switch (game)
+                            {
+                                case Enums.MEGame.ME1:
+                                    ME1Target = gt;
+                                    continue;
+                                case Enums.MEGame.ME2:
+                                    ME2Target = gt;
+                                    continue;
+                                case Enums.MEGame.ME3:
+                                    ME3Target = gt;
+                                    continue;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Utilities.WriteDebugLog("mem ini does not have path for this game.");
+                    }
+
+#if WINDOWS
+                    //does not exist in ini (or ini does not exist).
+                    string softwareKey = @"HKEY_LOCAL_MACHINE\SOFTWARE\";
+                    string key64 = @"Wow6432Node\";
+                    string gameKey = @"BioWare\Mass Effect";
+                    string entry = "Path";
+
+                    if (gameID == 2)
+                        gameKey += @" 2";
+                    else if (gameID == 3)
+                    {
+                        gameKey += @" 3";
+                        entry = "Install Dir";
+                    }
+
+                    path = (string)RegistryHandler.GetValue(softwareKey + gameKey, entry, null);
+                    if (path == null)
+                    {
+                        path = (string)Registry.GetValue(softwareKey + key64 + gameKey, entry, null);
+                    }
+                    if (path != null)
+                    {
+                        Utilities.WriteDebugLog("Found game path via registry: " + path);
+                        path = path.TrimEnd(Path.DirectorySeparatorChar);
+
+                        string GameEXEPath = "";
+                        switch (gameID)
+                        {
+                            case 1:
+                                GameEXEPath = Path.Combine(path, @"Binaries\MassEffect.exe");
+                                break;
+                            case 2:
+                                GameEXEPath = Path.Combine(path, @"Binaries\MassEffect2.exe");
+                                break;
+                            case 3:
+                                GameEXEPath = Path.Combine(path, @"Binaries\Win32\MassEffect3.exe");
+                                break;
+                        }
+                        Utilities.WriteDebugLog("GetGamePath Registry EXE Check Path: " + GameEXEPath);
+
+                        if (File.Exists(GameEXEPath))
+                        {
+                            Utilities.WriteDebugLog("EXE file exists - returning this path: " + GameEXEPath);
+                            return path; //we have path now
+                        }
+                    }
+                    else
+                    {
+                        Utilities.WriteDebugLog("Could not find game via registry.");
+                    }
+#endif
+                }
             }
         }
 
@@ -60,5 +170,11 @@ namespace ALOTInstallerCore.Helpers
         /// </summary>
         public static string BuildLocation { get; set; }
 
+        /// <summary>
+        /// Location where cached ASI files are placed
+        /// </summary>
+        public static readonly string CachedASIsFolder = Directory.CreateDirectory(Path.Combine(AppDataFolder(), @"CachedASIs")).FullName;
+
+        public static ObservableCollectionExtended<GameTarget> GameTargets { get; } = new ObservableCollectionExtended<GameTarget>();
     }
 }
