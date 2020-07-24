@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Builder\" />
     <Folder Include="Installer\" />
     <Folder Include="Libraries\Linux\" />
     <Folder Include="Libraries\MacOS\" />
