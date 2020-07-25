@@ -16,7 +16,8 @@ namespace ALOTInstallerCore.Helpers
             ImportAsMove,
             BetaMode,
             LastBetaAdvertisement,
-            DownloadsFolder
+            DownloadsFolder,
+            BuildLocation
         }
 
         public static Dictionary<SettingKeys, string> SettingsKeyMapping = new Dictionary<SettingKeys, string>()
@@ -29,7 +30,8 @@ namespace ALOTInstallerCore.Helpers
             {SettingKeys.ImportAsMove,"ImportAsMove"},
             {SettingKeys.BetaMode,"BetaMode"},
             {SettingKeys.LastBetaAdvertisement,"LastBetaAdvertisement"},
-            {SettingKeys.DownloadsFolder,"DownloadsFolder"}
+            {SettingKeys.DownloadsFolder,"DownloadsFolder"},
+            {SettingKeys.BuildLocation,"BuildLocation"},
         };
 
     }

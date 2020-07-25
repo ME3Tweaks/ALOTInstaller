@@ -11,7 +11,7 @@ using static ALOTInstallerCore.Hook;
 namespace ALOTInstallerCore.Helpers
 {
     /// <summary>
-    /// Contains locations for various ALOT Installer items.
+    /// Contains locations for various ALOT Installer items. Paths that are configurable by the user are accessible in the Settings class.
     /// </summary>
     public static class Locations
     {
@@ -36,18 +36,33 @@ namespace ALOTInstallerCore.Helpers
             }
             LoadGamePaths();
         }
+        //#if WINDOWS
+        public static string MEMPath() => Path.Combine(AppDataFolder(), @"MassEffectModderNoGui.exe");
+        //#endif
+#if LINUX
+        public static string MEMPath() => Path.Combine(AppDataFolder(), @"MassEffectModderNoGui");
+#endif
 
         private static void LoadLocationsWin64()
         {
-            string librarydir = RegistryHandler.GetRegistrySettingString(SettingsKeys.SettingsKeyMapping[SettingsKeys.SettingKeys.TextureLibraryDirectory]);
-            if (librarydir != null && Directory.Exists(librarydir))
+            TextureLibraryLocation = GetFolderSetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, "Downloaded_Mods");
+
+            //V4 only
+            BuildLocation = GetFolderSetting(SettingsKeys.SettingKeys.BuildLocation, "BuildLocation");
+        }
+
+        private static string GetFolderSetting(SettingsKeys.SettingKeys key, string defaultF)
+        {
+            string dir = RegistryHandler.GetRegistrySettingString(SettingsKeys.SettingsKeyMapping[key]);
+            if (dir != null && Directory.Exists(dir))
             {
-                TextureLibraryLocation = librarydir;
+                return dir;
             }
             else
             {
-                TextureLibraryLocation = Path.Combine(Utilities.GetExecutingAssemblyFolder(), "Downloaded_Mods");
-                Directory.CreateDirectory(TextureLibraryLocation); //Create to ensure existence
+                var path = Path.Combine(Utilities.GetExecutingAssemblyFolder(), defaultF);
+                Directory.CreateDirectory(path);
+                return path;
             }
         }
 
@@ -161,14 +176,6 @@ namespace ALOTInstallerCore.Helpers
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Location of the texture library that the manifests use
-        /// </summary>
-        public static string TextureLibraryLocation { get; set; }
-        /// <summary>
-        /// Location that can be used to build and stage textures in preparation for installation
-        /// </summary>
-        public static string BuildLocation { get; set; }
 
         /// <summary>
         /// Location where cached ASI files are placed
