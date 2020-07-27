@@ -16,9 +16,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Runtime.InteropServices;
+#if APPCENTER
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
+#endif 
 
 namespace AlotAddOnGUI
 {
@@ -70,13 +72,16 @@ namespace AlotAddOnGUI
         /// <param name="e"></param>
         private static void DelayedResolveTrackError(Exception e)
         {
+#if APPCENTER
             Crashes.TrackError(e);
+#endif
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
             Debug.WriteLine("Setting onstartup");
             base.OnStartup(e);
+#if APPCENTER
             if (APIKeys.HasAppCenterKey)
             {
                 //Setup App Center
@@ -117,6 +122,7 @@ namespace AlotAddOnGUI
                 //AppCenter.LogLevel = LogLevel.Verbose;
                 AppCenter.Start(APIKeys.AppCenterKey, typeof(Analytics), typeof(Crashes));
             }
+#endif
         }
 
         /// <summary>
@@ -387,9 +393,11 @@ namespace AlotAddOnGUI
             {
                 //turn off debug mode
                 Utilities.WriteRegistryKey(Registry.CurrentUser, AlotAddOnGUI.MainWindow.REGISTRY_KEY, AlotAddOnGUI.MainWindow.SETTINGSTR_DEBUGLOGGING, 0);
+#if APPCENTER
                 Analytics.TrackEvent("Update Completed", new Dictionary<string, string> {
                     { "NewVersion", System.Reflection.Assembly.GetEntryAssembly().GetName().Version.ToString() }
                 });
+#endif
             }
 
             Log.Information("Program Version: " + System.Reflection.Assembly.GetEntryAssembly().GetName().Version);
