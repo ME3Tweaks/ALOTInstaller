@@ -22,7 +22,9 @@ using System.Management;
 using Microsoft.Win32;
 using MahApps.Metro.Controls.Dialogs;
 using System.Linq;
+#if APPCENTER
 using Microsoft.AppCenter.Analytics;
+#endif
 using AuthenticodeExaminer;
 
 namespace AlotAddOnGUI.ui
@@ -160,11 +162,13 @@ namespace AlotAddOnGUI.ui
             diagnosticsWorker.DoWork += PerformDiagnostics;
             diagnosticsWorker.RunWorkerCompleted += FinishedDiagnostics;
             diagnosticsWorker.RunWorkerAsync();
+#if APPCENTER
             Analytics.TrackEvent("Ran diagnostic", new Dictionary<string, string>()
             {
                 { "Game", "ME"+game },
                 {"Type", full ? "Full": "Quick" }
             });
+#endif
         }
 
         private async void DiagnosticsProgressChanged(object sender, ProgressChangedEventArgs e)

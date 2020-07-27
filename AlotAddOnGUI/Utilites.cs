@@ -22,7 +22,9 @@ using System.ComponentModel;
 using ByteSizeLib;
 using System.Globalization;
 using ME3Explorer.Packages;
+#if APPCENTER
 using Microsoft.AppCenter.Analytics;
+#endif
 
 namespace AlotAddOnGUI
 {
@@ -522,14 +524,17 @@ namespace AlotAddOnGUI
             {
                 //supported
                 Log.Warning("Executable hash: " + hash + ", " + supportStatus.Item2);
+#if APPCENTER
                 Analytics.TrackEvent("Game source", new Dictionary<string, string>() { { "SourceME" + game, supportStatus.Item2 } });
-
+#endif
             }
             else
             {
                 Log.Fatal("This installation is not supported. Only official copies of the game are supported.");
                 Log.Fatal("Executable hash: " + hash + ", " + supportStatus.Item2);
+#if APPCENTER
                 Analytics.TrackEvent("Game source", new Dictionary<string, string>() { { "Unknown SourceME" + game, hash } });
+#endif
             }
         }
 

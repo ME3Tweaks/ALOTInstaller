@@ -28,8 +28,6 @@ using System.Windows.Navigation;
 using System.Xml.Linq;
 using ME3Explorer.Packages;
 using ME3Explorer.Unreal;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
 
 namespace AlotAddOnGUI
 {
@@ -374,7 +372,9 @@ namespace AlotAddOnGUI
                     Log.Error("Could not hash executable: " + ex.Message);
                 }
             }
+#if APPCENTER
             Analytics.TrackEvent("Started installation for ME" + INSTALLING_THREAD_GAME);
+#endif
             ProgressWeightPercentages.ClearTasks();
             ALOTVersionInfo versionInfo = Utilities.GetInstalledALOTInfo(INSTALLING_THREAD_GAME);
             TELEMETRY_IS_FULL_NEW_INSTALL = versionInfo == null;
@@ -767,7 +767,9 @@ namespace AlotAddOnGUI
                     {
                         Utilities.CompactFile(biopcharPath);
                         Utilities.TagWithALOTMarker(biopcharPath);
+#if APPCENTER
                         Analytics.TrackEvent("Applied ME2Controller compaction fix");
+#endif
                     }
                 }
             }
@@ -853,7 +855,9 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("Marker file was unable to be written due to an exception: " + ex.Message);
                     Log.Error("An error like this occuring could indicate significant other issues");
+#if APPCENTER
                     Crashes.TrackError(ex);
+#endif
                 }
             }
             //Install Binkw32
@@ -878,7 +882,9 @@ namespace AlotAddOnGUI
                 catch (Exception ex)
                 {
                     Log.Error("Failed to ME1 DLC Enable ASI! " + ex.Message);
+#if APPCENTER
                     Crashes.TrackError(ex);
+#endif
                 }
             }
 
@@ -956,8 +962,9 @@ namespace AlotAddOnGUI
                     InstallWorker.ReportProgress(0, new ThreadCommand(SHOW_ORIGIN_FLYOUT, INSTALLING_THREAD_GAME));
                 }
             }
+#if APPCENTER
             Analytics.TrackEvent("Finished installation for ME" + INSTALLING_THREAD_GAME);
-
+#endif
             e.Result = INSTALL_OK;
         }
 
@@ -1349,6 +1356,7 @@ namespace AlotAddOnGUI
                             }
                         }
                         Log.Information("Sending installation telemetry");
+#if APPCENTER
                         Analytics.TrackEvent("Installed ALOT", new Dictionary<string, string>()
                         {
                             {"Game","ME"+Game },
@@ -1364,7 +1372,7 @@ namespace AlotAddOnGUI
                             {"Disk Type", diskType.ToString() },
                             {"Failed", telemetryfailedcode.ToString() }
                         });
-
+#endif
                         Dictionary<string, string> telemetryTrackingForManifestFiles = new Dictionary<string, string>();
                         foreach (var af in AllAddonFiles)
                         {
@@ -1377,7 +1385,9 @@ namespace AlotAddOnGUI
                         if (telemetryTrackingForManifestFiles.Any())
                         {
                             telemetryTrackingForManifestFiles["Game"] = "ME" + INSTALLING_THREAD_GAME;
+#if APPCENTER
                             Analytics.TrackEvent("Installed game with telemetry tracked files", telemetryTrackingForManifestFiles);
+#endif
                         }
 
                         /*
@@ -1477,7 +1487,7 @@ namespace AlotAddOnGUI
             //InstallWorker?.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
             Log.Information("Fixing post-mars hackett cutscene memory issue");
             ME3ExplorerMinified.DLL.Startup();
-            #region BioA_CitHub fix
+#region BioA_CitHub fix
 
             {
                 var bioa_cithubPath = Path.Combine(Utilities.GetGamePath(3), "BioGame", "CookedPCConsole", "BioA_CitHub.pcc");
@@ -1524,8 +1534,8 @@ namespace AlotAddOnGUI
                 }
             }
 
-            #endregion
-            #region BioD_CitHub fix
+#endregion
+#region BioD_CitHub fix
             {
                 var biod_cithubPath = Path.Combine(Utilities.GetGamePath(3), "BioGame", "CookedPCConsole", "BioD_CitHub.pcc");
                 if (File.Exists(biod_cithubPath))
@@ -1553,7 +1563,7 @@ namespace AlotAddOnGUI
                     biod_cithub.save();
                 }
             }
-            #endregion
+#endregion
             Log.Information("Finished fixing post-mars hackett cutscene memory issue");
         }
 

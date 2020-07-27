@@ -38,8 +38,10 @@ using System.IO.Compression;
 using System.Globalization;
 using System.Management;
 using System.Collections.ObjectModel;
+#if APPCENTER
 using Microsoft.AppCenter.Crashes;
 using Microsoft.AppCenter.Analytics;
+#endif
 
 namespace AlotAddOnGUI
 {
@@ -966,6 +968,7 @@ namespace AlotAddOnGUI
             RunMEMUpdaterGUI();
             //string appCrashFile = EXE_DIRECTORY + @"Data\APP_CRASH";
             //string appCrashHandledFile = EXE_DIRECTORY + @"Data\APP_CRASH_HANDLED";
+#if APPCENTER
             bool didAppCrash = await Crashes.HasCrashedInLastSessionAsync();
             ErrorReport crashReport = await Crashes.GetLastSessionCrashReportAsync();
             if (didAppCrash)
@@ -1018,6 +1021,7 @@ namespace AlotAddOnGUI
 
                 }
             }
+#endif
             /*  if (MEUITM_INSTALLER_MODE)
               {
                   MEUITM_Flyout_BootPanel.Visibility = Visibility.Collapsed;
@@ -1913,7 +1917,9 @@ namespace AlotAddOnGUI
                                 else
                                 {
                                     Log.Error("Response from server was not valid XML! " + pageSourceCode);
+#if APPCENTER
                                     Crashes.TrackError(new Exception("Invalid XML from server manifest!"));
+#endif
                                     if (File.Exists(MANIFEST_LOC))
                                     {
                                         Log.Information("Reading cached manifest instead.");
@@ -4075,11 +4081,12 @@ namespace AlotAddOnGUI
 
             USING_BETA = Utilities.GetRegistrySettingBool(SETTINGSTR_BETAMODE) ?? false;
             Checkbox_BetaMode.IsChecked = USING_BETA;
+#if APPCENTER
             Analytics.TrackEvent("Session Type", new Dictionary<string, string>()
             {
                 ["Type"] = USING_BETA ? "Beta" : "Stable"
             });
-
+#endif
             LAST_BETA_ADVERT_TIME = DateTimeOffset.FromUnixTimeMilliseconds(Convert.ToInt64(Utilities.GetRegistrySettingString(SETTINGSTR_LAST_BETA_ADVERT_TIME) ?? "0"));
 
             DONT_FORCE_UPGRADES = Utilities.GetRegistrySettingBool(SETTINGSTR_DONT_FORCE_UPGRADES) ?? false;
@@ -4245,8 +4252,9 @@ namespace AlotAddOnGUI
 
             string exe = BINARY_DIRECTORY + "MassEffectModder.exe";
             Utilities.runProcess(exe, "", true);
+#if APPCENTER
             Analytics.TrackEvent("Ran Mass Effect Modder GUI");
-
+#endif
         }
 
         private void InstallingOverlayFlyout_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -4564,8 +4572,9 @@ namespace AlotAddOnGUI
                 if (filelist.Count > 0)
                 {
                     Log.Information("Found this many files to import from downloads folder:" + filelist.Count);
+#if APPCENTER
                     Analytics.TrackEvent("Imported files with Download Assistant");
-
+#endif
                     PerformImportOperation(filelist.ToArray(), false);
                 }
                 else
@@ -4720,7 +4729,9 @@ namespace AlotAddOnGUI
             Utilities.runProcess(BINARY_DIRECTORY + "lzma.exe", args);
             File.Delete(zipStaged);
             var lzmalog = File.ReadAllBytes(outfile);
+#if APPCENTER
             Analytics.TrackEvent("Uploaded log");
+#endif
             ProgressDialogController progresscontroller = await this.ShowProgressAsync("Uploading log", "Log is currently uploading, please wait...", true);
             progresscontroller.SetIndeterminate();
             try
@@ -5138,8 +5149,9 @@ namespace AlotAddOnGUI
         private void Button_ME3AutoTOC_Click(object sender, RoutedEventArgs e)
         {
             ShowStatus("Performing AutoTOC on Mass Effect 3...", 3000);
+#if APPCENTER
             Analytics.TrackEvent("Ran autotoc for ME3");
-
+#endif
             SettingsFlyout.IsOpen = false;
             Utilities_Flyout.IsOpen = false;
             string exe = BINARY_DIRECTORY + "FullAutoTOC.exe";
