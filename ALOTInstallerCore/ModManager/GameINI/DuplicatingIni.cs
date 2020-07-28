@@ -152,6 +152,18 @@ namespace ALOTInstallerCore.ModManager.GameINI
                     Entries.Add(value);
                 }
             }
+
+            public void SetSingleEntry(string key, string value)
+            {
+                Entries.RemoveAll(x => x.Key == key);
+                Entries.Add(new IniEntry(key, value));
+            }
+
+            public void SetSingleEntry(string key, int value)
+            {
+                Entries.RemoveAll(x => x.Key == key);
+                Entries.Add(new IniEntry(key, value.ToString()));
+            }
         }
 
         [DebuggerDisplay("IniEntry {Key} = {Value}")]
@@ -165,6 +177,12 @@ namespace ALOTInstallerCore.ModManager.GameINI
             public IniEntry(string line)
             {
                 RawText = line;
+                Key = KeyPair.Key;
+                Value = KeyPair.Value;
+            }
+            public IniEntry(string key, string value)
+            {
+                RawText = $"{key}={value}";
                 Key = KeyPair.Key;
                 Value = KeyPair.Value;
             }

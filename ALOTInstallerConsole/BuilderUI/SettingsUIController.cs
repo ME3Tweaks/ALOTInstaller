@@ -135,6 +135,7 @@ namespace ALOTInstallerConsole.BuilderUI
             if (selector.FilePaths.Any())
             {
                 UITools.SetText(me3PathField, selector.FilePaths.First());
+
                 // COMMIT CHANGE HERE
             }
         }
