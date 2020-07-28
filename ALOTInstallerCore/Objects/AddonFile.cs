@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using ALOTInstallerCore.Helpers;
 
 namespace ALOTInstallerCore.Objects
 {
@@ -398,9 +399,6 @@ namespace ALOTInstallerCore.Objects
         //            }
 
         //        }
-
-        public TextureModInstallationInfo MEUITMVer { get; set; }
-        public TextureModInstallationInfo ALOTVersion { get; set; }
         public bool IsModManagerMod { get; internal set; }
 
         //        public bool InstallME1DLCASI { get; internal set; }
@@ -479,7 +477,7 @@ namespace ALOTInstallerCore.Objects
         public override string ToString() => FriendlyName;
         public override void UpdateReadyStatus()
         {
-            var filePathMain = Path.Combine(ALOTInstallerCore.Helpers.Locations.TextureLibraryLocation, Filename);
+            var filePathMain = Path.Combine(Settings.TextureLibraryLocation, Filename);
             if (File.Exists(filePathMain) && new FileInfo(filePathMain).Length == FileSize)
             {
                 Ready = true;
@@ -488,7 +486,7 @@ namespace ALOTInstallerCore.Objects
             if (UnpackedSingleFilename != null && UnpackedFileSize > 0 && UnpackedFileMD5 != null)
             {
                 // This file supports unpacked mode
-                var filePathUnpacked = Path.Combine(ALOTInstallerCore.Helpers.Locations.TextureLibraryLocation, UnpackedSingleFilename);
+                var filePathUnpacked = Path.Combine(Settings.TextureLibraryLocation, UnpackedSingleFilename);
                 if (File.Exists(filePathUnpacked) && new FileInfo(filePathUnpacked).Length == UnpackedFileSize)
                 {
                     Ready = true;

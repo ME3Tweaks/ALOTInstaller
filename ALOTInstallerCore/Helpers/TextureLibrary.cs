@@ -22,16 +22,14 @@ namespace ALOTInstallerCore.Helpers
                 watcher.Renamed -= OnLibraryFileChanged;
                 watcher.Dispose();
             }
-            watcher = new FileSystemWatcher(Locations.TextureLibraryLocation);
-
-            // Watch for changes in LastAccess and LastWrite times, and
-            // the renaming of files or directories.
-            watcher.NotifyFilter = NotifyFilters.LastWrite
+            watcher = new FileSystemWatcher(Settings.TextureLibraryLocation)
+            {
+                NotifyFilter = NotifyFilters.LastWrite
                                  | NotifyFilters.FileName
-                                 | NotifyFilters.Size;
+                                 | NotifyFilters.Size,
 
-            // Only watch text files.
-            watcher.Filter = "*.zip;*.tpf;*.mem;*.rar;*.7z";
+                Filter = "*.zip;*.tpf;*.mem;*.rar;*.7z"
+            };
 
             // Add event handlers.
             watcher.Changed += OnLibraryFileChanged;

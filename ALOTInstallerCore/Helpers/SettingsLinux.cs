@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if LINUX
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -14,7 +15,7 @@ namespace ALOTInstallerCore.Helpers
     {
 
 
-        #region Static Property Changed
+#region Static Property Changed
 
         private static bool Loaded = false;
         public static event PropertyChangedEventHandler StaticPropertyChanged;
@@ -36,7 +37,7 @@ namespace ALOTInstallerCore.Helpers
             if (Loaded) Save();
             return true;
         }
-        #endregion
+#endregion
 
         /// <summary>
         /// Location of the texture library that the manifests use
@@ -395,3 +396,4 @@ namespace ALOTInstallerCore.Helpers
         }
     }
 }
+#endif

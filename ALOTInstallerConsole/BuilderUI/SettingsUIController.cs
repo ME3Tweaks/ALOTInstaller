@@ -13,6 +13,8 @@ namespace ALOTInstallerConsole.BuilderUI
         private TextField me1PathField;
         private TextField me2PathField;
         private TextField me3PathField;
+        private TextField textureLibraryLocation;
+        private TextField buildLocation;
 
         public override void SetupUI()
         {
@@ -103,6 +105,62 @@ namespace ALOTInstallerConsole.BuilderUI
             });
             y++;
 
+            // Texture library location
+            y++;
+            Add(new Label("Texture library directory (ALOT mode only)")
+            {
+                X = 2,
+                Y = y++,
+                Width = 42,
+                Height = 1
+            });
+            textureLibraryLocation = new TextField(Settings.TextureLibraryLocation)
+            {
+                X = 2,
+                Y = y,
+                Width = 50,
+                Height = 1,
+                ReadOnly = true
+            };
+            Add(textureLibraryLocation);
+            Add(new Button("Change")
+            {
+                X = 53,
+                Y = y,
+                Width = 10,
+                Height = 1,
+                Clicked = ChangeTextureLibraryLocation
+            });
+            y++;
+
+            // Build Location
+            y++;
+            Add(new Label("Staging directory (where textures are prepared for install)")
+            {
+                X = 2,
+                Y = y++,
+                Width = 65,
+                Height = 1
+            });
+            buildLocation = new TextField(Settings.BuildLocation)
+            {
+                X = 2,
+                Y = y,
+                Width = 50,
+                Height = 1,
+                ReadOnly = true
+            };
+            Add(buildLocation);
+            Add(new Button("Change")
+            {
+                X = 53,
+                Y = y,
+                Width = 10,
+                Height = 1,
+                Clicked = ChangeBuildLocation
+            });
+            y++;
+
             Button close = new Button("Close")
             {
                 X = Pos.Right(this) - 12,
@@ -111,6 +169,16 @@ namespace ALOTInstallerConsole.BuilderUI
                 Clicked = Close_Clicked
             };
             Add(close);
+        }
+
+        private void ChangeBuildLocation()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ChangeTextureLibraryLocation()
+        {
+            throw new NotImplementedException();
         }
 
         private void ChangeME1Path()

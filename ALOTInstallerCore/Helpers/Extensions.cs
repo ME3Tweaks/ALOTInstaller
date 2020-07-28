@@ -52,6 +52,22 @@ namespace ALOTInstallerCore.Helpers
             return "Error: Unknown game";
         }
 
+        public static Enums.MEGame ApplicableGameToMEGame(this ApplicableGame game)
+        {
+            if (game == ApplicableGame.ME1) return Enums.MEGame.ME1;
+            if (game == ApplicableGame.ME2) return Enums.MEGame.ME2;
+            if (game == ApplicableGame.ME3) return Enums.MEGame.ME3;
+            return Enums.MEGame.Unknown;
+        }
+
+        public static ApplicableGame ToApplicableGame(this Enums.MEGame game)
+        {
+            if (game == Enums.MEGame.ME1) return ApplicableGame.ME1;
+            if (game == Enums.MEGame.ME2) return ApplicableGame.ME2;
+            if (game == Enums.MEGame.ME3) return ApplicableGame.ME3;
+            return ApplicableGame.None;
+        }
+
         /// <summary>
         /// Checks if a list is ascending basded on the given comparison function.
         /// </summary>

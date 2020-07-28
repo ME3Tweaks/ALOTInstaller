@@ -29,11 +29,12 @@ namespace ALOTInstallerCore
             MacOS
         }
 
-        public static void Startup(Platform platform)
+        public static void Startup()
         {
             if (startedUp) return;
             startedUp = true;
-            Locations.LoadLocations(platform);
+            Settings.Load();
+            Locations.LoadLocations();
         }
     }
 }

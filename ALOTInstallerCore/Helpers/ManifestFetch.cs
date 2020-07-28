@@ -275,14 +275,11 @@ namespace ALOTInstallerCore.Startup
                                                //CopyDirectly = e.Element("file").Attribute("copydirectly") != null ? (bool)e.Element("file").Attribute("copydirectly") : false,
 
                                                // MEUITM, ALOT
-                                               MEUITMVer = e.Attribute("meuitmver") != null ? new TextureModInstallationInfo(0, 0, 0, Convert.ToInt32((string)e.Attribute("meuitmver"))) : null,
-                                               ALOTVersion = e.Attribute("alotversion") != null ? new TextureModInstallationInfo(
-                                                   Convert.ToInt16((string)e.Attribute("alotversion")),
-                                                   (string)e.Attribute("alotupdateversion") != null ? Convert.ToByte((string)e.Attribute("alotupdateversion")) : (byte)0,
-                                                   0, 0) : null,
-                                               //ALOTUpdateVersion = e.Attribute("alotupdateversion") != null ? Convert.ToByte((string)e.Attribute("alotupdateversion")) : (byte)0,
-                                               //ALOTMainVersionRequired = e.Attribute("appliestomainversion") != null ? Convert.ToInt16((string)e.Attribute("appliestomainversion")) : (short)0,
-
+                                               AlotVersionInfo = new TextureModInstallationInfo(
+                                                   TryConvert.ToInt16((string)e.Attribute("alotversion")), 
+                                                   TryConvert.ToByte((string)e.Attribute("alotupdateversion")),
+                                                   0, //Hotfix version is not used
+                                                   TryConvert.ToInt32((string)e.Attribute("meuitmver"))),
 
                                                //ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
                                                Author = (string)e.Attribute("author"),

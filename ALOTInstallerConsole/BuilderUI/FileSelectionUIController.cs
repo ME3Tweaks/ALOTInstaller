@@ -324,7 +324,8 @@ namespace ALOTInstallerConsole.BuilderUI
 
         public override void BeginFlow()
         {
-            TextureLibrary.SetupLibraryWatcher();
+            // Disabled for now.
+            //TextureLibrary.SetupLibraryWatcher();
         }
 
         internal class InstallerFileDataSource : IListDataSource

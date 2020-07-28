@@ -25,15 +25,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     startupStatusLabel.Text = "Starting up";
                 });
                 //Initialize ALOT Installer library
-#if WINDOWS
-                Hook.Startup(Hook.Platform.Windows);
-#elif LINUX
-            Hook.Startup(Hook.Platform.Linux);
-#elif MACOS
-            Hook.Startup(Hook.Platform.MacOS);
-#else
-            throw new Exception("Platform not specificed at build time!"); THIS TEXT WILL MAKE THE BUILD FAIL. DO NOT EDIT ME
-#endif
+                Hook.Startup();
 
                 var manifestFiles = OnlineContent.FetchALOTManifest((x) => Application.MainLoop.Invoke(() =>
                 {

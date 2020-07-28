@@ -19,21 +19,15 @@ namespace ALOTInstallerCore.Helpers
         public static string TempDirectory() => Directory.CreateDirectory(Path.Combine(AppDataFolder(), "Temp")).FullName;
         public static string GetCachedManifestPath() => Path.Combine(AppDataFolder(), "manifest.xml");
 
-        internal static void LoadLocations(Platform platform)
+        internal static void LoadLocations()
         {
-            switch (platform)
-            {
-                case Platform.Windows:
-                    {
-                        LoadLocationsWin64();
-                    }
-                    break;
-                case Platform.Linux:
-                    {
-                        LoadLocationsLinux64();
-                    }
-                    break;
-            }
+#if WINDOWS
+            //LoadLocationsWin64();
+#elif MACOS
+
+#elif LINUX
+            LoadLocationsLinux64();
+#endif
             LoadGamePaths();
         }
         //#if WINDOWS
@@ -43,13 +37,13 @@ namespace ALOTInstallerCore.Helpers
         public static string MEMPath() => Path.Combine(AppDataFolder(), @"MassEffectModderNoGui");
 #endif
 
-        private static void LoadLocationsWin64()
-        {
-            TextureLibraryLocation = GetFolderSetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, "Downloaded_Mods");
+        //private static void LoadLocationsWin64()
+        //{
+        //    TextureLibraryLocation = GetFolderSetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, "Downloaded_Mods");
 
-            //V4 only
-            BuildLocation = GetFolderSetting(SettingsKeys.SettingKeys.BuildLocation, "BuildLocation");
-        }
+        //    //V4 only
+        //    BuildLocation = GetFolderSetting(SettingsKeys.SettingKeys.BuildLocation, "BuildLocation");
+        //}
 
         private static string GetFolderSetting(SettingsKeys.SettingKeys key, string defaultF)
         {

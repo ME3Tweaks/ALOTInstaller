@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ALOTInstallerCore.Builder;
+using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
 using Terminal.Gui;
 
@@ -16,6 +18,11 @@ namespace ALOTInstallerConsole.BuilderUI
         }
         public override void BeginFlow()
         {
+            NamedBackgroundWorker builderWorker = new NamedBackgroundWorker("BuilderWorker");
+            StageStep ss = new StageStep(installOptions, builderWorker);
+            builderWorker.WorkerReportsProgress = true;
+            builderWorker.DoWork += ss.PerformStaging;
+            builderWorker.RunWorkerAsync();
         }
 
         public override void SetupUI()
