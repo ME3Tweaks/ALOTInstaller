@@ -68,6 +68,14 @@ namespace ALOTInstallerCore.Helpers
             return ApplicableGame.None;
         }
 
+        public static int ToGameNum(this Enums.MEGame game)
+        {
+            if (game == Enums.MEGame.ME1) return 1;
+            if (game == Enums.MEGame.ME2) return 2;
+            if (game == Enums.MEGame.ME3) return 3;
+            return 0; 
+        }
+
         /// <summary>
         /// Checks if a list is ascending basded on the given comparison function.
         /// </summary>

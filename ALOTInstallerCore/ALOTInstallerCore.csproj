@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Steps\Installer\Stage.cs~RF6ac8885.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Installer\" />
     <Folder Include="Libraries\Linux\" />
     <Folder Include="Libraries\MacOS\" />

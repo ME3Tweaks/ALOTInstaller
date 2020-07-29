@@ -21,5 +21,9 @@ namespace ALOTInstallerCore.Objects
         public bool InstallALOTAddon { get; set; }
         public bool InstallMEUITM { get; set; }
         public bool InstallUserfiles { get; set; }
+        /// <summary>
+        /// this might be better as just accessing settings
+        /// </summary>
+        public bool DebugLogging { get; set; }
     }
 }
