@@ -1477,84 +1477,137 @@ namespace AlotAddOnGUI
             //InstallWorker?.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
             Log.Information("Fixing post-mars hackett cutscene memory issue");
             ME3ExplorerMinified.DLL.Startup();
+            var biogamePath = Path.Combine(Utilities.GetGamePath(3), "BioGame");
+
             #region BioA_CitHub fix
 
+
+            var bioACithubs = Directory.GetFiles(biogamePath, "BioA_CitHub.pcc", SearchOption.AllDirectories);
+            foreach (var bioa_cithubPath in bioACithubs)
             {
-                var bioa_cithubPath = Path.Combine(Utilities.GetGamePath(3), "BioGame", "CookedPCConsole", "BioA_CitHub.pcc");
-                if (File.Exists(bioa_cithubPath))
+                try
                 {
-                    var bioa_cithub = MEPackageHandler.OpenMEPackage(bioa_cithubPath);
-                    var trigStream1 = bioa_cithub.getUExport(8);
-                    var propsT = trigStream1.GetProperties();
-                    var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
-                    // Clear preloading
-                    Log.Information("Clear LoadChunkNames from BioA_CitHub");
-                    streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
-
-                    // Clear visible asset
-                    var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
-                    for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                    if (File.Exists(bioa_cithubPath))
                     {
-                        if (visibleChunkNames[i].Value == "BioA_CitHub_Dock_Det")
+                        var bioa_cithub = MEPackageHandler.OpenMEPackage(bioa_cithubPath);
+                        var trigStream1 = bioa_cithub.getUExport(8);
+                        var propsT = trigStream1.GetProperties();
+                        var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
+                        // Clear preloading
+                        Log.Information("Clear LoadChunkNames from BioA_CitHub");
+                        if (streamStates != null && streamStates.Count > 1)
                         {
-                            Log.Information("Remove BioA_CitHub_Dock_Det from BioA_CitHub VisibleChunkNames(8)");
-                            visibleChunkNames.RemoveAt(i);
+                            streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
+
+                            // Clear visible asset
+                            var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
+                            if (visibleChunkNames != null)
+                            {
+                                for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                                {
+                                    if (visibleChunkNames[i].Value == "BioA_CitHub_Dock_Det")
+                                    {
+                                        Log.Information(
+                                            "Remove BioA_CitHub_Dock_Det from BioA_CitHub VisibleChunkNames(8)");
+                                        visibleChunkNames.RemoveAt(i);
+                                    }
+                                }
+                            }
+
+                            trigStream1.WriteProperty(streamStates);
                         }
-                    }
 
-                    trigStream1.WriteProperty(streamStates);
+                        var trigStream2 = bioa_cithub.getUExport(15);
+                        streamStates = trigStream2.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
 
-                    var trigStream2 = bioa_cithub.getUExport(15);
-                    streamStates = trigStream2.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
-
-                    // Cleanup visible assets
-                    visibleChunkNames = streamStates[0].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
-                    for (int i = visibleChunkNames.Count - 1; i > 0; i--)
-                    {
-                        if (visibleChunkNames[i].Value == "BioA_Nor_204Conference" || visibleChunkNames[i].Value == "BioA_Nor_204WarRoom")
+                        // Cleanup visible assets
+                        if (streamStates != null && streamStates.Any())
                         {
-                            Log.Information("Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(15)");
-                            visibleChunkNames.RemoveAt(i);
-                        }
-                    }
+                            var visibleChunkNames = streamStates[0].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
+                            if (visibleChunkNames != null)
+                            {
+                                for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                                {
+                                    if (visibleChunkNames[i].Value == "BioA_Nor_204Conference" ||
+                                        visibleChunkNames[i].Value == "BioA_Nor_204WarRoom")
+                                    {
+                                        Log.Information("Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(15)");
+                                        visibleChunkNames.RemoveAt(i);
+                                    }
+                                }
+                            }
 
-                    trigStream2.WriteProperty(streamStates);
-                    Log.Information("Saving package: " + bioa_cithubPath);
-                    bioa_cithub.save();
+                            trigStream2.WriteProperty(streamStates);
+                        }
+
+                        Log.Information("Saving package: " + bioa_cithubPath);
+                        bioa_cithub.save();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Error applying fix for BioA_Cithub to file ({bioa_cithubPath}) fix (post mars crash fix): " + e.Message);
                 }
             }
 
             #endregion
             #region BioD_CitHub fix
             {
-                var biod_cithubPath = Path.Combine(Utilities.GetGamePath(3), "BioGame", "CookedPCConsole", "BioD_CitHub.pcc");
-                if (File.Exists(biod_cithubPath))
+                var bioDCithubs = Directory.GetFiles(biogamePath, "BioD_CitHub.pcc", SearchOption.AllDirectories);
+                foreach (var biod_cithubPath in bioDCithubs)
                 {
-                    var biod_cithub = MEPackageHandler.OpenMEPackage(biod_cithubPath);
-                    var trigStream1 = biod_cithub.getUExport(162);
-                    var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
-                    // Clear preloading
-                    Log.Information("Clear LoadChunkNames from BioD_CitHub");
-                    streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
-
-                    // Clear visible asset
-                    var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
-                    for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                    try
                     {
-                        if (visibleChunkNames[i].Value == "BioH_Marine" || visibleChunkNames[i].Value == "BioD_CitHub_Dock")
+                        if (File.Exists(biod_cithubPath))
                         {
-                            Log.Information("Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(8)");
-                            visibleChunkNames.RemoveAt(i);
+                            var biod_cithub = MEPackageHandler.OpenMEPackage(biod_cithubPath);
+                            var trigStream1 = biod_cithub.getUExport(162);
+                            var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
+                            if (streamStates != null && streamStates.Count > 2)
+                            {
+                                Log.Information(@"Applying BioD_CitHub post-mars fix: " + biod_cithubPath);
+
+                                // Clear preloading
+                                Log.Information("Clear LoadChunkNames from BioD_CitHub");
+                                streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
+
+                                // Clear visible asset
+                                var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames")
+                                if (visibleChunkNames != null)
+                                {
+                                    for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                                    {
+                                        if (visibleChunkNames[i].Value == "BioH_Marine" ||
+                                            visibleChunkNames[i].Value == "BioD_CitHub_Dock")
+                                        {
+                                            Log.Information("Remove " + visibleChunkNames[i].Value +
+                                                            " from BioA_CitHub VisibleChunkNames(8)");
+                                            visibleChunkNames.RemoveAt(i);
+                                        }
+                                    }
+                                }
+
+                                trigStream1.WriteProperty(streamStates);
+                                Log.Information("Saving package: " + biod_cithubPath);
+                                biod_cithub.save();
+                            }
+                            else
+                            {
+                                Log.Information(@"Not applying BioD_Cithub fix to " + biod_cithubPath);
+                            }
                         }
                     }
-
-                    trigStream1.WriteProperty(streamStates);
-                    Log.Information("Saving package: " + biod_cithubPath);
-                    biod_cithub.save();
+                    catch (Exception e)
+                    {
+                        Log.Error(
+                            $"Error applying fix for BioD_Cithub to file ({biod_cithubPath}) fix (post mars crash fix): " +
+                            e.Message);
+                    }
                 }
             }
+
             #endregion
-            Log.Information("Finished fixing post-mars hackett cutscene memory issue");
+            Log.Information("Finished fixing post-mars hackett cutscene memory issue. Check above logs to see results");
         }
 
         /// <summary>
