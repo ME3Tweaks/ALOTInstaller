@@ -1572,7 +1572,7 @@ namespace AlotAddOnGUI
                                 streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
 
                                 // Clear visible asset
-                                var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames")
+                                var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
                                 if (visibleChunkNames != null)
                                 {
                                     for (int i = visibleChunkNames.Count - 1; i > 0; i--)
