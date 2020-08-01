@@ -27,9 +27,6 @@ namespace ALOTInstallerCore.Startup
             //public List<ManifestTutorial> Tutorials;
             public List<InstallerFile> ManifestFiles = new List<InstallerFile>(60);
             //public List<InstallerStage> Stages;
-            public int HighestApprovedMEMVersion;
-            public int SoakingMEMVersion;
-            public DateTime MEMSoakTestStartDate;
             public List<string> ME3DLCsNeedingTextureFixes;
             public List<string> ME2DLCsNeedingTextureFixes;
             public bool IsBundled;
@@ -157,15 +154,15 @@ namespace ALOTInstallerCore.Startup
                 //                           MEUITMOnly = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false
                 //                       }).ToList());
 
-                mp.HighestApprovedMEMVersion = rootElement.Element("highestapprovedmemversion") == null ? 999 : (int)rootElement.Element("highestapprovedmemversion");
+                MEMUpdater.HighestSupportedMEMVersion = rootElement.Element("highestapprovedmemversion") == null ? 999 : (int)rootElement.Element("highestapprovedmemversion");
                 if (rootElement.Element("soaktestingmemversion") != null)
                 {
                     XElement soakElem = rootElement.Element("soaktestingmemversion");
-                    mp.SoakingMEMVersion = (int)soakElem;
+                    MEMUpdater.SoakTestingMEMVersion = (int)soakElem;
                     if (soakElem.Attribute("soakstartdate") != null)
                     {
                         string soakStartDateStr = soakElem.Attribute("soakstartdate").Value;
-                        mp.MEMSoakTestStartDate = DateTime.ParseExact(soakStartDateStr, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                        MEMUpdater.SoakStartDate = DateTime.ParseExact(soakStartDateStr, "yyyy-MM-dd", CultureInfo.InvariantCulture);
                     }
                 }
 

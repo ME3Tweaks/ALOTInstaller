@@ -114,12 +114,20 @@ namespace ALOTInstallerCore
                                     break;
                                 }
                             }
+                            // Check if this build is approved for stable
                             if (!Settings.BetaMode && releaseNameInt > HighestSupportedMEMVersion)
                             {
                                 Log.Information("New MassEffectModderNoGui update is available, but is not yet approved for stable channel: " + releaseNameInt);
                                 continue;
                             }
-                            break;
+
+                            if (releaseNameInt > memVersion)
+                            {
+                                Log.Information($"New MassEffectModderNoGui update is available: {releaseNameInt}");
+                                latestReleaseWithApplicableAsset = r;
+                                break;
+                            }
+
                         }
                         else
                         {
