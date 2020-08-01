@@ -58,22 +58,41 @@ namespace ALOTInstallerConsole.InstallerUI
             Add(bottomLabel);
         }
 
+        private void setTextFromThread(Label label, string text)
+        {
+            Application.MainLoop.Invoke(() =>
+            {
+                label.Text = text;
+            });
+        }
+
         public override void BeginFlow()
         {
-            NamedBackgroundWorker installerWorker = new NamedBackgroundWorker("BuilderWorker");
-            InstallStep ss = new InstallStep(package, installerWorker);
+            NamedBackgroundWorker installerWorker = new NamedBackgroundWorker("InstallerWorker");
+            InstallStep ss = new InstallStep(package)
+            {
+                SetTopTextCallback = x => setTextFromThread(topLabel, x),
+                SetMiddleTextCallback = x => setTextFromThread(middleLabel, x),
+                SetBottomTextCallback = x => setTextFromThread(bottomLabel, x),
+                SetTopTextVisibilityCallback = x => setVisibilityFromThread(topLabel, x),
+                SetMiddleTextVisibilityCallback = x => setVisibilityFromThread(middleLabel, x),
+                SetBottomTextVisibilityCallback = x => setVisibilityFromThread(bottomLabel, x)
+            };
             installerWorker.WorkerReportsProgress = true;
-            installerWorker.ProgressChanged += handleProgress;
-            installerWorker.DoWork += ss.PerformStaging;
+            installerWorker.DoWork += ss.InstallTextures;
             installerWorker.RunWorkerAsync();
         }
 
-        private void handleProgress(object sender, ProgressChangedEventArgs e)
+        private void setVisibilityFromThread(Label label, bool visible)
         {
-            if (e.UserState is ProgressPackage pp)
+            Application.MainLoop.Invoke(() =>
             {
-
-            }
+                if (!visible)
+                {
+                    //?? Wait for better way to do this, I guess
+                    label.Text = "";
+                }
+            });
         }
     }
 }

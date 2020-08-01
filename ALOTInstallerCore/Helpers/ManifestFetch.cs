@@ -34,6 +34,8 @@ namespace ALOTInstallerCore.Startup
             public List<string> ME2DLCsNeedingTextureFixes;
             public bool IsBundled;
             public string ManifestVersion;
+            public int HighestSupportedMEMVersion;
+
         }
 
         /// <summary>
@@ -61,8 +63,8 @@ namespace ALOTInstallerCore.Startup
                 //    Title += " BETA MODE";
                 //}
 
-                //var fetchedManifest = webClient.DownloadString(new Uri(url));
-                var fetchedManifest = File.ReadAllText(@"E:\Documents\Visual Studio 2015\Projects\AlotAddOnGUI\manifest.xml");
+                var fetchedManifest = webClient.DownloadString(new Uri(url));
+                //var fetchedManifest = File.ReadAllText(@"E:\Documents\Visual Studio 2015\Projects\AlotAddOnGUI\manifest.xml");
 
                 if (Utilities.TestXMLIsValid(fetchedManifest))
                 {
@@ -367,6 +369,19 @@ namespace ALOTInstallerCore.Startup
                                                //    }
                                                //).ToList(),
                                            }).OrderBy(p => p.Priority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName));
+
+                if (rootElement.Element("soaktestingmemversion") != null)
+                {
+                    XElement soakElem = rootElement.Element("soaktestingmemversion");
+                    MEMUpdater.SoakTestingMEMVersion = (int)soakElem;
+                    if (soakElem.Attribute("soakstartdate") != null)
+                    {
+                        string soakStartDateStr = soakElem.Attribute("soakstartdate").Value;
+                        MEMUpdater.SoakStartDate = DateTime.ParseExact(soakStartDateStr, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                    }
+                }
+
+
                 if (!version.Equals(""))
                 {
                     Log.Information("Manifest version: " + version);

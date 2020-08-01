@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Text;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Startup;
+using Serilog;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
@@ -42,6 +43,20 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     v.UpdateReadyStatus();
                 }
+
+                void downloadProgressChanged(long bytes, long total)
+                {
+                    //Log.Information("Download: "+bytes);
+                    Application.MainLoop.Invoke(() =>
+                    {
+                        startupStatusLabel.Text = $"Updating MassEffectModderNoGui {bytes * 100 / total}%";
+                    });
+                }
+                Application.MainLoop.Invoke(() =>
+                {
+                    startupStatusLabel.Text = "Checking for MassEffectModderNoGui updates";
+                });
+                MEMUpdater.UpdateMEM(downloadProgressChanged);
 
                 b.Result = manifestFiles;
             };

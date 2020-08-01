@@ -23,11 +23,9 @@ namespace ALOTInstallerCore.Builder
     public class StageStep
     {
         private InstallOptionsPackage package;
-        private NamedBackgroundWorker worker;
 
         public StageStep(InstallOptionsPackage package, NamedBackgroundWorker worker)
         {
-            this.worker = worker;
             this.package = package;
         }
 

@@ -1,24 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using ALOTInstallerCore.Helpers;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps.Installer
 {
-    public class ProgressWeightHandler
+    /// <summary>
+    /// Handles progress for the installation step
+    /// </summary>
+    public class ProgressHandler : INotifyPropertyChanged
     {
-        public List<Stage> Stages;
+        /// <summary>
+        /// The list of all default stages. This information is populated from the manifest and is copied into a local progress handler object
+        /// </summary>
+        public static List<Stage> AllStages = new List<Stage>();
+
+        /// <summary>
+        /// Stages that applicable for this handler
+        /// </summary>
+        public ObservableCollectionExtended<Stage> Stages { get; } = new ObservableCollectionExtended<Stage>();
         private double TOTAL_ACTIVE_WEIGHT = 0;
-        private List<MutableKeyValuePair<int, double>> jobWeightList = new List<MutableKeyValuePair<int, double>>();
+        public int TOTAL_PROGRESS { get; private set; } = -1;
 
-        private int OVERALL_PROGRESS = -1;
-
-        public void ClearTasks()
-        {
-            TOTAL_ACTIVE_WEIGHT = 0;
-            jobWeightList.Clear();
-        }
 
         /// <summary>
         /// Adds a task to the progress tracker. These tasks must be submitted in the order that the program will execute them in. Tasks add to the weight pool and will allocate a progress slot.
@@ -26,12 +32,16 @@ namespace ALOTInstallerCore.Steps.Installer
         /// <param name="task">Name of stage.</param>
         public void AddTask(string stagename, int game = 0)
         {
-            Stage pw = Stages.FirstOrDefault(x => x.StageName == stagename);
+            Stage pw = AllStages.FirstOrDefault(x => x.StageName == stagename);
             if (pw != null)
             {
+                Stage localStage = new Stage(pw)
+                {
+                    StageIndex = Stages.Count
+                };
                 pw.reweightStageForGame(game);
-                jobWeightList.Add(new MutableKeyValuePair<int, double>(0, pw.Weight));
                 TOTAL_ACTIVE_WEIGHT += pw.Weight;
+                Stages.Add(pw);
             }
             else
             {
@@ -45,17 +55,9 @@ namespace ALOTInstallerCore.Steps.Installer
         /// <param name="stage">Which stage (index of weight list) that the progress should be assigned to</param>
         /// <param name="newProgressValue">The new value of progress</param>
         /// <returns>Newly calculated overall progress integer (from 0-100, rounded down).</returns>
-        public int SubmitProgress(int stage, int newProgressValue)
+        public int SubmitProgress(Stage stage, int newProgressValue)
         {
-            //if (newProgressValue == 100)
-            //    Debug.WriteLine("BREAK");
-            stage--; //stages are the display value so they will start at 1.
-            if (stage < 0 || stage >= jobWeightList.Count)
-            {
-                return 0;
-            }
-            //Log.Information("Setting progress for stage " + (stage+1) + " to " + newProgressValue + ". Overall progress for this task accounts for " + (jobWeightList[stage].Key * jobWeightList[stage].Value));
-            jobWeightList[stage].Key = newProgressValue;
+            stage.Progress = newProgressValue;
             return GetOverallProgress();
         }
 
@@ -66,46 +68,45 @@ namespace ALOTInstallerCore.Steps.Installer
         {
             TOTAL_ACTIVE_WEIGHT = 0;
             //recalculate total weight
-            foreach (MutableKeyValuePair<int, double> job in jobWeightList)
-            {
-                TOTAL_ACTIVE_WEIGHT += job.Value;
-            }
-            //calculate each job's value
-            foreach (MutableKeyValuePair<int, double> job in jobWeightList)
-            {
-                job.Value = job.Value / TOTAL_ACTIVE_WEIGHT;
-            }
+            //foreach (MutableKeyValuePair<int, double> job in jobWeightList)
+            //{
+            //    TOTAL_ACTIVE_WEIGHT += job.Value;
+            //}
+            ////calculate each job's value
+            //foreach (MutableKeyValuePair<int, double> job in jobWeightList)
+            //{
+            //    job.Value = job.Value / TOTAL_ACTIVE_WEIGHT;
+            //}
         }
 
         public int GetOverallProgress()
         {
             double currentFinishedWeight = 0;
-            foreach (MutableKeyValuePair<int, double> job in jobWeightList)
-            {
-                currentFinishedWeight += job.Key * job.Value; //progress * weight
-            }
+            //foreach (MutableKeyValuePair<int, double> job in jobWeightList)
+            //{
+            //    currentFinishedWeight += job.Key * job.Value; //progress * weight
+            //}
             if (TOTAL_ACTIVE_WEIGHT > 0)
             {
                 int progress = (int)currentFinishedWeight;
-                if (OVERALL_PROGRESS != progress)
-                {
-                    Log.Information("Overall Progress: " + progress + "%");
-                    OVERALL_PROGRESS = progress;
-                }
+                //if (OVERALL_PROGRESS != progress)
+                //{
+                //    Log.Information("Overall Progress: " + progress + "%");
+                //    OVERALL_PROGRESS = progress;
+                //}
                 return progress;
             }
             return 0;
         }
 
-        internal void ScaleCurrentTaskWeight(int index, double scale)
+        internal void ScaleStageWeight(Stage stage, double scale)
         {
-            jobWeightList[index].Value *= scale;
+            stage.Weight *= scale;
             ScaleWeights();
         }
 
         internal void SetDefaultWeights()
         {
-            Stages = new List<Stage>();
             Stages.Add(new Stage()
             {
                 StageName = "STAGE_PRESCAN"
@@ -147,17 +148,19 @@ namespace ALOTInstallerCore.Steps.Installer
                 Weight = 0.0400000
             });
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
-    public class MutableKeyValuePair<TKey, TValue>
-    {
-        public TKey Key { get; set; }
-        public TValue Value { get; set; }
+    //public class MutableKeyValuePair<TKey, TValue>
+    //{
+    //    public TKey Key { get; set; }
+    //    public TValue Value { get; set; }
 
-        public MutableKeyValuePair(TKey key, TValue value)
-        {
-            Key = key;
-            Value = value;
-        }
-    }
+    //    public MutableKeyValuePair(TKey key, TValue value)
+    //    {
+    //        Key = key;
+    //        Value = value;
+    //    }
+    //}
 }

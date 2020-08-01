@@ -167,7 +167,7 @@ namespace ALOTInstallerCore.Helpers
 
         private static void LoadLocationsLinux64()
         {
-            throw new NotImplementedException();
+
         }
 
 

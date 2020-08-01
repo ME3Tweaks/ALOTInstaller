@@ -8,25 +8,36 @@ using System.Text;
 using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.Steps.Installer;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps
 {
     /// <summary>
-    /// Object that handles the install step of texture installation
+    /// Object that handles the install step of texture installation.
     /// </summary>
     public class InstallStep
     {
         private InstallOptionsPackage package;
-        private NamedBackgroundWorker worker;
+        private ProgressHandler ProgressManager { get; }
+        public Action<string> SetTopTextCallback { get; set; }
+        public Action<string> SetMiddleTextCallback { get; set; }
+        public Action<string> SetBottomTextCallback { get; set; }
+        public Action<bool> SetTopTextVisibilityCallback { get; set; }
+        public Action<bool> SetMiddleTextVisibilityCallback { get; set; }
+        public Action<bool> SetBottomTextVisibilityCallback { get; set; }
+        /// <summary>
+        /// Callback for setting the 'overall' progress value, from 0 to 100. Can be used to display things like progressbars.
+        /// </summary>
+        public Action<int> SetOverallProgressCallback { get; set; }
 
-        public InstallStep(InstallOptionsPackage package, NamedBackgroundWorker worker)
+        public InstallStep(InstallOptionsPackage package)
         {
-            this.worker = worker;
+            ProgressManager = new ProgressHandler();
             this.package = package;
         }
 
-        private void InstallTextures()
+        public void InstallTextures(object sender, DoWorkEventArgs doWorkEventArgs)
         {
             #region common callbacks and objects
             object lockObject = new object();
@@ -49,7 +60,7 @@ namespace ALOTInstallerCore.Steps
                 string args = $"--check-for-markers --gameid {package.InstallTarget.Game.ToGameNum()} --ipc";
                 if (package.DebugLogging)
                 {
-                    args += $" --debug-logs";
+                    args += " --debug-logs";
                 }
 
                 List<string> badFiles = new List<string>();
@@ -59,7 +70,7 @@ namespace ALOTInstallerCore.Steps
                     switch (command)
                     {
                         case "TASK_PROGRESS":
-                            worker.ReportProgress(int.Parse(param), new ); // Pass IPC to handling app for UI update
+                            SetTopTextCallback?.Invoke($"Checking game files for existing texture markers {param}%");
                             break;
                         case "FILENAME":
 
@@ -83,68 +94,21 @@ namespace ALOTInstallerCore.Steps
                 {
                     Monitor.Wait(lockObject);
                 }
+
+                if (badFiles.Any())
+                {
+                    // Must abort!
+                    SetBottomTextCallback?.Invoke("Couldn't install textures");
+                    SetTopTextCallback?.Invoke("Files from a previous texture installation were found");
+                    //SetContinueButtonVisibility?.Invoke(true);
+                }
             }
             #endregion
+
+            // Main installer
+            Stage currentStage = null;
+
         }
 
-        /// <summary>
-        /// Performs the staging step.
-        /// </summary>
-        /// <returns></returns>
-        public void PerformStaging(object sender, DoWorkEventArgs e)
-        {
-            var filesToStage = getFilesToStage(package.AllInstallerFiles.Where(x => x.Ready && (x.ApplicableGames & package.InstallTarget.Game.ToApplicableGame()) != 0));
-
-            Log.Information(@"The following files will be staged for installation:");
-            foreach (var f in filesToStage)
-            {
-                Log.Information(f.Filename);
-            }
-
-            foreach (var f in filesToStage)
-            {
-                var outputDir = Path.Combine(Settings.BuildLocation, Path.GetFileNameWithoutExtension(f.Filename));
-                ExtractFile(f, outputDir);
-            }
-        }
-
-        /// <summary>
-        /// Gets list of files that will be staged for installation based on the given options the user has chosen.
-        /// </summary>
-        /// <param name="readyFiles"></param>
-        /// <returns></returns>
-        private List<InstallerFile> getFilesToStage(IEnumerable<InstallerFile> readyFiles)
-        {
-            var filesToStage = new List<InstallerFile>();
-            if (package.InstallALOT)
-            {
-                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0)); //Add MAJOR ALOT file
-            }
-
-            if (package.InstallALOTUpdate)
-            {
-                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.ALOTVER == 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0)); //Add MINOR ALOT file
-            }
-
-            if (package.InstallMEUITM)
-            {
-                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.MEUITMVER != 0)); //Add MEUITM file
-            }
-
-            if (package.InstallALOTAddon)
-            {
-                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x is ManifestFile)); //Add Addon files that don't have a set ALOTVersionInfo.
-            }
-
-            // Implement when user files class is ready.
-            //if (package.InstallUserfiles)
-            //{
-            //    filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x is Use)); //Add Addon files that don't have a set ALOTVersionInfo.
-            //}
-
-
-
-            return filesToStage;
-        }
     }
 }

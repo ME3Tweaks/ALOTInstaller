@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using ALOTInstallerConsole.InstallerUI;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
 using ALOTInstallerCore.Objects;
@@ -254,8 +255,22 @@ namespace ALOTInstallerConsole.BuilderUI
 
                 if (buildAndInstall)
                 {
-                    var builderUI = new BuilderUI.BuilderUIController();
-                    builderUI.SetOptionsPackage(new InstallOptionsPackage()
+                    //var builderUI = new BuilderUI.BuilderUIController();
+                    //builderUI.SetOptionsPackage(new InstallOptionsPackage()
+                    //{
+                    //    InstallTarget = target,
+                    //    AllInstallerFiles = dataSource.InstallerFiles,
+                    //    InstallALOT = alotCheckbox.Checked,
+                    //    InstallALOTUpdate = alotCheckbox.Checked,
+                    //    InstallMEUITM = meuitmCheckbox.Checked,
+                    //    InstallALOTAddon = addonCheckBox.Checked,
+                    //    InstallUserfiles = userFilesCheckBox.Checked
+                    //});
+                    //builderUI.SetupUI();
+                    //Program.SwapToNewView(builderUI);
+
+                    var installerUI = new InstallerUIController();
+                    installerUI.SetInstallPackage(new InstallOptionsPackage()
                     {
                         InstallTarget = target,
                         AllInstallerFiles = dataSource.InstallerFiles,
@@ -265,8 +280,8 @@ namespace ALOTInstallerConsole.BuilderUI
                         InstallALOTAddon = addonCheckBox.Checked,
                         InstallUserfiles = userFilesCheckBox.Checked
                     });
-                    builderUI.SetupUI();
-                    Program.SwapToNewView(builderUI);
+                    installerUI.SetupUI();
+                    Program.SwapToNewView(installerUI);
                 }
             }
         }

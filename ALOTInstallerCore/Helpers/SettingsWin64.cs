@@ -49,6 +49,12 @@ namespace ALOTInstallerCore.Helpers
         /// </summary>
         public static string BuildLocation { get; set; }
 
+        /// <summary>
+        /// Allows updating to beta, prerelease versions of items
+        /// </summary>
+        public static bool BetaMode { get; set; }
+
+
         /*
         private static bool _logModStartup = false;
         public static bool LogModStartup
