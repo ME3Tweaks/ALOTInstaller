@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ALOTInstallerCore.Objects;
 
 namespace ALOTInstallerCore.Steps.Installer
 {
@@ -39,37 +40,39 @@ namespace ALOTInstallerCore.Steps.Installer
         /// </summary>
         public List<StageFailure> FailureInfos { get; set; } = new List<StageFailure>();
         /// <summary>
-        /// Index of this stage in the installation. This value is indexed from 0
+        /// Index of this stage in the installation. This value is indexed from 1
         /// </summary>
-        public int StageIndex { get; set; }
+        public int StageUIIndex { get; set; }
         /// <summary>
         /// The amount of progress this individual stage has accomplished
         /// </summary>
         public int Progress { get; set; }
 
-        public void reweightStageForGame(int game)
+        /// <summary>
+        /// Reweights this stage for the specified game.
+        /// </summary>
+        /// <param name="game"></param>
+        public void reweightStageForGame(Enums.MEGame game)
         {
-            double scalingVal = 1;
             switch (game)
             {
-                case 1:
-                    scalingVal = ME1Scaling;
+                case Enums.MEGame.ME1:
+                    Weight *= ME1Scaling;
                     break;
-                case 2:
-                    scalingVal = ME2Scaling;
+                case Enums.MEGame.ME2:
+                    Weight *= ME2Scaling;
                     break;
-                case 3:
-                    scalingVal = ME3Scaling;
+                case Enums.MEGame.ME3:
+                    Weight *= ME3Scaling;
                     break;
             }
-            Weight *= scalingVal;
         }
 
         /// <summary>
         /// Gets the default stage failure information, which is used when MEM exits but we have no IPC trigger saying why it exits, which is almost always a crash.
         /// </summary>
         /// <returns>Default failure info</returns>
-        public StageFailure getDefaultFailure()=>FailureInfos.FirstOrDefault(x => x.FailureIPCTrigger == null);
+        public StageFailure getDefaultFailure() => FailureInfos.FirstOrDefault(x => x.FailureIPCTrigger == null);
 
         public Stage()
         {

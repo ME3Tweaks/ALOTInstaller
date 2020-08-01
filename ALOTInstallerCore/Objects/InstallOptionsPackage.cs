@@ -25,5 +25,9 @@ namespace ALOTInstallerCore.Objects
         /// this might be better as just accessing settings
         /// </summary>
         public bool DebugLogging { get; set; }
+        /// <summary>
+        /// Indicates that we should repack game files on install
+        /// </summary>
+        public bool RepackGameFiles { get; set; }
     }
 }

@@ -11,7 +11,35 @@ namespace ALOTInstallerCore.Helpers
 {
     public static class MEMIPCHandler
     {
-        public static async void RunMEMIPC(string arguments, Action<int> applicationStarted, Action<string, string> ipcCallback, Action<string> applicationStdErr, Action<int> applicationExited, CancellationToken cancellationToken = default)
+        public static async void RunMEMIPCUntilExit(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
+        {
+            object lockObject = new object();
+            void appStart(int processID)
+            {
+                applicationStarted?.Invoke(processID);
+                // This might need to be waited on after method is called.
+                Debug.WriteLine(@"Process launched. Process ID: " + processID);
+            }
+            void appExited(int code)
+            {
+                applicationExited?.Invoke(code);
+                lock (lockObject)
+                {
+                    Monitor.Pulse(lockObject);
+                }
+            }
+
+            // Run MEM
+            MEMIPCHandler.RunMEMIPC(arguments, appStart, ipcCallback, applicationStdErr, appExited,
+                cancellationToken);
+
+            // Wait until exit
+            lock (lockObject)
+            {
+                Monitor.Wait(lockObject);
+            }
+        }
+        public static async void RunMEMIPC(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
         {
             var cmd = Cli.Wrap(Locations.MEMPath()).WithArguments(arguments);
             Debug.Write($"Launching process: {Locations.MEMPath()} {arguments}");

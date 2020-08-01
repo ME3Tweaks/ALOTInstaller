@@ -45,8 +45,7 @@ namespace ALOTInstallerCore
             if (!downloadMEM)
             {
                 // File exists
-                var versInfo = FileVersionInfo.GetVersionInfo(mempath); //not sure this works on linux...
-                memVersion = versInfo.FileMajorPart;
+                memVersion = getMemVersion();
             }
 
             try
@@ -181,6 +180,19 @@ namespace ALOTInstallerCore
                 Log.Error("An error occurred running MassEffectModderNoGui updater: " + e.Message);
                 exceptionUpdating?.Invoke(e);
             }
+        }
+
+        private static int getMemVersion()
+        {
+            int version = 0;
+            MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
+            {
+                if (command == "VERSION")
+                {
+                    version = int.Parse(param);
+                }
+            });
+            return version;
         }
 
         private static ReleaseAsset getApplicableAssetForPlatform(Release r)

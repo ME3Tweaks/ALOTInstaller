@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Objects;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps.Installer
@@ -16,32 +17,33 @@ namespace ALOTInstallerCore.Steps.Installer
         /// <summary>
         /// The list of all default stages. This information is populated from the manifest and is copied into a local progress handler object
         /// </summary>
-        public static List<Stage> AllStages = new List<Stage>();
+        public static List<Stage> DefaultStages = new List<Stage>();
 
         /// <summary>
         /// Stages that applicable for this handler
         /// </summary>
         public ObservableCollectionExtended<Stage> Stages { get; } = new ObservableCollectionExtended<Stage>();
-        private double TOTAL_ACTIVE_WEIGHT = 0;
+        private double TOTAL_ACTIVE_WEIGHT => Stages.Sum(x => x.Weight);
         public int TOTAL_PROGRESS { get; private set; } = -1;
+        public Stage CurrentStage { get; private set; }
 
 
         /// <summary>
         /// Adds a task to the progress tracker. These tasks must be submitted in the order that the program will execute them in. Tasks add to the weight pool and will allocate a progress slot.
         /// </summary>
         /// <param name="task">Name of stage.</param>
-        public void AddTask(string stagename, int game = 0)
+        public void AddTask(string stagename, Enums.MEGame game = Enums.MEGame.Unknown)
         {
-            Stage pw = AllStages.FirstOrDefault(x => x.StageName == stagename);
+            Stage pw = DefaultStages.FirstOrDefault(x => x.StageName == stagename);
             if (pw != null)
             {
+                // Generate a local stage based on the global default ones.
                 Stage localStage = new Stage(pw)
                 {
-                    StageIndex = Stages.Count
+                    StageUIIndex = Stages.Count + 1 //+1 cause these are only really used for the UI
                 };
                 pw.reweightStageForGame(game);
-                TOTAL_ACTIVE_WEIGHT += pw.Weight;
-                Stages.Add(pw);
+                Stages.Add(localStage);
             }
             else
             {
@@ -49,15 +51,28 @@ namespace ALOTInstallerCore.Steps.Installer
             }
         }
 
+        public void CompleteAndMoveToStage(string stageName)
+        {
+            if (CurrentStage != null)
+            {
+                CurrentStage.Progress = 100;
+            }
+
+            CurrentStage = Stages.FirstOrDefault(x => x.StageName == stageName);
+        }
+
         /// <summary>
-        /// Submits a new progress value to the weighted percent class
+        /// Submits a new progress value for the current stage.
         /// </summary>
-        /// <param name="stage">Which stage (index of weight list) that the progress should be assigned to</param>
         /// <param name="newProgressValue">The new value of progress</param>
         /// <returns>Newly calculated overall progress integer (from 0-100, rounded down).</returns>
-        public int SubmitProgress(Stage stage, int newProgressValue)
+        public int SubmitProgress(int newProgressValue)
         {
-            stage.Progress = newProgressValue;
+            if (CurrentStage != null)
+            {
+                CurrentStage.Progress = newProgressValue;
+            }
+
             return GetOverallProgress();
         }
 
@@ -66,7 +81,6 @@ namespace ALOTInstallerCore.Steps.Installer
         /// </summary>
         public void ScaleWeights()
         {
-            TOTAL_ACTIVE_WEIGHT = 0;
             //recalculate total weight
             //foreach (MutableKeyValuePair<int, double> job in jobWeightList)
             //{
