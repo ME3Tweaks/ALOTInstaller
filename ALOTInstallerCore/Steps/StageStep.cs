@@ -100,15 +100,15 @@ namespace ALOTInstallerCore.Builder
         /// <returns></returns>
         public void PerformStaging(object sender, DoWorkEventArgs e)
         {
-            var filesToStage = getFilesToStage(package.AllInstallerFiles.Where(x => x.Ready && (x.ApplicableGames & package.InstallTarget.Game.ToApplicableGame()) != 0));
+            package.FilesToInstall = getFilesToStage(package.FilesToInstall.Where(x => x.Ready && (x.ApplicableGames & package.InstallTarget.Game.ToApplicableGame()) != 0));
 
             Log.Information(@"The following files will be staged for installation:");
-            foreach (var f in filesToStage)
+            foreach (var f in package.FilesToInstall)
             {
                 Log.Information(f.Filename);
             }
 
-            foreach (var f in filesToStage)
+            foreach (var f in package.FilesToInstall)
             {
                 var outputDir = Path.Combine(Settings.BuildLocation, Path.GetFileNameWithoutExtension(f.Filename));
                 ExtractFile(f, outputDir);

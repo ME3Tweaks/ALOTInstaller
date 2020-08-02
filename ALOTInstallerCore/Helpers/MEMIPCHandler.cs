@@ -41,6 +41,19 @@ namespace ALOTInstallerCore.Helpers
         }
         public static async void RunMEMIPC(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
         {
+            bool exceptionOcurred = false;
+            void internalHandleIPC(string command, string parm)
+            {
+                switch (command)
+                {
+                    case "EXCEPTION_OCCURRED": //An exception has occured and MEM is going to crash
+                        exceptionOcurred = true;
+                        break;
+                    default:
+                        ipcCallback?.Invoke(command, parm);
+                        break;
+                }
+            }
             var cmd = Cli.Wrap(Locations.MEMPath()).WithArguments(arguments);
             Debug.Write($"Launching process: {Locations.MEMPath()} {arguments}");
             await foreach (var cmdEvent in cmd.ListenAsync(cancellationToken))
@@ -54,16 +67,30 @@ namespace ALOTInstallerCore.Helpers
                         if (stdOut.Text.StartsWith(@"[IPC]"))
                         {
                             var ipc = breakdownIPC(stdOut.Text);
-                            ipcCallback?.Invoke(ipc.command, ipc.param);
+                            internalHandleIPC(ipc.command, ipc.param);
                         }
                         else
                         {
-                            Debug.WriteLine(stdOut.Text);
+                            if (exceptionOcurred)
+                            {
+                                Log.Fatal(stdOut.Text);
+                            }
+                            else
+                            {
+                                Debug.WriteLine(stdOut.Text);
+                            }
                         }
 
                         break;
                     case StandardErrorCommandEvent stdErr:
-                        applicationStdErr?.Invoke(stdErr.Text);
+                        if (exceptionOcurred)
+                        {
+                            Log.Fatal(stdErr.Text);
+                        }
+                        else
+                        {
+                            applicationStdErr?.Invoke(stdErr.Text);
+                        }
                         break;
                     case ExitedCommandEvent exited:
                         applicationExited?.Invoke(exited.ExitCode);

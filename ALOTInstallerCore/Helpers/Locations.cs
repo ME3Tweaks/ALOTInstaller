@@ -60,9 +60,9 @@ namespace ALOTInstallerCore.Helpers
             }
         }
 
-        public static GameTarget ME1Target { get; private set; }
-        public static GameTarget ME2Target { get; private set; }
-        public static GameTarget ME3Target { get; private set; }
+        public static GameTarget ME1Target { get; set; }
+        public static GameTarget ME2Target { get; set; }
+        public static GameTarget ME3Target { get; set; }
 
         private static void LoadGamePaths()
         {
@@ -177,5 +177,22 @@ namespace ALOTInstallerCore.Helpers
         public static readonly string CachedASIsFolder = Directory.CreateDirectory(Path.Combine(AppDataFolder(), @"CachedASIs")).FullName;
 
         public static ObservableCollectionExtended<GameTarget> GameTargets { get; } = new ObservableCollectionExtended<GameTarget>();
+
+        /// <summary>
+        /// Sets the game path that MEM and ALOTInstallerCore will use for the game specified by the target.
+        /// </summary>
+        /// <param name="target"></param>
+        public static void SetTarget(GameTarget target)
+        {
+            var memSettingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "MassEffectModder");
+            if (!Directory.Exists(memSettingsPath))
+                Directory.CreateDirectory(memSettingsPath);
+
+            var memIni = Path.Combine(memSettingsPath, "MassEffectModder.ini");
+            DuplicatingIni ini = File.Exists(memIni) ? DuplicatingIni.LoadIni(memIni) : new DuplicatingIni();
+            ini["GameDataPaths"][target.Game.ToString()].Value = target.TargetPath;
+            File.WriteAllText(memIni, ini.ToString());
+        }
     }
 }

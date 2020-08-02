@@ -26,7 +26,7 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
             WriteRegistryKey(subkey, subpath, value, data ? 1 : 0);
         }
 
-        internal static void WriteRegistryKey(RegistryKey subkey, string subpath, string value, int data)
+        internal static void WriteRegistryKey(RegistryKey subkey, string subpath, string value, object data)
         {
 
             int i = 0;
@@ -37,6 +37,26 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
                 i++;
             }
             subkey.SetValue(value, data);
+        }
+
+        internal static void WriteRegistrySettingBool(string keyname, bool value)
+        {
+            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon",keyname, value.ToString());
+        }
+
+        internal static void WriteRegistrySettingString(string keyname, string value)
+        {
+            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value);
+        }
+
+        internal static void WriteRegistrySettingInt(string keyname, int value)
+        {
+            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value);
+        }
+
+        internal static void WriteRegistrySettingFloat(string keyname, float value)
+        {
+            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value);
         }
 
         /// <summary>

@@ -76,6 +76,14 @@ namespace ALOTInstallerCore.Helpers
             return 0; 
         }
 
+        public static string ToGameName(this Enums.MEGame game)
+        {
+            if (game == Enums.MEGame.ME1) return "Mass Effect";
+            if (game == Enums.MEGame.ME2) return "Mass Effect 2";
+            if (game == Enums.MEGame.ME3) return "Mass Effect 3";
+            return "UNKNOWN GAME";
+        }
+
         /// <summary>
         /// Checks if a list is ascending basded on the given comparison function.
         /// </summary>

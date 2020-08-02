@@ -9,6 +9,7 @@ using System.Text;
 using System.Xml.Linq;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.Steps.Installer;
 using Serilog;
 
 namespace ALOTInstallerCore.Startup
@@ -191,33 +192,33 @@ namespace ALOTInstallerCore.Startup
                     }
                 }
 
-                //if (rootElement.Element("stages") != null)
-                //{
-                //    ProgressWeightPercentages.Stages =
-                //        (from stage in rootElement.Element("stages").Descendants("stage")
-                //         select new Stage
-                //         {
-                //             StageName = stage.Attribute("name").Value,
-                //             TaskName = stage.Attribute("tasktext").Value,
-                //             Weight = Convert.ToDouble(stage.Attribute("weight").Value, CultureInfo.InvariantCulture),
-                //             ME1Scaling = stage.Attribute("me1weightscaling") != null ? Convert.ToDouble(stage.Attribute("me1weightscaling").Value, CultureInfo.InvariantCulture) : 1,
-                //             ME2Scaling = stage.Attribute("me2weightscaling") != null ? Convert.ToDouble(stage.Attribute("me2weightscaling").Value, CultureInfo.InvariantCulture) : 1,
-                //             ME3Scaling = stage.Attribute("me3weightscaling") != null ? Convert.ToDouble(stage.Attribute("me3weightscaling").Value, CultureInfo.InvariantCulture) : 1,
-                //             FailureInfos = stage.Elements("failureinfo").Select(z => new StageFailure
-                //             {
-                //                 FailureIPCTrigger = z.Attribute("ipcerror") != null ? z.Attribute("ipcerror").Value : null,
-                //                 FailureBottomText = z.Attribute("failedbottommessage").Value,
-                //                 FailureTopText = z.Attribute("failedtopmessage").Value,
-                //                 FailureHeaderText = z.Attribute("failedheadermessage").Value,
-                //                 FailureResultCode = Convert.ToInt32(z.Attribute("resultcode").Value),
-                //                 Warning = z.Attribute("warning") != null ? bool.Parse(z.Attribute("warning").Value) : false
-                //             }).ToList()
-                //         }).ToList();
-                //}
-                //else
-                //{
-                //    ProgressWeightPercentages.SetDefaultWeights();
-                //}
+                if (rootElement.Element("stages") != null)
+                {
+                    ProgressHandler.DefaultStages =
+                        (from stage in rootElement.Element("stages").Descendants("stage")
+                         select new Stage
+                         {
+                             StageName = stage.Attribute("name")?.Value,
+                             TaskName = stage.Attribute("tasktext")?.Value,
+                             Weight = Convert.ToDouble(stage.Attribute("weight")?.Value, CultureInfo.InvariantCulture),
+                             ME1Scaling = TryConvert.ToDouble(stage.Attribute("me1weightscaling")?.Value, 1),
+                             ME2Scaling = TryConvert.ToDouble(stage.Attribute("me2weightscaling")?.Value, 1),
+                             ME3Scaling = TryConvert.ToDouble(stage.Attribute("me3weightscaling")?.Value, 1),
+                             FailureInfos = stage.Elements("failureinfo").Select(z => new StageFailure
+                             {
+                                 FailureIPCTrigger = z.Attribute("ipcerror")?.Value,
+                                 FailureBottomText = z.Attribute("failedbottommessage")?.Value,
+                                 FailureTopText = z.Attribute("failedtopmessage")?.Value,
+                                 FailureHeaderText = z.Attribute("failedheadermessage")?.Value,
+                                 FailureResultCode = Convert.ToInt32(z.Attribute("resultcode").Value),
+                                 Warning = TryConvert.ToBool(z.Attribute("warning")?.Value, false)
+                             }).ToList()
+                         }).ToList();
+                }
+                else
+                {
+                    ProgressHandler.UseBuiltinDefaultStages();
+                }
                 //var repackoptions = rootElement.Element("repackoptions");
                 //if (repackoptions != null)
                 //{

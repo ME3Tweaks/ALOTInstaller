@@ -12,10 +12,10 @@ namespace ALOTInstallerCore.Objects
     {
         public GameTarget InstallTarget { get; set; }
         /// <summary>
-        /// List of all installer files. The builder will determine what files are applicable out of this list
+        /// List of all installer files. The builder will determine what files are applicable out of this list and this list will be refined once staging is done.
         /// This list can change depending on the mode.
         /// </summary>
-        public List<InstallerFile> AllInstallerFiles { get; set; }
+        public List<InstallerFile> FilesToInstall { get; set; }
         public bool InstallALOT { get; set; }
         public bool InstallALOTUpdate { get; set; }
         public bool InstallALOTAddon { get; set; }

@@ -31,8 +31,8 @@ namespace ALOTInstallerCore.Steps.Installer
         /// <summary>
         /// Adds a task to the progress tracker. These tasks must be submitted in the order that the program will execute them in. Tasks add to the weight pool and will allocate a progress slot.
         /// </summary>
-        /// <param name="task">Name of stage.</param>
-        public void AddTask(string stagename, Enums.MEGame game = Enums.MEGame.Unknown)
+        /// <param name="stagename">Name of stage.</param>
+        public void AddStage(string stagename, Enums.MEGame game = Enums.MEGame.Unknown)
         {
             Stage pw = DefaultStages.FirstOrDefault(x => x.StageName == stagename);
             if (pw != null)
@@ -51,14 +51,23 @@ namespace ALOTInstallerCore.Steps.Installer
             }
         }
 
+        /// <summary>
+        /// Marks the current stage as completed (100% progress) and moves to the next stage, as specified by the stage name.
+        /// </summary>
+        /// <param name="stageName"></param>
         public void CompleteAndMoveToStage(string stageName)
         {
+            Log.Information("Transitioning to " + stageName);
             if (CurrentStage != null)
             {
                 CurrentStage.Progress = 100;
             }
 
             CurrentStage = Stages.FirstOrDefault(x => x.StageName == stageName);
+            if (CurrentStage == null)
+            {
+                Log.Error("Unknown stage: " + stageName);
+            }
         }
 
         /// <summary>
@@ -93,88 +102,76 @@ namespace ALOTInstallerCore.Steps.Installer
             //}
         }
 
+        /// <summary>
+        /// Gets the total percentage done. The value returned will be between 0 and 100, rounded
+        /// </summary>
+        /// <returns></returns>
         public int GetOverallProgress()
         {
-            double currentFinishedWeight = 0;
-            //foreach (MutableKeyValuePair<int, double> job in jobWeightList)
-            //{
-            //    currentFinishedWeight += job.Key * job.Value; //progress * weight
-            //}
-            if (TOTAL_ACTIVE_WEIGHT > 0)
+            double currentFinishedWeight = Stages.Sum(x => x.Weight * x.Progress);
+            double totalWeight = Stages.Sum(x => x.Weight);
+            if (totalWeight > 0)
             {
-                int progress = (int)currentFinishedWeight;
-                //if (OVERALL_PROGRESS != progress)
-                //{
-                //    Log.Information("Overall Progress: " + progress + "%");
-                //    OVERALL_PROGRESS = progress;
-                //}
-                return progress;
+                // have to cast this...? what?
+                return (int)Math.Round((currentFinishedWeight * 100 / totalWeight));
             }
             return 0;
         }
 
-        internal void ScaleStageWeight(Stage stage, double scale)
+        internal void ScaleStageWeight(string stagename, double scale)
         {
-            stage.Weight *= scale;
+            var stage = Stages.FirstOrDefault(x => x.StageName == stagename);
+            if (stage != null)
+            {
+                stage.Weight *= scale;
+            }
             ScaleWeights();
         }
 
-        internal void SetDefaultWeights()
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public static void UseBuiltinDefaultStages()
         {
-            Stages.Add(new Stage()
+            DefaultStages.Add(new Stage()
             {
                 StageName = "STAGE_PRESCAN"
             });
-            Stages.Add(new Stage()
+            DefaultStages.Add(new Stage()
             {
                 StageName = "STAGE_UNPACKDLC",
                 Weight = 0.11004021318
             });
-            Stages.Add(new Stage()
+            DefaultStages.Add(new Stage()
             {
                 StageName = "STAGE_SCAN",
                 Weight = 0.12055272684
             });
-            Stages.Add(new Stage()
+            DefaultStages.Add(new Stage()
             {
                 StageName = "STAGE_REMOVE",
                 Weight = 0.19155062326,
                 ME1Scaling = 2.3
             });
-            Stages.Add(new Stage()
+            DefaultStages.Add(new Stage()
             {
                 StageName = "STAGE_INSTALL",
                 Weight = 0.31997680866
             });
-            Stages.Add(new Stage()
+            DefaultStages.Add(new Stage()
             {
                 StageName = "STAGE_SAVE",
                 Weight = 0.25787962804
             });
-            Stages.Add(new Stage()
+            DefaultStages.Add(new Stage()
             {
                 StageName = "STAGE_REPACK",
                 Weight = 0.0800000
             });
-            Stages.Add(new Stage()
+            DefaultStages.Add(new Stage()
             {
                 StageName = "STAGE_INSTALLMARKERS",
                 Weight = 0.0400000
             });
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
-
-    //public class MutableKeyValuePair<TKey, TValue>
-    //{
-    //    public TKey Key { get; set; }
-    //    public TValue Value { get; set; }
-
-    //    public MutableKeyValuePair(TKey key, TValue value)
-    //    {
-    //        Key = key;
-    //        Value = value;
-    //    }
-    //}
 }

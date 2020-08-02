@@ -259,7 +259,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     //builderUI.SetOptionsPackage(new InstallOptionsPackage()
                     //{
                     //    InstallTarget = target,
-                    //    AllInstallerFiles = dataSource.InstallerFiles,
+                    //    FilesToInstall = dataSource.InstallerFiles,
                     //    InstallALOT = alotCheckbox.Checked,
                     //    InstallALOTUpdate = alotCheckbox.Checked,
                     //    InstallMEUITM = meuitmCheckbox.Checked,
@@ -273,7 +273,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     installerUI.SetInstallPackage(new InstallOptionsPackage()
                     {
                         InstallTarget = target,
-                        AllInstallerFiles = dataSource.InstallerFiles,
+                        FilesToInstall = dataSource.InstallerFiles,
                         InstallALOT = alotCheckbox.Checked,
                         InstallALOTUpdate = alotCheckbox.Checked,
                         InstallMEUITM = meuitmCheckbox.Checked,

@@ -318,14 +318,8 @@ namespace ALOTInstallerCore.Helpers
         {
             try
             {
-                if (!File.Exists(SettingsPath))
-                {
-                    File.Create(SettingsPath).Close();
-                }
-
-                var settingsIni = DuplicatingIni.LoadIni(SettingsPath);
-                SaveSettingString(settingsIni, "ALOTInstallerCore", SettingsKeys.SettingKeys.BuildLocation, BuildLocation);
-                SaveSettingString(settingsIni, "ALOTInstallerCore", SettingsKeys.SettingKeys.TextureLibraryDirectory, TextureLibraryLocation);
+                SaveSettingString(SettingsKeys.SettingKeys.BuildLocation, BuildLocation);
+                SaveSettingString( SettingsKeys.SettingKeys.TextureLibraryDirectory, TextureLibraryLocation);
 
 
                 //SaveSettingBool(settingsIni, "ALOTInstallerCore", "LogModStartup", LogModStartup);
@@ -348,7 +342,6 @@ namespace ALOTInstallerCore.Helpers
                 //SaveSettingBool(settingsIni, "ModMaker", "AutoAddControllerMixins", ModMakerControllerModOption);
                 //SaveSettingBool(settingsIni, "ModMaker", "AutoInjectCustomKeybinds", ModMakerAutoInjectCustomKeybindsOption);
 
-                File.WriteAllText(SettingsPath, settingsIni.ToString());
                 return SettingsSaveResult.SAVED;
             }
             catch (UnauthorizedAccessException uae)
@@ -364,24 +357,24 @@ namespace ALOTInstallerCore.Helpers
             return SettingsSaveResult.FAILED_OTHER;
         }
 
-        private static void SaveSettingString(DuplicatingIni settingsIni, string section, SettingsKeys.SettingKeys key, string value)
+        private static void SaveSettingString(SettingsKeys.SettingKeys key, string value)
         {
-            settingsIni[section].SetSingleEntry(SettingsKeys.SettingsKeyMapping[key], value);
+            RegistryHandler.WriteRegistrySettingString(SettingsKeys.SettingsKeyMapping[key], value);
         }
 
-        private static void SaveSettingBool(DuplicatingIni settingsIni, string section, SettingsKeys.SettingKeys key, bool value)
+        private static void SaveSettingBool(SettingsKeys.SettingKeys key, bool value)
         {
-            settingsIni[section].SetSingleEntry(SettingsKeys.SettingsKeyMapping[key], value.ToString());
+            RegistryHandler.WriteRegistrySettingBool(SettingsKeys.SettingsKeyMapping[key], value);
         }
 
-        private static void SaveSettingInt(DuplicatingIni settingsIni, string section, SettingsKeys.SettingKeys key, int value)
+        private static void SaveSettingInt(SettingsKeys.SettingKeys key, int value)
         {
-            settingsIni[section].SetSingleEntry(SettingsKeys.SettingsKeyMapping[key], value);
+            RegistryHandler.WriteRegistrySettingInt(SettingsKeys.SettingsKeyMapping[key], value);
         }
 
-        private static void SaveSettingDateTime(DuplicatingIni settingsIni, string section, SettingsKeys.SettingKeys key, DateTime value)
+        private static void SaveSettingDateTime(SettingsKeys.SettingKeys key, DateTime value)
         {
-            settingsIni[section].SetSingleEntry(SettingsKeys.SettingsKeyMapping[key], value.ToBinary().ToString());
+            RegistryHandler.WriteRegistrySettingString(SettingsKeys.SettingsKeyMapping[key], value.ToBinary().ToString());
         }
     }
 }

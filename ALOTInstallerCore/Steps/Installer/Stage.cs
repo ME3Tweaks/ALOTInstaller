@@ -83,25 +83,25 @@ namespace ALOTInstallerCore.Steps.Installer
         /// Copy constructor
         /// </summary>
         /// <param name="original"></param>
-        public Stage(Stage original) => new Stage()
+        public Stage(Stage original)
         {
-            ME1Scaling = original.ME1Scaling,
-            ME2Scaling = original.ME2Scaling,
-            ME3Scaling = original.ME3Scaling,
-            Weight = original.ME1Scaling,
-            StageName = original.StageName,
-            TaskName = original.TaskName,
-            FailureInfos = original.FailureInfos //These are never modified so we can just pass them through
-        };
+            ME1Scaling = original.ME1Scaling;
+            ME2Scaling = original.ME2Scaling;
+            ME3Scaling = original.ME3Scaling;
+            Weight = original.ME1Scaling;
+            StageName = original.StageName;
+            TaskName = original.TaskName;
+            FailureInfos = original.FailureInfos; //These are never modified so we can just pass them through
+        }
     }
 
     public class StageFailure
     {
-        public string FailureHeaderText { get; }
-        public string FailureTopText { get; }
-        public string FailureBottomText { get; }
-        public string FailureIPCTrigger { get; }
-        public int FailureResultCode { get; }
-        public bool Warning { get; }
+        public string FailureHeaderText { get; set; }
+        public string FailureTopText { get; set; }
+        public string FailureBottomText { get; set; }
+        public string FailureIPCTrigger { get; set; }
+        public int FailureResultCode { get; set; }
+        public bool Warning { get; set; }
     }
 }

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
+using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Startup;
 using Terminal.Gui;
 
@@ -173,22 +176,82 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void ChangeBuildLocation()
         {
-            throw new NotImplementedException();
+            OpenDialog selector = new OpenDialog("Select location to build textures for installation", "Select the location you would like to build the installation package at. This will take up considerable space depending on what will be installed.")
+            {
+                CanChooseDirectories = true,
+                CanChooseFiles = false,
+                DirectoryPath = Directory.Exists(Settings.BuildLocation) ? Settings.BuildLocation : null
+            };
+            Application.Run(selector);
+            if (selector.FilePaths.Any())
+            {
+                buildLocation.Text = Settings.BuildLocation = selector.FilePaths.First();
+                Settings.Save();
+            }
         }
 
         private void ChangeTextureLibraryLocation()
         {
-            throw new NotImplementedException();
+            OpenDialog selector = new OpenDialog("Select location to store textures for installation", "Select the location you would like to store the texture files that are part of the ALOT manifest. This location is where textures are stored, not where they are installed.")
+            {
+                CanChooseDirectories = true,
+                CanChooseFiles = false,
+                DirectoryPath = Directory.Exists(Settings.TextureLibraryLocation) ? Settings.TextureLibraryLocation : null
+            };
+            Application.Run(selector);
+            if (selector.FilePaths.Any())
+            {
+                textureLibraryLocation.Text = Settings.TextureLibraryLocation = selector.FilePaths.First();
+                Settings.Save();
+            }
         }
 
         private void ChangeME1Path()
         {
-            throw new NotImplementedException();
+            OpenDialog selector = new OpenDialog("Select MassEffect.exe", "Select the executable for Mass Effect, located in the Binaries directory.")
+            {
+                CanChooseDirectories = false,
+                AllowedFileTypes = new[] { ".exe" },
+            };
+            Application.Run(selector);
+            if (selector.FilePaths.Any())
+            {
+                var target = new GameTarget(Enums.MEGame.ME1, selector.FilePaths.First(), false, false);
+                var invalidReason = target.ValidateTarget();
+                if (invalidReason == null)
+                {
+                    UITools.SetText(me2PathField, selector.FilePaths.First());
+                    Locations.SetTarget(target);
+                }
+                else
+                {
+                    MessageBox.ErrorQuery("Invalid target selected", invalidReason, "OK");
+                }
+            }
         }
 
         private void ChangeME2Path()
         {
-            throw new NotImplementedException();
+            OpenDialog selector = new OpenDialog("Select MassEffect2.exe", "Select the executable for Mass Effect 2, located in the Binaries directory.")
+            {
+                CanChooseDirectories = false,
+                AllowedFileTypes = new[] { ".exe" },
+            };
+            Application.Run(selector);
+            if (selector.FilePaths.Any())
+            {
+                var target = new GameTarget(Enums.MEGame.ME2, selector.FilePaths.First(), false, false);
+                var invalidReason = target.ValidateTarget();
+                if (invalidReason == null)
+                {
+                    UITools.SetText(me2PathField, selector.FilePaths.First());
+                    Locations.SetTarget(target);
+                }
+                else
+                {
+                    MessageBox.ErrorQuery("Invalid target selected", invalidReason, "OK");
+                }
+            }
         }
 
         private void ChangeME3Path()
@@ -197,14 +260,22 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 CanChooseDirectories = false,
                 AllowedFileTypes = new[] {".exe"},
-                
             };
             Application.Run(selector);
             if (selector.FilePaths.Any())
             {
-                UITools.SetText(me3PathField, selector.FilePaths.First());
-
-                // COMMIT CHANGE HERE
+                var target = new GameTarget(Enums.MEGame.ME3, selector.FilePaths.First(), false, false);
+                var invalidReason = target.ValidateTarget();
+                if (invalidReason == null)
+                {
+                    UITools.SetText(me3PathField, selector.FilePaths.First());
+                    Locations.SetTarget(target);
+                }
+                else
+                {
+                    MessageBox.ErrorQuery("Invalid target selected", invalidReason, "OK");
+                }
+                
             }
         }
 

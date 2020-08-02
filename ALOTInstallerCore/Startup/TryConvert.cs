@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace ALOTInstallerCore.Helpers
 {
@@ -32,6 +33,24 @@ namespace ALOTInstallerCore.Helpers
                 return res;
             }
             return 0;
+        }
+
+        public static bool ToBool(string value, bool defaultValue)
+        {
+            if (bool.TryParse(value, out var res))
+            {
+                return res;
+            }
+            return defaultValue;
+        }
+
+        public static double ToDouble(string value, double defaultValue)
+        {
+            if (double.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var res))
+            {
+                return res;
+            }
+            return defaultValue;
         }
     }
 }

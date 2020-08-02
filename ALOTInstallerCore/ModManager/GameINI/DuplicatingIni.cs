@@ -15,7 +15,14 @@ namespace ALOTInstallerCore.ModManager.GameINI
         {
             get
             {
-                return Sections.FirstOrDefault(x => x.Header == sectionName) ?? new Section(); //Return blank section if section doesn't exist. This way we don't have issues doing a sub-indexer
+                var existingSection = Sections.FirstOrDefault(x => x.Header == sectionName);
+                if (existingSection != null) return existingSection;
+                var ns = new Section()
+                {
+                    Header = sectionName
+                };
+                Sections.Add(ns);
+                return ns;
             }
             set
             {
@@ -97,14 +104,10 @@ namespace ALOTInstallerCore.ModManager.GameINI
             //bool isFirst = true;
             foreach (var section in Sections)
             {
-                //if (isFirst)
-                //{
-                //    isFirst = false;
-                //}
-                //else
-                //{
-                //    sb.AppendLine(); //add a newline between headers.
-                //}
+                if (!section.Entries.Any())
+                {
+                    continue; //Do not write out empty sections.
+                }
                 sb.Append($"[{section.Header}]");
                 sb.Append("\n"); //AppendLine does \r\n which we don't want.
                 foreach (var line in section.Entries)
@@ -140,7 +143,12 @@ namespace ALOTInstallerCore.ModManager.GameINI
             {
                 get
                 {
-                    return Entries.FirstOrDefault(x => x.Key == keyname);
+                    var firstExistingEntry = Entries.FirstOrDefault(x => x.Key == keyname);
+                    if (firstExistingEntry != null) return firstExistingEntry;
+
+                    var ne = new IniEntry(keyname, "");
+                    Entries.Add(ne);
+                    return ne;
                 }
                 set
                 {

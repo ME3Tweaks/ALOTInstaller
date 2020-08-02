@@ -49,6 +49,54 @@ namespace ALOTInstallerCore.Steps
 
         public void InstallTextures(object sender, DoWorkEventArgs doWorkEventArgs)
         {
+            #region setup top text
+
+            string primary = "";
+            if (package.InstallALOTUpdate)
+            {
+                // alot update
+                var updateFile = package.FilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTUPDATEVER != 0);
+                if (updateFile != null)
+                {
+                    primary = $"ALOT {updateFile.AlotVersionInfo.ALOTVER}.{updateFile.AlotVersionInfo.ALOTUPDATEVER}";
+                }
+            }
+            else if (package.InstallALOT)
+            {
+                // main alot only
+                var mainfile = package.FilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER != 0);
+                if (mainfile != null)
+                {
+                    primary = $"ALOT {mainfile.AlotVersionInfo.ALOTVER}.0";
+                }
+            }
+
+            if (package.InstallMEUITM)
+            {
+                var meuitmFile = package.FilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.MEUITMVER != 0);
+                if (meuitmFile != null)
+                {
+                    if (primary == "")
+                    {
+                        primary = $"MEUITM v{meuitmFile.AlotVersionInfo.MEUITMVER}";
+                    }
+                    else
+                    {
+                        primary += $" & MEUITM v{meuitmFile.AlotVersionInfo.MEUITMVER}";
+                    }
+                }
+            }
+
+            if (primary == "")
+            {
+                primary = "texture mods";
+            }
+
+            SetTopTextCallback?.Invoke($"Installing {primary} for {package.InstallTarget.Game.ToGameName()}");
+
+            #endregion
+
+
             #region Check for existing markers
             {
                 string args = $"--check-for-markers --gameid {package.InstallTarget.Game.ToGameNum()} --ipc";
@@ -64,7 +112,7 @@ namespace ALOTInstallerCore.Steps
                     switch (command)
                     {
                         case "TASK_PROGRESS":
-                            SetTopTextCallback?.Invoke($"Checking game files for existing texture markers {param}%");
+                            SetBottomTextCallback?.Invoke($"Checking game files for existing texture markers {param}%");
                             break;
                         case "FILENAME":
 
@@ -83,13 +131,13 @@ namespace ALOTInstallerCore.Steps
                 int lastExitCode = int.MinValue;
                 MEMIPCHandler.RunMEMIPCUntilExit(args,
                     x => currentMemProcessId = x,
-                    handleIPC,
-                    x => Log.Error($"StdError: {x}"),
-                    x =>
-                    {
-                        currentMemProcessId = 0;
-                        lastExitCode = x;
-                    });
+                                    handleIPC,
+                                    x => Log.Error($"StdError: {x}"),
+                                    x =>
+                                    {
+                                        currentMemProcessId = 0;
+                                        lastExitCode = x;
+                                    });
 
                 if (badFiles.Any())
                 {
@@ -116,9 +164,6 @@ namespace ALOTInstallerCore.Steps
 
             #region Main installation phase
             {
-                ProgressHandler pm = new ProgressHandler();
-
-
                 void handleIPC(string command, string param)
                 {
                     switch (command)
@@ -126,7 +171,7 @@ namespace ALOTInstallerCore.Steps
                         case "STAGE_ADD": // Add a new stage 
                             {
                                 Log.Information("Adding stage added to install stages queue: " + param);
-                                pm.AddTask(param, package.InstallTarget.Game);
+                                pm.AddStage(param, package.InstallTarget.Game);
                                 break;
                             }
                         case "STAGE_WEIGHT": //Reweight a stage based on how long we think it will take
@@ -135,7 +180,7 @@ namespace ALOTInstallerCore.Steps
                             {
                                 double scale = Utilities.GetDouble(parameters[1], 1);
                                 Log.Information("Reweighting stage " + parameters[0] + " by " + parameters[1]);
-                                pm.ScaleStageWeight(pm.CurrentStage, scale);
+                                pm.ScaleStageWeight(parameters[0], scale);
                             }
                             catch (Exception e)
                             {
@@ -146,6 +191,7 @@ namespace ALOTInstallerCore.Steps
                             pm.CompleteAndMoveToStage(param);
                             updateStageOfStage();
                             updateCurrentStage();
+
                             break;
                         case "TASK_PROGRESS": //Report progress of a stage
                             pm.SubmitProgress(int.Parse(param));
@@ -153,9 +199,6 @@ namespace ALOTInstallerCore.Steps
                             break;
                         case "PROCESSING_FILE": //Report a file is being processed
                             Log.Information("Processing file " + param);
-                            break;
-                        case "EXCEPTION": //An exception has occured and MEM is going to crash
-                            Log.Fatal(param);
                             break;
                         default:
                             Debug.WriteLine($"Unhandled IPC: {command} {param}");
