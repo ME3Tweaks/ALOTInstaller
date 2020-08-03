@@ -101,12 +101,12 @@ namespace ALOTInstallerCore
                                 int soakThreshold = SoakThresholds[soakTestReleaseAge];
 
                                 // Soak gating
-                                if (applicableAsset.DownloadCount > soakThreshold)
-                                {
-                                    Log.Information($"New MassEffectModderNoGui update is soak testing and has reached the daily soak threshold of {soakThreshold}. This update is not applicable to us today, threshold will expand tomorrow.");
-                                    continue;
-                                }
-                                else
+                                //if (applicableAsset.DownloadCount > soakThreshold)
+                                //{
+                                //    Log.Information($"New MassEffectModderNoGui update is soak testing and has reached the daily soak threshold of {soakThreshold}. This update is not applicable to us today, threshold will expand tomorrow.");
+                                //    continue;
+                                //}
+                                //else
                                 {
                                     Log.Information("New MassEffectModderNoGui update is available and soaking, this client will participate in this soak test.");
                                     latestReleaseWithApplicableAsset = r;
@@ -167,6 +167,7 @@ namespace ALOTInstallerCore
                         });
                         
                         // Handle unzip code here.
+                        var res = SevenZipHelper.LZMA.ExtractSevenZipArchive(downloadPath, Locations.AppDataFolder(), true);
                     }
                     else
                     {

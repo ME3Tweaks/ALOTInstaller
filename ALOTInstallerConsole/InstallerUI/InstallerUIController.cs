@@ -25,10 +25,11 @@ namespace ALOTInstallerConsole.InstallerUI
         public override void SetupUI()
         {
             // Dynamically computed
+            var positionY = Pos.Center() - 1;
             topLabel = new Label("Overall Progress")
             {
                 X = 0,
-                Y = Pos.Center() - 1,
+                Y = positionY - 1,
                 Width = Dim.Fill(),
                 Height = 1,
                 TextAlignment = TextAlignment.Centered
@@ -37,7 +38,7 @@ namespace ALOTInstallerConsole.InstallerUI
             middleLabel = new Label("Stage X of Y")
             {
                 X = 0,
-                Y = Pos.Center() - 1,
+                Y = positionY,
                 Width = Dim.Fill(),
                 Height = 1,
                 TextAlignment = TextAlignment.Centered
@@ -47,7 +48,7 @@ namespace ALOTInstallerConsole.InstallerUI
             bottomLabel = new Label("Installing Textures")
             {
                 X = 0,
-                Y = Pos.Center() + 1,
+                Y = positionY + 1,
                 Width = Dim.Fill(),
                 Height = 1,
                 TextAlignment = TextAlignment.Centered

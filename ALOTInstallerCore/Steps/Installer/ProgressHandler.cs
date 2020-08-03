@@ -108,7 +108,7 @@ namespace ALOTInstallerCore.Steps.Installer
         /// <returns></returns>
         public int GetOverallProgress()
         {
-            double currentFinishedWeight = Stages.Sum(x => x.Weight * x.Progress);
+            double currentFinishedWeight = Stages.Sum(x => x.Weight * x.Progress) / 100.0; //progress is 0 to 100 so we must divide by 100 to get accurate result
             double totalWeight = Stages.Sum(x => x.Weight);
             if (totalWeight > 0)
             {

@@ -31,12 +31,14 @@ namespace SevenZipHelper
     [Localizable(false)]
     public static class LZMA
     {
-        [DllImport(@"sevenzipwrapper.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"CompressionWrappers.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
         private static extern int SevenZipDecompress([In] byte[] srcBuf, uint srcLen, [Out] byte[] dstBuf, ref uint dstLen);
 
-        [DllImport(@"sevenzipwrapper.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"CompressionWrappers.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
         private static extern int SevenZipCompress(int compressionLevel, [In] byte[] srcBuf, uint srcLen, [Out] byte[] dstBuf, ref uint dstLen);
 
+        [DllImport(@"CompressionWrappers.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int SevenZipUnpackFile([In] string archive, [In] string outputpath, [In] int keepArchivePaths);
 
         public static byte[] Decompress(byte[] src, uint dstLen)
         {
@@ -63,6 +65,13 @@ namespace SevenZipHelper
             Array.Copy(tmpbuf, dst, (int)dstLen);
 
             return dst;
+        }
+
+        public static bool ExtractSevenZipArchive(string archive, string outputpath, bool keepArchivePath = true)
+        {
+            Directory.CreateDirectory(outputpath); //must exist
+            var result = SevenZipUnpackFile(archive, outputpath, keepArchivePath ? 1 : 0);
+            return result == 0;
         }
 
         /// <summary>

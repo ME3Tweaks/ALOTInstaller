@@ -196,6 +196,7 @@ namespace ALOTInstallerCore.Steps
                         case "TASK_PROGRESS": //Report progress of a stage
                             pm.SubmitProgress(int.Parse(param));
                             updateCurrentStage();
+                            updateStageOfStage();
                             break;
                         case "PROCESSING_FILE": //Report a file is being processed
                             Log.Information("Processing file " + param);

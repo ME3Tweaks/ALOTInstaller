@@ -448,6 +448,7 @@ namespace ALOTInstallerCore.ModManager.Objects
 
                         var unpackedFiles = Directory.GetFiles(DLCDirectory, @"*", SearchOption.AllDirectories);
                         // not TOC is due to bug in autotoc
+                        //TODO: UNIFY WITH UNPACKED METHODS
                         if (unpackedFiles.Any(x =>
                             Path.GetExtension(x) == @".bin" &&
                             Path.GetFileNameWithoutExtension(x) != @"PCConsoleTOC") && !Unpacked) Inconsistent = true;
@@ -461,6 +462,7 @@ namespace ALOTInstallerCore.ModManager.Objects
 
                 public static bool HasUnpackedFiles(string sfarFile)
                 {
+                    // TODO: UNIFY THE UNPACKED DETECTION METHODS
                     var unpackedFiles =
                         Directory.GetFiles(Directory.GetParent(Directory.GetParent(sfarFile).FullName).FullName, @"*",
                             SearchOption.AllDirectories);
