@@ -186,7 +186,8 @@ namespace ALOTInstallerCore
         private static int getMemVersion()
         {
             int version = 0;
-            MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
+            // If the current version doesn't support the --version --ipc, we just assume it is 0.
+            MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc",ipcCallback: (command, param) =>
             {
                 if (command == "VERSION")
                 {

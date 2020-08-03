@@ -255,8 +255,24 @@ namespace ALOTInstallerConsole.BuilderUI
 
                 if (buildAndInstall)
                 {
-                    //var builderUI = new BuilderUI.BuilderUIController();
-                    //builderUI.SetOptionsPackage(new InstallOptionsPackage()
+                    var builderUI = new BuilderUI.BuilderUIController();
+                    builderUI.SetOptionsPackage(new InstallOptionsPackage()
+                    {
+                        InstallTarget = target,
+                        FilesToInstall = dataSource.InstallerFiles,
+                        InstallALOT = alotCheckbox.Checked,
+                        InstallALOTUpdate = alotCheckbox.Checked,
+                        InstallMEUITM = meuitmCheckbox.Checked,
+                        InstallALOTAddon = addonCheckBox.Checked,
+                        InstallUserfiles = userFilesCheckBox.Checked,
+                        DebugLogging = false, //needs option
+                        RepackGameFiles = true //needs option
+                    });
+                    builderUI.SetupUI();
+                    Program.SwapToNewView(builderUI);
+
+                    //var installerUI = new InstallerUIController();
+                    //installerUI.SetInstallPackage(new InstallOptionsPackage()
                     //{
                     //    InstallTarget = target,
                     //    FilesToInstall = dataSource.InstallerFiles,
@@ -266,22 +282,8 @@ namespace ALOTInstallerConsole.BuilderUI
                     //    InstallALOTAddon = addonCheckBox.Checked,
                     //    InstallUserfiles = userFilesCheckBox.Checked
                     //});
-                    //builderUI.SetupUI();
-                    //Program.SwapToNewView(builderUI);
-
-                    var installerUI = new InstallerUIController();
-                    installerUI.SetInstallPackage(new InstallOptionsPackage()
-                    {
-                        InstallTarget = target,
-                        FilesToInstall = dataSource.InstallerFiles,
-                        InstallALOT = alotCheckbox.Checked,
-                        InstallALOTUpdate = alotCheckbox.Checked,
-                        InstallMEUITM = meuitmCheckbox.Checked,
-                        InstallALOTAddon = addonCheckBox.Checked,
-                        InstallUserfiles = userFilesCheckBox.Checked
-                    });
-                    installerUI.SetupUI();
-                    Program.SwapToNewView(installerUI);
+                    //installerUI.SetupUI();
+                    //Program.SwapToNewView(installerUI);
                 }
             }
         }

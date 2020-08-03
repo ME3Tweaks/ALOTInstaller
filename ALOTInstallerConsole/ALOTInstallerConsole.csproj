@@ -12,17 +12,21 @@
     <Copyright>2020</Copyright>
     <Platforms>x64</Platforms>
     <NoWarn>$(NoWarn);NU1605</NoWarn>
+    <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
+    <Configurations>Debug;Release;WDebug</Configurations>
   </PropertyGroup>
-	<PropertyGroup>
-		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
-	</PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>-->
+  <PropertyGroup Condition="'$(Configuration)'=='WDebug'">
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
@@ -32,5 +36,9 @@
     <ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />
     <ProjectReference Include="..\gui.cs\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if &quot;$(Configuration)&quot;==&quot;WDebug&quot; xcopy &quot;$(SolutionDir)ALOTInstallerCore\Libraries\Windows&quot; &quot;$(OutDir)&quot; /Y" />
+  </Target>
 
 </Project>

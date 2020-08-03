@@ -29,6 +29,9 @@ namespace ALOTInstallerCore.Builder
             this.package = package;
         }
 
+        public Action<string> UpdateStatusCallback { get; set; }
+        public Action<int,int> UpdateProgressCallback { get; set; }
+
         private void ExtractFile(InstallerFile instFile, string substagingDir)
         {
             string filepath = null;
@@ -44,12 +47,6 @@ namespace ALOTInstallerCore.Builder
             if (extension == ".png") return; //no need to extract this file
 
             Directory.CreateDirectory(substagingDir);
-            object lockObject = new object();
-            void appStart(int processID)
-            {
-                // This might need to be waited on after method is called.
-                Debug.WriteLine(@"Process launched. Process ID: " + processID);
-            }
 
             void handleIPC(string command, string param)
             {
@@ -67,29 +64,17 @@ namespace ALOTInstallerCore.Builder
                 }
             }
 
-            void appExited(int code)
-            {
-                lock (lockObject)
-                {
-                    Monitor.Pulse(lockObject);
-                }
-            }
-
             switch (extension)
             {
                 case ".7z":
                 case ".rar":
                 case ".zip":
                     // Extract archive
-                    MEMIPCHandler.RunMEMIPC($"--unpack-archive --input \"{filepath}\" --output \"{substagingDir}\" --ipc",
-                        appStart,
+                    MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{filepath}\" --output \"{substagingDir}\" --ipc",
+                        null,
                         handleIPC,
                         x => Log.Error($"StdError on {filepath}: {x}"),
-                        appExited);
-                    lock (lockObject)
-                    {
-                        Monitor.Wait(lockObject);
-                    }
+                        null); //Change to catch exit code of non zero.
                     break;
             }
         }
@@ -108,10 +93,14 @@ namespace ALOTInstallerCore.Builder
                 Log.Information(f.Filename);
             }
 
+            int numDone = 0;
+            int numToDo = package.FilesToInstall.Count;
             foreach (var f in package.FilesToInstall)
             {
                 var outputDir = Path.Combine(Settings.BuildLocation, Path.GetFileNameWithoutExtension(f.Filename));
                 ExtractFile(f, outputDir);
+                Interlocked.Increment(ref numDone);
+                UpdateProgressCallback?.Invoke(numDone, numToDo);
             }
         }
 

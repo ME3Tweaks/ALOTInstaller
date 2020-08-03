@@ -54,8 +54,10 @@ namespace ALOTInstallerCore.Helpers
                         break;
                 }
             }
-            var cmd = Cli.Wrap(Locations.MEMPath()).WithArguments(arguments);
-            Debug.Write($"Launching process: {Locations.MEMPath()} {arguments}");
+
+            // No validation. Make sure exit code is checked in the calling process.
+            var cmd = Cli.Wrap(Locations.MEMPath()).WithArguments(arguments).WithValidation(CommandResultValidation.None);
+            Debug.WriteLine($"Launching process: {Locations.MEMPath()} {arguments}");
             await foreach (var cmdEvent in cmd.ListenAsync(cancellationToken))
             {
                 switch (cmdEvent)

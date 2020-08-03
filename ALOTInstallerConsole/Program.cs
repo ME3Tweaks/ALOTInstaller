@@ -19,6 +19,10 @@ namespace ALOTInstallerConsole
             var startupUI = new BuilderUI.StartupUIController();
             startupUI.SetupUI();
             Program.SwapToNewView(startupUI);
+
+            //var bui = new BuilderUI.BuilderUIController();
+            //bui.SetupUI();
+            //Program.SwapToNewView(bui);
         }
 
 
