@@ -20,6 +20,8 @@ Global
 		Debug|x64 = Debug|x64
 		Release|x64 = Release|x64
 		WDebug|x64 = WDebug|x64
+		LDebug|x64 = LDebug|x64
+		MDebug|x64 = MDebug|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C091BEC9-74DD-46DA-9452-24125BCF573B}.Debug|x64.ActiveCfg = Debug|x64
