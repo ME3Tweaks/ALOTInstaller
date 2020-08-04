@@ -3,6 +3,7 @@ using System.Threading;
 
 namespace ALOTInstallerCore.Helpers
 {
+    [System.ComponentModel.DesignerCategory("Code")]
     public class NamedBackgroundWorker : BackgroundWorker
     {
         public NamedBackgroundWorker(string name)

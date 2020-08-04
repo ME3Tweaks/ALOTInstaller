@@ -14,8 +14,13 @@ using Serilog;
 
 namespace ALOTInstallerCore.Startup
 {
+    /// <summary>
+    /// Class for handling online content
+    /// </summary>
     public class OnlineContent
     {
+        // ManifestFetch handles downloading and loading the ALOT manifest.
+
         public enum ManifestMode
         {
             None,
@@ -261,7 +266,21 @@ namespace ALOTInstallerCore.Startup
                 {
                     mp.ME2DLCsNeedingTextureFixes = new List<string>();
                 }
-
+                /* for preinstallmod
+                //ExtractionRedirects = e.Elements("extractionredirect")
+                //    .Select(d => new ExtractionRedirect
+                //    {
+                //        ArchiveRootPath = (string)d.Attribute("archiverootpath"),
+                //        RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
+                //        OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc"),
+                //        OptionalAnyDLC = (string)d.Attribute("optionalanydlc"),
+                //        OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
+                //        OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
+                //        LoggingName = (string)d.Attribute("loggingname"),
+                //        IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
+                //        ModVersion = (string)d.Attribute("version")
+                //    }).ToList(),
+                 */
                 mp.ManifestFiles.AddRange((from e in rootElement.Elements("addonfile")
                                            select new ManifestFile()
                                            {
@@ -276,10 +295,10 @@ namespace ALOTInstallerCore.Startup
 
                                                // MEUITM, ALOT
                                                AlotVersionInfo = new TextureModInstallationInfo(
-                                                   TryConvert.ToInt16((string)e.Attribute("alotversion")), 
-                                                   TryConvert.ToByte((string)e.Attribute("alotupdateversion")),
-                                                   0, //Hotfix version is not used
-                                                   TryConvert.ToInt32((string)e.Attribute("meuitmver"))),
+                                                   TryConvert.ToInt16(e.Attribute("alotversion")?.Value, 0), 
+                                                   TryConvert.ToByte(e.Attribute("alotupdateversion")?.Value, 0),
+                                                   0, //Hotfix version was never used
+                                                   TryConvert.ToInt32(e.Attribute("meuitmver")?.Value, 0)),
 
                                                //ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
                                                Author = (string)e.Attribute("author"),
@@ -296,21 +315,9 @@ namespace ALOTInstallerCore.Startup
                                                UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
                                                UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
                                                TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
-                                               Priority = e.Attribute("priority") != null ? Convert.ToInt32((string)e.Attribute("priority")) : 5,
+                                               UIPriority = TryConvert.ToInt32(e.Attribute("uipriority")?.Value, 5),
                                                IsModManagerMod = e.Element("file").Attribute("modmanagermod") != null ? (bool)e.Element("file").Attribute("modmanagermod") : false,
-                                               //ExtractionRedirects = e.Elements("extractionredirect")
-                                               //    .Select(d => new ExtractionRedirect
-                                               //    {
-                                               //        ArchiveRootPath = (string)d.Attribute("archiverootpath"),
-                                               //        RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
-                                               //        OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc"),
-                                               //        OptionalAnyDLC = (string)d.Attribute("optionalanydlc"),
-                                               //        OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
-                                               //        OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
-                                               //        LoggingName = (string)d.Attribute("loggingname"),
-                                               //        IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
-                                               //        ModVersion = (string)d.Attribute("version")
-                                               //    }).ToList(),
+                                               
                                                PackageFiles = e.Elements("packagefile")
                                                    .Select(r => new ManifestSubFile
                                                    {
@@ -326,6 +333,8 @@ namespace ALOTInstallerCore.Startup
                                                        m_me3 = r.Attribute("me3") != null ? true : false,
                                                        Processed = false
                                                    }).ToList(),
+
+                                               // MEUITM stuff, I think
                                                //ChoiceFiles = e.Elements("choicefile")
                                                //    .Select(q => new ChoiceFile
                                                //    {
@@ -366,7 +375,7 @@ namespace ALOTInstallerCore.Startup
                                                //        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
                                                //    }
                                                //).ToList(),
-                                           }).OrderBy(p => p.Priority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName));
+                                           }).OrderBy(p => p.UIPriority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName));
 
                 if (rootElement.Element("soaktestingmemversion") != null)
                 {

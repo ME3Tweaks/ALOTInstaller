@@ -162,7 +162,7 @@
       <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows" />
       <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
    </addonfile>
-   <addonfile alotversion="11" friendlyname="ALOT for ME1 11.0" author="CreeperLava" priority="0" recommendation="Required" installpriority="1">
+   <addonfile alotversion="11" friendlyname="ALOT for ME1 11.0" author="CreeperLava" uipriority="0" recommendation="Required" installpriority="1">
    	>
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
             tooltipname="ALOT for ME1 11.0"
@@ -177,7 +177,7 @@
             unpackedmd5="7d50bee890c3545e12a70cba8350e2be" />
       <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v11.mem" movedirectly="true" />
    </addonfile>
-   <addonfile alotversion="11" friendlyname="ALOT for ME2 11.0" author="CreeperLava" priority="0" recommendation="Required" installpriority="1">
+   <addonfile alotversion="11" friendlyname="ALOT for ME2 11.0" author="CreeperLava" uipriority="0" recommendation="Required" installpriority="1">
       <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
             tooltipname="ALOT for ME2 11.0"
             torrentfilename="ALOT for ME2.zip"
@@ -190,7 +190,7 @@
             unpackedmd5="42d42abcf3d8702140218cfc4574dc35" />
       <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v11.mem" movedirectly="true" />
    </addonfile>
-   <addonfile alotversion="11" friendlyname="ALOT for ME3 11.0" author="CreeperLava" priority="0" recommendation="Required" installpriority="1">
+   <addonfile alotversion="11" friendlyname="ALOT for ME3 11.0" author="CreeperLava" uipriority="0" recommendation="Required" installpriority="1">
       <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
             tooltipname="ALOT for ME3 11.0"
             torrentfilename="ALOT for ME3.zip"
@@ -204,7 +204,7 @@
    </addonfile>
    <addonfile alotversion="11"
               alotupdateversion="1"
-              priority="0"
+              uipriority="0"
               recommendation="Required"
               friendlyname="ALOT for ME1 11.1 - Update"
               tooltipname="ALOT for ME1 11.1 - Update"
@@ -218,7 +218,7 @@
    </addonfile>
    <addonfile alotversion="11"
               alotupdateversion="1"
-              priority="0"
+              uipriority="0"
               recommendation="Required"
               friendlyname="ALOT for ME2 11.1 - Update"
               tooltipname="ALOT for ME2 11.1 - Update"
@@ -232,7 +232,7 @@
    </addonfile>
    <addonfile alotversion="11"
               alotupdateversion="3"
-              priority="0"
+              uipriority="0"
               recommendation="Required"
               friendlyname="ALOT for ME3 11.3 - Update"
               tooltipname="ALOT for ME3 11.3 - Update"

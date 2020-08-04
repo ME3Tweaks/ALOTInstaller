@@ -5,6 +5,7 @@ using System.Text;
 
 namespace ALOTInstallerCore.Helpers
 {
+    [System.ComponentModel.DesignerCategory("Code")]
     public class ShortTimeoutWebClient : WebClient
     {
         protected override WebRequest GetWebRequest(Uri uri)

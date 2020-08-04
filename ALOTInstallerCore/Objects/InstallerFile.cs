@@ -100,11 +100,22 @@ namespace ALOTInstallerCore.Objects
         /// </summary>
         public bool IsProcessing { get; set; }
         /// <summary>
+        /// The priority that this file will install at. The higher the number, the later it will install, which means it will override earlier files.
+        /// </summary>
+        public int InstallPriority { get; set; }
+
+        /// <summary>
         /// Refreshes the Ready status for this file.
         /// </summary>
         /// <returns></returns>
         public abstract void UpdateReadyStatus();
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Returns the path to the file that this addon file points to - unpacked or packed, whatever the current backing file is.
+        /// </summary>
+        /// <returns></returns>
+        public abstract string GetUsedFilepath();
     }
 }

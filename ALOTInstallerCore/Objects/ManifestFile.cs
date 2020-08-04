@@ -286,7 +286,7 @@ namespace ALOTInstallerCore.Objects
 
         //        public string ALOTMainPackedFilename { get; set; }
         public string TorrentFilename { get; set; }
-        public int Priority { get; set; } //lower numbers i think are sorted to lower
+        public int UIPriority { get; set; } //lower numbers i think are sorted to lower
 
         //        public string ALOTArchiveInFilePath { get; set; }
         public string Author { get; set; }
@@ -493,6 +493,25 @@ namespace ALOTInstallerCore.Objects
                 }
             }
             Ready = false;
+        }
+
+        /// <summary>
+        /// Gets the backing file for this object. The unpacked single file version will be used if this file supports single unpacked files and the file is present.
+        /// This method will check if unpacked file exists and is the correct size. It will not check if packed file exists or is the correct size.
+        /// </summary>
+        /// <returns></returns>
+        public override string GetUsedFilepath()
+        {
+            if (UnpackedSingleFilename != null && UnpackedFileSize > 0 && UnpackedFileMD5 != null)
+            {
+                // This file supports unpacked mode
+                var filePathUnpacked = Path.Combine(Settings.TextureLibraryLocation, UnpackedSingleFilename);
+                if (File.Exists(filePathUnpacked) && new FileInfo(filePathUnpacked).Length == UnpackedFileSize)
+                {
+                    return filePathUnpacked;
+                }
+            }
+            return Path.Combine(Settings.TextureLibraryLocation, Filename);
         }
     }
 
