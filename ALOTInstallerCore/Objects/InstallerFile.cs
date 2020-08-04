@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 
 namespace ALOTInstallerCore.Objects
@@ -39,7 +40,7 @@ namespace ALOTInstallerCore.Objects
         Required
     }
 
-    public abstract class InstallerFile
+    public abstract class InstallerFile : INotifyPropertyChanged
     {
         /// <summary>
         /// Games this file is applicable to
@@ -91,9 +92,19 @@ namespace ALOTInstallerCore.Objects
         public bool Ready { get; set; }
 
         /// <summary>
+        /// String that can be used to display the status of this manifest file.
+        /// </summary>
+        public string StatusText { get; set; }
+        /// <summary>
+        /// Indicates if this file is currently the active processing file
+        /// </summary>
+        public bool IsProcessing { get; set; }
+        /// <summary>
         /// Refreshes the Ready status for this file.
         /// </summary>
         /// <returns></returns>
         public abstract void UpdateReadyStatus();
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

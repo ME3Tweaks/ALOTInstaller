@@ -11,7 +11,7 @@ namespace ALOTInstallerCore.Helpers
 {
     public static class MEMIPCHandler
     {
-        public static async void RunMEMIPCUntilExit(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
+        public static void RunMEMIPCUntilExit(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
         {
             object lockObject = new object();
             void appStart(int processID)
@@ -39,6 +39,10 @@ namespace ALOTInstallerCore.Helpers
                 Monitor.Wait(lockObject);
             }
         }
+
+        private static readonly UTF8Encoding unicode = new UTF8Encoding();
+
+
         public static async void RunMEMIPC(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
         {
             bool exceptionOcurred = false;
@@ -58,7 +62,7 @@ namespace ALOTInstallerCore.Helpers
             // No validation. Make sure exit code is checked in the calling process.
             var cmd = Cli.Wrap(Locations.MEMPath()).WithArguments(arguments).WithValidation(CommandResultValidation.None);
             Debug.WriteLine($"Launching process: {Locations.MEMPath()} {arguments}");
-            await foreach (var cmdEvent in cmd.ListenAsync(cancellationToken))
+            await foreach (var cmdEvent in cmd.ListenAsync(Encoding.Unicode, cancellationToken))
             {
                 switch (cmdEvent)
                 {
@@ -66,6 +70,7 @@ namespace ALOTInstallerCore.Helpers
                         applicationStarted?.Invoke(started.ProcessId);
                         break;
                     case StandardOutputCommandEvent stdOut:
+                        Debug.WriteLine(stdOut.Text);
                         if (stdOut.Text.StartsWith(@"[IPC]"))
                         {
                             var ipc = breakdownIPC(stdOut.Text);
@@ -79,7 +84,7 @@ namespace ALOTInstallerCore.Helpers
                             }
                             else
                             {
-                                Debug.WriteLine(stdOut.Text);
+                                //Debug.WriteLine(stdOut.Text);
                             }
                         }
 

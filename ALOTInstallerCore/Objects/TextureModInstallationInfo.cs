@@ -49,5 +49,8 @@
         {
             return $"ALOTVer {ALOTVER}.{ALOTUPDATEVER}.{ALOTHOTFIXVER}, MEUITM v{MEUITMVER}";
         }
+
+        public bool IsNotVersioned() => ALOTVER == 0 && ALOTHOTFIXVER == 0 & ALOTUPDATEVER == 0 && MEUITMVER == 0;
+        
     }
 }

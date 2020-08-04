@@ -14,7 +14,7 @@ namespace ALOTInstallerCore.Objects
     /// <summary>
     /// Describes a file in the manifest.
     /// </summary>
-    public sealed class ManifestFile : InstallerFile, INotifyPropertyChanged
+    public sealed class ManifestFile : InstallerFile
     {
 
         /// <summary>
@@ -57,7 +57,6 @@ namespace ALOTInstallerCore.Objects
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
 
         //        private bool m_ready;
         //        public string ComparisonsLink { get; set; }

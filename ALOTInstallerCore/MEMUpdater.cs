@@ -41,7 +41,7 @@ namespace ALOTInstallerCore
         {
             int memVersion = 0;
             var mempath = Locations.MEMPath();
-            bool downloadMEM = !File.Exists(mempath);
+            var downloadMEM = !File.Exists(mempath);
             if (!downloadMEM)
             {
                 // File exists
@@ -100,13 +100,13 @@ namespace ALOTInstallerCore
                                 }
                                 int soakThreshold = SoakThresholds[soakTestReleaseAge];
 
-                                // Soak gating
-                                //if (applicableAsset.DownloadCount > soakThreshold)
-                                //{
-                                //    Log.Information($"New MassEffectModderNoGui update is soak testing and has reached the daily soak threshold of {soakThreshold}. This update is not applicable to us today, threshold will expand tomorrow.");
-                                //    continue;
-                                //}
-                                //else
+                                //Soak gating
+                                if (applicableAsset.DownloadCount > soakThreshold)
+                                {
+                                    Log.Information($"New MassEffectModderNoGui update is soak testing and has reached the daily soak threshold of {soakThreshold}. This update is not applicable to us today, threshold will expand tomorrow.");
+                                    continue;
+                                }
+                                else
                                 {
                                     Log.Information("New MassEffectModderNoGui update is available and soaking, this client will participate in this soak test.");
                                     latestReleaseWithApplicableAsset = r;

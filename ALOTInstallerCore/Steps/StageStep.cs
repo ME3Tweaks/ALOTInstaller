@@ -28,12 +28,18 @@ namespace ALOTInstallerCore.Builder
         {
             this.package = package;
         }
-
+        /// <summary>
+        /// Callback to update the 'overall' status text of this step
+        /// </summary>
         public Action<string> UpdateStatusCallback { get; set; }
+        /// <summary>
+        /// Callback to update the 'overall' progress of this step
+        /// </summary>
         public Action<int,int> UpdateProgressCallback { get; set; }
 
         private void ExtractFile(InstallerFile instFile, string substagingDir)
         {
+            instFile.IsProcessing = true;
             string filepath = null;
             if (instFile is ManifestFile mf)
             {
@@ -53,10 +59,10 @@ namespace ALOTInstallerCore.Builder
                 switch (command)
                 {
                     case "TASK_PROGRESS":
-
+                        instFile.StatusText = $"Extracting archive {param}%";
                         break;
                     case "FILENAME":
-
+                        // Unpacking file
                         break;
                     default:
                         Debug.WriteLine($"Unhandled IPC: {command} {param}");
@@ -70,6 +76,7 @@ namespace ALOTInstallerCore.Builder
                 case ".rar":
                 case ".zip":
                     // Extract archive
+                    UpdateStatusCallback($"Extracting {instFile.FriendlyName}");
                     MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{filepath}\" --output \"{substagingDir}\" --ipc",
                         null,
                         handleIPC,
@@ -129,7 +136,7 @@ namespace ALOTInstallerCore.Builder
 
             if (package.InstallALOTAddon)
             {
-                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x is ManifestFile)); //Add Addon files that don't have a set ALOTVersionInfo.
+                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.IsNotVersioned() && x is ManifestFile)); //Add Addon files that don't have a set ALOTVersionInfo.
             }
 
             // Implement when user files class is ready.

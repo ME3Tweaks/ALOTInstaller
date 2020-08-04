@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using ALOTInstallerCore.Builder;
 using ALOTInstallerCore.Helpers;
@@ -32,6 +33,11 @@ namespace ALOTInstallerConsole.BuilderUI
 
         public override void BeginFlow()
         {
+            foreach (var f in installOptions.FilesToInstall)
+            {
+                f.PropertyChanged += InstallerFilePropertyChanged;
+            }
+
             NamedBackgroundWorker builderWorker = new NamedBackgroundWorker("BuilderWorker");
             StageStep ss = new StageStep(installOptions, builderWorker)
             {
@@ -41,6 +47,17 @@ namespace ALOTInstallerConsole.BuilderUI
             builderWorker.WorkerReportsProgress = true;
             builderWorker.DoWork += ss.PerformStaging;
             builderWorker.RunWorkerAsync();
+        }
+
+        private void InstallerFilePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is InstallerFile ifx && ifx.IsProcessing)
+            {
+                if (e.PropertyName == nameof(InstallerFile.StatusText))
+                {
+                    updateStatus($"[{ifx.FriendlyName}] {ifx.StatusText}");
+                }
+            }
         }
 
         public override void SetupUI()
