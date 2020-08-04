@@ -12,6 +12,7 @@
   <ItemGroup>
     <Folder Include="Libraries\Linux\" />
     <Folder Include="Libraries\MacOS\" />
+    <Folder Include="Libraries\Windows\" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)'=='WDebug'">
     <DefineConstants>TRACE;DEBUG</DefineConstants>
