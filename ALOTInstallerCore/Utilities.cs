@@ -638,7 +638,6 @@ namespace ALOTInstallerCore
 
         public static bool DeleteFilesAndFoldersRecursively(string target_dir)
         {
-#if WINDOWS
 
             bool result = true;
             foreach (string file in Directory.GetFiles(target_dir))
@@ -674,8 +673,6 @@ namespace ALOTInstallerCore
                 return false;
             }
             return result;
-#endif
-            return false;
         }
 
         public static string CalculateMD5(string filename)

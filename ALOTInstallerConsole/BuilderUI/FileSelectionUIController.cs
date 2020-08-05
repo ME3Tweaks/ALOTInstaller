@@ -209,7 +209,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     Width = 30,
                     Height = 1
                 };
-                CheckBox alotUpdate = new CheckBox("ALOT Update")
+                CheckBox alotUpdateCheckbox = new CheckBox("ALOT Update")
                 {
                     X = 1,
                     Y = y++,
@@ -244,7 +244,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 };
 
                 whatToBuildDialog.Add(alotCheckbox);
-                whatToBuildDialog.Add(alotUpdate);
+                whatToBuildDialog.Add(alotUpdateCheckbox);
                 if (target.Game == Enums.MEGame.ME1)
                 {
                     whatToBuildDialog.Add(meuitmCheckbox);
@@ -261,7 +261,7 @@ namespace ALOTInstallerConsole.BuilderUI
                         InstallTarget = target,
                         FilesToInstall = dataSource.InstallerFiles,
                         InstallALOT = alotCheckbox.Checked,
-                        InstallALOTUpdate = alotCheckbox.Checked,
+                        InstallALOTUpdate = alotUpdateCheckbox.Checked,
                         InstallMEUITM = meuitmCheckbox.Checked,
                         InstallALOTAddon = addonCheckBox.Checked,
                         InstallUserfiles = userFilesCheckBox.Checked,

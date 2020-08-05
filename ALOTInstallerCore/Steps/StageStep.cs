@@ -24,7 +24,7 @@ namespace ALOTInstallerCore.Builder
     public class StageStep
     {
         private InstallOptionsPackage package;
-
+        private int AddonID = -1; //ID of the Addon
         public StageStep(InstallOptionsPackage package, NamedBackgroundWorker worker)
         {
             this.package = package;
@@ -98,26 +98,50 @@ namespace ALOTInstallerCore.Builder
         /// <returns></returns>
         public void PerformStaging(object sender, DoWorkEventArgs e)
         {
+            var stagingDir = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString());
+            if (Directory.Exists(stagingDir))
+            {
+                Utilities.DeleteFilesAndFoldersRecursively(stagingDir);
+            }
             package.FilesToInstall = getFilesToStage(package.FilesToInstall.Where(x => x.Ready && (x.ApplicableGames & package.InstallTarget.Game.ToApplicableGame()) != 0));
             Log.Information(@"The following files will be staged for installation:");
+            int buildID = 0;
             foreach (var f in package.FilesToInstall)
             {
-                Log.Information(f.Filename);
+                f.ResetBuildVars();
+                if (f.AlotVersionInfo.IsNotVersioned() && AddonID < 0)
+                {
+                    // First non-versioned file. Versioned files are always able to be overriden so
+                    // first non versioned file will be first addon file (or user file).
+                    AddonID = buildID++; //Addon will install at this ID
+                }
+                f.BuildID = buildID++;
+
+                Log.Information($"{f.Filename}, Build ID {f.BuildID}");
             }
 
             int numDone = 0;
             int numToDo = package.FilesToInstall.Count;
             // Final location where MEM will install packages from. 
-            var finalBuiltPackagesDestination = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
+            var finalBuiltPackagesDestination = Path.Combine(stagingDir, "InstallationPackages");
+            if (Directory.Exists(finalBuiltPackagesDestination))
+            {
+                Utilities.DeleteFilesAndFoldersRecursively(finalBuiltPackagesDestination);
+            }
             Directory.CreateDirectory(finalBuiltPackagesDestination);
 
             // Where the addon file's individual textures are staged to where they will be compiled into a .mem file in the final build packages folder.
-            var addonStagingPath = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString(), "AddonStaging");
+            var addonStagingPath = Path.Combine(stagingDir, "AddonStaging");
+            if (Directory.Exists(addonStagingPath))
+            {
+                Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
+            }
             Directory.CreateDirectory(addonStagingPath);
+
 
             foreach (var f in package.FilesToInstall)
             {
-                var outputDir = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString(), Path.GetFileNameWithoutExtension(f.GetUsedFilepath()));
+                var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(f.GetUsedFilepath()));
                 // Extract Archive
                 var archiveExtracted = ExtractArchive(f, outputDir);
                 if (!archiveExtracted && FiletypeRequiresDecompilation(f.GetUsedFilepath()))
@@ -125,10 +149,26 @@ namespace ALOTInstallerCore.Builder
                     // Decompile file instead 
                     ExtractTextureContainer(package.InstallTarget.Game, f.GetUsedFilepath(), outputDir, f);
                 }
+                else if (f.PackageFiles.Any(x => !x.MoveDirectly))
+                {
+                    // Files that are not move only may be contained in texture container format.
+                    var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories)
+                        .Where(x => FiletypeRequiresDecompilation(x));
+                    foreach (var sf in subfilesToExtract)
+                    {
+                        ExtractTextureContainer(package.InstallTarget.Game, sf, outputDir, f);
+                    }
+                }
 
-                StageForBuilding(f, outputDir, addonStagingPath, package.InstallTarget.Game);
+                StageForBuilding(f, outputDir, addonStagingPath, finalBuiltPackagesDestination, package.InstallTarget.Game);
                 Interlocked.Increment(ref numDone);
                 UpdateProgressCallback?.Invoke(numDone, numToDo);
+            }
+
+            if (Directory.GetFiles(addonStagingPath).Any())
+            {
+                // Addon needs built
+                BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{AddonID:D3}_ALOTAddon.mem"), package.InstallTarget.Game);
             }
         }
 
@@ -138,7 +178,7 @@ namespace ALOTInstallerCore.Builder
         /// <param name="installerFile"></param>
         /// <param name="sourceDirectory"></param>
         /// <param name="stagingDest"></param>
-        private void StageForBuilding(InstallerFile installerFile, string sourceDirectory, string stagingDest, MEGame targetGame)
+        private void StageForBuilding(InstallerFile installerFile, string sourceDirectory, string stagingDest, string finalDest, MEGame targetGame)
         {
             if (installerFile is ManifestFile mf)
             {
@@ -150,32 +190,74 @@ namespace ALOTInstallerCore.Builder
                     foreach (var pf in mf.PackageFiles)
                     {
                         // Stage package files
-                        if (!pf.Processed && pf.ApplicableGames.HasFlag(targetGame))
+                        if (!pf.Processed && pf.ApplicableGames.HasFlag(targetGame.ToApplicableGame()))
                         {
-                            var matchingFile = filesInSource.FirstOrDefault(x => Path.GetFileName(x).Equals(pf.SourceName, StringComparison.InvariantCultureIgnoreCase));
-                            if (matchingFile != null && pf.DestinationName != null)
+                            var matchingFile = filesInSource.FirstOrDefault(x =>
+                                Path.GetFileName(x).Equals(pf.SourceName, StringComparison.InvariantCultureIgnoreCase));
+                            if (matchingFile != null)
                             {
-                                // Found file to stage
-                                Log.Information($"Copying package file: {pf.SourceName} -> {pf.DestinationName}");
-                                string destinationF = Path.Combine(stagingDest, pf.DestinationName);
-                                File.Copy(matchingFile, destinationF, true);
-                                numPackageFilesStaged++;
-                                installerFile.StatusText = $"Staging files {numPackageFilesStaged}/{numPackageFiles}";
-                            }
-                            else if (pf.DestinationName == null)
-                            {
-                                Log.Error($"Package file destinationname value is null. This is an error in the manifest file, please contact the developers. File: {installerFile.FriendlyName}, PackageFile: {pf.SourceName}");
+                                // found file to stage.
+                                string extension = Path.GetExtension(matchingFile);
+                                if (pf.MoveDirectly && extension == ".mem")
+                                {
+                                    // Directly move .mem file to output
+                                    var destinationF = Path.Combine(finalDest, $"{installerFile.BuildID:D3}_{pf.SourceName}");
+                                    Log.Information($"Moving .mem file to builtdir: {pf.SourceName} -> {destinationF}");
+
+                                    File.Move(matchingFile, destinationF, true);
+                                    pf.Processed = true;
+                                    continue;
+                                }
+
+                                if (pf.MoveDirectly)
+                                {
+                                    // not mem file. Move to staging
+                                    var destinationF = Path.Combine(stagingDest, pf.DestinationName ?? pf.SourceName);
+                                    Log.Information($"Moving package file to staging: {pf.SourceName} -> {pf.DestinationName ?? pf.SourceName}");
+                                    File.Move(matchingFile, destinationF, true);
+                                    pf.Processed = true;
+                                    continue;
+                                }
+
+                                //if (pf.CopyDirectly)
+                                //{
+                                //    var destinationF = Path.Combine(stagingDest, pf.DestinationName);
+                                //    File.Copy(matchingFile, destinationF, true);
+                                //    pf.Processed = true;
+                                //    continue;
+                                //}
+
+                                if (pf.DestinationName != null)
+                                {
+                                    // Found file to stage
+                                    Log.Information($"Copying package file: {pf.SourceName} -> {pf.DestinationName}");
+                                    string destinationF = Path.Combine(stagingDest, pf.DestinationName);
+                                    File.Copy(matchingFile, destinationF, true);
+                                    numPackageFilesStaged++;
+                                    installerFile.StatusText = $"Staging files {numPackageFilesStaged}/{numPackageFiles}";
+                                    pf.Processed = true;
+                                }
+                                else if (pf.DestinationName == null)
+                                {
+                                    Log.Error(
+                                        $"Package file destinationname value is null. This is an error in the manifest file, please contact the developers. File: {installerFile.FriendlyName}, PackageFile: {pf.SourceName}");
+                                }
                             }
                             else
                             {
-                                Log.Error("File specified by manifest doesn't exist after extraction: " + pf.SourceName);
+                                Log.Error("File specified by manifest doesn't exist after extraction: " +
+                                          pf.SourceName);
                             }
                         }
                     }
 
+                    if (mf.PackageFiles.Any(x => !x.Processed && x.ApplicableGames.HasFlag(targetGame.ToApplicableGame())))
+                    {
+                        Debug.WriteLine(":(");
+                    }
                     installerFile.StatusText = "Cleaning temporary files";
                     // todo: uncomment this
-                    //Utilities.DeleteFilesAndFoldersRecursively(sourceDirectory);
+                    Utilities.DeleteFilesAndFoldersRecursively(sourceDirectory);
                     installerFile.StatusText = "Staged for building";
                 }
             }
@@ -197,7 +279,7 @@ namespace ALOTInstallerCore.Builder
                         UpdateStatusCallback?.Invoke($"Building install package for {uiname}");
                         UpdateProgressCallback?.Invoke(TryConvert.ToInt32(param, 0), 100);
                         break;
-                    case "FILENAME":
+                    case "PROCESSING_FILE":
                         // Unpacking file
                         break;
                     default:
@@ -289,7 +371,7 @@ namespace ALOTInstallerCore.Builder
 
             if (package.InstallALOTUpdate)
             {
-                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.ALOTVER == 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0)); //Add MINOR ALOT file
+                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0)); //Add MINOR ALOT file
             }
 
             if (package.InstallMEUITM)

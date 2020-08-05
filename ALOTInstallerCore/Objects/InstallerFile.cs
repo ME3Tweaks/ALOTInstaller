@@ -103,6 +103,10 @@ namespace ALOTInstallerCore.Objects
         /// The priority that this file will install at. The higher the number, the later it will install, which means it will override earlier files.
         /// </summary>
         public int InstallPriority { get; set; }
+        /// <summary>
+        /// Internal ID that is used for output MEM files in the final directory
+        /// </summary>
+        public int BuildID { get; set; }
 
         /// <summary>
         /// Refreshes the Ready status for this file.
@@ -117,5 +121,16 @@ namespace ALOTInstallerCore.Objects
         /// </summary>
         /// <returns></returns>
         public abstract string GetUsedFilepath();
+
+        /// <summary>
+        /// Resets variables used only during the build step
+        /// </summary>
+        public void ResetBuildVars()
+        {
+            foreach (var manifestSubFile in PackageFiles)
+            {
+                manifestSubFile.Processed = false;
+            }
+        }
     }
 }
