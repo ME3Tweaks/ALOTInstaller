@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using ALOTInstallerConsole.InstallerUI;
 using ALOTInstallerCore.Builder;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
@@ -46,6 +47,23 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             builderWorker.WorkerReportsProgress = true;
             builderWorker.DoWork += ss.PerformStaging;
+            builderWorker.RunWorkerCompleted += (a, b) =>
+            {
+                if (b.Error == null)
+                {
+                    InstallerUIController fsuic = new InstallerUIController();
+                    fsuic.SetInstallPackage(installOptions);
+                    fsuic.SetupUI();
+                    Program.SwapToNewView(fsuic);
+                }
+                else
+                {
+                    MessageBox.ErrorQuery("Error occured while building textures", $"Error occured while building textures: {b.Error.Message}");
+                    FileSelectionUIController fsuic = new FileSelectionUIController();
+                    fsuic.SetupUI();
+                    Program.SwapToNewView(fsuic);
+                }
+            };
             builderWorker.RunWorkerAsync();
         }
 
@@ -63,7 +81,7 @@ namespace ALOTInstallerConsole.BuilderUI
         public override void SetupUI()
         {
             var ypos = Pos.Center() - 2;
-            Label l = new Label("Building texture installation package")
+            Label l = new Label("Building texture installation packages")
             {
                 Y = ypos,
                 X = 0,

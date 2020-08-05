@@ -68,7 +68,7 @@ namespace ALOTInstallerCore.Objects
         /// <summary>
         /// List of sub-files that this mod 
         /// </summary>
-        public List<ManifestSubFile> PackageFiles;
+        public List<PackageFile> PackageFiles;
 
         /// <summary>
         /// If this file is required to be in the Ready state to begin build step
@@ -127,9 +127,9 @@ namespace ALOTInstallerCore.Objects
         /// </summary>
         public void ResetBuildVars()
         {
-            foreach (var manifestSubFile in PackageFiles)
+            foreach (var pf in PackageFiles)
             {
-                manifestSubFile.Processed = false;
+                pf.Processed = false;
             }
         }
     }

@@ -495,31 +495,30 @@ namespace ALOTInstallerCore.ModManager.Objects
 
             }
 
-            internal void StampDebugALOTInfo()
+            internal void StampTextureModificationInfo(TextureModInstallationInfo tmii)
             {
-#if DEBUG
-                var markerPAth = getALOTMarkerFilePath();
+
+                var markerPath = getALOTMarkerFilePath();
                 try
                 {
-                    using (FileStream fs = new FileStream(markerPAth, System.IO.FileMode.Open, FileAccess.ReadWrite))
+                    using (FileStream fs = new FileStream(markerPath, System.IO.FileMode.Open, FileAccess.ReadWrite))
                     {
                         fs.SeekEnd();
-                        fs.WriteInt32(0); //meuitm
-                        fs.WriteUInt16(0); //major
-                        fs.WriteByte(0); //minor
-                        fs.WriteByte(0); //hotfix
+                        fs.WriteInt32(tmii.MEUITMVER); //meuitm
+                        fs.WriteInt16(tmii.ALOTVER); //major
+                        fs.WriteByte(tmii.ALOTUPDATEVER); //minor
+                        fs.WriteByte(tmii.ALOTHOTFIXVER); //hotfix
                         //fs.WriteByte(0); //unused
-                        fs.WriteInt32(100); //installer version
-                        fs.WriteUInt32(MEMI_TAG);
+                        fs.WriteInt32(tmii.ALOT_INSTALLER_VERSION_USED); //installer version
+                        fs.WriteInt32(tmii.MEM_VERSION_USED); //Backend MEM version
                     }
 
-                    Log.Information(@"Stamped ALOT for game. Installer 100, v 6.8, MEUITM 4");
+                    Log.Information(@"Stamped texture mod installation information on target");
                 }
                 catch (Exception e)
                 {
-                    Log.Error($@"Error writing debug ALOT marker file for {Game}. {e.Message}");
+                    Log.Error($@"Error writing debug texture mod installation marker file: {e.Message}");
                 }
-#endif
             }
 
             internal void StripALOTInfo()

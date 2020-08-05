@@ -1,4 +1,7 @@
-﻿namespace ALOTInstallerCore.Objects
+﻿using System;
+using System.Collections.Generic;
+
+namespace ALOTInstallerCore.Objects
 {
     /// <summary>
     /// Describes version information for a texture mod and/or installation
@@ -48,6 +51,26 @@
             this.ALOT_INSTALLER_VERSION_USED = alotInstallerVersionUsed;
         }
 
+        private TextureModInstallationInfo()
+        {
+
+        }
+
+        /// <summary>
+        /// Calculates the maximum version numbers between two TextureModInstallationInfo objects and returns the result.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public TextureModInstallationInfo MergeWith(TextureModInstallationInfo other)
+        {
+            TextureModInstallationInfo tmii = new TextureModInstallationInfo();
+            tmii.ALOTVER = Math.Max(ALOTVER, other.ALOTVER);
+            tmii.ALOTUPDATEVER = Math.Max(ALOTUPDATEVER, other.ALOTUPDATEVER);
+            tmii.ALOTHOTFIXVER = Math.Max(ALOTHOTFIXVER, other.ALOTHOTFIXVER);
+            tmii.MEUITMVER = Math.Max(MEUITMVER, other.MEUITMVER);
+            return tmii;
+        }
+
         /// <summary>
         /// Creates a installation information object, without information about what was used to install it.
         /// </summary>
@@ -73,6 +96,21 @@
         /// </summary>
         /// <returns></returns>
         public bool IsNotVersioned() => ALOTVER == 0 && ALOTHOTFIXVER == 0 & ALOTUPDATEVER == 0 && MEUITMVER == 0;
-        
+
+        /// <summary>
+        /// Calculates an installation marker based on the existing and installed file sets
+        /// </summary>
+        /// <param name="existing"></param>
+        /// <param name="packageFilesToInstall"></param>
+        /// <returns></returns>
+        public static TextureModInstallationInfo CalculateMarker(TextureModInstallationInfo existing, List<InstallerFile> packageFilesToInstall)
+        {
+            TextureModInstallationInfo final = existing;
+            foreach (var v in packageFilesToInstall)
+            {
+                final = final.MergeWith(v.AlotVersionInfo);
+            }
+            return final;
+        }
     }
 }

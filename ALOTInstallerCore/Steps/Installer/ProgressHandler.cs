@@ -52,11 +52,21 @@ namespace ALOTInstallerCore.Steps.Installer
         }
 
         /// <summary>
-        /// Marks the current stage as completed (100% progress) and moves to the next stage, as specified by the stage name.
+        /// Marks the current stage as completed (100% progress) and moves to the next stage, as specified by the stage name. Returns true if the stage transition is the indicator of completion.
         /// </summary>
         /// <param name="stageName"></param>
-        public void CompleteAndMoveToStage(string stageName)
+        public bool CompleteAndMoveToStage(string stageName)
         {
+            if (stageName == "STAGE_DONE")
+            {
+                // We've finished!
+                if (CurrentStage != null)
+                {
+                    CurrentStage.Progress = 100;
+                }
+
+                return true;
+            }
             Log.Information("Transitioning to " + stageName);
             if (CurrentStage != null)
             {
@@ -68,6 +78,8 @@ namespace ALOTInstallerCore.Steps.Installer
             {
                 Log.Error("Unknown stage: " + stageName);
             }
+
+            return false;
         }
 
         /// <summary>

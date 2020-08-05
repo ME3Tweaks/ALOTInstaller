@@ -31,14 +31,14 @@ namespace ALOTInstallerCore.Startup
         {
             public List<string> MusicPackMirrors;
             //public List<ManifestTutorial> Tutorials;
+            /// <summary>
+            /// Files that are part of the ALOT texture installation manifest. These files must be downcast to their types for accessing info on them.
+            /// </summary>
             public List<InstallerFile> ManifestFiles = new List<InstallerFile>(60);
-            //public List<InstallerStage> Stages;
             public List<string> ME3DLCsNeedingTextureFixes;
             public List<string> ME2DLCsNeedingTextureFixes;
             public bool IsBundled;
             public string ManifestVersion;
-            public int HighestSupportedMEMVersion;
-
         }
 
         /// <summary>
@@ -266,21 +266,55 @@ namespace ALOTInstallerCore.Startup
                 {
                     mp.ME2DLCsNeedingTextureFixes = new List<string>();
                 }
-                /* for preinstallmod
-                //ExtractionRedirects = e.Elements("extractionredirect")
-                //    .Select(d => new ExtractionRedirect
-                //    {
-                //        ArchiveRootPath = (string)d.Attribute("archiverootpath"),
-                //        RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
-                //        OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc"),
-                //        OptionalAnyDLC = (string)d.Attribute("optionalanydlc"),
-                //        OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
-                //        OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
-                //        LoggingName = (string)d.Attribute("loggingname"),
-                //        IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
-                //        ModVersion = (string)d.Attribute("version")
-                //    }).ToList(),
-                 */
+
+                // Add PREINSTALL MODS
+                mp.ManifestFiles.AddRange((from e in rootElement.Elements("preinstallmod")
+                                            select new PreinstallMod()
+                                            {
+                                                FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
+                                                AlotVersionInfo = new TextureModInstallationInfo(0,0,0,0),
+                                                Author = (string)e.Attribute("author"),
+                                                FriendlyName = (string)e.Attribute("friendlyname"),
+                                                //Optional = e.Attribute("optional") != null ? (bool)e.Attribute("optional") : false,
+                                                m_me1 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me1") : false,
+                                                m_me2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me2") : false,
+                                                m_me3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me3") : false,
+                                                Filename = (string)e.Element("file").Attribute("filename"),
+                                                Tooltipname = e.Element("file").Attribute("tooltipname") != null ? (string)e.Element("file").Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
+                                                DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
+                                                UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename") != null ? (string)e.Element("file").Attribute("unpackedsinglefilename") : null,
+                                                FileMD5 = (string)e.Element("file").Attribute("md5"),
+                                                UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
+                                                UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
+                                                TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
+                                                UIPriority = TryConvert.ToInt32(e.Attribute("uipriority")?.Value, 5),
+
+                                                PackageFiles = e.Elements("packagefile")
+                                                   .Select(r => new PackageFile
+                                                   {
+                                                       SourceName = (string)r.Attribute("sourcename"),
+                                                       MoveDirectly = r.Attribute("movedirectly") != null ? true : false,
+                                                       m_me1 = r.Attribute("me1") != null ? true : false,
+                                                       m_me2 = r.Attribute("me2") != null ? true : false,
+                                                       m_me3 = r.Attribute("me3") != null ? true : false,
+                                                       Processed = false
+                                                   }).ToList(),
+                                                ExtractionRedirects = e.Elements("extractionredirect")
+                                                    .Select(d => new PreinstallMod.ExtractionRedirect
+                                                    {
+                                                        ArchiveRootPath = (string)d.Attribute("archiverootpath"),
+                                                        RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
+                                                        OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc"),
+                                                        OptionalAnyDLC = (string)d.Attribute("optionalanydlc"),
+                                                        OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
+                                                        OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
+                                                        LoggingName = (string)d.Attribute("loggingname"),
+                                                        IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
+                                                        ModVersion = (string)d.Attribute("version")
+                                                    }).ToList(),
+                                            }));
+
+                // ADD TEXTURE MODS
                 mp.ManifestFiles.AddRange((from e in rootElement.Elements("addonfile")
                                            select new ManifestFile()
                                            {
@@ -289,13 +323,12 @@ namespace ALOTInstallerCore.Startup
                                                //Enabled = true,
                                                //TrackTelemetry = e.Element("telemetrytracking") != null ? (bool)e.Attribute("telemetrytracking") : false,
                                                //ComparisonsLink = (string)e.Attribute("comparisonslink"),
-                                               //InstallME1DLCASI = e.Attribute("installme1dlcasi") != null ? (bool)e.Attribute("installme1dlcasi") : false,
                                                FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
                                                //CopyDirectly = e.Element("file").Attribute("copydirectly") != null ? (bool)e.Element("file").Attribute("copydirectly") : false,
 
                                                // MEUITM, ALOT
                                                AlotVersionInfo = new TextureModInstallationInfo(
-                                                   TryConvert.ToInt16(e.Attribute("alotversion")?.Value, 0), 
+                                                   TryConvert.ToInt16(e.Attribute("alotversion")?.Value, 0),
                                                    TryConvert.ToByte(e.Attribute("alotupdateversion")?.Value, 0),
                                                    0, //Hotfix version was never used
                                                    TryConvert.ToInt32(e.Attribute("meuitmver")?.Value, 0)),
@@ -316,10 +349,8 @@ namespace ALOTInstallerCore.Startup
                                                UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
                                                TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
                                                UIPriority = TryConvert.ToInt32(e.Attribute("uipriority")?.Value, 5),
-                                               IsModManagerMod = e.Element("file").Attribute("modmanagermod") != null ? (bool)e.Element("file").Attribute("modmanagermod") : false,
-                                               
                                                PackageFiles = e.Elements("packagefile")
-                                                   .Select(r => new ManifestSubFile
+                                                   .Select(r => new PackageFile
                                                    {
                                                        ChoiceTitle = "", //unused in this block
                                                        SourceName = (string)r.Attribute("sourcename"),

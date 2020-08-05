@@ -7,7 +7,7 @@ namespace ALOTInstallerCore.Objects
     /// <summary>
     /// A file that is part of a manifest file, after extraction. These files are extracted from their source file and then staged for building into the addon. 
     /// </summary>
-    public class ManifestSubFile
+    public class PackageFile
     {
         /// <summary>
         /// Filename of this singular file

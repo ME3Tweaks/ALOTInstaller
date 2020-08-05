@@ -14,7 +14,7 @@ namespace ALOTInstallerCore.Objects
     /// <summary>
     /// Describes a file in the manifest.
     /// </summary>
-    public sealed class ManifestFile : InstallerFile
+    public class ManifestFile : InstallerFile
     {
 
         /// <summary>
@@ -281,7 +281,10 @@ namespace ALOTInstallerCore.Objects
         //                OnPropertyChanged("LeftBlockColor"); //ui update for this property
         //            }
         //        }
-        //        public bool ProcessAsModFile { get; set; }
+        /// <summary>
+        /// If this file should be directly placed into the staging directory, rather than decompiling the file (.mod files)
+        /// </summary>
+        public bool ProcessAsModFile { get; set; }
         public string UnpackedSingleFilename { get; set; }
 
         //        public string ALOTMainPackedFilename { get; set; }
@@ -323,7 +326,6 @@ namespace ALOTInstallerCore.Objects
         //        public bool Building { get; internal set; }
 
 
-        public string BuildID { get; internal set; }
         public string FileMD5 { get; internal set; }
         public string UnpackedFileMD5 { get; set; }
         public long UnpackedFileSize { get; set; }
@@ -398,7 +400,6 @@ namespace ALOTInstallerCore.Objects
         //            }
 
         //        }
-        public bool IsModManagerMod { get; internal set; }
 
         //        public bool InstallME1DLCASI { get; internal set; }
         //        public bool TrackTelemetry { get; internal set; }
@@ -513,18 +514,5 @@ namespace ALOTInstallerCore.Objects
             }
             return Path.Combine(Settings.TextureLibraryLocation, Filename);
         }
-    }
-
-    public class ExtractionRedirect
-    {
-        public string RelativeDestinationDirectory { get; set; }
-        public string ArchiveRootPath { get; set; }
-        public string OptionalRequiredDLC { get; set; }
-        public string OptionalAnyDLC { get; set; }
-        public bool IsDLC { get; internal set; }
-        public string ModVersion { get; internal set; }
-        public string LoggingName { get; internal set; }
-        public string OptionalRequiredFiles { get; set; }
-        public string OptionalRequiredFilesSizes { get; set; }
     }
 }

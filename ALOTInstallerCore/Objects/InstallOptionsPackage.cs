@@ -25,9 +25,14 @@ namespace ALOTInstallerCore.Objects
         /// this might be better as just accessing settings
         /// </summary>
         public bool DebugLogging { get; set; }
+
         /// <summary>
         /// Indicates that we should repack game files on install
         /// </summary>
-        public bool RepackGameFiles { get; set; }
+        public bool RepackGameFiles { get; set; } = true; //Default to true. Might change later
+        /// <summary>
+        /// Installs 2K instead of 4K lods at end of install. 2K lods use significantly less memory at the cost of less visual fidelity.
+        /// </summary>
+        public bool Limit2K { get; set; }
     }
 }
