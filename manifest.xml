@@ -744,8 +744,8 @@
       <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC" optionalrequireddlc="DLC_UNC"/>
       <games me1="true" me2="false" me3="false" />
    </preinstallmod>
-   <preinstallmod friendlyname="A Lot of Videos for ME2 - 1080p" author="Audemus" optional="true" telemetrytracking="true" group="ME2ALOV">
-      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files" filename="ALOV for ME2 1.1 (1080p)-245-1-1-1580074467.7z" torrentfilename="ALotofVideosforME2-1080p_1.1.7z" md5="700e3f16a21ac277f5285b5a7d751a1c" size="5533430325"  preinstallmod="true"/>
+   <preinstallmod friendlyname="A Lot of Videos for ME2 (1080p)" author="Audemus" optional="true" group="ME2ALOV">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files" filename="ALOV for ME2 1.1 (1080p)-245-1-1-1580074467.7z" torrentfilename="ALotofVideosforME2-4K_1.1.7z" md5="700e3f16a21ac277f5285b5a7d751a1c" size="5533430325"/>
       <extractionredirect archiverootpath="BASEGAME\Movies" relativedestinationdirectory="BIOGame\Movies"/>
       <extractionredirect archiverootpath="ARRIVAL\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part02\Movies" optionalrequireddlc="DLC_EXP_Part02"/>
       <extractionredirect archiverootpath="FIREWALKER\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Hammer01\Movies" optionalrequireddlc="DLC_UNC_Hammer01"/>
@@ -753,9 +753,19 @@
       <extractionredirect archiverootpath="LOTSB\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part01\Movies" optionalrequireddlc="DLC_EXP_Part01"/>
       <extractionredirect archiverootpath="OVERLORD\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies" optionalrequireddlc="DLC_UNC_Pack01"/>
       <games me1="false" me2="true" me3="false" />
-   </preinstallmod>   
-   <preinstallmod friendlyname="A Lot of Videos for ME3 - 1080p" author="Mellin" optional="true" version="1.3"  group="ME3ALOV">
-      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files" filename="ALOV for ME3 v1.3 (1080p)-773-1-3-1582271717.7z" torrentfilename="A Lot Of Videos (ALOV) for ME3 - 1080p_1.3.7z" md5="1d4f79c90a426e1f8363a4ba46498c95" size="17298419420" preinstallmod="true"/>
+   </preinstallmod>
+   <preinstallmod friendlyname="A Lot of Videos for ME2 (4K)" author="Audemus" optional="true" group="ME2ALOV">
+      <file downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files" filename="UNKNOWN_ALOVME2_4K.7z" torrentfilename="ALotofVideosforME2-4K_1.1.7z" md5="700e3f16a21ac277f5285b5a7d751a1c" size="14780810833"/>
+      <extractionredirect archiverootpath="BASEGAME\Movies" relativedestinationdirectory="BIOGame\Movies"/>
+      <extractionredirect archiverootpath="ARRIVAL\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part02\Movies" optionalrequireddlc="DLC_EXP_Part02"/>
+      <extractionredirect archiverootpath="FIREWALKER\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Hammer01\Movies" optionalrequireddlc="DLC_UNC_Hammer01"/>
+      <extractionredirect archiverootpath="KASUMI\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_HEN_MT\Movies" optionalrequireddlc="DLC_HEN_MT"/>
+      <extractionredirect archiverootpath="LOTSB\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part01\Movies" optionalrequireddlc="DLC_EXP_Part01"/>
+      <extractionredirect archiverootpath="OVERLORD\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies" optionalrequireddlc="DLC_UNC_Pack01"/>
+      <games me1="false" me2="true" me3="false" />
+   </preinstallmod>
+   <preinstallmod friendlyname="A Lot of Videos for ME3 (1080p)" author="Mellin" optional="true" version="1.3"  group="ME3ALOV">
+      <file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files" filename="ALOV for ME3 v1.3 (1080p)-773-1-3-1582271717.7z" torrentfilename="A Lot Of Videos (ALOV) for ME3 - 1080p_1.3.7z" md5="1d4f79c90a426e1f8363a4ba46498c95" size="17298419420"/>
       <extractionredirect archiverootpath="DLC_MOD_ALOV" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV" loggingname="ALOV for ME3 1080p - Core" isdlc="true"/> <!-- main mod -->
       <extractionredirect archiverootpath="DLC_MOD_ALOV_Patches" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches" optionalanyrequireddlc="DLC_MOD_EGM_Ark;DLC_MOD_EGM;DLC_MOD_EGM_Omg;DLC_CON_PEOM;DLC_EXP_CEMF;DLC_CON_JAM;DLC_CON_MtoC;DLC_CON_LIME;DLC_CON_JtoC" loggingname="ALOV for ME3 1080p - 3rd Party" isdlc="true"/> <!-- patch dlc -->
 
