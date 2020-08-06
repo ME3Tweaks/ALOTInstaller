@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Compression;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace ALOTInstallerCore.Objects
+namespace ALOTInstallerCore.Objects.Manifest
 {
     /// <summary>
     /// Predefined mod that will be installed after build but before installation of textures.
@@ -11,7 +8,15 @@ namespace ALOTInstallerCore.Objects
     /// </summary>
     public class PreinstallMod : ManifestFile
     {
+        /// <summary>
+        /// List of redirections of files from extracted path => game path
+        /// </summary>
         public List<ExtractionRedirect> ExtractionRedirects { get; set; }
+        /// <summary>
+        /// A mutual exclusive group option. If multiple files are ready at install time with same option group,
+        /// a dialog must be shown so the user can pick which one to use. Doing more than one will waste disk space and time
+        /// </summary>
+        public string OptionGroup { get; set; }
 
         public class ExtractionRedirect
         {

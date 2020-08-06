@@ -508,9 +508,10 @@ namespace ALOTInstallerCore.ModManager.Objects
                         fs.WriteInt16(tmii.ALOTVER); //major
                         fs.WriteByte(tmii.ALOTUPDATEVER); //minor
                         fs.WriteByte(tmii.ALOTHOTFIXVER); //hotfix
-                        //fs.WriteByte(0); //unused
+                        fs.WriteByte(0); //unused
                         fs.WriteInt32(tmii.ALOT_INSTALLER_VERSION_USED); //installer version
                         fs.WriteInt32(tmii.MEM_VERSION_USED); //Backend MEM version
+                        fs.WriteUInt32(MEMI_TAG);
                     }
 
                     Log.Information(@"Stamped texture mod installation information on target");

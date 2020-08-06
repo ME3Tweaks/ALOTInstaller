@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using ALOTInstallerCore.Helpers;
 
-namespace ALOTInstallerCore.Objects
+namespace ALOTInstallerCore.Objects.Manifest
 {
     /// <summary>
     /// Describes a file in the manifest.
@@ -298,13 +291,11 @@ namespace ALOTInstallerCore.Objects
 
         public string DownloadLink { get; set; }
         //        public List<string> Duplicates { get; set; }
-        //        public bool IsModManagerMod { get; set; }
-        //        public List<ExtractionRedirect> ExtractionRedirects { get; set; }
 
         //        public List<PackageFile> PackageFiles { get; set; }
-        //        public List<ChoiceFile> ChoiceFiles { get; set; }
-        //        public List<ZipFile> ZipFiles { get; set; }
-        //        public List<CopyFile> CopyFiles { get; set; }
+        public List<ChoiceFile> ChoiceFiles { get; set; }
+        public List<ZipFile> ZipFiles { get; set; }
+        public List<CopyFile> CopyFiles { get; set; }
 
         //        public string DownloadAssistantString
         //        {
@@ -477,19 +468,19 @@ namespace ALOTInstallerCore.Objects
         public override string ToString() => FriendlyName;
         public override void UpdateReadyStatus()
         {
-            var filePathMain = Path.Combine(Settings.TextureLibraryLocation, Filename);
-            if (File.Exists(filePathMain) && new FileInfo(filePathMain).Length == FileSize)
+            var fp = GetUsedFilepath();
+            if (File.Exists(fp))
             {
-                Ready = true;
-                return;
-            }
-            if (UnpackedSingleFilename != null && UnpackedFileSize > 0 && UnpackedFileMD5 != null)
-            {
-                // This file supports unpacked mode
-                var filePathUnpacked = Path.Combine(Settings.TextureLibraryLocation, UnpackedSingleFilename);
-                if (File.Exists(filePathUnpacked) && new FileInfo(filePathUnpacked).Length == UnpackedFileSize)
+                var filesize = new FileInfo(fp).Length;
+                if (Path.GetFileName(fp) == Filename || (TorrentFilename != null && Path.GetFileName(fp).Equals(TorrentFilename)))
                 {
-                    Ready = true;
+                    Ready = filesize == FileSize;
+                    return;
+                }
+
+                if (UnpackedSingleFilename != null && Path.GetFileName(fp).Equals(UnpackedSingleFilename))
+                {
+                    Ready = filesize == UnpackedFileSize;
                     return;
                 }
             }
@@ -510,6 +501,16 @@ namespace ALOTInstallerCore.Objects
                 if (File.Exists(filePathUnpacked) && new FileInfo(filePathUnpacked).Length == UnpackedFileSize)
                 {
                     return filePathUnpacked;
+                }
+            }
+
+            // Check if torrent file exists.
+            if (TorrentFilename != null)
+            {
+                var filepathTorrent = Path.Combine(Settings.TextureLibraryLocation, TorrentFilename);
+                if (File.Exists(filepathTorrent) && new FileInfo(filepathTorrent).Length == FileSize)
+                {
+                    return filepathTorrent;
                 }
             }
             return Path.Combine(Settings.TextureLibraryLocation, Filename);

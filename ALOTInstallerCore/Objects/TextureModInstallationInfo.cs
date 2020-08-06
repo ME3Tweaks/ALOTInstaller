@@ -105,7 +105,7 @@ namespace ALOTInstallerCore.Objects
         /// <returns></returns>
         public static TextureModInstallationInfo CalculateMarker(TextureModInstallationInfo existing, List<InstallerFile> packageFilesToInstall)
         {
-            TextureModInstallationInfo final = existing;
+            TextureModInstallationInfo final = existing ?? new TextureModInstallationInfo();
             foreach (var v in packageFilesToInstall)
             {
                 final = final.MergeWith(v.AlotVersionInfo);

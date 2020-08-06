@@ -9,6 +9,7 @@ using System.Text;
 using System.Xml.Linq;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps.Installer;
 using Serilog;
 
@@ -23,9 +24,18 @@ namespace ALOTInstallerCore.Startup
 
         public enum ManifestMode
         {
+            /// <summary>
+            /// No manifest. Install whatever you want, but you get to deal with the side effects
+            /// </summary>
             None,
+            /// <summary>
+            /// MEUITM manifest. Installs only MEUITM with MEUITM defaults
+            /// </summary>
             MEUITM,
-            ALOT
+            /// <summary>
+            /// ALOT manifest. Applies installation using ALOT rules for version upgrades
+            /// </summary>
+            ALOT,
         }
         public class ManifestPackage
         {
@@ -271,7 +281,7 @@ namespace ALOTInstallerCore.Startup
                 mp.ManifestFiles.AddRange((from e in rootElement.Elements("preinstallmod")
                                             select new PreinstallMod()
                                             {
-                                                FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
+                                                FileSize = TryConvert.ToInt64(e.Element("file").Attribute("size")?.Value, 0L),
                                                 AlotVersionInfo = new TextureModInstallationInfo(0,0,0,0),
                                                 Author = (string)e.Attribute("author"),
                                                 FriendlyName = (string)e.Attribute("friendlyname"),
@@ -288,16 +298,15 @@ namespace ALOTInstallerCore.Startup
                                                 UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
                                                 TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
                                                 UIPriority = TryConvert.ToInt32(e.Attribute("uipriority")?.Value, 5),
-
+                                                OptionGroup = e.Attribute("optiongroup")?.Value,
                                                 PackageFiles = e.Elements("packagefile")
                                                    .Select(r => new PackageFile
                                                    {
                                                        SourceName = (string)r.Attribute("sourcename"),
-                                                       MoveDirectly = r.Attribute("movedirectly") != null ? true : false,
-                                                       m_me1 = r.Attribute("me1") != null ? true : false,
-                                                       m_me2 = r.Attribute("me2") != null ? true : false,
-                                                       m_me3 = r.Attribute("me3") != null ? true : false,
-                                                       Processed = false
+                                                       MoveDirectly = TryConvert.ToBool(r.Attribute("movedirectly")?.Value, false),
+                                                       m_me1 = TryConvert.ToBool(r.Attribute("me1")?.Value, false),
+                                                       m_me2 = TryConvert.ToBool(r.Attribute("me2")?.Value, false),
+                                                       m_me3 = TryConvert.ToBool(r.Attribute("me3")?.Value, false),
                                                    }).ToList(),
                                                 ExtractionRedirects = e.Elements("extractionredirect")
                                                     .Select(d => new PreinstallMod.ExtractionRedirect
@@ -365,47 +374,49 @@ namespace ALOTInstallerCore.Startup
                                                        Processed = false
                                                    }).ToList(),
 
-                                               // MEUITM stuff, I think
-                                               //ChoiceFiles = e.Elements("choicefile")
-                                               //    .Select(q => new ChoiceFile
-                                               //    {
-                                               //        ChoiceTitle = (string)q.Attribute("choicetitle"),
-                                               //        Choices = q.Elements("packagefile").Select(c => new PackageFile
-                                               //        {
-                                               //            ChoiceTitle = (string)c.Attribute("choicetitle"),
-                                               //            SourceName = (string)c.Attribute("sourcename"),
-                                               //            DestinationName = (string)c.Attribute("destinationname"),
-                                               //            TPFSource = (string)c.Attribute("tpfsource"),
-                                               //            MoveDirectly = c.Attribute("movedirectly") != null ? true : false,
-                                               //            CopyDirectly = c.Attribute("copydirectly") != null ? true : false,
-                                               //            Delete = c.Attribute("delete") != null ? true : false,
-                                               //            ME1 = c.Attribute("me1") != null ? true : false,
-                                               //            ME2 = c.Attribute("me2") != null ? true : false,
-                                               //            ME3 = c.Attribute("me3") != null ? true : false,
-                                               //            Processed = false
-                                               //        }).ToList()
-                                               //    }).ToList(),
-                                               //ZipFiles = e.Elements("zipfile")
-                                               //    .Select(q => new classes.ZipFile
-                                               //    {
-                                               //        ChoiceTitle = (string)q.Attribute("choicetitle"),
-                                               //        Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
-                                               //        DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
-                                               //        InArchivePath = q.Attribute("inarchivepath").Value,
-                                               //        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
-                                               //        DeleteShaders = q.Attribute("deleteshaders") != null ? (bool)q.Attribute("deleteshaders") : false, //me1 only
-                                               //        MEUITMSoftShadows = q.Attribute("meuitmsoftshadows") != null ? (bool)q.Attribute("meuitmsoftshadows") : false, //me1,meuitm only
-                                               //    }).ToList(),
-                                               //CopyFiles = e.Elements("copyfile")
-                                               //    .Select(q => new CopyFile
-                                               //    {
-                                               //        ChoiceTitle = (string)q.Attribute("choicetitle"),
-                                               //        Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
-                                               //        DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
-                                               //        InArchivePath = q.Attribute("inarchivepath").Value,
-                                               //        GameDestinationPath = q.Attribute("gamedestinationpath").Value,
-                                               //    }
-                                               //).ToList(),
+                                               // Configurable mod options
+                                               ChoiceFiles = e.Elements("choicefile")
+                                                   .Select(q => new ChoiceFile
+                                                   {
+                                                       ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                                       Choices = q.Elements("packagefile").Select(c => new PackageFile
+                                                       {
+                                                           ChoiceTitle = (string)c.Attribute("choicetitle"),
+                                                           SourceName = (string)c.Attribute("sourcename"),
+                                                           DestinationName = (string)c.Attribute("destinationname"),
+                                                           TPFSource = (string)c.Attribute("tpfsource"),
+                                                           MoveDirectly = c.Attribute("movedirectly") != null ? true : false,
+                                                           CopyDirectly = c.Attribute("copydirectly") != null ? true : false,
+                                                           Delete = c.Attribute("delete") != null ? true : false,
+                                                           m_me1 = c.Attribute("me1") != null ? true : false,
+                                                           m_me2 = c.Attribute("me2") != null ? true : false,
+                                                           m_me3 = c.Attribute("me3") != null ? true : false,
+                                                           Processed = false
+                                                       }).ToList()
+                                                   }).ToList(),
+                                               // Included zip files
+                                               ZipFiles = e.Elements("zipfile")
+                                                   .Select(q => new ZipFile
+                                                   {
+                                                       ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                                       Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
+                                                       DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
+                                                       InArchivePath = q.Attribute("inarchivepath").Value,
+                                                       GameDestinationPath = q.Attribute("gamedestinationpath").Value,
+                                                       DeleteShaders = q.Attribute("deleteshaders") != null ? (bool)q.Attribute("deleteshaders") : false, //me1 only
+                                                       MEUITMSoftShadows = q.Attribute("meuitmsoftshadows") != null ? (bool)q.Attribute("meuitmsoftshadows") : false, //me1,meuitm only
+                                                   }).ToList(),
+                                               // Files that are copied into game directory
+                                               CopyFiles = e.Elements("copyfile")
+                                                   .Select(q => new CopyFile
+                                                   {
+                                                       ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                                       Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
+                                                       DefaultOption = q.Attribute("default") != null ? (bool)q.Attribute("default") : true,
+                                                       InArchivePath = q.Attribute("inarchivepath").Value,
+                                                       GameDestinationPath = q.Attribute("gamedestinationpath").Value,
+                                                   }
+                                               ).ToList(),
                                            }).OrderBy(p => p.UIPriority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName));
 
                 if (rootElement.Element("soaktestingmemversion") != null)
@@ -449,13 +460,11 @@ namespace ALOTInstallerCore.Startup
             {
                 foreach (var msf in mf.PackageFiles)
                 {
-                    //Damn I did not think this one through very well
-
                     mf.ApplicableGames |= msf.ApplicableGames;
-
                 }
                 if (mf.ApplicableGames == ApplicableGame.None)
                 {
+                    // If none, then all
                     mf.ApplicableGames = ApplicableGame.ME1 | ApplicableGame.ME2 | ApplicableGame.ME3;
                 }
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -8,6 +9,7 @@ using ALOTInstallerConsole.InstallerUI;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Startup;
 using NStack;
 using Terminal.Gui;
@@ -17,7 +19,7 @@ namespace ALOTInstallerConsole.BuilderUI
     public class FileSelectionUIController : UIController
     {
         private InstallerFileDataSource dataSource;
-
+        private ApplicableGame VisibleGames = ApplicableGame.ME1 | ApplicableGame.ME2 | ApplicableGame.ME3;
 
         public override void SetupUI()
         {
@@ -153,6 +155,39 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             Add(changeModeButton);
 
+            CheckBox me1FilterCheckbox = new CheckBox("ME1")
+            {
+                X = Pos.Left(this) + 30,
+                Y = Pos.Bottom(this) - 3,
+                Height = 1,
+                Width = 15,
+                Checked = true,
+                Toggled = x => changeFilter(Enums.MEGame.ME1, !x)
+            };
+            Add(me1FilterCheckbox);
+
+            CheckBox me2FilterCheckbox = new CheckBox("ME2")
+            {
+                X = Pos.Left(this) + 40,
+                Y = Pos.Bottom(this) - 3,
+                Height = 1,
+                Width = 15,
+                Checked = true,
+                Toggled = x => changeFilter(Enums.MEGame.ME2, !x)
+            };
+            Add(me2FilterCheckbox);
+
+            CheckBox me3FilterCheckbox = new CheckBox("ME3")
+            {
+                X = Pos.Left(this) + 50,
+                Y = Pos.Bottom(this) - 3,
+                Height = 1,
+                Width = 15,
+                Checked = true,
+                Toggled = x => changeFilter(Enums.MEGame.ME3, !x)
+            };
+            Add(me3FilterCheckbox);
+
             Button installButton = new Button("Install")
             {
                 X = Pos.Right(this) - 14,
@@ -162,6 +197,17 @@ namespace ALOTInstallerConsole.BuilderUI
                 Clicked = InstallButton_Click
             };
             Add(installButton);
+        }
+
+        private void changeFilter(Enums.MEGame game, bool nowChecked)
+        {
+            Debug.WriteLine($"{game} now checked: {nowChecked}");
+            if (nowChecked)
+                VisibleGames |= game.ToApplicableGame();
+            else
+                VisibleGames &= ~game.ToApplicableGame();
+            Debug.WriteLine($" > {VisibleGames}");
+            RefreshShownFiles();
         }
 
         private void InstallButton_Click()
@@ -298,13 +344,25 @@ namespace ALOTInstallerConsole.BuilderUI
         private void ChangeMode_Clicked()
         {
             var str = Program.ManifestModes.Keys.Select(x => (ustring)x.ToString()).ToArray();
-            var n = MessageBox.Query(50, 7, "Mode selector", "Select a mode for ALOT Installer.", str);
-            Program.CurrentManifestPackage = Program.ManifestModes[Program.ManifestModes.Keys.ToList()[n]];
+            var res =  MessageBox.Query(50, 7, "Mode selector", "Select a mode for ALOT Installer.", str);
+            CurrentMode = Program.ManifestModes.Keys.ToList()[res];
+            RefreshShownFiles();
+        }
+
+        private void RefreshShownFiles()
+        {
+            Program.CurrentManifestPackage = Program.ManifestModes[CurrentMode];
+            //var userFiles = dataSource.InstallerFiles.Where(x => x is UserFile);
             dataSource.InstallerFiles.Clear();
-            dataSource.InstallerFiles.AddRange(Program.CurrentManifestPackage.ManifestFiles);
+            dataSource.InstallerFiles.AddRange(Program.CurrentManifestPackage.ManifestFiles.Where(x=>(x.ApplicableGames & VisibleGames) != 0));
+            //dataSource.InstallerFiles.AddRange(userFiles);
             Application.Refresh();
         }
 
+        /// <summary>
+        /// The current mode
+        /// </summary>
+        public OnlineContent.ManifestMode CurrentMode { get; set; } = OnlineContent.ManifestMode.ALOT;
         public Label FilenameTextBlock { get; set; }
         public Label UnpackedFileHashTextBlock { get; set; }
         public Label UnpackedFilesizeTextBlock { get; set; }

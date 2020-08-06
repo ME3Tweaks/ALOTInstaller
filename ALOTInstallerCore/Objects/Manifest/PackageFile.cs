@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ALOTInstallerCore.Objects
+﻿namespace ALOTInstallerCore.Objects.Manifest
 {
     /// <summary>
     /// A file that is part of a manifest file, after extraction. These files are extracted from their source file and then staged for building into the addon. 

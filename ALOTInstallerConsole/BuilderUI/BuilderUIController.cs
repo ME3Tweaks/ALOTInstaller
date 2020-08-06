@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using ALOTInstallerConsole.InstallerUI;
 using ALOTInstallerCore.Builder;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
+using NStack;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
@@ -43,7 +45,8 @@ namespace ALOTInstallerConsole.BuilderUI
             StageStep ss = new StageStep(installOptions, builderWorker)
             {
                 UpdateStatusCallback = updateStatus,
-                UpdateProgressCallback = updateProgress
+                UpdateProgressCallback = updateProgress,
+                ResolveMutualExclusiveMods = resolveMutualExclusiveMod
             };
             builderWorker.WorkerReportsProgress = true;
             builderWorker.DoWork += ss.PerformStaging;
@@ -51,20 +54,39 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 if (b.Error == null)
                 {
-                    InstallerUIController fsuic = new InstallerUIController();
-                    fsuic.SetInstallPackage(installOptions);
-                    fsuic.SetupUI();
-                    Program.SwapToNewView(fsuic);
+                    if (installOptions.FilesToInstall != null)
+                    {
+                        InstallerUIController installerController = new InstallerUIController();
+                        installerController.SetInstallPackage(installOptions);
+                        installerController.SetupUI();
+                        Program.SwapToNewView(installerController);
+                        return;
+                    }
                 }
                 else
                 {
                     MessageBox.ErrorQuery("Error occured while building textures", $"Error occured while building textures: {b.Error.Message}");
-                    FileSelectionUIController fsuic = new FileSelectionUIController();
-                    fsuic.SetupUI();
-                    Program.SwapToNewView(fsuic);
                 }
+                FileSelectionUIController fsuic = new FileSelectionUIController();
+                fsuic.SetupUI();
+                Program.SwapToNewView(fsuic);
             };
             builderWorker.RunWorkerAsync();
+        }
+
+        private InstallerFile resolveMutualExclusiveMod(List<InstallerFile> arg)
+        {
+            var options = arg.Select(x => (ustring)x.FriendlyName).ToList();
+            int abortIndex = options.Count;
+            options.Add((ustring)"Abort install");
+            int selectedIndex = abortIndex;
+            Application.MainLoop.Invoke(() =>
+            {
+                selectedIndex = MessageBox.Query("Select which file to use",
+                "Only one of the following mods can be installed. Select which one to use:", options.ToArray());
+            });
+            if (selectedIndex == abortIndex) return null;
+            return arg[selectedIndex];
         }
 
         private void InstallerFilePropertyChanged(object sender, PropertyChangedEventArgs e)

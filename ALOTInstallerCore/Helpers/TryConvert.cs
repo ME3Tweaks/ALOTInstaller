@@ -52,5 +52,14 @@ namespace ALOTInstallerCore.Helpers
             }
             return defaultValue;
         }
+
+        public static long ToInt64(string value, long defaultValue)
+        {
+            if (Int64.TryParse(value, out var res))
+            {
+                return res;
+            }
+            return defaultValue;
+        }
     }
 }

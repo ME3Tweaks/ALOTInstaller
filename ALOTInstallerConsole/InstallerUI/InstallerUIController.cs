@@ -69,9 +69,11 @@ namespace ALOTInstallerConsole.InstallerUI
 
         public override void BeginFlow()
         {
+            string installString = null;
             NamedBackgroundWorker installerWorker = new NamedBackgroundWorker("InstallerWorker");
             InstallStep ss = new InstallStep(package)
             {
+                SetInstallString = x=> installString = x,
                 SetTopTextCallback = x => setTextFromThread(topLabel, x),
                 SetMiddleTextCallback = x => setTextFromThread(middleLabel, x),
                 SetBottomTextCallback = x => setTextFromThread(bottomLabel, x),
@@ -81,6 +83,14 @@ namespace ALOTInstallerConsole.InstallerUI
             };
             installerWorker.WorkerReportsProgress = true;
             installerWorker.DoWork += ss.InstallTextures;
+            installerWorker.RunWorkerCompleted += (a, b) =>
+            {
+
+                PostInstallUIController bui = new PostInstallUIController();
+                bui.setInstalledString(installString);
+                bui.SetupUI();
+                Program.SwapToNewView(bui);
+            };
             installerWorker.RunWorkerAsync();
         }
 

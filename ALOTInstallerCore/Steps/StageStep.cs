@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.Objects.Manifest;
 using Serilog;
 using static ALOTInstallerCore.Objects.Enums;
 
@@ -37,6 +38,11 @@ namespace ALOTInstallerCore.Builder
         /// Callback to update the 'overall' progress of this step
         /// </summary>
         public Action<int, int> UpdateProgressCallback { get; set; }
+        /// <summary>
+        /// Callback to allow the UI to prompt the user to choose what mutual exclusive mod to install.
+        /// This callback allows you to return null, which means abort staging.
+        /// </summary>
+        public Func<List<InstallerFile>, InstallerFile> ResolveMutualExclusiveMods { get; set; }
 
         /// <summary>
         /// Extracts an archive file (7z/zip/rar). Returns if a file was extracted or not.
@@ -104,6 +110,14 @@ namespace ALOTInstallerCore.Builder
                 Utilities.DeleteFilesAndFoldersRecursively(stagingDir);
             }
             package.FilesToInstall = getFilesToStage(package.FilesToInstall.Where(x => x.Ready && (x.ApplicableGames & package.InstallTarget.Game.ToApplicableGame()) != 0));
+            package.FilesToInstall = resolveMutualExclusiveGroups();
+            if (package.FilesToInstall == null)
+            {
+                // Abort!
+                Log.Information("A mutual group conflict was not resolved. Staging aborted by user");
+                return;
+            }
+
             Log.Information(@"The following files will be staged for installation:");
             int buildID = 0;
             foreach (var f in package.FilesToInstall)
@@ -156,6 +170,7 @@ namespace ALOTInstallerCore.Builder
                         .Where(x => FiletypeRequiresDecompilation(x));
                     foreach (var sf in subfilesToExtract)
                     {
+                        // todo: Prevent decompilation of package files marked as ProcessAsModFile as it's pointless
                         ExtractTextureContainer(package.InstallTarget.Game, sf, outputDir, f);
                     }
                 }
@@ -172,93 +187,189 @@ namespace ALOTInstallerCore.Builder
             }
         }
 
+        private List<InstallerFile> resolveMutualExclusiveGroups()
+        {
+            var files = new List<InstallerFile>();
+            Dictionary<string, List<InstallerFile>> mutualExclusiveMods = new Dictionary<string, List<InstallerFile>>();
+            foreach (var v in package.FilesToInstall)
+            {
+                if (v is PreinstallMod pm)
+                {
+                    if (pm.OptionGroup != null)
+                    {
+                        if (!mutualExclusiveMods.TryGetValue(pm.OptionGroup, out var _))
+                        {
+                            mutualExclusiveMods[pm.OptionGroup] = new List<InstallerFile>();
+                        }
+                        mutualExclusiveMods[pm.OptionGroup].Add(pm);
+                    }
+                }
+                else
+                {
+                    files.Add(v);
+                }
+            }
+
+            foreach (var pair in mutualExclusiveMods)
+            {
+                if (pair.Value.Count > 1)
+                {
+                    // Has issue
+                    var chosenFile = ResolveMutualExclusiveMods?.Invoke(pair.Value);
+                    if (chosenFile == null) return null;//abort
+                    files.Add(chosenFile);
+                }
+            }
+            //foreach (var groupsWithIssues in )
+
+            return files;
+        }
+
         /// <summary>
         /// Copies files from the source directory to the stagingDest according to the items listed in the installer file. THE SOURCE DIRECTORY WILL BE DELETED AFTER STAGING HAS COMPLETED!
         /// </summary>
         /// <param name="installerFile"></param>
-        /// <param name="sourceDirectory"></param>
-        /// <param name="stagingDest"></param>
-        private void StageForBuilding(InstallerFile installerFile, string sourceDirectory, string stagingDest, string finalDest, MEGame targetGame)
+        /// <param name="sourceDirectory">Where files are extracted to prior to being staged</param>
+        /// <param name="compilingStagingDest">Where files are staged to to be compiled into a .mem file</param>
+        /// <param name="finalDest">Where compiled (.mem) files for installation will be placed</param>
+        private void StageForBuilding(InstallerFile installerFile, string sourceDirectory, string compilingStagingDest, string finalDest, MEGame targetGame)
         {
             if (installerFile is ManifestFile mf)
             {
                 var filesInSource = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.AllDirectories);
-                int numPackageFiles = mf.PackageFiles.Count;
+                int numPackageFiles = mf.PackageFiles.Count + mf.ChoiceFiles.Count + mf.ZipFiles.Count + mf.CopyFiles.Count;
                 if (numPackageFiles > 0)
                 {
                     int numPackageFilesStaged = 0;
                     foreach (var pf in mf.PackageFiles)
                     {
-                        // Stage package files
-                        if (!pf.Processed && pf.ApplicableGames.HasFlag(targetGame.ToApplicableGame()))
+                        stagePackageFile(mf, pf, compilingStagingDest, finalDest, filesInSource, ref numPackageFilesStaged, numPackageFiles);
+                    }
+
+                    foreach (var cf in mf.ChoiceFiles)
+                    {
+                        // Stage choice files
+                        var chosenOption = cf.GetChosenFile();
+                        if (chosenOption != null)
                         {
-                            var matchingFile = filesInSource.FirstOrDefault(x =>
-                                Path.GetFileName(x).Equals(pf.SourceName, StringComparison.InvariantCultureIgnoreCase));
-                            if (matchingFile != null)
-                            {
-                                // found file to stage.
-                                string extension = Path.GetExtension(matchingFile);
-                                if (pf.MoveDirectly && extension == ".mem")
-                                {
-                                    // Directly move .mem file to output
-                                    var destinationF = Path.Combine(finalDest, $"{installerFile.BuildID:D3}_{pf.SourceName}");
-                                    Log.Information($"Moving .mem file to builtdir: {pf.SourceName} -> {destinationF}");
+                            Log.Information($"Option chosen on {mf.FriendlyName}, using choicefile {cf.ChoiceTitle}: {cf.GetChosenFile()}");
+                            stagePackageFile(mf, cf.GetChosenFile(), compilingStagingDest, finalDest, filesInSource, ref numPackageFilesStaged, numPackageFiles);
+                        }
+                        else
+                        {
+                            Log.Information($"Not installing {cf.ChoiceTitle}");
+                        }
+                    }
 
-                                    File.Move(matchingFile, destinationF, true);
-                                    pf.Processed = true;
-                                    continue;
-                                }
+                    //CopyFile and ZipFiles must be staged or they will simply be deleted
+                    int stagedID = 1;
+                    foreach (ZipFile zip in mf.ZipFiles)
+                    {
+                        if (zip.IsSelectedForInstallation())
+                        {
+                            string zipfile = Path.Combine(sourceDirectory, zip.InArchivePath);
+                            string stagedPath = Path.Combine(finalDest, $"{mf.BuildID}_{stagedID}_{Path.GetFileName(zip.InArchivePath)}");
+                            File.Move(zipfile, stagedPath);
+                            zip.StagedPath = stagedPath;
+                            zip.ID = stagedID;
+                            stagedID++;
+                        }
+                    }
 
-                                if (pf.MoveDirectly)
-                                {
-                                    // not mem file. Move to staging
-                                    var destinationF = Path.Combine(stagingDest, pf.DestinationName ?? pf.SourceName);
-                                    Log.Information($"Moving package file to staging: {pf.SourceName} -> {pf.DestinationName ?? pf.SourceName}");
-                                    File.Move(matchingFile, destinationF, true);
-                                    pf.Processed = true;
-                                    continue;
-                                }
-
-                                //if (pf.CopyDirectly)
-                                //{
-                                //    var destinationF = Path.Combine(stagingDest, pf.DestinationName);
-                                //    File.Copy(matchingFile, destinationF, true);
-                                //    pf.Processed = true;
-                                //    continue;
-                                //}
-
-                                if (pf.DestinationName != null)
-                                {
-                                    // Found file to stage
-                                    Log.Information($"Copying package file: {pf.SourceName} -> {pf.DestinationName}");
-                                    string destinationF = Path.Combine(stagingDest, pf.DestinationName);
-                                    File.Copy(matchingFile, destinationF, true);
-                                    numPackageFilesStaged++;
-                                    installerFile.StatusText = $"Staging files {numPackageFilesStaged}/{numPackageFiles}";
-                                    pf.Processed = true;
-                                }
-                                else if (pf.DestinationName == null)
-                                {
-                                    Log.Error(
-                                        $"Package file destinationname value is null. This is an error in the manifest file, please contact the developers. File: {installerFile.FriendlyName}, PackageFile: {pf.SourceName}");
-                                }
-                            }
-                            else
-                            {
-                                Log.Error("File specified by manifest doesn't exist after extraction: " +
-                                          pf.SourceName);
-                            }
+                    stagedID = 1;
+                    foreach (CopyFile copy in mf.CopyFiles)
+                    {
+                        if (copy.IsSelectedForInstallation())
+                        {
+                            string singleFile = Path.Combine(sourceDirectory, copy.InArchivePath);
+                            string stagedPath = Path.Combine(finalDest, $"{mf.BuildID}_{stagedID}_{Path.GetFileName(copy.InArchivePath)}");
+                            File.Move(singleFile, stagedPath);
+                            copy.StagedPath = stagedPath;
+                            copy.ID = stagedID; //still useful?
+                            stagedID++;
                         }
                     }
 
                     if (mf.PackageFiles.Any(x => !x.Processed && x.ApplicableGames.HasFlag(targetGame.ToApplicableGame())))
                     {
-                        Debug.WriteLine(":(");
+                        Log.Warning("Not all package files were marked as processed!");
                     }
                     installerFile.StatusText = "Cleaning temporary files";
-                    // todo: uncomment this
                     Utilities.DeleteFilesAndFoldersRecursively(sourceDirectory);
                     installerFile.StatusText = "Staged for building";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Stages a package file for install. This method is broken out to support objects that support encapsulating package files as sub objects
+        /// </summary>
+        /// <param name="installerFile"></param>
+        /// <param name="pf"></param>
+        /// <param name="compilingStagingDest"></param>
+        /// <param name="finalDest"></param>
+        /// <param name="filesInSource"></param>
+        /// <param name="numPackageFilesStaged"></param>
+        /// <param name="numPackageFiles"></param>
+        private void stagePackageFile(InstallerFile installerFile, PackageFile pf, string compilingStagingDest, string finalDest, string[] filesInSource, ref int numPackageFilesStaged, int numPackageFiles)
+        {
+            // Stage package files
+            if (!pf.Processed && pf.ApplicableGames.HasFlag(package.InstallTarget.Game.ToApplicableGame()))
+            {
+                var matchingFile = filesInSource.FirstOrDefault(x => Path.GetFileName(x).Equals(Path.GetFileName(pf.SourceName), StringComparison.InvariantCultureIgnoreCase));
+                if (matchingFile != null)
+                {
+                    // found file to stage.
+                    string extension = Path.GetExtension(matchingFile);
+                    if (pf.MoveDirectly && extension == ".mem")
+                    {
+                        // Directly move .mem file to output
+                        var destinationF = Path.Combine(finalDest, $"{installerFile.BuildID:D3}_{Path.GetFileName(pf.SourceName)}");
+                        Log.Information($"Moving .mem file to builtdir: {pf.SourceName} -> {destinationF}");
+
+                        File.Move(matchingFile, destinationF, true);
+                        pf.Processed = true;
+                        return;
+                    }
+
+                    if (pf.MoveDirectly)
+                    {
+                        // not mem file. Move to staging
+                        var destinationF = Path.Combine(compilingStagingDest, pf.DestinationName ?? pf.SourceName);
+                        Log.Information($"Moving package file to staging: {pf.SourceName} -> {pf.DestinationName ?? pf.SourceName}");
+                        File.Move(matchingFile, destinationF, true);
+                        pf.Processed = true;
+                        return;
+                    }
+
+                    //if (pf.CopyDirectly)
+                    //{
+                    //    var destinationF = Path.Combine(stagingDest, pf.DestinationName);
+                    //    File.Copy(matchingFile, destinationF, true);
+                    //    pf.Processed = true;
+                    //    continue;
+                    //}
+
+                    if (pf.DestinationName != null)
+                    {
+                        // Found file to stage
+                        Log.Information($"Copying package file: {pf.SourceName} -> {pf.DestinationName}");
+                        string destinationF = Path.Combine(compilingStagingDest, pf.DestinationName);
+                        File.Copy(matchingFile, destinationF, true);
+                        numPackageFilesStaged++;
+                        installerFile.StatusText = $"Staging files {numPackageFilesStaged}/{numPackageFiles}";
+                        pf.Processed = true;
+                    }
+                    else if (pf.DestinationName == null)
+                    {
+                        Log.Error(
+                            $"Package file destinationname value is null. This is an error in the manifest file, please contact the developers. File: {installerFile.FriendlyName}, PackageFile: {pf.SourceName}");
+                    }
+                }
+                else
+                {
+                    Log.Error("File specified by manifest doesn't exist after extraction: " +
+                              pf.SourceName);
                 }
             }
         }
