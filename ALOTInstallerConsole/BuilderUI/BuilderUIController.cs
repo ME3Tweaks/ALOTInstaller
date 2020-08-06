@@ -80,11 +80,8 @@ namespace ALOTInstallerConsole.BuilderUI
             int abortIndex = options.Count;
             options.Add((ustring)"Abort install");
             int selectedIndex = abortIndex;
-            Application.MainLoop.Invoke(() =>
-            {
-                selectedIndex = MessageBox.Query("Select which file to use",
-                "Only one of the following mods can be installed. Select which one to use:", options.ToArray());
-            });
+            selectedIndex = MessageBox.Query("Select which file to use",
+            "Only one of the following mods can be installed. Select which one to use:", options.ToArray());
             if (selectedIndex == abortIndex) return null;
             return arg[selectedIndex];
         }
