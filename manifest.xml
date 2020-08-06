@@ -732,8 +732,14 @@
 
    <!-- These are Mod Manager mods. They must be explicitly supported to work through the installer core -->
    <!-- Preinstallmod objects are supersets of the manifestfiles, in that they support the same features (packagefile) but will have their archive extracted after dlc is unpacked, but before game scan takes place. -->
-   <preinstallmod friendlyname="A Lot of Videos for ME1" author="Audemus" optional="true" group="ME1ALOV">
+   <preinstallmod friendlyname="A Lot of Videos for ME1 (1080p)" author="Audemus" optional="true" optiongroup="ME1ALOV">
       <file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files" filename="ALOV for ME1 v2.1.1 - (1080p)-144-2-1-1-1591487930.7z" torrentfilename="ALotofVideosforME1_2.1.1_1080p.7z" md5="3a96f6b2cbd6c676eccfcc8a03d55da8" size="2546147996"/>
+      <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC"/>
+      <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC" optionalrequireddlc="DLC_UNC"/>
+      <games me1="true" me2="false" me3="false" />
+   </preinstallmod>
+   <preinstallmod friendlyname="A Lot of Videos for ME1 (4K)" author="Audemus" optional="true" optiongroup="ME1ALOV">
+      <file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files" filename="UNKNOWN_ALOME1_4K.7z" torrentfilename="ALotofVideosforME1_2.0_4K.7z" md5="4f04d6b0d20201fe8b328d5c36ac78ed" size="4331336666"/>
       <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC"/>
       <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC" optionalrequireddlc="DLC_UNC"/>
       <games me1="true" me2="false" me3="false" />
