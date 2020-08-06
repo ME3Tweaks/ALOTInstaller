@@ -237,13 +237,13 @@ namespace ALOTInstallerCore.Builder
             if (installerFile is ManifestFile mf)
             {
                 var filesInSource = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.AllDirectories);
-                int numPackageFiles = mf.PackageFiles.Count + mf.ChoiceFiles.Count + mf.ZipFiles.Count + mf.CopyFiles.Count;
+                int? numPackageFiles = mf.PackageFiles.Count + mf.ChoiceFiles?.Count + mf.ZipFiles?.Count + mf.CopyFiles?.Count;
                 if (numPackageFiles > 0)
                 {
                     int numPackageFilesStaged = 0;
                     foreach (var pf in mf.PackageFiles)
                     {
-                        stagePackageFile(mf, pf, compilingStagingDest, finalDest, filesInSource, ref numPackageFilesStaged, numPackageFiles);
+                        stagePackageFile(mf, pf, compilingStagingDest, finalDest, filesInSource, ref numPackageFilesStaged, numPackageFiles.Value);
                     }
 
                     foreach (var cf in mf.ChoiceFiles)
@@ -253,7 +253,7 @@ namespace ALOTInstallerCore.Builder
                         if (chosenOption != null)
                         {
                             Log.Information($"Option chosen on {mf.FriendlyName}, using choicefile {cf.ChoiceTitle}: {cf.GetChosenFile()}");
-                            stagePackageFile(mf, cf.GetChosenFile(), compilingStagingDest, finalDest, filesInSource, ref numPackageFilesStaged, numPackageFiles);
+                            stagePackageFile(mf, cf.GetChosenFile(), compilingStagingDest, finalDest, filesInSource, ref numPackageFilesStaged, numPackageFiles.Value);
                         }
                         else
                         {
