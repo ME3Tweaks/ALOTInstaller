@@ -157,7 +157,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
             CheckBox me1FilterCheckbox = new CheckBox("ME1")
             {
-                X = Pos.Left(this) + 30,
+                X = Pos.Left(this) + 29,
                 Y = Pos.Bottom(this) - 3,
                 Height = 1,
                 Width = 15,
@@ -168,7 +168,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
             CheckBox me2FilterCheckbox = new CheckBox("ME2")
             {
-                X = Pos.Left(this) + 40,
+                X = Pos.Left(this) + 37,
                 Y = Pos.Bottom(this) - 3,
                 Height = 1,
                 Width = 15,
@@ -179,7 +179,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
             CheckBox me3FilterCheckbox = new CheckBox("ME3")
             {
-                X = Pos.Left(this) + 50,
+                X = Pos.Left(this) + 45,
                 Y = Pos.Bottom(this) - 3,
                 Height = 1,
                 Width = 15,
@@ -188,15 +188,31 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             Add(me3FilterCheckbox);
 
+            Add(new Button("Import assistant")
+            {
+                X = Pos.Right(this) - 34,
+                Y = Pos.Bottom(this) - 3,
+                Height = 1,
+                Width = 20,
+                Clicked = ImportAssistant_Click
+            });
+
             Button installButton = new Button("Install")
             {
-                X = Pos.Right(this) - 14,
+                X = Pos.Right(this) - 13,
                 Y = Pos.Bottom(this) - 3,
                 Height = 1,
                 Width = 11,
                 Clicked = InstallButton_Click
             };
             Add(installButton);
+        }
+
+        private void ImportAssistant_Click()
+        {
+            LibraryImporterUIController luic = new LibraryImporterUIController();
+            luic.SetupUI();
+            Program.SwapToNewView(luic);
         }
 
         private void changeFilter(Enums.MEGame game, bool nowChecked)

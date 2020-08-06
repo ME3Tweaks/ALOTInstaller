@@ -19,10 +19,6 @@ namespace ALOTInstallerConsole
             var startupUI = new BuilderUI.StartupUIController();
             startupUI.SetupUI();
             Program.SwapToNewView(startupUI);
-
-            //var bui = new BuilderUI.BuilderUIController();
-            //bui.SetupUI();
-            //Program.SwapToNewView(bui);
         }
 
 
@@ -44,6 +40,10 @@ namespace ALOTInstallerConsole
             Hook.SetLogger(Log.Logger);
         }
 
+        /// <summary>
+        /// Swaps the current top level UIController (if any) with another one.
+        /// </summary>
+        /// <param name="controller"></param>
         public static void SwapToNewView(UIController controller)
         {
             Application.RequestStop();

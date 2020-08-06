@@ -53,6 +53,7 @@ namespace ALOTInstallerCore.Helpers
         /// Allows updating to beta, prerelease versions of items
         /// </summary>
         public static bool BetaMode { get; set; }
+        public static bool MoveFilesWhenImporting { get; set; }
 
 
         /*
@@ -203,6 +204,7 @@ namespace ALOTInstallerCore.Helpers
         {
             TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, @"Downloaded_Mods");
             BuildLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, @"Staging");
+            MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
             //Language = LoadSettingString(settingsIni, "ModManager", "Language", "int");
             //LastContentCheck = LoadSettingDateTime(settingsIni, "ModManager", "LastContentCheck", DateTime.MinValue);
             //BetaMode = LoadSettingBool(settingsIni, "ModManager", "BetaMode", false);
@@ -281,6 +283,20 @@ namespace ALOTInstallerCore.Helpers
             if (int.TryParse(ini[section][key]?.Value, out var intValue))
             {
                 return intValue;
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+
+
+        private static bool LoadSettingBool(SettingsKeys.SettingKeys key, bool defaultValue)
+        {
+            var regSetting = RegistryHandler.GetRegistrySettingBool(SettingsKeys.SettingsKeyMapping[key]);
+            if (regSetting.HasValue)
+            {
+                return regSetting.Value;
             }
             else
             {
