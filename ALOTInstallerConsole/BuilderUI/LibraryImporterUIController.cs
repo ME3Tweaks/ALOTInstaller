@@ -49,7 +49,7 @@ namespace ALOTInstallerConsole.BuilderUI
                             .UserProfile) //Default to user profile cause idk if there is easy way to get downloads folder on linux
                 };
                 Application.Run(selector);
-                if (selector.FilePaths.Any())
+                if (!selector.Canceled && selector.FilePaths.Any())
                 {
                     ProgressDialog pd = new ProgressDialog("Importing files from folder", "Please wait while files are imported.");
                     NamedBackgroundWorker nbw = new NamedBackgroundWorker("ImportFromFolderThread");
@@ -88,7 +88,7 @@ namespace ALOTInstallerConsole.BuilderUI
                                     else
                                     {
                                         MessageBox.Query("No files imported",
-                                            "No manifest files were found in the specified directory (that were not already imported).",
+                                            $"No manifest files were found in the specified directory (that were not already imported):\n{selector.FilePaths.First()}",
                                             "OK");
                                     }
                                 });
