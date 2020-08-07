@@ -15,5 +15,10 @@ namespace ALOTInstallerConsole
         /// This method will be called right before the UI is attached, but after the prevoius one has been removed.
         /// </summary>
         public abstract void BeginFlow();
+
+        /// <summary>
+        /// Signals to the UIController that it is about to stop, and that event listeners should be unhooked
+        /// </summary>
+        public abstract void SignalStopping();
     }
 }

@@ -331,6 +331,7 @@ namespace ALOTInstallerConsole.BuilderUI
                         RepackGameFiles = true //needs option
                     });
                     builderUI.SetupUI();
+                    TextureLibrary.StopLibraryWatcher(); // Kill watcher
                     Program.SwapToNewView(builderUI);
 
                     //var installerUI = new InstallerUIController();
@@ -413,10 +414,18 @@ namespace ALOTInstallerConsole.BuilderUI
         public Label AuthorTextBlock { get; set; }
         public Label AppliesToGamesTextBlock { get; private set; }
 
+        private void ManifestFileReadyStatusChanged(ManifestFile mf)
+        {
+            Application.Refresh();
+        }
         public override void BeginFlow()
         {
-            // Disabled for now.
-            //TextureLibrary.SetupLibraryWatcher();
+            TextureLibrary.SetupLibraryWatcher(Program.CurrentManifestPackage.ManifestFiles.OfType<ManifestFile>().ToList(), ManifestFileReadyStatusChanged);
+        }
+
+        public override void SignalStopping()
+        {
+            
         }
 
         internal class InstallerFileDataSource : IListDataSource

@@ -74,6 +74,11 @@ namespace ALOTInstallerConsole.BuilderUI
             builderWorker.RunWorkerAsync();
         }
 
+        public override void SignalStopping()
+        {
+            
+        }
+
         private InstallerFile resolveMutualExclusiveMod(List<InstallerFile> arg)
         {
             var options = arg.Select(x => (ustring)x.FriendlyName).ToList();

@@ -94,6 +94,11 @@ namespace ALOTInstallerConsole.InstallerUI
             installerWorker.RunWorkerAsync();
         }
 
+        public override void SignalStopping()
+        {
+            
+        }
+
         private void setVisibilityFromThread(Label label, bool visible)
         {
             Application.MainLoop.Invoke(() =>

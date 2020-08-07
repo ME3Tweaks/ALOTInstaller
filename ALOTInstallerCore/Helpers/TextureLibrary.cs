@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using ALOTInstallerCore.Startup;
 using Serilog;
 
 namespace ALOTInstallerCore.Helpers
@@ -18,35 +19,44 @@ namespace ALOTInstallerCore.Helpers
     public static class TextureLibrary
     {
         private static FileSystemWatcher watcher;
-        public static void SetupLibraryWatcher()
+        private static List<ManifestFile> manifestFiles;
+        private static Action<ManifestFile> readyStatusChanged;
+        public static void SetupLibraryWatcher(List<ManifestFile> manifestFiles, Action<ManifestFile> readyStatusChanged)
         {
+            TextureLibrary.manifestFiles = manifestFiles;
+            TextureLibrary.readyStatusChanged = readyStatusChanged;
+            Debug.WriteLine("Starting filesystem watcher on " + Settings.TextureLibraryLocation);
             if (watcher != null)
             {
-                watcher.Changed -= OnLibraryFileChanged;
-                watcher.Created -= OnLibraryFileChanged;
-                watcher.Deleted -= OnLibraryFileChanged;
-                watcher.Renamed -= OnLibraryFileChanged;
-                watcher.Dispose();
+                StopLibraryWatcher();
             }
             watcher = new FileSystemWatcher(Settings.TextureLibraryLocation)
             {
                 NotifyFilter = NotifyFilters.LastWrite
                                  | NotifyFilters.FileName
                                  | NotifyFilters.Size,
-
-                Filter = "*.zip;*.tpf;*.mem;*.rar;*.7z"
+                Filters = { "*.zip", "*.tpf", "*.mem", "*.rar", "*.7z" }
             };
-
             // Add event handlers.
             watcher.Changed += OnLibraryFileChanged;
             watcher.Created += OnLibraryFileChanged;
             watcher.Deleted += OnLibraryFileChanged;
             watcher.Renamed += OnLibraryFileChanged;
+            watcher.EnableRaisingEvents = true;
         }
 
         private static void OnLibraryFileChanged(object sender, FileSystemEventArgs e)
         {
-            Debug.WriteLine("Change " + e.ChangeType);
+            if (e.Name != null)
+            {
+                Debug.WriteLine($"Change {e.ChangeType} for {e.Name}");
+                var matchingManifestFile = manifestFiles.Find(x =>
+                    Path.GetFileName(x.GetUsedFilepath()).Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
+                if (matchingManifestFile?.UpdateReadyStatus() ?? false)
+                {
+                    readyStatusChanged?.Invoke(matchingManifestFile);
+                }
+            }
         }
 
         /// <summary>
@@ -54,7 +64,7 @@ namespace ALOTInstallerCore.Helpers
         /// </summary>
         /// <param name="folder"></param>
         /// <param name="manifestFiles"></param>
-        public static void ImportFromFolder(string folder, List<ManifestFile> manifestFiles, Action<long, long> progressCallback = null, Action<List<ManifestFile>> importFinishedResultsCallback = null)
+        public static void ImportFromFolder(string folder, List<ManifestFile> manifestFiles, Action<string, long, long> progressCallback = null, Action<List<ManifestFile>> importFinishedResultsCallback = null)
         {
             // Todo: support (1), (2), etc extensions on filenames due to duplicates.
             object syncObj = new object();
@@ -65,18 +75,17 @@ namespace ALOTInstallerCore.Helpers
             {
                 void importFinished(bool imported, string failureReason)
                 {
-                    lock (syncObj)
-                    {
-                        Monitor.Pulse(syncObj);
-                    }
-
                     if (imported)
                     {
-                        manifestFiles.Add(v);
+                        importedFiles.Add(v);
                     }
                     else
                     {
                         Log.Error($"Error importing file: {failureReason}");
+                    }
+                    lock (syncObj)
+                    {
+                        Monitor.Pulse(syncObj);
                     }
                 }
                 // Main file
@@ -138,7 +147,7 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="fileImported">Notification when file is imported, and the result</param>
         /// <param name="progressCallback">Callback to be notified of progress (copy mode only)</param>
         /// <returns>True if an import is being attempted, false if no attempt at import occured.</returns>
-        public static bool AttemptImportManifestFile(string filename, List<ManifestFile> manifestFiles, Action<bool, string> fileImported, Action<long, long> progressCallback = null)
+        public static bool AttemptImportManifestFile(string filename, List<ManifestFile> manifestFiles, Action<bool, string> fileImported, Action<string, long, long> progressCallback = null)
         {
             var fsize = new FileInfo(filename).Length;
             var matchingMF = manifestFiles.FirstOrDefault(x => Path.GetFileName(filename).Equals(x.Filename, StringComparison.InvariantCultureIgnoreCase) && x.FileSize == fsize);
@@ -177,7 +186,7 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="isUnpacked"></param>
         /// <param name="progressCallback"></param>
         /// <param name="importFinishedCallback"></param>
-        private static void importFileToLibrary(ManifestFile mf, string sourceFile, bool isUnpacked, Action<long, long> progressCallback = null, Action<bool, string> importFinishedCallback = null)
+        private static void importFileToLibrary(ManifestFile mf, string sourceFile, bool isUnpacked, Action<string, long, long> progressCallback = null, Action<bool, string> importFinishedCallback = null)
         {
             Log.Information($"Importing {sourceFile} into texture library");
             // This may need to be WINDOWS ONLY for roots
@@ -191,10 +200,6 @@ namespace ALOTInstallerCore.Helpers
                 {
                     Log.Error($"Error importing {sourceFile}: {b.Error.Message}");
                     importFinishedCallback?.Invoke(false, $"An error occured while importing {sourceFile}: {b.Error.Message}");
-                }
-                else
-                {
-                    importFinishedCallback?.Invoke((bool)b.Result, null);
                 }
             };
             nbw.DoWork += (a, b) =>
@@ -220,7 +225,7 @@ namespace ALOTInstallerCore.Helpers
                     WebClient downloadClient = new WebClient();
                     downloadClient.DownloadProgressChanged += (s, e) =>
                     {
-                        progressCallback?.Invoke(e.BytesReceived, e.TotalBytesToReceive);
+                        progressCallback?.Invoke(mf.FriendlyName, e.BytesReceived, e.TotalBytesToReceive);
                     };
                     downloadClient.DownloadFileCompleted += async (s, e) =>
                     {
@@ -246,6 +251,25 @@ namespace ALOTInstallerCore.Helpers
                 }
             };
             nbw.RunWorkerAsync();
+        }
+
+        /// <summary>
+        /// Unhooks and stops the library watcher
+        /// </summary>
+        public static void StopLibraryWatcher()
+        {
+            readyStatusChanged = null;
+            manifestFiles = null;
+            if (watcher != null)
+            {
+                watcher.EnableRaisingEvents = false;
+                watcher.Changed -= OnLibraryFileChanged;
+                watcher.Created -= OnLibraryFileChanged;
+                watcher.Deleted -= OnLibraryFileChanged;
+                watcher.Renamed -= OnLibraryFileChanged;
+                watcher.Dispose();
+                watcher = null;
+            }
         }
     }
 }

@@ -466,8 +466,9 @@ namespace ALOTInstallerCore.Objects.Manifest
         //        }
         //    }
         public override string ToString() => FriendlyName;
-        public override void UpdateReadyStatus()
+        public override bool UpdateReadyStatus()
         {
+            var oldReady = Ready;
             var fp = GetUsedFilepath();
             if (File.Exists(fp))
             {
@@ -475,16 +476,17 @@ namespace ALOTInstallerCore.Objects.Manifest
                 if (Path.GetFileName(fp) == Filename || (TorrentFilename != null && Path.GetFileName(fp).Equals(TorrentFilename)))
                 {
                     Ready = filesize == FileSize;
-                    return;
+                    return oldReady != Ready;
                 }
 
                 if (UnpackedSingleFilename != null && Path.GetFileName(fp).Equals(UnpackedSingleFilename))
                 {
                     Ready = filesize == UnpackedFileSize;
-                    return;
+                    return oldReady != Ready;
                 }
             }
             Ready = false;
+            return oldReady != Ready;
         }
 
         /// <summary>

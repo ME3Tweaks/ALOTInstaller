@@ -16,6 +16,7 @@ namespace ALOTInstallerConsole
             SetupLogger();
             Application.Init();
             ManifestModes[OnlineContent.ManifestMode.None] = new OnlineContent.ManifestPackage(); //blank
+            CurrentManifestPackage = ManifestModes[OnlineContent.ManifestMode.None];
             var startupUI = new BuilderUI.StartupUIController();
             startupUI.SetupUI();
             Program.SwapToNewView(startupUI);
@@ -46,6 +47,7 @@ namespace ALOTInstallerConsole
         /// <param name="controller"></param>
         public static void SwapToNewView(UIController controller)
         {
+            controller.SignalStopping();
             Application.RequestStop();
             controller.BeginFlow();
             Application.Run(controller);

@@ -110,10 +110,10 @@ namespace ALOTInstallerCore.Objects
         public int BuildID { get; set; }
 
         /// <summary>
-        /// Refreshes the Ready status for this file.
+        /// Refreshes the Ready status for this file. Returns if the ready status changed due to this call.
         /// </summary>
         /// <returns></returns>
-        public abstract void UpdateReadyStatus();
+        public abstract bool UpdateReadyStatus();
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -78,6 +78,11 @@ namespace ALOTInstallerConsole.BuilderUI
             bw.RunWorkerAsync();
         }
 
+        public override void SignalStopping()
+        {
+            
+        }
+
         public override void SetupUI()
         {
             //var top = Application.Top;

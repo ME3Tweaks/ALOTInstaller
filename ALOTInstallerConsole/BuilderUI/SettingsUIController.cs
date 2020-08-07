@@ -290,5 +290,10 @@ namespace ALOTInstallerConsole.BuilderUI
         {
 
         }
+
+        public override void SignalStopping()
+        {
+            
+        }
     }
 }

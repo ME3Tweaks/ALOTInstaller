@@ -59,5 +59,10 @@ namespace ALOTInstallerConsole.InstallerUI
         {
 
         }
+
+        public override void SignalStopping()
+        {
+            
+        }
     }
 }
