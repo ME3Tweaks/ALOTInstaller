@@ -183,7 +183,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 DirectoryPath = Directory.Exists(Settings.BuildLocation) ? Settings.BuildLocation : null
             };
             Application.Run(selector);
-            if (!selector.Canceled && selector.FilePaths.Any())
+            if (!selector.Canceled && selector.FilePath != null && Directory.Exists(selector.FilePath.ToString()))
             {
                 buildLocation.Text = Settings.BuildLocation = selector.FilePaths.First();
                 Settings.Save();
@@ -199,7 +199,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 DirectoryPath = Directory.Exists(Settings.TextureLibraryLocation) ? Settings.TextureLibraryLocation : null
             };
             Application.Run(selector);
-            if (!selector.Canceled && selector.FilePaths.Any())
+            if (!selector.Canceled && selector.FilePath != null && Directory.Exists(selector.FilePath.ToString()))
             {
                 textureLibraryLocation.Text = Settings.TextureLibraryLocation = selector.FilePaths.First();
                 Settings.Save();
@@ -215,7 +215,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 AllowedFileTypes = new[] { ".exe" },
             };
             Application.Run(selector);
-            if (!selector.Canceled && selector.FilePaths.Any())
+            if (!selector.Canceled && selector.FilePaths.Any() && File.Exists(selector.FilePaths.First()))
             {
                 var target = new GameTarget(Enums.MEGame.ME1, selector.FilePaths.First(), false, false);
                 var invalidReason = target.ValidateTarget();
@@ -239,7 +239,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 AllowedFileTypes = new[] { ".exe" },
             };
             Application.Run(selector);
-            if (!selector.Canceled && selector.FilePaths.Any())
+            if (!selector.Canceled && selector.FilePaths.Any() && File.Exists(selector.FilePaths.First()))
             {
                 var target = new GameTarget(Enums.MEGame.ME2, selector.FilePaths.First(), false, false);
                 var invalidReason = target.ValidateTarget();
@@ -263,7 +263,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 AllowedFileTypes = new[] {".exe"},
             };
             Application.Run(selector);
-            if (!selector.Canceled && selector.FilePaths.Any())
+            if (!selector.Canceled && selector.FilePaths.Any() && File.Exists(selector.FilePaths.First()))
             {
                 var target = new GameTarget(Enums.MEGame.ME3, selector.FilePaths.First(), false, false);
                 var invalidReason = target.ValidateTarget();

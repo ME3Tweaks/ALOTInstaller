@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using ALOTInstallerConsole.UserControls;
@@ -40,7 +41,7 @@ namespace ALOTInstallerConsole.BuilderUI
             if (Program.ManifestModes.TryGetValue(OnlineContent.ManifestMode.ALOT, out var manifestP))
             {
                 OpenDialog selector = new OpenDialog("Select location to import files from",
-                    "Select a folder containing manifest files, such as your downloads folder.")
+                    "Select a folder containing manifest files, such as your downloads folder.\nSelect Open once you are in the folder you wish to choose.")
                 {
                     CanChooseDirectories = true,
                     CanChooseFiles = false,
@@ -49,13 +50,14 @@ namespace ALOTInstallerConsole.BuilderUI
                             .UserProfile) //Default to user profile cause idk if there is easy way to get downloads folder on linux
                 };
                 Application.Run(selector);
-                if (!selector.Canceled && selector.FilePaths.Any())
+                Debug.WriteLine(selector.FilePath);
+                if (!selector.Canceled && selector.DirectoryPath != null && Directory.Exists(selector.DirectoryPath.ToString()))
                 {
                     ProgressDialog pd = new ProgressDialog("Importing files from folder", "Please wait while files are imported.");
                     NamedBackgroundWorker nbw = new NamedBackgroundWorker("ImportFromFolderThread");
                     nbw.DoWork += (a, b) =>
                     {
-                        TextureLibrary.ImportFromFolder(selector.FilePaths[0],
+                        TextureLibrary.ImportFromFolder(selector.DirectoryPath.ToString(),
                             manifestP.ManifestFiles.OfType<ManifestFile>().ToList(),
                             (uiString, d, t) =>
                             {
@@ -88,7 +90,7 @@ namespace ALOTInstallerConsole.BuilderUI
                                     else
                                     {
                                         MessageBox.Query("No files imported",
-                                            $"No manifest files were found in the specified directory (that were not already imported):\n{selector.FilePaths.First()}",
+                                            $"No manifest files were found in the specified directory (that were not already imported):\n{selector.DirectoryPath}",
                                             "OK");
                                     }
                                 });
@@ -96,7 +98,6 @@ namespace ALOTInstallerConsole.BuilderUI
                         );
                     };
                     nbw.RunWorkerAsync();
-                    Debug.WriteLine("RUN");
                     Application.Run(pd); //can this be run from background thread?
                 }
             }

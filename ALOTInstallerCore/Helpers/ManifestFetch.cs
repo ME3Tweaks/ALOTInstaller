@@ -22,6 +22,16 @@ namespace ALOTInstallerCore.Startup
     {
         // ManifestFetch handles downloading and loading the ALOT manifest.
 
+        /// <summary>
+        /// List of ME2 DLC foldernames that are known to have bad texture exports that must be fixed prior to install
+        /// </summary>
+        public static List<string> ME3DLCRequiringTextureExportFixes = new List<string>();
+
+        /// <summary>
+        /// List of ME3 DLC foldernames that are known to have bad texture exports that must be fixed prior to install
+        /// </summary>
+        public static List<string> ME2DLCRequiringTextureExportFixes = new List<string>();
+
         public enum ManifestMode
         {
             /// <summary>
@@ -207,6 +217,16 @@ namespace ALOTInstallerCore.Startup
                     }
                 }
 
+                if (rootElement.Element("me3dlctexturefixes") != null)
+                {
+                    ME3DLCRequiringTextureExportFixes = rootElement.Elements("me3dlctexturefixes").Descendants("dlc").Select(x => x.Attribute("name").Value.ToUpperInvariant()).ToList();
+                }
+
+                if (rootElement.Element("me2dlctexturefixes") != null)
+                {
+                    ME2DLCRequiringTextureExportFixes = rootElement.Elements("me2dlctexturefixes").Descendants("dlc").Select(x => x.Attribute("name").Value.ToUpperInvariant()).ToList();
+                }
+
                 if (rootElement.Element("stages") != null)
                 {
                     ProgressHandler.DefaultStages =
@@ -279,49 +299,49 @@ namespace ALOTInstallerCore.Startup
 
                 // Add PREINSTALL MODS
                 mp.ManifestFiles.AddRange((from e in rootElement.Elements("preinstallmod")
-                                            select new PreinstallMod()
-                                            {
-                                                FileSize = TryConvert.ToInt64(e.Element("file").Attribute("size")?.Value, 0L),
-                                                AlotVersionInfo = new TextureModInstallationInfo(0,0,0,0),
-                                                Author = (string)e.Attribute("author"),
-                                                FriendlyName = (string)e.Attribute("friendlyname"),
-                                                //Optional = e.Attribute("optional") != null ? (bool)e.Attribute("optional") : false,
-                                                m_me1 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me1") : false,
-                                                m_me2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me2") : false,
-                                                m_me3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me3") : false,
-                                                Filename = (string)e.Element("file").Attribute("filename"),
-                                                Tooltipname = e.Element("file").Attribute("tooltipname") != null ? (string)e.Element("file").Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
-                                                DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
-                                                UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename") != null ? (string)e.Element("file").Attribute("unpackedsinglefilename") : null,
-                                                FileMD5 = (string)e.Element("file").Attribute("md5"),
-                                                UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
-                                                UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
-                                                TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
-                                                UIPriority = TryConvert.ToInt32(e.Attribute("uipriority")?.Value, 5),
-                                                OptionGroup = e.Attribute("optiongroup")?.Value,
-                                                PackageFiles = e.Elements("packagefile")
-                                                   .Select(r => new PackageFile
+                                           select new PreinstallMod()
+                                           {
+                                               FileSize = TryConvert.ToInt64(e.Element("file").Attribute("size")?.Value, 0L),
+                                               AlotVersionInfo = new TextureModInstallationInfo(0, 0, 0, 0),
+                                               Author = (string)e.Attribute("author"),
+                                               FriendlyName = (string)e.Attribute("friendlyname"),
+                                               //Optional = e.Attribute("optional") != null ? (bool)e.Attribute("optional") : false,
+                                               m_me1 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me1") : false,
+                                               m_me2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me2") : false,
+                                               m_me3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me3") : false,
+                                               Filename = (string)e.Element("file").Attribute("filename"),
+                                               Tooltipname = e.Element("file").Attribute("tooltipname") != null ? (string)e.Element("file").Attribute("tooltipname") : (string)e.Attribute("friendlyname"),
+                                               DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
+                                               UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename") != null ? (string)e.Element("file").Attribute("unpackedsinglefilename") : null,
+                                               FileMD5 = (string)e.Element("file").Attribute("md5"),
+                                               UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
+                                               UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize")) : 0L,
+                                               TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
+                                               UIPriority = TryConvert.ToInt32(e.Attribute("uipriority")?.Value, 5),
+                                               OptionGroup = e.Attribute("optiongroup")?.Value,
+                                               PackageFiles = e.Elements("packagefile")
+                                                  .Select(r => new PackageFile
+                                                  {
+                                                      SourceName = (string)r.Attribute("sourcename"),
+                                                      MoveDirectly = TryConvert.ToBool(r.Attribute("movedirectly")?.Value, false),
+                                                      m_me1 = TryConvert.ToBool(r.Attribute("me1")?.Value, false),
+                                                      m_me2 = TryConvert.ToBool(r.Attribute("me2")?.Value, false),
+                                                      m_me3 = TryConvert.ToBool(r.Attribute("me3")?.Value, false),
+                                                  }).ToList(),
+                                               ExtractionRedirects = e.Elements("extractionredirect")
+                                                   .Select(d => new PreinstallMod.ExtractionRedirect
                                                    {
-                                                       SourceName = (string)r.Attribute("sourcename"),
-                                                       MoveDirectly = TryConvert.ToBool(r.Attribute("movedirectly")?.Value, false),
-                                                       m_me1 = TryConvert.ToBool(r.Attribute("me1")?.Value, false),
-                                                       m_me2 = TryConvert.ToBool(r.Attribute("me2")?.Value, false),
-                                                       m_me3 = TryConvert.ToBool(r.Attribute("me3")?.Value, false),
+                                                       ArchiveRootPath = (string)d.Attribute("archiverootpath"),
+                                                       RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
+                                                       OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc"),
+                                                       OptionalAnyDLC = (string)d.Attribute("optionalanydlc"),
+                                                       OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
+                                                       OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
+                                                       LoggingName = (string)d.Attribute("loggingname"),
+                                                       IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
+                                                       ModVersion = (string)d.Attribute("version")
                                                    }).ToList(),
-                                                ExtractionRedirects = e.Elements("extractionredirect")
-                                                    .Select(d => new PreinstallMod.ExtractionRedirect
-                                                    {
-                                                        ArchiveRootPath = (string)d.Attribute("archiverootpath"),
-                                                        RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
-                                                        OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc"),
-                                                        OptionalAnyDLC = (string)d.Attribute("optionalanydlc"),
-                                                        OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
-                                                        OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
-                                                        LoggingName = (string)d.Attribute("loggingname"),
-                                                        IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
-                                                        ModVersion = (string)d.Attribute("version")
-                                                    }).ToList(),
-                                            }));
+                                           }));
 
                 // ADD TEXTURE MODS
                 mp.ManifestFiles.AddRange((from e in rootElement.Elements("addonfile")

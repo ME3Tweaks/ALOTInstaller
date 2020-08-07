@@ -11,6 +11,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using ALOTInstallerCore.Startup;
 using ALOTInstallerCore.Steps.Installer;
 using Serilog;
 
@@ -29,17 +30,39 @@ namespace ALOTInstallerCore.Steps
         /// Callback to set what is being installed. Used for UI purposes
         /// </summary>
         public Action<string> SetInstallString { get; set; }
+        /// <summary>
+        /// Callback to set the first line of text's visibility
+        /// </summary>
         public Action<string> SetTopTextCallback { get; set; }
+        /// <summary>
+        /// Callback to set the second line of text's visibility
+        /// </summary>
         public Action<string> SetMiddleTextCallback { get; set; }
+        /// <summary>
+        /// Callback to set the third line of text
+        /// </summary>
         public Action<string> SetBottomTextCallback { get; set; }
+        /// <summary>
+        /// Callback to set the first line of text's visibility
+        /// </summary>
         public Action<bool> SetTopTextVisibilityCallback { get; set; }
+        /// <summary>
+        /// Callback to set the second line of text's visibility
+        /// </summary>
         public Action<bool> SetMiddleTextVisibilityCallback { get; set; }
+        /// <summary>
+        /// Callback to set the third line of text's visibility
+        /// </summary>
         public Action<bool> SetBottomTextVisibilityCallback { get; set; }
+        /// <summary>
+        /// Callback to indicate that there should be a warning about Origin automatically updating the game for users and that they should never do this. Only triggers on Origin versions of games (ME1/2/3 + 3 steam)
+        /// </summary>
+        public Action<Enums.MEGame> ShowStorefrontDontClickUpdateCallbackAction { get; set; }
 
         /// <summary>
-        /// Callback for setting the 'overall' progress value, from 0 to 100. Can be used to display things like progressbars.
+        /// Callback for setting the 'overall' progress value, from 0 to 100. Can be used to display things like progressbars. Only works for the main long install step
         /// </summary>
-        public Action<int> SetOverallProgressCallback { get; set; }
+        //public Action<int> SetOverallProgressCallback { get; set; }
 
         public InstallStep(InstallOptionsPackage package)
         {
@@ -61,8 +84,9 @@ namespace ALOTInstallerCore.Steps
         public enum InstallResult
         {
             InstallFailed_ExistingMarkersFound,
-
-            InstallOK
+            InstallFailed_TextureExportFixFailed,
+            InstallFailed_MEMCrashed,
+            InstallOK,
         }
 
         public void InstallTextures(object sender, DoWorkEventArgs doWorkEventArgs)
@@ -116,6 +140,20 @@ namespace ALOTInstallerCore.Steps
 
             #endregion
 
+            #region Attempt clearing read-write flag
+
+#if WINDOWS
+            try
+            {
+                Utilities.MakeAllFilesInDirReadWrite(package.InstallTarget.TargetPath);
+            }
+            catch (Exception e)
+            {
+                Log.Warning($"Exception occured while trying to make the game directory fully read-write: {e.Message}. We will continue anyways and hope nothing dies");
+            }
+#endif
+
+            #endregion
 
             #region Check for existing markers
 
@@ -165,7 +203,7 @@ namespace ALOTInstallerCore.Steps
                     // Must abort!
                     SetBottomTextCallback?.Invoke("Couldn't install textures");
                     SetTopTextCallback?.Invoke("Files from a previous texture installation were found");
-                    //SetContinueButtonVisibility?.Invoke(true);
+                    doWorkEventArgs.Result = InstallResult.InstallFailed_ExistingMarkersFound;
                     return; //Exit
                 }
             }
@@ -178,10 +216,15 @@ namespace ALOTInstallerCore.Steps
 
             #region Fix broken mods like Bonus Powers Pack
 
+            if (!applyNeverStreamFixes())
+            {
+                doWorkEventArgs.Result = InstallResult.InstallFailed_TextureExportFixFailed;
+                return;
+            }
             #endregion
 
             #region Apply Post-mars post-hackett fix (ME3 only)
-
+            applyCitadelTransitionFix();
             #endregion
 
             #region Main installation phase
@@ -281,9 +324,10 @@ namespace ALOTInstallerCore.Steps
                     // Apply ME1 LAA
                     applyME1LAA();
                 }
-                stampVersionInformation();
-                applyLODs();
+                stampVersionInformation(); //At this point we are now OK
 
+                applyLODs();
+                moveBackNewlyUnpackedFiles();
                 //applyBinkw32();
                 if (package.InstallTarget.Game == Enums.MEGame.ME3)
                 {
@@ -292,9 +336,156 @@ namespace ALOTInstallerCore.Steps
 
                 #endregion
 
+                showOnlineStorefrontNoUpdateScreen();
                 doWorkEventArgs.Result = InstallResult.InstallOK;
             }
+        }
 
+        private void showOnlineStorefrontNoUpdateScreen()
+        {
+            //Check if origin
+            string originTouchupFile = Path.Combine(package.InstallTarget.TargetPath, "__Installer", "Touchup.exe");
+            if (File.Exists(originTouchupFile))
+            {
+                //origin based
+                ShowStorefrontDontClickUpdateCallback?.Invoke(package.InstallTarget.Game);
+            }
+        }
+
+        private void moveBackNewlyUnpackedFiles()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void applyCitadelTransitionFix()
+        {
+#if WINDOWS
+// This depends on the ME3Explorer lib, which can't (and may never) work on linux
+            if (package.InstallTarget.Game == Enums.MEGame.ME3)
+            {
+                SetBottomTextCallback?.Invoke("Fixing Mars to Citadel transition";
+                //InstallWorker?.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                Log.Information("Fixing post-mars hackett cutscene memory issue");
+                ME3ExplorerMinified.DLL.Startup();
+
+            #region BioA_CitHub fix
+
+                {
+                    var bioa_cithubPath = Path.Combine(Utilities.GetGamePath(3), "BioGame", "CookedPCConsole", "BioA_CitHub.pcc");
+                    if (File.Exists(bioa_cithubPath))
+                    {
+                        var bioa_cithub = MEPackageHandler.OpenMEPackage(bioa_cithubPath);
+                        var trigStream1 = bioa_cithub.getUExport(8);
+                        var propsT = trigStream1.GetProperties();
+                        var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
+                        // Clear preloading
+                        Log.Information("Clear LoadChunkNames from BioA_CitHub");
+                        streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
+
+                        // Clear visible asset
+                        var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
+                        for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                        {
+                            if (visibleChunkNames[i].Value == "BioA_CitHub_Dock_Det")
+                            {
+                                Log.Information("Remove BioA_CitHub_Dock_Det from BioA_CitHub VisibleChunkNames(8)");
+                                visibleChunkNames.RemoveAt(i);
+                            }
+                        }
+
+                        trigStream1.WriteProperty(streamStates);
+
+                        var trigStream2 = bioa_cithub.getUExport(15);
+                        streamStates = trigStream2.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
+
+                        // Cleanup visible assets
+                        visibleChunkNames = streamStates[0].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
+                        for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                        {
+                            if (visibleChunkNames[i].Value == "BioA_Nor_204Conference" || visibleChunkNames[i].Value == "BioA_Nor_204WarRoom")
+                            {
+                                Log.Information("Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(15)");
+                                visibleChunkNames.RemoveAt(i);
+                            }
+                        }
+
+                        trigStream2.WriteProperty(streamStates);
+                        Log.Information("Saving package: " + bioa_cithubPath);
+                        bioa_cithub.save();
+                    }
+                }
+
+            #endregion
+
+            #region BioD_CitHub fix
+
+                {
+                    var biod_cithubPath = Path.Combine(Utilities.GetGamePath(3), "BioGame", "CookedPCConsole", "BioD_CitHub.pcc");
+                    if (File.Exists(biod_cithubPath))
+                    {
+                        var biod_cithub = MEPackageHandler.OpenMEPackage(biod_cithubPath);
+                        var trigStream1 = biod_cithub.getUExport(162);
+                        var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
+                        // Clear preloading
+                        Log.Information("Clear LoadChunkNames from BioD_CitHub");
+                        streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
+
+                        // Clear visible asset
+                        var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
+                        for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                        {
+                            if (visibleChunkNames[i].Value == "BioH_Marine" || visibleChunkNames[i].Value == "BioD_CitHub_Dock")
+                            {
+                                Log.Information("Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(8)");
+                                visibleChunkNames.RemoveAt(i);
+                            }
+                        }
+
+                        trigStream1.WriteProperty(streamStates);
+                        Log.Information("Saving package: " + biod_cithubPath);
+                        biod_cithub.save();
+                    }
+                }
+
+            #endregion
+
+                Log.Information("Finished fixing post-mars hackett cutscene memory issue");
+            }
+#endif
+        }
+
+
+        private bool applyNeverStreamFixes()
+        {
+            if (package.InstallTarget.Game >= Enums.MEGame.ME2)
+            {
+                string dlcPath = Path.Combine(package.InstallTarget.TargetPath, "BIOGame", "DLC");
+                package.InstallTarget.PopulateDLCMods(false);
+                var listOfItemsToFix = package.InstallTarget.Game == Enums.MEGame.ME2 ? OnlineContent.ME2DLCRequiringTextureExportFixes : OnlineContent.ME3DLCRequiringTextureExportFixes;
+                foreach (var d in package.InstallTarget.UIInstalledDLCMods)
+                {
+                    if (listOfItemsToFix.Contains(d.DLCFolderName, StringComparer.InvariantCultureIgnoreCase))
+                    {
+                        // Fix required
+                        Log.Information("DLC requires texture fixes: " + d.DLCFolderName);
+                        SetBottomTextCallback?.Invoke($"Fixing texture exports in {d.DLCFolderName}");
+                        string args = $"--fix-textures-property --gameid {package.InstallTarget.Game.ToGameNum()} --filter \"{d.DLCFolderName}\" --ipc";
+                        int resultCode = -1;
+                        MEMIPCHandler.RunMEMIPCUntilExit(args,
+                            null,
+                            null,
+                            x => Log.Error($"StdError fixing DLC foldernames for {d.DLCFolderName}: {x}"),
+                            x => resultCode = x);
+                        if (resultCode != 0)
+                        {
+                            Log.Error($"Non zero result code fixing textures for {d.DLCFolderName}: {resultCode}");
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
 
         private void installZipCopyFiles()
@@ -615,7 +806,7 @@ namespace ALOTInstallerCore.Steps
                     {
                         //Write a _metacmm.txt file
                         var metacmm = Path.Combine(ingameDestination, "_metacmm.txt");
-                        string contents = $"{extractionRedirect.LoggingName}\n{extractionRedirect.ModVersion}\nALOT Installer {System.Reflection.Assembly.GetEntryAssembly().GetName().Version}\n{Guid.NewGuid().ToString()}";
+                        string contents = $"{extractionRedirect.LoggingName}\n{extractionRedirect.ModVersion}\n{Assembly.GetEntryAssembly().FullName} {System.Reflection.Assembly.GetEntryAssembly().GetName().Version}\n{Guid.NewGuid().ToString()}";
                         File.WriteAllText(metacmm, contents);
                     }
                 }
