@@ -45,11 +45,13 @@ namespace ALOTInstallerCore.Helpers
             watcher.EnableRaisingEvents = true;
         }
 
+
+
         private static void OnLibraryFileChanged(object sender, FileSystemEventArgs e)
         {
             if (e.Name != null)
             {
-                Debug.WriteLine($"Change {e.ChangeType} for {e.Name}");
+                //Debug.WriteLine($"Change {e.ChangeType} for {e.Name}");
                 var matchingManifestFile = manifestFiles.Find(x =>
                     Path.GetFileName(x.GetUsedFilepath()).Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
                 if (matchingManifestFile?.UpdateReadyStatus() ?? false)
@@ -110,7 +112,7 @@ namespace ALOTInstallerCore.Helpers
                     if (matchingFile != null && new FileInfo(matchingFile).Length == v.FileSize)
                     {
                         // Import
-                        importFileToLibrary(v, matchingFile, false);
+                        importFileToLibrary(v, matchingFile, false, progressCallback, importFinished);
                         lock (syncObj)
                         {
                             Monitor.Wait(syncObj);
@@ -269,6 +271,25 @@ namespace ALOTInstallerCore.Helpers
                 watcher.Renamed -= OnLibraryFileChanged;
                 watcher.Dispose();
                 watcher = null;
+            }
+        }
+
+        /// <summary>
+        /// Clears actions callbacks
+        /// </summary>
+        public static void UnregisterCallbacks()
+        {
+            readyStatusChanged = null;
+        }
+
+        /// <summary>
+        /// Forces all items in the specified list to refresh their ready status
+        /// </summary>
+        public static void ResetAllReadyStatuses(List<InstallerFile> files)
+        {
+            foreach (var v in files)
+            {
+                v.UpdateReadyStatus();
             }
         }
     }

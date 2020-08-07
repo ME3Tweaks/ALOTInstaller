@@ -206,6 +206,8 @@ namespace ALOTInstallerConsole.BuilderUI
                 Clicked = InstallButton_Click
             };
             Add(installButton);
+
+            TextureLibrary.ResetAllReadyStatuses(Program.CurrentManifestPackage.ManifestFiles);
         }
 
         private void ImportAssistant_Click()
@@ -369,6 +371,7 @@ namespace ALOTInstallerConsole.BuilderUI
         private void RefreshShownFiles()
         {
             Program.CurrentManifestPackage = Program.ManifestModes[CurrentMode];
+            TextureLibrary.ResetAllReadyStatuses(Program.CurrentManifestPackage.ManifestFiles);
             //var userFiles = dataSource.InstallerFiles.Where(x => x is UserFile);
             dataSource.InstallerFiles.Clear();
             dataSource.InstallerFiles.AddRange(Program.CurrentManifestPackage.ManifestFiles.Where(x=>(x.ApplicableGames & VisibleGames) != 0));
@@ -425,7 +428,8 @@ namespace ALOTInstallerConsole.BuilderUI
 
         public override void SignalStopping()
         {
-            
+            // This window will close. We need to clear the ready status changed action so we don't keep reference to us
+            TextureLibrary.UnregisterCallbacks();
         }
 
         internal class InstallerFileDataSource : IListDataSource

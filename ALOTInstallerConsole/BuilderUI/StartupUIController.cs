@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
 using ALOTInstallerCore;
+using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Startup;
 using Serilog;
 using Terminal.Gui;
@@ -28,21 +29,18 @@ namespace ALOTInstallerConsole.BuilderUI
                 //Initialize ALOT Installer library
                 Hook.Startup();
 
-                var manifestFiles = OnlineContent.FetchALOTManifest((x) => Application.MainLoop.Invoke(() =>
+                var alotManifestPackage = OnlineContent.FetchALOTManifest((x) => Application.MainLoop.Invoke(() =>
                 {
                     startupStatusLabel.Text = x;
                 }));
 
                 // Load the ready state while we are still in background thread
-                Application.MainLoop.Invoke(() =>
-                {
-                    startupStatusLabel.Text = "Checking texture library";
-                });
+                //Application.MainLoop.Invoke(() =>
+                //{
+                //    startupStatusLabel.Text = "Checking texture library";
+                //});
 
-                foreach (var v in manifestFiles.ManifestFiles)
-                {
-                    v.UpdateReadyStatus();
-                }
+                //TextureLibrary.ResetAllReadyStatuses(Program.CurrentManifestPackage.ManifestFiles);
 
                 void downloadProgressChanged(long bytes, long total)
                 {
@@ -58,13 +56,13 @@ namespace ALOTInstallerConsole.BuilderUI
                 });
                 MEMUpdater.UpdateMEM(downloadProgressChanged);
 
-                b.Result = manifestFiles;
+                b.Result = alotManifestPackage;
             };
             bw.RunWorkerCompleted += (a, b) =>
             {
                 if (b.Error == null)
                 {
-                    Program.CurrentManifestPackage = b.Result as OnlineContent.ManifestPackage;
+                    Program.CurrentManifestPackage = b.Result as OnlineContent.ManifestPackage; //ALOT is default manifest package at boot time
                     Program.ManifestModes[OnlineContent.ManifestMode.ALOT] = b.Result as OnlineContent.ManifestPackage;
                     FileSelectionUIController bui = new FileSelectionUIController();
                     bui.SetupUI();

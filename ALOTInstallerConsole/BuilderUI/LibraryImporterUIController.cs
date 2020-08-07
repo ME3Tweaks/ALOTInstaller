@@ -39,8 +39,8 @@ namespace ALOTInstallerConsole.BuilderUI
         {
             if (Program.ManifestModes.TryGetValue(OnlineContent.ManifestMode.ALOT, out var manifestP))
             {
-                OpenDialog selector = new OpenDialog("Select location to build textures for installation",
-                    "Select the location you would like to build the installation package at. This will take up considerable space depending on what will be installed.")
+                OpenDialog selector = new OpenDialog("Select location to import files from",
+                    "Select a folder containing manifest files, such as your downloads folder.")
                 {
                     CanChooseDirectories = true,
                     CanChooseFiles = false,
@@ -59,9 +59,12 @@ namespace ALOTInstallerConsole.BuilderUI
                             manifestP.ManifestFiles.OfType<ManifestFile>().ToList(),
                             (uiString, d, t) =>
                             {
-                                pd.BottomMessage = "Importing {uiString}";
-                                pd.ProgressMax = t;
-                                pd.ProgressValue = d;
+                                Application.MainLoop.Invoke(() =>
+                                {
+                                    pd.BottomMessage = $"Importing {uiString}";
+                                    pd.ProgressMax = t;
+                                    pd.ProgressValue = d;
+                                });
                             },
                             imported =>
                             {

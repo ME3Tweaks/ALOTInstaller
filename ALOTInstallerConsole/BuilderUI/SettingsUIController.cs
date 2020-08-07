@@ -203,6 +203,7 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 textureLibraryLocation.Text = Settings.TextureLibraryLocation = selector.FilePaths.First();
                 Settings.Save();
+                TextureLibrary.StopLibraryWatcher(); //This will be reloaded when we return to the manifest controller
             }
         }
 
