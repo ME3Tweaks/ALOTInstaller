@@ -325,8 +325,8 @@ namespace ALOTInstallerCore.Builder
                         // Directly move .mem file to output
                         var destinationF = Path.Combine(finalDest, $"{installerFile.BuildID:D3}_{Path.GetFileName(pf.SourceName)}");
                         Log.Information($"Moving .mem file to builtdir: {pf.SourceName} -> {destinationF}");
-
-                        File.Move(matchingFile, destinationF, true);
+                        if (File.Exists(destinationF)) File.Delete(destinationF);
+                        File.Move(matchingFile, destinationF);
                         pf.Processed = true;
                         return;
                     }
@@ -336,7 +336,8 @@ namespace ALOTInstallerCore.Builder
                         // not mem file. Move to staging
                         var destinationF = Path.Combine(compilingStagingDest, pf.DestinationName ?? pf.SourceName);
                         Log.Information($"Moving package file to staging: {pf.SourceName} -> {pf.DestinationName ?? pf.SourceName}");
-                        File.Move(matchingFile, destinationF, true);
+                        if (File.Exists(destinationF)) File.Delete(destinationF);
+                        File.Move(matchingFile, destinationF);
                         pf.Processed = true;
                         return;
                     }

@@ -33,7 +33,7 @@ namespace ALOTInstallerCore.Helpers
                 NotifyFilter = NotifyFilters.LastWrite
                                  | NotifyFilters.FileName
                                  | NotifyFilters.Size,
-                Filters = { "*.zip", "*.tpf", "*.mem", "*.rar", "*.7z" }
+                Filter = "*.*" //Filters is not supported on .NET Standard 2.1
             };
             // Add event handlers.
             watcher.Changed += OnLibraryFileChanged;

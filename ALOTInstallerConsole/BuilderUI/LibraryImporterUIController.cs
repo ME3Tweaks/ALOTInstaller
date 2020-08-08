@@ -48,13 +48,13 @@ namespace ALOTInstallerConsole.BuilderUI
                 };
                 Application.Run(selector);
                 Debug.WriteLine(selector.FilePath);
-                if (!selector.Canceled && selector.DirectoryPath != null && Directory.Exists(selector.DirectoryPath.ToString()))
+                if (!selector.Canceled && selector.FilePath != null && Directory.Exists(selector.FilePath.ToString()))
                 {
                     ProgressDialog pd = new ProgressDialog("Importing files from folder", "Please wait while files are imported.");
                     NamedBackgroundWorker nbw = new NamedBackgroundWorker("ImportFromFolderThread");
                     nbw.DoWork += (a, b) =>
                     {
-                        TextureLibrary.ImportFromFolder(selector.DirectoryPath.ToString(),
+                        TextureLibrary.ImportFromFolder(selector.FilePath.ToString(),
                             manifestP.ManifestFiles.OfType<ManifestFile>().ToList(),
                             (uiString, d, t) =>
                             {
@@ -87,7 +87,7 @@ namespace ALOTInstallerConsole.BuilderUI
                                     else
                                     {
                                         MessageBox.Query("No files imported",
-                                            $"No manifest files were found in the specified directory (that were not already imported):\n{selector.DirectoryPath}",
+                                            $"No manifest files were found in the specified directory (that were not already imported):\n{selector.FilePath}",
                                             "OK");
                                     }
                                 });
