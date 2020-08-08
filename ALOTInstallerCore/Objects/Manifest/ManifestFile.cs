@@ -320,7 +320,6 @@ namespace ALOTInstallerCore.Objects.Manifest
         public string FileMD5 { get; internal set; }
         public string UnpackedFileMD5 { get; set; }
         public long UnpackedFileSize { get; set; }
-        public RecommendationType Recommendation { get; set; }
         //        public bool Optional { get; internal set; }
         //        private bool _enabled;
         //        public bool CopyDirectly { get; internal set; }
