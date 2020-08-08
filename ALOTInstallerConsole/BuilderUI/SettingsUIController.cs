@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using Terminal.Gui;
 

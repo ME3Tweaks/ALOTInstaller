@@ -112,5 +112,20 @@ namespace ALOTInstallerCore.Objects
             }
             return final;
         }
+
+        public Version ToVersion()
+        {
+            return new Version(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER);
+        }
+
+        public static bool operator <(TextureModInstallationInfo first, TextureModInstallationInfo second)
+        {
+            return first.ToVersion().CompareTo(second.ToVersion()) < 0;
+        }
+
+        public static bool operator >(TextureModInstallationInfo first, TextureModInstallationInfo second)
+        {
+            return first.ToVersion().CompareTo(second.ToVersion()) > 0;
+        }
     }
 }

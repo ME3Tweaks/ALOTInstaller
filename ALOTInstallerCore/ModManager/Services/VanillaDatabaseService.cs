@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameDirectories;
-using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using Serilog;
 

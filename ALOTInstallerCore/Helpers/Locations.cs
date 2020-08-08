@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 using ALOTInstallerCore.ModManager.GameINI;
-using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 
 namespace ALOTInstallerCore.Helpers

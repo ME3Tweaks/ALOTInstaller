@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects;
 
 namespace ALOTInstallerCore.Objects
 {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects;
 
 namespace ALOTInstallerCore.ModManager.GameDirectories
 

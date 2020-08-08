@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Startup;
+using ALOTInstallerCore.Steps;
 using NStack;
+using Serilog;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
@@ -225,9 +228,8 @@ namespace ALOTInstallerConsole.BuilderUI
             RefreshShownFiles();
         }
 
-        private void InstallButton_Click()
+        private async void InstallButton_Click()
         {
-            // Perform precheck here
             List<string> paths = new List<string>();
             if (Locations.ME1Target != null) paths.Add("ME1");
             if (Locations.ME2Target != null) paths.Add("ME2");
@@ -316,8 +318,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
                 if (buildAndInstall)
                 {
-                    var builderUI = new BuilderUI.BuilderUIController();
-                    builderUI.SetOptionsPackage(new InstallOptionsPackage()
+                    var optionsPackage = new InstallOptionsPackage()
                     {
                         InstallTarget = target,
                         FilesToInstall = dataSource.InstallerFiles,
@@ -328,24 +329,43 @@ namespace ALOTInstallerConsole.BuilderUI
                         InstallUserfiles = userFilesCheckBox.Checked,
                         DebugLogging = false, //needs option
                         RepackGameFiles = true //needs option
-                    });
-                    builderUI.SetupUI();
-                    TextureLibrary.StopLibraryWatcher(); // Kill watcher
-                    Program.SwapToNewView(builderUI);
+                    };
 
-                    //var installerUI = new InstallerUIController();
-                    //installerUI.SetInstallPackage(new InstallOptionsPackage()
-                    //{
-                    //    InstallTarget = target,
-                    //    FilesToInstall = dataSource.InstallerFiles,
-                    //    InstallALOT = alotCheckbox.Checked,
-                    //    InstallALOTUpdate = alotCheckbox.Checked,
-                    //    InstallMEUITM = meuitmCheckbox.Checked,
-                    //    InstallALOTAddon = addonCheckBox.Checked,
-                    //    InstallUserfiles = userFilesCheckBox.Checked
-                    //});
-                    //installerUI.SetupUI();
-                    //Program.SwapToNewView(installerUI);
+                    MessageDialog md = new MessageDialog("Performing installation precheck [1/2]");
+                    NamedBackgroundWorker prestageCheckWorker = new NamedBackgroundWorker("PrecheckWorker-Prestaging");
+                    prestageCheckWorker.DoWork += (a, b) =>
+                    {
+                        b.Result = Precheck.PerformPreStagingCheck(optionsPackage, CurrentMode);
+                    };
+                    prestageCheckWorker.RunWorkerCompleted += (sender, b) =>
+                    {
+                        if (md.IsCurrentTop)
+                        {
+                            // Close the dialog
+                            Application.RequestStop();
+                        }
+                        if (b.Error != null)
+                        {
+                            Log.Error($"Exception occured in precheck for pre-stage: {b.Error.Message}");
+                            MessageBox.Query("Precheck failed", b.Result as string, "OK");
+                        }
+                        else if (b.Result != null)
+                        {
+                            // Precheck failed
+                            MessageBox.Query("Precheck failed", b.Result as string, "OK");
+                        }
+                        else
+                        {
+                            // Precheck passed
+                            var builderUI = new BuilderUI.BuilderUIController();
+                            builderUI.SetOptionsPackage(optionsPackage);
+                            builderUI.SetupUI();
+                            TextureLibrary.StopLibraryWatcher(); // Kill watcher
+                            Program.SwapToNewView(builderUI);
+                        }
+                    };
+                    prestageCheckWorker.RunWorkerAsync();
+                    Application.Run(md);
                 }
             }
         }
@@ -360,7 +380,7 @@ namespace ALOTInstallerConsole.BuilderUI
         private void ChangeMode_Clicked()
         {
             var str = Program.ManifestModes.Keys.Select(x => (ustring)x.ToString()).ToArray();
-            var res =  MessageBox.Query(50, 7, "Mode selector", "Select a mode for ALOT Installer.", str);
+            var res = MessageBox.Query(50, 7, "Mode selector", "Select a mode for ALOT Installer.", str);
             CurrentMode = Program.ManifestModes.Keys.ToList()[res];
             RefreshShownFiles();
         }
@@ -371,7 +391,7 @@ namespace ALOTInstallerConsole.BuilderUI
             TextureLibrary.ResetAllReadyStatuses(Program.CurrentManifestPackage.ManifestFiles);
             //var userFiles = dataSource.InstallerFiles.Where(x => x is UserFile);
             dataSource.InstallerFiles.Clear();
-            dataSource.InstallerFiles.AddRange(Program.CurrentManifestPackage.ManifestFiles.Where(x=>(x.ApplicableGames & VisibleGames) != 0));
+            dataSource.InstallerFiles.AddRange(Program.CurrentManifestPackage.ManifestFiles.Where(x => (x.ApplicableGames & VisibleGames) != 0));
             //dataSource.InstallerFiles.AddRange(userFiles);
             Application.Refresh();
         }
