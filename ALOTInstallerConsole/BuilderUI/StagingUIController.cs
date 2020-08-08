@@ -2,15 +2,18 @@
 using System.ComponentModel;
 using System.Linq;
 using ALOTInstallerConsole.InstallerUI;
+using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore.Builder;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.Steps;
 using NStack;
+using Serilog;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
 {
-    class BuilderUIController : UIController
+    class StagingUIController : UIController
     {
         private Label currentStatusLabel;
         private InstallOptionsPackage installOptions;
@@ -52,14 +55,7 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 if (b.Error == null)
                 {
-                    if (installOptions.FilesToInstall != null)
-                    {
-                        InstallerUIController installerController = new InstallerUIController();
-                        installerController.SetInstallPackage(installOptions);
-                        installerController.SetupUI();
-                        Program.SwapToNewView(installerController);
-                        return;
-                    }
+                    performPreinstallCheck();
                 }
                 else
                 {
@@ -72,9 +68,57 @@ namespace ALOTInstallerConsole.BuilderUI
             builderWorker.RunWorkerAsync();
         }
 
+        private void performPreinstallCheck()
+        {
+            MessageDialog md = new MessageDialog("Performing installation precheck [2/2]");
+            NamedBackgroundWorker prestageCheckWorker = new NamedBackgroundWorker("PrecheckWorker-Prestaging");
+            prestageCheckWorker.DoWork += (a, b) =>
+            {
+                b.Result = Precheck.PerformPreStagingCheck(installOptions);
+            };
+            prestageCheckWorker.RunWorkerCompleted += (sender, b) =>
+            {
+                if (md.IsCurrentTop)
+                {
+                    // Close the dialog
+                    Application.RequestStop();
+                }
+                if (b.Error != null)
+                {
+                    Log.Error($"Exception occured in precheck for pre-install: {b.Error.Message}");
+                    MessageBox.Query("Precheck failed", b.Result as string, "OK");
+                    BuilderUI.FileSelectionUIController fsuic = new FileSelectionUIController();
+                    fsuic.SetupUI();
+                    Program.SwapToNewView(fsuic);
+                }
+                else if (b.Result != null)
+                {
+                    // Precheck failed
+                    MessageBox.Query("Precheck failed", b.Result as string, "OK");
+                    BuilderUI.FileSelectionUIController fsuic = new FileSelectionUIController();
+                    fsuic.SetupUI();
+                    Program.SwapToNewView(fsuic);
+                }
+                else
+                {
+                    // Precheck passed
+                    if (installOptions.FilesToInstall != null)
+                    {
+                        InstallerUIController installerController = new InstallerUIController();
+                        installerController.SetInstallPackage(installOptions);
+                        installerController.SetupUI();
+                        Program.SwapToNewView(installerController);
+                    }
+                }
+            };
+            prestageCheckWorker.RunWorkerAsync();
+            Application.Run(md);
+
+        }
+
         public override void SignalStopping()
         {
-            
+
         }
 
         private InstallerFile resolveMutualExclusiveMod(List<InstallerFile> arg)

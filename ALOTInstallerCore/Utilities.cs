@@ -1553,20 +1553,30 @@ namespace ALOTInstallerCore
 
         }
 
-        public static long DirSize(DirectoryInfo d)
+        public static long GetSizeOfDirectory(DirectoryInfo d, string[] extensionsToCalculate = null)
         {
             long size = 0;
             // Add file sizes.
             FileInfo[] fis = d.GetFiles();
             foreach (FileInfo fi in fis)
             {
-                size += fi.Length;
+                if (extensionsToCalculate != null)
+                {
+                    if (extensionsToCalculate.Contains(Path.GetExtension(fi.Name)))
+                    {
+                        size += fi.Length;
+                    }
+                }
+                else
+                {
+                    size += fi.Length;
+                }
             }
             // Add subdirectory sizes.
             DirectoryInfo[] dis = d.GetDirectories();
             foreach (DirectoryInfo di in dis)
             {
-                size += DirSize(di);
+                size += GetSizeOfDirectory(di, extensionsToCalculate);
             }
             return size;
         }

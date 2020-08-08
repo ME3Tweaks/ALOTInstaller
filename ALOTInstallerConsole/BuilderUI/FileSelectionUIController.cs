@@ -327,7 +327,7 @@ namespace ALOTInstallerConsole.BuilderUI
                         InstallMEUITM = meuitmCheckbox.Checked,
                         InstallALOTAddon = addonCheckBox.Checked,
                         InstallUserfiles = userFilesCheckBox.Checked,
-                        DebugLogging = false, //needs option
+                        InstallerMode = CurrentMode,
                         RepackGameFiles = true //needs option
                     };
 
@@ -335,7 +335,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     NamedBackgroundWorker prestageCheckWorker = new NamedBackgroundWorker("PrecheckWorker-Prestaging");
                     prestageCheckWorker.DoWork += (a, b) =>
                     {
-                        b.Result = Precheck.PerformPreStagingCheck(optionsPackage, CurrentMode);
+                        b.Result = Precheck.PerformPreStagingCheck(optionsPackage);
                     };
                     prestageCheckWorker.RunWorkerCompleted += (sender, b) =>
                     {
@@ -357,7 +357,7 @@ namespace ALOTInstallerConsole.BuilderUI
                         else
                         {
                             // Precheck passed
-                            var builderUI = new BuilderUI.BuilderUIController();
+                            var builderUI = new BuilderUI.StagingUIController();
                             builderUI.SetOptionsPackage(optionsPackage);
                             builderUI.SetupUI();
                             TextureLibrary.StopLibraryWatcher(); // Kill watcher

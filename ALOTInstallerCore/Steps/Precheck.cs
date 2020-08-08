@@ -6,7 +6,9 @@ using System.Linq;
 using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameDirectories;
+using ALOTInstallerCore.ModManager.gamefileformats.sfar;
 using ALOTInstallerCore.ModManager.Objects;
+using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Startup;
@@ -19,18 +21,72 @@ namespace ALOTInstallerCore.Steps
     /// </summary>
     public class Precheck
     {
+
+        public static string PerformPreInstallCheck(InstallOptionsPackage package)
+        {
+            // Get required disk space
+            long requiredDiskSpace = Utilities.GetSizeOfDirectory(new DirectoryInfo(Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString())));
+            foreach (var v in package.FilesToInstall.OfType<PreinstallMod>())
+            {
+                var archiveF = v.GetUsedFilepath();
+                requiredDiskSpace += (long)(new FileInfo(archiveF).Length * 1.4); //Assume there is 40% compression 
+            }
+
+            if (!package.RepackGameFiles)
+            {
+                // Game files will be unpacked.
+                requiredDiskSpace += (long)(Utilities.GetSizeOfDirectory(new DirectoryInfo(package.InstallTarget.TargetPath), new[] { ".pcc", ".upk", ".sfm", ".u" }) * .4);
+            }
+
+            if (package.InstallTarget.Game == Enums.MEGame.ME3)
+            {
+                // Check how much disk space SFAR unpacking will take
+                var installedDLC = VanillaDatabaseService.GetInstalledOfficialDLC(package.InstallTarget);
+                var gameDlcDir = Path.Combine(package.InstallTarget.TargetPath, "BIOGame", "DLC");
+                foreach (var d in installedDLC)
+                {
+                    var sfar = Path.Combine(gameDlcDir, d, "CookedPCCConsole", "Default.sfar");
+                    if (File.Exists(sfar) && new FileInfo(sfar).Length > 32)
+                    {
+                        // Packed
+                        DLCPackage dlc = new DLCPackage(sfar);
+                        long filesizeTotal = 0;
+                        foreach (var v in dlc.Files)
+                        {
+                            filesizeTotal += v.RealUncompressedSize;
+                        }
+
+                        filesizeTotal -= new FileInfo(sfar).Length;
+                        if (filesizeTotal > 0)
+                        {
+                            requiredDiskSpace += filesizeTotal;
+                        }
+                    }
+                }
+
+            }
+
+            var targetDi = new DriveInfo(package.InstallTarget.TargetPath);
+            if (targetDi.AvailableFreeSpace < requiredDiskSpace * 1.1)
+            {
+                // Less than 10% buffer
+                return $"There is not enough space on the disk the game resides on to install textures. Note that the required space is only an estimate and includes required temporary space.\n\nDrive: {targetDi.Name}\nRequired space: {FileSizeFormatter.FormatSize(requiredDiskSpace)}\nAvailable space: {FileSizeFormatter.FormatSize(targetDi.AvailableFreeSpace)}";
+            }
+            return null;
+        }
+
         /// <summary>
         /// Performs an installation precheck that should occur after the user has selected files, but before the staging step. This method is synchronous and should probably be run on a background thread as it may take a few seconds.
         /// </summary>
         /// <param name="target"></param>
         /// <param name="mode"></param>
         /// <param name="filesToInstall"></param>
-        public static string PerformPreStagingCheck(InstallOptionsPackage package, OnlineContent.ManifestMode mode)
+        public static string PerformPreStagingCheck(InstallOptionsPackage package)
         {
             var pc = new Precheck()
             {
                 target = package.InstallTarget,
-                mode = mode,
+                mode = package.InstallerMode,
                 filesToInstall = package.FilesToInstall.OfType<ManifestFile>().ToList()
             };
 

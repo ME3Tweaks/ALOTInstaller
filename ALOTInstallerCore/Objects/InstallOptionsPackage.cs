@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ALOTInstallerCore.ModManager.Objects;
+using ALOTInstallerCore.Startup;
 
 namespace ALOTInstallerCore.Objects
 {
@@ -19,6 +20,11 @@ namespace ALOTInstallerCore.Objects
         public bool InstallALOTAddon { get; set; }
         public bool InstallMEUITM { get; set; }
         public bool InstallUserfiles { get; set; }
+
+        /// <summary>
+        /// The mode to run the installer in
+        /// </summary>
+        public OnlineContent.ManifestMode InstallerMode { get; set; }
         /// <summary>
         /// this might be better as just accessing settings
         /// </summary>
