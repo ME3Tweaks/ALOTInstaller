@@ -38,7 +38,7 @@ namespace ALOTInstallerConsole.BuilderUI
             if (Program.ManifestModes.TryGetValue(OnlineContent.ManifestMode.ALOT, out var manifestP))
             {
                 OpenDialog selector = new OpenDialog("Select location to import files from",
-                    "Select a folder containing manifest files, such as your downloads folder.\nSelect Open once you are in the folder you wish to choose.")
+                    "Select a folder containing manifest files, such as your downloads folder.")
                 {
                     CanChooseDirectories = true,
                     CanChooseFiles = false,

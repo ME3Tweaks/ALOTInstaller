@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -244,130 +245,169 @@ namespace ALOTInstallerConsole.BuilderUI
             if (paths[selectedIndex] == "ME3") target = Locations.ME3Target;
 
             // Precheck done
-            int warningResponse = MessageBox.Query("Warning", "Once you install texture mods, you will not be able to further install mods that contain .pcc, .u, .upk or .sfm files without breaking textures in the game. Please make sure you have all of your DLC and non-texture mods installed now, as you will not be able to safely install them later.", "OK", "Abort install");
+            int warningResponse = MessageBox.Query("Warning", "Once you install texture mods, you will not be able to further install mods that contain .pcc, .u, .upk or .sfm files without breaking textures in the game. Make sure you have all of your DLC and non-texture mods installed now, as you will not be able to install them later.", "OK", "Abort install");
             if (warningResponse != 0) return; //abort
 
             // Show options
             if (Program.CurrentManifestPackage.ManifestFiles.Any())
             {
-                bool buildAndInstall = false;
-                var buildAndInstallButton = new Button("Build & Install")
-                {
-                    Clicked = () =>
-                    {
-                        Application.RequestStop();
-                        buildAndInstall = true;
-                    }
-                };
-                var cancelButton = new Button("Cancel")
-                {
-                    Clicked = () => Application.RequestStop()
-                };
+                showOptionsDialog(target);
 
-                int y = 0;
-                CheckBox alotCheckbox = new CheckBox("ALOT")
-                {
-                    X = 1,
-                    Y = y++,
-                    Width = 30,
-                    Height = 1
-                };
-                CheckBox alotUpdateCheckbox = new CheckBox("ALOT Update")
-                {
-                    X = 1,
-                    Y = y++,
-                    Width = 30,
-                    Height = 1
-                };
-                CheckBox meuitmCheckbox = new CheckBox("MEUITM")
-                {
-                    X = 1,
-                    Y = y++,
-                    Width = 30,
-                    Height = 1
-                };
-                CheckBox addonCheckBox = new CheckBox("ALOT Addon")
-                {
-                    X = 1,
-                    Y = y++,
-                    Width = 30,
-                    Height = 1
-                };
-                CheckBox userFilesCheckBox = new CheckBox("User files")
-                {
-                    X = 1,
-                    Y = y++,
-                    Width = 30,
-                    Height = 1
-                };
-                var whatToBuildDialog = new Dialog("Choose items to install", buildAndInstallButton, cancelButton)
-                {
-                    Height = 10,
-                    Width = 40
-                };
+            }
+        }
 
-                whatToBuildDialog.Add(alotCheckbox);
-                whatToBuildDialog.Add(alotUpdateCheckbox);
-                if (target.Game == Enums.MEGame.ME1)
+        /// <summary>
+        /// Shows the options dialog. Performs precheck
+        /// </summary>
+        /// <param name="target"></param>
+        private void showOptionsDialog(GameTarget target)
+        {
+            #region Button handlers
+            bool buildAndInstall = false;
+            var buildAndInstallButton = new Button("Install")
+            {
+                Clicked = () =>
                 {
-                    whatToBuildDialog.Add(meuitmCheckbox);
+                    Application.RequestStop();
+                    buildAndInstall = true;
                 }
-                whatToBuildDialog.Add(addonCheckBox);
-                whatToBuildDialog.Add(userFilesCheckBox);
-                Application.Run(whatToBuildDialog);
+            };
+            var cancelButton = new Button("Cancel")
+            {
+                Clicked = () => Application.RequestStop()
+            };
+            #endregion
 
-                if (buildAndInstall)
+            var availableInstallOptions = InstallOptionsStep.CalculateInstallOptions(target, CurrentMode, dataSource.InstallerFiles);
+
+            // Begin setting up UI items
+            int y = 0;
+            int maxWidth = 53;
+            int requiredHeight = 3;
+            var installOptionsPicker = new Dialog("Choose installation options", buildAndInstallButton, cancelButton)
+            {
+                Height = 10,
+                Width = 90
+            };
+            installOptionsPicker.Add(new Label($"Installer mode: {CurrentMode}")
+            {
+                X = 1,
+                Y = y++,
+                Width = Dim.Fill(),
+                Height = 1
+            });
+
+            y++; // Newline
+
+            foreach (var v in availableInstallOptions)
+            {
+                CheckBox cb = new CheckBox(getUIString(v, dataSource.InstallerFiles))
                 {
-                    var optionsPackage = new InstallOptionsPackage()
-                    {
-                        InstallTarget = target,
-                        FilesToInstall = dataSource.InstallerFiles,
-                        InstallALOT = alotCheckbox.Checked,
-                        InstallALOTUpdate = alotUpdateCheckbox.Checked,
-                        InstallMEUITM = meuitmCheckbox.Checked,
-                        InstallALOTAddon = addonCheckBox.Checked,
-                        InstallUserfiles = userFilesCheckBox.Checked,
-                        InstallerMode = CurrentMode,
-                        RepackGameFiles = true //needs option
-                    };
+                    X = 1,
+                    Y = y++,
+                    Width = Dim.Fill(),
+                    Height = 1,
+                    Checked = v.Value.state == InstallOptionsStep.OptionState.CheckedVisible ||
+                              v.Value.state == InstallOptionsStep.OptionState.ForceCheckedVisible,
+                    CanFocus = v.Value.state == InstallOptionsStep.OptionState.CheckedVisible ||
+                               v.Value.state == InstallOptionsStep.OptionState.UncheckedVisible
+                };
+                installOptionsPicker.Add(cb);
 
-                    MessageDialog md = new MessageDialog("Performing installation precheck [1/2]");
-                    NamedBackgroundWorker prestageCheckWorker = new NamedBackgroundWorker("PrecheckWorker-Prestaging");
-                    prestageCheckWorker.DoWork += (a, b) =>
+                maxWidth = Math.Max(maxWidth, cb.Text.Length + 4);
+
+                if (v.Value.reasonForState != null)
+                {
+                    installOptionsPicker.Add(new Label(v.Value.reasonForState)
                     {
-                        b.Result = Precheck.PerformPreStagingCheck(optionsPackage);
-                    };
-                    prestageCheckWorker.RunWorkerCompleted += (sender, b) =>
-                    {
-                        if (md.IsCurrentTop)
-                        {
-                            // Close the dialog
-                            Application.RequestStop();
-                        }
-                        if (b.Error != null)
-                        {
-                            Log.Error($"Exception occured in precheck for pre-stage: {b.Error.Message}");
-                            MessageBox.Query("Precheck failed", b.Result as string, "OK");
-                        }
-                        else if (b.Result != null)
-                        {
-                            // Precheck failed
-                            MessageBox.Query("Precheck failed", b.Result as string, "OK");
-                        }
-                        else
-                        {
-                            // Precheck passed
-                            var builderUI = new BuilderUI.StagingUIController();
-                            builderUI.SetOptionsPackage(optionsPackage);
-                            builderUI.SetupUI();
-                            TextureLibrary.StopLibraryWatcher(); // Kill watcher
-                            Program.SwapToNewView(builderUI);
-                        }
-                    };
-                    prestageCheckWorker.RunWorkerAsync();
-                    Application.Run(md);
+                        X = 1,
+                        Y = y++,
+                        Width = Dim.Fill(),
+                        Height = 1,
+                    });
+                    maxWidth = Math.Max(maxWidth, v.Value.reasonForState.Length + 4);
                 }
             }
+
+            y++;
+            y++;
+            installOptionsPicker.Add(new Label("Items marked with * cannot be toggled on or off")
+            {
+                X = 1,
+                Y = y++,
+                Width = Dim.Fill(),
+                Height = 1,
+            });
+            // We start at 50 so this is already not too long
+
+            installOptionsPicker.Height = y + requiredHeight;
+            installOptionsPicker.Width = maxWidth;
+
+            Application.Run(installOptionsPicker);
+
+            if (buildAndInstall)
+            {
+                var optionsPackage = new InstallOptionsPackage()
+                {
+                    InstallTarget = target,
+                    FilesToInstall = dataSource.InstallerFiles,
+                    //InstallALOT = alotCheckbox.Checked,
+                    //InstallALOTUpdate = alotUpdateCheckbox.Checked,
+                    //InstallMEUITM = meuitmCheckbox.Checked,
+                    //InstallALOTAddon = addonCheckBox.Checked,
+                    //InstallUserfiles = userFilesCheckBox.Checked,
+                    InstallerMode = CurrentMode,
+                    RepackGameFiles = true //needs option
+                };
+
+                MessageDialog md = new MessageDialog("Performing installation precheck [1/2]");
+                NamedBackgroundWorker prestageCheckWorker = new NamedBackgroundWorker("PrecheckWorker-Prestaging");
+                prestageCheckWorker.DoWork += (a, b) => { b.Result = Precheck.PerformPreStagingCheck(optionsPackage); };
+                prestageCheckWorker.RunWorkerCompleted += (sender, b) =>
+                {
+                    if (md.IsCurrentTop)
+                    {
+                        // Close the dialog
+                        Application.RequestStop();
+                    }
+
+                    if (b.Error != null)
+                    {
+                        Log.Error($"Exception occured in precheck for pre-stage: {b.Error.Message}");
+                        MessageBox.Query("Precheck failed", b.Result as string, "OK");
+                    }
+                    else if (b.Result != null)
+                    {
+                        // Precheck failed
+                        MessageBox.Query("Precheck failed", b.Result as string, "OK");
+                    }
+                    else
+                    {
+                        // Precheck passed
+                        var builderUI = new BuilderUI.StagingUIController();
+                        builderUI.SetOptionsPackage(optionsPackage);
+                        builderUI.SetupUI();
+                        TextureLibrary.StopLibraryWatcher(); // Kill watcher
+                        Program.SwapToNewView(builderUI);
+                    }
+                };
+                prestageCheckWorker.RunWorkerAsync();
+                Application.Run(md);
+            }
+        }
+
+        private ustring getUIString(KeyValuePair<InstallOptionsStep.InstallOption, (InstallOptionsStep.OptionState state, string reasonForState)> option, List<InstallerFile> installerFiles)
+        {
+
+            var forcedOption = option.Value.state == InstallOptionsStep.OptionState.ForceCheckedVisible || option.Value.state == InstallOptionsStep.OptionState.DisabledVisible;
+            string suffix = forcedOption ? "*" : "";
+
+            if (option.Key == InstallOptionsStep.InstallOption.ALOT) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0)?.FriendlyName ?? "ALOT") + suffix;
+            if (option.Key == InstallOptionsStep.InstallOption.ALOTUpdate) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0)?.FriendlyName ?? "ALOT update") + suffix;
+            if (option.Key == InstallOptionsStep.InstallOption.ALOTAddon) return "ALOT Addon" + suffix;
+            if (option.Key == InstallOptionsStep.InstallOption.MEUITM) return "MEUITM" + suffix;
+            if (option.Key == InstallOptionsStep.InstallOption.UserFiles) return "User files" + suffix;
+            return "UNKNOWN OPTION";
         }
 
         private void Settings_Clicked()
