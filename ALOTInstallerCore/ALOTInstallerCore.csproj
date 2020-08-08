@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="ModManager\binkw32\me1\binkw23.dll" />
+    <None Remove="ModManager\binkw32\me1\binkw32.dll" />
+    <None Remove="ModManager\binkw32\me2\binkw23.dll" />
+    <None Remove="ModManager\binkw32\me2\binkw32.dll" />
+    <None Remove="ModManager\binkw32\me3\binkw23.dll" />
+    <None Remove="ModManager\binkw32\me3\binkw32.dll" />
     <None Remove="Steps\Installer\Stage.cs~RF6ac8885.TMP" />
   </ItemGroup>
   <ItemGroup>
@@ -27,5 +33,13 @@
     <PackageReference Include="Octokit" Version="0.48.0" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />
     <PackageReference Include="Serilog" Version="2.9.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ModManager\binkw32\me1\binkw23.dll" />
+    <EmbeddedResource Include="ModManager\binkw32\me1\binkw32.dll" />
+    <EmbeddedResource Include="ModManager\binkw32\me2\binkw23.dll" />
+    <EmbeddedResource Include="ModManager\binkw32\me2\binkw32.dll" />
+    <EmbeddedResource Include="ModManager\binkw32\me3\binkw23.dll" />
+    <EmbeddedResource Include="ModManager\binkw32\me3\binkw32.dll" />
   </ItemGroup>
 </Project>

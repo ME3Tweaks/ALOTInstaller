@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ALOTInstallerConsole.BuilderUI;
+﻿using ALOTInstallerConsole.BuilderUI;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.InstallerUI

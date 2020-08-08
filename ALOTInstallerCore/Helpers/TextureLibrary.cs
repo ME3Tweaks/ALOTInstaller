@@ -4,11 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
-using ALOTInstallerCore.Startup;
 using Serilog;
 
 namespace ALOTInstallerCore.Helpers
@@ -291,6 +289,67 @@ namespace ALOTInstallerCore.Helpers
             {
                 v.UpdateReadyStatus();
             }
+        }
+
+        /// <summary>
+        /// Attempts to import unpacked versions of files from the specified directory to the texture library
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <param name="manifestFiles"></param>
+        /// <returns></returns>
+        public static bool AttemptImportUnpackedFiles(string directory, List<ManifestFile> manifestFiles, bool deletePackedOnImport = false)
+        {
+            try
+            {
+                Dictionary<ManifestFile, string> mfToUnpackedMap = new Dictionary<ManifestFile, string>();
+                foreach (var mf in manifestFiles)
+                {
+                    if (mf.UnpackedSingleFilename != null)
+                    {
+                        if (Path.GetFileName(mf.GetUsedFilepath()).Equals(mf.Filename, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            // The ready file is the normal file but there is unpacked single file support for this
+                            // Find the unpacked file
+                            foreach (var uf in Directory.GetFiles(directory))
+                            {
+                                var len = new FileInfo(uf).Length;
+                                if (len == mf.UnpackedFileSize && Path.GetExtension(mf.UnpackedSingleFilename) == Path.GetExtension(uf))
+                                {
+                                    if (len < 1000000000)
+                                    {
+                                        // < 1GB. Bigger would make this take a long time... not much we can do about this
+                                        var md5 = Utilities.CalculateMD5(uf);
+                                        if (md5 != mf.UnpackedFileMD5)
+                                            continue; //This is not correct unpacked file
+                                    }
+
+                                    mfToUnpackedMap[mf] = uf;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach (var movableFile in mfToUnpackedMap)
+                {
+                    var oldFname = movableFile.Key.GetUsedFilepath();
+                    var destF = Path.Combine(Settings.TextureLibraryLocation, movableFile.Key.UnpackedSingleFilename);
+                    File.Move(movableFile.Value, destF); // With no progress this can take a while
+                    var newFname = movableFile.Key.GetUsedFilepath();
+                    if (oldFname != newFname)
+                    {
+                        movableFile.Key.UpdateReadyStatus(); // force it to update readiness (not sure this does anything useful, but who knows?
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Error trying to move unpacked files to texture library: {e.Message}");
+                return false;
+            }
+
+            return true;
         }
     }
 }

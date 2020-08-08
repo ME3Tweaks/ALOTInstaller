@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Windows.Input;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.Services;
@@ -16,7 +14,7 @@ namespace ALOTInstallerCore.ModManager.Objects
 {
 
 
-    namespace MassEffectModManagerCore.modmanager.objects
+    namespace ALOTInstallerCore.modmanager.objects
     {
 
         public class GameTarget : IEqualityComparer<GameTarget>, INotifyPropertyChanged
@@ -622,21 +620,21 @@ namespace ALOTInstallerCore.ModManager.Objects
                 if (Game == Enums.MEGame.ME1)
                 {
                     var obinkPath = Path.Combine(TargetPath, "Binaries", "binkw23.dll");
-                    Utilities.ExtractInternalFile("MassEffectModManagerCore.modmanager.binkw32.me1.binkw32.dll", binkPath, true);
-                    Utilities.ExtractInternalFile("MassEffectModManagerCore.modmanager.binkw32.me1.binkw23.dll", obinkPath, true);
+                    Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me1.binkw32.dll", binkPath, true);
+                    Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me1.binkw23.dll", obinkPath, true);
                 }
                 else if (Game == Enums.MEGame.ME2)
                 {
                     var obinkPath = Path.Combine(TargetPath, "Binaries", "binkw23.dll");
-                    Utilities.ExtractInternalFile("MassEffectModManagerCore.modmanager.binkw32.me2.binkw32.dll", binkPath, true);
-                    Utilities.ExtractInternalFile("MassEffectModManagerCore.modmanager.binkw32.me2.binkw23.dll", obinkPath, true);
+                    Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me2.binkw32.dll", binkPath, true);
+                    Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me2.binkw23.dll", obinkPath, true);
 
                 }
                 else if (Game == Enums.MEGame.ME3)
                 {
                     var obinkPath = Path.Combine(TargetPath, "Binaries", "win32", "binkw23.dll");
-                    Utilities.ExtractInternalFile("MassEffectModManagerCore.modmanager.binkw32.me3.binkw32.dll", binkPath, true);
-                    Utilities.ExtractInternalFile("MassEffectModManagerCore.modmanager.binkw32.me3.binkw23.dll", obinkPath, true);
+                    Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me3.binkw32.dll", binkPath, true);
+                    Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me3.binkw23.dll", obinkPath, true);
                 }
                 else
                 {

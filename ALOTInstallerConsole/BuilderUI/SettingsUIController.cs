@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Text;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
 using ALOTInstallerCore.Objects;
-using ALOTInstallerCore.Startup;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI

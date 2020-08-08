@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
-using System.Text;
-using System.Windows.Input;
-using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
-using Serilog;
 
 namespace ALOTInstallerCore.ModManager.Objects
 {

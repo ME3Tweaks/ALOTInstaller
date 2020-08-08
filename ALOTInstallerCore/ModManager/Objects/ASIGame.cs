@@ -4,11 +4,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Windows.Input;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameDirectories;
-using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
 using ALOTInstallerCore.Objects;
 using Serilog;
 

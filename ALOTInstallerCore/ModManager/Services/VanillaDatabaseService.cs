@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameDirectories;
-using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
 using ALOTInstallerCore.Objects;
 using Serilog;
 

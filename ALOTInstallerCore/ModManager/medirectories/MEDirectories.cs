@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
-using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using Serilog;

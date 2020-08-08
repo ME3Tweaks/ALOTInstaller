@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
-using System.Text;
 using System.Threading;
 
 namespace ALOTInstallerCore.Helpers

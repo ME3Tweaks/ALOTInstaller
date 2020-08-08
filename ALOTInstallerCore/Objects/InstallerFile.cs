@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 using ALOTInstallerCore.Objects.Manifest;
 
 namespace ALOTInstallerCore.Objects

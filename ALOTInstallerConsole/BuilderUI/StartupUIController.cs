@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+﻿using System.ComponentModel;
 using ALOTInstallerCore;
-using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Startup;
-using Serilog;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI

@@ -1,12 +1,9 @@
 ﻿using ALOTInstallerCore.PlatformSpecific.Windows;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using ALOTInstallerCore.ModManager.GameINI;
-using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
 using ALOTInstallerCore.Objects;
-using static ALOTInstallerCore.Hook;
 
 namespace ALOTInstallerCore.Helpers
 {

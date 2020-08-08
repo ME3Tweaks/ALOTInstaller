@@ -5,8 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
@@ -26,38 +24,46 @@ namespace ALOTInstallerCore.Steps
         private string memInputPath;
 
         private ProgressHandler pm { get; }
+
         /// <summary>
         /// Callback to set what is being installed. Used for UI purposes
         /// </summary>
         public Action<string> SetInstallString { get; set; }
+
         /// <summary>
         /// Callback to set the first line of text's visibility
         /// </summary>
         public Action<string> SetTopTextCallback { get; set; }
+
         /// <summary>
         /// Callback to set the second line of text's visibility
         /// </summary>
         public Action<string> SetMiddleTextCallback { get; set; }
+
         /// <summary>
         /// Callback to set the third line of text
         /// </summary>
         public Action<string> SetBottomTextCallback { get; set; }
+
         /// <summary>
         /// Callback to set the first line of text's visibility
         /// </summary>
         public Action<bool> SetTopTextVisibilityCallback { get; set; }
+
         /// <summary>
         /// Callback to set the second line of text's visibility
         /// </summary>
         public Action<bool> SetMiddleTextVisibilityCallback { get; set; }
+
         /// <summary>
         /// Callback to set the third line of text's visibility
         /// </summary>
         public Action<bool> SetBottomTextVisibilityCallback { get; set; }
+
         /// <summary>
         /// Callback to indicate that there should be a warning about Origin automatically updating the game for users and that they should never do this. Only triggers on Origin versions of games (ME1/2/3 + 3 steam)
         /// </summary>
-        public Action<Enums.MEGame> ShowStorefrontDontClickUpdateCallbackAction { get; set; }
+        public Action<Enums.MEGame> ShowStorefrontDontClickUpdateCallback { get; set; }
 
         /// <summary>
         /// Callback for setting the 'overall' progress value, from 0 to 100. Can be used to display things like progressbars. Only works for the main long install step
@@ -86,12 +92,18 @@ namespace ALOTInstallerCore.Steps
             InstallFailed_ExistingMarkersFound,
             InstallFailed_TextureExportFixFailed,
             InstallFailed_MEMCrashed,
+            InstallFailed_MEMReturnedNonZero,
+            InstallFailed_MEMExitedBeforeStageDone,
+            InstallFailed_ME1LAAApplyFailed,
+            InstallFailed_FailedToApplyTextureInfo,
+            InstallFailed_ZipCopyFilesError,
             InstallOK,
         }
 
         public void InstallTextures(object sender, DoWorkEventArgs doWorkEventArgs)
         {
             // Where the compiled .mem and staged other files will be
+
             #region setup top text
 
             string primary = "";
@@ -157,61 +169,24 @@ namespace ALOTInstallerCore.Steps
 
             #region Check for existing markers
 
+            if (!checkForExistingMarkers())
             {
-                string args = $"--check-for-markers --gameid {package.InstallTarget.Game.ToGameNum()} --ipc";
-                if (package.DebugLogging)
-                {
-                    args += " --debug-logs";
-                }
-
-                List<string> badFiles = new List<string>();
-
-                void handleIPC(string command, string param)
-                {
-                    switch (command)
-                    {
-                        case "TASK_PROGRESS":
-                            SetBottomTextCallback?.Invoke($"Checking game files for existing texture markers {param}%");
-                            break;
-                        case "FILENAME":
-
-                            break;
-                        case "ERROR_FILEMARKER_FOUND":
-                            Log.Error("File was part of a different texture installation: " + param);
-                            badFiles.Add(param);
-                            break;
-                        default:
-                            Debug.WriteLine($"Unhandled IPC: {command} {param}");
-                            break;
-                    }
-                }
-
-                int currentMemProcessId = 0;
-                int lastExitCode = int.MinValue;
-                MEMIPCHandler.RunMEMIPCUntilExit(args,
-                    x => currentMemProcessId = x,
-                    handleIPC,
-                    x => Log.Error($"StdError: {x}"),
-                    x =>
-                    {
-                        currentMemProcessId = 0;
-                        lastExitCode = x;
-                    });
-
-                if (badFiles.Any())
-                {
-                    // Must abort!
-                    SetBottomTextCallback?.Invoke("Couldn't install textures");
-                    SetTopTextCallback?.Invoke("Files from a previous texture installation were found");
-                    doWorkEventArgs.Result = InstallResult.InstallFailed_ExistingMarkersFound;
-                    return; //Exit
-                }
+                doWorkEventArgs.Result = InstallResult.InstallFailed_ExistingMarkersFound;
+                return;
             }
+
+
 
             #endregion
 
             #region Preinstall ALOV mods
-            applyModManagerMods();
+
+            if (!applyModManagerMods())
+            {
+                doWorkEventArgs.Result = InstallResult.InstallFailed_TextureExportFixFailed;
+                return;
+            }
+
             #endregion
 
             #region Fix broken mods like Bonus Powers Pack
@@ -221,10 +196,13 @@ namespace ALOTInstallerCore.Steps
                 doWorkEventArgs.Result = InstallResult.InstallFailed_TextureExportFixFailed;
                 return;
             }
+
             #endregion
 
             #region Apply Post-mars post-hackett fix (ME3 only)
+
             applyCitadelTransitionFix();
+
             #endregion
 
             #region Main installation phase
@@ -244,23 +222,28 @@ namespace ALOTInstallerCore.Steps
                             }
                         case "STAGE_WEIGHT": //Reweight a stage based on how long we think it will take
                             string[] parameters = param.Split(' ');
-                            try
+                            if (parameters.Length > 1)
                             {
-                                double scale = Utilities.GetDouble(parameters[1], 1);
-                                Log.Information("Reweighting stage " + parameters[0] + " by " + parameters[1]);
-                                pm.ScaleStageWeight(parameters[0], scale);
+                                try
+                                {
+                                    double scale = Utilities.GetDouble(parameters[1], 1);
+                                    Log.Information("Reweighting stage " + parameters[0] + " by " + parameters[1]);
+                                    pm.ScaleStageWeight(parameters[0], scale);
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.Warning("STAGE_WEIGHT parameter invalid: " + e.Message);
+                                }
                             }
-                            catch (Exception e)
+                            else
                             {
-                                Log.Information("STAGE_WEIGHT parameter invalid: " + e);
+                                Log.Error("STAGE_WEIGHT IPC requires 2 parameters, STAGE and WEIGHT");
                             }
-
                             break;
                         case "STAGE_CONTEXT": //Change to new stage
                             doneReached = pm.CompleteAndMoveToStage(param);
                             updateStageOfStage();
                             updateCurrentStage();
-
                             break;
                         case "TASK_PROGRESS": //Report progress of a stage
                             pm.SubmitProgress(int.Parse(param));
@@ -285,11 +268,6 @@ namespace ALOTInstallerCore.Steps
                     args += " --repack-mode";
                 }
 
-                if (package.DebugLogging)
-                {
-                    args += " --debug-logs";
-                }
-
                 MEMIPCHandler.RunMEMIPCUntilExit(args,
                     x => currentMemProcessId = x,
                     handleIPC,
@@ -302,36 +280,60 @@ namespace ALOTInstallerCore.Steps
                 if (lastExitCode != 0)
                 {
                     Log.Error($@"MEM exited with non zero exit code: {lastExitCode}");
-                    // Todo: Issue callbacks to handle this
+                    doWorkEventArgs.Result = InstallResult.InstallFailed_MEMReturnedNonZero;
                     return;
                 }
 
                 if (!doneReached)
                 {
                     Log.Error(@"MEM exited without reaching STAGE_DONE!");
-                    // Todo: Issue callbacks to handle this
+                    doWorkEventArgs.Result = InstallResult.InstallFailed_MEMExitedBeforeStageDone;
                     return;
                 }
 
                 #endregion
 
                 #region Post-main install modifications
+
                 SetMiddleTextCallback?.Invoke("Finishing installation");
 
-                installZipCopyFiles();
+                if (!installZipCopyFiles())
+                {
+                    doWorkEventArgs.Result = InstallResult.InstallFailed_ZipCopyFilesError;
+                    return;
+                }
+
                 if (package.InstallTarget.Game == Enums.MEGame.ME1)
                 {
                     // Apply ME1 LAA
-                    applyME1LAA();
+                    if (!applyME1LAA())
+                    {
+                        doWorkEventArgs.Result = InstallResult.InstallFailed_ME1LAAApplyFailed;
+                        return;
+                    }
                 }
-                stampVersionInformation(); //At this point we are now OK
 
-                applyLODs();
-                moveBackNewlyUnpackedFiles();
-                //applyBinkw32();
+                if (!stampVersionInformation())
+                {
+                    doWorkEventArgs.Result = InstallResult.InstallFailed_FailedToApplyTextureInfo;
+                    return;
+                }
+
+                //At this point we are now OK, errors will result in warnings only.
+                bool hasWarning = false;
+
+                hasWarning |= applyLODs();
+                if (package.ImportNewlyUnpackedFiles)
+                {
+                    TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), true);
+                }
+
+
+                hasWarning |= !package.InstallTarget.InstallBinkBypass();
                 if (package.InstallTarget.Game == Enums.MEGame.ME3)
                 {
                     // Install ASIs.
+                    // Need ASI manager code from Mod Manager once it is ready
                 }
 
                 #endregion
@@ -340,6 +342,52 @@ namespace ALOTInstallerCore.Steps
                 doWorkEventArgs.Result = InstallResult.InstallOK;
             }
         }
+
+        private bool checkForExistingMarkers()
+        {
+            string args = $"--check-for-markers --gameid {package.InstallTarget.Game.ToGameNum()} --ipc";
+            if (package.DebugLogging)
+            {
+                args += " --debug-logs";
+            }
+
+            List<string> badFiles = new List<string>();
+
+            void handleIPC(string command, string param)
+            {
+                switch (command)
+                {
+                    case "TASK_PROGRESS":
+                        SetBottomTextCallback?.Invoke($"Checking game files for existing texture markers {param}%");
+                        break;
+                    case "FILENAME":
+
+                        break;
+                    case "ERROR_FILEMARKER_FOUND":
+                        Log.Error("File was part of a different texture installation: " + param);
+                        badFiles.Add(param);
+                        break;
+                    default:
+                        Debug.WriteLine($"Unhandled IPC: {command} {param}");
+                        break;
+                }
+            }
+
+            int currentMemProcessId = 0;
+            int lastExitCode = int.MinValue;
+            MEMIPCHandler.RunMEMIPCUntilExit(args,
+                x => currentMemProcessId = x,
+                handleIPC,
+                x => Log.Error($"StdError: {x}"),
+                x =>
+                {
+                    currentMemProcessId = 0;
+                    lastExitCode = x;
+                });
+
+            return !badFiles.Any();
+        }
+
 
         private void showOnlineStorefrontNoUpdateScreen()
         {
@@ -350,11 +398,6 @@ namespace ALOTInstallerCore.Steps
                 //origin based
                 ShowStorefrontDontClickUpdateCallback?.Invoke(package.InstallTarget.Game);
             }
-        }
-
-        private void moveBackNewlyUnpackedFiles()
-        {
-            throw new NotImplementedException();
         }
 
         private void applyCitadelTransitionFix()
@@ -488,102 +531,101 @@ namespace ALOTInstallerCore.Steps
             return true;
         }
 
-        private void installZipCopyFiles()
+        private bool installZipCopyFiles()
         {
-            //things like soft shadows, reshade
-            foreach (InstallerFile af in package.FilesToInstall)
+            try
             {
-                if (af is ManifestFile mf)
+                //things like soft shadows, reshade
+                foreach (InstallerFile af in package.FilesToInstall)
                 {
-                    if (mf.CopyFiles != null)
+                    if (af is ManifestFile mf)
                     {
-                        foreach (CopyFile cf in mf.CopyFiles)
+                        if (mf.CopyFiles != null)
                         {
-                            if (cf.IsSelectedForInstallation())
+                            foreach (CopyFile cf in mf.CopyFiles)
                             {
-                                string installationPath = Path.Combine(package.InstallTarget.TargetPath, cf.GameDestinationPath);
-                                File.Copy(cf.StagedPath, installationPath, true);
-                                Log.Information($"Installed copyfile: {cf.ChoiceTitle} {cf.StagedPath} to {installationPath}");
+                                if (cf.IsSelectedForInstallation())
+                                {
+                                    string installationPath = Path.Combine(package.InstallTarget.TargetPath, cf.GameDestinationPath);
+                                    File.Copy(cf.StagedPath, installationPath, true);
+                                    Log.Information($"Installed copyfile: {cf.ChoiceTitle} {cf.StagedPath} to {installationPath}");
+                                }
                             }
                         }
-                    }
 
-                    if (mf.ZipFiles != null)
-                    {
-                        foreach (ZipFile zf in mf.ZipFiles)
+                        if (mf.ZipFiles != null)
                         {
-                            if (zf.IsSelectedForInstallation())
+                            foreach (ZipFile zf in mf.ZipFiles)
                             {
-                                SetBottomTextCallback?.Invoke($"Installing {zf.ChoiceTitle}");
-                                string installationPath = Path.Combine(package.InstallTarget.TargetPath, zf.GameDestinationPath);
-                                int extractcode = -1;
-                                Directory.CreateDirectory(installationPath);
-                                MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{zf.StagedPath}\" --output \"{installationPath}\" --ipc",
-                                    null,
-                                    null,
-                                    x => Log.Error($"StdError on {zf.StagedPath}: {x}"),
-                                    x => extractcode = x);
-                                if (extractcode == 0)
+                                if (zf.IsSelectedForInstallation())
                                 {
-                                    Log.Information($"Installed copyfile: {zf.ChoiceTitle} {zf.StagedPath} to {installationPath}");
-
-                                }
-                                else
-                                {
-                                    Log.Error("Extraction of " + zf.ChoiceTitle + " failed with code " + extractcode);
-                                }
-
-                                if (package.InstallTarget.Game == Enums.MEGame.ME1 && zf.DeleteShaders)
-                                {
-                                    string documents = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                                    string localusershaderscache = Path.Combine(documents,
-                                        @"BioWare\Mass Effect\Published\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
-                                    if (File.Exists(localusershaderscache))
+                                    SetBottomTextCallback?.Invoke($"Installing {zf.ChoiceTitle}");
+                                    string installationPath = Path.Combine(package.InstallTarget.TargetPath, zf.GameDestinationPath);
+                                    int extractcode = -1;
+                                    Directory.CreateDirectory(installationPath);
+                                    MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{zf.StagedPath}\" --output \"{installationPath}\" --ipc",
+                                        null,
+                                        null,
+                                        x => Log.Error($"StdError on {zf.StagedPath}: {x}"),
+                                        x => extractcode = x);
+                                    if (extractcode == 0)
                                     {
-                                        File.Delete(localusershaderscache);
-                                        Log.Information("Deleted user localshadercache: " + localusershaderscache);
+                                        Log.Information($"Installed zipfile: {zf.ChoiceTitle} {zf.StagedPath} to {installationPath}");
+
                                     }
                                     else
                                     {
-                                        Log.Warning("unable to delete user local shadercache, it does not exist: " +
-                                                    localusershaderscache);
+                                        Log.Error("Extraction of " + zf.ChoiceTitle + " failed with code " + extractcode);
                                     }
 
-                                    string gamelocalshadercache =
-                                        Path.Combine(package.InstallTarget.TargetPath,
-                                            @"BioGame\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
-                                    if (File.Exists(gamelocalshadercache))
+                                    if (package.InstallTarget.Game == Enums.MEGame.ME1 && zf.DeleteShaders)
                                     {
-                                        File.Delete(gamelocalshadercache);
-                                        Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
-                                    }
-                                    else
-                                    {
-                                        Log.Warning("Unable to delete game localshadercache, it does not exist: " +
-                                                    gamelocalshadercache);
-                                    }
-                                }
-
-                                //MEUITM SPECIFIC FIX
-                                //REMOVE ONCE THIS IS FIXED IN FUTURE MEUITM
-                                if (mf.AlotVersionInfo.MEUITMVER != 0 && !zf.MEUITMSoftShadows)
-                                {
-                                    //reshade
-                                    var d3d9ini = Path.Combine(package.InstallTarget.TargetPath, "Binaries", "d3d9.ini");
-                                    if (File.Exists(d3d9ini))
-                                    {
-                                        try
+                                        string documents = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                                        string localusershaderscache = Path.Combine(documents, @"BioWare\Mass Effect\Published\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
+                                        if (File.Exists(localusershaderscache))
                                         {
-                                            DuplicatingIni shaderConf = DuplicatingIni.LoadIni(d3d9ini);
-                                            shaderConf["GENERAL"]["TextureSearchPaths"].Value = Path.Combine(package.InstallTarget.TargetPath, "Binaries", "reshade-shaders", "Textures");
-                                            shaderConf["GENERAL"]["EffectSearchPaths"].Value = Path.Combine(package.InstallTarget.TargetPath, "Binaries", "reshade-shaders", "Shaders");
-                                            shaderConf["GENERAL"]["PresetFiles"].Value = Path.Combine(package.InstallTarget.TargetPath, "Binaries", "MassEffect.ini");
-                                            File.WriteAllText(d3d9ini, shaderConf.ToString());
-                                            Log.Information("Corrected MEUITM shader ini");
+                                            File.Delete(localusershaderscache);
+                                            Log.Information("Deleted user localshadercache: " + localusershaderscache);
                                         }
-                                        catch (Exception ex)
+                                        else
                                         {
-                                            Log.Error("Error fixing MEUITM shader ini: " + ex.Message);
+                                            Log.Warning("unable to delete user local shadercache, it does not exist: " + localusershaderscache);
+                                        }
+
+                                        string gamelocalshadercache = Path.Combine(package.InstallTarget.TargetPath, @"BioGame\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
+                                        if (File.Exists(gamelocalshadercache))
+                                        {
+                                            File.Delete(gamelocalshadercache);
+                                            Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
+                                        }
+                                        else
+                                        {
+                                            Log.Warning("Unable to delete game localshadercache, it does not exist: " + gamelocalshadercache);
+                                        }
+                                    }
+
+                                    //MEUITM SPECIFIC FIX
+                                    //REMOVE ONCE THIS IS FIXED IN FUTURE MEUITM
+                                    if (mf.AlotVersionInfo.MEUITMVER != 0 && !zf.MEUITMSoftShadows)
+                                    {
+                                        //reshade
+                                        var d3d9ini = Path.Combine(package.InstallTarget.TargetPath, "Binaries", "d3d9.ini");
+                                        if (File.Exists(d3d9ini))
+                                        {
+                                            try
+                                            {
+                                                DuplicatingIni shaderConf = DuplicatingIni.LoadIni(d3d9ini);
+                                                shaderConf["GENERAL"]["TextureSearchPaths"].Value = Path.Combine(package.InstallTarget.TargetPath, "Binaries", "reshade-shaders", "Textures");
+                                                shaderConf["GENERAL"]["EffectSearchPaths"].Value = Path.Combine(package.InstallTarget.TargetPath, "Binaries", "reshade-shaders", "Shaders");
+                                                shaderConf["GENERAL"]["PresetFiles"].Value = Path.Combine(package.InstallTarget.TargetPath, "Binaries", "MassEffect.ini");
+                                                File.WriteAllText(d3d9ini, shaderConf.ToString());
+                                                Log.Information("Corrected MEUITM shader ini");
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Log.Error("Error fixing MEUITM shader ini: " + ex.Message);
+                                                return false;
+                                            }
                                         }
                                     }
                                 }
@@ -592,26 +634,49 @@ namespace ALOTInstallerCore.Steps
                     }
                 }
             }
-        }
-
-        private void stampVersionInformation()
-        {
-            SetBottomTextCallback?.Invoke("Updating texture installation marker");
-            TextureModInstallationInfo tmii = TextureModInstallationInfo.CalculateMarker(package.InstallTarget.GetInstalledALOTInfo(), package.FilesToInstall);
-            tmii.ALOT_INSTALLER_VERSION_USED = Assembly.GetEntryAssembly().GetName().Version.Build;
-            int version = 0;
-            // If the current version doesn't support the --version --ipc, we just assume it is 0.
-            MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
+            catch (Exception e)
             {
-                if (command == "VERSION")
-                {
-                    tmii.MEM_VERSION_USED = int.Parse(param);
-                }
-            });
-            package.InstallTarget.StampTextureModificationInfo(tmii);
+                Log.Error($"Error applying copy/zip files: {e.Message}");
+                return false;
+            }
+
+            return true;
         }
 
-        private void applyLODs()
+        /// <summary>
+        /// Applies the texture installation information marker
+        /// </summary>
+        /// <returns></returns>
+        private bool stampVersionInformation()
+        {
+            try
+            {
+                SetBottomTextCallback?.Invoke("Updating texture installation marker");
+                TextureModInstallationInfo tmii = TextureModInstallationInfo.CalculateMarker(package.InstallTarget.GetInstalledALOTInfo(), package.FilesToInstall);
+                tmii.ALOT_INSTALLER_VERSION_USED = Assembly.GetEntryAssembly().GetName().Version.Build;
+                int version = 0;
+                // If the current version doesn't support the --version --ipc, we just assume it is 0.
+                MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
+                {
+                    if (command == "VERSION")
+                    {
+                        tmii.MEM_VERSION_USED = int.Parse(param);
+                    }
+                });
+                package.InstallTarget.StampTextureModificationInfo(tmii);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Error setting texture installation marker: {e.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Applies the texture level-of-detail settings
+        /// </summary>
+        private bool applyLODs()
         {
             SetBottomTextCallback?.Invoke("Applying graphics settings");
             Log.Information("Updating texture lods");
@@ -624,36 +689,53 @@ namespace ALOTInstallerCore.Steps
                 Log.Information(" > MEUITM Soft Shadows");
                 args += " --soft-shadows-mode --meuitm-mode";
             }
+
             if (package.Limit2K)
             {
                 Log.Information(" > Using 2K lods");
                 args += " --limit-2k";
             }
 
-
+            int exitcode = -1;
             // We don't care about IPC on this
             MEMIPCHandler.RunMEMIPCUntilExit(args,
                 null,
                 null,
                 x => Log.Error($"StdError setting LODs: {x}"),
-                null); //Change to catch exit code of non zero.        
+                x => exitcode = x); //Change to catch exit code of non zero.        
+            if (exitcode != 0)
+            {
+                Log.Error($"MassEffectModderNoGui had error setting LODs, exited with code {exitcode}");
+                return false;
+            }
+
+            return true;
         }
 
-        private void applyME1LAA()
+        /// <summary>
+        /// Applies the LAA patch as well as the Mass Effect -> Mass_Effect product name patch to bypass the Windows compatibility DB
+        /// </summary>
+        /// <returns></returns>
+        private bool applyME1LAA()
         {
             SetBottomTextCallback?.Invoke("Applying LAA");
             Log.Information("Applying LAA/Admin to game executable");
             string args = "--apply-me1-laa";
-
+            int exitcode = -1;
             // We don't care about IPC on this
             MEMIPCHandler.RunMEMIPCUntilExit(args,
                 null,
                 null,
                 x => Log.Error($"StdError setting LAA: {x}"),
-                null); //Change to catch exit code of non zero.        
+                x => exitcode = x); //Change to catch exit code of non zero.        
+
+            return exitcode == 0;
         }
 
-        private void applyModManagerMods()
+        /// <summary>
+        /// Applies specifically supported Mod Manager mods (technically they aren't mod managerm ods...)
+        /// </summary>
+        private bool applyModManagerMods()
         {
             //Apply ALOT-verified Mod Manager mods that we support installing
             SetMiddleTextVisibilityCallback?.Invoke(false);
@@ -664,6 +746,7 @@ namespace ALOTInstallerCore.Steps
 
                 // We will stage the archive contents into game dir to start with, so moving files should be fast.
                 var stagingPath = Directory.CreateDirectory(Path.Combine(package.InstallTarget.TargetPath, "ModExtractStaging")).FullName;
+
 
                 void handleIPC(string command, string param)
                 {
@@ -681,11 +764,17 @@ namespace ALOTInstallerCore.Steps
                     }
                 }
 
+                int exitcode = -1;
                 MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{modAddon.GetUsedFilepath()}\" --output \"{stagingPath}\" --ipc",
                     null,
                     handleIPC,
                     x => Log.Error($"StdError on {modAddon.FriendlyName}: {x}"),
-                    null); //Change to catch exit code of non zero.
+                    x => exitcode = x); //Change to catch exit code of non zero.
+                if (exitcode != 0)
+                {
+                    Log.Error($"MassEffectModderNoGui exited with non zero code {exitcode} extracting {modAddon.FriendlyName}");
+                    return false;
+                }
 
                 SetBottomTextCallback?.Invoke("Installing files");
 
@@ -694,125 +783,143 @@ namespace ALOTInstallerCore.Steps
                     ? Path.Combine(package.InstallTarget.TargetPath, "DLC")
                     : Path.Combine(package.InstallTarget.TargetPath, "BioGame", "DLC");
 
-                foreach (var extractionRedirect in modAddon.ExtractionRedirects)
+                try
                 {
-                    //dlc is required (all in list)
-                    if (extractionRedirect.OptionalRequiredDLC != null)
+                    foreach (var extractionRedirect in modAddon.ExtractionRedirects)
                     {
-                        List<string> requiredDlc = extractionRedirect.OptionalRequiredDLC.Split(';').ToList();
-                        List<string> requiredFiles = new List<string>();
-                        List<long> requiredFilesSizes = new List<long>();
-
-
-                        if (extractionRedirect.OptionalRequiredFiles != null)
+                        //dlc is required (all in list)
+                        if (extractionRedirect.OptionalRequiredDLC != null)
                         {
-                            requiredFiles = extractionRedirect.OptionalRequiredFiles.Split(';').ToList();
-                            if (extractionRedirect.OptionalRequiredFilesSizes != null)
+                            List<string> requiredDlc = extractionRedirect.OptionalRequiredDLC.Split(';').ToList();
+                            List<string> requiredFiles = new List<string>();
+                            List<long> requiredFilesSizes = new List<long>();
+
+
+                            if (extractionRedirect.OptionalRequiredFiles != null)
                             {
-                                //parse required sizes list. This can be null which means we don't check the list of file sizes in the list
-                                requiredFilesSizes = extractionRedirect.OptionalRequiredFilesSizes.Split(';').Select(x => long.Parse(x)).ToList();
-                            }
-                        }
-
-                        //check if any required dlc is missing
-                        if (requiredDlc.Any(x => !Directory.Exists(Path.Combine(dlcDirectory, x))))
-                        {
-                            Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. Rule requires all of the DLC: " + extractionRedirect.OptionalRequiredDLC);
-                            continue;
-                        }
-
-                        //Check if any required file is missing
-                        if (requiredFiles.Any(x => !File.Exists(Path.Combine(dlcDirectory, x))))
-                        {
-                            Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. At least one file for this rule was not found: " + extractionRedirect.OptionalRequiredFiles);
-                            continue;
-                        }
-
-                        //Check if any required file size is wrong
-                        if (requiredFilesSizes.Any())
-                        {
-                            bool doNotInstall = false;
-                            for (int i = 0; i < requiredFilesSizes.Count; i++)
-                            {
-                                string file = requiredFiles[i];
-                                long size = requiredFilesSizes[i];
-                                string finalPath = Path.Combine(dlcDirectory, file);
-                                var info = new FileInfo(finalPath);
-                                if (info.Length != size)
+                                requiredFiles = extractionRedirect.OptionalRequiredFiles.Split(';').ToList();
+                                if (extractionRedirect.OptionalRequiredFilesSizes != null)
                                 {
-                                    Log.Information(extractionRedirect.LoggingName +
-                                                    ": Extraction rule is not applicable to this setup, file size for file " + file + " does not match rule.");
-                                    doNotInstall = true;
-                                    break;
+                                    //parse required sizes list. This can be null which means we don't check the list of file sizes in the list
+                                    requiredFilesSizes = extractionRedirect.OptionalRequiredFilesSizes.Split(';').Select(x => long.Parse(x)).ToList();
                                 }
                             }
 
-                            if (doNotInstall)
+                            //check if any required dlc is missing
+                            if (requiredDlc.Any(x => !Directory.Exists(Path.Combine(dlcDirectory, x))))
                             {
+                                Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. Rule requires all of the DLC: " + extractionRedirect.OptionalRequiredDLC);
+                                continue;
+                            }
+
+                            //Check if any required file is missing
+                            if (requiredFiles.Any(x => !File.Exists(Path.Combine(dlcDirectory, x))))
+                            {
+                                Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. At least one file for this rule was not found: " + extractionRedirect.OptionalRequiredFiles);
+                                continue;
+                            }
+
+                            //Check if any required file size is wrong
+                            if (requiredFilesSizes.Any())
+                            {
+                                bool doNotInstall = false;
+                                for (int i = 0; i < requiredFilesSizes.Count; i++)
+                                {
+                                    string file = requiredFiles[i];
+                                    long size = requiredFilesSizes[i];
+                                    string finalPath = Path.Combine(dlcDirectory, file);
+                                    var info = new FileInfo(finalPath);
+                                    if (info.Length != size)
+                                    {
+                                        Log.Information(extractionRedirect.LoggingName +
+                                                        ": Extraction rule is not applicable to this setup, file size for file " + file + " does not match rule.");
+                                        doNotInstall = true;
+                                        break;
+                                    }
+                                }
+
+                                if (doNotInstall)
+                                {
+                                    continue;
+                                }
+                            }
+                        }
+
+                        //dlc required (any in list)
+                        if (extractionRedirect.OptionalAnyDLC != null)
+                        {
+                            List<string> anyDLC = extractionRedirect.OptionalAnyDLC.Split(';').ToList();
+                            //check if all dlc is missing
+                            if (anyDLC.All(x => !Directory.Exists(Path.Combine(dlcDirectory, x))))
+                            {
+                                Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. Rule requires at least one of the DLC: " + extractionRedirect.OptionalRequiredDLC);
                                 continue;
                             }
                         }
-                    }
 
-                    //dlc required (any in list)
-                    if (extractionRedirect.OptionalAnyDLC != null)
-                    {
-                        List<string> anyDLC = extractionRedirect.OptionalAnyDLC.Split(';').ToList();
-                        //check if all dlc is missing
-                        if (anyDLC.All(x => !Directory.Exists(Path.Combine(dlcDirectory, x))))
+                        Log.Information("Applying extraction rule: " + extractionRedirect.LoggingName);
+                        var rootPath = Path.Combine(stagingPath, extractionRedirect.ArchiveRootPath);
+                        var filesToMove = Directory.GetFiles(rootPath, "*", SearchOption.AllDirectories);
+
+                        var ingameDestination = Path.Combine(package.InstallTarget.TargetPath, extractionRedirect.RelativeDestinationDirectory);
+                        if (extractionRedirect.IsDLC && Directory.Exists(ingameDestination))
                         {
-                            Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. Rule requires at least one of the DLC: " + extractionRedirect.OptionalRequiredDLC);
-                            continue;
-                        }
-                    }
-
-                    Log.Information("Applying extraction rule: " + extractionRedirect.LoggingName);
-                    var rootPath = Path.Combine(stagingPath, extractionRedirect.ArchiveRootPath);
-                    var filesToMove = Directory.GetFiles(rootPath, "*", SearchOption.AllDirectories);
-
-                    var ingameDestination = Path.Combine(package.InstallTarget.TargetPath, extractionRedirect.RelativeDestinationDirectory);
-                    if (extractionRedirect.IsDLC && Directory.Exists(ingameDestination))
-                    {
-                        //delete first
-                        Utilities.DeleteFilesAndFoldersRecursively(ingameDestination);
-                    }
-
-                    Directory.CreateDirectory(ingameDestination);
-
-                    foreach (var file in filesToMove)
-                    {
-                        string relativePath = file.Substring(rootPath.Length + 1);
-                        var extension = Path.GetExtension(relativePath);
-                        if (extension.Equals(".pcc", StringComparison.InvariantCultureIgnoreCase) ||
-                            extension.Equals(".tfc", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            Log.Information("Skipping file that that cannot be installed after alot: " + relativePath);
-                            continue;
+                            //delete first
+                            Utilities.DeleteFilesAndFoldersRecursively(ingameDestination);
                         }
 
-                        string finalDestinationPath = Path.Combine(ingameDestination, relativePath);
-                        if (File.Exists(finalDestinationPath))
+                        Directory.CreateDirectory(ingameDestination);
+
+                        foreach (var file in filesToMove)
                         {
-                            Log.Information("Deleting existing file before move: " + finalDestinationPath);
-                            File.Delete(finalDestinationPath);
+                            string relativePath = file.Substring(rootPath.Length + 1);
+                            var extension = Path.GetExtension(relativePath);
+                            if (extension.Equals(".pcc", StringComparison.InvariantCultureIgnoreCase) ||
+                                extension.Equals(".tfc", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                Log.Information("Skipping file that that cannot be installed after alot: " + relativePath);
+                                continue;
+                            }
+
+                            string finalDestinationPath = Path.Combine(ingameDestination, relativePath);
+                            if (File.Exists(finalDestinationPath))
+                            {
+                                Log.Information("Deleting existing file before move: " + finalDestinationPath);
+                                File.Delete(finalDestinationPath);
+                            }
+
+                            Log.Information($"Moving staged file into game directory: {file} -> {finalDestinationPath}");
+                            Directory.CreateDirectory(Directory.GetParent(finalDestinationPath).FullName);
+                            File.Move(file, finalDestinationPath);
                         }
 
-                        Log.Information($"Moving staged file into game directory: {file} -> {finalDestinationPath}");
-                        Directory.CreateDirectory(Directory.GetParent(finalDestinationPath).FullName);
-                        File.Move(file, finalDestinationPath);
-                    }
-
-                    if (extractionRedirect.IsDLC)
-                    {
-                        //Write a _metacmm.txt file
-                        var metacmm = Path.Combine(ingameDestination, "_metacmm.txt");
-                        string contents = $"{extractionRedirect.LoggingName}\n{extractionRedirect.ModVersion}\n{Assembly.GetEntryAssembly().FullName} {System.Reflection.Assembly.GetEntryAssembly().GetName().Version}\n{Guid.NewGuid().ToString()}";
-                        File.WriteAllText(metacmm, contents);
+                        if (extractionRedirect.IsDLC)
+                        {
+                            //Write a _metacmm.txt file
+                            var metacmm = Path.Combine(ingameDestination, "_metacmm.txt");
+                            string contents = $"{extractionRedirect.LoggingName}\n{extractionRedirect.ModVersion}\n{Assembly.GetEntryAssembly().FullName} {System.Reflection.Assembly.GetEntryAssembly().GetName().Version}\n{Guid.NewGuid().ToString()}";
+                            File.WriteAllText(metacmm, contents);
+                        }
                     }
                 }
+                catch (Exception e)
+                {
+                    Log.Error($"Error installing preinstall mod {modAddon.FriendlyName}: {e.Message}. ModExtractingStaging at root of install folder may need to be manually deleted");
+                    return false;
+                }
 
-                Utilities.DeleteFilesAndFoldersRecursively(stagingPath);
+                try
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(stagingPath);
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Error deleting staging folder for {modAddon.FriendlyName}: {e.Message}");
+                    // This is technically not an error. So we will not return this as an error.
+                }
             }
+
+            return true;
         }
     }
 }

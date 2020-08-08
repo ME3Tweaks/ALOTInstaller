@@ -8,7 +8,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using ALOTInstallerCore.Objects;
 
 namespace ALOTInstallerCore.Helpers

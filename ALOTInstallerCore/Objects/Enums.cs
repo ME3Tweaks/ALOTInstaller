@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ALOTInstallerCore.Objects
+﻿namespace ALOTInstallerCore.Objects
 {
     public class Enums
     {

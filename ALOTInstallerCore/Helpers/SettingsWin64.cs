@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using System.Text;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.PlatformSpecific.Windows;
 using Serilog;
@@ -53,7 +51,14 @@ namespace ALOTInstallerCore.Helpers
         /// Allows updating to beta, prerelease versions of items
         /// </summary>
         public static bool BetaMode { get; set; }
+        /// <summary>
+        /// Move files instead of copying them when files are imported. This only applies to files on the same drive (moving doesn't report progress)
+        /// </summary>
         public static bool MoveFilesWhenImporting { get; set; }
+        /// <summary>
+        /// Makes more output messaging occur
+        /// </summary>
+        public static bool DebugLogs { get; set; }
 
 
         /*
@@ -335,7 +340,7 @@ namespace ALOTInstallerCore.Helpers
             try
             {
                 SaveSettingString(SettingsKeys.SettingKeys.BuildLocation, BuildLocation);
-                SaveSettingString( SettingsKeys.SettingKeys.TextureLibraryDirectory, TextureLibraryLocation);
+                SaveSettingString(SettingsKeys.SettingKeys.TextureLibraryDirectory, TextureLibraryLocation);
 
 
                 //SaveSettingBool(settingsIni, "ALOTInstallerCore", "LogModStartup", LogModStartup);

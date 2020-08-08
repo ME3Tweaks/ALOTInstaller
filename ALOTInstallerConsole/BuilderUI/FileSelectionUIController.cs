@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Text;
-using ALOTInstallerConsole.InstallerUI;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
+using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Startup;
@@ -23,6 +19,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
         public override void SetupUI()
         {
+            Locations.ME3Target.InstallBinkBypass();
             Title = "ALOT Installer";
             List<InstallerFile> ifS = new List<InstallerFile>();
 

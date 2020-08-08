@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
-using ALOTInstallerCore.Builder;
-using ALOTInstallerCore.Helpers;
+﻿using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Steps;
 using Terminal.Gui;

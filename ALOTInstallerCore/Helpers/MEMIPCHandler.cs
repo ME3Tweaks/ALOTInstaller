@@ -1,6 +1,5 @@
 ﻿using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
@@ -13,6 +12,10 @@ namespace ALOTInstallerCore.Helpers
     {
         public static void RunMEMIPCUntilExit(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
         {
+            if (Settings.DebugLogs)
+            {
+                arguments += " --debug-logs";
+            }
             object lockObject = new object();
             void appStart(int processID)
             {

@@ -2,20 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Win32;     //This namespace is used to work with Registry editor.
+//This namespace is used to work with Registry editor.
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 using Serilog;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using System.Security.AccessControl;
-using System.Security.Principal;
 using System.Xml;
-using System.Windows;
 using System.Xml.Linq;
-using System.Security.Cryptography;
-using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using ALOTInstallerCore.Objects;
@@ -759,40 +753,39 @@ namespace ALOTInstallerCore
 
         public static bool InstallBinkw32Bypass(int game)
         {
-#if WINDOWS
-
             try
             {
+                var res =
+                    typeof(Utilities).GetTypeInfo().Assembly.GetManifestResourceNames();
                 Log.Information("Installing binkw32 for Mass Effect " + game);
                 string gamePath = GetGamePath(game);
-                switch (game)
-                {
-                    case 1:
-                        gamePath += "\\Binaries\\";
-                        System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me1_binkw23);
-                        System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me1_binkw32);
-                        break;
-                    case 2:
-                        gamePath += "\\Binaries\\";
-                        System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me2_binkw23);
-                        System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me2_binkw32);
-                        break;
-                    case 3:
-                        gamePath += "\\Binaries\\Win32\\";
-                        System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me3_binkw23);
-                        System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me3_binkw32);
-                        break;
-                }
+                //switch (game)
+                //{
+                //    case 1:
+                //        gamePath += "\\Binaries\\";
+                //        System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", ALOTInstallerCore.Properties.Resources.me1_binkw23);
+                //        System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me1_binkw32);
+                //        break;
+                //    case 2:
+                //        gamePath += "\\Binaries\\";
+                //        System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me2_binkw23);
+                //        System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me2_binkw32);
+                //        break;
+                //    case 3:
+                //        gamePath += "\\Binaries\\Win32\\";
+                //        System.IO.File.WriteAllBytes(gamePath + "binkw23.dll", AlotAddOnGUI.Properties.Resources.me3_binkw23);
+                //        System.IO.File.WriteAllBytes(gamePath + "binkw32.dll", AlotAddOnGUI.Properties.Resources.me3_binkw32);
+                //        break;
+                //}
+
                 Log.Information("Installed binkw32 for Mass Effect " + game);
                 return true;
             }
             catch (Exception e)
             {
                 Log.Error("Unable to install binkw32: " + e.Message);
-                Log.Error(App.FlattenException(e));
-                Log.Error("DLC will not authenticate.");
             }
-#endif
+
             return false;
         }
 

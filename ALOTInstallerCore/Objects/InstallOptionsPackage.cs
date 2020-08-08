@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ALOTInstallerCore.ModManager.Objects.MassEffectModManagerCore.modmanager.objects;
+﻿using System.Collections.Generic;
+using ALOTInstallerCore.ModManager.Objects.ALOTInstallerCore.modmanager.objects;
 
 namespace ALOTInstallerCore.Objects
 {
@@ -34,5 +32,9 @@ namespace ALOTInstallerCore.Objects
         /// Installs 2K instead of 4K lods at end of install. 2K lods use significantly less memory at the cost of less visual fidelity.
         /// </summary>
         public bool Limit2K { get; set; }
+        /// <summary>
+        /// Will attempt to import unpacked files when they are available. Packed versions will be deleted after import.
+        /// </summary>
+        public bool ImportNewlyUnpackedFiles { get; set; }
     }
 }
