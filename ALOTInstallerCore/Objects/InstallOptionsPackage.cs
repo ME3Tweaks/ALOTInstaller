@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using ALOTInstallerCore.ModManager.Objects;
-using ALOTInstallerCore.Startup;
+using ALOTInstallerCore.Objects.Manifest;
 
 namespace ALOTInstallerCore.Objects
 {
@@ -24,11 +24,7 @@ namespace ALOTInstallerCore.Objects
         /// <summary>
         /// The mode to run the installer in
         /// </summary>
-        public OnlineContent.ManifestMode InstallerMode { get; set; }
-        /// <summary>
-        /// this might be better as just accessing settings
-        /// </summary>
-        public bool DebugLogging { get; set; }
+        public ManifestMode InstallerMode { get; set; }
 
         /// <summary>
         /// Indicates that we should repack game files on install

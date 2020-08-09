@@ -11,7 +11,6 @@ using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
-using ALOTInstallerCore.Startup;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps
@@ -172,7 +171,7 @@ namespace ALOTInstallerCore.Steps
         }
 
         private GameTarget target { get; set; }
-        private OnlineContent.ManifestMode mode { get; set; }
+        private ManifestMode mode { get; set; }
         private List<ManifestFile> filesToInstall { get; set; }
 
         private Precheck()
@@ -255,10 +254,10 @@ namespace ALOTInstallerCore.Steps
         private bool checkRequiredFiles(out string failureReason)
         {
             failureReason = null;
-            if (mode == OnlineContent.ManifestMode.None) return true; //no files are required in free mode
+            if (mode == ManifestMode.None) return true; //no files are required in free mode
 
             var texturesInfo = target.GetInstalledALOTInfo();
-            if (mode == OnlineContent.ManifestMode.ALOT)
+            if (mode == ManifestMode.ALOT)
             {
                 bool hasAlot = texturesInfo != null && texturesInfo.ALOTVER > 0;
                 // ALOT main is required if alot is not installed

@@ -110,6 +110,12 @@ namespace ALOTInstallerCore.Builder
             }
             installOptions.FilesToInstall = getFilesToStage(installOptions.FilesToInstall.Where(x => x.Ready && (x.ApplicableGames & installOptions.InstallTarget.Game.ToApplicableGame()) != 0));
             installOptions.FilesToInstall = resolveMutualExclusiveGroups();
+
+            //DEBUG ONLY
+            installOptions.FilesToInstall =
+                installOptions.FilesToInstall.Where(x => x.FriendlyName.Contains("HR Maya")).ToList();
+
+
             if (installOptions.FilesToInstall == null)
             {
                 // Abort!
@@ -155,9 +161,24 @@ namespace ALOTInstallerCore.Builder
             foreach (var installerFile in installOptions.FilesToInstall)
             {
                 var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
+                {
+                    if (installerFile is ManifestFile mf)
+                    {
+                        mf.StagedName = installerFile.GetUsedFilepath();
+                    }
+                }
                 Directory.CreateDirectory(outputDir);
                 // Extract Archive
                 var archiveExtracted = ExtractArchive(installerFile, outputDir);
+                if (archiveExtracted && installOptions.ImportNewlyUnpackedFiles && installerFile is ManifestFile _mf && _mf.UnpackedSingleFilename != null && Path.GetExtension(_mf.UnpackedSingleFilename) != ".mem")
+                {
+                    // mem files will be directly moved to install source. All other files will be staged for build so we need to 
+                    // copy them back before we delete the extraction dir after we stage the files
+                    TextureLibrary.AttemptImportUnpackedFiles(outputDir, new List<ManifestFile>(new[] { _mf }), true,
+                       (filename, x, y) => UpdateStatusCallback?.Invoke($"Optimizing {filename} for future installs {(int)(x * 100f / y)}%"),
+                       forceCopy: true
+                    );
+                }
                 if (!archiveExtracted && FiletypeRequiresDecompilation(installerFile.GetUsedFilepath()))
                 {
                     // Decompile file instead 

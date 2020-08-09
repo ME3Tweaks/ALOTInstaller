@@ -515,6 +515,12 @@ namespace ALOTInstallerCore.Objects.Manifest
         }
 
         /// <summary>
+        /// Path of the file that was used when staging began. This can be used to determine where to move a file back if this file was moved, or
+        /// to find out if a packed or unpacked file was used
+        /// </summary>
+        public string StagedName { get; set; }
+
+        /// <summary>
         /// Indicates that a mod file should be staged rather than decompiled if encountered when staging the manifest file
         /// </summary>
         public override bool StageModFiles { get; set; }

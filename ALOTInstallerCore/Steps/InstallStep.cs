@@ -9,7 +9,6 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
-using ALOTInstallerCore.Startup;
 using ALOTInstallerCore.Steps.Installer;
 using Serilog;
 
@@ -98,6 +97,7 @@ namespace ALOTInstallerCore.Steps
             InstallFailed_FailedToApplyTextureInfo,
             InstallFailed_ZipCopyFilesError,
             InstallOK,
+            InstallOKWithWarning
         }
 
         public void InstallTextures(object sender, DoWorkEventArgs doWorkEventArgs)
@@ -268,15 +268,20 @@ namespace ALOTInstallerCore.Steps
                     args += " --repack-mode";
                 }
 
-                MEMIPCHandler.RunMEMIPCUntilExit(args,
-                    x => currentMemProcessId = x,
-                    handleIPC,
-                    x => Log.Error($"StdError: {x}"),
-                    x =>
-                    {
-                        currentMemProcessId = 0;
-                        lastExitCode = x;
-                    });
+                // Uncomment the next 2 lines and then comment out the IPC call to simulate OK install
+                lastExitCode = 0;
+                doneReached = true;
+
+                //MEMIPCHandler.RunMEMIPCUntilExit(args,
+                //    x => currentMemProcessId = x,
+                //    handleIPC,
+                //    x => Log.Error($"StdError: {x}"),
+                //    x =>
+                //    {
+                //        currentMemProcessId = 0;
+                //        lastExitCode = x;
+                //    });
+
                 if (lastExitCode != 0)
                 {
                     Log.Error($@"MEM exited with non zero exit code: {lastExitCode}");
@@ -323,10 +328,7 @@ namespace ALOTInstallerCore.Steps
                 bool hasWarning = false;
 
                 hasWarning |= applyLODs();
-                if (package.ImportNewlyUnpackedFiles)
-                {
-                    TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), true);
-                }
+                TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), package.ImportNewlyUnpackedFiles);
 
 
                 hasWarning |= !package.InstallTarget.InstallBinkBypass();
@@ -338,15 +340,24 @@ namespace ALOTInstallerCore.Steps
 
                 #endregion
 
+                try
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(memInputPath);
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Unable to delete installation packages at {memInputPath}: {e.Message}");
+                }
+
                 showOnlineStorefrontNoUpdateScreen();
-                doWorkEventArgs.Result = InstallResult.InstallOK;
+                doWorkEventArgs.Result = hasWarning ? InstallResult.InstallOKWithWarning : InstallResult.InstallOK;
             }
         }
 
         private bool checkForExistingMarkers()
         {
             string args = $"--check-for-markers --gameid {package.InstallTarget.Game.ToGameNum()} --ipc";
-            if (package.DebugLogging)
+            if (Settings.DebugLogs)
             {
                 args += " --debug-logs";
             }
@@ -504,7 +515,7 @@ namespace ALOTInstallerCore.Steps
             {
                 string dlcPath = Path.Combine(package.InstallTarget.TargetPath, "BIOGame", "DLC");
                 package.InstallTarget.PopulateDLCMods(false);
-                var listOfItemsToFix = package.InstallTarget.Game == Enums.MEGame.ME2 ? OnlineContent.ME2DLCRequiringTextureExportFixes : OnlineContent.ME3DLCRequiringTextureExportFixes;
+                var listOfItemsToFix = package.InstallTarget.Game == Enums.MEGame.ME2 ? ManifestHandler.MasterManifest.ME2DLCRequiringTextureExportFixes : ManifestHandler.MasterManifest.ME3DLCRequiringTextureExportFixes;
                 foreach (var d in package.InstallTarget.UIInstalledDLCMods)
                 {
                     if (listOfItemsToFix.Contains(d.DLCFolderName, StringComparer.InvariantCultureIgnoreCase))
@@ -746,7 +757,6 @@ namespace ALOTInstallerCore.Steps
 
                 // We will stage the archive contents into game dir to start with, so moving files should be fast.
                 var stagingPath = Directory.CreateDirectory(Path.Combine(package.InstallTarget.TargetPath, "ModExtractStaging")).FullName;
-
 
                 void handleIPC(string command, string param)
                 {

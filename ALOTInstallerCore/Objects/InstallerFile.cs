@@ -71,15 +71,11 @@ namespace ALOTInstallerCore.Objects
         public List<PackageFile> PackageFiles;
 
         /// <summary>
-        /// If this file is required to be in the Ready state to begin build step
-        /// </summary>
-        public bool IsReadyRequiredForBuild { get; set; }
-        /// <summary>
         /// Friendly name to display
         /// </summary>
         public string FriendlyName { get; set; }
         /// <summary>
-        /// Filename for the backing file. IF this is a userfile, it is the full file path.
+        /// Filename for the backing file. Do not use this variable when dealing with UserFiles
         /// </summary>
         public string Filename { get; set; }
         /// <summary>

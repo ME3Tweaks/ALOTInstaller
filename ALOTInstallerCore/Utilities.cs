@@ -14,6 +14,8 @@ using System.Globalization;
 using System.Reflection;
 using ALOTInstallerCore.Objects;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using ALOTInstallerCore.Helpers;
 
 namespace ALOTInstallerCore
 {
@@ -699,28 +701,25 @@ namespace ALOTInstallerCore
 
         public static string CalculateMD5(string filename)
         {
-#if WINDOWS
+            if (!File.Exists(filename))
+            {
+                Log.Error($"Cannot hash file that doesn't exist: {filename}");
+                return null;
+            }
 
             try
             {
-                using (var md5 = MD5.Create())
-                {
-                    using (var stream = File.OpenRead(filename))
-                    {
-                        var hash = md5.ComputeHash(stream);
-                        return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                    }
-                }
+                using var md5 = MD5.Create();
+                using var stream = File.OpenRead(filename);
+                var hash = md5.ComputeHash(stream);
+                return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
             }
             catch (IOException e)
             {
                 Log.Error("I/O ERROR CALCULATING CHECKSUM OF FILE: " + filename);
-                Log.Error("This is a critical error - this system may have hardware issues.");
-                Log.Error(App.FlattenException(e));
-                return "";
+                Log.Error(e.Flatten());
+                return null;
             }
-#endif
-            return "";
         }
 
         public static void RemoveRunAsAdminXPSP3FromME1()

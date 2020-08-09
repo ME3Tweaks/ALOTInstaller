@@ -301,14 +301,18 @@ namespace ALOTInstallerCore.Helpers
         /// <returns></returns>
         public static List<string> GetUnusedFilesInLibrary()
         {
-            var results = new List<string>();
             var files = Directory.GetFiles(Settings.TextureLibraryLocation).Select(o => Path.GetFileName(o)).ToList();
-            foreach (var f in AllManifestFiles)
+            foreach (var f in ManifestHandler.GetAllManifestFiles())
             {
-
+                files.Remove(Path.GetFileName(f.GetUsedFilepath()));
             }
 
-            return results;
+            foreach (var f in files)
+            {
+                Debug.WriteLine($"Unused file in library: {f}");
+            }
+
+            return files;
         }
 
         /// <summary>
@@ -317,20 +321,46 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="directory"></param>
         /// <param name="manifestFiles"></param>
         /// <returns></returns>
-        public static bool AttemptImportUnpackedFiles(string directory, List<ManifestFile> manifestFiles, bool deletePackedOnImport = false)
+        public static bool AttemptImportUnpackedFiles(string directory, List<ManifestFile> manifestFiles, bool switchFilesToUnpacked = true, Action<string, long, long> progressCallback = null, bool forceCopy = false)
         {
             try
             {
+                DriveInfo sDi = new DriveInfo(directory);
+                DriveInfo dDi = new DriveInfo(Settings.TextureLibraryLocation);
+                var files = Directory.GetFiles(directory);
                 Dictionary<ManifestFile, string> mfToUnpackedMap = new Dictionary<ManifestFile, string>();
                 foreach (var mf in manifestFiles)
                 {
                     if (mf.UnpackedSingleFilename != null)
                     {
-                        if (Path.GetFileName(mf.GetUsedFilepath()).Equals(mf.Filename, StringComparison.InvariantCultureIgnoreCase))
+                        if (Path.GetFileName(mf.StagedName).Equals(mf.Filename, StringComparison.InvariantCultureIgnoreCase))
                         {
                             // The ready file is the normal file but there is unpacked single file support for this
+                            // This file was extracted or copied so it's still in library
                             // Find the unpacked file
-                            foreach (var uf in Directory.GetFiles(directory))
+                            foreach (var uf in files)
+                            {
+                                var len = new FileInfo(uf).Length;
+                                if (len == mf.UnpackedFileSize && Path.GetExtension(mf.UnpackedSingleFilename) == Path.GetExtension(uf))
+                                {
+                                    if (len < 1000000000)
+                                    {
+                                        // < 1GB. Bigger would make this take a long time... not much we can do about this
+                                        var md5 = Utilities.CalculateMD5(uf);
+                                        if (md5 != mf.UnpackedFileMD5)
+                                            continue; //This is not correct unpacked file
+                                    }
+
+                                    mfToUnpackedMap[mf] = uf;
+                                    break;
+                                }
+                            }
+                        }
+                        else if (!File.Exists(mf.StagedName) && Path.GetExtension(mf.StagedName).Equals(Path.GetExtension(mf.UnpackedSingleFilename), StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            // Ready file is using unpacked file but the unpacked file isn't available so it returned the main one
+                            // This needs to be moved back
+                            foreach (var uf in files)
                             {
                                 var len = new FileInfo(uf).Length;
                                 if (len == mf.UnpackedFileSize && Path.GetExtension(mf.UnpackedSingleFilename) == Path.GetExtension(uf))
@@ -355,11 +385,38 @@ namespace ALOTInstallerCore.Helpers
                 {
                     var oldFname = movableFile.Key.GetUsedFilepath();
                     var destF = Path.Combine(Settings.TextureLibraryLocation, movableFile.Key.UnpackedSingleFilename);
-                    File.Move(movableFile.Value, destF); // With no progress this can take a while
-                    var newFname = movableFile.Key.GetUsedFilepath();
-                    if (oldFname != newFname)
+                    bool cancelDueToError = false;
+                    if (sDi.RootDirectory == dDi.RootDirectory && !forceCopy)
                     {
-                        movableFile.Key.UpdateReadyStatus(); // force it to update readiness (not sure this does anything useful, but who knows?
+                        // Move
+                        if (!File.Exists(destF))
+                        {
+                            Log.Information($"Moving unpacked file to texture library: {movableFile.Value} -> {destF}");
+                            File.Move(movableFile.Value, destF);
+                        }
+                    }
+                    else
+                    {
+                        //Copy
+                        Log.Information($"Copying unpacked file to texture library: {movableFile.Value} -> {destF}");
+                        CopyTools.CopyFileWithProgress(movableFile.Value, destF,
+                            (x, y) => progressCallback?.Invoke(movableFile.Key.FriendlyName, x, y),
+                            x => cancelDueToError = true
+                        );
+                    }
+
+                    if (switchFilesToUnpacked && !cancelDueToError && oldFname != movableFile.Key.GetUsedFilepath())
+                    {
+                        // Switched to unpacked
+                        Log.Information($"Deleting packed version of manifest file now that it is in unpacked mode: {oldFname}");
+                        try
+                        {
+                            File.Delete(oldFname);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error($"Unable to delete packed version of {movableFile.Key.FriendlyName}: {e.Message}");
+                        }
                     }
                 }
             }

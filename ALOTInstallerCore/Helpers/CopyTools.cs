@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Net;
+using System.Threading;
 
 namespace ALOTInstallerCore.Helpers
 {
@@ -11,8 +13,56 @@ namespace ALOTInstallerCore.Helpers
     /// Copied and modified from ALOT Installer
     /// </summary>
     [Localizable(false)]
-    public static class CopyDir
+    public static class CopyTools
     {
+        /// <summary>
+        /// Copies a file using Webclient to provide progress callbacks with error handling.
+        /// </summary>
+        /// <param name="sourceFile"></param>
+        /// <param name="destFile"></param>
+        /// <param name="progressCallback"></param>
+        /// <param name="errorCallback"></param>
+        /// <returns></returns>
+        public static bool CopyFileWithProgress(string sourceFile, string destFile, Action<long, long> progressCallback, Action<Exception> errorCallback)
+        {
+            WebClient downloadClient = new WebClient();
+            downloadClient.DownloadProgressChanged += (s, e) =>
+            {
+                progressCallback?.Invoke(e.BytesReceived, e.TotalBytesToReceive);
+            };
+            bool result = false;
+            object syncObj = new object();
+            downloadClient.DownloadFileCompleted += async (s, e) =>
+            {
+                if (e.Error != null)
+                {
+                    Log.Error($"An error occured copying the file to the destination:");
+                    Log.Error(e.Error.Flatten());
+                    errorCallback?.Invoke(e.Error);
+                }
+                else if (File.Exists(destFile))
+                {
+                    result = true;
+                }
+                else
+                {
+                    Log.Error($"Destination file doesn't exist after file copy: {destFile}");
+                    errorCallback?.Invoke(new Exception($"Destination file doesn't exist after file copy: {destFile}"));
+                }
+
+                lock (syncObj)
+                {
+                    Monitor.Pulse(syncObj);
+                }
+            };
+            downloadClient.DownloadFileAsync(new Uri(sourceFile), destFile);
+            lock (syncObj)
+            {
+                Monitor.Wait(syncObj);
+            }
+            return result;
+        }
+
 
         public static int CopyAll_ProgressBar(DirectoryInfo source, DirectoryInfo target, Action<int> totalItemsToCopyCallback = null, Action fileCopiedCallback = null, Func<string, bool> aboutToCopyCallback = null, int total = -1, int done = 0, string[] ignoredExtensions = null, bool testrun = false)
         {

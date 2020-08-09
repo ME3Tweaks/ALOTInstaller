@@ -5,7 +5,6 @@ using System.Text;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
-using ALOTInstallerCore.Startup;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps
@@ -48,11 +47,11 @@ namespace ALOTInstallerCore.Steps
         }
 
         public static Dictionary<InstallOption, (OptionState state, string reasonForState)> CalculateInstallOptions(
-            GameTarget gameTarget, OnlineContent.ManifestMode manifestMode, List<InstallerFile> filesForTarget)
+            GameTarget gameTarget, ManifestMode manifestMode, List<InstallerFile> filesForTarget)
         {
             var targetAlotInfo = gameTarget.GetInstalledALOTInfo();
             var options = new Dictionary<InstallOption, (OptionState, string)>();
-            if (manifestMode == OnlineContent.ManifestMode.None)
+            if (manifestMode == ManifestMode.None)
             {
                 if (filesForTarget.Any(x => x is UserFile && x.Ready))
                 {
@@ -67,7 +66,7 @@ namespace ALOTInstallerCore.Steps
                 return options;
             }
 
-            if (manifestMode == OnlineContent.ManifestMode.MEUITM)
+            if (manifestMode == ManifestMode.MEUITM)
             {
                 // MEUITM mode requires MEUITM file ready
 
@@ -127,7 +126,7 @@ namespace ALOTInstallerCore.Steps
                 return options;
             }
 
-            if (manifestMode == OnlineContent.ManifestMode.ALOT)
+            if (manifestMode == ManifestMode.ALOT)
             {
                 // ALOT mode requires ALOT + ALOT update if applicable
                 var alotFile = filesForTarget.FirstOrDefault(x =>
