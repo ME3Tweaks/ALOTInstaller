@@ -16,6 +16,10 @@ namespace ALOTInstallerCore.Helpers
     /// </summary>
     public static class TextureLibrary
     {
+        /// <summary>
+        /// A list of all manifest files, across all modes
+        /// </summary>
+        private static List<ManifestFile> allManifestFiles;
         private static FileSystemWatcher watcher;
         private static List<ManifestFile> manifestFiles;
         private static Action<ManifestFile> readyStatusChanged;
@@ -289,6 +293,22 @@ namespace ALOTInstallerCore.Helpers
             {
                 v.UpdateReadyStatus();
             }
+        }
+
+        /// <summary>
+        /// Gets a list of filenames (not paths!) in the texture library that are not used. This can be due to the manifest changing over time.
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetUnusedFilesInLibrary()
+        {
+            var results = new List<string>();
+            var files = Directory.GetFiles(Settings.TextureLibraryLocation).Select(o => Path.GetFileName(o)).ToList();
+            foreach (var f in AllManifestFiles)
+            {
+
+            }
+
+            return results;
         }
 
         /// <summary>
