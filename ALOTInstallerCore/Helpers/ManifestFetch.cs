@@ -253,30 +253,6 @@ namespace ALOTInstallerCore.Startup
                 {
                     ProgressHandler.UseBuiltinDefaultStages();
                 }
-                //var repackoptions = rootElement.Element("repackoptions");
-                //if (repackoptions != null)
-                //{
-                //    ME2_REPACK_MANIFEST_ENABLED = repackoptions.Attribute("me2repackenabled") != null ? (bool)repackoptions.Attribute("me2repackenabled") : true;
-                //    Log.Information("Manifest says ME2 repack option can be used: " + ME2_REPACK_MANIFEST_ENABLED);
-                //    ME3_REPACK_MANIFEST_ENABLED = repackoptions.Attribute("me3repackenabled") != null ? (bool)repackoptions.Attribute("me3repackenabled") : false;
-                //    Log.Information("Manifest says ME3 repack option can be used: " + ME3_REPACK_MANIFEST_ENABLED);
-                //    Checkbox_RepackME2GameFiles.IsEnabled = ME2_REPACK_MANIFEST_ENABLED;
-                //    Checkbox_RepackME3GameFiles.IsEnabled = ME3_REPACK_MANIFEST_ENABLED;
-                //    if (!ME2_REPACK_MANIFEST_ENABLED)
-                //    {
-                //        Checkbox_RepackME2GameFiles.IsChecked = false;
-                //        Checkbox_RepackME2GameFiles.ToolTip = "Disabled by server manifest";
-                //    }
-                //    if (!ME3_REPACK_MANIFEST_ENABLED)
-                //    {
-                //        Checkbox_RepackME3GameFiles.IsChecked = false;
-                //        Checkbox_RepackME3GameFiles.ToolTip = "Disabled by server manifest";
-                //    }
-                //}
-                //else
-                //{
-                //    Log.Information("Manifest does not have repackoptions - using defaults");
-                //}
 
                 if (rootElement.Element("me3dlctexturefixes") != null)
                 {
