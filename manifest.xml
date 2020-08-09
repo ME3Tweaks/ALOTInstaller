@@ -696,7 +696,8 @@
             <packagefile me3="true" sourcename="MASSEFFECT3.EXE_0xF8FE187D_Liara_spec.dds" destinationname="ASA_ARM_LIAf_Spec_0xF8FE187D.dds" />
         </addonfile>
         <addonfile friendlyname="HR Maya Brooks" author="Ottemis" installpriority="10">
-            <file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=files" filename="HR Maya Brooks-276-1-0.rar" md5="dd0ce86c11c907d423d44e11efc0ebbf" size="25569742" />
+            <file downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=files" filename="HR Maya Brooks-276-1-0.rar" md5="dd0ce86c11c907d423d44e11efc0ebbf" size="25569742" 
+                  unpackedsinglefilename="ME3_Brooks_Armax_Ottemis.tpf" unpackedmd5="0082e40b7b495b763c2855eed8360639" unpackedsize="25569650"/>
             <packagefile me3="true" sourcename="HMF_ARM_FTLa_Diff_Ottemis.dds" destinationname="HMF_ARM_FTLa_Diff_0x8C060CC8.dds" />
             <packagefile me3="true" sourcename="HMF_ARM_FTLa_Norm_0x8803C0CA_Otte.dds" destinationname="HMF_ARM_FTLa_Norm_0x8803C0CA.dds" />
             <packagefile me3="true" sourcename="HMF_ARM_FTLa_Spec_0xBE1A9E16_Otte.dds" destinationname="HMF_ARM_FTLa_Spec_0xBE1A9E16.dds" />
