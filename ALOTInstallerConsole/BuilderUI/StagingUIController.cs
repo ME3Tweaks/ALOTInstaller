@@ -59,7 +59,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 }
                 else
                 {
-                    MessageBox.ErrorQuery("Error occured while building textures", $"Error occured while building textures: {b.Error.Message}", "OK");
+                    MessageBox.ErrorQuery("Error occured while building textures", $"Error occured while building textures: {b.Error.Message}");
                 }
                 FileSelectionUIController fsuic = new FileSelectionUIController();
                 fsuic.SetupUI();
