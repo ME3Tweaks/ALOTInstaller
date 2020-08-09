@@ -513,5 +513,10 @@ namespace ALOTInstallerCore.Objects.Manifest
             }
             return Path.Combine(Settings.TextureLibraryLocation, Filename);
         }
+
+        /// <summary>
+        /// Indicates that a mod file should be staged rather than decompiled if encountered when staging the manifest file
+        /// </summary>
+        public override bool StageModFiles { get; set; }
     }
 }
