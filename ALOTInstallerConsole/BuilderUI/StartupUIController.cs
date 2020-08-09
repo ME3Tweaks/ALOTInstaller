@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using ALOTInstallerCore;
-using ALOTInstallerCore.Startup;
+using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Objects.Manifest;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
@@ -24,7 +25,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 //Initialize ALOT Installer library
                 Hook.Startup();
 
-                var alotManifestPackage = OnlineContent.FetchALOTManifest((x) => Application.MainLoop.Invoke(() =>
+                var alotManifestModePackage = ManifestHandler.LoadMasterManifest((x) => Application.MainLoop.Invoke(() =>
                 {
                     startupStatusLabel.Text = x;
                 }));
@@ -35,7 +36,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 //    startupStatusLabel.Text = "Checking texture library";
                 //});
 
-                //TextureLibrary.ResetAllReadyStatuses(Program.CurrentManifestPackage.ManifestFiles);
+                //TextureLibrary.ResetAllReadyStatuses(Program.CurrentManifestModePackage.ManifestFiles);
 
                 void downloadProgressChanged(long bytes, long total)
                 {
@@ -51,15 +52,17 @@ namespace ALOTInstallerConsole.BuilderUI
                 });
                 MEMUpdater.UpdateMEM(downloadProgressChanged);
 
-                b.Result = alotManifestPackage;
+                b.Result = alotManifestModePackage;
             };
             bw.RunWorkerCompleted += (a, b) =>
             {
                 if (b.Error == null)
                 {
-                    Program.CurrentManifestPackage = b.Result as OnlineContent.ManifestPackage; //ALOT is default manifest package at boot time
-                    Program.ManifestModes[OnlineContent.ManifestMode.ALOT] = b.Result as OnlineContent.ManifestPackage;
                     FileSelectionUIController bui = new FileSelectionUIController();
+                    if (ManifestHandler.MasterManifest != null)
+                    {
+                        ManifestHandler.CurrentMode = ManifestMode.ALOT;
+                    }
                     bui.SetupUI();
                     Program.SwapToNewView(bui);
                 }

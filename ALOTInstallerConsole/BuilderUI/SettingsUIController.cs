@@ -119,7 +119,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 X = 1,
                 Y = 10,
                 Width = 67,
-                Height = 7
+                Height = 9
             };
             y = 0;
             fileLocationsFv.Add(new Label("Texture library directory (ALOT/MEUITM mode only)")
@@ -174,9 +174,21 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = 1,
                 Clicked = ChangeBuildLocation
             });
+
+            y++;
             y++;
 
+            fileLocationsFv.Add(new Button("Cleanup texture library")
+            {
+                X = 36,
+                Y = y,
+                Height = 1,
+                Width = 27,
+                Clicked = CleanupLibrary_Clicked
+            });
+
             Add(fileLocationsFv);
+
             Button close = new Button("Close")
             {
                 X = Pos.Right(this) - 12,
@@ -185,6 +197,11 @@ namespace ALOTInstallerConsole.BuilderUI
                 Clicked = Close_Clicked
             };
             Add(close);
+        }
+
+        private void CleanupLibrary_Clicked()
+        {
+            var uselessFiles = TextureLibrary.GetUnusedFilesInLibrary();
         }
 
         private void ChangeBuildLocation()

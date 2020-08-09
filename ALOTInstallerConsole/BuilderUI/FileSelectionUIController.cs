@@ -9,7 +9,6 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
-using ALOTInstallerCore.Startup;
 using ALOTInstallerCore.Steps;
 using NStack;
 using Serilog;
@@ -21,30 +20,24 @@ namespace ALOTInstallerConsole.BuilderUI
     {
         private InstallerFileDataSource dataSource;
         private ApplicableGame VisibleGames = ApplicableGame.ME1 | ApplicableGame.ME2 | ApplicableGame.ME3;
+        private FrameView leftsideListContainer;
+        private FrameView selectedFileInfoFrameView;
 
         public override void SetupUI()
         {
-            Locations.ME3Target.InstallBinkBypass();
             Title = "ALOT Installer";
-            List<InstallerFile> ifS = new List<InstallerFile>();
-
-            if (Program.CurrentManifestPackage != null)
-            {
-                Title += $" Manifest version {Program.CurrentManifestPackage.ManifestVersion}";
-                ifS.AddRange(Program.CurrentManifestPackage.ManifestFiles);
-            }
-            dataSource = new InstallerFileDataSource(ifS);
+            dataSource = new InstallerFileDataSource(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode));
             ManifestFilesListView = new ListView(dataSource)
             {
                 Width = 48,
                 Height = Dim.Fill(),
                 X = 0,
                 Y = 0,
-                SelectedItemChanged = SelectedManifestFileChanged
+                SelectedItemChanged = SelectedListViewFileChanged
             };
 
             // LEFT SIDE
-            var fv = new FrameView("ALOT manifest files")
+            leftsideListContainer = new FrameView()
             {
                 Width = 50,
                 Height = Dim.Fill() - 1,
@@ -52,100 +45,18 @@ namespace ALOTInstallerConsole.BuilderUI
                 Y = 0
             };
 
-            fv.Add(ManifestFilesListView);
-            Add(fv);
+            leftsideListContainer.Add(ManifestFilesListView);
+            Add(leftsideListContainer);
 
             // RIGHT SIDE
-            fv = new FrameView("Selected file information")
+            selectedFileInfoFrameView = new FrameView("Selected file information")
             {
                 Width = Dim.Fill(),
                 Height = Dim.Fill() - 1,
                 X = 50,
                 Y = 0
             };
-            Add(fv);
-
-            int y = 0;
-            AuthorTextBlock = new Label("")
-            {
-                Width = Dim.Fill(),
-                Height = 1,
-                Y = y++
-            };
-            fv.Add(AuthorTextBlock);
-
-            FilenameTextBlock = new Label("")
-            {
-                Width = Dim.Fill(),
-                Height = 1,
-                Y = y++
-            };
-            fv.Add(FilenameTextBlock);
-
-            AppliesToGamesTextBlock = new Label("")
-            {
-                Width = Dim.Fill(),
-                Height = 1,
-                Y = y++
-            };
-            fv.Add(AppliesToGamesTextBlock);
-
-            ExpectedFileSizeTextBlock = new Label("")
-            {
-                Width = Dim.Fill(),
-                Height = 1,
-                Y = y++
-            };
-            fv.Add(ExpectedFileSizeTextBlock);
-
-            ExpectedFileSizeHashTextBlock = new Label("")
-            {
-                Width = Dim.Fill(),
-                Height = 1,
-                Y = y++
-            };
-            fv.Add(ExpectedFileSizeHashTextBlock);
-
-            ReadyTextBlock = new Label("")
-            {
-                Width = Dim.Fill(),
-                Height = 1,
-                Y = y++
-            };
-            fv.Add(ReadyTextBlock);
-
-            UnpackedFilenameTextBlock = new Label("")
-            {
-                Width = Dim.Fill(),
-                Height = 1,
-                Y = y++
-            };
-            fv.Add(UnpackedFilenameTextBlock);
-
-            UnpackedFilesizeTextBlock = new Label("")
-            {
-                Width = Dim.Fill(),
-                Height = 1,
-                Y = y++
-            };
-            fv.Add(UnpackedFilesizeTextBlock);
-            UnpackedFileHashTextBlock = new Label("")
-            {
-                Width = Dim.Fill(),
-                Height = 1,
-                Y = y++
-            };
-            fv.Add(UnpackedFileHashTextBlock);
-
-            DownloadButton = new Button("Download")
-            {
-                Width = 12,
-                Height = 1,
-                X = Pos.Right(fv) - fv.X - 14,
-                Y = Pos.Bottom(fv) - 3,
-                Clicked = DownloadClicked
-            };
-            fv.Add(DownloadButton);
+            Add(selectedFileInfoFrameView);
 
 
             Button settingsButton = new Button("Settings")
@@ -201,14 +112,17 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             Add(me3FilterCheckbox);
 
-            Add(new Button("Import assistant")
+            if (ManifestHandler.MasterManifest != null)
             {
-                X = Pos.Right(this) - 34,
-                Y = Pos.Bottom(this) - 3,
-                Height = 1,
-                Width = 20,
-                Clicked = ImportAssistant_Click
-            });
+                Add(new Button("Import assistant")
+                {
+                    X = Pos.Right(this) - 34,
+                    Y = Pos.Bottom(this) - 3,
+                    Height = 1,
+                    Width = 20,
+                    Clicked = ImportAssistant_Click
+                });
+            }
 
             Button installButton = new Button("Install")
             {
@@ -220,7 +134,8 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             Add(installButton);
 
-            TextureLibrary.ResetAllReadyStatuses(Program.CurrentManifestPackage.ManifestFiles);
+            TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode));
+            SetLeftsideTitle();
         }
 
         public ListView ManifestFilesListView { get; set; }
@@ -270,15 +185,20 @@ namespace ALOTInstallerConsole.BuilderUI
             if (paths[selectedIndex] == "ME2") target = Locations.ME2Target;
             if (paths[selectedIndex] == "ME3") target = Locations.ME3Target;
 
-            // Precheck done
+            // Warn user
             int warningResponse = MessageBox.Query("Warning", "Once you install texture mods, you will not be able to further install mods that contain .pcc, .u, .upk or .sfm files without breaking textures in the game. Make sure you have all of your DLC and non-texture mods installed now, as you will not be able to install them later.", "OK", "Abort install");
             if (warningResponse != 0) return; //abort
 
             // Show options
-            if (Program.CurrentManifestPackage.ManifestFiles.Any())
+            if (dataSource.InstallerFiles.Any(x => x.Ready))
             {
                 showOptionsDialog(target);
-
+            }
+            else
+            {
+                Log.Error("Cannot start install process: No files are ready in library.");
+                MessageBox.Query("Cannot install textures",
+                    "There are no files ready for installation. Import manifest into the texture library, or add your own user files to install.", "OK");
             }
         }
 
@@ -304,7 +224,7 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             #endregion
 
-            var availableInstallOptions = InstallOptionsStep.CalculateInstallOptions(target, CurrentMode, dataSource.InstallerFiles);
+            var availableInstallOptions = InstallOptionsStep.CalculateInstallOptions(target, ManifestHandler.CurrentMode, dataSource.InstallerFiles);
 
             // Begin setting up UI items
             int y = 0;
@@ -315,7 +235,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = 10,
                 Width = 90
             };
-            installOptionsPicker.Add(new Label($"Installer mode: {CurrentMode}")
+            installOptionsPicker.Add(new Label($"Installer mode: {ManifestHandler.CurrentMode}")
             {
                 X = 1,
                 Y = y++,
@@ -383,6 +303,17 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             installOptionsPicker.Add(use2KLodsCb);
 
+            CheckBox reimportUnpackedFiles = new CheckBox("Optimize texture library")
+            {
+                X = 1,
+                Y = y++,
+                Width = Dim.Fill(),
+                Height = 1,
+                Checked = true
+            };
+            installOptionsPicker.Add(reimportUnpackedFiles);
+            maxWidth = Math.Max(reimportUnpackedFiles.Text.Length + 4, maxWidth);
+
             y++;
             y++;
             installOptionsPicker.Add(new Label("Items marked with * cannot be toggled on or off")
@@ -392,7 +323,6 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = Dim.Fill(),
                 Height = 1,
             });
-            // We start at 50 so this is already not too long
 
             installOptionsPicker.Height = y + requiredHeight;
             installOptionsPicker.Width = maxWidth;
@@ -410,9 +340,10 @@ namespace ALOTInstallerConsole.BuilderUI
                     InstallMEUITM = getInstallOptionValue(InstallOptionsStep.InstallOption.MEUITM, installOptionMapping),
                     InstallALOTAddon = getInstallOptionValue(InstallOptionsStep.InstallOption.ALOTAddon, installOptionMapping),
                     InstallUserfiles = getInstallOptionValue(InstallOptionsStep.InstallOption.UserFiles, installOptionMapping),
-                    InstallerMode = CurrentMode,
+                    InstallerMode = ManifestHandler.CurrentMode,
                     RepackGameFiles = compressPackagesCb.Checked,
-                    Limit2K = use2KLodsCb.Checked
+                    Limit2K = use2KLodsCb.Checked,
+                    ImportNewlyUnpackedFiles = reimportUnpackedFiles.Checked
                 };
 
                 MessageDialog md = new MessageDialog("Performing installation precheck [1/2]");
@@ -485,61 +416,141 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void ChangeMode_Clicked()
         {
-            var str = Program.ManifestModes.Keys.Select(x => (ustring)x.ToString()).ToArray();
-            var res = MessageBox.Query(50, 7, "Mode selector", "Select a mode for ALOT Installer.", str);
-            CurrentMode = Program.ManifestModes.Keys.ToList()[res];
-            RefreshShownFiles();
+            if (ManifestHandler.MasterManifest != null)
+            {
+                var str = ManifestHandler.MasterManifest.ManifestModePackageMappping.Keys.Select(x => (ustring)x.ToString()).ToArray();
+                var res = MessageBox.Query("Mode selector", "Select a mode for ALOT Installer.", str);
+                ManifestHandler.CurrentMode = ManifestHandler.MasterManifest.ManifestModePackageMappping.Keys.ToList()[res];
+                SetLeftsideTitle();
+                RefreshShownFiles();
+            }
+            else
+            {
+                MessageBox.Query("Cannot change modes", "The master manifest file was not able to load. Check the logs for more information.",
+                    "OK");
+            }
+        }
+
+        private void SetLeftsideTitle()
+        {
+            if (ManifestHandler.CurrentMode == ManifestMode.None)
+            {
+                leftsideListContainer.Title = "Files to install";
+            }
+            else
+            {
+                leftsideListContainer.Title = $"{ManifestHandler.CurrentMode} manifest files";
+            }
         }
 
         private void RefreshShownFiles()
         {
-            Program.CurrentManifestPackage = Program.ManifestModes[CurrentMode];
-            TextureLibrary.ResetAllReadyStatuses(Program.CurrentManifestPackage.ManifestFiles);
-            //var userFiles = dataSource.InstallerFiles.Where(x => x is UserFile);
+            TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode));
+            var userFiles = dataSource.InstallerFiles.Where(x => x is UserFile);
             dataSource.InstallerFiles.Clear();
-            dataSource.InstallerFiles.AddRange(Program.CurrentManifestPackage.ManifestFiles.Where(x => (x.ApplicableGames & VisibleGames) != 0));
-            //dataSource.InstallerFiles.AddRange(userFiles);
+            dataSource.InstallerFiles.AddRange(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode).Where(x => (x.ApplicableGames & VisibleGames) != 0));
+            dataSource.InstallerFiles.AddRange(userFiles);
             Application.Refresh();
         }
 
-        /// <summary>
-        /// The current mode
-        /// </summary>
-        public OnlineContent.ManifestMode CurrentMode { get; set; } = OnlineContent.ManifestMode.ALOT;
-        public Label FilenameTextBlock { get; set; }
-        public Label UnpackedFileHashTextBlock { get; set; }
-        public Label UnpackedFilesizeTextBlock { get; set; }
-        public Label UnpackedFilenameTextBlock { get; set; }
-        public Label ReadyTextBlock { get; set; }
-        public Label ExpectedFileSizeHashTextBlock { get; set; }
-        public Label ExpectedFileSizeTextBlock { get; set; }
-        public Button DownloadButton { get; set; }
 
-        private void SelectedManifestFileChanged(ListViewItemEventArgs obj)
+        private void SelectedListViewFileChanged(ListViewItemEventArgs obj)
         {
+            selectedFileInfoFrameView.RemoveAll();
+            int y = 0;
             if (obj.Value is ManifestFile mf)
             {
-                UpdateDisplayedManifestFile(mf);
+                y = UpdateDisplayedManifestFile(mf, y);
+            }
+
+            if (obj.Value is PreinstallMod pm)
+            {
+                y++;
+                y = UpdateDisplayedPreinstallMod(pm, y);
+            }
+            if (obj.Value is UserFile uf)
+            {
+                y = UpdateDisplayedUserFile(uf, y);
+            }
+            if (obj.Value == null)
+            {
+                UpdateNoDisplayedFile(y);
             }
         }
 
-        private void UpdateDisplayedManifestFile(ManifestFile mf)
+        private int UpdateDisplayedPreinstallMod(PreinstallMod pm, int y)
         {
-            AppliesToGamesTextBlock.Text = "Applies to: " + string.Join(' ', mf.SupportedGames());
-            ReadyTextBlock.Text = "Ready: " + mf.Ready.ToString();
-            AuthorTextBlock.Text = "Author: " + mf.Author;
-            FilenameTextBlock.Text = "Filename: " + mf.Filename;
-            ExpectedFileSizeHashTextBlock.Text = "File MD5: " + mf.FileMD5;
-            ExpectedFileSizeTextBlock.Text = $"File size: {mf.FileSize} ({FileSizeFormatter.FormatSize(mf.FileSize)})";
-
-            // Unpacked
-            UnpackedFilenameTextBlock.Text = "Unpacked filename: " + (mf.UnpackedSingleFilename != null ? mf.UnpackedSingleFilename : "N/A");
-            UnpackedFilesizeTextBlock.Text = "Unpacked file size: " + (mf.UnpackedFileSize > 0 ? mf.UnpackedFileSize.ToString() : "N/A");
-            UnpackedFileHashTextBlock.Text = "Unpacked file MD5: " + (mf.UnpackedFileMD5 != null ? mf.UnpackedFileMD5 : "N/A");
+            AddSFIFVLabel("This mod will be installed before textures are installed", ref y);
+            return y;
         }
 
-        public Label AuthorTextBlock { get; set; }
-        public Label AppliesToGamesTextBlock { get; private set; }
+        private void UpdateNoDisplayedFile(int y)
+        {
+            AddSFIFVLabel("Select a file", ref y);
+        }
+
+
+        private int UpdateDisplayedUserFile(UserFile uf, int y)
+        {
+            AddSFIFVLabel("User supplied file", ref y);
+            y++;
+
+            AddSFIFVLabel($"Applies to games: {uf.ApplicableGames}", ref y);
+            AddSFIFVLabel($"Ready: {uf.Ready}", ref y);
+            y++;
+
+            AddSFIFVLabel($"Filename: {uf.Filename}", ref y);
+            AddSFIFVLabel($"File size: {uf.FileSize} ({FileSizeFormatter.FormatSize(uf.FileSize)})", ref y);
+            
+            
+            return y;
+        }
+
+        private void AddSFIFVLabel(string text, ref int y)
+        {
+            selectedFileInfoFrameView.Add(new Label(text)
+            {
+                Width = Dim.Fill(),
+                Height = 1,
+                Y = y++
+            });
+        }
+
+        private int UpdateDisplayedManifestFile(ManifestFile mf, int y)
+        {
+            AddSFIFVLabel("Manifest file", ref y);
+            y++;
+
+            AddSFIFVLabel($"Author: {mf.Author}", ref y);
+            AddSFIFVLabel($"Applies to game(s): {mf.ApplicableGames}", ref y);
+            AddSFIFVLabel($"Ready: {mf.Ready}", ref y);
+            y++;
+
+            AddSFIFVLabel($"Filename: {mf.Filename}", ref y);
+            AddSFIFVLabel($"File size: {mf.FileSize} ({FileSizeFormatter.FormatSize(mf.FileSize)})", ref y);
+            AddSFIFVLabel($"File MD5: {mf.FileMD5}", ref y);
+            if (mf.UnpackedSingleFilename != null && mf.UnpackedFileSize != 0 && mf.UnpackedFileMD5 != null)
+            {
+                y++;
+                AddSFIFVLabel($"This file supports unpacked mode", ref y);
+                AddSFIFVLabel($"Unpacked filename: {mf.UnpackedSingleFilename}", ref y);
+                AddSFIFVLabel($"Unpacked size: {mf.UnpackedFileSize} ({FileSizeFormatter.FormatSize(mf.UnpackedFileSize)})", ref y);
+                AddSFIFVLabel($"Unpacked file MD5: {mf.UnpackedFileMD5}", ref y);
+            }
+
+            var textForWebbutton = mf.Ready ? "Open mod web page" : "Download";
+            selectedFileInfoFrameView.Add(new Button(textForWebbutton)
+            {
+                Width = textForWebbutton.Length + 4,
+                Height = 1,
+                X = Pos.Right(selectedFileInfoFrameView) - selectedFileInfoFrameView.X - textForWebbutton.Length - 6,
+                Y = Pos.Bottom(selectedFileInfoFrameView) - 3,
+                Clicked = DownloadClicked
+            });
+
+            return y;
+        }
+
 
         private void ManifestFileReadyStatusChanged(ManifestFile mf)
         {
@@ -547,7 +558,7 @@ namespace ALOTInstallerConsole.BuilderUI
         }
         public override void BeginFlow()
         {
-            TextureLibrary.SetupLibraryWatcher(Program.CurrentManifestPackage.ManifestFiles.OfType<ManifestFile>().ToList(), ManifestFileReadyStatusChanged);
+            TextureLibrary.SetupLibraryWatcher(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode).OfType<ManifestFile>().ToList(), ManifestFileReadyStatusChanged);
         }
 
         public override void SignalStopping()
@@ -571,7 +582,20 @@ namespace ALOTInstallerConsole.BuilderUI
                 container.Move(col, line);
 
                 InstallerFile instF = InstallerFiles[item];
-                RenderUstr(driver, instF.Ready ? "*" : " ", 1, 0, 2);
+                if (instF.Ready)
+                {
+                    if (instF is ManifestFile)
+                    {
+                        RenderUstr(driver, "*", 1, 0, 2);
+                    }
+                    else if (instF is UserFile)
+                    {
+                        RenderUstr(driver, "U", 1, 0, 2);
+                    }
+                } else
+                {
+                    RenderUstr(driver, " ", 1, 0, 2);
+                }
                 RenderUstr(driver, instF.FriendlyName, 4, 0, 48);
             }
 

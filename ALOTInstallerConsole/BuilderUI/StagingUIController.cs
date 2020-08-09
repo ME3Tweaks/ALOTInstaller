@@ -71,12 +71,12 @@ namespace ALOTInstallerConsole.BuilderUI
         private void performPreinstallCheck()
         {
             MessageDialog md = new MessageDialog("Performing installation precheck [2/2]");
-            NamedBackgroundWorker prestageCheckWorker = new NamedBackgroundWorker("PrecheckWorker-Prestaging");
-            prestageCheckWorker.DoWork += (a, b) =>
+            NamedBackgroundWorker preinstallCheckWorker = new NamedBackgroundWorker("PrecheckWorker-Preinstall");
+            preinstallCheckWorker.DoWork += (a, b) =>
             {
-                b.Result = Precheck.PerformPreStagingCheck(installOptions);
+                b.Result = Precheck.PerformPreInstallCheck(installOptions);
             };
-            prestageCheckWorker.RunWorkerCompleted += (sender, b) =>
+            preinstallCheckWorker.RunWorkerCompleted += (sender, b) =>
             {
                 if (md.IsCurrentTop)
                 {
@@ -111,7 +111,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     }
                 }
             };
-            prestageCheckWorker.RunWorkerAsync();
+            preinstallCheckWorker.RunWorkerAsync();
             Application.Run(md);
 
         }

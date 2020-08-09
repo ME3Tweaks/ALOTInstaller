@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.Startup;
+using ALOTInstallerCore.Objects.Manifest;
 using Serilog;
 using Terminal.Gui;
 
@@ -15,15 +15,10 @@ namespace ALOTInstallerConsole
         {
             SetupLogger();
             Application.Init();
-            ManifestModes[OnlineContent.ManifestMode.None] = new OnlineContent.ManifestPackage(); //blank
-            CurrentManifestPackage = ManifestModes[OnlineContent.ManifestMode.None];
             var startupUI = new BuilderUI.StartupUIController();
             startupUI.SetupUI();
             Program.SwapToNewView(startupUI);
         }
-
-
-        public static Dictionary<OnlineContent.ManifestMode, OnlineContent.ManifestPackage> ManifestModes = new Dictionary<OnlineContent.ManifestMode, OnlineContent.ManifestPackage>();
 
         /// <summary>
         /// Sets up the logger for this application as well as the core library
@@ -52,8 +47,5 @@ namespace ALOTInstallerConsole
             controller.BeginFlow();
             Application.Run(controller);
         }
-
-        public static OnlineContent.ManifestPackage CurrentManifestPackage;
-
     }
 }

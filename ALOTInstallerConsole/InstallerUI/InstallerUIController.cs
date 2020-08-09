@@ -30,7 +30,7 @@ namespace ALOTInstallerConsole.InstallerUI
                 TextAlignment = TextAlignment.Centered
             };
 
-            middleLabel = new Label("Stage X of Y")
+            middleLabel = new Label("")
             {
                 X = 0,
                 Y = positionY,
