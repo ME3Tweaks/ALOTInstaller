@@ -346,14 +346,7 @@ namespace ALOTInstallerCore.Startup
                 mp.ManifestFiles.AddRange((from e in rootElement.Elements("addonfile")
                                            select new ManifestFile()
                                            {
-                                               //AlreadyInstalled = false,
-                                               //Showing = false,
-                                               //Enabled = true,
-                                               //TrackTelemetry = e.Element("telemetrytracking") != null ? (bool)e.Attribute("telemetrytracking") : false,
-                                               //ComparisonsLink = (string)e.Attribute("comparisonslink"),
-                                               FileSize = e.Element("file").Attribute("size") != null ? Convert.ToInt64((string)e.Element("file").Attribute("size")) : 0L,
-                                               //CopyDirectly = e.Element("file").Attribute("copydirectly") != null ? (bool)e.Element("file").Attribute("copydirectly") : false,
-
+                                               FileSize = TryConvert.ToInt64(e.Element("file").Attribute("size")?.Value, 0L),
                                                // MEUITM, ALOT
                                                AlotVersionInfo = new TextureModInstallationInfo(
                                                    TryConvert.ToInt16(e.Attribute("alotversion")?.Value, 0),
@@ -361,7 +354,7 @@ namespace ALOTInstallerCore.Startup
                                                    0, //Hotfix version was never used
                                                    TryConvert.ToInt32(e.Attribute("meuitmver")?.Value, 0)),
 
-                                               //ProcessAsModFile = e.Attribute("processasmodfile") != null ? (bool)e.Attribute("processasmodfile") : false,
+                                               StageModFiles = TryConvert.ToBool(e.Attribute("stagemodfiles")?.Value, false),
                                                Author = (string)e.Attribute("author"),
                                                FriendlyName = (string)e.Attribute("friendlyname"),
                                                //Optional = e.Attribute("optional") != null ? (bool)e.Attribute("optional") : false,
@@ -383,10 +376,8 @@ namespace ALOTInstallerCore.Startup
                                                        ChoiceTitle = "", //unused in this block
                                                        SourceName = (string)r.Attribute("sourcename"),
                                                        DestinationName = (string)r.Attribute("destinationname"),
-                                                       TPFSource = (string)r.Attribute("tpfsource"),
                                                        MoveDirectly = r.Attribute("movedirectly") != null ? true : false,
                                                        CopyDirectly = r.Attribute("copydirectly") != null ? true : false,
-                                                       Delete = r.Attribute("delete") != null ? true : false,
                                                        m_me1 = r.Attribute("me1") != null ? true : false,
                                                        m_me2 = r.Attribute("me2") != null ? true : false,
                                                        m_me3 = r.Attribute("me3") != null ? true : false,
@@ -403,10 +394,8 @@ namespace ALOTInstallerCore.Startup
                                                            ChoiceTitle = (string)c.Attribute("choicetitle"),
                                                            SourceName = (string)c.Attribute("sourcename"),
                                                            DestinationName = (string)c.Attribute("destinationname"),
-                                                           TPFSource = (string)c.Attribute("tpfsource"),
                                                            MoveDirectly = c.Attribute("movedirectly") != null ? true : false,
                                                            CopyDirectly = c.Attribute("copydirectly") != null ? true : false,
-                                                           Delete = c.Attribute("delete") != null ? true : false,
                                                            m_me1 = c.Attribute("me1") != null ? true : false,
                                                            m_me2 = c.Attribute("me2") != null ? true : false,
                                                            m_me3 = c.Attribute("me3") != null ? true : false,

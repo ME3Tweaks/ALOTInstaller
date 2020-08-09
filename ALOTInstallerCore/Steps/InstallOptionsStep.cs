@@ -256,7 +256,7 @@ namespace ALOTInstallerCore.Steps
                 if (filesForTarget.Any(x =>
                     x is ManifestFile mf && mf.AlotVersionInfo.IsNotVersioned() || x is PreinstallMod))
                 {
-                    options[InstallOption.ALOTAddon] = (OptionState.ForceCheckedVisible, null);
+                    options[InstallOption.ALOTAddon] = (OptionState.CheckedVisible, null);
                 }
                 else
                 {

@@ -23,11 +23,11 @@ namespace ALOTInstallerCore.Builder
     /// </summary>
     public class StageStep
     {
-        private InstallOptionsPackage package;
+        private InstallOptionsPackage installOptions;
         private int AddonID = -1; //ID of the Addon
-        public StageStep(InstallOptionsPackage package, NamedBackgroundWorker worker)
+        public StageStep(InstallOptionsPackage installOptions, NamedBackgroundWorker worker)
         {
-            this.package = package;
+            this.installOptions = installOptions;
         }
         /// <summary>
         /// Callback to update the 'overall' status text of this step
@@ -103,14 +103,14 @@ namespace ALOTInstallerCore.Builder
         /// <returns></returns>
         public void PerformStaging(object sender, DoWorkEventArgs e)
         {
-            var stagingDir = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString());
+            var stagingDir = Path.Combine(Settings.BuildLocation, installOptions.InstallTarget.Game.ToString());
             if (Directory.Exists(stagingDir))
             {
                 Utilities.DeleteFilesAndFoldersRecursively(stagingDir);
             }
-            package.FilesToInstall = getFilesToStage(package.FilesToInstall.Where(x => x.Ready && (x.ApplicableGames & package.InstallTarget.Game.ToApplicableGame()) != 0));
-            package.FilesToInstall = resolveMutualExclusiveGroups();
-            if (package.FilesToInstall == null)
+            installOptions.FilesToInstall = getFilesToStage(installOptions.FilesToInstall.Where(x => x.Ready && (x.ApplicableGames & installOptions.InstallTarget.Game.ToApplicableGame()) != 0));
+            installOptions.FilesToInstall = resolveMutualExclusiveGroups();
+            if (installOptions.FilesToInstall == null)
             {
                 // Abort!
                 Log.Information("A mutual group conflict was not resolved. Staging aborted by user");
@@ -119,7 +119,7 @@ namespace ALOTInstallerCore.Builder
 
             Log.Information(@"The following files will be staged for installation:");
             int buildID = 0;
-            foreach (var f in package.FilesToInstall)
+            foreach (var f in installOptions.FilesToInstall)
             {
                 f.ResetBuildVars();
                 if (f.AlotVersionInfo.IsNotVersioned() && AddonID < 0)
@@ -134,7 +134,7 @@ namespace ALOTInstallerCore.Builder
             }
 
             int numDone = 0;
-            int numToDo = package.FilesToInstall.Count;
+            int numToDo = installOptions.FilesToInstall.Count;
             // Final location where MEM will install packages from. 
             var finalBuiltPackagesDestination = Path.Combine(stagingDir, "InstallationPackages");
             if (Directory.Exists(finalBuiltPackagesDestination))
@@ -152,17 +152,27 @@ namespace ALOTInstallerCore.Builder
             Directory.CreateDirectory(addonStagingPath);
 
 
-            foreach (var f in package.FilesToInstall)
+            foreach (var installerFile in installOptions.FilesToInstall)
             {
-                var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(f.GetUsedFilepath()));
+                var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
+                Directory.CreateDirectory(outputDir);
                 // Extract Archive
-                var archiveExtracted = ExtractArchive(f, outputDir);
-                if (!archiveExtracted && FiletypeRequiresDecompilation(f.GetUsedFilepath()))
+                var archiveExtracted = ExtractArchive(installerFile, outputDir);
+                if (!archiveExtracted && FiletypeRequiresDecompilation(installerFile.GetUsedFilepath()))
                 {
                     // Decompile file instead 
-                    ExtractTextureContainer(package.InstallTarget.Game, f.GetUsedFilepath(), outputDir, f);
+                    if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mod" && installerFile.StageModFiles)
+                    {
+                        var modDest = Path.Combine(stagingDir, Path.GetFileName(installerFile.GetUsedFilepath()));
+                        Log.Information($"Copying .mod file to staging (due to StageModFiles=true): {installerFile.GetUsedFilepath()} -> {modDest}");
+                        File.Copy(installerFile.GetUsedFilepath(), modDest);
+                    }
+                    else
+                    {
+                        ExtractTextureContainer(installOptions.InstallTarget.Game, installerFile.GetUsedFilepath(), outputDir, installerFile);
+                    }
                 }
-                else if (f.PackageFiles.Any(x => !x.MoveDirectly))
+                else if (installerFile.PackageFiles.Any(x => !x.MoveDirectly))
                 {
                     // Files that are not move only may be contained in texture container format.
                     var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories)
@@ -170,11 +180,20 @@ namespace ALOTInstallerCore.Builder
                     foreach (var sf in subfilesToExtract)
                     {
                         // todo: Prevent decompilation of package files marked as ProcessAsModFile as it's pointless
-                        ExtractTextureContainer(package.InstallTarget.Game, sf, outputDir, f);
+                        if (Path.GetExtension(sf) == ".mod" && installerFile.StageModFiles)
+                        {
+                            var modDest = Path.Combine(stagingDir, Path.GetFileName(sf));
+                            Log.Information($"Moving .mod file to staging (due to StageModFiles=true): {sf} -> {modDest}");
+                            File.Move(sf, modDest);
+                        }
+                        else
+                        {
+                            ExtractTextureContainer(installOptions.InstallTarget.Game, sf, outputDir, installerFile);
+                        }
                     }
                 }
 
-                StageForBuilding(f, outputDir, addonStagingPath, finalBuiltPackagesDestination, package.InstallTarget.Game);
+                StageForBuilding(installerFile, outputDir, addonStagingPath, finalBuiltPackagesDestination, installOptions.InstallTarget.Game);
                 Interlocked.Increment(ref numDone);
                 UpdateProgressCallback?.Invoke(numDone, numToDo);
             }
@@ -182,7 +201,7 @@ namespace ALOTInstallerCore.Builder
             if (Directory.GetFiles(addonStagingPath).Any())
             {
                 // Addon needs built
-                BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{AddonID:D3}_ALOTAddon.mem"), package.InstallTarget.Game);
+                BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{AddonID:D3}_ALOTAddon.mem"), installOptions.InstallTarget.Game);
             }
         }
 
@@ -190,7 +209,7 @@ namespace ALOTInstallerCore.Builder
         {
             var files = new List<InstallerFile>();
             Dictionary<string, List<InstallerFile>> mutualExclusiveMods = new Dictionary<string, List<InstallerFile>>();
-            foreach (var v in package.FilesToInstall)
+            foreach (var v in installOptions.FilesToInstall)
             {
                 if (v is PreinstallMod pm)
                 {
@@ -313,7 +332,7 @@ namespace ALOTInstallerCore.Builder
         private void stagePackageFile(InstallerFile installerFile, PackageFile pf, string compilingStagingDest, string finalDest, string[] filesInSource, ref int numPackageFilesStaged, int numPackageFiles)
         {
             // Stage package files
-            if (!pf.Processed && pf.ApplicableGames.HasFlag(package.InstallTarget.Game.ToApplicableGame()))
+            if (!pf.Processed && pf.ApplicableGames.HasFlag(installOptions.InstallTarget.Game.ToApplicableGame()))
             {
                 var matchingFile = filesInSource.FirstOrDefault(x => Path.GetFileName(x).Equals(Path.GetFileName(pf.SourceName), StringComparison.InvariantCultureIgnoreCase));
                 if (matchingFile != null)
@@ -475,22 +494,22 @@ namespace ALOTInstallerCore.Builder
         private List<InstallerFile> getFilesToStage(IEnumerable<InstallerFile> readyFiles)
         {
             var filesToStage = new List<InstallerFile>();
-            if (package.InstallALOT)
+            if (installOptions.InstallALOT)
             {
                 filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0)); //Add MAJOR ALOT file
             }
 
-            if (package.InstallALOTUpdate)
+            if (installOptions.InstallALOTUpdate)
             {
                 filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0)); //Add MINOR ALOT file
             }
 
-            if (package.InstallMEUITM)
+            if (installOptions.InstallMEUITM)
             {
                 filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.MEUITMVER != 0)); //Add MEUITM file
             }
 
-            if (package.InstallALOTAddon)
+            if (installOptions.InstallALOTAddon)
             {
                 filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.IsNotVersioned() && x is ManifestFile)); //Add Addon files that don't have a set ALOTVersionInfo.
             }

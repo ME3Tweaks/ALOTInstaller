@@ -13,6 +13,15 @@ namespace ALOTInstallerCore.Objects
         public string FullFilePath { get; set; }
 
         /// <summary>
+        /// User Files will always indicate that mod files should be staged rather than decompiled as users will have no idea what it means to decompile the mod file
+        /// </summary>
+        public override bool StageModFiles
+        {
+            get => true;
+            set { } //Must have setter even if unused
+        }
+
+        /// <summary>
         /// Updates the ready status for this user file. Checks if file exists on disk and sets Ready based on this returned value
         /// </summary>
         /// <returns></returns>
@@ -29,5 +38,6 @@ namespace ALOTInstallerCore.Objects
         /// </summary>
         /// <returns></returns>
         public override string GetUsedFilepath() => FullFilePath;
+
     }
 }

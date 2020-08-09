@@ -34,7 +34,7 @@ namespace ALOTInstallerCore.ModManager.Objects
             this.dlcFolderPath = dlcFolderPath;
             this.game = game;
             DLCFolderName = DLCFolderNameString = Path.GetFileName(dlcFolderPath);
-            if (ThirdPartyIdentificationService.ModDatabase[game.ToString()].TryGetValue(DLCFolderName.TrimStart('x'), out var tpmi))
+            if (ThirdPartyIdentificationService.ModDatabase != null && ThirdPartyIdentificationService.ModDatabase[game.ToString()].TryGetValue(DLCFolderName.TrimStart('x'), out var tpmi))
             {
                 ModName = tpmi.modname;
             }

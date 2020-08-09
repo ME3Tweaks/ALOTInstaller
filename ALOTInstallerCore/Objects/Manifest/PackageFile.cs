@@ -21,11 +21,7 @@
         /// Directly copy this file to the staging directory. This is used if a texture can be applied to multiple areas
         /// </summary>
         public bool CopyDirectly { get; set; }
-        /// <summary>
-        /// This file should be deleted after extracting the whole archive as it is not used
-        /// </summary>
-        public bool Delete { get; set; }
-        public string TPFSource { get; set; }
+
         public ApplicableGame ApplicableGames { get; set; }
         /// <summary>
         /// If this file has been processed (extracted and moved for staging/install)

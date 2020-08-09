@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using ALOTInstallerConsole.UserControls;
+using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
@@ -33,7 +34,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 ifS.AddRange(Program.CurrentManifestPackage.ManifestFiles);
             }
             dataSource = new InstallerFileDataSource(ifS);
-            var ManifestFilesList = new ListView(dataSource)
+            ManifestFilesListView = new ListView(dataSource)
             {
                 Width = 48,
                 Height = Dim.Fill(),
@@ -50,7 +51,8 @@ namespace ALOTInstallerConsole.BuilderUI
                 X = 0,
                 Y = 0
             };
-            fv.Add(ManifestFilesList);
+
+            fv.Add(ManifestFilesListView);
             Add(fv);
 
             // RIGHT SIDE
@@ -61,6 +63,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 X = 50,
                 Y = 0
             };
+            Add(fv);
 
             int y = 0;
             AuthorTextBlock = new Label("")
@@ -134,7 +137,16 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             fv.Add(UnpackedFileHashTextBlock);
 
-            Add(fv);
+            DownloadButton = new Button("Download")
+            {
+                Width = 12,
+                Height = 1,
+                X = Pos.Right(fv) - fv.X - 14,
+                Y = Pos.Bottom(fv) - 3,
+                Clicked = DownloadClicked
+            };
+            fv.Add(DownloadButton);
+
 
             Button settingsButton = new Button("Settings")
             {
@@ -209,6 +221,20 @@ namespace ALOTInstallerConsole.BuilderUI
             Add(installButton);
 
             TextureLibrary.ResetAllReadyStatuses(Program.CurrentManifestPackage.ManifestFiles);
+        }
+
+        public ListView ManifestFilesListView { get; set; }
+
+        private void DownloadClicked()
+        {
+            if (ManifestFilesListView.SelectedItem >= 0)
+            {
+                var file = dataSource.InstallerFiles[ManifestFilesListView.SelectedItem];
+                if (file is ManifestFile mf)
+                {
+                    Utilities.OpenWebPage(mf.DownloadLink);
+                }
+            }
         }
 
         private void ImportAssistant_Click()
@@ -298,7 +324,7 @@ namespace ALOTInstallerConsole.BuilderUI
             });
 
             y++; // Newline
-
+            Dictionary<InstallOptionsStep.InstallOption, CheckBox> installOptionMapping = new Dictionary<InstallOptionsStep.InstallOption, CheckBox>();
             foreach (var v in availableInstallOptions)
             {
                 CheckBox cb = new CheckBox(getUIString(v, dataSource.InstallerFiles))
@@ -313,7 +339,7 @@ namespace ALOTInstallerConsole.BuilderUI
                                v.Value.state == InstallOptionsStep.OptionState.UncheckedVisible
                 };
                 installOptionsPicker.Add(cb);
-
+                installOptionMapping[v.Key] = cb;
                 maxWidth = Math.Max(maxWidth, cb.Text.Length + 4);
 
                 if (v.Value.reasonForState != null)
@@ -328,6 +354,34 @@ namespace ALOTInstallerConsole.BuilderUI
                     maxWidth = Math.Max(maxWidth, v.Value.reasonForState.Length + 4);
                 }
             }
+
+            y++;
+            CheckBox compressPackagesCb = new CheckBox("Compress packages")
+            {
+                X = 1,
+                Y = y++,
+                Width = Dim.Fill(),
+                Height = 1,
+                Checked = target.Game != Enums.MEGame.ME1
+            };
+
+            if (target.Game > Enums.MEGame.ME1)
+            {
+                installOptionsPicker.Add(compressPackagesCb);
+            }
+            else
+            {
+                y--; // remove newline it made
+            }
+
+            CheckBox use2KLodsCb = new CheckBox("Set 2K LODs instead of 4K")
+            {
+                X = 1,
+                Y = y++,
+                Width = Dim.Fill(),
+                Height = 1,
+            };
+            installOptionsPicker.Add(use2KLodsCb);
 
             y++;
             y++;
@@ -351,13 +405,14 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     InstallTarget = target,
                     FilesToInstall = dataSource.InstallerFiles,
-                    //InstallALOT = alotCheckbox.Checked,
-                    //InstallALOTUpdate = alotUpdateCheckbox.Checked,
-                    //InstallMEUITM = meuitmCheckbox.Checked,
-                    //InstallALOTAddon = addonCheckBox.Checked,
-                    //InstallUserfiles = userFilesCheckBox.Checked,
+                    InstallALOT = getInstallOptionValue(InstallOptionsStep.InstallOption.ALOT, installOptionMapping),
+                    InstallALOTUpdate = getInstallOptionValue(InstallOptionsStep.InstallOption.ALOTUpdate, installOptionMapping),
+                    InstallMEUITM = getInstallOptionValue(InstallOptionsStep.InstallOption.MEUITM, installOptionMapping),
+                    InstallALOTAddon = getInstallOptionValue(InstallOptionsStep.InstallOption.ALOTAddon, installOptionMapping),
+                    InstallUserfiles = getInstallOptionValue(InstallOptionsStep.InstallOption.UserFiles, installOptionMapping),
                     InstallerMode = CurrentMode,
-                    RepackGameFiles = true //needs option
+                    RepackGameFiles = compressPackagesCb.Checked,
+                    Limit2K = use2KLodsCb.Checked
                 };
 
                 MessageDialog md = new MessageDialog("Performing installation precheck [1/2]");
@@ -394,6 +449,17 @@ namespace ALOTInstallerConsole.BuilderUI
                 prestageCheckWorker.RunWorkerAsync();
                 Application.Run(md);
             }
+        }
+
+        /// <summary>
+        /// Method to make code less ugly
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="installOptionMapping"></param>
+        /// <returns></returns>
+        private bool getInstallOptionValue(InstallOptionsStep.InstallOption key, Dictionary<InstallOptionsStep.InstallOption, CheckBox> installOptionMapping)
+        {
+            return installOptionMapping.ContainsKey(key) ? installOptionMapping[key].Checked : false;
         }
 
         private ustring getUIString(KeyValuePair<InstallOptionsStep.InstallOption, (InstallOptionsStep.OptionState state, string reasonForState)> option, List<InstallerFile> installerFiles)
@@ -447,6 +513,7 @@ namespace ALOTInstallerConsole.BuilderUI
         public Label ReadyTextBlock { get; set; }
         public Label ExpectedFileSizeHashTextBlock { get; set; }
         public Label ExpectedFileSizeTextBlock { get; set; }
+        public Button DownloadButton { get; set; }
 
         private void SelectedManifestFileChanged(ListViewItemEventArgs obj)
         {
@@ -463,7 +530,7 @@ namespace ALOTInstallerConsole.BuilderUI
             AuthorTextBlock.Text = "Author: " + mf.Author;
             FilenameTextBlock.Text = "Filename: " + mf.Filename;
             ExpectedFileSizeHashTextBlock.Text = "File MD5: " + mf.FileMD5;
-            ExpectedFileSizeTextBlock.Text = "File size: " + mf.FileSize;
+            ExpectedFileSizeTextBlock.Text = $"File size: {mf.FileSize} ({FileSizeFormatter.FormatSize(mf.FileSize)})";
 
             // Unpacked
             UnpackedFilenameTextBlock.Text = "Unpacked filename: " + (mf.UnpackedSingleFilename != null ? mf.UnpackedSingleFilename : "N/A");

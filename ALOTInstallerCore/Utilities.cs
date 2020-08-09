@@ -13,6 +13,7 @@ using System.Xml.Linq;
 using System.Globalization;
 using System.Reflection;
 using ALOTInstallerCore.Objects;
+using System.Runtime.InteropServices;
 
 namespace ALOTInstallerCore
 {
@@ -183,7 +184,34 @@ namespace ALOTInstallerCore
 #endif
             return "";
         }
-
+        public static void OpenWebPage(string url)
+        {
+            try
+            {
+                Process.Start(url);
+            }
+            catch
+            {
+                // hack because of this: https://github.com/dotnet/corefx/issues/10361
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    url = url.Replace("&", "^&");
+                    Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", url);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", url);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
         public static bool IsWindows10OrNewer()
         {
 #if WINDOWS

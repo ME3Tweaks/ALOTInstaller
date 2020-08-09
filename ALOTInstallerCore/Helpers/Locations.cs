@@ -4,6 +4,7 @@ using System.IO;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using Serilog;
 
 namespace ALOTInstallerCore.Helpers
 {
@@ -179,17 +180,26 @@ namespace ALOTInstallerCore.Helpers
         /// Sets the game path that MEM and ALOTInstallerCore will use for the game specified by the target.
         /// </summary>
         /// <param name="target"></param>
-        public static void SetTarget(GameTarget target)
+        public static bool SetTarget(GameTarget target)
         {
-            var memSettingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "MassEffectModder");
-            if (!Directory.Exists(memSettingsPath))
-                Directory.CreateDirectory(memSettingsPath);
+            int exitcode = 0;
+            string args = $"--set-game-data-path --game-id {target.Game.ToGameNum()} --path \"{target.TargetPath}\"";
+            MEMIPCHandler.RunMEMIPCUntilExit(args, applicationExited: x => exitcode = x);
+            if (exitcode != 0)
+            {
+                Log.Error($"Non-zero MassEffectModderNoGui exit code setting game path: {exitcode}");
+            }
+            return exitcode == 0;
+            // Manual method
+            //var memSettingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            //    "MassEffectModder");
+            //if (!Directory.Exists(memSettingsPath))
+            //    Directory.CreateDirectory(memSettingsPath);
 
-            var memIni = Path.Combine(memSettingsPath, "MassEffectModder.ini");
-            DuplicatingIni ini = File.Exists(memIni) ? DuplicatingIni.LoadIni(memIni) : new DuplicatingIni();
-            ini["GameDataPaths"][target.Game.ToString()].Value = target.TargetPath;
-            File.WriteAllText(memIni, ini.ToString());
+            //var memIni = Path.Combine(memSettingsPath, "MassEffectModder.ini");
+            //DuplicatingIni ini = File.Exists(memIni) ? DuplicatingIni.LoadIni(memIni) : new DuplicatingIni();
+            //ini["GameDataPaths"][target.Game.ToString()].Value = target.TargetPath;
+            //File.WriteAllText(memIni, ini.ToString());
         }
     }
 }

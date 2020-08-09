@@ -274,10 +274,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         //                OnPropertyChanged("LeftBlockColor"); //ui update for this property
         //            }
         //        }
-        /// <summary>
-        /// If this file should be directly placed into the staging directory, rather than decompiling the file (.mod files)
-        /// </summary>
-        public bool ProcessAsModFile { get; set; }
+
         public string UnpackedSingleFilename { get; set; }
 
         //        public string ALOTMainPackedFilename { get; set; }
@@ -293,9 +290,9 @@ namespace ALOTInstallerCore.Objects.Manifest
         //        public List<string> Duplicates { get; set; }
 
         //        public List<PackageFile> PackageFiles { get; set; }
-        public List<ChoiceFile> ChoiceFiles { get; set; }
-        public List<ZipFile> ZipFiles { get; set; }
-        public List<CopyFile> CopyFiles { get; set; }
+        public List<ChoiceFile> ChoiceFiles { get; set; } = new List<ChoiceFile>();
+        public List<ZipFile> ZipFiles { get; set; } = new List<ZipFile>();
+        public List<CopyFile> CopyFiles { get; set; } = new List<CopyFile>();
 
         //        public string DownloadAssistantString
         //        {

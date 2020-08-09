@@ -128,6 +128,11 @@ namespace ALOTInstallerCore.Objects
         public abstract string GetUsedFilepath();
 
         /// <summary>
+        /// Indicates that any .mod files found in the extraction directory (or file itself) shouldn't be decompiled and instead directly staged to be compiled to .mem file (will keep mesh changes)
+        /// </summary>
+        public abstract bool StageModFiles { get; set; }
+
+        /// <summary>
         /// Resets variables used only during the build step
         /// </summary>
         public void ResetBuildVars()
