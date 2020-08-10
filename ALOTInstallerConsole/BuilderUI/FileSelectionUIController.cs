@@ -26,7 +26,7 @@ namespace ALOTInstallerConsole.BuilderUI
         public override void SetupUI()
         {
             Title = "ALOT Installer";
-            dataSource = new InstallerFileDataSource(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode));
+            dataSource = new InstallerFileDataSource(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode, true));
             ManifestFilesListView = new ListView(dataSource)
             {
                 Width = 48,
@@ -40,7 +40,7 @@ namespace ALOTInstallerConsole.BuilderUI
             leftsideListContainer = new FrameView()
             {
                 Width = 50,
-                Height = Dim.Fill() - 1,
+                Height = Dim.Fill() - 2,
                 X = 0,
                 Y = 0
             };
@@ -81,8 +81,8 @@ namespace ALOTInstallerConsole.BuilderUI
 
             CheckBox me1FilterCheckbox = new CheckBox("ME1")
             {
-                X = Pos.Left(this) + 29,
-                Y = Pos.Bottom(this) - 3,
+                X = 0,
+                Y = Pos.Bottom(this) - 4,
                 Height = 1,
                 Width = 15,
                 Checked = true,
@@ -92,8 +92,8 @@ namespace ALOTInstallerConsole.BuilderUI
 
             CheckBox me2FilterCheckbox = new CheckBox("ME2")
             {
-                X = Pos.Left(this) + 37,
-                Y = Pos.Bottom(this) - 3,
+                X = 8,
+                Y = Pos.Bottom(this) - 4,
                 Height = 1,
                 Width = 15,
                 Checked = true,
@@ -103,8 +103,8 @@ namespace ALOTInstallerConsole.BuilderUI
 
             CheckBox me3FilterCheckbox = new CheckBox("ME3")
             {
-                X = Pos.Left(this) + 45,
-                Y = Pos.Bottom(this) - 3,
+                X = 16,
+                Y = Pos.Bottom(this) - 4,
                 Height = 1,
                 Width = 15,
                 Checked = true,
@@ -116,8 +116,8 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 Add(new Button("Import assistant")
                 {
-                    X = Pos.Right(this) - 34,
-                    Y = Pos.Bottom(this) - 3,
+                    X = 30,
+                    Y = Pos.Bottom(this) - 4,
                     Height = 1,
                     Width = 20,
                     Clicked = ImportAssistant_Click
@@ -134,7 +134,7 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             Add(installButton);
 
-            TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode));
+            TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode, true));
             SetLeftsideTitle();
         }
 
@@ -523,6 +523,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
             AddSFIFVLabel($"Author: {mf.Author}", ref y);
             AddSFIFVLabel($"Applies to game(s): {mf.ApplicableGames}", ref y);
+            AddSFIFVLabel($"This file is {mf.RecommendationString}", ref y);
             AddSFIFVLabel($"Ready: {mf.Ready}", ref y);
             y++;
 

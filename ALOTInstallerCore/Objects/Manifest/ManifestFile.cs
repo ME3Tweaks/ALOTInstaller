@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using ALOTInstallerCore.Helpers;
 
@@ -7,7 +9,7 @@ namespace ALOTInstallerCore.Objects.Manifest
     /// <summary>
     /// Describes a file in the manifest.
     /// </summary>
-    public class ManifestFile : InstallerFile
+    public class ManifestFile : InstallerFile, INotifyPropertyChanged //this must be here to make fody run on this
     {
 
         /// <summary>
@@ -317,6 +319,28 @@ namespace ALOTInstallerCore.Objects.Manifest
         public string FileMD5 { get; internal set; }
         public string UnpackedFileMD5 { get; set; }
         public long UnpackedFileSize { get; set; }
+        /// <summary>
+        /// The recommendation type for this manifest file. This can be used to determine UI colors
+        /// </summary>
+        public RecommendationType Recommendation { get; set; }
+        /// <summary>
+        /// The recommendation string (from the manifest) for the file for this installer file. Ideally, it should match a recommendation type.
+        /// </summary>
+        public string RecommendationString { get; set; }
+
+        public void OnRecommendationStringChanged()
+        {
+            if (RecommendationString == null)
+            {
+                Recommendation = RecommendationType.None;
+                return;
+            }
+
+            if (Enum.TryParse<RecommendationType>(RecommendationString, out var r))
+            {
+                Recommendation = r;
+            }
+        }
         //        public bool Optional { get; internal set; }
         //        private bool _enabled;
         //        public bool CopyDirectly { get; internal set; }

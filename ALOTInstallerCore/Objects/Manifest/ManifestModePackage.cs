@@ -10,9 +10,10 @@ namespace ALOTInstallerCore.Objects.Manifest
     public class ManifestModePackage
     {
         /// <summary>
-        /// Files that are part of the mode's installation manifest. These files must be downcast to their types for accessing info on them.
+        /// Files that are part of the mode's installation manifest.
         /// </summary>
         public List<ManifestFile> ManifestFiles = new List<ManifestFile>(60);
+
         /// <summary>
         /// The version of this mode's manifest
         /// </summary>
@@ -22,5 +23,10 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// List of tutorials for this manifest mode
         /// </summary>
         public List<ManifestTutorial> Tutorials = new List<ManifestTutorial>();
+
+        /// <summary>
+        /// List of user supplied files for this mode
+        /// </summary>
+        public List<UserFile> UserFiles { get; } = new List<UserFile>();
     }
 }

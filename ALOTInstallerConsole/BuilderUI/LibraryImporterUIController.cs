@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using NStack;
 using Serilog;
 using Terminal.Gui;
 
@@ -23,6 +26,14 @@ namespace ALOTInstallerConsole.BuilderUI
                 Clicked = ImportFromFolder_Clicked
             });
 
+            Add(new Button("Load User File")
+            {
+                X = Pos.Left(this) + 24,
+                Y = Pos.Bottom(this) - 3,
+                Height = 1,
+                Clicked = LoadUserFile_Clicked
+            });
+
             Add(new Button("Close")
             {
                 X = Pos.Right(this) - 12,
@@ -32,14 +43,60 @@ namespace ALOTInstallerConsole.BuilderUI
             });
         }
 
+        private void LoadUserFile_Clicked()
+        {
+            OpenDialog selector = new OpenDialog("Select file",
+                "Supported extensions: .7z, .rar, .zip, .dds, .mem, .tpf, .mod, .png")
+            {
+                CanChooseDirectories = false,
+                CanChooseFiles = true,
+                AllowedFileTypes = new []{ "7z", ".rar", ".zip", ".dds", ".mem", ".tpf", ".mod", ".png" },
+                DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) //Default to user profile cause idk if there is easy way to get downloads folder on linux
+            };
+            Application.Run(selector);
+            Debug.WriteLine(selector.FilePath);
+            if (!selector.Canceled && selector.FilePaths.Any() && File.Exists(selector.FilePaths.First()))
+            {
+                var selectedFile = selector.FilePaths.First();
+                if (!ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].UserFiles.Any(X => X.FullFilePath == selectedFile))
+                {
+
+                    ApplicableGame games = ApplicableGame.None;
+                    List<string> paths = new List<string>();
+                    if (Locations.ME1Target != null) paths.Add("ME1");
+                    if (Locations.ME2Target != null) paths.Add("ME2");
+                    if (Locations.ME3Target != null) paths.Add("ME3");
+                    paths.Add("Abort");
+                    var selectedIndex = MessageBox.Query("Select game", $"Select which game {Path.GetFileName(selectedFile)} applies to.", paths.Select(x => (ustring)x.ToString()).ToArray());
+                    if (paths[selectedIndex] == "Abort" || selectedIndex < 0) return;
+                    games = Enum.Parse<ApplicableGame>(paths[selectedIndex]);
+
+                    UserFile uf = new UserFile()
+                    {
+                        AlotVersionInfo = new TextureModInstallationInfo(0, 0, 0, 0),
+                        ApplicableGames = games,
+                        FullFilePath = selector.FilePath.ToString(),
+                        FriendlyName = Path.GetFileName(selectedFile),
+                        Filename = Path.GetFileName(selectedFile),
+                        FileSize = new FileInfo(selectedFile).Length
+                    };
+                    ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].UserFiles.Add(uf);
+                }
+                else
+                {
+                    MessageBox.Query("Already added", "This user file is already loaded for install.", "OK");
+                }
+
+            }
+        }
+
         private void ImportFromFolder_Clicked()
         {
             if (ManifestHandler.MasterManifest != null)
             {
                 if (ManifestHandler.MasterManifest.ManifestModePackageMappping.TryGetValue(ManifestMode.ALOT, out var manifestP))
                 {
-                    OpenDialog selector = new OpenDialog("Select location to import files from",
-                        "Select a folder containing manifest files, such as your downloads folder.")
+                    OpenDialog selector = new OpenDialog("Select location to import files from", "Select a folder containing manifest files, such as your downloads folder.")
                     {
                         CanChooseDirectories = true,
                         CanChooseFiles = false,

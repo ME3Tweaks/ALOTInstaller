@@ -81,7 +81,7 @@ namespace ALOTInstallerCore.Objects
         /// <summary>
         /// Size of the backing file
         /// </summary>
-        public long FileSize { get; internal set; }
+        public long FileSize { get; set; }
         /// <summary>
         /// File is ready to be processed or not
         /// </summary>
@@ -103,11 +103,6 @@ namespace ALOTInstallerCore.Objects
         /// Internal ID that is used for output MEM files in the final directory
         /// </summary>
         public int BuildID { get; set; }
-        /// <summary>
-        /// The recommendation type for this installer file. This type will be checked against in the precheck for various modes
-        /// </summary>
-        public RecommendationType Recommendation { get; set; }
-
 
         /// <summary>
         /// Refreshes the Ready status for this file. Returns if the ready status changed due to this call.

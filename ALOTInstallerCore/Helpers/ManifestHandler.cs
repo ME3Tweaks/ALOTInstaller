@@ -291,6 +291,7 @@ namespace ALOTInstallerCore.Helpers
                                                            IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
                                                            ModVersion = (string)d.Attribute("version")
                                                        }).ToList(),
+                                                   RecommendationString = e.Attribute("recommendation")?.Value
                                                }));
 
                     // ADD TEXTURE MODS
@@ -455,12 +456,16 @@ namespace ALOTInstallerCore.Helpers
             return manifestFiles;
         }
 
-        public static List<InstallerFile> GetManifestFilesForMode(ManifestMode mode)
+        public static List<InstallerFile> GetManifestFilesForMode(ManifestMode mode, bool includeUserFiles = false)
         {
             List<InstallerFile> files = new List<InstallerFile>();
             if (MasterManifest != null && MasterManifest.ManifestModePackageMappping.TryGetValue(mode, out var mp))
             {
-                return mp.ManifestFiles.Cast<InstallerFile>().ToList();
+                files.AddRange(mp.ManifestFiles);
+                if (includeUserFiles)
+                {
+                    files.AddRange(mp.UserFiles);
+                }
             }
 
             return files;
