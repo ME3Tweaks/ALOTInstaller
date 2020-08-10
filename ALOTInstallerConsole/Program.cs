@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Xml.Linq;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects.Manifest;
@@ -11,29 +13,16 @@ namespace ALOTInstallerConsole
 {
     class Program
     {
+        private static void setWrapperLogger(ILogger logger) => Log.Logger = logger;
         static void Main(string[] args)
         {
-            SetupLogger();
+            //Initialize ALOT Installer library
+            ALOTInstallerCoreLib.Startup(setWrapperLogger);
+
             Application.Init();
             var startupUI = new BuilderUI.StartupUIController();
             startupUI.SetupUI();
             Program.SwapToNewView(startupUI);
-        }
-
-        /// <summary>
-        /// Sets up the logger for this application as well as the core library
-        /// </summary>
-        private static void SetupLogger()
-        {
-            var logsDir = Directory.CreateDirectory(Path.Combine(Locations.AppDataFolder(), "Logs")).FullName;
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.File(Path.Combine(logsDir, "alotinstallerconsole-{Date}.txt"), rollingInterval: RollingInterval.Day, flushToDiskInterval: new TimeSpan(0, 0, 15))
-#if DEBUG
-                .WriteTo.Debug()
-#endif
-                .CreateLogger();
-            Hook.SetLogger(Log.Logger);
         }
 
         /// <summary>
@@ -47,5 +36,18 @@ namespace ALOTInstallerConsole
             controller.BeginFlow();
             Application.Run(controller);
         }
+
+        //static void debug()
+        //{
+        //    var xml = File.ReadAllText(@"C:\users\mgamerz\desktop\t.txt");
+        //    XDocument x = XDocument.Parse(xml);
+        //    foreach (var v in x.Root.Elements("supportedhash"))
+        //    {
+        //        if (v.Attribute("game").Value == "me3")
+        //        {
+        //            Debug.WriteLine($"[@\"{v.Value}\"] = @\"{v.Attribute("name").Value}\",");
+        //        }
+        //    }
+        //}
     }
 }

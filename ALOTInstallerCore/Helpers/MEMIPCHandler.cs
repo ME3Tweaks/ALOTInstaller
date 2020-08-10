@@ -3,13 +3,35 @@ using System;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using ALOTInstallerCore.Objects;
 using CliWrap;
 using CliWrap.EventStream;
 
 namespace ALOTInstallerCore.Helpers
 {
+    /// <summary>
+    /// Utility class for interacting with MEM
+    /// </summary>
     public static class MEMIPCHandler
     {
+        /// <summary>
+        /// Returns the version number for MEM, or 0 if it couldn't be retreived
+        /// </summary>
+        /// <returns></returns>
+        public static int GetMemVersion()
+        {
+            int version = 0;
+            // If the current version doesn't support the --version --ipc, we just assume it is 0.
+            MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
+            {
+                if (command == "VERSION")
+                {
+                    version = int.Parse(param);
+                }
+            });
+            return version;
+        }
+
         public static void RunMEMIPCUntilExit(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
         {
             if (Settings.DebugLogs)
@@ -170,5 +192,23 @@ namespace ALOTInstallerCore.Helpers
         //    };
         //    memProcess.Run();
         //}
+
+        /// <summary>
+        /// Sets the path MEM will use for the specified game
+        /// </summary>
+        /// <param name="targetGame"></param>
+        /// <param name="targetPath"></param>
+        /// <returns></returns>
+        public static bool SetGamePath(Enums.MEGame targetGame, string targetPath)
+        {
+            int exitcode = 0;
+            string args = $"--set-game-data-path --game-id {targetGame.ToGameNum()} --path \"{targetPath}\"";
+            MEMIPCHandler.RunMEMIPCUntilExit(args, applicationExited: x => exitcode = x);
+            if (exitcode != 0)
+            {
+                Log.Error($"Non-zero MassEffectModderNoGui exit code setting game path: {exitcode}");
+            }
+            return exitcode == 0;
+        }
     }
 }

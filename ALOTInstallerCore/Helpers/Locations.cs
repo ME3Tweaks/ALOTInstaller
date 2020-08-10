@@ -13,7 +13,7 @@ namespace ALOTInstallerCore.Helpers
     /// </summary>
     public static class Locations
     {
-        public static string AppDataFolder() => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create), Path.GetFileNameWithoutExtension(System.Diagnostics.Process.GetCurrentProcess().MainModule.ModuleName))).FullName;
+        public static string AppDataFolder() => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create), Utilities.GetHostingProcessname())).FullName;
         public static string TempDirectory() => Directory.CreateDirectory(Path.Combine(AppDataFolder(), "Temp")).FullName;
         public static string GetCachedManifestPath() => Path.Combine(AppDataFolder(), "manifest.xml");
 
@@ -69,6 +69,7 @@ namespace ALOTInstallerCore.Helpers
             string mempath = null;
 
             // MIGHT NEED CHANGED ON LINUX
+            // TODO: USE MEM --game-paths
             string inipath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MassEffectModder");
             inipath = Path.Combine(inipath, "MassEffectModder.ini");
             DuplicatingIni configIni = null;
@@ -102,10 +103,6 @@ namespace ALOTInstallerCore.Helpers
                                     continue;
                             }
                         }
-                    }
-                    else
-                    {
-                        Utilities.WriteDebugLog("mem ini does not have path for this game.");
                     }
 
 #if WINDOWS
@@ -182,14 +179,21 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="target"></param>
         public static bool SetTarget(GameTarget target)
         {
-            int exitcode = 0;
-            string args = $"--set-game-data-path --game-id {target.Game.ToGameNum()} --path \"{target.TargetPath}\"";
-            MEMIPCHandler.RunMEMIPCUntilExit(args, applicationExited: x => exitcode = x);
-            if (exitcode != 0)
+
+            var successful = MEMIPCHandler.SetGamePath(target.Game, target.TargetPath);
+            switch (target.Game)
             {
-                Log.Error($"Non-zero MassEffectModderNoGui exit code setting game path: {exitcode}");
+                case Enums.MEGame.ME1:
+                    ME1Target = target;
+                    break;
+                case Enums.MEGame.ME2:
+                    ME2Target = target;
+                    break;
+                case Enums.MEGame.ME3:
+                    ME3Target = target;
+                    break;
             }
-            return exitcode == 0;
+            return successful;
             // Manual method
             //var memSettingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             //    "MassEffectModder");

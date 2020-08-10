@@ -6,6 +6,7 @@ using System.Linq;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
@@ -124,6 +125,15 @@ namespace ALOTInstallerConsole.BuilderUI
                 });
             }
 
+            Button diagButton = new Button("Diagnostics")
+            {
+                X = Pos.Right(this) - 28,
+                Y = Pos.Bottom(this) - 3,
+                Height = 1,
+                Clicked = Diagnostics_Click
+            };
+            Add(diagButton);
+
             Button installButton = new Button("Install")
             {
                 X = Pos.Right(this) - 13,
@@ -136,6 +146,12 @@ namespace ALOTInstallerConsole.BuilderUI
 
             TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode, true));
             SetLeftsideTitle();
+        }
+
+        private void Diagnostics_Click()
+        {
+            DiagnosticsController.InitDiagnostics();
+            
         }
 
         public ListView ManifestFilesListView { get; set; }

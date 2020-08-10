@@ -22,7 +22,7 @@ namespace ALOTInstallerCore.ModManager.Services
 
         public static CaseInsensitiveDictionary<List<(int size, string md5)>> LoadDatabaseFor(Enums.MEGame game, bool isMe1PL = false)
         {
-            string assetPrefix = @"MassEffectModManagerCore.modmanager.gamemd5.me";
+            string assetPrefix = @"ALOTInstallerCore.ModManager.gamemd5.me";
             switch (game)
             {
                 case Enums.MEGame.ME1:
@@ -405,30 +405,32 @@ namespace ALOTInstallerCore.ModManager.Services
         {
             [@"647b93621389709cab8d268379bd4c47"] = @"Steam",
             [@"78ac3d9b4aad1989dae74505ea65aa6c"] = @"Steam, MEM patched",
+            [@"fef464b4b92c19ce76add75de6732ccf"] = @"Steam, BioWare signed",
             [@"2390143503635f3c4cfaed0afe0b8c71"] = @"Origin, MEM patched",
             [@"ff1f894fa1c2dbf4d4b9f0de85c166e5"] = @"Origin",
             [@"73b76699d4e245c92110a93c54980b78"] = @"DVD",
             [@"298c30a399d0959e5e997a9d64b42548"] = @"DVD, Polish",
-            [@"9a89527800722ec308c01a421bfeb478"] = @"DVD, Polish, MEM Patched",
-            [@"8bba14d838d9c95e10d8ceeb5c958976"] = @"Origin - German"
+            [@"9a89527800722ec308c01a421bfeb478"] = @"DVD, Polish, MEM patched",
+            [@"8bba14d838d9c95e10d8ceeb5c958976"] = @"Origin, German",
+            [@"b4737d250c00472aeb365c5d769ce6aa"] = @"Origin, Alternate?",
         };
 
         private static Dictionary<string, string> SUPPORTED_HASHES_ME2 = new Dictionary<string, string>
         {
             [@"73827026bc9629562c4a3f61a752541c"] = @"Origin, ME2Game/MassEffect2 swapped",
             [@"32fb31b80804040996ed78d14110b54b"] = @"Origin",
-            [@"229173ca9057baeb4fd9f0fb2e569051"] = @"Origin - ME2Game",
+            [@"229173ca9057baeb4fd9f0fb2e569051"] = @"Origin, ME2Game",
             [@"16f214ce81ba228347bce7b93fb0f37a"] = @"Origin",
             [@"73b76699d4e245c92110a93c54980b78"] = @"Steam",
-            [@"e26f142d44057628efd086c605623dcf"] = @"DVD - Alternate",
+            [@"e26f142d44057628efd086c605623dcf"] = @"DVD, Alternate",
             [@"b1d9c44be87acac610dfa9947e114096"] = @"DVD"
         };
 
         private static Dictionary<string, string> SUPPORTED_HASHES_ME3 = new Dictionary<string, string>
         {
             [@"1d09c01c94f01b305f8c25bb56ce9ab4"] = @"Origin",
-            [@"90d51c84b278b273e41fbe75682c132e"] = @"Origin - Alternate",
-            [@"70dc87862da9010aad1acd7d0c2c857b"] = @"Origin - Russian",
+            [@"90d51c84b278b273e41fbe75682c132e"] = @"Origin, Alternate",
+            [@"70dc87862da9010aad1acd7d0c2c857b"] = @"Origin, Russian",
         };
 
         /// <summary>

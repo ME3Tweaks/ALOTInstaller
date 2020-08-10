@@ -186,6 +186,11 @@ namespace ALOTInstallerCore
 #endif
             return "";
         }
+
+        /// <summary>
+        /// Opens a web page. This works cross platform
+        /// </summary>
+        /// <param name="url"></param>
         public static void OpenWebPage(string url)
         {
             try
@@ -214,6 +219,7 @@ namespace ALOTInstallerCore
                 }
             }
         }
+
         public static bool IsWindows10OrNewer()
         {
 #if WINDOWS
@@ -224,7 +230,7 @@ namespace ALOTInstallerCore
             return true;
         }
 
-        /// <summary> Checks for write access for the given file.
+        /// <summary> Checks for write access for the given folder, using a subfile named temp_alot.txt.
         /// </summary>
         /// <param name="fileName">The filename.</param>
         /// <returns>true, if write access is allowed, otherwise false</returns>
@@ -247,27 +253,6 @@ namespace ALOTInstallerCore
                 Log.Error("Directory write test had error that was not UnauthorizedAccess: " + e.Message);
             }
             return false;
-        }
-
-        public static bool IsDirectoryWritable2(string dirPath)
-        {
-            try
-            {
-                using (FileStream fs = File.Create(
-                    Path.Combine(
-                        dirPath,
-                        Path.GetRandomFileName()
-                    ),
-                    1,
-                    FileOptions.DeleteOnClose)
-                )
-                { }
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         public static bool IsAdministrator()
@@ -398,65 +383,23 @@ namespace ALOTInstallerCore
             return null;
         }
 
-        public static void WriteDebugLog(string v)
-        {
-            //if (MainWindow.DEBUG_LOGGING)
-            //{
-            //    Log.Debug(v);
-            //}
-        }
-
-        public static string GetGameEXEPath(int game)
-        {
-            string path = GetGamePath(game);
-            if (path == null) { return null; }
-            switch (game)
-            {
-                case 1:
-                    Utilities.WriteDebugLog("GetEXE ME1 Path: " + Path.Combine(path, @"Binaries\MassEffect.exe"));
-                    return Path.Combine(path, @"Binaries\MassEffect.exe");
-                case 2:
-                    Utilities.WriteDebugLog("GetEXE ME2 Path: " + Path.Combine(path, @"Binaries\MassEffect.exe"));
-                    return Path.Combine(path, @"Binaries\MassEffect2.exe");
-                case 3:
-                    Utilities.WriteDebugLog("GetEXE ME3 Path: " + Path.Combine(path, @"Binaries\MassEffect.exe"));
-                    return Path.Combine(path, @"Binaries\Win32\MassEffect3.exe");
-            }
-            return null;
-        }
-
-        public static string ReadLockedTextFile(string file)
-        {
-            try
-            {
-                using (FileStream fileStream = new FileStream(
-                    file,
-                    FileMode.Open,
-                    FileAccess.Read,
-                    FileShare.ReadWrite))
-                {
-                    using (StreamReader streamReader = new StreamReader(fileStream))
-                    {
-                        return streamReader.ReadToEnd();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-
-        public static bool IsDirectoryEmpty(string path)
-        {
-            return !Directory.EnumerateFileSystemEntries(path).Any();
-        }
-
         /// <summary>
-        /// Link to the ALOT Discord
+        /// Reads all lines from a file, attempting to do so even if the file is in use by another process
         /// </summary>
+        /// <param name="path"></param>
         /// <returns></returns>
-        public static string DiscordInviteLink { get; } = "https://discord.gg/tTePzaa";
+        public static string[] WriteSafeReadAllLines(String path)
+        {
+            using var csv = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using var sr = new StreamReader(csv);
+            List<string> file = new List<string>();
+            while (!sr.EndOfStream)
+            {
+                file.Add(sr.ReadLine());
+            }
+
+            return file.ToArray();
+        }
 
         public static string GetGameBackupPath(int game)
         {
@@ -494,48 +437,6 @@ namespace ALOTInstallerCore
             return path;
 #endif
             return "";
-        }
-
-        // Pinvoke for API function
-#if WINDOWS
-
-        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetDiskFreeSpaceEx(string lpDirectoryName,
-        out ulong lpFreeBytesAvailable,
-        out ulong lpTotalNumberOfBytes,
-        out ulong lpTotalNumberOfFreeBytes);
-#endif
-
-        public static bool DriveFreeBytes(string folderName, out ulong freespace)
-        {
-#if WINDOWS
-
-            freespace = 0;
-            if (string.IsNullOrEmpty(folderName))
-            {
-                throw new ArgumentNullException("folderName");
-            }
-
-            if (!folderName.EndsWith("\\"))
-            {
-                folderName += '\\';
-            }
-
-            ulong free = 0, dummy1 = 0, dummy2 = 0;
-
-            if (GetDiskFreeSpaceEx(folderName, out free, out dummy1, out dummy2))
-            {
-                freespace = free;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-#endif
-            freespace = 1;
-            return true;
         }
 
         public static string GetRelativePath(string filespec, string folder)
@@ -720,6 +621,21 @@ namespace ALOTInstallerCore
                 Log.Error(e.Flatten());
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Calculates the MD5 of the stream from the beginning
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string CalculateMD5(Stream s)
+        {
+            long pos = s.Position;
+            s.Position = 0;
+            using var md5 = MD5.Create();
+            var hash = md5.ComputeHash(s);
+            s.Position = pos;
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
         public static void RemoveRunAsAdminXPSP3FromME1()
@@ -1640,6 +1556,11 @@ namespace ALOTInstallerCore
 #endif
         }
 
+        /// <summary>
+        /// Returns if a game is running or not
+        /// </summary>
+        /// <param name="game"></param>
+        /// <returns></returns>
         public static bool IsGameRunning(Enums.MEGame game)
         {
             if (game == Enums.MEGame.ME1)
@@ -1665,5 +1586,11 @@ namespace ALOTInstallerCore
         /// </summary>
         /// <returns></returns>
         public static Version GetAppVersion() => Assembly.GetEntryAssembly().GetName().Version;
+
+        /// <summary>
+        /// Returns the hosting processes' name, without extetnsion
+        /// </summary>
+        /// <returns></returns>
+        public static string GetHostingProcessname() => Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.ModuleName);
     }
 }

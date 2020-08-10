@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects.Manifest;
@@ -11,6 +12,7 @@ namespace ALOTInstallerConsole.BuilderUI
         #region UI
 
         private Label startupStatusLabel;
+        private Action loggerSetupFunc;
 
         #endregion
         public override void BeginFlow()
@@ -22,9 +24,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     startupStatusLabel.Text = "Starting up";
                 });
-                //Initialize ALOT Installer library
-                Hook.Startup();
-
+                
                 var alotManifestModePackage = ManifestHandler.LoadMasterManifest((x) => Application.MainLoop.Invoke(() =>
                 {
                     startupStatusLabel.Text = x;
@@ -104,6 +104,11 @@ namespace ALOTInstallerConsole.BuilderUI
             },
             startupStatusLabel);
             //top.Add(this);
+        }
+
+        public void SetLoggerSetupFunc(Action setupLogger)
+        {
+            loggerSetupFunc = setupLogger;
         }
     }
 }
