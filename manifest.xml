@@ -154,7 +154,7 @@
         </addonfile>
     </manifest>
     <manifest mode="ALOT" version="7.0.0">
-        <addonfile meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" author="CDAMJC" installpriority="0">
+        <addonfile meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" author="CDAMJC" installpriority="0" recommendation="Recommended">
             <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" tooltipname="MEUITM Anniversary Edition" torrentfilename="MEUITM.zip" filename="MEUITM Anniversary Edition Direct Download-1-2-1574046168.zip" size="3304906568" md5="4befad0f104c665358ec6f5f67a9dd5a" />
             <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
             <choicefile choicetitle="Asari Face Style">
@@ -258,15 +258,15 @@
             <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" filename="ALOT for ME3 11.3 - Update-363-2020-11-3-1593591936.zip" size="23588808" md5="7b0cf8367c334f62df013a5e5aaa886c" />
             <packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v11.mem" movedirectly="true" />
         </addonfile>
-        <addonfile friendlyname="Improved Static Lighting for ME1" author="CreeperLava" installpriority="3">
+        <addonfile friendlyname="Improved Static Lighting for ME1" author="CreeperLava" installpriority="3" recommendation="Recommended">
             <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files" tooltipname="Improved Static Lighting for ME1" torrentfilename="LightMaps_ME1.zip" filename="Improved Static Lighting for ME1-83-2020-10-0-1573101555.zip" size="6610942066" md5="2234159c710d77ffd2e8a91fefe975ee" />
             <packagefile me1="true" sourcename="LightMaps_ME1.mem" movedirectly="true" />
         </addonfile>
-        <addonfile friendlyname="Improved Static Lighting for ME2" author="CreeperLava" installpriority="3">
+        <addonfile friendlyname="Improved Static Lighting for ME2" author="CreeperLava" installpriority="3" recommendation="Recommended">
             <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" tooltipname="Improved Static Lighting for ME2" torrentfilename="LightMaps_ME2.zip" filename="Improved Static Lighting for ME2-68-2020-10-0-1573098585.zip" size="665769837" md5="d78abde1cef08b7ce64c70eaa4c46b71" unpackedsinglefilename="LightMaps_ME2.mem" unpackedsize="665769669" unpackedmd5="cf3fe16cede255158312adbfafa277d2" />
             <packagefile me2="true" sourcename="LightMaps_ME2.mem" movedirectly="true" />
         </addonfile>
-        <addonfile friendlyname="Improved Static Lighting for ME3" author="CreeperLava" installpriority="3">
+        <addonfile friendlyname="Improved Static Lighting for ME3" author="CreeperLava" installpriority="3" recommendation="Recommended">
             <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" tooltipname="Improved Static Lighting for ME3" torrentfilename="LightMaps_ME3.zip" filename="Improved Static Lighting for ME3-363-2019-10-0-1573144588.zip" size="9082233367" md5="33fe926fd3c82d00b886e74b6b87527f" />
             <packagefile me3="true" sourcename="LightMaps_ME3.mem" movedirectly="true" />
         </addonfile>

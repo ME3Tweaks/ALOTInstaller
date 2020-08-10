@@ -309,62 +309,53 @@ namespace ALOTInstallerCore.Helpers
                                                    StageModFiles = TryConvert.ToBool(e.Attribute("stagemodfiles")?.Value, false),
                                                    Author = (string)e.Attribute("author"),
                                                    FriendlyName = (string)e.Attribute("friendlyname"),
-                                                   //Optional = e.Attribute("optional") != null ? (bool)e.Attribute("optional") : false,
-                                                   m_me1 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me1") : false,
-                                                   m_me2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me2") : false,
-                                                   m_me3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me3") : false,
+                                                   m_me1 = TryConvert.ToBool(e.Element("games")?.Attribute("me1")?.Value, false),
+                                                   m_me2 = TryConvert.ToBool(e.Element("games")?.Attribute("me2")?.Value, false),
+                                                   m_me3 = TryConvert.ToBool(e.Element("games")?.Attribute("me3")?.Value, false),
                                                    Filename = (string)e.Element("file").Attribute("filename"),
-                                                   Tooltipname = e.Element("file").Attribute("tooltipname") != null
-                                                       ? (string)e.Element("file").Attribute("tooltipname")
-                                                       : (string)e.Attribute("friendlyname"),
+                                                   Tooltipname = e.Element("file").Attribute("tooltipname")?.Value ?? e.Attribute("friendlyname").Value,
                                                    DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
-                                                   UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename") != null
-                                                       ? (string)e.Element("file").Attribute("unpackedsinglefilename")
-                                                       : null,
+                                                   UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename")?.Value,
                                                    FileMD5 = (string)e.Element("file").Attribute("md5"),
                                                    UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
-                                                   UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null
-                                                       ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize"))
-                                                       : 0L,
+                                                   UnpackedFileSize = TryConvert.ToInt64(e.Element("file").Attribute("unpackedsize")?.Value, 0L),
                                                    TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
                                                    UIPriority = TryConvert.ToInt32(e.Attribute("uipriority")?.Value, 5),
                                                    PackageFiles = e.Elements("packagefile")
                                                        .Select(r => new PackageFile
                                                        {
                                                            ChoiceTitle = "", //unused in this block
-                                                           SourceName = (string)r.Attribute("sourcename"),
-                                                           DestinationName = (string)r.Attribute("destinationname"),
-                                                           MoveDirectly = r.Attribute("movedirectly") != null ? true : false,
-                                                           CopyDirectly = r.Attribute("copydirectly") != null ? true : false,
-                                                           m_me1 = r.Attribute("me1") != null ? true : false,
-                                                           m_me2 = r.Attribute("me2") != null ? true : false,
-                                                           m_me3 = r.Attribute("me3") != null ? true : false,
-                                                           Processed = false
+                                                           SourceName = r.Attribute("sourcename").Value,
+                                                           DestinationName = r.Attribute("destinationname")?.Value,
+                                                           MoveDirectly = TryConvert.ToBool(r.Attribute("movedirectly")?.Value, false),
+                                                           CopyDirectly = TryConvert.ToBool(r.Attribute("copydirectly")?.Value, false),
+                                                           m_me1 = TryConvert.ToBool(r.Attribute("me1")?.Value, false),
+                                                           m_me2 = TryConvert.ToBool(r.Attribute("me2")?.Value, false),
+                                                           m_me3 = TryConvert.ToBool(r.Attribute("me3")?.Value, false),
                                                        }).ToList(),
 
                                                    // Configurable mod options
                                                    ChoiceFiles = e.Elements("choicefile")
                                                        .Select(q => new ChoiceFile
                                                        {
-                                                           ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                                           ChoiceTitle = q.Attribute("choicetitle").Value,
                                                            Choices = q.Elements("packagefile").Select(c => new PackageFile
                                                            {
-                                                               ChoiceTitle = (string)c.Attribute("choicetitle"),
-                                                               SourceName = (string)c.Attribute("sourcename"),
-                                                               DestinationName = (string)c.Attribute("destinationname"),
-                                                               MoveDirectly = c.Attribute("movedirectly") != null ? true : false,
-                                                               CopyDirectly = c.Attribute("copydirectly") != null ? true : false,
-                                                               m_me1 = c.Attribute("me1") != null ? true : false,
-                                                               m_me2 = c.Attribute("me2") != null ? true : false,
-                                                               m_me3 = c.Attribute("me3") != null ? true : false,
-                                                               Processed = false
+                                                               ChoiceTitle = c.Attribute("choicetitle").Value,
+                                                               SourceName = c.Attribute("sourcename").Value,
+                                                               DestinationName = c.Attribute("destinationname")?.Value,
+                                                               MoveDirectly = TryConvert.ToBool(c.Attribute("movedirectly")?.Value, false),
+                                                               CopyDirectly = TryConvert.ToBool(c.Attribute("copydirectly")?.Value, false),
+                                                               m_me1 = TryConvert.ToBool(c.Attribute("me1")?.Value, false),
+                                                               m_me2 = TryConvert.ToBool(c.Attribute("me2")?.Value, false),
+                                                               m_me3 = TryConvert.ToBool(c.Attribute("me3")?.Value, false),
                                                            }).ToList()
                                                        }).ToList(),
                                                    // Included zip files
                                                    ZipFiles = e.Elements("zipfile")
                                                        .Select(q => new ZipFile
                                                        {
-                                                           ChoiceTitle = (string)q.Attribute("choicetitle"),
+                                                           ChoiceTitle = q.Attribute("choicetitle").Value,
                                                            Optional = TryConvert.ToBool(q.Attribute("optional")?.Value, false),
                                                            DefaultOption = TryConvert.ToBool(q.Attribute("default")?.Value, true),
                                                            InArchivePath = q.Attribute("inarchivepath").Value,
@@ -383,6 +374,7 @@ namespace ALOTInstallerCore.Helpers
                                                            GameDestinationPath = q.Attribute("gamedestinationpath").Value,
                                                        }
                                                        ).ToList(),
+                                                   RecommendationString = e.Attribute("recommendation")?.Value
                                                }).OrderBy(p => p.UIPriority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName));
 
                     //Set Game
