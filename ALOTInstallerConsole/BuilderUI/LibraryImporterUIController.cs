@@ -46,11 +46,11 @@ namespace ALOTInstallerConsole.BuilderUI
         private void LoadUserFile_Clicked()
         {
             OpenDialog selector = new OpenDialog("Select file",
-                "Supported extensions: .7z, .rar, .zip, .dds, .mem, .tpf, .mod, .png")
+                "Supported extensions: .7z, .rar, .zip, .dds, .mem, .tpf, .mod, .png, .tga")
             {
                 CanChooseDirectories = false,
                 CanChooseFiles = true,
-                AllowedFileTypes = new []{ "7z", ".rar", ".zip", ".dds", ".mem", ".tpf", ".mod", ".png" },
+                AllowedFileTypes = new []{ "7z", ".rar", ".zip", ".dds", ".mem", ".tpf", ".mod", ".png", ".tga" },
                 DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) //Default to user profile cause idk if there is easy way to get downloads folder on linux
             };
             Application.Run(selector);
@@ -76,7 +76,7 @@ namespace ALOTInstallerConsole.BuilderUI
                         AlotVersionInfo = new TextureModInstallationInfo(0, 0, 0, 0),
                         ApplicableGames = games,
                         FullFilePath = selector.FilePath.ToString(),
-                        FriendlyName = Path.GetFileName(selectedFile),
+                        FriendlyName = Path.GetFileNameWithoutExtension(selectedFile),
                         Filename = Path.GetFileName(selectedFile),
                         FileSize = new FileInfo(selectedFile).Length
                     };

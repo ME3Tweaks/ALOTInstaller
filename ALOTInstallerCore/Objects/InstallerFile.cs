@@ -68,7 +68,7 @@ namespace ALOTInstallerCore.Objects
         /// <summary>
         /// List of sub-files that this mod 
         /// </summary>
-        public List<PackageFile> PackageFiles;
+        public List<PackageFile> PackageFiles = new List<PackageFile>();
 
         /// <summary>
         /// Friendly name to display

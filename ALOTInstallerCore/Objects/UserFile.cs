@@ -6,10 +6,13 @@ using System.Text;
 namespace ALOTInstallerCore.Objects
 {
     /// <summary>
-    /// A user file is a file that is not listed in the manifest and is added to the installer by the user.
+    /// A user file is a file that is not listed in the manifest and is added to the installer by the user
     /// </summary>
     public class UserFile : InstallerFile
     {
+        /// <summary>
+        /// The full path to the user file
+        /// </summary>
         public string FullFilePath { get; set; }
 
         /// <summary>
@@ -34,7 +37,7 @@ namespace ALOTInstallerCore.Objects
         }
 
         /// <summary>
-        /// Gets the backing file for this UserFile.
+        /// Gets the backing file for this UserFile
         /// </summary>
         /// <returns></returns>
         public override string GetUsedFilepath() => FullFilePath;

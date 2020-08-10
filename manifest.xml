@@ -154,7 +154,7 @@
         </addonfile>
     </manifest>
     <manifest mode="ALOT" version="7.0.0">
-        <addonfile meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" author="CDAMJC" installpriority="0" recommendationreason="Placeholder reason" recommendation="Recommended">
+        <addonfile meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" author="CDAMJC" installpriority="0" recommendationreason="Enhances many commonly seen areas in Mass Effect" recommendation="Recommended">
             <file downloadlink="https://www.nexusmods.com/masseffect/mods/1" tooltipname="MEUITM Anniversary Edition" torrentfilename="MEUITM.zip" filename="MEUITM Anniversary Edition Direct Download-1-2-1574046168.zip" size="3304906568" md5="4befad0f104c665358ec6f5f67a9dd5a" />
             <packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
             <choicefile choicetitle="Asari Face Style">
@@ -233,40 +233,40 @@
             <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows" />
             <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
         </addonfile>
-        <addonfile alotversion="11" friendlyname="ALOT for ME1 11.0" author="CreeperLava" uipriority="0" recommendationreason="Placeholder reason" recommendation="Required" installpriority="1">
+        <addonfile alotversion="11" friendlyname="ALOT for ME1 11.0" author="CreeperLava" uipriority="0" recommendationreason="Required per ALOT mode rules" recommendation="Required" installpriority="1">
             &gt;
             <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files" tooltipname="ALOT for ME1 11.0" torrentfilename="ALOT for ME1.zip" filename="ALOT for ME1 11.0-83-2020-11-1591229529.zip" size="4293992409" md5="8066a931b6e0ff7c4f007984c3a76e50" unpackedsinglefilename="ALOT_ME1_v11.mem" unpackedsize="4203662462" unpackedmd5="7d50bee890c3545e12a70cba8350e2be" />
             <packagefile me1="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v11.mem" movedirectly="true" />
         </addonfile>
-        <addonfile alotversion="11" friendlyname="ALOT for ME2 11.0" author="CreeperLava" uipriority="0" recommendationreason="Placeholder reason" recommendation="Required" installpriority="1">
+        <addonfile alotversion="11" friendlyname="ALOT for ME2 11.0" author="CreeperLava" uipriority="0" recommendationreason="Required per ALOT mode rules" recommendation="Required" installpriority="1">
             <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" tooltipname="ALOT for ME2 11.0" torrentfilename="ALOT for ME2.zip" filename="ALOT for ME2 11.0-68-2020-11-1591228690.zip" size="6478711287" md5="972a69975cc2e474e3781290a43ecd82" unpackedsinglefilename="ALOT_ME2_v11.mem" unpackedsize="6388381224" unpackedmd5="42d42abcf3d8702140218cfc4574dc35" />
             <packagefile me2="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v11.mem" movedirectly="true" />
         </addonfile>
-        <addonfile alotversion="11" friendlyname="ALOT for ME3 11.0" author="CreeperLava" uipriority="0" recommendationreason="Placeholder reason" recommendation="Required" installpriority="1">
+        <addonfile alotversion="11" friendlyname="ALOT for ME3 11.0" author="CreeperLava" uipriority="0" recommendationreason="Required per ALOT mode rules" recommendation="Required" installpriority="1">
             <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" tooltipname="ALOT for ME3 11.0" torrentfilename="ALOT for ME3.zip" filename="ALOT for ME3 11.0-363-2020-11-1591212660.zip" size="9153130765" md5="cc72e1dd98ef96089533245618557a1a" unpackedsinglefilename="ALOT_ME3_v11.mem" unpackedsize="9062800702" unpackedmd5="ca1632d7f1f6d9fd22ad410641c8aae7" />
             <packagefile me3="true" sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v11.mem" movedirectly="true" />
         </addonfile>
-        <addonfile alotversion="11" alotupdateversion="1" uipriority="0" recommendationreason="Placeholder reason" recommendation="Required" friendlyname="ALOT for ME1 11.1 - Update" tooltipname="ALOT for ME1 11.1 - Update" author="CreeperLava" installpriority="2">
+        <addonfile alotversion="11" alotupdateversion="1" uipriority="0" recommendationreason="Required for up to date install" recommendation="Required" friendlyname="ALOT for ME1 11.1 - Update" tooltipname="ALOT for ME1 11.1 - Update" author="CreeperLava" installpriority="2">
             <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files" filename="ALOT for ME1 11.0 - Update-83-2020-11-1-1591653251.zip" size="68399573" md5="118987417fc41fc6e2f68d316aa57395" />
             <packagefile me1="true" sourcename="ALOT_ME1_UPDATE_v11.mem" movedirectly="true" />
         </addonfile>
-        <addonfile alotversion="11" alotupdateversion="1" uipriority="0" recommendationreason="Placeholder reason" recommendation="Required" friendlyname="ALOT for ME2 11.1 - Update" tooltipname="ALOT for ME2 11.1 - Update" author="CreeperLava" installpriority="2">
+        <addonfile alotversion="11" alotupdateversion="1" uipriority="0" recommendationreason="Required for up to date install" recommendation="Required" friendlyname="ALOT for ME2 11.1 - Update" tooltipname="ALOT for ME2 11.1 - Update" author="CreeperLava" installpriority="2">
             <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" filename="ALOT for ME2 11.1 - Update-68-2020-11-1-1592240377.zip" size="234813" md5="6fdb227c271d5a3acbc8a5997641a345" />
             <packagefile me2="true" sourcename="ALOT_ME2_UPDATE_v11.mem" movedirectly="true" />
         </addonfile>
-        <addonfile alotversion="11" alotupdateversion="3" uipriority="0" recommendationreason="Placeholder reason" recommendation="Required" friendlyname="ALOT for ME3 11.3 - Update" tooltipname="ALOT for ME3 11.3 - Update" author="CreeperLava" installpriority="2">
+        <addonfile alotversion="11" alotupdateversion="3" uipriority="0" recommendationreason="Required for up to date install" recommendation="Required" friendlyname="ALOT for ME3 11.3 - Update" tooltipname="ALOT for ME3 11.3 - Update" author="CreeperLava" installpriority="2">
             <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" filename="ALOT for ME3 11.3 - Update-363-2020-11-3-1593591936.zip" size="23588808" md5="7b0cf8367c334f62df013a5e5aaa886c" />
             <packagefile me3="true" sourcename="ALOT_ME3_UPDATE_v11.mem" movedirectly="true" />
         </addonfile>
-        <addonfile friendlyname="Improved Static Lighting for ME1" author="CreeperLava" installpriority="3" recommendationreason="Placeholder reason" recommendation="Recommended">
+        <addonfile friendlyname="Improved Static Lighting for ME1" author="CreeperLava" installpriority="3" recommendationreason="Signficantly improves the static shadows in level environments" recommendation="Recommended">
             <file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files" tooltipname="Improved Static Lighting for ME1" torrentfilename="LightMaps_ME1.zip" filename="Improved Static Lighting for ME1-83-2020-10-0-1573101555.zip" size="6610942066" md5="2234159c710d77ffd2e8a91fefe975ee" />
             <packagefile me1="true" sourcename="LightMaps_ME1.mem" movedirectly="true" />
         </addonfile>
-        <addonfile friendlyname="Improved Static Lighting for ME2" author="CreeperLava" installpriority="3" recommendationreason="Placeholder reason" recommendation="Recommended">
+        <addonfile friendlyname="Improved Static Lighting for ME2" author="CreeperLava" installpriority="3" recommendationreason="Signficantly improves the static shadows in level environments" recommendation="Recommended">
             <file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files" tooltipname="Improved Static Lighting for ME2" torrentfilename="LightMaps_ME2.zip" filename="Improved Static Lighting for ME2-68-2020-10-0-1573098585.zip" size="665769837" md5="d78abde1cef08b7ce64c70eaa4c46b71" unpackedsinglefilename="LightMaps_ME2.mem" unpackedsize="665769669" unpackedmd5="cf3fe16cede255158312adbfafa277d2" />
             <packagefile me2="true" sourcename="LightMaps_ME2.mem" movedirectly="true" />
         </addonfile>
-        <addonfile friendlyname="Improved Static Lighting for ME3" author="CreeperLava" installpriority="3" recommendationreason="Placeholder reason" recommendation="Recommended">
+        <addonfile friendlyname="Improved Static Lighting for ME3" author="CreeperLava" installpriority="3" recommendationreason="Signficantly improves the static shadows in level environments" recommendation="Recommended">
             <file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files" tooltipname="Improved Static Lighting for ME3" torrentfilename="LightMaps_ME3.zip" filename="Improved Static Lighting for ME3-363-2019-10-0-1573144588.zip" size="9082233367" md5="33fe926fd3c82d00b886e74b6b87527f" />
             <packagefile me3="true" sourcename="LightMaps_ME3.mem" movedirectly="true" />
         </addonfile>
@@ -725,19 +725,19 @@
         </addonfile>
         <!-- These are Mod Manager mods. They must be explicitly supported to work through the installer core -->
         <!-- Preinstallmod objects are supersets of the manifestfiles, in that they support the same features (packagefile) but will have their archive extracted after dlc is unpacked, but before game scan takes place. -->
-        <preinstallmod friendlyname="A Lot of Videos for ME1 (1080p)" author="Audemus" recommendationreason="Placeholder reason" recommendation="Recommended" optiongroup="ME1ALOV">
+        <preinstallmod friendlyname="A Lot of Videos for ME1 (1080p)" author="Audemus" recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect" recommendation="Recommended" optiongroup="ME1ALOV">
             <file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files" filename="ALOV for ME1 v2.1.1 - (1080p)-144-2-1-1-1591487930.7z" torrentfilename="ALotofVideosforME1_2.1.1_1080p.7z" md5="3a96f6b2cbd6c676eccfcc8a03d55da8" size="2546147996" />
             <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC" />
             <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC" optionalrequireddlc="DLC_UNC" />
             <games me1="true" me2="false" me3="false" />
         </preinstallmod>
-        <preinstallmod friendlyname="A Lot of Videos for ME1 (4K)" author="Audemus" recommendationreason="Placeholder reason" recommendation="Optional" optiongroup="ME1ALOV">
+        <preinstallmod friendlyname="A Lot of Videos for ME1 (4K)" author="Audemus" recommendationreason="Optional due to large filesize and CPU requirements" recommendation="Optional" optiongroup="ME1ALOV">
             <file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files" filename="ALotofVideosforME1_2.0_4K.7z" torrentfilename="ALotofVideosforME1_2.0_4K.7z" md5="4f04d6b0d20201fe8b328d5c36ac78ed" size="4331336666" />
             <extractionredirect archiverootpath="BASEGAME" relativedestinationdirectory="BioGame\CookedPC" />
             <extractionredirect archiverootpath="BDTS" relativedestinationdirectory="DLC\DLC_UNC" optionalrequireddlc="DLC_UNC" />
             <games me1="true" me2="false" me3="false" />
         </preinstallmod>
-        <preinstallmod friendlyname="A Lot of Videos for ME2 (1080p)" author="Audemus" recommendationreason="Placeholder reason" recommendation="Recommended" group="ME2ALOV">
+        <preinstallmod friendlyname="A Lot of Videos for ME2 (1080p)" author="Audemus" recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 2" recommendation="Recommended" group="ME2ALOV">
             <file downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files" filename="ALOV for ME2 1.1 (1080p)-245-1-1-1580074467.7z" torrentfilename="ALotofVideosforME2-4K_1.1.7z" md5="700e3f16a21ac277f5285b5a7d751a1c" size="5533430325" />
             <extractionredirect archiverootpath="BASEGAME\Movies" relativedestinationdirectory="BIOGame\Movies" />
             <extractionredirect archiverootpath="ARRIVAL\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part02\Movies" optionalrequireddlc="DLC_EXP_Part02" />
@@ -747,7 +747,7 @@
             <extractionredirect archiverootpath="OVERLORD\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies" optionalrequireddlc="DLC_UNC_Pack01" />
             <games me1="false" me2="true" me3="false" />
         </preinstallmod>
-        <preinstallmod friendlyname="A Lot of Videos for ME2 (4K)" author="Audemus"  recommendationreason="Placeholder reason" recommendation="Optional" optiongroup="ME2ALOV">
+        <preinstallmod friendlyname="A Lot of Videos for ME2 (4K)" author="Audemus"  recommendationreason="Optional due to large filesize and CPU requirements" recommendation="Optional" optiongroup="ME2ALOV">
             <file downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files" filename="ALotofVideosforME2-4K_1.1.7z" torrentfilename="ALotofVideosforME2-4K_1.1.7z" md5="c4ac2e9d1e947205a4a2b970f358b9b7" size="14780810833" />
             <extractionredirect archiverootpath="BASEGAME\Movies" relativedestinationdirectory="BIOGame\Movies" />
             <extractionredirect archiverootpath="ARRIVAL\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part02\Movies" optionalrequireddlc="DLC_EXP_Part02" />
@@ -757,7 +757,7 @@
             <extractionredirect archiverootpath="OVERLORD\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies" optionalrequireddlc="DLC_UNC_Pack01" />
             <games me1="false" me2="true" me3="false" />
         </preinstallmod>
-        <preinstallmod friendlyname="A Lot of Videos for ME3 (1080p)" author="Mellin" recommendationreason="Placeholder reason" recommendation="Recommended" version="1.3" optiongroup="ME3ALOV">
+        <preinstallmod friendlyname="A Lot of Videos for ME3 (1080p)" author="Mellin" recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3" recommendation="Recommended" version="1.3" optiongroup="ME3ALOV">
             <file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files" filename="ALOV for ME3 v1.3 (1080p)-773-1-3-1582271717.7z" torrentfilename="A Lot Of Videos (ALOV) for ME3 - 1080p_1.3.7z" md5="1d4f79c90a426e1f8363a4ba46498c95" size="17298419420" />
             <extractionredirect archiverootpath="DLC_MOD_ALOV" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV" loggingname="ALOV for ME3 1080p - Core" isdlc="true" />
             <!-- main mod -->
@@ -806,7 +806,7 @@
             <extractionredirect archiverootpath="Patches_Alternates\LIME_WWP_FLOW" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LIME" optionalrequiredfiles="DLC_CON_LIME\Movies\End03_D_NormandyChaseExt.bik" optionalrequiredfilessizes="43174424" loggingname="Lime WWP (Plasma)" />
             <packagefile me3="true" sourcename="ALOV_ALOT_addon_v1.mem" movedirectly="true" />
         </preinstallmod>
-        <preinstallmod friendlyname="A Lot of Videos for ME3 (4K)" author="Mellin" recommendationreason="Placeholder reason" recommendation="Optional" version="1.3" optiongroup="ME3ALOV">
+        <preinstallmod friendlyname="A Lot of Videos for ME3 (4K)" author="Mellin" recommendationreason="Optional due to large filesize and CPU requirements" recommendation="Optional" version="1.3" optiongroup="ME3ALOV">
             <file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files" filename="A Lot Of Videos (ALOV) for ME3 - 4K_1.3.7z" torrentfilename="A Lot Of Videos (ALOV) for ME3 - 4K_1.3.7z" md5="22887ee6ddc2393d24772d133849ca00" size="46989265885" />
             <extractionredirect archiverootpath="DLC_MOD_ALOV" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV" loggingname="ALOV for ME3 4K - Core" isdlc="true" />
             <!-- main mod -->

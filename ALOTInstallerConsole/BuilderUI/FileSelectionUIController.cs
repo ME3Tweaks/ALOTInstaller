@@ -303,6 +303,7 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             installOptionsPicker.Add(use2KLodsCb);
 
+
             CheckBox reimportUnpackedFiles = new CheckBox("Optimize texture library")
             {
                 X = 1,
@@ -311,7 +312,16 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = 1,
                 Checked = true
             };
-            installOptionsPicker.Add(reimportUnpackedFiles);
+
+            if (ManifestHandler.CurrentMode == ManifestMode.ALOT)
+            {
+                installOptionsPicker.Add(reimportUnpackedFiles);
+            }
+            else
+            {
+                y--; //Roll back up 1 Y
+            }
+
             maxWidth = Math.Max(reimportUnpackedFiles.Text.Length + 4, maxWidth);
 
             y++;
@@ -501,8 +511,8 @@ namespace ALOTInstallerConsole.BuilderUI
 
             AddSFIFVLabel($"Filename: {uf.Filename}", ref y);
             AddSFIFVLabel($"File size: {uf.FileSize} ({FileSizeFormatter.FormatSize(uf.FileSize)})", ref y);
-            
-            
+
+
             return y;
         }
 
@@ -512,7 +522,7 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 Width = Dim.Fill(),
                 Height = 1,
-                Y = y++
+                Y = y++,
             });
         }
 
@@ -523,8 +533,11 @@ namespace ALOTInstallerConsole.BuilderUI
 
             AddSFIFVLabel($"Author: {mf.Author}", ref y);
             AddSFIFVLabel($"Applies to game(s): {mf.ApplicableGames}", ref y);
-            AddSFIFVLabel($"This file is {mf.RecommendationString}", ref y);
             AddSFIFVLabel($"Ready: {mf.Ready}", ref y);
+            AddSFIFVLabel($"Recommendation: {mf.RecommendationString}", ref y);
+            AddSFIFVLabel("Recommendation reason:", ref y);
+            AddSFIFVLabel(mf.RecommendationReason, ref y);
+
             y++;
 
             AddSFIFVLabel($"Filename: {mf.Filename}", ref y);
@@ -593,7 +606,8 @@ namespace ALOTInstallerConsole.BuilderUI
                     {
                         RenderUstr(driver, "U", 1, 0, 2);
                     }
-                } else
+                }
+                else
                 {
                     RenderUstr(driver, " ", 1, 0, 2);
                 }

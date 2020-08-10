@@ -55,7 +55,7 @@ namespace ALOTInstallerCore.Helpers
                 //}
 
                 var fetchedManifest = webClient.DownloadString(new Uri(url));
-                //var fetchedManifest = File.ReadAllText(@"E:\Documents\Visual Studio 2015\Projects\AlotAddOnGUI\manifest.xml");
+                //var fetchedManifest = File.ReadAllText(@"C:\Users\Mgamerz\source\repos\AlotAddOnGUI\manifest.xml");
 
                 if (Utilities.TestXMLIsValid(fetchedManifest))
                 {
@@ -230,16 +230,13 @@ namespace ALOTInstallerCore.Helpers
                 foreach (var manifestElement in manifests)
                 {
                     ManifestModePackage mp = new ManifestModePackage();
-                    //AllTutorials.AddRange((from e in rootElement.Elements("tutorial")
-                    //                       select new ManifestTutorial
-                    //                       {
-                    //                           Link = (string)e.Attribute("link"),
-                    //                           Text = (string)e.Attribute("text"),
-                    //                           ToolTip = (string)e.Attribute("tooltip"),
-                    //                           MEUITMOnly = e.Attribute("meuitm") != null ? (bool)e.Attribute("meuitm") : false
-                    //                       }).ToList());
-
-
+                    mp.Tutorials.AddRange((from e in rootElement.Elements("tutorial")
+                                           select new ManifestTutorial
+                                           {
+                                               Link = (string)e.Attribute("link"),
+                                               Text = (string)e.Attribute("text"),
+                                               ToolTip = (string)e.Attribute("tooltip"),
+                                           }).ToList());
 
                     // Add PREINSTALL MODS
                     mp.ManifestFiles.AddRange((from e in manifestElement.Elements("preinstallmod")

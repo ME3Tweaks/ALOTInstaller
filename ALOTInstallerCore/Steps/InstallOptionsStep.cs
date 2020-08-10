@@ -55,12 +55,11 @@ namespace ALOTInstallerCore.Steps
             {
                 if (filesForTarget.Any(x => x is UserFile && x.Ready))
                 {
-                    options[InstallOption.UserFiles] = (OptionState.CheckedVisible, null);
+                    options[InstallOption.UserFiles] = (OptionState.ForceCheckedVisible, null);
                 }
                 else
                 {
-                    options[InstallOption.UserFiles] = (OptionState.DisabledVisible,
-                        "User files have been added for install but none of them are ready to install");
+                    options[InstallOption.UserFiles] = (OptionState.DisabledVisible, "User files have been added for install but none of them are ready to install");
                 }
 
                 return options;

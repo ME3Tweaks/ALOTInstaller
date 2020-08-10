@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
@@ -58,6 +59,8 @@ namespace ALOTInstallerCore.Builder
             if (extension == ".tpf") return false; //This file will be broken down at the next step
             if (extension == ".dds") return false; //no need to extract this file
             if (extension == ".png") return false; //no need to extract this file
+            if (extension == ".tga") return false; //no need to extract this file
+            if (extension == ".bik") return false; //no need to extract this file
 
             Directory.CreateDirectory(substagingDir);
 
@@ -112,8 +115,8 @@ namespace ALOTInstallerCore.Builder
             installOptions.FilesToInstall = resolveMutualExclusiveGroups();
 
             //DEBUG ONLY
-            installOptions.FilesToInstall =
-                installOptions.FilesToInstall.Where(x => x.FriendlyName.Contains("HR Maya")).ToList();
+            //installOptions.FilesToInstall =
+            //    installOptions.FilesToInstall.Where(x => x.FriendlyName.Contains("HR Maya")).ToList();
 
 
             if (installOptions.FilesToInstall == null)
@@ -160,61 +163,117 @@ namespace ALOTInstallerCore.Builder
 
             foreach (var installerFile in installOptions.FilesToInstall)
             {
-                var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
+                if (installerFile is ManifestFile mf)
                 {
-                    if (installerFile is ManifestFile mf)
+                    var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
+                    mf.StagedName = installerFile.GetUsedFilepath();
+                    Directory.CreateDirectory(outputDir);
+                    // Extract Archive
+                    var archiveExtracted = ExtractArchive(installerFile, outputDir);
+                    if (archiveExtracted && installOptions.ImportNewlyUnpackedFiles && installerFile is ManifestFile _mf && _mf.UnpackedSingleFilename != null && Path.GetExtension(_mf.UnpackedSingleFilename) != ".mem")
                     {
-                        mf.StagedName = installerFile.GetUsedFilepath();
+                        // mem files will be directly moved to install source. All other files will be staged for build so we need to 
+                        // copy them back before we delete the extraction dir after we stage the files
+                        TextureLibrary.AttemptImportUnpackedFiles(outputDir, new List<ManifestFile>(new[] { _mf }), true,
+                           (filename, x, y) => UpdateStatusCallback?.Invoke($"Optimizing {filename} for future installs {(int)(x * 100f / y)}%"),
+                           forceCopy: true
+                        );
                     }
-                }
-                Directory.CreateDirectory(outputDir);
-                // Extract Archive
-                var archiveExtracted = ExtractArchive(installerFile, outputDir);
-                if (archiveExtracted && installOptions.ImportNewlyUnpackedFiles && installerFile is ManifestFile _mf && _mf.UnpackedSingleFilename != null && Path.GetExtension(_mf.UnpackedSingleFilename) != ".mem")
-                {
-                    // mem files will be directly moved to install source. All other files will be staged for build so we need to 
-                    // copy them back before we delete the extraction dir after we stage the files
-                    TextureLibrary.AttemptImportUnpackedFiles(outputDir, new List<ManifestFile>(new[] { _mf }), true,
-                       (filename, x, y) => UpdateStatusCallback?.Invoke($"Optimizing {filename} for future installs {(int)(x * 100f / y)}%"),
-                       forceCopy: true
-                    );
-                }
-                if (!archiveExtracted && FiletypeRequiresDecompilation(installerFile.GetUsedFilepath()))
-                {
-                    // Decompile file instead 
-                    if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mod" && installerFile.StageModFiles)
+
+                    // Check if listed file is a decompilable format and not archive format 
+                    if (!archiveExtracted && FiletypeRequiresDecompilation(installerFile.GetUsedFilepath()))
                     {
-                        var modDest = Path.Combine(stagingDir, Path.GetFileName(installerFile.GetUsedFilepath()));
-                        Log.Information($"Copying .mod file to staging (due to StageModFiles=true): {installerFile.GetUsedFilepath()} -> {modDest}");
-                        File.Copy(installerFile.GetUsedFilepath(), modDest);
-                    }
-                    else
-                    {
-                        ExtractTextureContainer(installOptions.InstallTarget.Game, installerFile.GetUsedFilepath(), outputDir, installerFile);
-                    }
-                }
-                else if (installerFile.PackageFiles.Any(x => !x.MoveDirectly))
-                {
-                    // Files that are not move only may be contained in texture container format.
-                    var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories)
-                        .Where(x => FiletypeRequiresDecompilation(x));
-                    foreach (var sf in subfilesToExtract)
-                    {
-                        // todo: Prevent decompilation of package files marked as ProcessAsModFile as it's pointless
-                        if (Path.GetExtension(sf) == ".mod" && installerFile.StageModFiles)
+                        // Decompile file instead 
+                        if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mod" && installerFile.StageModFiles)
                         {
-                            var modDest = Path.Combine(stagingDir, Path.GetFileName(sf));
-                            Log.Information($"Moving .mod file to staging (due to StageModFiles=true): {sf} -> {modDest}");
-                            File.Move(sf, modDest);
+                            var modDest = Path.Combine(stagingDir, Path.GetFileName(installerFile.GetUsedFilepath()));
+                            Log.Information($"Copying .mod file to staging (due to StageModFiles=true): {installerFile.GetUsedFilepath()} -> {modDest}");
+                            File.Copy(installerFile.GetUsedFilepath(), modDest);
                         }
                         else
                         {
-                            ExtractTextureContainer(installOptions.InstallTarget.Game, sf, outputDir, installerFile);
+                            ExtractTextureContainer(installOptions.InstallTarget.Game,
+                                installerFile.GetUsedFilepath(),
+                                outputDir, installerFile);
                         }
+                    }
+                    else if (installerFile.PackageFiles.Any(x => !x.MoveDirectly))
+                    {
+                        // Files that are not move only may be contained in texture container format.
+                        var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).Where(FiletypeRequiresDecompilation);
+                        foreach (var sf in subfilesToExtract)
+                        {
+                            if (Path.GetExtension(sf) == ".mod" && installerFile.StageModFiles)
+                            {
+                                var modDest = Path.Combine(stagingDir, Path.GetFileName(sf));
+                                Log.Information($"Moving .mod file to staging (due to StageModFiles=true): {sf} -> {modDest}");
+                                File.Move(sf, modDest);
+                            }
+                            else
+                            {
+                                ExtractTextureContainer(installOptions.InstallTarget.Game, sf, outputDir, installerFile);
+                            }
+                        }
+                    }
+
+                    // Staging for addon
+                    StageForBuilding(installerFile, outputDir, addonStagingPath, finalBuiltPackagesDestination, installOptions.InstallTarget.Game);
+                }
+                else if (installerFile is UserFile uf)
+                {
+                    var userFileExtractionPath = Path.Combine(stagingDir, "USER_" + Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
+                    var userFileBuildMemPath = Path.Combine(userFileExtractionPath, "BuildSource");
+                    Directory.CreateDirectory(userFileBuildMemPath);
+
+                    // Extract Archive
+                    var archiveExtracted = ExtractArchive(installerFile, userFileExtractionPath);
+
+                    // File is a direct copy if it's not extracted by extract archive
+                    if (!archiveExtracted)
+                    {
+                        CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), Path.Combine(userFileBuildMemPath, Path.GetFileName(installerFile.GetUsedFilepath())),
+                            (x, y) => UpdateStatusCallback?.Invoke(
+                                $"Staging {Path.GetFileName(installerFile.GetUsedFilepath())} {(int)(x * 100f / y)}%"),
+                            x =>
+                            {
+                                // Do something here. Not sure what
+                            }
+                        );
+                    }
+                    else
+                    {
+                        // Files are in archive. Find files to stage to mem
+                        var subfilesToStage = Directory.GetFiles(userFileExtractionPath, "*.*", SearchOption.AllDirectories).Where(FiletypeRequiresDecompilation);
+                        int stagedID = 0;
+                        foreach (var sf in subfilesToStage)
+                        {
+                            if (Path.GetExtension(sf) == ".mem")
+                            {
+                                // Can be staged directly
+                                var destF = Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID}_{stagedID}_{Path.GetFileName(sf)}");
+                                Log.Information($"Moving prebuild .mem archive subfile to installation packages folder: {sf} -> {destF}");
+                                File.Move(sf, destF);
+                                stagedID++;
+                            }
+                            else if (userSubfileShouldBeStaged(sf))
+                            {
+                                var modDest = Path.Combine(userFileBuildMemPath, Path.GetFileName(sf));
+                                Log.Information($"Moving archive subfile to user staging: {sf} -> {modDest}");
+                                File.Move(sf, modDest);
+                            }
+                        }
+
+                        if (Directory.GetFiles(userFileBuildMemPath).Any())
+                        {
+                            // Requires build
+                            BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID}_{stagedID}_{uf.FriendlyName}.mem"), installOptions.InstallTarget.Game);
+                            stagedID++;
+                        }
+
+                        Utilities.DeleteFilesAndFoldersRecursively(userFileExtractionPath);
                     }
                 }
 
-                StageForBuilding(installerFile, outputDir, addonStagingPath, finalBuiltPackagesDestination, installOptions.InstallTarget.Game);
                 Interlocked.Increment(ref numDone);
                 UpdateProgressCallback?.Invoke(numDone, numToDo);
             }
@@ -224,6 +283,35 @@ namespace ALOTInstallerCore.Builder
                 // Addon needs built
                 BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{AddonID:D3}_ALOTAddon.mem"), installOptions.InstallTarget.Game);
             }
+        }
+
+        /// <summary>
+        /// Method that determines if a filepath should be staged for user file build
+        /// </summary>
+        /// <param name="sf"></param>
+        /// <returns></returns>
+        private bool userSubfileShouldBeStaged(string sf)
+        {
+            var extension = Path.GetExtension(sf.ToLower());
+            var filename = Path.GetFileNameWithoutExtension(sf.ToLower());
+            switch (extension)
+            {
+                case ".mod": return true;
+                case ".tpf": return true;
+                case ".png":
+                case ".dds":
+                case ".tga":
+                    string regex = "0x[0-9a-f]{8}"; //This matches even if user has more chars after the 8th hex so...
+                    var isOK = Regex.IsMatch(filename, regex);
+                    if (!isOK)
+                    {
+                        Log.Warning($"Rejecting {Path.GetFileName(sf)} from userfile build due to missing 0xhhhhhhhh texture CRC to replace");
+                    }
+                    return isOK;
+
+                default: return false;
+            }
+
         }
 
         private List<InstallerFile> resolveMutualExclusiveGroups()
@@ -439,11 +527,12 @@ namespace ALOTInstallerCore.Builder
                 }
             }
 
+            int exitcode = -1;
             MEMIPCHandler.RunMEMIPCUntilExit($"--convert-to-mem --gameid {targetGame.ToGameNum()} --input \"{sourceDir}\" --output \"{outputFile}\" --ipc",
                 null,
                 handleIPC,
                 x => Log.Error($"StdError building {uiname}: {x}"),
-                null); //Change to catch exit code of non zero.
+                x => exitcode = x); //Change to catch exit code of non zero.
         }
 
         /// <summary>
@@ -535,11 +624,10 @@ namespace ALOTInstallerCore.Builder
                 filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.IsNotVersioned() && x is ManifestFile)); //Add Addon files that don't have a set ALOTVersionInfo.
             }
 
-            // Implement when user files class is ready.
-            //if (package.InstallUserfiles)
-            //{
-            //    filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x is Use)); //Add Addon files that don't have a set ALOTVersionInfo.
-            //}
+            if (installOptions.InstallUserfiles)
+            {
+                filesToStage.AddRange(readyFiles.Where(x => x is UserFile));
+            }
 
 
 
