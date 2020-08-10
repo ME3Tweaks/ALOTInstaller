@@ -365,30 +365,20 @@ namespace ALOTInstallerCore.Helpers
                                                        .Select(q => new ZipFile
                                                        {
                                                            ChoiceTitle = (string)q.Attribute("choicetitle"),
-                                                           Optional = q.Attribute("optional") != null ? (bool)q.Attribute("optional") : false,
-                                                           DefaultOption = q.Attribute("default") != null
-                                                               ? (bool)q.Attribute("default")
-                                                               : true,
+                                                           Optional = TryConvert.ToBool(q.Attribute("optional")?.Value, false),
+                                                           DefaultOption = TryConvert.ToBool(q.Attribute("default")?.Value, true),
                                                            InArchivePath = q.Attribute("inarchivepath").Value,
                                                            GameDestinationPath = q.Attribute("gamedestinationpath").Value,
-                                                           DeleteShaders = q.Attribute("deleteshaders") != null
-                                                               ? (bool)q.Attribute("deleteshaders")
-                                                               : false, //me1 only
-                                                           MEUITMSoftShadows = q.Attribute("meuitmsoftshadows") != null
-                                                               ? (bool)q.Attribute("meuitmsoftshadows")
-                                                               : false, //me1,meuitm only
+                                                           DeleteShaders = TryConvert.ToBool(q.Attribute("deleteshaders")?.Value, false),
+                                                           MEUITMSoftShadows = TryConvert.ToBool(q.Attribute("meuitmsoftshadows")?.Value, true),
                                                        }).ToList(),
                                                    // Files that are copied into game directory
                                                    CopyFiles = e.Elements("copyfile")
                                                        .Select(q => new CopyFile
                                                        {
                                                            ChoiceTitle = (string)q.Attribute("choicetitle"),
-                                                           Optional = q.Attribute("optional") != null
-                                                                   ? (bool)q.Attribute("optional")
-                                                                   : false,
-                                                           DefaultOption = q.Attribute("default") != null
-                                                                   ? (bool)q.Attribute("default")
-                                                                   : true,
+                                                           Optional = TryConvert.ToBool(q.Attribute("optional")?.Value, false),
+                                                           DefaultOption = TryConvert.ToBool(q.Attribute("default")?.Value, true),
                                                            InArchivePath = q.Attribute("inarchivepath").Value,
                                                            GameDestinationPath = q.Attribute("gamedestinationpath").Value,
                                                        }

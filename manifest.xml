@@ -229,8 +229,8 @@
                 <packagefile me1="true" sourcename="MEUITM\mods\WrexVS.mem" movedirectly="true" choicetitle="Vanilla" />
                 <packagefile me1="true" sourcename="MEUITM\mods\Wrex.mem" movedirectly="true" choicetitle="Battle hardened" />
             </choicefile>
-            <zipfile recommendation="Optional" default="false" inarchivepath="MEUITM\mods\MEUITMReShade.zip" gamedestinationpath="binaries" choicetitle="MEUITM Reshade" />
-            <zipfile recommendation="Optional" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows" />
+            <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\MEUITMReShade.zip" gamedestinationpath="binaries" choicetitle="MEUITM Reshade" />
+            <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" meuitmsoftshadows="true" gamedestinationpath="Engine\Shaders" deleteshaders="true" choicetitle="Soft Shadows" />
             <copyfile optional="false" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
         </addonfile>
         <addonfile alotversion="11" friendlyname="ALOT for ME1 11.0" author="CreeperLava" uipriority="0" recommendation="Required" installpriority="1">
