@@ -291,7 +291,8 @@ namespace ALOTInstallerCore.Helpers
                                                            IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
                                                            ModVersion = (string)d.Attribute("version")
                                                        }).ToList(),
-                                                   RecommendationString = e.Attribute("recommendation")?.Value
+                                                   RecommendationString = e.Attribute("recommendation")?.Value,
+                                                   RecommendationReason = e.Attribute("recommendationreason")?.Value,
                                                }));
 
                     // ADD TEXTURE MODS
@@ -374,7 +375,8 @@ namespace ALOTInstallerCore.Helpers
                                                            GameDestinationPath = q.Attribute("gamedestinationpath").Value,
                                                        }
                                                        ).ToList(),
-                                                   RecommendationString = e.Attribute("recommendation")?.Value
+                                                   RecommendationString = e.Attribute("recommendation")?.Value,
+                                                   RecommendationReason = e.Attribute("recommendationreason")?.Value,
                                                }).OrderBy(p => p.UIPriority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName));
 
                     //Set Game

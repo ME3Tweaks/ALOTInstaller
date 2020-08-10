@@ -11,6 +11,10 @@ namespace ALOTInstallerCore.Objects.Manifest
     /// </summary>
     public class ManifestFile : InstallerFile, INotifyPropertyChanged //this must be here to make fody run on this
     {
+        /// <summary>
+        /// String describing the reason for the recommendation
+        /// </summary>
+        public string RecommendationReason { get; set; }
 
         /// <summary>
         /// Loading indicator that this is an ME3 file. On setting this, it will set the bit in ApplicableGames. Do not use this variable, use ApplicableGames instead.
