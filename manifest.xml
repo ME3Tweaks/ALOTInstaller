@@ -747,7 +747,7 @@
             <extractionredirect archiverootpath="OVERLORD\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies" optionalrequireddlc="DLC_UNC_Pack01" />
             <games me1="false" me2="true" me3="false" />
         </preinstallmod>
-        <preinstallmod friendlyname="A Lot of Videos for ME2 (4K)" author="Audemus" optiongroup="ME2ALOV">
+        <preinstallmod friendlyname="A Lot of Videos for ME2 (4K)" author="Audemus"  recommendation="Optional" optiongroup="ME2ALOV">
             <file downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files" filename="ALotofVideosforME2-4K_1.1.7z" torrentfilename="ALotofVideosforME2-4K_1.1.7z" md5="c4ac2e9d1e947205a4a2b970f358b9b7" size="14780810833" />
             <extractionredirect archiverootpath="BASEGAME\Movies" relativedestinationdirectory="BIOGame\Movies" />
             <extractionredirect archiverootpath="ARRIVAL\Movies" relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part02\Movies" optionalrequireddlc="DLC_EXP_Part02" />
