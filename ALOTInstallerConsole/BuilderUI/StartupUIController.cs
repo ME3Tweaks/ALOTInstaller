@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects.Manifest;
@@ -17,6 +18,30 @@ namespace ALOTInstallerConsole.BuilderUI
         #endregion
         public override void BeginFlow()
         {
+
+            View scrollableContent = new View()
+            {
+                Width = 40,
+                Height = 45,
+            };
+            for (int i = 0; i < 45; i++)
+            {
+                scrollableContent.Add(new Label("I AM LINE " + i)
+                {
+                    X = 0,
+                    Y = i,
+                    Width = Dim.Fill()
+                });
+            }
+
+            ScrollDialog sd = new ScrollDialog("Scroll dialog", "This is top message", "This is bottom message", scrollableContent,  new Button("OK")
+            {
+                Clicked = Application.RequestStop
+            });
+            Application.Run(sd);
+
+
+
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += (a, b) =>
             {
@@ -24,7 +49,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     startupStatusLabel.Text = "Starting up";
                 });
-                
+
                 var alotManifestModePackage = ManifestHandler.LoadMasterManifest((x) => Application.MainLoop.Invoke(() =>
                 {
                     startupStatusLabel.Text = x;
@@ -75,7 +100,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
         public override void SignalStopping()
         {
-            
+
         }
 
         public override void SetupUI()

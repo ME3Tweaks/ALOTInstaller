@@ -202,6 +202,7 @@ namespace ALOTInstallerConsole.BuilderUI
         private void CleanupLibrary_Clicked()
         {
             var uselessFiles = TextureLibrary.GetUnusedFilesInLibrary();
+
         }
 
         private void ChangeBuildLocation()
