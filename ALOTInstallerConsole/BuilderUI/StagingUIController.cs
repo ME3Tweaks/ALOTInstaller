@@ -47,7 +47,8 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 UpdateStatusCallback = updateStatus,
                 UpdateProgressCallback = updateProgress,
-                ResolveMutualExclusiveMods = resolveMutualExclusiveMod
+                ResolveMutualExclusiveMods = resolveMutualExclusiveMod,
+                ErrorStagingCallback = errorStaging,
             };
             builderWorker.WorkerReportsProgress = true;
             builderWorker.DoWork += ss.PerformStaging;
@@ -62,10 +63,14 @@ namespace ALOTInstallerConsole.BuilderUI
                     MessageBox.ErrorQuery("Error occured while building textures", $"Error occured while building textures: {b.Error.Message}", "OK");
                 }
                 FileSelectionUIController fsuic = new FileSelectionUIController();
-                fsuic.SetupUI();
                 Program.SwapToNewView(fsuic);
             };
             builderWorker.RunWorkerAsync();
+        }
+
+        private void errorStaging(string obj)
+        {
+            MessageBox.ErrorQuery("Error occured during staging", obj, "OK");
         }
 
         private void performPreinstallCheck()
@@ -95,8 +100,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     // Precheck failed
                     MessageBox.Query("Precheck failed", b.Result as string, "OK");
-                    BuilderUI.FileSelectionUIController fsuic = new FileSelectionUIController();
-                    fsuic.SetupUI();
+                    FileSelectionUIController fsuic = new FileSelectionUIController();
                     Program.SwapToNewView(fsuic);
                 }
                 else
@@ -106,7 +110,6 @@ namespace ALOTInstallerConsole.BuilderUI
                     {
                         InstallerUIController installerController = new InstallerUIController();
                         installerController.SetInstallPackage(installOptions);
-                        installerController.SetupUI();
                         Program.SwapToNewView(installerController);
                     }
                 }
@@ -139,7 +142,7 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 if (e.PropertyName == nameof(InstallerFile.StatusText))
                 {
-                    updateStatus($"[{ifx.FriendlyName}] {ifx.StatusText}");
+                    updateStatus(ifx.StatusText);
                 }
             }
         }

@@ -269,18 +269,24 @@ namespace ALOTInstallerCore.Steps
                 }
 
                 // Uncomment the next 2 lines and then comment out the IPC call to simulate OK install
-                lastExitCode = 0;
-                doneReached = true;
+                if (package.DebugNoInstall)
+                {
+                    lastExitCode = 0;
+                    doneReached = true;
+                }
+                else
+                {
 
-                //MEMIPCHandler.RunMEMIPCUntilExit(args,
-                //    x => currentMemProcessId = x,
-                //    handleIPC,
-                //    x => Log.Error($"StdError: {x}"),
-                //    x =>
-                //    {
-                //        currentMemProcessId = 0;
-                //        lastExitCode = x;
-                //    });
+                    MEMIPCHandler.RunMEMIPCUntilExit(args,
+                        x => currentMemProcessId = x,
+                        handleIPC,
+                        x => Log.Error($"StdError: {x}"),
+                        x =>
+                        {
+                            currentMemProcessId = 0;
+                            lastExitCode = x;
+                        });
+                }
 
                 if (lastExitCode != 0)
                 {
@@ -328,7 +334,8 @@ namespace ALOTInstallerCore.Steps
                 bool hasWarning = false;
 
                 hasWarning |= applyLODs();
-                TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), package.ImportNewlyUnpackedFiles);
+                TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), package.ImportNewlyUnpackedFiles,
+                    (file, done, todo) => SetBottomTextCallback?.Invoke($"Optimizing {file} for future installs {(int)(done * 100f / todo)}%"));
 
 
                 hasWarning |= !package.InstallTarget.InstallBinkBypass();
@@ -664,16 +671,10 @@ namespace ALOTInstallerCore.Steps
             {
                 SetBottomTextCallback?.Invoke("Updating texture installation marker");
                 TextureModInstallationInfo tmii = TextureModInstallationInfo.CalculateMarker(package.InstallTarget.GetInstalledALOTInfo(), package.FilesToInstall);
-                tmii.ALOT_INSTALLER_VERSION_USED = Assembly.GetEntryAssembly().GetName().Version.Build;
+                tmii.ALOT_INSTALLER_VERSION_USED = (short)Assembly.GetEntryAssembly().GetName().Version.Build;
                 int version = 0;
                 // If the current version doesn't support the --version --ipc, we just assume it is 0.
-                MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
-                {
-                    if (command == "VERSION")
-                    {
-                        tmii.MEM_VERSION_USED = int.Parse(param);
-                    }
-                });
+                tmii.MEM_VERSION_USED = MEMIPCHandler.GetMemVersion();
                 package.InstallTarget.StampTextureModificationInfo(tmii);
                 return true;
             }

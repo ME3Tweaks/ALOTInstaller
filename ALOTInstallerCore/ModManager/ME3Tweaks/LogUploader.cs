@@ -60,7 +60,6 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             //{
             var lzmalog = SevenZipHelper.LZMA.CompressToLZMAFile(Encoding.UTF8.GetBytes(logtext));
             var lzmamd5 = Utilities.CalculateMD5(new MemoryStream(lzmalog));
-            File.WriteAllBytes(@"C:\users\mgamerz\desktop\log.txt.lzma", lzmalog);
             try
             {
                 // examples of converting both Stream and byte [] to HttpContent objects

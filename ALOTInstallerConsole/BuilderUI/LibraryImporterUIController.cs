@@ -13,44 +13,17 @@ using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
 {
-    public class LibraryImporterUIController : UIController
+    public static class LibraryImporterController
     {
-        public override void SetupUI()
-        {
-            Title = "Texture library importer";
-            Add(new Button("Import from folder")
-            {
-                X = Pos.Left(this) + 2,
-                Y = Pos.Bottom(this) - 3,
-                Height = 1,
-                Clicked = ImportFromFolder_Clicked
-            });
 
-            Add(new Button("Load User File")
-            {
-                X = Pos.Left(this) + 24,
-                Y = Pos.Bottom(this) - 3,
-                Height = 1,
-                Clicked = LoadUserFile_Clicked
-            });
-
-            Add(new Button("Close")
-            {
-                X = Pos.Right(this) - 12,
-                Y = Pos.Bottom(this) - 3,
-                Height = 1,
-                Clicked = Close_Clicked
-            });
-        }
-
-        private void LoadUserFile_Clicked()
+        public static void LoadUserFile()
         {
             OpenDialog selector = new OpenDialog("Select file",
                 "Supported extensions: .7z, .rar, .zip, .dds, .mem, .tpf, .mod, .png, .tga")
             {
                 CanChooseDirectories = false,
                 CanChooseFiles = true,
-                AllowedFileTypes = new []{ "7z", ".rar", ".zip", ".dds", ".mem", ".tpf", ".mod", ".png", ".tga" },
+                AllowedFileTypes = new[] { "7z", ".rar", ".zip", ".dds", ".mem", ".tpf", ".mod", ".png", ".tga" },
                 DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) //Default to user profile cause idk if there is easy way to get downloads folder on linux
             };
             Application.Run(selector);
@@ -90,7 +63,7 @@ namespace ALOTInstallerConsole.BuilderUI
             }
         }
 
-        private void ImportFromFolder_Clicked()
+        public static void ImportManifestFilesFromFolder()
         {
             if (ManifestHandler.MasterManifest != null)
             {
@@ -166,22 +139,6 @@ namespace ALOTInstallerConsole.BuilderUI
                         "The ALOT manifest has not been loaded. Manifest files cannot be imported.", "OK");
                 }
             }
-        }
-
-        private void Close_Clicked()
-        {
-            FileSelectionUIController bui = new FileSelectionUIController();
-            bui.SetupUI();
-            Program.SwapToNewView(bui);
-        }
-
-        public override void BeginFlow()
-        {
-
-        }
-
-        public override void SignalStopping()
-        {
         }
     }
 }

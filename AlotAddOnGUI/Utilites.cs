@@ -749,8 +749,19 @@ namespace AlotAddOnGUI
         {
             using (FileStream fs = new FileStream(GetALOTMarkerFilePath(game), FileMode.Open, FileAccess.Write))
             {
+                // MARKER FILE FORMAT
+                // When writing marker, the end of the file is appended with the following data:
+
+                // INT MEUITM VERSION
+                // SHORT ALOT MAJOR
+                // BYTE ALOT UPDATE
+                // BYTE ALOT HOTFIX (NOT USED)
+                // SHORT MEM VERSION USED
+                // SHORT INSTALLER VERSION USED
+                // BYTE "MEMI" ASCII
+
                 fs.SeekEnd();
-                fs.WriteInt32(alotVersionInfo.MEUITMVER); //MEUITM version.
+                fs.WriteInt32(alotVersionInfo.MEUITMVER); //-16 //MEUITM version.
                 fs.WriteInt16(alotVersionInfo.ALOTVER); //-12 //ALOT Primary
                 fs.WriteByte(alotVersionInfo.ALOTUPDATEVER); //-10 //ALOT Update
                 fs.WriteByte(alotVersionInfo.ALOTHOTFIXVER); //-9 //Hotfix version (not used)

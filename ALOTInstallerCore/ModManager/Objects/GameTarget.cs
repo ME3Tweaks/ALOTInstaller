@@ -488,7 +488,7 @@ namespace ALOTInstallerCore.ModManager.Objects
 
         }
 
-        internal void StampTextureModificationInfo(TextureModInstallationInfo tmii)
+        public void StampTextureModificationInfo(TextureModInstallationInfo tmii)
         {
 
             var markerPath = getALOTMarkerFilePath();
@@ -496,13 +496,24 @@ namespace ALOTInstallerCore.ModManager.Objects
             {
                 using (FileStream fs = new FileStream(markerPath, System.IO.FileMode.Open, FileAccess.ReadWrite))
                 {
+                    // MARKER FILE FORMAT
+                    // When writing marker, the end of the file is appended with the following data:
+
+                    // INT MEUITM VERSION
+                    // SHORT ALOT MAJOR
+                    // BYTE ALOT UPDATE
+                    // BYTE ALOT HOTFIX (NOT USED)
+                    // SHORT MEM VERSION USED
+                    // SHORT INSTALLER VERSION USED
+                    // BYTE "MEMI" ASCII
+
                     fs.SeekEnd();
                     fs.WriteInt32(tmii.MEUITMVER); //meuitm
                     fs.WriteInt16(tmii.ALOTVER); //major
                     fs.WriteByte(tmii.ALOTUPDATEVER); //minor
                     fs.WriteByte(tmii.ALOTHOTFIXVER); //hotfix
-                    fs.WriteInt32(tmii.ALOT_INSTALLER_VERSION_USED); //installer version
-                    fs.WriteInt32(tmii.MEM_VERSION_USED); //Backend MEM version
+                    fs.WriteInt16(tmii.ALOT_INSTALLER_VERSION_USED); //installer version
+                    fs.WriteInt16(tmii.MEM_VERSION_USED); //Backend MEM version
                     fs.WriteUInt32(MEMI_TAG);
                 }
 

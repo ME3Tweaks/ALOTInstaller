@@ -63,7 +63,6 @@ namespace ALOTInstallerConsole.BuilderUI
                     {
                         ManifestHandler.CurrentMode = ManifestMode.ALOT;
                     }
-                    bui.SetupUI();
                     Program.SwapToNewView(bui);
                 }
                 else

@@ -147,7 +147,7 @@ namespace ALOTInstallerCore.Steps
                     if (targetAlotInfo.ALOTVER > 0 && targetAlotInfo.ALOTVER != alotFile.AlotVersionInfo.ALOTVER)
                     {
                         // Not matching ALOT version
-                        if (alotFile.Ready)
+                        if (!alotFile.Ready)
                         {
                             options[InstallOption.ALOT] = (OptionState.DisabledVisible,
                                 "ALOT installed, but not imported into texture library");
@@ -259,6 +259,54 @@ namespace ALOTInstallerCore.Steps
                 else
                 {
                     options[InstallOption.ALOTAddon] = (OptionState.DisabledVisible, "No Addon files are imported");
+                }
+
+                // MEUITM
+                if (gameTarget.Game == Enums.MEGame.ME1)
+                {
+                    var meuitmFile = filesForTarget.FirstOrDefault(x =>
+                    x.AlotVersionInfo.MEUITMVER > 0);
+                    if (meuitmFile == null)
+                    {
+                        // Not in manifest...?
+                        Log.Error("ALOT manifest is missing MEUITM...?");
+                    }
+                    else
+                    {
+
+                        int meuitmFileVer = meuitmFile.AlotVersionInfo.MEUITMVER;
+                        if (targetAlotInfo != null && targetAlotInfo.MEUITMVER > 0)
+                        {
+                            // Has some version of MEUITM installed
+                            if (targetAlotInfo.MEUITMVER != meuitmFileVer)
+                            {
+                                options[InstallOption.MEUITM] = (OptionState.DisabledVisible,
+                                    "Cannot install a different version of MEUITM on top of existing installed version");
+                            }
+                            else if (meuitmFile.Ready)
+                            {
+                                options[InstallOption.MEUITM] = (OptionState.UncheckedVisible, "MEUITM already installed");
+                            }
+                            else
+                            {
+                                options[InstallOption.MEUITM] = (OptionState.DisabledVisible,
+                                    "MEUITM not imported to texture library");
+                            }
+                        }
+                        else
+                        {
+                            // does not have textures installed or textures installed but MEUITM not installed
+                            if (meuitmFile.Ready)
+                            {
+                                options[InstallOption.MEUITM] = (OptionState.CheckedVisible, null);
+                            }
+                            else
+                            {
+                                options[InstallOption.MEUITM] = (OptionState.DisabledVisible,
+                                    "MEUITM not imported to texture library");
+                            }
+                        }
+                    }
                 }
 
                 // CHECK USER FILES

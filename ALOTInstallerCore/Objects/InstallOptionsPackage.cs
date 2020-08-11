@@ -38,5 +38,9 @@ namespace ALOTInstallerCore.Objects
         /// Will attempt to import unpacked files when they are available. Packed versions will be deleted after import.
         /// </summary>
         public bool ImportNewlyUnpackedFiles { get; set; }
+        /// <summary>
+        /// DEBUG ONLY: Skip main install block and simulate OK install
+        /// </summary>
+        public bool DebugNoInstall { get; set; }
     }
 }

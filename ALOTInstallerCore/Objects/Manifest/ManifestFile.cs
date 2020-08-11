@@ -285,9 +285,25 @@ namespace ALOTInstallerCore.Objects.Manifest
 
         //        public string ALOTMainPackedFilename { get; set; }
         public string TorrentFilename { get; set; }
-        public int UIPriority { get; set; } //lower numbers i think are sorted to lower
+        /// <summary>
+        /// The order in which files are installed. Lower numbers are installed first, thus higher ones will supercede lower ones that replace the same textures.
+        /// </summary>
+        public int InstallPriority { get; set; } //lower numbers i think are sorted to lower
 
-        //        public string ALOTArchiveInFilePath { get; set; }
+        /// <summary>
+        /// If this file is backed by the unpacked version. This call only works when file is in the library and not staged
+        /// </summary>
+        /// <returns></returns>
+        public bool IsBackedByUnpacked()
+        {
+            if (UnpackedSingleFilename == null) return false;
+            return Path.GetFileName(GetUsedFilepath()) == UnpackedSingleFilename;
+        }
+        /// <summary>
+        /// Priority for sorting in the UI. Lower numbers are sorted higher.
+        /// </summary>
+        public int UIPriority { get; set; }
+
         public string Author { get; set; }
 
         public string Tooltipname { get; set; }
@@ -552,5 +568,15 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// Indicates that a mod file should be staged rather than decompiled if encountered when staging the manifest file
         /// </summary>
         public override bool StageModFiles { get; set; }
+
+        /// <summary>
+        /// Gets the backing MD5 for this file
+        /// </summary>
+        /// <returns></returns>
+        public string GetBackingHash()
+        {
+            if (IsBackedByUnpacked()) return UnpackedFileMD5;
+            return FileMD5;
+        }
     }
 }

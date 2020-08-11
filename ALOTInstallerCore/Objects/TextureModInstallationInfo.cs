@@ -27,11 +27,11 @@ namespace ALOTInstallerCore.Objects
         /// <summary>
         /// What the build number of the installer that was used for this installation was. This is the third set of digits in the version number (e.g. 586)
         /// </summary>
-        public int ALOT_INSTALLER_VERSION_USED;
+        public short ALOT_INSTALLER_VERSION_USED;
         /// <summary>
         /// The version of MEM that was used to perform the installation of the textures
         /// </summary>
-        public int MEM_VERSION_USED;
+        public short MEM_VERSION_USED;
         /// <summary>
         /// Creates a installation information object, with the information about what was used to install it.
         /// </summary>
@@ -88,7 +88,28 @@ namespace ALOTInstallerCore.Objects
 
         public override string ToString()
         {
-            return $"ALOTVer {ALOTVER}.{ALOTUPDATEVER}.{ALOTHOTFIXVER}, MEUITM v{MEUITMVER}";
+            string str = "";
+            if (IsNotVersioned())
+            {
+                return "Non MEUITM/ALOT textures installed";
+            }
+
+            if (ALOTVER > 0)
+            {
+                str += $"ALOT {ALOTVER}.{ALOTUPDATEVER}";
+            }
+
+            if (MEUITMVER > 0)
+            {
+                if (str != "")
+                {
+                    str += ", ";
+                }
+
+                str += $"MEUITM v{MEUITMVER}";
+            }
+
+            return str;
         }
 
         /// <summary>

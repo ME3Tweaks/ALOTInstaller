@@ -17,7 +17,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
         public override void SetupUI()
         {
-            Title = "Settings";
+            //Title = "Settings";
 
             FrameView gamePathsFv = new FrameView("Game paths")
             {
@@ -331,7 +331,6 @@ namespace ALOTInstallerConsole.BuilderUI
         private void Close_Clicked()
         {
             FileSelectionUIController bui = new FileSelectionUIController();
-            bui.SetupUI();
             Program.SwapToNewView(bui);
         }
 

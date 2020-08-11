@@ -33,7 +33,7 @@ namespace ALOTInstallerConsole.InstallerUI
 
             Button continueButton = new Button("Continue")
             {
-                X = 0,
+                X = Pos.Center(),
                 Y = yPos + 6,
                 Width = 12,
                 Height = 1,
@@ -48,7 +48,6 @@ namespace ALOTInstallerConsole.InstallerUI
         {
             // Return to the primary menu
             FileSelectionUIController bui = new FileSelectionUIController();
-            bui.SetupUI();
             Program.SwapToNewView(bui);
         }
 

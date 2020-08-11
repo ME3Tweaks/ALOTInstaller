@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading;
 using ALOTInstallerCore.Helpers;
@@ -30,6 +31,11 @@ namespace ALOTInstallerCore.Builder
         {
             this.installOptions = installOptions;
         }
+
+        /// <summary>
+        /// Callback that is invoked with a message about why staging failed
+        /// </summary>
+        public Action<string> ErrorStagingCallback { get; set; }
         /// <summary>
         /// Callback to update the 'overall' status text of this step
         /// </summary>
@@ -49,7 +55,7 @@ namespace ALOTInstallerCore.Builder
         /// </summary>
         /// <param name="instFile"></param>
         /// <param name="substagingDir"></param>
-        private bool ExtractArchive(InstallerFile instFile, string substagingDir)
+        private bool? ExtractArchive(InstallerFile instFile, string substagingDir)
         {
             instFile.IsProcessing = true;
             string filepath = instFile.GetUsedFilepath();
@@ -69,7 +75,7 @@ namespace ALOTInstallerCore.Builder
                 switch (command)
                 {
                     case "TASK_PROGRESS":
-                        instFile.StatusText = $"Extracting archive {param}%";
+                        instFile.StatusText = $"Extracting {instFile.FriendlyName} {param}%";
                         break;
                     case "FILENAME":
                         // Unpacking file
@@ -86,13 +92,15 @@ namespace ALOTInstallerCore.Builder
                 case ".rar":
                 case ".zip":
                     // Extract archive
+                    int exitcode = -1;
                     UpdateStatusCallback($"Extracting {instFile.FriendlyName}");
                     MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{filepath}\" --output \"{substagingDir}\" --ipc",
                         null,
                         handleIPC,
                         x => Log.Error($"StdError on {filepath}: {x}"),
-                        null); //Change to catch exit code of non zero.
-                    return true;
+                        x => exitcode = x); //Change to catch exit code of non zero.
+                    if (exitcode == 0) return true;
+                    return null;
                 default:
                     Log.Error("Unsupported file extension: " + extension);
                     break;
@@ -104,7 +112,7 @@ namespace ALOTInstallerCore.Builder
         /// Performs the staging step.
         /// </summary>
         /// <returns></returns>
-        public void PerformStaging(object sender, DoWorkEventArgs e)
+        public async void PerformStaging(object sender, DoWorkEventArgs e)
         {
             var stagingDir = Path.Combine(Settings.BuildLocation, installOptions.InstallTarget.Game.ToString());
             if (Directory.Exists(stagingDir))
@@ -160,23 +168,53 @@ namespace ALOTInstallerCore.Builder
             }
             Directory.CreateDirectory(addonStagingPath);
 
-
+            bool abortStaging = false;
             foreach (var installerFile in installOptions.FilesToInstall)
             {
+                if (abortStaging) break;
+                bool stage = true; // If file doesn't need processing this is not necessary
                 if (installerFile is ManifestFile mf)
                 {
                     var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
                     mf.StagedName = installerFile.GetUsedFilepath();
                     Directory.CreateDirectory(outputDir);
                     // Extract Archive
-                    var archiveExtracted = ExtractArchive(installerFile, outputDir);
+                    var archiveExtractedN = ExtractArchive(installerFile, outputDir);
+                    if (archiveExtractedN == null)
+                    {
+                        // There was an error
+                        UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file");
+                        using var sourcefStream = File.OpenRead(installerFile.GetUsedFilepath());
+                        long sizeToHash = sourcefStream.Length;
+                        if (sizeToHash > 0)
+                        {
+                            var hash = HashAlgorithmExtensions.ComputeHashAsync(MD5.Create(), sourcefStream,
+                                progress: x => UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file {(int)(x * 100f / sizeToHash)}%")).Result;
+                            if (hash == mf.GetBackingHash())
+                            {
+                                ErrorStagingCallback?.Invoke($"Error extracting {installerFile.GetUsedFilepath()}, but file matches manifest - possible disk issues?");
+                            }
+                            else
+                            {
+                                ErrorStagingCallback?.Invoke($"File is corrupt: {installerFile.GetUsedFilepath()}, this file should be deleted and redownloaded.\nExpected hash:{mf.GetBackingHash()}\nHash of file: {hash}");
+                            }
+                        }
+                        else
+                        {
+                            ErrorStagingCallback?.Invoke($"Unable to read {installerFile.GetUsedFilepath()}, size is 0 bytes");
+                        }
+                        abortStaging = true;
+                        throw new Exception($"{installerFile.FriendlyName} failed to extract");
+                    }
+
+                    var archiveExtracted = archiveExtractedN.Value;
                     if (archiveExtracted && installOptions.ImportNewlyUnpackedFiles && installerFile is ManifestFile _mf && _mf.UnpackedSingleFilename != null && Path.GetExtension(_mf.UnpackedSingleFilename) != ".mem")
                     {
                         // mem files will be directly moved to install source. All other files will be staged for build so we need to 
                         // copy them back before we delete the extraction dir after we stage the files
                         TextureLibrary.AttemptImportUnpackedFiles(outputDir, new List<ManifestFile>(new[] { _mf }), true,
-                           (filename, x, y) => UpdateStatusCallback?.Invoke($"Optimizing {filename} for future installs {(int)(x * 100f / y)}%"),
-                           forceCopy: true
+                            (filename, x, y) => UpdateStatusCallback?.Invoke($"Optimizing {filename} for future installs {(int)(x * 100f / y)}%"),
+                            forceCopy: true
                         );
                     }
 
@@ -197,16 +235,23 @@ namespace ALOTInstallerCore.Builder
                                 outputDir, installerFile);
                         }
                     }
-                    else if (installerFile.PackageFiles.Any(x => !x.MoveDirectly))
+                    else if (archiveExtracted)
                     {
                         // Files that are not move only may be contained in texture container format.
-                        var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).Where(FiletypeRequiresDecompilation);
+                        var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).Where(FiletypeRequiresDecompilation).ToList();
                         foreach (var sf in subfilesToExtract)
                         {
+                            var matchingPackageFile = installerFile.PackageFiles.Find(x => x.SourceName == Path.GetFileName(sf));
                             if (Path.GetExtension(sf) == ".mod" && installerFile.StageModFiles)
                             {
                                 var modDest = Path.Combine(stagingDir, Path.GetFileName(sf));
                                 Log.Information($"Moving .mod file to staging (due to StageModFiles=true): {sf} -> {modDest}");
+                                File.Move(sf, modDest);
+                            }
+                            else if (matchingPackageFile != null && matchingPackageFile.MoveDirectly)
+                            {
+                                var modDest = Path.Combine(stagingDir, Path.GetFileName(sf));
+                                Log.Information($"Moving file to staging (MoveDirectly=true): {sf} -> {modDest}");
                                 File.Move(sf, modDest);
                             }
                             else
@@ -216,8 +261,44 @@ namespace ALOTInstallerCore.Builder
                         }
                     }
 
-                    // Staging for addon
-                    StageForBuilding(installerFile, outputDir, addonStagingPath, finalBuiltPackagesDestination, installOptions.InstallTarget.Game);
+
+                    // Single file unpacked
+                    else if (!archiveExtracted && installerFile.PackageFiles.All(x => x.MoveDirectly) && installerFile.PackageFiles.Count == 1 && installerFile is ManifestFile mfx && mfx.IsBackedByUnpacked())
+                    {
+                        // File must just be moved directly it seems
+                        var destF = Path.Combine(finalBuiltPackagesDestination, $"{installerFile.BuildID}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
+
+                        if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory == new DriveInfo(finalBuiltPackagesDestination).RootDirectory)
+                        {
+                            // Move
+                            Log.Information($"Moving unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                            File.Move(installerFile.GetUsedFilepath(), destF);
+                        }
+                        else
+                        {
+                            //Copy
+                            Log.Information($"Copying unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                            CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
+                                (x, y) => { UpdateStatusCallback?.Invoke($"Staging {installerFile.FriendlyName} for install {(int)(x * 100f / y)}%"); },
+                                exception => { abortStaging = true; });
+                        }
+
+                        stage = false;
+                    }
+                    else if (archiveExtracted && installerFile.PackageFiles.All(x => x.MoveDirectly))
+                    {
+                        // Subfiles move to dest
+                    }
+                    else
+                    {
+                        Log.Error($"STAGING NOT HANDLED FOR {installerFile.FriendlyName}");
+                    }
+
+                    if (stage)
+                    {
+                        // Staging for addon
+                        StageForBuilding(installerFile, outputDir, addonStagingPath, finalBuiltPackagesDestination, installOptions.InstallTarget.Game);
+                    }
                 }
                 else if (installerFile is UserFile uf)
                 {
@@ -226,8 +307,16 @@ namespace ALOTInstallerCore.Builder
                     Directory.CreateDirectory(userFileBuildMemPath);
 
                     // Extract Archive
-                    var archiveExtracted = ExtractArchive(installerFile, userFileExtractionPath);
+                    var archiveExtractedN = ExtractArchive(installerFile, userFileExtractionPath);
+                    if (archiveExtractedN == null)
+                    {
+                        ErrorStagingCallback?.Invoke($"Unable to extract {installerFile.GetUsedFilepath()}");
+                        abortStaging = true;
+                        throw new Exception($"{installerFile.FriendlyName} failed to extract");
+                    }
 
+
+                    var archiveExtracted = archiveExtractedN.Value;
                     // File is a direct copy if it's not extracted by extract archive
                     if (!archiveExtracted)
                     {
@@ -276,6 +365,12 @@ namespace ALOTInstallerCore.Builder
 
                 Interlocked.Increment(ref numDone);
                 UpdateProgressCallback?.Invoke(numDone, numToDo);
+            }
+
+            if (abortStaging)
+            {
+                // Error callback goes here
+                return;
             }
 
             if (Directory.GetFiles(addonStagingPath).Any())

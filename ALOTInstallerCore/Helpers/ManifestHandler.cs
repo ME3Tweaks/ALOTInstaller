@@ -247,23 +247,18 @@ namespace ALOTInstallerCore.Helpers
                                                    Author = (string)e.Attribute("author"),
                                                    FriendlyName = (string)e.Attribute("friendlyname"),
                                                    //Optional = e.Attribute("optional") != null ? (bool)e.Attribute("optional") : false,
-                                                   m_me1 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me1") : false,
-                                                   m_me2 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me2") : false,
-                                                   m_me3 = e.Element("games") != null ? (bool)e.Element("games").Attribute("me3") : false,
+                                                   m_me1 = TryConvert.ToBool(e.Element("games")?.Attribute("me1")?.Value, false),
+                                                   m_me2 = TryConvert.ToBool(e.Element("games")?.Attribute("me2")?.Value, false),
+                                                   m_me3 = TryConvert.ToBool(e.Element("games")?.Attribute("me3")?.Value, false),
                                                    Filename = (string)e.Element("file").Attribute("filename"),
-                                                   Tooltipname = e.Element("file").Attribute("tooltipname") != null
-                                                       ? (string)e.Element("file").Attribute("tooltipname")
-                                                       : (string)e.Attribute("friendlyname"),
+                                                   Tooltipname = e.Element("file").Attribute("tooltipname")?.Value ?? e.Attribute("friendlyname").Value,
                                                    DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
-                                                   UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename") != null
-                                                       ? (string)e.Element("file").Attribute("unpackedsinglefilename")
-                                                       : null,
+                                                   //UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename")?.Value,
                                                    FileMD5 = (string)e.Element("file").Attribute("md5"),
-                                                   UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
-                                                   UnpackedFileSize = e.Element("file").Attribute("unpackedsize") != null
-                                                       ? Convert.ToInt64((string)e.Element("file").Attribute("unpackedsize"))
-                                                       : 0L,
+                                                   //UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
+                                                   //UnpackedFileSize = TryConvert.ToInt64(e.Element("file").Attribute("unpackedsize")?.Value, 0L),
                                                    TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
+                                                   InstallPriority = TryConvert.ToInt32(e.Attribute("installpriority")?.Value, 5),
                                                    UIPriority = TryConvert.ToInt32(e.Attribute("uipriority")?.Value, 5),
                                                    OptionGroup = e.Attribute("optiongroup")?.Value,
                                                    PackageFiles = e.Elements("packagefile")
@@ -285,7 +280,7 @@ namespace ALOTInstallerCore.Helpers
                                                            OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
                                                            OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
                                                            LoggingName = (string)d.Attribute("loggingname"),
-                                                           IsDLC = d.Attribute("isdlc") != null ? (bool)d.Attribute("isdlc") : false,
+                                                           IsDLC = TryConvert.ToBool(d.Attribute("isdlc")?.Value,false),
                                                            ModVersion = (string)d.Attribute("version")
                                                        }).ToList(),
                                                    RecommendationString = e.Attribute("recommendation")?.Value,
@@ -296,7 +291,6 @@ namespace ALOTInstallerCore.Helpers
                     mp.ManifestFiles.AddRange((from e in manifestElement.Elements("addonfile")
                                                select new ManifestFile()
                                                {
-                                                   FileSize = TryConvert.ToInt64(e.Element("file").Attribute("size")?.Value, 0L),
                                                    // MEUITM, ALOT
                                                    AlotVersionInfo = new TextureModInstallationInfo(
                                                        TryConvert.ToInt16(e.Attribute("alotversion")?.Value, 0),
@@ -310,15 +304,21 @@ namespace ALOTInstallerCore.Helpers
                                                    m_me1 = TryConvert.ToBool(e.Element("games")?.Attribute("me1")?.Value, false),
                                                    m_me2 = TryConvert.ToBool(e.Element("games")?.Attribute("me2")?.Value, false),
                                                    m_me3 = TryConvert.ToBool(e.Element("games")?.Attribute("me3")?.Value, false),
+
                                                    Filename = (string)e.Element("file").Attribute("filename"),
-                                                   Tooltipname = e.Element("file").Attribute("tooltipname")?.Value ?? e.Attribute("friendlyname").Value,
-                                                   DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
-                                                   UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename")?.Value,
+                                                   FileSize = TryConvert.ToInt64(e.Element("file").Attribute("size")?.Value, 0L),
                                                    FileMD5 = (string)e.Element("file").Attribute("md5"),
+                                                   
+                                                   UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename")?.Value,
                                                    UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
                                                    UnpackedFileSize = TryConvert.ToInt64(e.Element("file").Attribute("unpackedsize")?.Value, 0L),
                                                    TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
+                                                   
+                                                   InstallPriority = TryConvert.ToInt32(e.Attribute("installpriority")?.Value, 5),
                                                    UIPriority = TryConvert.ToInt32(e.Attribute("uipriority")?.Value, 5),
+                                                   Tooltipname = e.Element("file").Attribute("tooltipname")?.Value ?? e.Attribute("friendlyname").Value,
+                                                   DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
+
                                                    PackageFiles = e.Elements("packagefile")
                                                        .Select(r => new PackageFile
                                                        {
@@ -374,7 +374,9 @@ namespace ALOTInstallerCore.Helpers
                                                        ).ToList(),
                                                    RecommendationString = e.Attribute("recommendation")?.Value,
                                                    RecommendationReason = e.Attribute("recommendationreason")?.Value,
-                                               }).OrderBy(p => p.UIPriority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName));
+                                               }));
+
+                    mp.ManifestFiles = mp.ManifestFiles.OrderBy(p => p.UIPriority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList();
 
                     //Set Game
                     foreach (var mf in mp.ManifestFiles)

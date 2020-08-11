@@ -354,6 +354,12 @@ namespace ALOTInstallerCore.Helpers
                                     mfToUnpackedMap[mf] = uf;
                                     break;
                                 }
+                                else
+                                {
+                                    // It's probably the right file... The chance of same sized files this big is probably pretty rare, right?
+                                    mfToUnpackedMap[mf] = uf;
+                                    break;
+                                }
                             }
                         }
                         else if (!File.Exists(mf.StagedName) && Path.GetExtension(mf.StagedName).Equals(Path.GetExtension(mf.UnpackedSingleFilename), StringComparison.InvariantCultureIgnoreCase))

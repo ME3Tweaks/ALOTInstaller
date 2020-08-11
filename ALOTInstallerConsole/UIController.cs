@@ -17,5 +17,15 @@ namespace ALOTInstallerConsole
         /// Signals to the UIController that it is about to stop, and that event listeners should be unhooked
         /// </summary>
         public abstract void SignalStopping();
+
+        public UIController() : base()
+        {
+
+        }
+
+        public UIController(string title, int padding) : base(title, padding)
+        {
+
+        }
     }
 }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml.Linq;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using Serilog;
 using Terminal.Gui;
@@ -20,8 +21,8 @@ namespace ALOTInstallerConsole
             ALOTInstallerCoreLib.Startup(setWrapperLogger);
 
             Application.Init();
+            Locations.ME3Target.StampTextureModificationInfo(new TextureModInstallationInfo(11,1,0,0));
             var startupUI = new BuilderUI.StartupUIController();
-            startupUI.SetupUI();
             Program.SwapToNewView(startupUI);
         }
 
@@ -33,6 +34,7 @@ namespace ALOTInstallerConsole
         {
             controller.SignalStopping();
             Application.RequestStop();
+            controller.SetupUI();
             controller.BeginFlow();
             Application.Run(controller);
         }

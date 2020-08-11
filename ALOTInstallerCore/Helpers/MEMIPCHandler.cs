@@ -18,15 +18,15 @@ namespace ALOTInstallerCore.Helpers
         /// Returns the version number for MEM, or 0 if it couldn't be retreived
         /// </summary>
         /// <returns></returns>
-        public static int GetMemVersion()
+        public static short GetMemVersion()
         {
-            int version = 0;
+           short version = 0;
             // If the current version doesn't support the --version --ipc, we just assume it is 0.
             MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
             {
                 if (command == "VERSION")
                 {
-                    version = int.Parse(param);
+                    version = short.Parse(param);
                 }
             });
             return version;

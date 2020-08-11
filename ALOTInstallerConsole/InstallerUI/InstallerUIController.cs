@@ -83,7 +83,6 @@ namespace ALOTInstallerConsole.InstallerUI
 
                 PostInstallUIController bui = new PostInstallUIController();
                 bui.setInstalledString(installString);
-                bui.SetupUI();
                 Program.SwapToNewView(bui);
             };
             installerWorker.RunWorkerAsync();
