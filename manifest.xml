@@ -843,7 +843,7 @@
             uipriority="0"
             recommendationreason="Required per ALOT mode rules"
             recommendation="Required"
-            installpriority="1">&gt; 
+            installpriority="1">
         <file
             downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
             tooltipname="ALOT for ME1 11.0"
@@ -919,7 +919,11 @@
                     downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
                     filename="ALOT for ME1 11.0 - Update-83-2020-11-1-1591653251.zip"
                     size="68399573"
-                    md5="118987417fc41fc6e2f68d316aa57395" />
+                    md5="118987417fc41fc6e2f68d316aa57395"
+                    unpackedsinglefilename="ALOT_ME1_UPDATE_v11.mem"
+                    unpackedsize="68399393"
+                    unpackedmd5="b01584a1a1744e3775d0c4ce002a2b20"
+                    />
                <packagefile
                     me1="true"
                     sourcename="ALOT_ME1_UPDATE_v11.mem"
@@ -939,7 +943,10 @@
                     downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
                     filename="ALOT for ME2 11.1 - Update-68-2020-11-1-1592240377.zip"
                     size="234813"
-                    md5="6fdb227c271d5a3acbc8a5997641a345" />
+                    md5="6fdb227c271d5a3acbc8a5997641a345"
+                    unpackedsinglefilename="ALOT_ME2_UPDATE_v11.mem"
+                    unpackedsize="234633"
+                    unpackedmd5="eafa043cb7a5aa7ec3a2ed2dff9abd47" />
                <packagefile
                     me2="true"
                     sourcename="ALOT_ME2_UPDATE_v11.mem"
@@ -959,7 +966,10 @@
                     downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
                     filename="ALOT for ME3 11.3 - Update-363-2020-11-3-1593591936.zip"
                     size="23588808"
-                    md5="7b0cf8367c334f62df013a5e5aaa886c" />
+                    md5="7b0cf8367c334f62df013a5e5aaa886c"
+                    unpackedsinglefilename="ALOT_ME3_UPDATE_v11.mem"
+                    unpackedsize="23588628"
+                    unpackedmd5="564041c8507f472ee550ed993704d09c" />
                <packagefile
                     me3="true"
                     sourcename="ALOT_ME3_UPDATE_v11.mem"
