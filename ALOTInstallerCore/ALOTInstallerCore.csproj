@@ -23,6 +23,7 @@
     <Folder Include="Libraries\Linux\" />
     <Folder Include="Libraries\MacOS\" />
     <Folder Include="Libraries\Windows\" />
+    <Folder Include="ModManager\asi\" />
     <Folder Include="Startup\" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)'=='WDebug'">

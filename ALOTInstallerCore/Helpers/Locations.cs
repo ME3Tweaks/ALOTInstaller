@@ -29,7 +29,18 @@ namespace ALOTInstallerCore.Helpers
             LoadGamePaths();
         }
         //#if WINDOWS
-        public static string MEMPath() => Path.Combine(AppDataFolder(), @"MassEffectModderNoGui.exe");
+
+        private static string forcedMemPath;
+
+        /// <summary>
+        /// Allows the wrapping application to force the location of Mass Effect Modder No Gui
+        /// </summary>
+        /// <param name="forcedPath"></param>
+        public static void OverrideMEMPath(string forcedPath)
+        {
+            forcedMemPath = forcedPath;
+        }
+        public static string MEMPath() => forcedMemPath ?? Path.Combine(AppDataFolder(), @"MassEffectModderNoGui.exe");
         //#endif
 #if LINUX
         public static string MEMPath() => Path.Combine(AppDataFolder(), @"MassEffectModderNoGui");
