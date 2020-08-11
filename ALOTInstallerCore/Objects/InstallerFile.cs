@@ -124,6 +124,11 @@ namespace ALOTInstallerCore.Objects
         public abstract bool StageModFiles { get; set; }
 
         /// <summary>
+        /// If this file is disabled by the user and will not install. Only files that are not required can have this value set
+        /// </summary>
+        public bool Disabled { get; set; }
+
+        /// <summary>
         /// Resets variables used only during the build step
         /// </summary>
         public void ResetBuildVars()

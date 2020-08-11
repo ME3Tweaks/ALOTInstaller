@@ -532,10 +532,33 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 y = UpdateDisplayedUserFile(uf, y);
             }
+
+            if (obj is InstallerFile ifx)
+            {
+                y = UpdateDisplayInstallerFile(ifx, ref y);
+            }
+
             if (obj == null)
             {
                 UpdateNoDisplayedFile(y);
             }
+        }
+
+        private int UpdateDisplayInstallerFile(InstallerFile ifx, ref int i)
+        {
+            selectedFileInfoFrameView.Add(new CheckBox("Don't install file")
+            {
+                Width = "Don't install file".Length + 4,
+                Height = 1,
+                X = 1,
+                Y = Pos.Bottom(selectedFileInfoFrameView) - 4,
+                Checked = ifx.Disabled,
+                Toggled = (old) =>
+                {
+                    ifx.Disabled = !old;
+                }
+            });
+            return i;
         }
 
         private int UpdateDisplayedPreinstallMod(PreinstallMod pm, int y)
@@ -610,7 +633,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 AddSFIFVLabel($"Unpacked size: {mf.UnpackedFileSize} ({FileSizeFormatter.FormatSize(mf.UnpackedFileSize)})", ref y);
                 AddSFIFVLabel($"Unpacked file MD5: {mf.UnpackedFileMD5}", ref y);
             }
-
+            
             var textForWebbutton = mf.Ready ? "Open mod web page" : "Download";
             selectedFileInfoFrameView.Add(new Button(textForWebbutton)
             {

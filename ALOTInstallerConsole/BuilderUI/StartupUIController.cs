@@ -19,26 +19,26 @@ namespace ALOTInstallerConsole.BuilderUI
         public override void BeginFlow()
         {
 
-            View scrollableContent = new View()
-            {
-                Width = 40,
-                Height = 45,
-            };
-            for (int i = 0; i < 45; i++)
-            {
-                scrollableContent.Add(new Label("I AM LINE " + i)
-                {
-                    X = 0,
-                    Y = i,
-                    Width = Dim.Fill()
-                });
-            }
+            //View scrollableContent = new View()
+            //{
+            //    Width = 40,
+            //    Height = 45,
+            //};
+            //for (int i = 0; i < 45; i++)
+            //{
+            //    scrollableContent.Add(new Label("I AM LINE " + i)
+            //    {
+            //        X = 0,
+            //        Y = i,
+            //        Width = Dim.Fill()
+            //    });
+            //}
 
-            ScrollDialog sd = new ScrollDialog("Scroll dialog", "This is top message", "This is bottom message", scrollableContent,  new Button("OK")
-            {
-                Clicked = Application.RequestStop
-            });
-            Application.Run(sd);
+            //ScrollDialog sd = new ScrollDialog("Scroll dialog", "This is top message", "This is bottom message", scrollableContent,  new Button("OK")
+            //{
+            //    Clicked = Application.RequestStop
+            //});
+            //Application.Run(sd);
 
 
 

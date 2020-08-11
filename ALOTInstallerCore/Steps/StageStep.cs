@@ -112,7 +112,7 @@ namespace ALOTInstallerCore.Builder
         /// Performs the staging step.
         /// </summary>
         /// <returns></returns>
-        public async void PerformStaging(object sender, DoWorkEventArgs e)
+        public void PerformStaging(object sender, DoWorkEventArgs e)
         {
             var stagingDir = Path.Combine(Settings.BuildLocation, installOptions.InstallTarget.Game.ToString());
             if (Directory.Exists(stagingDir))
@@ -218,6 +218,8 @@ namespace ALOTInstallerCore.Builder
                         );
                     }
 
+                    bool decompiled = false;
+
                     // Check if listed file is a decompilable format and not archive format 
                     if (!archiveExtracted && FiletypeRequiresDecompilation(installerFile.GetUsedFilepath()))
                     {
@@ -233,12 +235,14 @@ namespace ALOTInstallerCore.Builder
                             ExtractTextureContainer(installOptions.InstallTarget.Game,
                                 installerFile.GetUsedFilepath(),
                                 outputDir, installerFile);
+                            decompiled = true;
                         }
                     }
                     else if (archiveExtracted)
                     {
-                        // Files that are not move only may be contained in texture container format.
-                        var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).Where(FiletypeRequiresDecompilation).ToList();
+                        // This installer file was extracted from an archive, and there are files in it that are not marked as move directly
+                        // Decompile all files not marked as MoveDirectly
+                        var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
                         foreach (var sf in subfilesToExtract)
                         {
                             var matchingPackageFile = installerFile.PackageFiles.Find(x => x.SourceName == Path.GetFileName(sf));
@@ -250,20 +254,25 @@ namespace ALOTInstallerCore.Builder
                             }
                             else if (matchingPackageFile != null && matchingPackageFile.MoveDirectly)
                             {
-                                var modDest = Path.Combine(stagingDir, Path.GetFileName(sf));
-                                Log.Information($"Moving file to staging (MoveDirectly=true): {sf} -> {modDest}");
-                                File.Move(sf, modDest);
+                                // This file will be handled by stagePackageFile(); Do not decompile it
+                                // We could move it here but let's just keep code in one place
+                            }
+                            else if (FiletypeRequiresDecompilation(sf))
+                            {
+                                ExtractTextureContainer(installOptions.InstallTarget.Game, sf, outputDir, installerFile);
+                                decompiled = true;
                             }
                             else
                             {
-                                ExtractTextureContainer(installOptions.InstallTarget.Game, sf, outputDir, installerFile);
+                                // File skipped
+                                Log.Information($"File skipped for processing: {sf}");
                             }
                         }
                     }
 
 
                     // Single file unpacked
-                    else if (!archiveExtracted && installerFile.PackageFiles.All(x => x.MoveDirectly) && installerFile.PackageFiles.Count == 1 && installerFile is ManifestFile mfx && mfx.IsBackedByUnpacked())
+                    if (!archiveExtracted && !decompiled && installerFile is ManifestFile mfx && mfx.IsBackedByUnpacked())
                     {
                         // File must just be moved directly it seems
                         var destF = Path.Combine(finalBuiltPackagesDestination, $"{installerFile.BuildID}_{Path.GetFileName(installerFile.GetUsedFilepath())}");

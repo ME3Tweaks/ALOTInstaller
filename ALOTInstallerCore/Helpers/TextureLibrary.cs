@@ -413,15 +413,22 @@ namespace ALOTInstallerCore.Helpers
 
                     if (switchFilesToUnpacked && !cancelDueToError && oldFname != movableFile.Key.GetUsedFilepath())
                     {
-                        // Switched to unpacked
-                        Log.Information($"Deleting packed version of manifest file now that it is in unpacked mode: {oldFname}");
-                        try
+                        if (!movableFile.Key.IsBackedByUnpacked())
                         {
-                            File.Delete(oldFname);
+                            Log.Error("File copied back did not trigger switch to unpacked version! Something probably went wrong on file copy.");
                         }
-                        catch (Exception e)
+                        else
                         {
-                            Log.Error($"Unable to delete packed version of {movableFile.Key.FriendlyName}: {e.Message}");
+                            // Switched to unpacked
+                            Log.Information($"Deleting packed version of manifest file now that it is in unpacked mode: {oldFname}");
+                            try
+                            {
+                                File.Delete(oldFname);
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error($"Unable to delete packed version of {movableFile.Key.FriendlyName}: {e.Message}");
+                            }
                         }
                     }
                 }
