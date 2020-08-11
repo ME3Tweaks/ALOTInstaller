@@ -222,7 +222,9 @@
             meuitmver="2"
             friendlyname="MEUITM Anniversary Edition (2018)"
             author="CDAMJC"
-            installpriority="0">
+            installpriority="0"
+            recommendationreason="Enhances large amount of textures in Mass Effect"
+            recommendation="Required">
                <file
                     downloadlink="https://www.nexusmods.com/masseffect/mods/1"
                     tooltipname="MEUITM Anniversary Edition"
@@ -533,7 +535,7 @@
             friendlyname="MEUITM Anniversary Edition (2018)"
             author="CDAMJC"
             installpriority="0"
-            recommendationreason="Enhances many commonly seen areas in Mass Effect"
+            recommendationreason="Enhances large amount of textures in Mass Effect"
             recommendation="Recommended">
                <file
                     downloadlink="https://www.nexusmods.com/masseffect/mods/1"
