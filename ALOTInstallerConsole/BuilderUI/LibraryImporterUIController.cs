@@ -83,7 +83,7 @@ namespace ALOTInstallerConsole.BuilderUI
                         Directory.Exists(selector.FilePath.ToString()))
                     {
                         ProgressDialog pd = new ProgressDialog("Importing files from folder",
-                            "Please wait while files are imported.");
+                            "Please wait while files are imported.", "Preparing to import files...", true);
                         NamedBackgroundWorker nbw = new NamedBackgroundWorker("ImportFromFolderThread");
                         nbw.DoWork += (a, b) =>
                         {

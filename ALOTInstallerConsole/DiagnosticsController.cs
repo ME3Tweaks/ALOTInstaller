@@ -78,7 +78,7 @@ namespace ALOTInstallerConsole
             }
 
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("DiagnosticsWorker");
-            ProgressDialog pd = new ProgressDialog("Uploading logs", "Please wait while logs are collected.")
+            ProgressDialog pd = new ProgressDialog("Uploading logs", "Please wait while logs are collected.", "Preparing to collect logs", true)
             {
                 ProgressMax = 100
             };

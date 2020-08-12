@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
@@ -23,6 +24,7 @@ namespace ALOTInstallerConsole.BuilderUI
         private ApplicableGame VisibleGames = ApplicableGame.ME1 | ApplicableGame.ME2 | ApplicableGame.ME3;
         private FrameView leftsideListContainer;
         private FrameView selectedFileInfoFrameView;
+        private ScrollView leftSideScrollView;
 
         public override void SetupUI()
         {
@@ -36,14 +38,35 @@ namespace ALOTInstallerConsole.BuilderUI
                 modeMenuItems.Add(new MenuItem(m.Key.ToString(), "", () => ChangeMode(m.Key)));
             }
 
+            List<MenuItem> textureInstallationInfoMenuItems = new List<MenuItem>();
+            foreach (var v in Locations.GetAllAvailableTargets())
+            {
+                var tii = v.GetInstalledALOTInfo();
+                if (tii != null)
+                {
+                    textureInstallationInfoMenuItems.Add(new MenuItem($"{v.Game}: {v.GetInstalledALOTInfo()}", "", null));
+                }
+                else
+                {
+                    textureInstallationInfoMenuItems.Add(new MenuItem($"{v.Game}: No textures installed", "", null));
+                }
+            }
+
+
             MenuBar mb = new MenuBar(new MenuBarItem[]
             {
                 new MenuBarItem("Files", new MenuItem[]
                 {
                     new MenuItem("_Import manifest files", "", ImportManifestFiles, ()=> ManifestHandler.MasterManifest.ManifestModePackageMappping.Count > 1),
-                    new MenuItem("_Add user files to current mode", "",  AddUserFiles)
+                    new MenuItem("_Add user files to current mode", "",  AddUserFiles),
+                    new MenuItem("_Cleanup texture library folder", "", CleanupTextureLibrary),
                 }),
-                new MenuBarItem("Modes", modeMenuItems.ToArray())
+                new MenuBarItem("Change mode", modeMenuItems.ToArray()),
+                new MenuBarItem("Game Status",
+                    textureInstallationInfoMenuItems.ToArray()),
+                new MenuBarItem("_Tools",new MenuItem[] {
+                    new MenuItem("Run AutoTOC", "",RunAutoToc, ()=>Locations.ME3Target != null),
+                })
             });
 
             Add(mb);
@@ -67,6 +90,18 @@ namespace ALOTInstallerConsole.BuilderUI
                 X = 0,
                 Y = 1
             };
+
+            leftSideScrollView = new ScrollView()
+            {
+                X = 0,
+                Y = 0,
+                Height = Dim.Fill(),
+                Width = 50,
+            };
+
+            //uncomment whenever gui.cs scrollview gets fixed for Dim.Fill()
+            //leftSideScrollView.Add(ManifestFilesListView);
+            //leftsideListContainer.Add(leftSideScrollView);
 
             leftsideListContainer.Add(ManifestFilesListView);
             Add(leftsideListContainer);
@@ -158,6 +193,77 @@ namespace ALOTInstallerConsole.BuilderUI
 
             TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode, true));
             SetLeftsideTitle();
+            UpdateLeftSideScrollViewSizing();
+        }
+
+        private void RunAutoToc()
+        {
+            ProgressDialog pd = new ProgressDialog("AutoTOC", "Performing AutoTOC", "Calculating Table of Contents (TOC) files", true);
+            NamedBackgroundWorker nbw = new NamedBackgroundWorker("AutoTocWorker");
+            nbw.DoWork += (a, b) =>
+            {
+                AutoTOC.RunTOCOnGameTarget(Locations.ME3Target, x => pd.ProgressValue = x);
+            };
+            nbw.RunWorkerCompleted += (a, b) =>
+            {
+                if (pd.IsCurrentTop)
+                {
+                    Application.RequestStop(); // Close dialog
+                }
+            };
+            nbw.RunWorkerAsync();
+            Application.Run(pd);
+        }
+
+        private void UpdateLeftSideScrollViewSizing()
+        {
+            int w = 0;
+            int h = 0;
+            foreach (var v in dataSource.ShownFiles)
+            {
+                w = Math.Max(w, v.FriendlyName.Length);
+                h++;
+
+            }
+            //leftSideScrollView.Bounds = new Rect(1, 2, 50, Application.Top.Bounds.Height);
+            leftSideScrollView.ContentSize = new Size(w, h);
+        }
+
+        private void CleanupTextureLibrary()
+        {
+            var unusedFilesInLib = TextureLibrary.GetUnusedFilesInLibrary();
+            if (unusedFilesInLib.Any())
+            {
+                string message = "The following files located in the texture library are no longer used or were moved into the texture library manually and are unused, and can be safely deleted:\n";
+                foreach (var v in unusedFilesInLib)
+                {
+                    message += $"\n{v} ({FileSizeFormatter.FormatSize(new FileInfo(Path.Combine(Settings.TextureLibraryLocation, v)).Length)})";
+
+                }
+                message += "\n\nDelete these files?";
+                int result = MessageBox.Query(100, 20, "Irrelevant files found", message, "Delete files", "Leave files");
+                if (result == 0)
+                {
+                    // Delete em'
+                    foreach (var v in unusedFilesInLib)
+                    {
+                        var fullPath = Path.Combine(Settings.TextureLibraryLocation, v);
+                        Log.Information($"Deleting unused file in texture library: {fullPath}");
+                        try
+                        {
+                            File.Delete(fullPath);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error($"Error deleting file: {e.Message}");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Query("Library is clean", "No unused files were found in the texture library folder.", "OK");
+            }
         }
 
         public FileSelectionUIController() : base("", -1)
@@ -187,7 +293,7 @@ namespace ALOTInstallerConsole.BuilderUI
         {
             if (ManifestFilesListView.SelectedItem >= 0)
             {
-                var file = dataSource.InstallerFiles[ManifestFilesListView.SelectedItem];
+                var file = dataSource.ShownFiles[ManifestFilesListView.SelectedItem];
                 if (file is ManifestFile mf)
                 {
                     Utilities.OpenWebPage(mf.DownloadLink);
@@ -226,7 +332,7 @@ namespace ALOTInstallerConsole.BuilderUI
             if (warningResponse != 0) return; //abort
 
             // Show options
-            if (dataSource.InstallerFiles.Any(x => x.Ready))
+            if (dataSource.ShownFiles.Any(x => x.Ready))
             {
                 showOptionsDialog(target);
             }
@@ -260,7 +366,7 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             #endregion
 
-            var availableInstallOptions = InstallOptionsStep.CalculateInstallOptions(target, ManifestHandler.CurrentMode, dataSource.InstallerFiles);
+            var availableInstallOptions = InstallOptionsStep.CalculateInstallOptions(target, ManifestHandler.CurrentMode, dataSource.ShownFiles);
 
             // Begin setting up UI items
             int y = 0;
@@ -293,7 +399,7 @@ namespace ALOTInstallerConsole.BuilderUI
             Dictionary<InstallOptionsStep.InstallOption, CheckBox> installOptionMapping = new Dictionary<InstallOptionsStep.InstallOption, CheckBox>();
             foreach (var v in availableInstallOptions)
             {
-                CheckBox cb = new CheckBox(getUIString(v, dataSource.InstallerFiles))
+                CheckBox cb = new CheckBox(getUIString(v, dataSource.ShownFiles))
                 {
                     X = 1,
                     Y = y++,
@@ -401,7 +507,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 var optionsPackage = new InstallOptionsPackage()
                 {
                     InstallTarget = target,
-                    FilesToInstall = dataSource.InstallerFiles,
+                    FilesToInstall = dataSource.ShownFiles,
                     InstallALOT = getInstallOptionValue(InstallOptionsStep.InstallOption.ALOT, installOptionMapping),
                     InstallALOTUpdate = getInstallOptionValue(InstallOptionsStep.InstallOption.ALOTUpdate, installOptionMapping),
                     InstallMEUITM = getInstallOptionValue(InstallOptionsStep.InstallOption.MEUITM, installOptionMapping),
@@ -498,14 +604,14 @@ namespace ALOTInstallerConsole.BuilderUI
         private void RefreshShownFiles()
         {
             TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode));
-            var userFiles = dataSource.InstallerFiles.Where(x => x is UserFile);
-            dataSource.InstallerFiles.Clear();
-            dataSource.InstallerFiles.AddRange(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode).Where(x => (x.ApplicableGames & VisibleGames) != 0));
-            dataSource.InstallerFiles.AddRange(userFiles);
+            var userFiles = dataSource.ShownFiles.Where(x => x is UserFile);
+            dataSource.ShownFiles.Clear();
+            dataSource.ShownFiles.AddRange(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode).Where(x => (x.ApplicableGames & VisibleGames) != 0));
+            dataSource.ShownFiles.AddRange(userFiles);
             Application.Refresh();
 
             var selectedIndex = ManifestFilesListView.SelectedItem;
-            updateDisplayedInfo(selectedIndex >= 0 && dataSource.Count > selectedIndex ? dataSource.InstallerFiles[selectedIndex] : null);
+            updateDisplayedInfo(selectedIndex >= 0 && dataSource.Count > selectedIndex ? dataSource.ShownFiles[selectedIndex] : null);
         }
 
 
@@ -546,18 +652,23 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private int UpdateDisplayInstallerFile(InstallerFile ifx, ref int i)
         {
-            selectedFileInfoFrameView.Add(new CheckBox("Don't install file")
+            if (ifx.Ready)
             {
-                Width = "Don't install file".Length + 4,
-                Height = 1,
-                X = 1,
-                Y = Pos.Bottom(selectedFileInfoFrameView) - 4,
-                Checked = ifx.Disabled,
-                Toggled = (old) =>
+                selectedFileInfoFrameView.Add(new CheckBox("Don't install file")
                 {
-                    ifx.Disabled = !old;
-                }
-            });
+                    Width = "Don't install file".Length + 4,
+                    Height = 1,
+                    X = 0,
+                    Y = Pos.Bottom(selectedFileInfoFrameView) - 4,
+                    Checked = ifx.Disabled,
+                    Toggled = (old) =>
+                    {
+                        ifx.Disabled = !old;
+                        ManifestFilesListView.SetNeedsDisplay();
+                    }
+                });
+            }
+
             return i;
         }
 
@@ -608,7 +719,7 @@ namespace ALOTInstallerConsole.BuilderUI
             AddSFIFVLabel($"Applies to game(s): {mf.ApplicableGames}", ref y);
             if (mf.UnpackedSingleFilename != null && mf.UnpackedFileSize != 0 && mf.UnpackedFileMD5 != null)
             {
-                
+
                 AddSFIFVLabel($"Ready: {mf.Ready} via {(mf.IsBackedByUnpacked() ? "unpacked file" : "primary file")}", ref y);
             }
             else
@@ -633,7 +744,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 AddSFIFVLabel($"Unpacked size: {mf.UnpackedFileSize} ({FileSizeFormatter.FormatSize(mf.UnpackedFileSize)})", ref y);
                 AddSFIFVLabel($"Unpacked file MD5: {mf.UnpackedFileMD5}", ref y);
             }
-            
+
             var textForWebbutton = mf.Ready ? "Open mod web page" : "Download";
             selectedFileInfoFrameView.Add(new Button(textForWebbutton)
             {
@@ -665,27 +776,34 @@ namespace ALOTInstallerConsole.BuilderUI
 
         internal class InstallerFileDataSource : IListDataSource
         {
-            public List<InstallerFile> InstallerFiles { get; set; }
+            public List<InstallerFile> ShownFiles { get; set; }
 
             public bool IsMarked(int item) => false;
 
-            public int Count => InstallerFiles.Count;
+            public int Count => ShownFiles.Count;
 
-            public InstallerFileDataSource(List<InstallerFile> itemList) => InstallerFiles = itemList;
+            public InstallerFileDataSource(List<InstallerFile> itemList) => ShownFiles = itemList;
 
             public void Render(ListView container, ConsoleDriver driver, bool selected, int item, int col, int line, int width)
             {
                 container.Move(col, line);
 
-                InstallerFile instF = InstallerFiles[item];
+                InstallerFile instF = ShownFiles[item];
                 if (instF.Ready)
                 {
-                    if (instF is ManifestFile)
+                    if (instF.Disabled)
                     {
+                        driver.SetColors(ConsoleColor.Red, ConsoleColor.Blue);
+                        RenderUstr(driver, "D", 1, 0, 2);
+                    }
+                    else if (instF is ManifestFile)
+                    {
+                        driver.SetColors(ConsoleColor.Green, ConsoleColor.Blue);
                         RenderUstr(driver, "*", 1, 0, 2);
                     }
                     else if (instF is UserFile)
                     {
+                        driver.SetColors(ConsoleColor.Yellow, ConsoleColor.Blue);
                         RenderUstr(driver, "U", 1, 0, 2);
                     }
                 }
@@ -724,7 +842,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
             public IList ToList()
             {
-                return InstallerFiles;
+                return ShownFiles;
             }
         }
     }

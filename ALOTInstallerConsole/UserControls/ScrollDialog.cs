@@ -10,7 +10,7 @@ namespace ALOTInstallerConsole.UserControls
     /// </summary>
 public class ScrollDialog : Dialog
 {
-    public ScrollDialog(string title, string topMessage, string bottommessage, View scrollableContent, params Button[] buttons) : base(title, buttons)
+    public ScrollDialog(string title, string topMessage, string bottommessage, View scrollableContent, int cWidth, int cHeight, params Button[] buttons) : base(title, buttons)
     {
         Height = 20;
         Width = 50;
@@ -19,33 +19,32 @@ public class ScrollDialog : Dialog
         {
             X = 0,
             Y = 0,
-            Width = Dim.Fill(),
+            //Width = 15,
             Height = 2
         });
 
-        var scrollView = new ScrollView()
+        var scrollView = new ScrollView(new Rect(1, 3, 47, 12))
         {
             Y = 2,
-            ContentSize = new Size(28, 10),
+            ContentSize = new Size(cWidth, cHeight),
             //ContentOffset = new Point (0, 0),
-            ShowVerticalScrollIndicator = true,
-            ShowHorizontalScrollIndicator = true,
-            //AutoHideScrollBars = true,
+            //ShowVerticalScrollIndicator = true,
+            //ShowHorizontalScrollIndicator = true,
+            AutoHideScrollBars = true,
             ColorScheme = Colors.TopLevel,
-            Width = 50,
-            Height = 12,
+
         };
         scrollView.Add(scrollableContent);
 
         Add(scrollView);
 
-        Add(new Label(bottommessage)
-        {
-            X = 0,
-            Y = Pos.Bottom(this) - 5,
-            Width = Dim.Fill(),
-            Height = 1
-        });
+        //Add(new Label(bottommessage)
+        //{
+        //    X = 0,
+        //    Y = Pos.Bottom(this) - 5,
+        //    Width = Dim.Fill(),
+        //    Height = 1
+        //});
     }
 }
 }

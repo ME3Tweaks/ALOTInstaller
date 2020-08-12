@@ -1,5 +1,6 @@
 ﻿using ALOTInstallerCore.PlatformSpecific.Windows;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.ModManager.Objects;
@@ -215,6 +216,19 @@ namespace ALOTInstallerCore.Helpers
             //DuplicatingIni ini = File.Exists(memIni) ? DuplicatingIni.LoadIni(memIni) : new DuplicatingIni();
             //ini["GameDataPaths"][target.Game.ToString()].Value = target.TargetPath;
             //File.WriteAllText(memIni, ini.ToString());
+        }
+
+        /// <summary>
+        /// Gets a list of all available game targets
+        /// </summary>
+        /// <returns></returns>
+        public static List<GameTarget> GetAllAvailableTargets()
+        {
+            List<GameTarget> gameTargets = new List<GameTarget>();
+            if (ME1Target != null) gameTargets.Add(ME1Target);
+            if (ME2Target != null) gameTargets.Add(ME2Target);
+            if (ME3Target != null) gameTargets.Add(ME3Target);
+            return gameTargets;
         }
     }
 }

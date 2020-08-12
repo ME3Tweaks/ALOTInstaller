@@ -86,7 +86,8 @@ namespace ALOTInstallerCore.Steps
             {
                 target = package.InstallTarget,
                 mode = package.InstallerMode,
-                filesToInstall = package.FilesToInstall.OfType<ManifestFile>().ToList()
+                manifestFilesToInstall = package.FilesToInstall.OfType<ManifestFile>().ToList(),
+                package = package
             };
 
             if (!pc.checkRequiredFiles(out var failureReason1))
@@ -118,25 +119,31 @@ namespace ALOTInstallerCore.Steps
                 }
             }
 
-            if (pc.target.GetInstalledALOTInfo() != null)
+            if (!pc.package.DebugNoInstall)
             {
-                var replacedAddedRemovedFiles = pc.checkForReplacedAddedRemovedFiles();
-                if (replacedAddedRemovedFiles.Any())
+                if (pc.target.GetInstalledALOTInfo() != null)
                 {
-                    Log.Error("The texture map has become desynchronized from the game state on disk:");
-                    foreach (var v in replacedAddedRemovedFiles)
+                    var replacedAddedRemovedFiles = pc.checkForReplacedAddedRemovedFiles();
+                    if (replacedAddedRemovedFiles.Any())
                     {
-                        Log.Error($" > {v}");
+                        Log.Error("The texture map has become desynchronized from the game state on disk:");
+                        foreach (var v in replacedAddedRemovedFiles)
+                        {
+                            Log.Error($" > {v}");
+                        }
+
+                        Log.Error("Cannot install textures when game has been modified outside of MEM-based texture tools after texture install has taken place");
+                        // Texture map is inconsistent, and MEM will refuse installation because the game is not in sync with the texture map
+                        return "The texture map from the previous installation has become desynchronized from the current game state. This means that files/mods were added, removed, or replaced/modified since the last texture installation took place. The game must be restored to vanilla so a new texture map can be created.";
                     }
-                    Log.Error("Cannot install textures when game has been modified outside of MEM-based texture tools after texture install has taken place");
-                    // Texture map is inconsistent, and MEM will refuse installation because the game is not in sync with the texture map
-                    return "The texture map from the previous installation has become desynchronized from the current game state. This means that files/mods were added, removed, or replaced/modified since the last texture installation took place. The game must be restored to vanilla so a new texture map can be created.";
                 }
             }
+
             return null; //OK
         }
 
         private static readonly string[] UnpackedFileExtensions = { @".pcc", @".tlk", @".bin", @".dlc", ".afc", @".tfc" };
+        private InstallOptionsPackage package;
 
         private List<string> checkDLCConsistency()
         {
@@ -172,7 +179,7 @@ namespace ALOTInstallerCore.Steps
 
         private GameTarget target { get; set; }
         private ManifestMode mode { get; set; }
-        private List<ManifestFile> filesToInstall { get; set; }
+        private List<ManifestFile> manifestFilesToInstall { get; set; }
 
         private Precheck()
         {
@@ -210,7 +217,7 @@ namespace ALOTInstallerCore.Steps
                 }
             }
 
-            string args = $"--detect-bad-mods --gameid {target.Game.ToGameNum()} --ipc";
+            string args = $@"--check-game-data-mismatch --gameid {target.Game.ToGameNum()} --ipc";
             int lastExitCode = int.MinValue;
             MEMIPCHandler.RunMEMIPCUntilExit(args,
                 null,
@@ -261,7 +268,7 @@ namespace ALOTInstallerCore.Steps
             {
                 bool hasAlot = texturesInfo != null && texturesInfo.ALOTVER > 0;
                 // ALOT main is required if alot is not installed
-                var alotMainFile = filesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER != 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0); //main file only
+                var alotMainFile = manifestFilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER != 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0); //main file only
                 if (alotMainFile == null)
                 {
                     Log.Error("ALOT manifest is missing the ALOT main file!");
@@ -293,7 +300,7 @@ namespace ALOTInstallerCore.Steps
                 }
 
                 // ALOT update is required if available in manifest but not installed
-                var alotUpdateFile = filesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTUPDATEVER != 0);
+                var alotUpdateFile = manifestFilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTUPDATEVER != 0);
                 if (alotUpdateFile != null)
                 {
                     // An ALOT update exists for our game
@@ -328,7 +335,7 @@ namespace ALOTInstallerCore.Steps
             }
 
             // MEUITM mode doesn't have any conditions currently except MEUITM
-            return filesToInstall.Any(x => x.Recommendation == RecommendationType.Required);
+            return manifestFilesToInstall.Any(x => x.Recommendation == RecommendationType.Required);
         }
     }
 }

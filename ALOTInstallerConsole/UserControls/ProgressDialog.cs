@@ -14,23 +14,23 @@ namespace ALOTInstallerConsole.UserControls
         private void OnProgressValueChanged()
         {
             if (ProgressMax == 0) return;
-            progressBar.Fraction = ProgressValue * 1.0f / ProgressMax;
+            Application.MainLoop.Invoke(() => progressBar.Fraction = ProgressValue * 1.0f / ProgressMax);
         }
 
         private void OnProgressMaxChanged()
         {
             if (ProgressMax == 0) return;
-            progressBar.Fraction = ProgressValue * 1.0f / ProgressMax;
+            Application.MainLoop.Invoke(() => progressBar.Fraction = ProgressValue * 1.0f / ProgressMax);
         }
 
         private void OnTopMessageChanged()
         {
-            topMessageLabel.Text = TopMessage;
+            Application.MainLoop.Invoke(() => topMessageLabel.Text = TopMessage);
         }
 
         private void OnBottomMessageChanged()
         {
-            bottomMessageLabel.Text = BottomMessage;
+            Application.MainLoop.Invoke(() => bottomMessageLabel.Text = BottomMessage);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -39,7 +39,7 @@ namespace ALOTInstallerConsole.UserControls
         private Label topMessageLabel;
         private Label bottomMessageLabel;
 
-        public ProgressDialog(ustring title, string topMessage, params Button[] buttons) : base(title, buttons)
+        public ProgressDialog(ustring title, string topMessage, string initialBottomMessage, bool showProgressBar, params Button[] buttons) : base(title, buttons)
         {
             topMessageLabel = new Label(topMessage)
             {
@@ -51,7 +51,7 @@ namespace ALOTInstallerConsole.UserControls
             Add(topMessageLabel);
 
             int progressBarPos = 4;
-            bottomMessageLabel = new Label("Bottom message")
+            bottomMessageLabel = new Label(initialBottomMessage)
             {
                 X = 1,
                 Y = progressBarPos++,
@@ -68,7 +68,10 @@ namespace ALOTInstallerConsole.UserControls
                 Height = 1,
                 ColorScheme = Colors.Menu
             };
-            Add(progressBar);
+            if (showProgressBar)
+            {
+                Add(progressBar);
+            }
 
             Width = 75;
             Height = 9;
