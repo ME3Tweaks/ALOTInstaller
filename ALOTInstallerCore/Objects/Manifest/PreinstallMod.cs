@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace ALOTInstallerCore.Objects.Manifest
 {
@@ -6,7 +7,7 @@ namespace ALOTInstallerCore.Objects.Manifest
     /// Predefined mod that will be installed after build but before installation of textures.
     /// This is only used for ALOV mods currently and should not be really be expanded (use Mod Manager instead)
     /// </summary>
-    public class PreinstallMod : ManifestFile
+    public class PreinstallMod : ManifestFile, INotifyPropertyChanged //this must be here to make fody run on this
     {
         /// <summary>
         /// List of redirections of files from extracted path => game path

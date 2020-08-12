@@ -53,7 +53,7 @@ namespace ALOTInstallerCore.Steps
             var options = new Dictionary<InstallOption, (OptionState, string)>();
             if (manifestMode == ManifestMode.None)
             {
-                if (filesForTarget.Any(x => x is UserFile && x.Ready))
+                if (filesForTarget.Any(x => x is UserFile && x.Ready && !x.Disabled))
                 {
                     options[InstallOption.UserFiles] = (OptionState.ForceCheckedVisible, null);
                 }
@@ -87,7 +87,7 @@ namespace ALOTInstallerCore.Steps
                         options[InstallOption.MEUITM] = (OptionState.DisabledVisible,
                             "Cannot install a different version of MEUITM on top of existing installed version");
                     }
-                    else if (meuitmFile.Ready)
+                    else if (meuitmFile.Ready && !meuitmFile.Disabled)
                     {
                         options[InstallOption.MEUITM] = (OptionState.UncheckedVisible, "MEUITM already installed");
                     }
@@ -100,7 +100,7 @@ namespace ALOTInstallerCore.Steps
                 else
                 {
                     // does not have textures installed or textures installed but MEUITM not installed
-                    if (meuitmFile.Ready)
+                    if (meuitmFile.Ready && !meuitmFile.Disabled)
                     {
                         options[InstallOption.MEUITM] = (OptionState.ForceCheckedVisible, null);
                     }
@@ -112,7 +112,7 @@ namespace ALOTInstallerCore.Steps
                 }
 
                 // MEUITM mode user files
-                if (filesForTarget.Any(x => x is UserFile && x.Ready))
+                if (filesForTarget.Any(x => x is UserFile && x.Ready && !x.Disabled))
                 {
                     options[InstallOption.UserFiles] = (OptionState.CheckedVisible, null);
                 }
@@ -147,7 +147,7 @@ namespace ALOTInstallerCore.Steps
                     if (targetAlotInfo.ALOTVER > 0 && targetAlotInfo.ALOTVER != alotFile.AlotVersionInfo.ALOTVER)
                     {
                         // Not matching ALOT version
-                        if (!alotFile.Ready)
+                        if (!alotFile.Ready || alotFile.Disabled)
                         {
                             options[InstallOption.ALOT] = (OptionState.DisabledVisible,
                                 "ALOT installed, but not imported into texture library");
@@ -160,7 +160,7 @@ namespace ALOTInstallerCore.Steps
                     }
                     else
                     {
-                        if (alotFile.Ready)
+                        if (alotFile.Ready && !alotFile.Disabled)
                         {
                             options[InstallOption.ALOT] = (OptionState.UncheckedVisible, null);
                         }
@@ -174,7 +174,7 @@ namespace ALOTInstallerCore.Steps
                 else
                 {
                     // No textures have been installed
-                    if (alotFile.Ready)
+                    if (alotFile.Ready && !alotFile.Disabled)
                     {
                         options[InstallOption.ALOT] = (OptionState.ForceCheckedVisible, null);
                     }
@@ -197,14 +197,14 @@ namespace ALOTInstallerCore.Steps
                             if (targetAlotInfo.ALOTVER != alotUpdateFile.AlotVersionInfo.ALOTVER)
                             {
                                 // Not matching ALOT version. Update is not applicable
-                                if (alotUpdateFile.Ready)
-                                {
-                                    options[InstallOption.ALOTUpdate] = (OptionState.DisabledVisible, "ALOT installed, but not imported into texture library");
-                                }
-                                else
-                                {
+                                //if (alotUpdateFile.Ready && !alotUpdateFile.Disabled)
+                                //{
+                                //    options[InstallOption.ALOTUpdate] = (OptionState.DisabledVisible, $"{alotUpdateFile.FriendlyName} is not applicable to the current game installation");
+                                //}
+                                //else
+                                //{
                                     options[InstallOption.ALOTUpdate] = (OptionState.DisabledVisible, $"{alotUpdateFile.FriendlyName} is not applicable to the current game installation");
-                                }
+                                //}
                             }
                             else if (targetAlotInfo.ALOTUPDATEVER > alotUpdateFile.AlotVersionInfo.ALOTUPDATEVER)
                             {
@@ -225,12 +225,16 @@ namespace ALOTInstallerCore.Steps
                         else
                         {
                             // ALOT not installed but textures installed
-                            if (alotFile.Ready)
+                            if (alotFile.Ready && !alotFile.Disabled && alotUpdateFile.Ready && !alotUpdateFile.Disabled)
                             {
                                 // in ALOT mode in this case this update must be installed
                                 options[InstallOption.ALOTUpdate] = (OptionState.ForceCheckedVisible, null);
                             }
-                            else
+                            else if (alotUpdateFile.Ready && !alotUpdateFile.Disabled)
+                            {
+                                options[InstallOption.ALOTUpdate] = (OptionState.DisabledVisible, "Update must be applied alongside ALOT on initial install of ALOT");
+                            }
+                            else 
                             {
                                 options[InstallOption.ALOTUpdate] = (OptionState.DisabledVisible, "Textures installed but ALOT not installed, update not applicable");
                             }

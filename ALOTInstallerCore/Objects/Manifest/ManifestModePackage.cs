@@ -28,5 +28,10 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// List of user supplied files for this mode
         /// </summary>
         public List<UserFile> UserFiles { get; } = new List<UserFile>();
+
+        /// <summary>
+        /// Description of this mode
+        /// </summary>
+        public string ModeDescription { get; set; } = "No rules. Install whatever you want"; //Defaults to 'None' description. Manifest loader will override this
     }
 }

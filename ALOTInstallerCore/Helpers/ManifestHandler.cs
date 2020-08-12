@@ -230,6 +230,7 @@ namespace ALOTInstallerCore.Helpers
                 foreach (var manifestElement in manifests)
                 {
                     ManifestModePackage mp = new ManifestModePackage();
+                    mp.ModeDescription = manifestElement.Attribute("description")?.Value;
                     mp.Tutorials.AddRange((from e in rootElement.Elements("tutorial")
                                            select new ManifestTutorial
                                            {

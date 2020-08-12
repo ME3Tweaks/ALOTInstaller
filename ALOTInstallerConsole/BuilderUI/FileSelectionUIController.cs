@@ -35,7 +35,7 @@ namespace ALOTInstallerConsole.BuilderUI
             var modeMenuItems = new List<MenuItem>();
             foreach (var m in ManifestHandler.MasterManifest.ManifestModePackageMappping)
             {
-                modeMenuItems.Add(new MenuItem(m.Key.ToString(), "", () => ChangeMode(m.Key)));
+                modeMenuItems.Add(new MenuItem(m.Key.ToString(), $"({ManifestHandler.MasterManifest.ManifestModePackageMappping[m.Key].ModeDescription})", () => ChangeMode(m.Key)));
             }
 
             List<MenuItem> textureInstallationInfoMenuItems = new List<MenuItem>();
@@ -57,15 +57,18 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 new MenuBarItem("Files", new MenuItem[]
                 {
-                    new MenuItem("_Import manifest files", "", ImportManifestFiles, ()=> ManifestHandler.MasterManifest.ManifestModePackageMappping.Count > 1),
-                    new MenuItem("_Add user files to current mode", "",  AddUserFiles),
-                    new MenuItem("_Cleanup texture library folder", "", CleanupTextureLibrary),
+                    new MenuItem("_Import manifest files", "(Import files listed in manifest)", ImportManifestFiles, ()=> ManifestHandler.MasterManifest.ManifestModePackageMappping.Count > 1),
+                    new MenuItem("_Add user files to current mode", "(Add your own files to install)",  AddUserFiles),
+                    new MenuItem("_Cleanup texture library folder", "(Delete old files from texture library)", CleanupTextureLibrary),
                 }),
                 new MenuBarItem("Change mode", modeMenuItems.ToArray()),
                 new MenuBarItem("Game Status",
                     textureInstallationInfoMenuItems.ToArray()),
                 new MenuBarItem("_Tools",new MenuItem[] {
-                    new MenuItem("Run AutoTOC", "",RunAutoToc, ()=>Locations.ME3Target != null),
+                    new MenuItem("Run AutoTOC", "(Update ME3 TOC files)",RunAutoToc, ()=>Locations.ME3Target != null),
+                }),
+                new MenuBarItem("_Help",new MenuItem[] {
+                    new MenuItem("ALOT Discord", "(Support for ALOT Installer)",()=>Utilities.OpenWebPage(ALOTCommunity.DiscordInviteLink)),
                 })
             });
 
@@ -332,13 +335,13 @@ namespace ALOTInstallerConsole.BuilderUI
             if (warningResponse != 0) return; //abort
 
             // Show options
-            if (dataSource.ShownFiles.Any(x => x.Ready))
+            if (dataSource.ShownFiles.Any(x => x.Ready && !x.Disabled))
             {
                 showOptionsDialog(target);
             }
             else
             {
-                Log.Error("Cannot start install process: No files are ready in library.");
+                Log.Error("Cannot start install process: No files are ready or enabled for install in library.");
                 MessageBox.Query("Cannot install textures",
                     "There are no files ready for installation. Import manifest into the texture library, or add your own user files to install.", "OK");
             }
@@ -652,8 +655,8 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private int UpdateDisplayInstallerFile(InstallerFile ifx, ref int i)
         {
-            if (ifx.Ready)
-            {
+            if (ifx.Ready && (ifx is UserFile || ifx is ManifestFile mf && mf.Recommendation != RecommendationType.Required))
+
                 selectedFileInfoFrameView.Add(new CheckBox("Don't install file")
                 {
                     Width = "Don't install file".Length + 4,
@@ -667,8 +670,6 @@ namespace ALOTInstallerConsole.BuilderUI
                         ManifestFilesListView.SetNeedsDisplay();
                     }
                 });
-            }
-
             return i;
         }
 
