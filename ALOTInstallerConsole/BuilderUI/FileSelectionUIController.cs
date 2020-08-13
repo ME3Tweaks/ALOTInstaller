@@ -65,6 +65,10 @@ namespace ALOTInstallerConsole.BuilderUI
                 new MenuBarItem("Game Status",
                     textureInstallationInfoMenuItems.ToArray()),
                 new MenuBarItem("_Tools",new MenuItem[] {
+                    new MenuItem("Backup & Restore", "(Manage game backups & restores)", () =>
+                    {
+                        Program.SwapToNewView(new BackupRestoreUIController());
+                    }),
                     new MenuItem("Run AutoTOC", "(Update ME3 TOC files)",RunAutoToc, ()=>Locations.ME3Target != null),
                 }),
                 new MenuBarItem("_Help",new MenuItem[] {
@@ -213,6 +217,8 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     Application.RequestStop(); // Close dialog
                 }
+
+                MessageBox.Query("AutoTOC complete", "AutoTOC of Mass Effect 3 complete.", "OK");
             };
             nbw.RunWorkerAsync();
             Application.Run(pd);

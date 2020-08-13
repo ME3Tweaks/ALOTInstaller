@@ -266,6 +266,21 @@ namespace ALOTInstallerCore
         }
 
         /// <summary>
+        /// Given a game and executable path, returns the basepath of the installation.
+        /// </summary>
+        /// <param name="game">What game this exe is for</param>
+        /// <param name="exe">Executable path</param>
+        /// <returns></returns>
+        public static string GetGamePathFromExe(Enums.MEGame game, string exe)
+        {
+            string result = Path.GetDirectoryName(Path.GetDirectoryName(exe)); //binaries, <GAME>
+
+            if (game == Enums.MEGame.ME3)
+                result = Path.GetDirectoryName(result); //up one more because of win32 directory.
+            return result;
+        }
+
+        /// <summary>
         /// Gets the MEM game path. If the MEM game path is not set, the one from the registry is used.
         /// </summary>
         /// <param name="gameID"></param>

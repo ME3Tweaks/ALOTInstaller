@@ -40,26 +40,26 @@ namespace ALOTInstallerCore.ModManager.Services
         }
         #endregion
 
-        private static bool _me1Installed;
-        public static bool ME1Installed
-        {
-            get => _me1Installed;
-            private set => SetProperty(ref _me1Installed, value);
-        }
+        //private static bool _me1Installed;
+        //public static bool ME1Installed
+        //{
+        //    get => _me1Installed;
+        //    private set => SetProperty(ref _me1Installed, value);
+        //}
 
-        private static bool _me2Installed;
-        public static bool ME2Installed
-        {
-            get => _me2Installed;
-            private set => SetProperty(ref _me2Installed, value);
-        }
+        //private static bool _me2Installed;
+        //public static bool ME2Installed
+        //{
+        //    get => _me2Installed;
+        //    private set => SetProperty(ref _me2Installed, value);
+        //}
 
-        private static bool _me3Installed;
-        public static bool ME3Installed
-        {
-            get => _me3Installed;
-            private set => SetProperty(ref _me3Installed, value);
-        }
+        //private static bool _me3Installed;
+        //public static bool ME3Installed
+        //{
+        //    get => _me3Installed;
+        //    private set => SetProperty(ref _me3Installed, value);
+        //}
 
 
         //Todo: Maybe cache this so we aren't doing so many reads. Not sure how often this gets hit since it is used in some commands
@@ -129,7 +129,7 @@ namespace ALOTInstallerCore.ModManager.Services
         }
 #endif
 
-        public static bool AnyGameMissingBackup => (!ME1BackedUp && ME1Installed) || (!ME2BackedUp && ME2Installed) || (!ME3BackedUp && ME3Installed);
+        public static bool AnyGameMissingBackup => (!ME1BackedUp && Locations.ME1Target != null) || (!ME2BackedUp && Locations.ME2Target != null) || (!ME3BackedUp && Locations.ME3Target != null);
 
 
 #if WPF
@@ -448,13 +448,13 @@ namespace ALOTInstallerCore.ModManager.Services
             StaticBackupStateChanged?.Invoke(null, null);
         }
 
-        public static void SetInstallStatuses(ObservableCollectionExtended<GameTarget> installationTargets)
-        {
-            ME1Installed = installationTargets.Any(x => x.Game == Enums.MEGame.ME1);
-            ME2Installed = installationTargets.Any(x => x.Game == Enums.MEGame.ME2);
-            ME3Installed = installationTargets.Any(x => x.Game == Enums.MEGame.ME3);
-            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(AnyGameMissingBackup)));
-            StaticBackupStateChanged?.Invoke(null, null);
-        }
+        //public static void SetInstallStatuses(ObservableCollectionExtended<GameTarget> installationTargets)
+        //{
+        //    ME1Installed = installationTargets.Any(x => x.Game == Enums.MEGame.ME1);
+        //    ME2Installed = installationTargets.Any(x => x.Game == Enums.MEGame.ME2);
+        //    ME3Installed = installationTargets.Any(x => x.Game == Enums.MEGame.ME3);
+        //    StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(AnyGameMissingBackup)));
+        //    StaticBackupStateChanged?.Invoke(null, null);
+        //}
     }
 }
