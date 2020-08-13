@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -132,75 +133,71 @@ namespace ALOTInstallerCore.ModManager.Services
         public static bool AnyGameMissingBackup => (!ME1BackedUp && Locations.ME1Target != null) || (!ME2BackedUp && Locations.ME2Target != null) || (!ME3BackedUp && Locations.ME3Target != null);
 
 
-#if WPF
+
         /// <summary>
         /// Refreshes the status strings of a backup. This method will run on the UI thread.
         /// </summary>
         /// <param name="window">Main window which houses the installation targets list. If htis is null, the game will behave as if it was installed.</param>
         /// <param name="game">Game to refresh. If not specified all strings will be updated</param>
-        public static void RefreshBackupStatus(MainWindow window, Enums.MEGame game = Enums.MEGame.Unknown)
+        public static void RefreshBackupStatus(List<GameTarget> allTargets, bool forceCmmVanilla = true, Enums.MEGame game = Enums.MEGame.Unknown)
         {
-            Application.Current.Dispatcher.Invoke(delegate
+
+            if (game == Enums.MEGame.ME1 || game == Enums.MEGame.Unknown)
             {
+                RefreshBackupStatus(Enums.MEGame.ME1, allTargets.Any(x => x.Game == Enums.MEGame.ME1),
+                    forceCmmVanilla, ME1BackedUp, msg => ME1BackupStatus = msg, msg => ME1BackupStatusTooltip = msg);
+            }
 
-                if (game == Enums.MEGame.ME1 || game == Enums.MEGame.Unknown)
-                {
-                    RefreshBackupStatus(Enums.MEGame.ME1, window == null || window.InstallationTargets.Any(x => x.Game == Enums.MEGame.ME1),
-                        ME1BackedUp, msg => ME1BackupStatus = msg, msg => ME1BackupStatusTooltip = msg);
-                }
-
-                if (game == Enums.MEGame.ME2 || game == Enums.MEGame.Unknown)
-                {
-                    RefreshBackupStatus(Enums.MEGame.ME2, window == null || window.InstallationTargets.Any(x => x.Game == Enums.MEGame.ME2),
-                        ME2BackedUp, msg => ME2BackupStatus = msg, msg => ME2BackupStatusTooltip = msg);
-                }
-                if (game == Enums.MEGame.ME3 || game == Enums.MEGame.Unknown)
-                {
-                    RefreshBackupStatus(Enums.MEGame.ME3, window == null || window.InstallationTargets.Any(x => x.Game == Enums.MEGame.ME3), ME3BackedUp,
-                        msg => ME3BackupStatus = msg, msg => ME3BackupStatusTooltip = msg);
-                }
-            });
+            if (game == Enums.MEGame.ME2 || game == Enums.MEGame.Unknown)
+            {
+                RefreshBackupStatus(Enums.MEGame.ME2, allTargets.Any(x => x.Game == Enums.MEGame.ME2), forceCmmVanilla,
+                    ME2BackedUp, msg => ME2BackupStatus = msg, msg => ME2BackupStatusTooltip = msg);
+            }
+            if (game == Enums.MEGame.ME3 || game == Enums.MEGame.Unknown)
+            {
+                RefreshBackupStatus(Enums.MEGame.ME3, allTargets.Any(x => x.Game == Enums.MEGame.ME3), forceCmmVanilla,
+                    ME3BackedUp, msg => ME3BackupStatus = msg, msg => ME3BackupStatusTooltip = msg);
+            }
         }
 
 
-        private static void RefreshBackupStatus(Enums.MEGame game, bool installed, bool backedUp, Action<string> setStatus, Action<string> setStatusToolTip)
+        private static void RefreshBackupStatus(Enums.MEGame game, bool installed, bool forceCmmVanilla, bool backedUp, Action<string> setStatus, Action<string> setStatusToolTip)
         {
             if (installed)
             {
-                var bPath = GetGameBackupPath(game, forceReturnPath: true);
+                var bPath = GetGameBackupPath(game, forceCmmVanilla, forceReturnPath: true);
                 if (backedUp)
                 {
-                    setStatus(M3L.GetString(M3L.string_backedUp));
-                    setStatusToolTip(M3L.GetString(M3L.string_interp_backupStatusStoredAt, bPath));
+                    setStatus("Backed up");
+                    setStatusToolTip($"Backup stored at {bPath}");
                 }
                 else if (bPath == null)
                 {
 
-                    setStatus(M3L.GetString(M3L.string_notBackedUp));
-                    setStatusToolTip(M3L.GetString(M3L.string_gameHasNotBeenBackedUp));
+                    setStatus("Not backed up");
+                    setStatusToolTip("Game has not been backed up");
                 }
                 else if (!Directory.Exists(bPath))
                 {
-                    setStatus(M3L.GetString(M3L.string_backupUnavailable));
-                    setStatusToolTip(M3L.GetString(M3L.string_interp_backupStatusNotAccessible, bPath));
+                    setStatus("Backup unavailable");
+                    setStatusToolTip($"Backup path not accessible: {bPath}");
                 }
                 else
                 {
-                    var nonVanillaPath = GetGameBackupPath(game, forceCmmVanilla: false);
-                    if (nonVanillaPath != null)
-                    {
-                        setStatus(M3L.GetString(M3L.string_backupNotVanilla));
-                        setStatusToolTip(M3L.GetString(M3L.string_interp_backupStatusNotVanilla, nonVanillaPath));
-                    }
+                    //var nonVanillaPath = GetGameBackupPath(game, forceCmmVanilla: false);
+                    //if (nonVanillaPath != null)
+                    //{
+                    //    setStatus(M3L.GetString(M3L.string_backupNotVanilla));
+                    //    setStatusToolTip(M3L.GetString(M3L.string_interp_backupStatusNotVanilla, nonVanillaPath));
+                    //}
                 }
             }
             else
             {
-                setStatus(M3L.GetString(M3L.string_notInstalled));
-                setStatusToolTip(M3L.GetString(M3L.string_gameNotInstalledHasItBeenRunOnce));
+                setStatus("Game not installed");
+                setStatusToolTip("Game not installed. Run at least once to ensure game is fully setup");
             }
         }
-#endif
 
         private static string _me1BackupStatus;
         public static string ME1BackupStatus
@@ -249,7 +246,7 @@ namespace ALOTInstallerCore.ModManager.Services
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        internal static string GetBackupStatus(Enums.MEGame game)
+        public static string GetBackupStatus(Enums.MEGame game)
         {
             switch (game)
             {
@@ -266,7 +263,7 @@ namespace ALOTInstallerCore.ModManager.Services
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        internal static string GetBackupStatusTooltip(Enums.MEGame game)
+        public static string GetBackupStatusTooltip(Enums.MEGame game)
         {
             switch (game)
             {
@@ -346,14 +343,14 @@ namespace ALOTInstallerCore.ModManager.Services
             switch (game)
             {
                 case Enums.MEGame.ME1:
-                    path = RegistryHandler.GetRegistrySettingString(@"HKCU\Software\ALOTAddon", @"ME1VanillaBackupLocation");
+                    path = RegistryHandler.GetRegistrySettingString(@"HKEY_CURRENT_USER\Software\ALOTAddon", @"ME1VanillaBackupLocation");
                     break;
                 case Enums.MEGame.ME2:
-                    path = RegistryHandler.GetRegistrySettingString(@"HKCU\Software\ALOTAddon", @"ME2VanillaBackupLocation");
+                    path = RegistryHandler.GetRegistrySettingString(@"HKEY_CURRENT_USER\Software\ALOTAddon", @"ME2VanillaBackupLocation");
                     break;
                 case Enums.MEGame.ME3:
                     //Check for backup via registry - Use Mod Manager's game backup key to find backup.
-                    path = RegistryHandler.GetRegistrySettingString(@"HKCU\Software\Mass Effect 3 Mod Manager", @"VanillaCopyLocation");
+                    path = RegistryHandler.GetRegistrySettingString(@"HKEY_CURRENT_USER\Software\Mass Effect 3 Mod Manager", @"VanillaCopyLocation");
                     break;
                 default:
                     return null;
@@ -424,12 +421,6 @@ namespace ALOTInstallerCore.ModManager.Services
             return path;
         }
 
-#if WPF
-            public static void ResetIcon(Enums.MEGame game)
-        {
-            SetIcon(game, FontAwesomeIcon.TimesCircle);
-        }
-#endif
         public static void SetBackedUp(Enums.MEGame game, bool b)
         {
             switch (game)

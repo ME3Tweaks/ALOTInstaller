@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using System;
 
 namespace ALOTInstallerCore.PlatformSpecific.Windows
 {
@@ -38,7 +39,7 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
 
         internal static void WriteRegistrySettingBool(string keyname, bool value)
         {
-            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon",keyname, value.ToString());
+            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value.ToString());
         }
 
         internal static void WriteRegistrySettingString(string keyname, string value)
