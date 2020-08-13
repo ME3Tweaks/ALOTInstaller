@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore.Helpers;
@@ -22,7 +23,6 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void buildUI()
         {
-            RemoveAll();
             int y = 1;
 
             foreach (var e in Enums.AllGames)
@@ -109,6 +109,21 @@ namespace ALOTInstallerConsole.BuilderUI
                 Clicked = Close_Clicked
             };
             Add(close);
+
+#if DEBUG
+            Add(new Button("Reload UI")
+            {
+                X = Pos.Right(this) - 30,
+                Y = Pos.Bottom(this) - 3,
+                Height = 1,
+                Clicked = () =>
+                {
+                    RemoveAll();
+                    buildUI();
+                    Application.Refresh();
+                }
+            });
+#endif
         }
 
         private void CreateBackup(Enums.MEGame game)
@@ -148,14 +163,29 @@ namespace ALOTInstallerConsole.BuilderUI
                     {
                         // ?
                     },
-                    WarningListCallback = (title, message, list) =>
+                    UpdateStatusCallback = (newstatus) => pd.BottomMessage = newstatus,
+                    WarningListCallback = (title, message, bottommessage, list) => ScrollDialog.Prompt(title, message, bottommessage, list, Colors.Error, "Yes", "No") == 0,
+                    SelectGameBackupFolderDestination = () =>
                     {
-                        return ScrollDialog.Prompt(title, message, list) == 0;
+                        string selectedPath = null;
+                        //Application.MainLoop.Invoke(() =>
+                        //{
+                            OpenDialog selector = new OpenDialog("Select backup destination directory",
+                                "Select an empty directory to copy the backup to.")
+                            {
+                                CanChooseDirectories = true,
+                                CanChooseFiles = false,
+                            };
+                            Application.Run(selector);
+                            if (!selector.Canceled && selector.FilePath != null && Directory.Exists(selector.FilePath.ToString()))
+                            {
+                                selectedPath = selector.FilePath.ToString();
+                            }
+                        //});
 
-                        return true;
-                    }
-
-
+                        return selectedPath;
+                    },
+                    BackupSourceTarget = Locations.GetTarget(game)
                 };
                 backupController.BeginBackup();
             };
@@ -165,10 +195,10 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     Application.RequestStop();
                 }
-                MessageBox.Query("Restore completed", $"{game.ToGameName()} has been restored from backup.");
+                MessageBox.Query("Backup completed", $"{game.ToGameName()} has been backed up.", "OK");
                 buildUI(); //Refresh the interface
             };
-
+            nbw.RunWorkerAsync();
             Application.Run(pd);
             //}
         }
@@ -195,7 +225,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     {
                         Application.RequestStop();
                     }
-                    MessageBox.Query("Restore completed", $"{game.ToGameName()} has been restored from backup.");
+                    MessageBox.Query("Restore completed", $"{game.ToGameName()} has been restored from backup.", "OK");
                     buildUI(); //Refresh the interface
                 };
 
@@ -212,7 +242,7 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 // Unlink
                 BackupHandler.UnlinkBackup(meGame);
-                MessageBox.Query("Backup unlinked", $"The backup for {meGame.ToGameName()} has been unlinked.");
+                MessageBox.Query("Backup unlinked", $"The backup for {meGame.ToGameName()} has been unlinked.", "OK");
                 buildUI(); //Refresh the interface
             }
         }

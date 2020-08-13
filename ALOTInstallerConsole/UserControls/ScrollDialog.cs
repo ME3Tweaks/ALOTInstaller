@@ -49,28 +49,45 @@ namespace ALOTInstallerConsole.UserControls
             //});
         }
 
-        public ScrollDialog(string title) : base(title)
+        public ScrollDialog(string title, params Button[] buttons) : base(title, buttons)
         {
 
         }
 
-        public static int Prompt(string title, string message, List<string> listItems, params string[] buttons)
+        public static int Prompt(string title, string topmessage, string bottommessage, List<string> listItems, ColorScheme scheme, params string[] buttons)
         {
-            int SCROLLVIEWER_WIDTH = 50;
+            int SCROLLVIEWER_WIDTH = 90;
             int response = -1;
-            ScrollDialog sd = new ScrollDialog(title)
+
+            int topMessageHeight = TextFormatter.MaxLines(topmessage, SCROLLVIEWER_WIDTH);
+            int bottomMessageHeight = TextFormatter.MaxLines(bottommessage, SCROLLVIEWER_WIDTH);
+
+            int y = 0;
+            //Buttons
+            var buttonList = new List<Button>();
+            foreach (var buttonText in buttons)
+            {
+                buttonList.Add(new Button(buttonText));
+            }
+
+            //Dialog
+
+
+            ScrollDialog sd = new ScrollDialog(title, buttonList.ToArray())
             {
                 Width = SCROLLVIEWER_WIDTH + 2,
-                Height = 20
+                ColorScheme = scheme
             };
-            int y = 0;
-            sd.Add(new Label(message)
+            sd.Add(new Label(topmessage)
             {
                 X = 0,
                 Y = y,
-                Height = 2
+                Width = SCROLLVIEWER_WIDTH,
+                Height = topMessageHeight
             });
 
+            y += topMessageHeight;
+            y++; // spacing for list
             //Build view
             int maxW = listItems.Max(x => x.Length); //widest string width
             int maxH = listItems.Count;
@@ -87,29 +104,49 @@ namespace ALOTInstallerConsole.UserControls
                 {
                     X = 0,
                     Y = i,
-                    Width = Math.Max(maxW, SCROLLVIEWER_WIDTH),
-                    ColorScheme = Colors.Menu
+                    Width = Math.Max(maxW, SCROLLVIEWER_WIDTH)
                 });
             }
 
-            var scrollView = new ScrollView(new Rect(0, 2, SCROLLVIEWER_WIDTH, 12))
+            var scrollView = new ScrollView(new Rect(0, y, SCROLLVIEWER_WIDTH, 12))
             {
-                Y = 1,
                 ContentSize = new Size(maxW, maxH),
+                KeepContentAlwaysInViewport = true,
                 //ContentOffset = new Point (0, 0),
                 //ShowVerticalScrollIndicator = true,
                 //ShowHorizontalScrollIndicator = true,
                 AutoHideScrollBars = true,
-                ColorScheme = Colors.TopLevel,
             };
             scrollView.Add(scrollableContent);
             sd.Add(scrollView);
 
-            //Buttons
-            foreach(var )
+            y += 12; //scrolview height
+            y++; //space one out
+            // Bottom message
+            sd.Add(new Label(bottommessage)
+            {
+                X = 0,
+                Y = y,
+                Width = SCROLLVIEWER_WIDTH,
+                Height = bottomMessageHeight
+            });
+
+            y += bottomMessageHeight;
+
+            // Setup actions
+            for (int n = 0; n < buttonList.Count; n++)
+            {
+                int buttonId = n;
+                buttonList[n].Clicked += () =>
+                {
+                    response = buttonId;
+                    Application.RequestStop();
+                };
+            }
+
+            sd.Height = y + 4;
 
             Application.Run(sd);
-
             return response;
         }
     }

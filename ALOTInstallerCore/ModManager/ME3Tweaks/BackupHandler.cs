@@ -41,12 +41,12 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             /// </summary>
             public Func<string, string, bool> WarningActionCallback { get; set; }
             /// <summary>
-            /// Called when the user must select a game executable (for backup)
+            /// Called when the user must select a game executable (for backup). Return null to indicate teh user aborted the prompt.
             /// </summary>
             public Func<Enums.MEGame, string> SelectGameExecutableCallback { get; set; }
 
             /// <summary>
-            /// Called when the user must select a backup folder destination
+            /// Called when the user must select a backup folder destination. Return null to indicate user aborted the prompt.
             /// </summary>
             public Func<string> SelectGameBackupFolderDestination { get; set; }
             /// <summary>
@@ -54,10 +54,14 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             /// </summary>
             public Action NotifyBackupThreadCompleted { get; set; }
             /// <summary>
-            /// Called when there is a warning that has a potentially long list of items in it. These items should be placed in a scrolling mechanism
+            /// Called when there is a warning that has a potentially long list of items in it, with a title, top and bottom message, as well as a list of strings. These items should be placed in a scrolling mechanism
             /// </summary>
-            public Func<string, string, List<string>, bool> WarningListCallback { get; set; }
+            public Func<string, string, string, List<string>, bool> WarningListCallback { get; set; }
 
+            /// <summary>
+            /// Called when there is a new status message that should be displayed, such as what is being backed up.
+            /// </summary>
+            public Action<string> UpdateStatusCallback { get; set; }
 
             public GameBackup(Enums.MEGame game, IEnumerable<GameTarget> availableBackupSources)
             {
@@ -119,128 +123,120 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                 }
 
-                NamedBackgroundWorker nbw = new NamedBackgroundWorker(Game + @"Backup");
-                nbw.DoWork += (a, b) =>
+
+                Log.Information(@"Starting the backup thread. Checking path: " + targetToBackup.TargetPath);
+                BackupInProgress = true;
+
+                List<string> nonVanillaFiles = new List<string>();
+
+                void nonVanillaFileFoundCallback(string filepath)
                 {
-                    Log.Information(@"Starting the backup thread. Checking path: " + targetToBackup.TargetPath);
-                    BackupInProgress = true;
+                    Log.Error($@"Non-vanilla file found: {filepath}");
+                    nonVanillaFiles.Add(filepath.Substring(targetToBackup.TargetPath.Length + 1)); //Oh goody i'm sure this won't cause issues
+                }
 
-                    List<string> nonVanillaFiles = new List<string>();
+                List<string> inconsistentDLC = new List<string>();
 
-                    void nonVanillaFileFoundCallback(string filepath)
+                void inconsistentDLCFoundCallback(string filepath)
+                {
+                    if (targetToBackup.Supported)
                     {
-                        Log.Error($@"Non-vanilla file found: {filepath}");
-                        nonVanillaFiles.Add(filepath);
+                        Log.Error($@"DLC is in an inconsistent state: {filepath}");
+                        inconsistentDLC.Add(filepath);
                     }
-
-                    List<string> inconsistentDLC = new List<string>();
-
-                    void inconsistentDLCFoundCallback(string filepath)
+                    else
                     {
-                        if (targetToBackup.Supported)
-                        {
-                            Log.Error($@"DLC is in an inconsistent state: {filepath}");
-                            inconsistentDLC.Add(filepath);
-                        }
-                        else
-                        {
-                            Log.Error(@"Detected an inconsistent DLC, likely due to an unofficial copy of the game");
-                        }
+                        Log.Error(@"Detected an inconsistent DLC, likely due to an unofficial copy of the game");
                     }
+                }
 
-                    ProgressVisible = true;
-                    ProgressIndeterminate = true;
-                    BackupStatus = "Validating backup source";
-                    Log.Information(@"Checking target is vanilla");
-                    bool isVanilla = VanillaDatabaseService.ValidateTargetAgainstVanilla(targetToBackup, nonVanillaFileFoundCallback);
+                ProgressVisible = true;
+                ProgressIndeterminate = true;
+                BackupStatus = "Validating backup source";
+                Log.Information(@"Checking target is vanilla");
+                bool isVanilla = VanillaDatabaseService.ValidateTargetAgainstVanilla(targetToBackup, nonVanillaFileFoundCallback);
 
-                    Log.Information(@"Checking DLC consistency");
-                    bool isDLCConsistent = VanillaDatabaseService.ValidateTargetDLCConsistency(targetToBackup, inconsistentDLCCallback: inconsistentDLCFoundCallback);
+                Log.Information(@"Checking DLC consistency");
+                bool isDLCConsistent = VanillaDatabaseService.ValidateTargetDLCConsistency(targetToBackup, inconsistentDLCCallback: inconsistentDLCFoundCallback);
 
-                    Log.Information(@"Checking only vanilla DLC is installed");
-                    List<string> dlcModsInstalled = VanillaDatabaseService.GetInstalledDLCMods(targetToBackup).Select(x =>
+                Log.Information(@"Checking only vanilla DLC is installed");
+                List<string> dlcModsInstalled = VanillaDatabaseService.GetInstalledDLCMods(targetToBackup).Select(x =>
+                {
+                    var tpmi = ThirdPartyServices.GetThirdPartyModInfo(x, targetToBackup.Game);
+                    if (tpmi != null) return $@"{x} ({tpmi.modname})";
+                    return x;
+                }).ToList();
+                List<string> installedDLC = VanillaDatabaseService.GetInstalledOfficialDLC(targetToBackup);
+                List<string> allOfficialDLC = MEDirectories.OfficialDLC(targetToBackup.Game);
+
+                if (installedDLC.Count() < allOfficialDLC.Count())
+                {
+                    var dlcList = string.Join("\n - ", allOfficialDLC.Except(installedDLC).Select(x => $@"{MEDirectories.OfficialDLCNames(targetToBackup.Game)[x]} ({x})")); //do not localize
+                    dlcList = @" - " + dlcList;
+                    Log.Information(@"The following dlc will be missing in the backup if user continues: " + dlcList);
+                    string message =
+                        $"This target does not have have all OFFICIAL DLC installed. Ensure you have installed all OFFICIAL DLC you want to include in your backup, otherwise a game restore will not include all of it.\n\nThe following DLC is not installed:\n{dlcList}\n\nMake a backup of this target?";
+                    var okToBackup = WarningActionCallback?.Invoke("Warning: some official DLC missing", message);
+                    if (!okToBackup.HasValue || !okToBackup.Value)
                     {
-                        var tpmi = ThirdPartyServices.GetThirdPartyModInfo(x, targetToBackup.Game);
-                        if (tpmi != null) return $@"{x} ({tpmi.modname})";
-                        return x;
-                    }).ToList();
-                    List<string> installedDLC = VanillaDatabaseService.GetInstalledOfficialDLC(targetToBackup);
-                    List<string> allOfficialDLC = MEDirectories.OfficialDLC(targetToBackup.Game);
-
-                    if (installedDLC.Count() < allOfficialDLC.Count())
-                    {
-                        var dlcList = string.Join("\n - ", allOfficialDLC.Except(installedDLC).Select(x => $@"{MEDirectories.OfficialDLCNames(targetToBackup.Game)[x]} ({x})")); //do not localize
-                        dlcList = @" - " + dlcList;
-                        Log.Information(@"The following dlc will be missing in the backup if user continues: " + dlcList);
-                        string message =
-                            $"This target does not have have all OFFICIAL DLC installed. Ensure you have installed all OFFICIAL DLC you want to include in your backup, otherwise a game restore will not include all of it.\n\nThe following DLC is not installed:\n{dlcList}\n\nMake a backup of this target?";
-                        var okToBackup = WarningActionCallback?.Invoke("Warning: some official DLC missing", message);
-                        if (!okToBackup.HasValue || !okToBackup.Value)
-                        {
-                            Log.Information("User canceled backup due to some missing data");
-                            return;
-                        }
+                        Log.Information("User canceled backup due to some missing data");
+                        return;
                     }
+                }
 
-                    if (!isDLCConsistent)
+                if (!isDLCConsistent)
+                {
+                    if (targetToBackup.Supported)
                     {
-                        if (targetToBackup.Supported)
-                        {
-                            BlockingActionCallback?.Invoke("Issue detected", "Detected inconsistent DLCs, which is due to having vanilla DLC files with unpacked archives. Delete (do not repair) your game installation and reinstall the game to fix this issue.");
-                            return;
-                        }
-                        else
-                        {
-                            BlockingActionCallback?.Invoke("Issue detected", "Detected inconsistent DLCs, likely due to using an unofficial copy of the game. This game cannot be backed up.");
-                            return;
-                        }
+                        BlockingActionCallback?.Invoke("Issue detected", "Detected inconsistent DLCs, which is due to having vanilla DLC files with unpacked archives. Delete (do not repair) your game installation and reinstall the game to fix this issue.");
+                        return;
                     }
-
-
-                    if (!isVanilla)
+                    else
                     {
-                        //Show UI for non vanilla
-                        string message = "The following files were found to be modified and are not vanilla. You can continue making a backup, however other modding tools such as ME3Tweaks Mod Manager will not accept this as a valid backup source. It is highly recommended that all backups of a game be unmodified, as a broken modified backup is a worthless backup.";
-                        string bottomMessage = "Make a backup anyways (NOT RECOMMENDED)?";
-                        var continueBackup = WarningListCallback?.Invoke(message, bottomMessage, nonVanillaFiles);
-                        if (!continueBackup.HasValue || !continueBackup.Value)
-                        {
-                            Log.Information("User aborted backup due to non-vanilla files found");
-                            return;
-                        }
+                        BlockingActionCallback?.Invoke("Issue detected", "Detected inconsistent DLCs, likely due to using an unofficial copy of the game. This game cannot be backed up.");
+                        return;
                     }
-                    else if (dlcModsInstalled.Any())
+                }
+
+
+                if (!isVanilla)
+                {
+                    //Show UI for non vanilla
+                    string message = "The following files were found to be modified and are not vanilla. You can continue making a backup, however other modding tools such as ME3Tweaks Mod Manager will not accept this as a valid backup source. It is highly recommended that all backups of a game be unmodified, as a broken modified backup is a worthless backup.";
+                    string bottomMessage = "Make a backup anyways (NOT RECOMMENDED)?";
+                    var continueBackup = WarningListCallback?.Invoke("Found non vanilla files", message, bottomMessage, nonVanillaFiles);
+                    if (!continueBackup.HasValue || !continueBackup.Value)
                     {
-                        //Show UI for non vanilla
-                        string message = "The following DLC mods were found to be installed. These mods are not part of the original game. You can continue making a backup, however other modding tools such as ME3Tweaks Mod Manager will not accept this as a valid backup source. It is highly recommended that all backups of a game be unmodified, as a broken modified backup is a worthless backup.";
-                        string bottomMessage = "Make a backup anyways (NOT RECOMMENDED)?";
-                        var continueBackup = WarningListCallback?.Invoke(message, bottomMessage, dlcModsInstalled);
-                        if (!continueBackup.HasValue || !continueBackup.Value)
-                        {
-                            Log.Information("User aborted backup due to found DLC mods");
-                            return;
-                        }
+                        Log.Information("User aborted backup due to non-vanilla files found");
+                        return;
                     }
-
-                    BackupStatus = "Waiting for user input";
-
-                    string backupPath = null;
-                    if (!targetToBackup.IsCustomOption)
+                }
+                else if (dlcModsInstalled.Any())
+                {
+                    //Show UI for non vanilla
+                    string message = "The following DLC mods were found to be installed. These mods are not part of the original game. You can continue making a backup, however other modding tools such as ME3Tweaks Mod Manager will not accept this as a valid backup source. It is highly recommended that all backups of a game be unmodified, as a broken modified backup is a worthless backup.";
+                    string bottomMessage = "Make a backup anyways (NOT RECOMMENDED)?";
+                    var continueBackup = WarningListCallback?.Invoke("Found installed DLC mods", message, bottomMessage, dlcModsInstalled);
+                    if (!continueBackup.HasValue || !continueBackup.Value)
                     {
-                        // Creating a new backup
-                        Log.Information(@"Prompting user to select backup destination");
-                        backupPath = SelectGameBackupFolderDestination?.Invoke();
-                        if (backupPath != null && Directory.Exists(backupPath))
-                        {
-                            Log.Information(@"Backup path chosen: " + backupPath);
-                            bool okToBackup = validateBackupPath(backupPath, targetToBackup);
-                            if (!okToBackup)
-                            {
-                                EndBackup();
-                                return;
-                            }
-                        }
-                        else
+                        Log.Information("User aborted backup due to found DLC mods");
+                        return;
+                    }
+                }
+
+                BackupStatus = "Waiting for user input";
+
+                string backupPath = null;
+                if (!targetToBackup.IsCustomOption)
+                {
+                    // Creating a new backup
+                    Log.Information(@"Prompting user to select backup destination");
+                    backupPath = SelectGameBackupFolderDestination?.Invoke();
+                    if (backupPath != null && Directory.Exists(backupPath))
+                    {
+                        Log.Information(@"Backup path chosen: " + backupPath);
+                        bool okToBackup = validateBackupPath(backupPath, targetToBackup);
+                        if (!okToBackup)
                         {
                             EndBackup();
                             return;
@@ -248,138 +244,139 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                     else
                     {
-                        Log.Information(@"Linking existing backup at " + targetToBackup.TargetPath);
-                        backupPath = targetToBackup.TargetPath;
-                        // Linking existing backup
-                        bool okToBackup = validateBackupPath(targetToBackup.TargetPath, targetToBackup);
-                        if (!okToBackup)
-                        {
-                            EndBackup();
-                            return;
-                        }
+                        EndBackup();
+                        return;
+                    }
+                }
+                else
+                {
+                    Log.Information(@"Linking existing backup at " + targetToBackup.TargetPath);
+                    backupPath = targetToBackup.TargetPath;
+                    // Linking existing backup
+                    bool okToBackup = validateBackupPath(targetToBackup.TargetPath, targetToBackup);
+                    if (!okToBackup)
+                    {
+                        EndBackup();
+                        return;
+                    }
+                }
+
+
+                if (!targetToBackup.IsCustomOption)
+                {
+                    #region callbacks and copy code
+
+                    // Copy to new backup
+                    void fileCopiedCallback()
+                    {
+                        ProgressValue++;
+                        BackupProgressCallback?.Invoke(ProgressValue, ProgressMax);
                     }
 
+                    string dlcFolderpath = MEDirectories.DLCPath(targetToBackup) + '\\';
+                    int dlcSubStringLen = dlcFolderpath.Length;
 
-                    if (!targetToBackup.IsCustomOption)
+                    bool aboutToCopyCallback(string file)
                     {
-                        #region callbacks and copy code
-
-                        // Copy to new backup
-                        void fileCopiedCallback()
+                        try
                         {
-                            ProgressValue++;
-                            BackupProgressCallback?.Invoke(ProgressValue, ProgressMax);
-                        }
-
-                        string dlcFolderpath = MEDirectories.DLCPath(targetToBackup) + '\\';
-                        int dlcSubStringLen = dlcFolderpath.Length;
-
-                        bool aboutToCopyCallback(string file)
-                        {
-                            try
+                            if (file.Contains(@"\cmmbackup\")) return false; //do not copy cmmbackup files
+                            if (file.StartsWith(dlcFolderpath))
                             {
-                                if (file.Contains(@"\cmmbackup\")) return false; //do not copy cmmbackup files
-                                if (file.StartsWith(dlcFolderpath))
+                                //It's a DLC!
+                                string dlcname = file.Substring(dlcSubStringLen);
+                                var dlcFolderNameEndPos = dlcname.IndexOf('\\');
+                                if (dlcFolderNameEndPos > 0)
                                 {
-                                    //It's a DLC!
-                                    string dlcname = file.Substring(dlcSubStringLen);
-                                    var dlcFolderNameEndPos = dlcname.IndexOf('\\');
-                                    if (dlcFolderNameEndPos > 0)
+                                    dlcname = dlcname.Substring(0, dlcFolderNameEndPos);
+                                    if (MEDirectories.OfficialDLCNames(targetToBackup.Game)
+                                        .TryGetValue(dlcname, out var hrName))
                                     {
-                                        dlcname = dlcname.Substring(0, dlcFolderNameEndPos);
-                                        if (MEDirectories.OfficialDLCNames(targetToBackup.Game)
-                                            .TryGetValue(dlcname, out var hrName))
-                                        {
-                                            BackupStatusLine2 = $"Backing up {hrName}";
-                                        }
-                                        else
-                                        {
-                                            BackupStatusLine2 = $"Backing up {dlcname}";
-                                        }
+                                        UpdateStatusCallback?.Invoke($"Backing up {hrName}");
                                     }
                                     else
                                     {
-                                        // Loose files in the DLC folder
-                                        BackupStatusLine2 = $"Backing up basegame";
+                                        UpdateStatusCallback?.Invoke($"Backing up {dlcname}");
                                     }
                                 }
                                 else
                                 {
-                                    //It's basegame
-                                    if (file.EndsWith(@".bik"))
-                                    {
-                                        BackupStatusLine2 = $"Backing up movies";
-                                    }
-                                    else if (new FileInfo(file).Length > 52428800)
-                                    {
-
-                                        BackupStatusLine2 = $"Backing up {Path.GetFileName(file)}";
-                                    }
-                                    else
-                                    {
-                                        BackupStatusLine2 = $"Backing up basegame";
-                                    }
+                                    // Loose files in the DLC folder
+                                    UpdateStatusCallback?.Invoke($"Backing up basegame");
                                 }
                             }
-                            catch (Exception e)
+                            else
                             {
-                                Log.Error($"Error about to copy file: {e.Message}");
-                                Analytics.TrackError(e);
+                                //It's basegame
+                                if (file.EndsWith(@".bik"))
+                                {
+                                    UpdateStatusCallback?.Invoke("Backing up movies");
+                                }
+                                else if (new FileInfo(file).Length > 52428800)
+                                {
+
+                                    UpdateStatusCallback?.Invoke($"Backing up {Path.GetFileName(file)}");
+                                }
+                                else
+                                {
+                                    UpdateStatusCallback?.Invoke("Backing up basegame");
+                                }
                             }
-
-
-                            return true;
                         }
-
-                        void totalFilesToCopyCallback(int total)
+                        catch (Exception e)
                         {
-                            ProgressValue = 0;
-                            ProgressIndeterminate = false;
-                            ProgressMax = total;
+                            Log.Error($"Error about to copy file: {e.Message}");
+                            Analytics.TrackError(e);
                         }
 
-                        BackupStatus = "Creating backup";
-                        Log.Information($@"Backing up {targetToBackup.TargetPath} to {backupPath}");
-                        CopyTools.CopyAll_ProgressBar(new DirectoryInfo(targetToBackup.TargetPath),
-                            new DirectoryInfo(backupPath),
-                            totalItemsToCopyCallback: totalFilesToCopyCallback,
-                            aboutToCopyCallback: aboutToCopyCallback,
-                            fileCopiedCallback: fileCopiedCallback,
-                            ignoredExtensions: new[] { @"*.pdf", @"*.mp3", @"*.wav" });
-                        #endregion
+
+                        return true;
                     }
 
-                    // Write key
-                    WriteBackupLocation(Game, backupPath);
+                    void totalFilesToCopyCallback(int total)
+                    {
+                        ProgressValue = 0;
+                        ProgressIndeterminate = false;
+                        ProgressMax = total;
+                    }
 
+                    BackupStatus = "Creating backup";
+                    Log.Information($@"Backing up {targetToBackup.TargetPath} to {backupPath}");
+                    CopyTools.CopyAll_ProgressBar(new DirectoryInfo(targetToBackup.TargetPath),
+                        new DirectoryInfo(backupPath),
+                        totalItemsToCopyCallback: totalFilesToCopyCallback,
+                        aboutToCopyCallback: aboutToCopyCallback,
+                        fileCopiedCallback: fileCopiedCallback,
+                        ignoredExtensions: new[] { @"*.pdf", @"*.mp3", @"*.wav" });
+                    #endregion
+                }
+
+                // Write key
+                WriteBackupLocation(Game, backupPath);
+                if (isVanilla && !dlcModsInstalled.Any())
+                {
                     var cmmvanilla = Path.Combine(backupPath, @"cmm_vanilla");
                     if (!File.Exists(cmmvanilla))
                     {
                         Log.Information($@"Writing cmm_vanilla to " + cmmvanilla);
                         File.Create(cmmvanilla).Close();
                     }
+                }
+                else
+                {
+                    Log.Information("Not writing vanilla marker as this is not a vanilla backup");
+                }
 
-                    Log.Information($@"Backup completed.");
+                Log.Information($@"Backup completed.");
 
-                    Analytics.TrackEvent?.Invoke(@"Created a backup", new Dictionary<string, string>()
+                Analytics.TrackEvent?.Invoke(@"Created a backup", new Dictionary<string, string>()
                         {
                                 {@"game", Game.ToString()},
                                 {@"Result", @"Success"},
                                 {@"Type", targetToBackup.IsCustomOption ? @"Linked" : @"Copy"}
                         });
 
-                    EndBackup();
-                };
-                nbw.RunWorkerCompleted += (a, b) =>
-                        {
-                            if (b.Error != null)
-                            {
-                                Log.Error($@"Exception occured in {nbw.Name} thread: {b.Error.Message}");
-                            }
-
-                            NotifyBackupThreadCompleted?.Invoke();
-                        };
-                nbw.RunWorkerAsync();
+                EndBackup();
             }
 
             private bool validateBackupPath(string backupPath, GameTarget targetToBackup)
@@ -458,7 +455,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 BackupLocation = BackupService.GetGameBackupPath(Game);
                 //BackupService.RefreshBackupStatus(window, Game);
                 BackupStatus = BackupService.GetBackupStatus(Game);
-                BackupStatusLine2 = BackupLocation ?? BackupService.GetBackupStatusTooltip(Game);
+                UpdateStatusCallback?.Invoke(BackupLocation ?? BackupService.GetBackupStatusTooltip(Game));
             }
 
             public event PropertyChangedEventHandler PropertyChanged;
@@ -475,13 +472,13 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         }
 
         //#if WINDOWS
-        private const string REGISTRY_KEY_ME3CMM = @"HKEY_CURRENT_USER\Software\Mass Effect 3 Mod Manager";
+        private const string REGISTRY_KEY_ME3CMM = @"Software\Mass Effect 3 Mod Manager";
 
         /// <summary>
         /// ALOT Addon Registry Key, used for ME1 and ME2 backups
         /// </summary>
-        private const string BACKUP_REGISTRY_KEY = @"HKEY_CURRENT_USER\Software\ALOTAddon"; //Shared. Do not change
-                                                                                            //#endif
+        private const string BACKUP_REGISTRY_KEY = @"Software\ALOTAddon"; //Shared. Do not change
+                                                                          //#endif
 
         private static void WriteBackupLocation(Enums.MEGame game, string backupPath)
         {
