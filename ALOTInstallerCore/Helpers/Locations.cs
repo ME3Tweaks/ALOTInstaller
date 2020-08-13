@@ -230,5 +230,20 @@ namespace ALOTInstallerCore.Helpers
             if (ME3Target != null) gameTargets.Add(ME3Target);
             return gameTargets;
         }
+
+        public static GameTarget GetTarget(Enums.MEGame meGame)
+        {
+            switch (meGame)
+            {
+                case Enums.MEGame.ME1:
+                    return ME1Target;
+                case Enums.MEGame.ME2:
+                    return ME2Target;
+                case Enums.MEGame.ME3:
+                    return ME3Target;
+                default:
+                    return null;
+            }
+        }
     }
 }

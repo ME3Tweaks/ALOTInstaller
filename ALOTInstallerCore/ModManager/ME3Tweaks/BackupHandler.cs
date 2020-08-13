@@ -31,7 +31,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             /// <summary>
             /// Reports the current progress of the backup
             /// </summary>
-            public Action<double> BackupProgressCallback { get; set; }
+            public Action<long, long> BackupProgressCallback { get; set; }
             /// <summary>
             /// Called when there is a blocking action, such as game running
             /// </summary>
@@ -67,7 +67,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 ResetBackupStatus();
             }
 
-            private void BeginBackup()
+            public void BeginBackup()
             {
                 var targetToBackup = BackupSourceTarget;
                 if (!targetToBackup.IsCustomOption)
@@ -120,13 +120,6 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 }
 
                 NamedBackgroundWorker nbw = new NamedBackgroundWorker(Game + @"Backup");
-                nbw.WorkerReportsProgress = true;
-                nbw.ProgressChanged += (a, b) =>
-                {
-                    if (b.UserState is double d)
-                        BackupProgressCallback?.Invoke(d);
-                };
-
                 nbw.DoWork += (a, b) =>
                 {
                     Log.Information(@"Starting the backup thread. Checking path: " + targetToBackup.TargetPath);
@@ -275,10 +268,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         void fileCopiedCallback()
                         {
                             ProgressValue++;
-                            if (ProgressMax > 0)
-                            {
-                                nbw.ReportProgress(0, ProgressValue * 1.0 / ProgressMax);
-                            }
+                            BackupProgressCallback?.Invoke(ProgressValue, ProgressMax);
                         }
 
                         string dlcFolderpath = MEDirectories.DLCPath(targetToBackup) + '\\';
@@ -508,6 +498,27 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             }//#else
 
             //#endif
+        }
+
+        public static void UnlinkBackup(Enums.MEGame meGame)
+        {
+#if !WINDOWS
+            switch (meGame)
+            {
+                case Enums.MEGame.ME1:
+                case Enums.MEGame.ME2:
+                    RegistryHandler.DeleteRegistryKey(Registry.CurrentUser, BACKUP_REGISTRY_KEY,
+                        meGame + @"VanillaBackupLocation");
+                    break;
+                case Enums.MEGame.ME3:
+                    RegistryHandler.DeleteRegistryKey(Registry.CurrentUser, REGISTRY_KEY_ME3CMM,
+                        @"VanillaCopyLocation");
+                    break;
+            }
+#elif LINUX
+
+#endif
+
         }
     }
 }

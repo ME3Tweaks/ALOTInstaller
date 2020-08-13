@@ -447,5 +447,24 @@ namespace ALOTInstallerCore.ModManager.Services
         //    StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(AnyGameMissingBackup)));
         //    StaticBackupStateChanged?.Invoke(null, null);
         //}
+        public static bool HasGameEverBeenBackedUp(Enums.MEGame game)
+        {
+            switch (game)
+            {
+                case Enums.MEGame.ME1:
+                    return RegistryHandler.GetRegistrySettingString(@"HKEY_CURRENT_USER\Software\ALOTAddon",
+                        @"ME1VanillaBackupLocation") != null;
+                case Enums.MEGame.ME2:
+                    return RegistryHandler.GetRegistrySettingString(@"HKEY_CURRENT_USER\Software\ALOTAddon",
+                        @"ME2VanillaBackupLocation") != null;
+                    break;
+                case Enums.MEGame.ME3:
+                    //Check for backup via registry - Use Mod Manager's game backup key to find backup.
+                    return RegistryHandler.GetRegistrySettingString(
+                        @"HKEY_CURRENT_USER\Software\Mass Effect 3 Mod Manager", @"VanillaCopyLocation") != null;
+                default:
+                    return false;
+            }
+        }
     }
 }

@@ -92,5 +92,16 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
             }
             return null;
         }
+
+        public static void DeleteRegistryKey(RegistryKey currentUser, string subkey, string valuename)
+        {
+            using (RegistryKey key = currentUser.OpenSubKey(subkey, true))
+            {
+                if (key != null)
+                {
+                    key.DeleteValue(valuename, false);
+                }
+            }
+        }
     }
 }

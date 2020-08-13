@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
@@ -18,7 +20,26 @@ namespace ALOTInstallerConsole.BuilderUI
         #endregion
         public override void BeginFlow()
         {
+            var listItems = new List<string>(50);
+            Random random = new Random();
 
+            for (int i = 0; i < 50; i++)
+            {
+                StringBuilder str_build = new StringBuilder();
+
+                char letter;
+                var length = random.Next(30) + 1;
+                for (int j = 0; j < length; j++)
+                {
+                    double flt = random.NextDouble();
+                    int shift = Convert.ToInt32(Math.Floor(25 * flt));
+                    letter = Convert.ToChar(shift + 65);
+                    str_build.Append(letter);
+                    //j++;
+                }
+                listItems.Add(str_build.ToString());
+            }
+            ScrollDialog.Prompt("Test", "I am the message", listItems, "OK");
             //View scrollableContent = new View()
             //{
             //    Width = 40,
