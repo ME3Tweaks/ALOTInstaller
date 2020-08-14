@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
@@ -122,21 +123,6 @@ namespace ALOTInstallerConsole.BuilderUI
                 Clicked = Close_Clicked
             };
             Add(close);
-
-#if DEBUG
-            Add(new Button("Reload UI")
-            {
-                X = Pos.Right(this) - 30,
-                Y = Pos.Bottom(this) - 3,
-                Height = 1,
-                Clicked = () =>
-                {
-                    RemoveAll();
-                    buildUI();
-                    //Application.Refresh();
-                }
-            });
-#endif
         }
 
         //private void LinkBackup(Enums.MEGame game)
@@ -190,7 +176,7 @@ namespace ALOTInstallerConsole.BuilderUI
         //            },
         //            BackupSourceTarget = Locations.GetTarget(game)
         //        };
-        //        backupController.BeginBackup();
+        //        backupController.PerformBackup();
         //    };
         //    nbw.RunWorkerCompleted += (a, b) =>
         //    {
@@ -227,34 +213,57 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     SelectGameExecutableCallback = (_game) =>
                     {
-                        OpenDialog selector = new OpenDialog($"Select {_game.ToGameName().Replace(" ", "")}.exe", $"Select the executable for your backup of {_game.ToGameName()}.")
+                        object o = new object();
+
+                        GameTarget gt = null;
+                        Application.MainLoop.Invoke(() =>
                         {
-                            CanChooseDirectories = false,
-                            AllowedFileTypes = new[] { ".exe" },
-                        };
-                        Application.Run(selector);
-                        if (!selector.Canceled && selector.FilePath != null && File.Exists(selector.FilePath.ToString()))
-                        {
-                            var path = Utilities.GetGamePathFromExe(_game, selector.FilePath.ToString());
-                            string invalidReason = null;
-                            if (path != null)
+                            OpenDialog selector = new OpenDialog($"Select {_game.ToGameName().Replace(" ", "")}.exe",
+                                $"Select the executable for your backup of {_game.ToGameName()}.")
                             {
-                                var target = new GameTarget(_game, path, false, true);
-                                invalidReason = target.ValidateTarget(true);
-                                if (invalidReason == null)
+                                CanChooseDirectories = false,
+                                CanChooseFiles = true,
+                                AllowedFileTypes = new[] { $"{_game.ToGameName().Replace(" ", "")}.exe" },
+                            };
+                            Application.Run(selector);
+                            if (!selector.Canceled && selector.FilePath != null &&
+                                File.Exists(selector.FilePath.ToString()))
+                            {
+                                var path = Utilities.GetGamePathFromExe(_game, selector.FilePath.ToString());
+                                string invalidReason = null;
+                                if (path != null)
                                 {
-                                    return target;
+                                    var target = new GameTarget(_game, path, false, true);
+                                    invalidReason = target.ValidateTarget(true);
+                                    if (invalidReason == null)
+                                    {
+                                        gt = target;
+                                        lock (o)
+                                        {
+                                            Monitor.Pulse(o);
+                                        }
+                                        return;
+                                    }
                                 }
+                                else
+                                {
+                                    invalidReason =
+                                        "Game executable cannot possibly be located this close to root of volume";
+                                }
+
+                                MessageBox.ErrorQuery("Invalid target selected", invalidReason, "OK");
+
                             }
-                            else
+                            lock (o)
                             {
-                                invalidReason = "Game executable cannot possibly be located this close to root of volume";
+                                Monitor.Pulse(o);
                             }
-
-                            MessageBox.ErrorQuery("Invalid target selected", invalidReason, "OK");
+                        });
+                        lock (o)
+                        {
+                            Monitor.Wait(o);
                         }
-
-                        return null;
+                        return gt;
                     },
                     BlockingActionCallback = (title, message) =>
                     {
@@ -275,26 +284,27 @@ namespace ALOTInstallerConsole.BuilderUI
                     SelectGameBackupFolderDestination = () =>
                     {
                         string selectedPath = null;
-                        //Application.MainLoop.Invoke(() =>
-                        //{
-                        OpenDialog selector = new OpenDialog("Select backup destination directory",
-                            "Select an empty directory to copy the backup to.")
+                        Application.MainLoop.Invoke(() =>
                         {
-                            CanChooseDirectories = true,
-                            CanChooseFiles = false,
-                        };
-                        Application.Run(selector);
-                        if (!selector.Canceled && selector.FilePath != null && Directory.Exists(selector.FilePath.ToString()))
-                        {
-                            selectedPath = selector.FilePath.ToString();
-                        }
-                        //});
+                            OpenDialog selector = new OpenDialog("Select backup destination directory",
+                                "Select an empty directory to copy the backup to.")
+                            {
+                                CanChooseDirectories = true,
+                                CanChooseFiles = false,
+                            };
+                            Application.Run(selector);
+                            if (!selector.Canceled && selector.FilePath != null &&
+                                Directory.Exists(selector.FilePath.ToString()))
+                            {
+                                selectedPath = selector.FilePath.ToString();
+                            }
+                        });
 
                         return selectedPath;
                     },
                     BackupSourceTarget = linkMode ? new GameTarget(game, "Link to existing backup", false, true) : Locations.GetTarget(game)
                 };
-                backupController.BeginBackup();
+                b.Result = backupController.PerformBackup();
             };
             nbw.RunWorkerCompleted += (a, b) =>
             {
@@ -302,8 +312,16 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     Application.RequestStop();
                 }
-                MessageBox.Query("Backup completed", $"{game.ToGameName()} has been backed up.", "OK");
-                buildUI(); //Refresh the interface
+
+                if (b.Error == null)
+                {
+                    if (b.Result is bool x && x)
+                    {
+                        MessageBox.Query("Backup completed", $"{game.ToGameName()} has been backed up.", "OK");
+                        Program.SwapToNewView(
+                            new BackupRestoreUIController()); //just reload whole interface. This works around oddness in gui.cs RemoveAll();
+                    }
+                }
             };
             nbw.RunWorkerAsync();
             Application.Run(pd);
@@ -333,7 +351,7 @@ namespace ALOTInstallerConsole.BuilderUI
                         Application.RequestStop();
                     }
                     MessageBox.Query("Restore completed", $"{game.ToGameName()} has been restored from backup.", "OK");
-                    buildUI(); //Refresh the interface
+                    Program.SwapToNewView(new BackupRestoreUIController());
                 };
 
                 Application.Run(pd);
@@ -350,7 +368,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 // Unlink
                 BackupHandler.UnlinkBackup(meGame);
                 MessageBox.Query("Backup unlinked", $"The backup for {meGame.ToGameName()} has been unlinked.", "OK");
-                buildUI(); //Refresh the interface
+                Program.SwapToNewView(new BackupRestoreUIController());
             }
         }
 

@@ -20,7 +20,7 @@ namespace ALOTInstallerCore.Helpers
         /// <returns></returns>
         public static short GetMemVersion()
         {
-           short version = 0;
+            short version = 0;
             // If the current version doesn't support the --version --ipc, we just assume it is 0.
             MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
             {
@@ -30,6 +30,22 @@ namespace ALOTInstallerCore.Helpers
                 }
             });
             return version;
+        }
+
+        /// <summary>
+        /// Verifies a game against the MEM MD5 database
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="applicationStarted"></param>
+        /// <param name="ipcCallback"></param>
+        /// <param name="applicationStdErr"></param>
+        /// <param name="applicationExited"></param>
+        /// <param name="cancellationToken"></param>
+        public static void VerifyVanilla(Enums.MEGame game, Action<int> applicationStarted = null,
+            Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null,
+            Action<int> applicationExited = null, CancellationToken cancellationToken = default)
+        {
+            RunMEMIPCUntilExit($"--check-game-data-vanilla --gameid {game.ToGameNum()} --ipc", applicationStarted, ipcCallback, applicationStdErr, applicationExited, cancellationToken);
         }
 
         public static void RunMEMIPCUntilExit(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
@@ -68,7 +84,7 @@ namespace ALOTInstallerCore.Helpers
         private static readonly UTF8Encoding unicode = new UTF8Encoding();
 
 
-        public static async void RunMEMIPC(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
+        private static async void RunMEMIPC(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
         {
             bool exceptionOcurred = false;
             void internalHandleIPC(string command, string parm)
@@ -148,50 +164,6 @@ namespace ALOTInstallerCore.Helpers
             string param = str.Substring(endOfCommand + 5).Trim();
             return (command, param);
         }
-
-        //public static void RunMassEffectModderNoGuiIPC(string operationName, string exe, string args, object lockObject, Action<string, string> exceptionOccuredCallback, Action<int?> setExitCodeCallback = null, Action<string, string> ipcCallback = null)
-        //{
-        //    Log.Information($@"Running Mass Effect Modder No GUI w/ IPC: {exe} {args}");
-        //    var memProcess = new ConsoleApp(exe, args);
-        //    bool hasExceptionOccured = false;
-        //    memProcess.ConsoleOutput += (o, args2) =>
-        //    {
-        //        string str = args2.Line;
-        //        if (hasExceptionOccured)
-        //        {
-        //            Log.Fatal(@"MassEffectModderNoGui.exe: " + str);
-        //        }
-        //        if (str.StartsWith(@"[IPC]", StringComparison.Ordinal))
-        //        {
-        //            string command = str.Substring(5);
-        //            int endOfCommand = command.IndexOf(' ');
-        //            if (endOfCommand >= 0)
-        //            {
-        //                command = command.Substring(0, endOfCommand);
-        //            }
-
-        //            string param = str.Substring(endOfCommand + 5).Trim();
-        //            if (command == @"EXCEPTION_OCCURRED")
-        //            {
-        //                hasExceptionOccured = true;
-        //                exceptionOccuredCallback?.Invoke(operationName, param);
-        //                return; //don't process this command further, nothing handles it.
-        //            }
-
-        //            ipcCallback?.Invoke(command, param);
-        //        }
-        //        //Debug.WriteLine(args2.Line);
-        //    };
-        //    memProcess.Exited += (a, b) =>
-        //    {
-        //        setExitCodeCallback?.Invoke(memProcess.ExitCode);
-        //        lock (lockObject)
-        //        {
-        //            Monitor.Pulse(lockObject);
-        //        }
-        //    };
-        //    memProcess.Run();
-        //}
 
         /// <summary>
         /// Sets the path MEM will use for the specified game

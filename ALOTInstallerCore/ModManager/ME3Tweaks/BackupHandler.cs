@@ -75,28 +75,28 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 ResetBackupStatus();
             }
 
-            public void BeginBackup()
+            public bool PerformBackup()
             {
                 var targetToBackup = BackupSourceTarget;
                 if (!targetToBackup.IsCustomOption)
                 {
-                    Log.Information($"BeginBackup() on {BackupSourceTarget.TargetPath}");
+                    Log.Information($"PerformBackup() on {BackupSourceTarget.TargetPath}");
                     // Backup target
                     if (Utilities.IsGameRunning(targetToBackup.Game))
                     {
                         BlockingActionCallback?.Invoke("Cannot backup game", $"Cannot backup while {BackupSourceTarget.Game.ToGameName()} is running.");
-                        return;
+                        return false;
                     }
                 }
                 else
                 {
                     // Point to existing game installation
-                    Log.Information(@"BeginBackup() with IsCustomOption.");
+                    Log.Information(@"PerformBackup() with IsCustomOption.");
                     var linkOK = WarningActionCallback?.Invoke("Ensure correct game chosen", "The path you specify will be checked if it is a vanilla backup. Once this check is complete it will be marked as a backup and modding tools will refuse to modify it. Ensure this is not your active game path or you will be unable to mod the game.");
                     if (!linkOK.HasValue || !linkOK.Value)
                     {
                         Log.Information(@"User aborted linking due to dialog");
-                        return;
+                        return false;
                     }
 
                     Log.Information(@"Prompting user to select executable of link target");
@@ -106,7 +106,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (targetToBackup == null)
                     {
                         Log.Warning("User did not choose game executable to link as backup. Aborting");
-                        return;
+                        return false;
                     }
 
                     if (AvailableTargetsToBackup.Any(x => x.TargetPath.Equals(targetToBackup.TargetPath, StringComparison.InvariantCultureIgnoreCase)))
@@ -114,7 +114,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         // Can't point to an existing modding target
                         Log.Error(@"This target is not valid to point to as a backup: It is listed a modding target already, it must be removed as a target first");
                         BlockingActionCallback?.Invoke("Cannot backup game", "Cannot use this target as backup: It is the current game path for this game.");
-                        return;
+                        return false;
                     }
 
                     var validationFailureReason = targetToBackup.ValidateTarget(ignoreCmmVanilla: true);
@@ -122,7 +122,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     {
                         Log.Error(@"This installation is not valid to point to as a backup: " + validationFailureReason);
                         BlockingActionCallback?.Invoke("Cannot backup game", $"Cannot use this target as backup: {validationFailureReason}");
-                        return;
+                        return false;
                     }
                 }
 
@@ -182,7 +182,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (!okToBackup.HasValue || !okToBackup.Value)
                     {
                         Log.Information("User canceled backup due to some missing data");
-                        return;
+                        return false;
                     }
                 }
 
@@ -191,12 +191,12 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (targetToBackup.Supported)
                     {
                         BlockingActionCallback?.Invoke("Issue detected", "Detected inconsistent DLCs, which is due to having vanilla DLC files with unpacked archives. Delete (do not repair) your game installation and reinstall the game to fix this issue.");
-                        return;
+                        return false;
                     }
                     else
                     {
                         BlockingActionCallback?.Invoke("Issue detected", "Detected inconsistent DLCs, likely due to using an unofficial copy of the game. This game cannot be backed up.");
-                        return;
+                        return false;
                     }
                 }
 
@@ -210,7 +210,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (!continueBackup.HasValue || !continueBackup.Value)
                     {
                         Log.Information("User aborted backup due to non-vanilla files found");
-                        return;
+                        return false;
                     }
                 }
                 else if (dlcModsInstalled.Any())
@@ -222,7 +222,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (!continueBackup.HasValue || !continueBackup.Value)
                     {
                         Log.Information("User aborted backup due to found DLC mods");
-                        return;
+                        return false;
                     }
                 }
 
@@ -241,13 +241,13 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         if (!okToBackup)
                         {
                             EndBackup();
-                            return;
+                            return false;
                         }
                     }
                     else
                     {
                         EndBackup();
-                        return;
+                        return false;
                     }
                 }
                 else
@@ -259,7 +259,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (!okToBackup)
                     {
                         EndBackup();
-                        return;
+                        return false;
                     }
                 }
 
@@ -379,6 +379,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         });
 
                 EndBackup();
+                return true;
             }
 
             private bool validateBackupPath(string backupPath, GameTarget targetToBackup)
