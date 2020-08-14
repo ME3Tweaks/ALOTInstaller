@@ -212,7 +212,7 @@ namespace ALOTInstallerCore.Helpers
             MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
             //Language = LoadSettingString(settingsIni, "ModManager", "Language", "int");
             //LastContentCheck = LoadSettingDateTime(settingsIni, "ModManager", "LastContentCheck", DateTime.MinValue);
-            //BetaMode = LoadSettingBool(settingsIni, "ModManager", "BetaMode", false);
+            BetaMode = LoadSettingBool(SettingsKeys.SettingKeys.BetaMode, false);
             //AutoUpdateLODs = LoadSettingBool(settingsIni, "ModManager", "AutoUpdateLODs", true);
             //WebClientTimeout = LoadSettingInt(settingsIni, "ModManager", "WebclientTimeout", 5);
             //ModMakerControllerModOption = LoadSettingBool(settingsIni, "ModMaker", "AutoAddControllerMixins", false);

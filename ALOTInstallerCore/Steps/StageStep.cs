@@ -36,19 +36,30 @@ namespace ALOTInstallerCore.Builder
         /// Callback that is invoked with a message about why staging failed
         /// </summary>
         public Action<string> ErrorStagingCallback { get; set; }
+
         /// <summary>
         /// Callback to update the 'overall' status text of this step
         /// </summary>
         public Action<string> UpdateStatusCallback { get; set; }
+
         /// <summary>
         /// Callback to update the 'overall' progress of this step
         /// </summary>
         public Action<int, int> UpdateProgressCallback { get; set; }
+
         /// <summary>
         /// Callback to allow the UI to prompt the user to choose what mutual exclusive mod to install.
         /// This callback allows you to return null, which means abort staging.
         /// </summary>
         public Func<List<InstallerFile>, InstallerFile> ResolveMutualExclusiveMods { get; set; }
+
+        /// <summary>
+        /// Callback to allow the UI to prompt the user to choose what options to use for a manifest file
+        /// that uses ZipFiles, CopyFiles and ChoiceFiles. The caller should set the selected value
+        /// on the objects, as they will be reset to their defaults before being passed to the UI.
+        /// Return false to abort staging.
+        /// </summary>
+        public Func<ManifestFile, List<ConfigurableModInterface>, bool> ConfigureModOptions { get; set; }
 
         /// <summary>
         /// Extracts an archive file (7z/zip/rar). Returns if a file was extracted or not.
@@ -121,7 +132,10 @@ namespace ALOTInstallerCore.Builder
             }
             installOptions.FilesToInstall = getFilesToStage(installOptions.FilesToInstall.Where(x => x.Ready && (x.ApplicableGames & installOptions.InstallTarget.Game.ToApplicableGame()) != 0));
             installOptions.FilesToInstall = resolveMutualExclusiveGroups();
-
+            if (!promptModConfiguration())
+            {
+                return; //abort.
+            }
             //DEBUG ONLY
             //installOptions.FilesToInstall =
             //    installOptions.FilesToInstall.Where(x => x.FriendlyName.Contains("HR Maya")).ToList();
@@ -387,6 +401,36 @@ namespace ALOTInstallerCore.Builder
                 // Addon needs built
                 BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{AddonID:D3}_ALOTAddon.mem"), installOptions.InstallTarget.Game);
             }
+        }
+
+        private bool promptModConfiguration()
+        {
+            foreach (var m in installOptions.FilesToInstall.Where(x => x is ManifestFile mf && (mf.CopyFiles.Any() || mf.ChoiceFiles.Any() || mf.ZipFiles.Any())))
+            {
+                var mf = m as ManifestFile;
+                mf.PackageFiles.RemoveAll(x => x.Transient);
+                var configurableOptions = new List<ConfigurableModInterface>();
+                configurableOptions.AddRange(mf.ChoiceFiles);
+                configurableOptions.AddRange(mf.CopyFiles);
+                configurableOptions.AddRange(mf.ZipFiles);
+                foreach (var v in configurableOptions)
+                {
+                    v.SelectedIndex = 0; //Reset to default option.
+                }
+
+                var result = ConfigureModOptions?.Invoke(mf, configurableOptions);
+                if (!result.HasValue || !result.Value)
+                {
+                    return false;
+                }
+
+                foreach (var v in configurableOptions.OfType<ChoiceFile>())
+                {
+                    mf.PackageFiles.Add(v.GetChosenFile());
+                }
+            }
+
+            return true;
         }
 
         /// <summary>

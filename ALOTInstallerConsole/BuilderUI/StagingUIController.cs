@@ -6,6 +6,7 @@ using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore.Builder;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
 using NStack;
 using Serilog;
@@ -49,6 +50,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 UpdateProgressCallback = updateProgress,
                 ResolveMutualExclusiveMods = resolveMutualExclusiveMod,
                 ErrorStagingCallback = errorStaging,
+                ConfigureModOptions = configureModOptions,
             };
             builderWorker.WorkerReportsProgress = true;
             builderWorker.DoWork += ss.PerformStaging;
@@ -66,6 +68,29 @@ namespace ALOTInstallerConsole.BuilderUI
                 Program.SwapToNewView(fsuic);
             };
             builderWorker.RunWorkerAsync();
+        }
+
+        private bool configureModOptions(ManifestFile mf, List<ConfigurableModInterface> optionsToConfigure)
+        {
+            bool continueStaging = true;
+            int num = 1;
+            foreach (var v in optionsToConfigure)
+            {
+                var choices = v.ChoicesHuman.Select(x => (ustring)x).ToList();
+                choices.Add((ustring)"Abort install");
+
+                var sIndex = MessageBox.Query($"{mf.FriendlyName} configuration [{num}/{optionsToConfigure.Count}]", $"Select what option you'd like to use for:\n\n{v.ChoiceTitle}\n", choices.ToArray());
+                if (sIndex == choices.Count - 1)
+                {
+                    Log.Information($"User aborted staging on config mod option {v.ChoiceTitle}");
+                    continueStaging = false;
+                    break;
+                }
+
+                v.SelectedIndex = sIndex;
+                num++;
+            }
+            return continueStaging;
         }
 
         private void errorStaging(string obj)

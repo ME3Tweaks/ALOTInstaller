@@ -1,10 +1,17 @@
-﻿namespace ALOTInstallerCore.Objects.Manifest
+﻿using System.Diagnostics;
+
+namespace ALOTInstallerCore.Objects.Manifest
 {
+    [DebuggerDisplay("PackageFile {SourceName}, Transient={Transient}")]
     /// <summary>
     /// A file that is part of a manifest file, after extraction. These files are extracted from their source file and then staged for building into the addon. 
     /// </summary>
     public class PackageFile
     {
+        /// <summary>
+        /// Transient Package Files only exist in the PackageFiles list of a manifest file for a single installation session and are added from the selected list of ChoiceFiles. They are temporary package files and are internally removed from an <c>InstallerFile</c>'s PackageFiles list when staging begins.
+        /// </summary>
+        public bool Transient { get; set; }
         /// <summary>
         /// Filename of this singular file
         /// </summary>

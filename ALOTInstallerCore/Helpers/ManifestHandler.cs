@@ -348,6 +348,7 @@ namespace ALOTInstallerCore.Helpers
                                                                m_me1 = TryConvert.ToBool(c.Attribute("me1")?.Value, false),
                                                                m_me2 = TryConvert.ToBool(c.Attribute("me2")?.Value, false),
                                                                m_me3 = TryConvert.ToBool(c.Attribute("me3")?.Value, false),
+                                                               Transient = true
                                                            }).ToList()
                                                        }).ToList(),
                                                    // Included zip files
