@@ -91,27 +91,24 @@ namespace ALOTInstallerConsole.UserControls
             //Build view
             int maxW = listItems.Max(x => x.Length); //widest string width
             int maxH = listItems.Count;
+            int svHeight = Math.Min(maxH, 12);
             View scrollableContent = new View()
             {
                 Height = maxH,
                 Width = maxW
             };
 
-            for (int i = 0; i < listItems.Count; i++)
+            scrollableContent.Add(new Label(string.Join("\n", listItems))
             {
-                var str = listItems[i];
-                scrollableContent.Add(new Label(str)
-                {
-                    X = 0,
-                    Y = i,
-                    Width = Math.Max(maxW, SCROLLVIEWER_WIDTH)
-                });
-            }
+                X = 0,
+                Y = 0,
+                Width = Math.Max(maxW, SCROLLVIEWER_WIDTH)
+            });
 
-            var scrollView = new ScrollView(new Rect(0, y, SCROLLVIEWER_WIDTH, 12))
+            var scrollView = new ScrollView(new Rect(0, y, SCROLLVIEWER_WIDTH, svHeight))
             {
                 ContentSize = new Size(maxW, maxH),
-                KeepContentAlwaysInViewport = true,
+                //KeepContentAlwaysInViewport = true,
                 //ContentOffset = new Point (0, 0),
                 //ShowVerticalScrollIndicator = true,
                 //ShowHorizontalScrollIndicator = true,
@@ -120,7 +117,7 @@ namespace ALOTInstallerConsole.UserControls
             scrollView.Add(scrollableContent);
             sd.Add(scrollView);
 
-            y += 12; //scrolview height
+            y += svHeight; //scrolview height
             y++; //space one out
             // Bottom message
             sd.Add(new Label(bottommessage)

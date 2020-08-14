@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameDirectories;
@@ -237,7 +238,7 @@ namespace ALOTInstallerCore.ModManager.Services
             return false;
         }
 
-        public static bool ValidateTargetAgainstVanilla(GameTarget target, Action<string> failedValidationCallback)
+        public static bool ValidateTargetAgainstVanilla(GameTarget target, Action<string> failedValidationCallback, Action<string> statusUpdate = null, Action<long, long> progressUpdate = null, bool md5Check = false)
         {
             bool isVanilla = true;
             CaseInsensitiveDictionary<List<(int size, string md5)>> vanillaDB = null;
@@ -260,23 +261,75 @@ namespace ALOTInstallerCore.ModManager.Services
             }
             if (Directory.Exists(target.TargetPath))
             {
-
-                foreach (string file in Directory.EnumerateFiles(target.TargetPath, @"*", SearchOption.AllDirectories))
+                var allFiles = Directory.EnumerateFiles(target.TargetPath, @"*", SearchOption.AllDirectories).ToList();
+                int numDone = 0;
+                foreach (string file in allFiles)
                 {
+                    progressUpdate?.Invoke(numDone, allFiles.Count);
+                    numDone++;
                     var shortname = file.Substring(target.TargetPath.Length + 1);
+                    statusUpdate?.Invoke($"Checking {Path.GetFileName(shortname)}");
                     if (vanillaDB.TryGetValue(shortname, out var fileInfo))
                     {
                         var localFileInfo = new FileInfo(file);
                         bool sfar = Path.GetExtension(file) == @".sfar";
-                        bool correctSize = fileInfo.Any(x => x.size == localFileInfo.Length);
-                        if (correctSize && !sfar) continue; //OK
-                        if (sfar && correctSize)
+                        string uistr = Path.GetFileName(file);
+                        if (sfar)
                         {
-                            //Inconsistency check
-                            if (!GameTarget.SFARObject.HasUnpackedFiles(file)) continue; //Consistent
+                            // Get name
+                            var dlcFolderName = Path.GetFileName(Directory.GetParent(Directory.GetParent(file).FullName).FullName);
+                            if (!MEDirectories.OfficialDLCNames(target.Game).TryGetValue(dlcFolderName, out uistr))
+                            {
+                                uistr = dlcFolderName + " SFAR";
+                            }
                         }
-                        failedValidationCallback?.Invoke(file);
-                        isVanilla = false;
+                        bool correctSize = fileInfo.Any(x => x.size == localFileInfo.Length);
+                        if (!correctSize)
+                        {
+                            Log.Error($"File has wrong size: {file} with size {localFileInfo.Length}");
+                            failedValidationCallback?.Invoke(file);
+                            isVanilla = false;
+                            continue;
+                        }
+
+                        if (md5Check)
+                        {
+                            string md5 = null;
+                            if (localFileInfo.Length > 30000000)
+                            {
+                                //30 MB
+                                using var f = File.OpenRead(file);
+                                md5 = HashAlgorithmExtensions.ComputeHashAsync(MD5.Create(), f, default, d =>
+                                {
+                                    statusUpdate?.Invoke($"Checking {uistr} {(int)(d * 100f / localFileInfo.Length)}%");
+                                }).Result;
+                            }
+                            else
+                            {
+                                md5 = Utilities.CalculateMD5(file);
+                            }
+
+                            if (fileInfo.All(x => md5 != x.md5))
+                            {
+                                Log.Error($"File doesn't match any known MD5: {file} with md5 {md5}");
+                                failedValidationCallback?.Invoke(file);
+                            }
+                        }
+                        else
+                        {
+
+                            if (!sfar) continue; //OK
+                            if (!GameTarget.SFARObject.HasUnpackedFiles(file)) continue; //Consistent
+                            // SFAR has unpacked files
+                            if (target.Supported)
+                            {
+                                failedValidationCallback?.Invoke(file + " has unpacked files");
+                            }
+                            else
+                            {
+                                failedValidationCallback?.Invoke(file);
+                            }
+                        }
                     }
                     else
                     {

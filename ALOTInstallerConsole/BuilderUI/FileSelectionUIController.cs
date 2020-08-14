@@ -70,6 +70,10 @@ namespace ALOTInstallerConsole.BuilderUI
                         Program.SwapToNewView(new BackupRestoreUIController());
                     }),
                     new MenuItem("Run AutoTOC", "(Update ME3 TOC files)",RunAutoToc, ()=>Locations.ME3Target != null),
+                        new MenuItem("Check if ME1 is vanilla", "", ()=>CheckVanilla(Enums.MEGame.ME1), ()=> Locations.ME1Target != null),
+                        new MenuItem("Check if ME2 is vanilla", "", ()=>CheckVanilla(Enums.MEGame.ME2), ()=> Locations.ME2Target != null),
+                    new MenuItem("Check if ME3 is vanilla", "", ()=>CheckVanilla(Enums.MEGame.ME3), ()=> Locations.ME3Target != null),
+
                 }),
                 new MenuBarItem("_Help",new MenuItem[] {
                     new MenuItem("ALOT Discord", "(Support for ALOT Installer)",()=>Utilities.OpenWebPage(ALOTCommunity.DiscordInviteLink)),
@@ -201,6 +205,11 @@ namespace ALOTInstallerConsole.BuilderUI
             TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode, true));
             SetLeftsideTitle();
             UpdateLeftSideScrollViewSizing();
+        }
+
+        private void CheckVanilla(Enums.MEGame game)
+        {
+            VerifyVanillaController.VerifyVanilla(game);
         }
 
         private void RunAutoToc()

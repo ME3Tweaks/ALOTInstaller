@@ -21,6 +21,7 @@ namespace ALOTInstallerConsole.UserControls
         private void OnProgressMaxChanged()
         {
             if (ProgressMax == 0) return;
+
             Application.MainLoop.Invoke(() => progressBar.Fraction = ProgressValue * 1.0f / ProgressMax);
         }
 
