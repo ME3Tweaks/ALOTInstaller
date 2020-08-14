@@ -47,12 +47,11 @@ namespace ALOTInstallerCore.Helpers
             {
                 //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", MANIFEST_LOC);
                 string url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/ALOT-v4/manifest.xml";
-                //if (USING_BETA)
-                //{
-                //    Log.Information("In BETA mode.");
-                //    url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/master/manifest-beta.xml";
-                //    Title += " BETA MODE";
-                //}
+                if (Settings.BetaMode)
+                {
+                    Log.Information("BETA MODE: Fetching beta mode manifest.");
+                    url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/ALOT-v4/manifest-beta.xml";
+                }
 
                 var fetchedManifest = webClient.DownloadString(new Uri(url));
                 //var fetchedManifest = File.ReadAllText(@"C:\Users\Mgamerz\source\repos\AlotAddOnGUI\manifest.xml");
@@ -281,7 +280,7 @@ namespace ALOTInstallerCore.Helpers
                                                            OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
                                                            OptionalRequiredFilesSizes = (string)d.Attribute("optionalrequiredfilessizes"),
                                                            LoggingName = (string)d.Attribute("loggingname"),
-                                                           IsDLC = TryConvert.ToBool(d.Attribute("isdlc")?.Value,false),
+                                                           IsDLC = TryConvert.ToBool(d.Attribute("isdlc")?.Value, false),
                                                            ModVersion = (string)d.Attribute("version")
                                                        }).ToList(),
                                                    RecommendationString = e.Attribute("recommendation")?.Value,
@@ -309,12 +308,12 @@ namespace ALOTInstallerCore.Helpers
                                                    Filename = (string)e.Element("file").Attribute("filename"),
                                                    FileSize = TryConvert.ToInt64(e.Element("file").Attribute("size")?.Value, 0L),
                                                    FileMD5 = (string)e.Element("file").Attribute("md5"),
-                                                   
+
                                                    UnpackedSingleFilename = e.Element("file").Attribute("unpackedsinglefilename")?.Value,
                                                    UnpackedFileMD5 = (string)e.Element("file").Attribute("unpackedmd5"),
                                                    UnpackedFileSize = TryConvert.ToInt64(e.Element("file").Attribute("unpackedsize")?.Value, 0L),
                                                    TorrentFilename = (string)e.Element("file").Attribute("torrentfilename"),
-                                                   
+
                                                    InstallPriority = TryConvert.ToInt32(e.Attribute("installpriority")?.Value, 5),
                                                    UIPriority = TryConvert.ToInt32(e.Attribute("uipriority")?.Value, 5),
                                                    Tooltipname = e.Element("file").Attribute("tooltipname")?.Value ?? e.Attribute("friendlyname").Value,
