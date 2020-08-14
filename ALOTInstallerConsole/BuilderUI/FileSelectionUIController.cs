@@ -321,7 +321,7 @@ namespace ALOTInstallerConsole.BuilderUI
             RefreshShownFiles();
         }
 
-        private async void InstallButton_Click()
+        private void InstallButton_Click()
         {
             List<string> paths = new List<string>();
             if (Locations.ME1Target != null) paths.Add("ME1");

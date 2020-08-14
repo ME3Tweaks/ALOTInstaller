@@ -41,9 +41,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             /// </summary>
             public Func<string, string, bool> WarningActionCallback { get; set; }
             /// <summary>
-            /// Called when the user must select a game executable (for backup). Return null to indicate teh user aborted the prompt.
+            /// Called when the user must select a game executable (for backup). Return null to indicate the user aborted the prompt.
             /// </summary>
-            public Func<Enums.MEGame, string> SelectGameExecutableCallback { get; set; }
+            public Func<Enums.MEGame, GameTarget> SelectGameExecutableCallback { get; set; }
 
             /// <summary>
             /// Called when the user must select a backup folder destination. Return null to indicate user aborted the prompt.
@@ -62,6 +62,10 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             /// Called when there is a new status message that should be displayed, such as what is being backed up.
             /// </summary>
             public Action<string> UpdateStatusCallback { get; set; }
+            /// <summary>
+            /// Sets the progressbar (if any) with this backup operation to indeterminate or not.
+            /// </summary>
+            public Action<bool> SetProgressIndeterminateCallback { get; set; }
 
             public GameBackup(Enums.MEGame game, IEnumerable<GameTarget> availableBackupSources)
             {
@@ -97,15 +101,14 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                     Log.Information(@"Prompting user to select executable of link target");
 
-                    var gameexe = SelectGameExecutableCallback?.Invoke(Game);
+                    targetToBackup = SelectGameExecutableCallback?.Invoke(Game);
 
-                    if (gameexe == null)
+                    if (targetToBackup == null)
                     {
                         Log.Warning("User did not choose game executable to link as backup. Aborting");
                         return;
                     }
 
-                    targetToBackup = new GameTarget(Game, Utilities.GetGamePathFromExe(Game, gameexe), false, true);
                     if (AvailableTargetsToBackup.Any(x => x.TargetPath.Equals(targetToBackup.TargetPath, StringComparison.InvariantCultureIgnoreCase)))
                     {
                         // Can't point to an existing modding target
@@ -150,9 +153,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                 }
 
-                ProgressVisible = true;
-                ProgressIndeterminate = true;
-                BackupStatus = "Validating backup source";
+                UpdateStatusCallback?.Invoke("Validating backup source");
+                SetProgressIndeterminateCallback?.Invoke(true);
                 Log.Information(@"Checking target is vanilla");
                 bool isVanilla = VanillaDatabaseService.ValidateTargetAgainstVanilla(targetToBackup, nonVanillaFileFoundCallback);
 

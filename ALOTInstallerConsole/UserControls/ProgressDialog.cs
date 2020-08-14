@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Threading;
 using NStack;
 using Terminal.Gui;
 
@@ -31,6 +32,28 @@ namespace ALOTInstallerConsole.UserControls
         private void OnBottomMessageChanged()
         {
             Application.MainLoop.Invoke(() => bottomMessageLabel.Text = BottomMessage);
+        }
+
+        public bool Indeterminate { get; set; }
+
+        private Timer currentIndeterminateTimer;
+        private void OnIndeterminateChanged()
+        {
+            if (Indeterminate)
+            {
+                currentIndeterminateTimer = new Timer((x) =>
+                {
+                    Application.MainLoop.Invoke(()=> progressBar.Pulse());
+                }, null, 500, 200);
+            }
+            else
+            {
+                if (currentIndeterminateTimer != null)
+                {
+                    currentIndeterminateTimer.Dispose();
+                    currentIndeterminateTimer = null;
+                }
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

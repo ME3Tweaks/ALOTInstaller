@@ -231,7 +231,7 @@ namespace ALOTInstallerCore.Helpers
                     {
                         progressCallback?.Invoke(mf.FriendlyName, e.BytesReceived, e.TotalBytesToReceive);
                     };
-                    downloadClient.DownloadFileCompleted += async (s, e) =>
+                    downloadClient.DownloadFileCompleted += (s, e) =>
                     {
                         if (e.Error != null)
                         {

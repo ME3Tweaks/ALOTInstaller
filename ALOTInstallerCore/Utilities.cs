@@ -273,11 +273,19 @@ namespace ALOTInstallerCore
         /// <returns></returns>
         public static string GetGamePathFromExe(Enums.MEGame game, string exe)
         {
-            string result = Path.GetDirectoryName(Path.GetDirectoryName(exe)); //binaries, <GAME>
+            try
+            {
+                string result = Path.GetDirectoryName(Path.GetDirectoryName(exe)); //binaries, <GAME>
 
-            if (game == Enums.MEGame.ME3)
-                result = Path.GetDirectoryName(result); //up one more because of win32 directory.
-            return result;
+                if (game == Enums.MEGame.ME3)
+                    result = Path.GetDirectoryName(result); //up one more because of win32 directory.
+                return result;
+            }
+            catch (Exception e)
+            {
+                // Can't possibly be game
+                return null;
+            }
         }
 
         /// <summary>
