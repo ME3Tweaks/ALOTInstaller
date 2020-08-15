@@ -66,7 +66,6 @@ namespace ALOTInstallerCore.ModManager.Objects
             {
                 if (Directory.Exists(TargetPath))
                 {
-                    var oldTMOption = TextureModded;
                     var alotInfo = GetInstalledALOTInfo();
                     if (alotInfo != null)
                     {
@@ -116,10 +115,10 @@ namespace ALOTInstallerCore.ModManager.Objects
                         CLog.Information(@"ME1 Polish Edition detected", lodUpdateAndLogging);
                     }
 
-                    //if (RegistryActive && Settings.AutoUpdateLODs && oldTMOption != TextureModded && (lodUpdateAndLogging || forceLodUpdate))
-                    //{
-                    //    UpdateLODs();
-                    //}
+                    if (lodUpdateAndLogging || forceLodUpdate)
+                    {
+                        UpdateLODs();
+                    }
                 }
                 else
                 {
@@ -129,40 +128,33 @@ namespace ALOTInstallerCore.ModManager.Objects
             }
         }
 
-        public void UpdateLODs(bool me12k = false)
+        public void UpdateLODs(bool twoK = false)
         {
             // Use MEM
-
             //OLD CODE
-            //if (!TextureModded)
-            //{
-            //    Utilities.SetLODs(this, false, false, false);
-            //}
-            //else
-            //{
-            //    if (Game == Enums.MEGame.ME1)
-            //    {
-            //        if (MEUITMInstalled)
-            //        {
-            //            //detect soft shadows/meuitm
-            //            var branchingPCFCommon = Path.Combine(TargetPath, @"Engine", @"Shaders", @"BranchingPCFCommon.usf");
-            //            if (File.Exists(branchingPCFCommon))
-            //            {
-            //                var md5 = Utilities.CalculateMD5(branchingPCFCommon);
-            //                Utilities.SetLODs(this, true, me12k, md5 == @"10db76cb98c21d3e90d4f0ffed55d424");
-            //                return;
-            //            }
-            //        }
+            var textureInfo = GetInstalledALOTInfo();
+            LodSetting setting = LodSetting.Vanilla;
+            if (textureInfo != null)
+            {
+                setting |= twoK ? LodSetting.TwoK : LodSetting.FourK;
+                if (Game == Enums.MEGame.ME1)
+                {
+                    if (textureInfo.MEUITMVER > 0)
+                    {
+                        //detect soft shadows/meuitm
+                        var branchingPCFCommon = Path.Combine(TargetPath, @"Engine", @"Shaders", @"BranchingPCFCommon.usf");
+                        if (File.Exists(branchingPCFCommon))
+                        {
+                            if (Utilities.CalculateMD5(branchingPCFCommon) == @"10db76cb98c21d3e90d4f0ffed55d424")
+                            {
+                                setting |= LodSetting.SoftShadows;
+                            }
+                        }
+                    }
+                }
+            }
 
-            //        //set default HQ lod
-            //        Utilities.SetLODs(this, true, me12k, false);
-            //    }
-            //    else
-            //    {
-            //        //me2/3
-            //        Utilities.SetLODs(this, true, false, false);
-            //    }
-            //}
+            MEMIPCHandler.SetLODs(Game, setting);
         }
 
         public bool Equals(GameTarget x, GameTarget y)

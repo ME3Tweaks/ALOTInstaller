@@ -245,5 +245,11 @@ namespace ALOTInstallerCore.Helpers
                     return null;
             }
         }
+
+        public static void ReloadTarget(Enums.MEGame game)
+        {
+            var target = GetTarget(game);
+            target?.ReloadGameTarget(true, true);
+        }
     }
 }

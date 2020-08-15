@@ -330,32 +330,76 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void RestoreBackup(Enums.MEGame game)
         {
-            int response = MessageBox.ErrorQuery($"Warning: Existing game will be deleted",
-                $"Restoring your game will fully delete the game located at {Locations.GetTarget(game).TargetPath}, after which your backup will be copied into its place. Your texture settings will also be reset to the normal settings.\n\nRestore {game.ToGameName()}?",
-                "No, leave it alone", "Yes, restore it");
-            if (response == 1)
-            {
-                // Perform the restore
-                ProgressDialog pd = new ProgressDialog("Restore in progress",
-                    $"Please wait while {game.ToGameName()} is restored from backup.", "Preparing to restore game",
-                    true);
-                NamedBackgroundWorker nbw = new NamedBackgroundWorker("RestoreWorker");
-                nbw.DoWork += (a, b) =>
-                {
-                    // Restore code here
-                };
-                nbw.RunWorkerCompleted += (a, b) =>
-                {
-                    if (pd.IsCurrentTop)
-                    {
-                        Application.RequestStop();
-                    }
-                    MessageBox.Query("Restore completed", $"{game.ToGameName()} has been restored from backup.", "OK");
-                    Program.SwapToNewView(new BackupRestoreUIController());
-                };
+            string destinationPath = Locations.GetTarget(game)?.TargetPath;
+            int result = MessageBox.Query("Select restore type", "Restore over the existing game, or make a copy of the game using your backup?", "Restore existing game", "Make a copy", "Cancel");
 
-                Application.Run(pd);
-            }
+            if (result == 2) return; //Cancel
+
+            // Perform the restore
+            ProgressDialog pd = new ProgressDialog("Restore in progress",
+                $"Please wait while {game.ToGameName()} is restored from backup.", "Preparing to restore game",
+                true);
+            NamedBackgroundWorker nbw = new NamedBackgroundWorker("RestoreWorker");
+            nbw.DoWork += (a, b) =>
+            {
+                BackupHandler.GameRestore gr = new BackupHandler.GameRestore(game)
+                {
+                    ConfirmationCallback = (title, message) => MessageBox.ErrorQuery(title, message, "OK", "Cancel") == 0,
+                    BlockingErrorCallback = (title, message) => MessageBox.ErrorQuery(title, message, "OK"),
+                    RestoreErrorCallback = (title, message) => MessageBox.ErrorQuery(title, message, "OK"),
+                    UpdateStatusCallback = message => pd.BottomMessage = message,
+                    UpdateProgressCallback = (done, total) =>
+                    {
+                        pd.ProgressMax = total;
+                        pd.ProgressValue = done;
+                    },
+                    SetProgressIndeterminateCallback = indeterminate => pd.Indeterminate = indeterminate,
+                    SelectDestinationDirectoryCallback = (title, message) =>
+                    {
+                        object o = new object();
+                        string path = null;
+                        Application.MainLoop.Invoke(() =>
+                        {
+                            OpenDialog selector = new OpenDialog(title, message)
+                            {
+                                CanChooseDirectories = true,
+                                CanChooseFiles = false
+                            };
+                            Application.Run(selector);
+                            if (!selector.Canceled && selector.FilePath != null && Directory.Exists(selector.FilePath.ToString()))
+                            {
+                                path = selector.FilePath.ToString();
+                                lock (o)
+                                {
+                                    Monitor.Pulse(o);
+                                }
+                            }
+                        });
+                        lock (o)
+                        {
+                            Monitor.Wait(o);
+                        }
+
+                        return path;
+                    }
+                };
+                gr.PerformRestore(result == 0 ? destinationPath : null);
+
+
+                // Restore code here
+            };
+            nbw.RunWorkerCompleted += (a, b) =>
+            {
+                if (pd.IsCurrentTop)
+                {
+                    Application.RequestStop();
+                }
+                MessageBox.Query("Restore completed", $"{game.ToGameName()} has been restored from backup.", "OK");
+                Program.SwapToNewView(new BackupRestoreUIController());
+            };
+            nbw.RunWorkerAsync();
+            Application.Run(pd);
+
         }
 
         private void UnlinkBackup(Enums.MEGame meGame)

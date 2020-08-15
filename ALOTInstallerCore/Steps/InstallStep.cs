@@ -692,36 +692,27 @@ namespace ALOTInstallerCore.Steps
         {
             SetBottomTextCallback?.Invoke("Applying graphics settings");
             Log.Information("Updating texture lods");
-            string args = $"--apply-lods-gfx --gameid {package.InstallTarget.Game.ToGameNum()}";
 
+            LodSetting setting = LodSetting.Vanilla;
             var meuitmSoftShadows = package.FilesToInstall.Any(x =>
                 x is ManifestFile mf && mf.ZipFiles.Any(x => x.IsSelectedForInstallation() && x.MEUITMSoftShadows));
             if (meuitmSoftShadows)
             {
+                setting |= LodSetting.SoftShadows;
                 Log.Information(" > MEUITM Soft Shadows");
-                args += " --soft-shadows-mode --meuitm-mode";
             }
 
             if (package.Limit2K)
             {
+                setting |= LodSetting.TwoK;
                 Log.Information(" > Using 2K lods");
-                args += " --limit-2k";
             }
-
-            int exitcode = -1;
-            // We don't care about IPC on this
-            MEMIPCHandler.RunMEMIPCUntilExit(args,
-                null,
-                null,
-                x => Log.Error($"StdError setting LODs: {x}"),
-                x => exitcode = x); //Change to catch exit code of non zero.        
-            if (exitcode != 0)
+            else
             {
-                Log.Error($"MassEffectModderNoGui had error setting LODs, exited with code {exitcode}");
-                return false;
+                setting |= LodSetting.FourK;
             }
 
-            return true;
+            return MEMIPCHandler.SetLODs(package.InstallTarget.Game, setting);
         }
 
         /// <summary>

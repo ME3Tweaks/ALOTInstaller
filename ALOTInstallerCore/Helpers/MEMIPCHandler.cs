@@ -9,6 +9,16 @@ using CliWrap.EventStream;
 
 namespace ALOTInstallerCore.Helpers
 {
+    [Flags]
+    public enum LodSetting
+    {
+        Vanilla = 0,
+        TwoK = 1,
+        FourK = 2,
+        SoftShadows = 4,
+    }
+
+
     /// <summary>
     /// Utility class for interacting with MEM
     /// </summary>
@@ -181,6 +191,50 @@ namespace ALOTInstallerCore.Helpers
                 Log.Error($"Non-zero MassEffectModderNoGui exit code setting game path: {exitcode}");
             }
             return exitcode == 0;
+        }
+
+        /// <summary>
+        /// Sets the LODs as specified in the setting bitmask with MEM for the specified game
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="setting"></param>
+        /// <returns></returns>
+        public static bool SetLODs(Enums.MEGame game, LodSetting setting)
+        {
+            string args = $"--apply-lods-gfx --gameid {game.ToGameNum()}";
+            if (setting.HasFlag(LodSetting.SoftShadows))
+            {
+                args += " --soft-shadows-mode --meuitm-mode";
+            }
+
+            if (setting.HasFlag(LodSetting.TwoK))
+            {
+                args += " --limit-2k";
+            }
+            else if (setting.HasFlag(LodSetting.FourK))
+            {
+                // Nothing
+            }
+            else if (setting == LodSetting.Vanilla)
+            {
+                // Remove LODs
+                args = $"--remove-lods --gameid {game.ToGameNum()}";
+            }
+
+            int exitcode = -1;
+            // We don't care about IPC on this
+            MEMIPCHandler.RunMEMIPCUntilExit(args,
+                null,
+                null,
+                x => Log.Error($"StdError setting LODs: {x}"),
+                x => exitcode = x); //Change to catch exit code of non zero.        
+            if (exitcode != 0)
+            {
+                Log.Error($"MassEffectModderNoGui had error setting LODs, exited with code {exitcode}");
+                return false;
+            }
+
+            return true;
         }
     }
 }
