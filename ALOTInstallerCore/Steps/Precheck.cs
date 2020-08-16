@@ -90,6 +90,11 @@ namespace ALOTInstallerCore.Steps
                 package = package
             };
 
+            if (!pc.checkOneOptionSelected(out var noOptionsSelectedReason))
+            {
+                return noOptionsSelectedReason;
+            }
+
             if (!pc.checkRequiredFiles(out var failureReason1))
             {
                 // Require files validation failed
@@ -140,6 +145,91 @@ namespace ALOTInstallerCore.Steps
             }
 
             return null; //OK
+        }
+
+        private bool checkOneOptionSelected(out string failurereason)
+        {
+            if (!package.InstallALOT && !package.InstallALOTUpdate && !package.InstallAddons &&
+                !package.InstallMEUITM && !package.InstallUserfiles)
+            {
+                failurereason = "No options for installation were selected.";
+                return false;
+            }
+
+            failurereason = null;
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if MEUITM is available for install, and throws a warning if it isn't. This should only be run in ALOT mode
+        /// </summary>
+        /// <param name="package"></param>
+        /// <param name="missingRecommandedItemsDialogCallback"></param>
+        /// <returns></returns>
+        public static bool CheckMEUITM(InstallOptionsPackage package, Func<string, string, string, List<string>, bool> missingRecommandedItemsDialogCallback)
+        {
+            if (package.InstallerMode != ManifestMode.ALOT) return true; // Only work in ALOT mode.
+            var installedInfo = package.InstallTarget.GetInstalledALOTInfo();
+            var shouldCheck = installedInfo == null || installedInfo.MEUITMVER == 0; //if MEUITM is ever updated, this should probably be changed.
+
+            if (shouldCheck)
+            {
+                var meuitmFile = package.FilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.MEUITMVER > 0);
+                if (meuitmFile != null)
+                {
+                    var result = missingRecommandedItemsDialogCallback?.Invoke("MEUITM not available for installation",
+                        $"Mass Effect Updated and Improved Textures Mod (MEUITM) is highly recommended when installing ALOT for ME1, as it provides a very large amount of the textures that improve the look of Mass Effect. Without MEUITM, the game will look significantly worse. This file should be imported into the library before installing textures.",
+                        "Install anyways (NOT RECOMMENDED)?", new List<string>());
+                    return result.HasValue && result.Value;
+                }
+            }
+
+            return true;
+        }
+
+        public static bool CheckAllRecommendedItems(InstallOptionsPackage package,
+            Func<string, string, string, List<string>, bool> missingRecommandedItemsDialogCallback)
+        {
+            // install options package at this point will still have full list of files.
+
+            // Get a list of ONLY non-versioned recommended files (which will only be addon files)
+            var applicableManifestFiles = package.FilesToInstall.Where(x =>
+                    x is ManifestFile mf && mf.ApplicableGames.HasFlag(package.InstallTarget.Game.ToApplicableGame())
+                                         && mf.AlotVersionInfo.IsNotVersioned()
+                                         && mf.Recommendation == RecommendationType.Recommended)
+                .ToList();
+
+            var nonReadyRecommendedFiles = applicableManifestFiles.Where(x => !x.Ready).Select(x => x as ManifestFile).ToList();
+            // remove option group items if the other item in the optiongroup is available
+            for (int i = nonReadyRecommendedFiles.Count - 1; i > 0; i--)
+            {
+                var nonReadyFile = nonReadyRecommendedFiles[i];
+                if (nonReadyFile is PreinstallMod pm)
+                {
+                    if (pm.OptionGroup != null)
+                    {
+                        // Find other matching file
+                        var otherMatchingItem = package.FilesToInstall.FirstOrDefault(x =>
+                            x is PreinstallMod pmx && pmx.OptionGroup == pm.OptionGroup && pmx != pm);
+                        if (otherMatchingItem != null && otherMatchingItem.Ready)
+                        {
+                            // Another version of this item is ready instead
+                            nonReadyRecommendedFiles.RemoveAt(i);
+                        }
+                    }
+                }
+            }
+
+            if (nonReadyRecommendedFiles.Any())
+            {
+                // At least one recommended file for this game is not ready
+                var result = missingRecommandedItemsDialogCallback?.Invoke("Not all addon files available for install",
+                    $"Not all addon files for {package.InstallerMode} mode are currently ready for install in the texture library. Without these files, the game will be missing significant amounts of upgraded textures. You should have these files imported into your texture library before you continue installation.",
+                    "Install anyways (NOT RECOMMENDED)?", nonReadyRecommendedFiles.Select(x => x.FriendlyName).ToList());
+                return result.HasValue && result.Value;
+            }
+
+            return true;
         }
 
         private static readonly string[] UnpackedFileExtensions = { @".pcc", @".tlk", @".bin", @".dlc", ".afc", @".tfc" };

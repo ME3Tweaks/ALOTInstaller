@@ -5158,7 +5158,7 @@ namespace AlotAddOnGUI
             ConsoleApp ca = new ConsoleApp(exe, "\"" + Utilities.GetGamePath(3) + "\"");
             ca.ConsoleOutput += (o, args2) =>
             {
-                if (args2.Line != null && args2.Line != "")
+                if (!string.IsNullOrEmpty(args2.Line))
                 {
                     Log.Information("FullAutoTOC output: " + args2.Line);
                 }

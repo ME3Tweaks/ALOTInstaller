@@ -529,7 +529,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     InstallALOT = getInstallOptionValue(InstallOptionsStep.InstallOption.ALOT, installOptionMapping),
                     InstallALOTUpdate = getInstallOptionValue(InstallOptionsStep.InstallOption.ALOTUpdate, installOptionMapping),
                     InstallMEUITM = getInstallOptionValue(InstallOptionsStep.InstallOption.MEUITM, installOptionMapping),
-                    InstallALOTAddon = getInstallOptionValue(InstallOptionsStep.InstallOption.ALOTAddon, installOptionMapping),
+                    InstallAddons = getInstallOptionValue(InstallOptionsStep.InstallOption.Addon, installOptionMapping),
                     InstallUserfiles = getInstallOptionValue(InstallOptionsStep.InstallOption.UserFiles, installOptionMapping),
                     InstallerMode = ManifestHandler.CurrentMode,
                     RepackGameFiles = compressPackagesCb.Checked,
@@ -538,8 +538,25 @@ namespace ALOTInstallerConsole.BuilderUI
 #if DEBUG
                     DebugNoInstall = debugNoInstallCb.Checked
 #endif
-
                 };
+
+                // Precheck 0: All recommended files ready
+                if (optionsPackage.InstallAddons)
+                {
+                    if (!Precheck.CheckAllRecommendedItems(optionsPackage,
+                        (title, topMessage, bottomMessage, missingFilesList)
+                            => ScrollDialog.Prompt(title, topMessage, bottomMessage, missingFilesList, Colors.Error,
+                                "Abort install", "Continue with missing files") == 1)) return;
+                }
+
+                if (optionsPackage.InstallTarget.Game == Enums.MEGame.ME1)
+                {
+                    //Check MEUITM
+                    if (!Precheck.CheckMEUITM(optionsPackage,
+                        (title, topMessage, bottomMessage, missingFilesList)
+                            => ScrollDialog.Prompt(title, topMessage, bottomMessage, missingFilesList, Colors.Error,
+                                "Abort install", "Continue without MEUITM") == 1)) return;
+                }
 
                 MessageDialog md = new MessageDialog("Performing installation precheck [1/2]");
                 NamedBackgroundWorker prestageCheckWorker = new NamedBackgroundWorker("PrecheckWorker-Prestaging");
@@ -595,7 +612,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
             if (option.Key == InstallOptionsStep.InstallOption.ALOT) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0)?.FriendlyName ?? "ALOT") + suffix;
             if (option.Key == InstallOptionsStep.InstallOption.ALOTUpdate) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0)?.FriendlyName ?? "ALOT update") + suffix;
-            if (option.Key == InstallOptionsStep.InstallOption.ALOTAddon) return "ALOT Addon" + suffix;
+            if (option.Key == InstallOptionsStep.InstallOption.Addon) return "ALOT Addon" + suffix;
             if (option.Key == InstallOptionsStep.InstallOption.MEUITM) return "MEUITM" + suffix;
             if (option.Key == InstallOptionsStep.InstallOption.UserFiles) return "User files" + suffix;
             return "UNKNOWN OPTION";

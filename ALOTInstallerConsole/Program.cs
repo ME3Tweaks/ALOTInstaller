@@ -21,7 +21,6 @@ namespace ALOTInstallerConsole
             ALOTInstallerCoreLib.Startup(setWrapperLogger);
 
             Application.Init();
-            Locations.ME3Target.StampTextureModificationInfo(new TextureModInstallationInfo(11,1,0,0));
             var startupUI = new BuilderUI.StartupUIController();
             Program.SwapToNewView(startupUI);
         }

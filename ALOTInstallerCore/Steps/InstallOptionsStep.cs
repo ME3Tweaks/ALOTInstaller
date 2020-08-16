@@ -39,10 +39,25 @@ namespace ALOTInstallerCore.Steps
 
         public enum InstallOption
         {
+            /// <summary>
+            /// Install ALOT. ALOT mode only.
+            /// </summary>
             ALOT,
+            /// <summary>
+            /// Install update for ALOT. ALOT mode only.
+            /// </summary>
             ALOTUpdate,
-            ALOTAddon,
+            /// <summary>
+            /// Install Addon. MEUITM and ALOT mode only.
+            /// </summary>
+            Addon,
+            /// <summary>
+            /// Install MEUITM. MEUITM and ALOT mode only.
+            /// </summary>
             MEUITM,
+            /// <summary>
+            /// Install user files. Available to all modes.
+            /// </summary>
             UserFiles
         }
 
@@ -258,11 +273,11 @@ namespace ALOTInstallerCore.Steps
                 if (filesForTarget.Any(x =>
                     x is ManifestFile mf && mf.AlotVersionInfo.IsNotVersioned() || x is PreinstallMod))
                 {
-                    options[InstallOption.ALOTAddon] = (OptionState.CheckedVisible, null);
+                    options[InstallOption.Addon] = (OptionState.CheckedVisible, null);
                 }
                 else
                 {
-                    options[InstallOption.ALOTAddon] = (OptionState.DisabledVisible, "No Addon files are imported");
+                    options[InstallOption.Addon] = (OptionState.DisabledVisible, "No Addon files are imported");
                 }
 
                 // MEUITM

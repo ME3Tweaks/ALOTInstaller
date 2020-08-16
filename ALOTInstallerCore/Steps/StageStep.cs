@@ -767,7 +767,7 @@ namespace ALOTInstallerCore.Builder
                 filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.MEUITMVER != 0)); //Add MEUITM file
             }
 
-            if (installOptions.InstallALOTAddon)
+            if (installOptions.InstallAddons)
             {
                 filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.IsNotVersioned() && x is ManifestFile)); //Add Addon files that don't have a set ALOTVersionInfo.
             }
