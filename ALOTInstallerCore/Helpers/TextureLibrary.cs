@@ -53,12 +53,25 @@ namespace ALOTInstallerCore.Helpers
         {
             if (e.Name != null)
             {
-                //Debug.WriteLine($"Change {e.ChangeType} for {e.Name}");
+                Debug.WriteLine($"Change {e.ChangeType} for {e.Name}");
                 var matchingManifestFile = manifestFiles.Find(x =>
-                    Path.GetFileName(x.GetUsedFilepath()).Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
+                    Path.GetFileName(x.GetUsedFilepath())
+                        .Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
                 if (matchingManifestFile?.UpdateReadyStatus() ?? false)
                 {
                     readyStatusChanged?.Invoke(matchingManifestFile);
+                }
+
+                if (e.ChangeType == WatcherChangeTypes.Renamed && e is RenamedEventArgs rea)
+                {
+                    // Trigger on old name too.
+                    matchingManifestFile = manifestFiles.Find(x =>
+                        Path.GetFileName(x.GetUsedFilepath())
+                            .Equals(rea.OldName, StringComparison.InvariantCultureIgnoreCase));
+                    if (matchingManifestFile?.UpdateReadyStatus() ?? false)
+                    {
+                        readyStatusChanged?.Invoke(matchingManifestFile);
+                    }
                 }
             }
         }
