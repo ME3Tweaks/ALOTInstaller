@@ -56,11 +56,34 @@ namespace ALOTInstallerConsole.UserControls
 
         public static int Prompt(string title, string topmessage, string bottommessage, List<string> listItems, ColorScheme scheme, params string[] buttons)
         {
-            int SCROLLVIEWER_WIDTH = 90;
+            int SCROLLVIEWER_MAX_WIDTH = 90;
+            int BELOW_MAXW_BUFFER = 5;
+            int SCROLLBAR_WIDTH = 1;
+
+            // Calculate sizes
+            int maxW = listItems.Any() ? listItems.Max(x => x.Length) : 1; //widest string width
+            int tmaxW = Math.Max(maxW, topmessage.Length);
+            tmaxW = Math.Max(maxW, bottommessage.Length);
+            tmaxW = Math.Max(maxW, title.Length);
+            int maxH = listItems.Count;
+            int svHeight = Math.Min(maxH, 12);
+            bool hasVerticalScrollbar = maxH > svHeight;
+            int labelWidth = maxW;
+            if (maxW < SCROLLVIEWER_MAX_WIDTH && hasVerticalScrollbar)
+            {
+                labelWidth = SCROLLVIEWER_MAX_WIDTH - SCROLLBAR_WIDTH;
+            }
+
+            if (tmaxW + BELOW_MAXW_BUFFER < SCROLLVIEWER_MAX_WIDTH)
+            {
+                SCROLLVIEWER_MAX_WIDTH = tmaxW + BELOW_MAXW_BUFFER;
+            }
+
+
             int response = -1;
 
-            int topMessageHeight = TextFormatter.MaxLines(topmessage, SCROLLVIEWER_WIDTH);
-            int bottomMessageHeight = TextFormatter.MaxLines(bottommessage, SCROLLVIEWER_WIDTH);
+            int topMessageHeight = TextFormatter.MaxLines(topmessage, SCROLLVIEWER_MAX_WIDTH);
+            int bottomMessageHeight = TextFormatter.MaxLines(bottommessage, SCROLLVIEWER_MAX_WIDTH);
 
             int y = 0;
             //Buttons
@@ -72,40 +95,38 @@ namespace ALOTInstallerConsole.UserControls
 
             //Dialog
 
-
             ScrollDialog sd = new ScrollDialog(title, buttonList.ToArray())
             {
-                Width = SCROLLVIEWER_WIDTH + 2,
+                Width = SCROLLVIEWER_MAX_WIDTH + 2,
                 ColorScheme = scheme
             };
             sd.Add(new Label(topmessage)
             {
                 X = 0,
                 Y = y,
-                Width = SCROLLVIEWER_WIDTH,
+                Width = SCROLLVIEWER_MAX_WIDTH,
                 Height = topMessageHeight
             });
 
             y += topMessageHeight;
             y++; // spacing for list
             //Build view
-            int maxW = listItems.Any() ? listItems.Max(x => x.Length) : 1; //widest string width
-            int maxH = listItems.Count;
-            int svHeight = Math.Min(maxH, 12);
+           
+
             View scrollableContent = new View()
             {
                 Height = maxH,
-                Width = maxW
+                Width = labelWidth
             };
 
             scrollableContent.Add(new Label(string.Join("\n", listItems))
             {
                 X = 0,
                 Y = 0,
-                Width = Math.Max(maxW, SCROLLVIEWER_WIDTH)
+                Width = labelWidth
             });
 
-            var scrollView = new ScrollView(new Rect(0, y, SCROLLVIEWER_WIDTH, svHeight))
+            var scrollView = new ScrollView(new Rect(0, y, SCROLLVIEWER_MAX_WIDTH, svHeight))
             {
                 ContentSize = new Size(maxW, maxH),
                 //KeepContentAlwaysInViewport = true,
@@ -124,7 +145,7 @@ namespace ALOTInstallerConsole.UserControls
             {
                 X = 0,
                 Y = y,
-                Width = SCROLLVIEWER_WIDTH,
+                Width = SCROLLVIEWER_MAX_WIDTH,
                 Height = bottomMessageHeight
             });
 

@@ -22,39 +22,14 @@ namespace ALOTInstallerConsole.BuilderUI
         #endregion
         public override void BeginFlow()
         {
-            //View scrollableContent = new View()
-            //{
-            //    Width = 40,
-            //    Height = 50,
-            //};
-
-
-            //int maxW = 0;
-            //int maxH = 0;
+            //List<string> items = new List<string>();
             //for (int i = 0; i < 50; i++)
             //{
-            //    var str = "TEST I AM A LINE SHOW ME PLS LINE " + i;
-            //    int w = 47;
-            //    scrollableContent.Add(new Label(str)
-            //    {
-            //        X = 0,
-            //        Y = i,
-            //        Width = w,
-            //        ColorScheme = Colors.Menu
-            //    });
-            //    maxW = Math.Max(maxW, str.Length);
-            //    maxW = Math.Max(maxW, w);
-            //    maxH++;
+            //    items.Add("TEST I AM A LINE SHOW ME PLS LINE " + i);
             //}
 
 
-            //ScrollDialog sd = new ScrollDialog("Scroll dialog", "This is top message", "This is bottom message", scrollableContent, maxW, maxH, new Button("OK")
-            //{
-            //    Clicked = Application.RequestStop
-            //});
-            //Application.Run(sd);
-
-
+            //ScrollDialog.Prompt("Scroll dialog", "This is top message", "This is bottom message", items, Colors.Menu, "OK");
 
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += (a, b) =>
