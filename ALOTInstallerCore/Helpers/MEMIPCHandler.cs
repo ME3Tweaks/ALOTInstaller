@@ -20,7 +20,7 @@ namespace ALOTInstallerCore.Helpers
 
 
     /// <summary>
-    /// Utility class for interacting with MEM
+    /// Utility class for interacting with MEM. Calls must be run on a background thread or they will stall due to how the CliWrap library appears tto work.
     /// </summary>
     public static class MEMIPCHandler
     {
@@ -73,6 +73,7 @@ namespace ALOTInstallerCore.Helpers
             }
             void appExited(int code)
             {
+                Debug.WriteLine($"Process exited with code {code}");
                 applicationExited?.Invoke(code);
                 lock (lockObject)
                 {
@@ -133,14 +134,10 @@ namespace ALOTInstallerCore.Helpers
                             {
                                 Log.Fatal(stdOut.Text);
                             }
-                            else
-                            {
-                                //Debug.WriteLine(stdOut.Text);
-                            }
                         }
-
                         break;
                     case StandardErrorCommandEvent stdErr:
+                        Debug.WriteLine("STDERR " + stdErr.Text);
                         if (exceptionOcurred)
                         {
                             Log.Fatal(stdErr.Text);
@@ -225,7 +222,7 @@ namespace ALOTInstallerCore.Helpers
             // We don't care about IPC on this
             MEMIPCHandler.RunMEMIPCUntilExit(args,
                 null,
-                null,
+                (x, y) => Debug.WriteLine("hi"),
                 x => Log.Error($"StdError setting LODs: {x}"),
                 x => exitcode = x); //Change to catch exit code of non zero.        
             if (exitcode != 0)

@@ -72,7 +72,8 @@ namespace ALOTInstallerConsole.BuilderUI
                     new MenuItem("Run AutoTOC", "(Update ME3 TOC files)",RunAutoToc, ()=>Locations.ME3Target != null),
                         new MenuItem("Check if ME1 is vanilla", "", ()=>CheckVanilla(Enums.MEGame.ME1), ()=> Locations.ME1Target != null),
                         new MenuItem("Check if ME2 is vanilla", "", ()=>CheckVanilla(Enums.MEGame.ME2), ()=> Locations.ME2Target != null),
-                    new MenuItem("Check if ME3 is vanilla", "", ()=>CheckVanilla(Enums.MEGame.ME3), ()=> Locations.ME3Target != null),
+                        new MenuItem("Check if ME3 is vanilla", "", ()=>CheckVanilla(Enums.MEGame.ME3), ()=> Locations.ME3Target != null),
+                        new MenuItem("Texture LOD selector", "(Change texture quality settings)", ()=>LODController.PromptForLODs()),
 
                 }),
                 new MenuBarItem("_Help",new MenuItem[] {
