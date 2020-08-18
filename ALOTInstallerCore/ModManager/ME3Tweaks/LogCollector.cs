@@ -6,14 +6,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.gamefileformats;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
-using Microsoft.Win32;
 using NickStrupat;
 
 namespace ALOTInstallerCore.ModManager.ME3Tweaks

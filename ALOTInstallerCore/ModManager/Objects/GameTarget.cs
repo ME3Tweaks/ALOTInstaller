@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager.asi;
 using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using MassEffectModManagerCore.modmanager.asi;
 using Serilog;
 using Path = System.IO.Path;
 
@@ -673,6 +675,44 @@ namespace ALOTInstallerCore.ModManager.Objects
             }
 
             return false;
+        }
+
+        public List<InstalledASIMod> GetInstalledASIs()
+        {
+            List<InstalledASIMod> installedASIs = new List<InstalledASIMod>();
+            try
+            {
+                string asiDirectory = MEDirectories.ASIPath(this);
+                if (asiDirectory != null && Directory.Exists(TargetPath))
+                {
+                    if (!Directory.Exists(asiDirectory))
+                    {
+                        Directory.CreateDirectory(asiDirectory); //Create it, but we don't need it
+                        return installedASIs; //It won't have anything in it if we are creating it
+                    }
+
+                    var asiFiles = Directory.GetFiles(asiDirectory, @"*.asi");
+                    foreach (var asiFile in asiFiles)
+                    {
+                        var hash = Utilities.CalculateMD5(asiFile);
+                        var matchingManifestASI = ASIManager.GetASIVersionByHash(hash, Game);
+                        if (matchingManifestASI != null)
+                        {
+                            installedASIs.Add(new KnownInstalledASIMod(asiFile, hash, Game, matchingManifestASI));
+                        }
+                        else
+                        {
+                            installedASIs.Add(new UnknownInstalledASIMod(asiFile, hash, Game));
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(@"Error fetching list of installed ASIs: " + e.Message);
+            }
+
+            return installedASIs;
         }
     }
 }

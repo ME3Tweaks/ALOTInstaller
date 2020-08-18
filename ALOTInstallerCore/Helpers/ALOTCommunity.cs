@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ALOTInstallerCore.Helpers
+﻿namespace ALOTInstallerCore.Helpers
 {
     /// <summary>
     /// Specific stuff to the ALOT community

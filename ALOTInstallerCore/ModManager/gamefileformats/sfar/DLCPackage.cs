@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using ALOTInstallerCore.Helpers;
 
 namespace ALOTInstallerCore.ModManager.gamefileformats.sfar

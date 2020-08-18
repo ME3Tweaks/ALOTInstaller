@@ -10,6 +10,7 @@ using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps.Installer;
+using MassEffectModManagerCore.modmanager.asi;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps
@@ -343,6 +344,13 @@ namespace ALOTInstallerCore.Steps
                 {
                     // Install ASIs.
                     // Need ASI manager code from Mod Manager once it is ready
+                    if (package.InstallTarget.Supported)
+                    {
+                        SetBottomTextCallback?.Invoke("Installing troubleshooting files");
+                        ASIManager.LoadManifest();
+                        ASIManager.InstallASIToTargetByGroupID(9, package.InstallTarget); //AutoTOC
+                        ASIManager.InstallASIToTargetByGroupID(8, package.InstallTarget); //ME3Logger Truncating
+                    }
                 }
 
                 #endregion

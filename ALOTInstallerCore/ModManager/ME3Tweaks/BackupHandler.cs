@@ -336,7 +336,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         catch (Exception e)
                         {
                             Log.Error($"Error about to copy file: {e.Message}");
-                            Crashes.TrackError(e, null);
+                            Crashes.TrackError(e);
                         }
 
                         return true;
@@ -664,7 +664,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             }
                             catch (Exception e)
                             {
-                                Crashes.TrackError(e, new Dictionary<string, string>()
+                                Crashes.TrackError2(e, new Dictionary<string, string>()
                                         {
                                             {@"Source", @"Restore UI display callback"},
                                             {@"Value", fileBeingCopied},

@@ -59,6 +59,10 @@ namespace ALOTInstallerCore.Helpers
         /// Makes more output messaging occur
         /// </summary>
         public static bool DebugLogs { get; set; }
+        /// <summary>
+        /// When online content was last checked, used for preventing too many requests to ME3Tweaks
+        /// </summary>
+        public static DateTime LastContentCheck { get; set; }
 
 
         /*

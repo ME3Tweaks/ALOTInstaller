@@ -5,7 +5,6 @@ using System.IO;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
-using Serilog;
 
 namespace ALOTInstallerCore.Helpers
 {
@@ -250,6 +249,26 @@ namespace ALOTInstallerCore.Helpers
         {
             var target = GetTarget(game);
             target?.ReloadGameTarget(true, true);
+        }
+
+        internal static string GetME3TweaksServicesCache()
+        {
+            return Directory.CreateDirectory(Path.Combine(AppDataFolder(), "ME3TweaksServicesCache")).FullName;
+        }
+
+        public static string GetBasegameIdentificationCacheFile()
+        {
+            return Path.Combine(GetME3TweaksServicesCache(), "basegamefileidentificationservice.json");
+        }
+
+        internal static string GetThirdPartyIdentificationCachedFile()
+        {
+            return Path.Combine(GetME3TweaksServicesCache(), "thirdpartyidentificationservice.json");
+        }
+
+        internal static string GetObjectInfoFolder()
+        {
+            return Directory.CreateDirectory(Path.Combine(AppDataFolder(), "ObjectInfo")).FullName;
         }
     }
 }

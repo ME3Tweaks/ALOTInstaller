@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ALOTInstallerCore.Objects.Manifest
+﻿namespace ALOTInstallerCore.Objects.Manifest
 {
     /// <summary>
     /// Class that is used for setting up info to display a tutorial link/button to a user

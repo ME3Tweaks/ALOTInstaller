@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Web;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.Objects;
 using Serilog;
-using SevenZipHelper;
 
 namespace ALOTInstallerCore.ModManager.ME3Tweaks
 {
