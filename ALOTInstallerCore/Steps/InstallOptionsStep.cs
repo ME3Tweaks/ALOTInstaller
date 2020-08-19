@@ -64,7 +64,7 @@ namespace ALOTInstallerCore.Steps
         {
             var targetAlotInfo = gameTarget.GetInstalledALOTInfo();
             var options = new Dictionary<InstallOption, (OptionState, string)>();
-            if (manifestMode == ManifestMode.None)
+            if (manifestMode == ManifestMode.Free)
             {
                 if (filesForTarget.Any(x => x is UserFile && x.Ready && !x.Disabled))
                 {

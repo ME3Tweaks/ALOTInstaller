@@ -1,0 +1,99 @@
+﻿<UserControl x:Class="ALOTInstallerWPF.Flyouts.SettingsFlyout"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ALOTInstallerWPF.Flyouts"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="300" MinWidth="300">
+    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible" ScrollViewer.PanningMode="VerticalFirst">
+        <StackPanel>
+            <Expander IsExpanded="True" HorizontalAlignment="Stretch" Expanded="Expander_Expanded">
+                <Expander.Header>
+                    <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Texture Mod Installation Status"/>
+                </Expander.Header>
+                <StackPanel>
+                    <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME1TextureInstallInfo, FallbackValue='ME1: Textures installed, )no ALOT, no MEUITM'}"/>
+                    <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME2TextureInstallInfo, FallbackValue='ME2: Game not installed'}"/>
+                    <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME3TextureInstallInfo, FallbackValue='ME3: ALOT 11.3'}"/>
+                </StackPanel>
+            </Expander>
+            <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                <Expander.Header>
+                    <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Filtering"/>
+                </Expander.Header>
+                <StackPanel>
+                    <StackPanel>
+                        <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect files" OnContent="Show Mass Effect files" IsOn="{Binding ShowME1Files}" ToolTip="Toggle showing files for Mass Effect"/>
+                        <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect 2 files" OnContent="Show Mass Effect 2 files" IsOn="{Binding ShowME2Files}" ToolTip="Toggle showing files for Mass Effect 2"/>
+                        <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect 3 files" OnContent="Show Mass Effect 3 files" IsOn="{Binding ShowME3Files}" ToolTip="Toggle showing files for Mass Effect 3"/>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                <Expander.Header>
+                    <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Backup &amp; Restore"/>
+                </Expander.Header>
+                <!--<StackPanel>
+                    <Button x:Name="Button_ME1Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME1: Not Backed Up" Click="Button_ME1Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                    <Button x:Name="Button_ME2Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME2: Not Backed Up" Click="Button_ME2Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                    <Button x:Name="Button_ME3Backup" Margin="20,0,20,0" FontSize="12" Padding="0,3,0,3" Content="ME3: Not Backed Up" Click="Button_ME3Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                </StackPanel>-->
+            </Expander>
+            <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                <Expander.Header>
+                    <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Diagnostics &amp; MEM"/>
+                </Expander.Header>
+                <!--<StackPanel>
+                    <Button x:Name="Button_GenerateDiagnostic" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Generate Game Diagnostics" ToolTip="Generates a diagnostic log to help figure out issues with one of the games&#10;The log is automatically uploaded for sharing when the diagnostic completes." Click="Button_GenerateDiagnostics_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                    <Button x:Name="Button_UploadLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Upload installer log" ToolTip="Uploads the latest program log to the ALOT Log Viewing Service" Click="Button_UploadLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                    <Button x:Name="Button_ReportIssue" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Report issue / ALOT Discord" ToolTip="Go to the ALOT discord" Click="Button_ReportIssue_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                    <Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" FontWeight="Bold"  Content="Game utilities" Click="Button_Utilities_Click" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Opens panel with various useful end-user utilities"/>
+                    <Button x:Name="Button_ViewLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="View installer log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                    <Label HorizontalAlignment="Center" Margin="20,0,20,3" Padding="0,3,0,3" FontWeight="Bold" x:Name="Label_MEMVersion" Content="MEM (NoGUI) Version: TBD" FontSize="12" ToolTip="Version of MassEffectModderNoGui this program is using"/>
+                </StackPanel>-->
+            </Expander>
+            <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                <Expander.Header>
+                    <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Misc Settings" Padding="0,0,0,0"/>
+                </Expander.Header>
+                <StackPanel>
+                    <!--<Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowFirstTime" Content="Show Intro Dialog" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Shows the initial instructions screen"/>-->
+                    <Button Name="Button_LibraryDir" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Command="{Binding SetLibraryLocationCommand}" Content="Set texture library location" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Allows you to change where mods are stored before installation"/>
+                    <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Command="{Binding CleanupLibraryCommand}" Content="Cleanup Texture Library" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Removes old files from the texture library that are no longer in the manifest.&#10;Any files in this folder that you manually added that are not in the manifest will also be deleted."/>
+                    <!--<CheckBox Margin="5" x:Name="Checkbox_RepackME2GameFiles" Content="Repack ME2 files" Click="Checkbox_RepackME2Files_Click" ToolTip="Repacking game files for ME2 makes installation take longer, but will save some disk space.&#10;This option only has an effect during the initial installation of ALOT. Subsequent installations are not affected." />
+                    <CheckBox Margin="5" x:Name="Checkbox_RepackME3GameFiles" Content="Repack ME3 files" Click="Checkbox_RepackME3Files_Click" ToolTip="Repacking game files for ME3 makes installation take longer, but will save some disk space.&#10;This option only has an effect during the initial installation of ALOT. Subsequent installations are not affected." />-->
+                    <mah:ToggleSwitch OnContent="Import via Move" OffContent="Import via Copy" ToolTip="Files that are importing will be moved instead of copied.&#10;This only is used if files are on same drive - if files are on different drives then they are always copied." />
+                    <!--<CheckBox Margin="5" x:Name="Checkbox_DebugLogging" Content="Debug logging" Click="Checkbox_DebugLogging_Click" ToolTip="Turns on debug logging. Makes log significantly bigger with more logs - only turn on if requested by developers."  />-->
+                    <mah:ToggleSwitch  x:Name="Checkbox_BetaMode" Content="Beta Mode" Toggled="Checkbox_BetaMode_OnToggled" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
+                </StackPanel>
+            </Expander>
+            <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                <Expander.Header>
+                    <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Tutorials &amp; Guides" Padding="0,0,0,0"/>
+                </Expander.Header>
+                <StackPanel x:Name="StackPanel_ManifestTutorials">
+                    <TextBlock x:Name="Label_NoTutorials" Text="No tutorials available in manifest"/>
+                </StackPanel>
+            </Expander>
+            <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                <Expander.Header>
+                    <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Credits" Padding="0,0,0,0"/>
+                </Expander.Header>
+                <StackPanel>
+                    <TextBlock Margin="20,0,0,0" Padding="0,0,0,2" Text="Brought to you by" HorizontalAlignment="Left"/>
+                    <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Aquadran" ToolTip="Developed MEM. One who made this all possible." HorizontalAlignment="Left"/>
+                    <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="CreeperLava" ToolTip="Developed ALOT. Glued all the pieces together." HorizontalAlignment="Left"/>
+                    <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mgamerz" ToolTip="Complained a bunch and then made this suave UI." HorizontalAlignment="Left"/>
+                    <TextBlock Margin="20,0,0,0" Padding="0,0,0,2" Text="Other Credits" HorizontalAlignment="Left"/>
+
+                    <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mass Effect Wiki" ToolTip="This program uses content from the Mass Effect wiki at FANDOM and is licensed under the Creative Commons Attribution-Share Alike License." HorizontalAlignment="Left"/>
+                    <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="ME3Tweaks" ToolTip="Powers the log uploading service to Pastebin" HorizontalAlignment="Left"/>
+                    <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Erik JS" ToolTip="Developer of binkw32 ASI plugins for ME2 and ME3" HorizontalAlignment="Left"/>
+                    <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="SirCxyrtyx " ToolTip="Developer of the AutoTOC ASI plugin" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </Expander>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

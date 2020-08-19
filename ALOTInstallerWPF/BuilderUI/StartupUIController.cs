@@ -53,11 +53,13 @@ namespace ALOTInstallerWPF.BuilderUI
                 {
                     // Todo: Have some way for app to change defaults (to MEUITM? Last mode set? ??)
                     ManifestHandler.SetCurrentMode(ManifestMode.ALOT);
+                    pd.SetMessage("Preparing texture library");
+                    foreach (var v in ManifestHandler.MasterManifest.ManifestModePackageMappping)
+                    {
+                        TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(v.Key));
+                    }
                 }
 
-                pd.SetMessage("Preparing texture library");
-                TextureLibrary.ResetAllReadyStatuses(
-                    ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode));
 
                 pd.SetMessage("Preparing interface");
                 Application.Current.Dispatcher.InvokeAsync(() =>
@@ -70,22 +72,22 @@ namespace ALOTInstallerWPF.BuilderUI
                 });
             };
             bw.RunWorkerCompleted += (a, b) =>
-            {
-                pd.CloseAsync();
-                //if (b.Error == null)
-                //{
-                //    FileSelectionUIController bui = new FileSelectionUIController();
-                //    if (ManifestHandler.MasterManifest != null)
-                //    {
-                //        ManifestHandler.CurrentMode = ManifestMode.ALOT;
-                //    }
-                //    Program.SwapToNewView(bui);
-                //}
-                //else
-                //{
-                //    startupStatusLabel.Text = "Error preparing application: " + b.Error.Message;
-                //}
-            };
+                {
+                    pd.CloseAsync();
+                    //if (b.Error == null)
+                    //{
+                    //    FileSelectionUIController bui = new FileSelectionUIController();
+                    //    if (ManifestHandler.MasterManifest != null)
+                    //    {
+                    //        ManifestHandler.CurrentMode = ManifestMode.ALOT;
+                    //    }
+                    //    Program.SwapToNewView(bui);
+                    //}
+                    //else
+                    //{
+                    //    startupStatusLabel.Text = "Error preparing application: " + b.Error.Message;
+                    //}
+                };
             bw.RunWorkerAsync();
 
 

@@ -151,7 +151,7 @@ namespace ALOTInstallerCore.Helpers
             {
                 UsingBundled = usingBundled
             };
-            MasterManifest.ManifestModePackageMappping[ManifestMode.None] = new ManifestModePackage(); //Blank none mode
+            MasterManifest.ManifestModePackageMappping[ManifestMode.Free] = new ManifestModePackage(); //Blank none mode
 
             try
             {
@@ -471,6 +471,18 @@ namespace ALOTInstallerCore.Helpers
             }
 
             return files;
+        }
+        
+        /// <summary>
+        /// Gets the level of readiness of non-optional manifest files. THis can be used to show the user how 'ready' the recommended experience for the current mode is before install
+        /// </summary>
+        /// <returns></returns>
+        public static (long ready, long recommendedCount) GetNonOptionalReadyness()
+        {
+            var filesToCheck = GetManifestFilesForMode(CurrentMode).OfType<ManifestFile>().Where(x => x.Recommendation == RecommendationType.Recommended || x.Recommendation == RecommendationType.Required);
+            int readyx = filesToCheck.Count(x=>x.Ready);
+            int recommendedCountx = filesToCheck.Count();
+            return (readyx, recommendedCountx);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

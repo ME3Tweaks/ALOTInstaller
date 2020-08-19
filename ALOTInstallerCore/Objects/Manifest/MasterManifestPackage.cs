@@ -10,7 +10,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// <summary>
         /// No manifest. Install whatever you want, but you get to deal with the side effects
         /// </summary>
-        None,
+        Free,
         /// <summary>
         /// MEUITM manifest. Installs only MEUITM with MEUITM defaults (+ user files)
         /// </summary>

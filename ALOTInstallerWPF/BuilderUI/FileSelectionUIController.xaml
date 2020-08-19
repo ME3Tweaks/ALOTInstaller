@@ -8,6 +8,7 @@
              xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:objects="clr-namespace:ALOTInstallerWPF.Objects"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -17,6 +18,7 @@
         <converters:InstallerFileBackingFileConverter x:Key="InstallerFileBackingFileConverter"/>
         <converters:ReadyIconConverter x:Key="ReadyIconConverter"/>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:RecommendationColorConverter x:Key="RecommendationColorConverter"/>
         <!--<Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
             <Style.Resources>
                 <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource IdealForegroundColor}" />
@@ -64,88 +66,97 @@
             <Setter Property="Margin" Value="0,0,0,0" />
         </Style>
     </UserControl.Resources>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="15" />
-            <RowDefinition Height="1*" />
-            <RowDefinition Height="auto" />
-        </Grid.RowDefinitions>
-        <Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
-            <TextBlock x:Name="HeaderLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
-        </Label>
-        <Label Grid.Column="0" Grid.Row="1"  HorizontalContentAlignment="Center">
-            <TextBlock x:Name="AddonFilesLabel" TextAlignment="Center" Text="Preparing application..." TextWrapping="Wrap" />
-        </Label>
+    <DockPanel>
+        <TabControl DockPanel.Dock="Top" HorizontalAlignment="Stretch" SelectedItem="{Binding SelectedHeader}" ItemsSource="{Binding AvailableModes}" DisplayMemberPath="ModeText">
+            <TabControl.Resources>
+                <Style TargetType="{x:Type TabPanel}">
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                </Style>
+            </TabControl.Resources>
+            <TabControl.ContentTemplate>
+                <DataTemplate DataType="{x:Type objects:ModeHeader}">
+                    <TextBlock Text="{Binding ModeDescription}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+        <ProgressBar DockPanel.Dock="Top" Value="{Binding ProgressValue}" Maximum="{Binding ProgressMax}" IsIndeterminate="{Binding ProgressIndeterminate}"/>
         <!--<ProgressBar alotaddonguiui:ProgressBarSmooth.SmoothValue="{Binding ProgressBarValue}" Value="{Binding Path=ProgressBarValue, Mode=OneWay}" Minimum="0" Maximum="{Binding Progressbar_Max}" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true" />-->
-        <ListBox Grid.Column="0" Grid.Row="3"
-                  BorderThickness="0"
-                  ItemsSource="{Binding CurrentlyDisplayedFiles}" 
-                  VirtualizingPanel.IsVirtualizingWhenGrouping="True" 
-                  VirtualizingPanel.IsVirtualizing="True"
-                  Name="InstallerFilesListBox">
+        <DockPanel DockPanel.Dock="Bottom">
+            <Separator DockPanel.Dock="Top"/>
+            <Button Content="Settings" ToolTip="Opens the settings and status panel" DockPanel.Dock="Left" Padding="10,2" 
+                    Command="{Binding OpenSettingsCommand}"
+                    FontWeight="Bold" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" 
+                    mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11"/>
+            <Button Content="Import Assistant" ToolTip="Assists in preparing files for install" Padding="10,2" Margin="-1,0,0,0" DockPanel.Dock="Left" FontWeight="Bold" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11"/>
+
+            <Button HorizontalAlignment="Right" Content="Install textures" Padding="10,2" FontWeight="Bold" 
+                    Style="{StaticResource MahApps.Styles.Button.Square.Accent}" mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11" ToolTip="Prepares to build and install textures.&#10;There are several dialogs and checks that occur before installation begins"
+                    Command="{Binding InstallTexturesCommand}"/>
+        </DockPanel>
+
+
+        <ListBox BorderThickness="0"
+                 ItemsSource="{Binding DisplayedFilesView}" 
+                 VirtualizingPanel.IsVirtualizingWhenGrouping="True" 
+                 VirtualizingPanel.IsVirtualizing="True"
+                 Name="InstallerFilesListBox">
             <!-- This is what each list item looks like-->
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type manifest:ManifestFile}">
-                    <DockPanel Background="{Binding Converter={StaticResource ReadyBackgroundColorConverter}}">
-                        <Border DockPanel.Dock="Left" Background="{Binding Converter={StaticResource ReadyColorConverter}}" Padding="0,4" Width="5" Margin="0,0,4,0"/>
+                    <DockPanel Background="{Binding Self, Converter={StaticResource ReadyBackgroundColorConverter}}">
+                        <Border DockPanel.Dock="Left" Background="{Binding Self, Converter={StaticResource ReadyColorConverter}}" Padding="0,4" Width="5" Margin="0,0,4,0"/>
 
                         <StackPanel Orientation="Vertical" DockPanel.Dock="Left" Margin="0,3">
                             <StackPanel Orientation="Horizontal">
-                                <iconPacks:PackIconIonicons Margin="0,0,3,0"  Kind="{Binding Converter={StaticResource ReadyIconConverter}}" Foreground="{Binding Converter={StaticResource ReadyColorConverter}}" />
+                                <iconPacks:PackIconIonicons Margin="0,0,3,0"  Kind="{Binding Self, Converter={StaticResource ReadyIconConverter}}" Foreground="{Binding Self, Converter={StaticResource ReadyColorConverter}}" />
                                 <TextBlock Text="{Binding FriendlyName}" FontWeight="Bold"/>
                             </StackPanel>
-
-                            <TextBlock Text="{Binding StatusText}"/>
-                            <TextBlock Text="{Binding Converter={StaticResource InstallerFileBackingFileConverter}}" FontSize="10"/>
-                            <StackPanel Orientation="Horizontal" Visibility="{Binding Ready, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}" Margin="0,4">
-                            <iconPacks:PackIconIonicons Kind="DownloadMD"/>
-                            <TextBlock  Margin="5,0">
-                                <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
-                                    <Hyperlink.Style >
-                                        <Style TargetType="Hyperlink"
-                                               BasedOn="{StaticResource {x:Type Hyperlink}}">
-                                            <Setter Property="Foreground" Value="#31ae90"/>
-                                            <Setter Property="FontWeight" Value="Bold"/>
-
-                                        </Style>
-                                    </Hyperlink.Style>
-                                    <Hyperlink.ToolTip>
-                                        <TextBlock>
-                                            <TextBlock.Text>
-                                                <MultiBinding StringFormat="{}{0}&#10;File title: {1}">
-                                                    <Binding Path="DownloadLink" />
-                                                    <Binding Path="Tooltipname" />
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                    </Hyperlink.ToolTip>
-                                    Download
-                                </Hyperlink>
-                            </TextBlock>
+                            <TextBlock Text="{Binding StatusText}" Visibility="{Binding Ready, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
+                            <TextBlock Text="{Binding RecommendationReason}" FontSize="11" MaxWidth="320" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding Self, Converter={StaticResource InstallerFileBackingFileConverter}}" FontSize="10"/>
                             </StackPanel>
-
-                        </StackPanel>
 
                         <StackPanel Orientation="Vertical" DockPanel.Dock="Right" Margin="3,3">
                             <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Border Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME1'}" ToolTip="This file applies to Mass Effect" Padding="1" BorderThickness="1" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
+                                <Border Padding="3,1" Margin="5,0" BorderThickness="1" BorderBrush="LightGray" Background="{Binding Recommendation, Converter={StaticResource RecommendationColorConverter}}" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    <TextBlock TextAlignment="Right" Text="{Binding RecommendationString}" FontSize="10" FontStyle="Italic"/>
+                                </Border>
+                                <Border Padding="2,1" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME1'}" ToolTip="This file applies to Mass Effect" BorderThickness="1" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
                                     <TextBlock FontSize="10"  Text="Mass Effect" VerticalAlignment="Center"/>
                                 </Border>
-                                <Border Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME2'}" ToolTip="This file applies to Mass Effect 2" Padding="1" BorderThickness="1" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
+                                <Border Padding="2,1" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME2'}" ToolTip="This file applies to Mass Effect 2" BorderThickness="1" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
                                     <TextBlock FontSize="10"  Text="Mass Effect 2" VerticalAlignment="Center"/>
                                 </Border>
-                                <Border Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME3'}" ToolTip="This file applies to Mass Effect 3" Padding="1" BorderThickness="1" BorderBrush="Chartreuse" Background="#0f4e60" CornerRadius="2" VerticalAlignment="Center">
+                                <Border Padding="2,1" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME3'}" ToolTip="This file applies to Mass Effect 3" BorderThickness="1" BorderBrush="Chartreuse" Background="#0f4e60" CornerRadius="2" VerticalAlignment="Center">
                                     <TextBlock FontSize="10"  Text="Mass Effect 3" VerticalAlignment="Center"/>
                                 </Border>
                             </StackPanel>
-                            <TextBlock TextAlignment="Right" Text="{Binding RecommendationString}" FontSize="10" FontStyle="Italic"/>
-                            <TextBlock TextAlignment="Right" Text="{Binding RecommendationReason}" FontSize="10" FontStyle="Italic"/>
+                            <StackPanel Orientation="Horizontal" Visibility="{Binding Ready, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}" Margin="0,4" HorizontalAlignment="Right">
+                                <iconPacks:PackIconIonicons Kind="DownloadMD"/>
+                                <TextBlock  Margin="5,0">
+                                    <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
+                                        <Hyperlink.Style >
+                                            <Style TargetType="Hyperlink"
+                                                   BasedOn="{StaticResource {x:Type Hyperlink}}">
+                                                <Setter Property="Foreground" Value="#31ae90"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
 
+                                            </Style>
+                                        </Hyperlink.Style>
+                                        <Hyperlink.ToolTip>
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{}{0}&#10;File title: {1}">
+                                                        <Binding Path="DownloadLink" />
+                                                        <Binding Path="Tooltipname" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </Hyperlink.ToolTip>
+                                        Download
+                                    </Hyperlink>
+                                </TextBlock>
+                            </StackPanel>
                         </StackPanel>
 
 
@@ -313,12 +324,5 @@
         </ListBox>
 
         <!--Bottom Buttons-->
-        <DockPanel Grid.Row="4" Grid.Column="0">
-            <Separator DockPanel.Dock="Top"/>
-            <Button Content="Settings" ToolTip="Opens the settings and status panel" DockPanel.Dock="Left" Padding="10,2" FontWeight="Bold" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11"/>
-            <Button Content="Import Assistant" ToolTip="Assists in preparing files for install" Padding="10,2" Margin="-1,0,0,0" DockPanel.Dock="Left" FontWeight="Bold" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11"/>
-
-            <Button HorizontalAlignment="Right" Content="Install textures" Padding="10,2" FontWeight="Bold" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11" ToolTip="Prepares to build and install textures.&#10;There are several dialogs and checks that occur before installation begins"/>
-        </DockPanel>
-    </Grid>
+    </DockPanel>
 </UserControl>

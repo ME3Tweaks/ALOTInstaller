@@ -5,9 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using ALOTInstallerCore.Objects;
+using System.Threading.Tasks;
 using ALOTInstallerCore.Objects.Manifest;
 using Serilog;
+using ALOTInstallerCore.Objects;
 
 namespace ALOTInstallerCore.Helpers
 {
@@ -22,15 +23,23 @@ namespace ALOTInstallerCore.Helpers
         private static FileSystemWatcher watcher;
         private static List<ManifestFile> manifestFiles;
         private static Action<ManifestFile> readyStatusChanged;
+        private static System.Timers.Timer fullRefreshTimer;
+
+        /// <summary>
+        /// Sets up the folder watcher for the texture library folder.
+        /// </summary>
+        /// <param name="watchedManifestFiles"></param>
+        /// <param name="readyStatusChangedCallback"></param>
         public static void SetupLibraryWatcher(List<ManifestFile> watchedManifestFiles, Action<ManifestFile> readyStatusChangedCallback)
         {
-            TextureLibrary.manifestFiles = watchedManifestFiles;
-            TextureLibrary.readyStatusChanged = readyStatusChangedCallback;
-            Debug.WriteLine("Starting filesystem watcher on " + Settings.TextureLibraryLocation);
             if (watcher != null)
             {
                 StopLibraryWatcher();
             }
+            TextureLibrary.manifestFiles = watchedManifestFiles;
+            TextureLibrary.readyStatusChanged = readyStatusChangedCallback;
+            Debug.WriteLine("Starting filesystem watcher on " + Settings.TextureLibraryLocation);
+
             watcher = new FileSystemWatcher(Settings.TextureLibraryLocation)
             {
                 // Just notify on everything because it seems things like move are done through attributes (??)
@@ -44,11 +53,37 @@ namespace ALOTInstallerCore.Helpers
 
             };
             // Add event handlers.
+            if (fullRefreshTimer == null)
+            {
+                fullRefreshTimer = new System.Timers.Timer(15000)
+                {
+                    AutoReset = true,
+                    Enabled = true
+                };
+                fullRefreshTimer.Elapsed += async (a, b) =>
+                {
+                    Debug.WriteLine("Full ready status refresh");
+                    await Task.Run(() =>
+                    {
+                        var updatedFiles = TextureLibrary.ResetAllReadyStatuses(TextureLibrary.manifestFiles.OfType<InstallerFile>().ToList());
+                        if (updatedFiles.Any())
+                        {
+                            readyStatusChangedCallback?.Invoke(null);
+                        }
+                    });
+                };
+            }
+            else
+            {
+                fullRefreshTimer.Enabled = true;
+            }
+
             watcher.Changed += OnLibraryFileChanged;
             watcher.Created += OnLibraryFileChanged;
             watcher.Deleted += OnLibraryFileChanged;
             watcher.Renamed += OnLibraryFileChanged;
             watcher.EnableRaisingEvents = true;
+
         }
 
         private static void OnLibraryFileChanged(object sender, FileSystemEventArgs e)
@@ -286,6 +321,8 @@ namespace ALOTInstallerCore.Helpers
         /// </summary>
         public static void StopLibraryWatcher()
         {
+            Debug.WriteLine("Killing filesystem watcher");
+            if (fullRefreshTimer != null) fullRefreshTimer.Enabled = false;
             readyStatusChanged = null;
             manifestFiles = null;
             if (watcher != null)
@@ -311,12 +348,18 @@ namespace ALOTInstallerCore.Helpers
         /// <summary>
         /// Forces all items in the specified list to refresh their ready status
         /// </summary>
-        public static void ResetAllReadyStatuses(List<InstallerFile> files)
+        public static List<InstallerFile> ResetAllReadyStatuses(List<InstallerFile> files)
         {
+            var updatedFiles = new List<InstallerFile>();
             foreach (var v in files)
             {
-                v.UpdateReadyStatus();
+                if (v.UpdateReadyStatus())
+                {
+                    updatedFiles.Add(v);
+                }
             }
+
+            return updatedFiles;
         }
 
         /// <summary>

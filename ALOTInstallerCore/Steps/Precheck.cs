@@ -351,7 +351,7 @@ namespace ALOTInstallerCore.Steps
         private bool checkRequiredFiles(out string failureReason)
         {
             failureReason = null;
-            if (mode == ManifestMode.None) return true; //no files are required in free mode
+            if (mode == ManifestMode.Free) return true; //no files are required in free mode
 
             var texturesInfo = target.GetInstalledALOTInfo();
             if (mode == ManifestMode.ALOT)

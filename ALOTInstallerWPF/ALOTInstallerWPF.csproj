@@ -19,6 +19,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\logo_me1.png" />
+    <None Remove="Images\logo_me2.png" />
+    <None Remove="Images\logo_me3.png" />
+    <None Remove="Images\logo_mem.png" />
+    <None Remove="Images\me1_bg.jpg" />
+    <None Remove="Images\me1_bg_alt.jpg" />
+    <None Remove="Images\me2_bg.jpg" />
+    <None Remove="Images\me2_bg_alt.jpg" />
+    <None Remove="Images\me3_bg.jpg" />
+    <None Remove="Images\me3_bg_alt.jpg" />
+    <None Remove="Images\meuitm.jpg" />
+    <None Remove="Images\origin\me1update.png" />
+    <None Remove="Images\origin\me2update.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MahApps.Metro" Version="2.2.0" />
     <PackageReference Include="MahApps.Metro.IconPacks.Ionicons" Version="4.4.0" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />
@@ -46,6 +62,23 @@
 	  <Reference Include="MahApps.Metro">
 	    <HintPath>..\packages\MahApps.Metro.1.6.5\lib\net47\MahApps.Metro.dll</HintPath>
 	  </Reference>
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Resource Include="Images\logo_me1.png" />
+	  <Resource Include="Images\logo_me2.png" />
+	  <Resource Include="Images\logo_me3.png" />
+	  <Resource Include="Images\logo_mem.png" />
+	  <Resource Include="Images\me1_bg.jpg" />
+	  <Resource Include="Images\me1_bg_alt.jpg" />
+	  <Resource Include="Images\me2_bg.jpg" />
+	  <Resource Include="Images\me2_bg_alt.jpg" />
+	  <Resource Include="Images\me3_bg.jpg" />
+	  <Resource Include="Images\me3_bg_alt.jpg" />
+	  <Resource Include="Images\meuitm.jpg" />
+	  <Resource Include="Images\origin\me1update.png" />
+	  <Resource Include="Images\origin\me2update.png" />
 	</ItemGroup>
 
 </Project>

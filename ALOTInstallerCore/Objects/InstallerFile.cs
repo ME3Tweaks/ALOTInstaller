@@ -25,11 +25,11 @@ namespace ALOTInstallerCore.Objects
         /// <summary>
         /// No recommendation status
         /// </summary>
-        None, 
+        None,
         /// <summary>
         /// Strays from vanilla
         /// </summary>
-        Optional, 
+        Optional,
         /// <summary>
         /// Similar to vanilla
         /// </summary>
@@ -138,5 +138,19 @@ namespace ALOTInstallerCore.Objects
                 pf.Processed = false;
             }
         }
+
+        /// <summary>
+        /// Reference to self. Can be used to force data binding updates for wrapper applications. Will be property notified on changes to things such as Ready status.
+        /// </summary>
+        public InstallerFile Self => this;
+
+        /// <summary>
+        /// Causes the data bindings for the Self object to refresh.
+        /// </summary>
+        internal void NotifyStatusUpdate()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Self)));
+        }
+
     }
 }

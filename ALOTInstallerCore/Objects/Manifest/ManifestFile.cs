@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 using ALOTInstallerCore.Helpers;
+using Serilog;
 
 namespace ALOTInstallerCore.Objects.Manifest
 {
@@ -504,6 +506,17 @@ namespace ALOTInstallerCore.Objects.Manifest
         public override string ToString() => FriendlyName;
         public override bool UpdateReadyStatus()
         {
+            var updated = internalUpdateReadyStatus();
+            if (updated)
+            {
+                Log.Information($"ManifestFile {FriendlyName} changing ready status. Is now ready: {Ready}");
+            }
+
+            return updated;
+        }
+
+        private bool internalUpdateReadyStatus()
+        {
             var oldReady = Ready;
             var fp = GetUsedFilepath();
             if (File.Exists(fp))
@@ -533,6 +546,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// </summary>
         private void updateStatus()
         {
+            NotifyStatusUpdate();
             if (Disabled)
             {
                 StatusText = "Disabled, will not install";
