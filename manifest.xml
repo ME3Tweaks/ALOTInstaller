@@ -506,14 +506,14 @@
                            choicetitle="Battle hardened" />
                </choicefile>
                <zipfile
-                    recommendationreason="Placeholder reason"
+                    recommendationreason="Adds some good-looking lighting effects"
                     recommendation="Optional"
                     default="false"
                     inarchivepath="MEUITM\mods\MEUITMReShade.zip"
                     gamedestinationpath="binaries"
                     choicetitle="MEUITM Reshade" />
                <zipfile
-                    recommendationreason="Placeholder reason"
+                    recommendationreason="Enhances the shadows"
                     recommendation="Optional"
                     default="false"
                     inarchivepath="MEUITM\mods\SoftShadowsauto.zip"
@@ -843,7 +843,7 @@
             friendlyname="ALOT for ME1 11.0"
             author="CreeperLava"
             uipriority="0"
-            recommendationreason="Required per ALOT mode rules"
+            recommendationreason="Main ALOT file, required"
             recommendation="Required"
             installpriority="1">
         <file
@@ -866,7 +866,7 @@
             friendlyname="ALOT for ME2 11.0"
             author="CreeperLava"
             uipriority="0"
-            recommendationreason="Required per ALOT mode rules"
+            recommendationreason="Main ALOT file, required"
             recommendation="Required"
             installpriority="1">
                <file
@@ -889,7 +889,7 @@
             friendlyname="ALOT for ME3 11.0"
             author="CreeperLava"
             uipriority="0"
-            recommendationreason="Required per ALOT mode rules"
+            recommendationreason="Main ALOT file, required"
             recommendation="Required"
             installpriority="1">
                <file
@@ -1043,7 +1043,7 @@
         <addonfile
             friendlyname="Allers Complexion Tweak"
             author="Ellise"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1062,7 +1062,7 @@
         <addonfile
             friendlyname="Brooks Complexion Tweak"
             author="Ellise"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1081,7 +1081,7 @@
         <addonfile
             friendlyname="Illusive Man Complexion Tweak"
             author="Ellise"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1142,7 +1142,7 @@
         <addonfile
             friendlyname="Ashley Complexion Tweak"
             author="Ellise"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1162,7 +1162,7 @@
         <addonfile
             friendlyname="Jacob Complexion Tweak"
             author="Ellise"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1190,7 +1190,7 @@
         <addonfile
             friendlyname="Kaidan Complexion Tweak"
             author="Ellise"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1209,7 +1209,7 @@
         <addonfile
             friendlyname="FemShep Complexion Tweak"
             author="Ellise"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures for default FemShep (not custom), but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1228,7 +1228,7 @@
         <addonfile
             friendlyname="Sheploo Complexion Tweak"
             author="Ellise"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures for default BroShep (not custom), but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1247,7 +1247,7 @@
         <addonfile
             friendlyname="James Complexion Tweak"
             author="Ellise"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1266,7 +1266,7 @@
         <addonfile
             friendlyname="Zaeed Complexion Tweak"
             author="Ellise"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1285,7 +1285,7 @@
         <addonfile
             friendlyname="FemShep High Quality textures"
             author="heleuss"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures for custom FemSheps (not default), but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1305,7 +1305,7 @@
         <addonfile
             friendlyname="BroShep High Quality textures"
             author="heleuss"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures for custom BroSheps (not default), but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1321,7 +1321,7 @@
         <addonfile
             friendlyname="FemShep High Quality textures"
             author="heleuss"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures for custom FemSheps (not default), but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1341,7 +1341,7 @@
         <addonfile
             friendlyname="BroShep High Quality textures"
             author="heleuss"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Very good face textures for custom BroSheps (not default), but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1361,7 +1361,7 @@
             friendlyname="HR Predator Texture"
             author="TheDarkFalkon"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality weapon textures"
             recommendation="Recommended">
                <file
                     downloadlink="https://drive.google.com/drive/folders/1ha-PdId0T6O_AgSs-LAEsmpV8ILgCpuc?usp=sharing"
@@ -1398,7 +1398,7 @@
             friendlyname="HR Shuriken Texture"
             author="TheDarkFalkon"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality weapon textures"
             recommendation="Recommended">
                <file
                     downloadlink="https://drive.google.com/drive/folders/1ha-PdId0T6O_AgSs-LAEsmpV8ILgCpuc?usp=sharing"
@@ -1428,7 +1428,7 @@
             friendlyname="HR Katana Texture"
             author="TheDarkFalkon"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality weapon textures"
             recommendation="Recommended">
                <file
                     downloadlink="https://drive.google.com/drive/folders/1ha-PdId0T6O_AgSs-LAEsmpV8ILgCpuc?usp=sharing"
@@ -1461,7 +1461,7 @@
             friendlyname="HR Carnifex Texture"
             author="TheDarkFalkon"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality weapon textures"
             recommendation="Recommended">
                <file
                     downloadlink="https://drive.google.com/drive/folders/1ha-PdId0T6O_AgSs-LAEsmpV8ILgCpuc?usp=sharing"
@@ -1491,7 +1491,7 @@
             friendlyname="HR Paladin Texture"
             author="TheDarkFalkon"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality weapon textures"
             recommendation="Recommended">
                <file
                     downloadlink="https://drive.google.com/drive/folders/1ha-PdId0T6O_AgSs-LAEsmpV8ILgCpuc?usp=sharing"
@@ -1515,7 +1515,7 @@
             friendlyname="HR Phaeston Texture"
             author="TheDarkFalkon"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality weapon textures"
             recommendation="Recommended">
                <file
                     downloadlink="https://drive.google.com/drive/folders/1ha-PdId0T6O_AgSs-LAEsmpV8ILgCpuc?usp=sharing"
@@ -1543,7 +1543,7 @@
             friendlyname="HR M-92 Mantis"
             author="TheDarkFalkon"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality weapon textures"
             recommendation="Recommended">
                <file
                     downloadlink="https://1drv.ms/u/s!Ap-6jpUc4ODbgwc5r2cAvx9K7iFn"
@@ -1567,7 +1567,7 @@
             friendlyname="Armor Sets Pack for ME3"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality armor textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/134/?tab=files"
@@ -2074,7 +2074,7 @@
             friendlyname="ME3 HR Alliance Blues - 4096"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/79/?tab=files"
@@ -2141,7 +2141,7 @@
             friendlyname="HR Alliance Cruiser"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=files"
@@ -2164,7 +2164,7 @@
             friendlyname="Armax Arena Cerberus Female"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/185/?tab=files"
@@ -2203,7 +2203,7 @@
             friendlyname="Armax Arena Cerberus Male"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/185/?tab=files"
@@ -2238,7 +2238,7 @@
             friendlyname="Ashley Alternate Armor"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/13/?tab=files"
@@ -2273,7 +2273,7 @@
             friendlyname="Ashley Alternate From Ashes Armor"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/15/?tab=files"
@@ -2300,7 +2300,7 @@
             friendlyname="Ashley CE Armor"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/95/?tab=files"
@@ -2335,7 +2335,7 @@
             friendlyname="Ashley Default"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/4/?tab=files"
@@ -2370,7 +2370,7 @@
             friendlyname="Citadel Enviromentals 102"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=files"
@@ -2425,7 +2425,7 @@
             friendlyname="Combat Fatigues"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/141/?tab=files"
@@ -2522,7 +2522,7 @@
             author="Ottemis"
             stagemodfiles="true"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/238/?tab=files"
@@ -2544,7 +2544,7 @@
             author="Ottemis"
             stagemodfiles="true"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/273/?tab=files"
@@ -2577,7 +2577,7 @@
             friendlyname="Fourth Casual Black"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/301/?tab=files"
@@ -2629,7 +2629,7 @@
             friendlyname="Garrus Alternate Armor"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/6/?tab=files"
@@ -2661,7 +2661,7 @@
             friendlyname="Kai Leng"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=files"
@@ -2708,7 +2708,7 @@
             friendlyname="Kaidan Alt From Ashes Armor in Original Black"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/17/?tab=files"
@@ -2731,7 +2731,7 @@
             friendlyname="Kaidan CE Armor"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/294/?tab=files"
@@ -2774,7 +2774,7 @@
             friendlyname="Kaidan Default Armor"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/290/?tab=files"
@@ -2805,7 +2805,7 @@
             friendlyname="Liara Alt From Ashes Armor"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/8/?tab=files"
@@ -2833,7 +2833,7 @@
             friendlyname="Liara Alternate Armor"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/12/?tab=files"
@@ -2861,7 +2861,7 @@
             friendlyname="HR Maya Brooks"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures. Doesn't conflict with Brooks' complexion tweak"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=files"
@@ -2888,7 +2888,7 @@
             friendlyname="N7 Hoody"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/45/?tab=files"
@@ -2927,7 +2927,7 @@
             friendlyname="Science Uniforms"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/161/?tab=files"
@@ -2962,7 +2962,7 @@
             friendlyname="Vega Alt From Ashes Armor in Original Blue"
             author="Ottemis"
             installpriority="10"
-            recommendationreason="Placeholder reason"
+            recommendationreason="Vanilla-friendly, high quality textures"
             recommendation="Recommended">
                <file
                     downloadlink="http://www.nexusmods.com/masseffect3/mods/7/?tab=files"
