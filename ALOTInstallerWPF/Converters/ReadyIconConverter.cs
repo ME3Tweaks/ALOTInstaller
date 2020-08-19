@@ -5,22 +5,23 @@ using System.Text;
 using System.Windows.Data;
 using System.Windows.Media;
 using ALOTInstallerCore.Objects;
+using MahApps.Metro.IconPacks;
 
 namespace ALOTInstallerWPF.Converters
 {
-    class ReadyColorConverter : IValueConverter
+    class ReadyIconConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (value is InstallerFile ifx)
             {
-                if (ifx.IsProcessing) return Brushes.Yellow;
-                if (ifx.Disabled) return Brushes.Gray;
-                if (ifx.Ready) return Brushes.LimeGreen;
-                return Brushes.Red;
+                if (ifx.IsProcessing) return PackIconIoniconsKind.CogiOS;
+                if (ifx.Disabled) return PackIconIoniconsKind.RemoveCircleMD;
+                if (ifx.Ready) return PackIconIoniconsKind.CheckmarkCircleMD;
+                return PackIconIoniconsKind.CloseCircleMD;
             }
 
-            return Brushes.DeepPink;
+            return PackIconIoniconsKind.JetMD;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

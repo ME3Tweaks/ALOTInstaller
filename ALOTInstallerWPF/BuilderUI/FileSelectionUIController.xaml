@@ -6,12 +6,14 @@
              xmlns:local="clr-namespace:ALOTInstallerWPF.BuilderUI"
              xmlns:manifest="clr-namespace:ALOTInstallerCore.Objects.Manifest;assembly=ALOTInstallerCore"
              xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <converters:ApplicableGamesVisibilityConverter x:Key="ApplicableGamesVisibilityConverter"/>
         <converters:ReadyColorConverter x:Key="ReadyColorConverter"/>
         <converters:InstallerFileBackingFileConverter x:Key="InstallerFileBackingFileConverter"/>
+        <converters:ReadyIconConverter x:Key="ReadyIconConverter"/>
         <!--<Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
             <Style.Resources>
                 <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource IdealForegroundColor}" />
@@ -85,16 +87,20 @@
             <!-- This is what each list item looks like-->
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type manifest:ManifestFile}">
-                    <DockPanel Margin="3">
-                        <Border DockPanel.Dock="Left" Background="{Binding Converter={StaticResource ReadyColorConverter}}" Width="5" Margin="0,0,4,0"/>
+                    <DockPanel>
+                        <Border DockPanel.Dock="Left" Background="{Binding Converter={StaticResource ReadyColorConverter}}" Padding="0,4" Width="5" Margin="0,0,4,0"/>
 
-                        <StackPanel Orientation="Vertical" DockPanel.Dock="Left">
-                            <TextBlock Text="{Binding FriendlyName}" FontWeight="Bold"/>
+                        <StackPanel Orientation="Vertical" DockPanel.Dock="Left" Margin="0,3">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconIonicons Margin="0,0,3,0"  Kind="{Binding Converter={StaticResource ReadyIconConverter}}" Foreground="{Binding Converter={StaticResource ReadyColorConverter}}" />
+                                <TextBlock Text="{Binding FriendlyName}" FontWeight="Bold"/>
+                            </StackPanel>
+
                             <TextBlock Text="{Binding StatusText}"/>
                             <TextBlock Text="{Binding Converter={StaticResource InstallerFileBackingFileConverter}}" FontSize="10"/>
                         </StackPanel>
 
-                        <StackPanel Orientation="Vertical" DockPanel.Dock="Right" Margin="3,0">
+                        <StackPanel Orientation="Vertical" DockPanel.Dock="Right" Margin="3,3">
                             <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
                                 <Border Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME1'}" ToolTip="This file applies to Mass Effect" Padding="1" BorderThickness="1" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
                                     <TextBlock FontSize="10"  Text="Mass Effect" VerticalAlignment="Center"/>
