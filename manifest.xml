@@ -1321,7 +1321,7 @@
         <addonfile
             friendlyname="FemShep High Quality textures"
             author="heleuss"
-            recommendationreason="Very good face textures for custom FemSheps, but a little different from vanilla and thus up to personal preference"
+            recommendationreason="Very good face textures for custom FemSheps (not default), but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
@@ -1341,7 +1341,7 @@
         <addonfile
             friendlyname="BroShep High Quality textures"
             author="heleuss"
-            recommendationreason="Very good face textures for custom BroSheps, but a little different from vanilla and thus up to personal preference"
+            recommendationreason="Very good face textures for custom BroSheps (not default), but a little different from vanilla and thus up to personal preference"
             recommendation="Optional"
             installpriority="10">
                <file
