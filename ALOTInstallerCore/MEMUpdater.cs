@@ -34,7 +34,7 @@ namespace ALOTInstallerCore
         /// <summary>
         /// Checks for and updates mem if necessary
         /// </summary>
-        public static void UpdateMEM(Action<long, long> downloadProgressChanged = null, Action<Exception> exceptionUpdating = null)
+        public static void UpdateMEM(Action<long, long> downloadProgressChanged = null, Action<Exception> exceptionUpdating = null, Action<string> statusMessageUpdate = null)
         {
             int memVersion = 0;
             var mempath = Locations.MEMPath();
@@ -164,6 +164,7 @@ namespace ALOTInstallerCore
                         });
                         
                         // Handle unzip code here.
+                        statusMessageUpdate?.Invoke("Extracting MassEffectModderNoGui");
                         var res = SevenZipHelper.LZMA.ExtractSevenZipArchive(downloadPath, Locations.AppDataFolder(), true);
                     }
                     else

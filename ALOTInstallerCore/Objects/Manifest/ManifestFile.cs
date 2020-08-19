@@ -285,10 +285,6 @@ namespace ALOTInstallerCore.Objects.Manifest
 
         //        public string ALOTMainPackedFilename { get; set; }
         public string TorrentFilename { get; set; }
-        /// <summary>
-        /// The order in which files are installed. Lower numbers are installed first, thus higher ones will supercede lower ones that replace the same textures.
-        /// </summary>
-        public int InstallPriority { get; set; } //lower numbers i think are sorted to lower
 
         /// <summary>
         /// If this file is backed by the unpacked version. This call only works when file is in the library and not staged
@@ -516,17 +512,38 @@ namespace ALOTInstallerCore.Objects.Manifest
                 if (Path.GetFileName(fp) == Filename || (TorrentFilename != null && Path.GetFileName(fp).Equals(TorrentFilename)))
                 {
                     Ready = filesize == FileSize;
+                    updateStatus();
                     return oldReady != Ready;
                 }
 
                 if (UnpackedSingleFilename != null && Path.GetFileName(fp).Equals(UnpackedSingleFilename))
                 {
                     Ready = filesize == UnpackedFileSize;
+                    updateStatus();
                     return oldReady != Ready;
                 }
             }
             Ready = false;
+            updateStatus();
             return oldReady != Ready;
+        }
+
+        /// <summary>
+        /// Updates the ready status text
+        /// </summary>
+        private void updateStatus()
+        {
+            if (Disabled)
+            {
+                StatusText = "Disabled, will not install";
+                return;
+            }
+            if (Ready)
+            {
+                StatusText = "Imported, ready to install";
+                return;
+            }
+            StatusText = "Not imported, not ready to install";
         }
 
         /// <summary>

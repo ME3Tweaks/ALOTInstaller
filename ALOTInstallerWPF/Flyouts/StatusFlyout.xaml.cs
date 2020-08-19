@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,25 +10,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using ALOTInstallerWPF.BuilderUI;
-using ALOTInstallerWPF.Controllers;
-using MahApps.Metro.Controls;
 
-namespace ALOTInstallerWPF
+namespace ALOTInstallerWPF.Flyouts
 {
     /// <summary>
-    /// Main window for ALOT Installer
+    /// Interaction logic for StatusFlyout.xaml
     /// </summary>
-    public partial class MainWindow : MetroWindow
+    public partial class StatusFlyout : UserControl
     {
-        public MainWindow()
+        public StatusFlyout()
         {
             InitializeComponent();
-        }
-
-        private void MainWindow_OnContentRendered(object? sender, EventArgs e)
-        {
-            StartupUIController.BeginFlow(this);
         }
     }
 }

@@ -1,12 +1,297 @@
-﻿<Window x:Class="ALOTInstallerWPF.MainWindow"
+﻿<mah:MetroWindow x:Class="ALOTInstallerWPF.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ALOTInstallerWPF"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        ContentRendered="MainWindow_OnContentRendered"
+        Title="ALOT Installer" Height="450" Width="800">
+    <Grid Name="ContentGrid"/>
+    <!--
+    <Controls:MetroWindow.Flyouts>
+        <Controls:FlyoutsControl>
+            <Controls:Flyout x:Name="SettingsFlyout" Header="Settings" IsPinned="False" Theme="Accent" Position="Right">
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible" ScrollViewer.PanningMode="VerticalFirst">
+                    <StackPanel>
+                        <Expander IsExpanded="True" HorizontalAlignment="Stretch" Expanded="Expander_Expanded">
+                            <Expander.Header>
+                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="ALOT Installation Status"/>
+                            </Expander.Header>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                    <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME1" Content="ME1: Not Installed"/>
+                                </StackPanel>
+                                <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME2" Content="ME2: Not Installed"/>
+                                <Label Margin="20,0,0,0" Padding="0,0,0,5" x:Name="Label_ALOTStatus_ME3" Content="ME3: Not Installed"/>
+                            </StackPanel>
+                        </Expander>
+                        <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                            <Expander.Header>
+                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Filtering"/>
+                            </Expander.Header>
+                            <StackPanel>
+                                <StackPanel Name="StackPanel_SwitchToALOTMode">
+                                    <TextBlock Margin="0,0,0,10" MaxWidth="210" TextAlignment="Center" TextWrapping="WrapWithOverflow" Text="Switch to ALOT mode to install additional textures with MEUITM. ALOT mode is required for installing textures for Mass Effect 2 or 3."/>
+                                    <Button Name="Button_SwitchToALOTMode"  Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="Switch to ALOT mode"  Click="SwitchToALOTMode_Button_Click" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Switch to full ALOT Installer mode, enabling support for all 3 games"/>
+                                </StackPanel>
+                                <StackPanel Name="Panel_ALOTFiltering">
+                                    <mah:ToggleSwitch x:Name="Switch_ME1Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect files" OnLabel="Show Mass Effect files" IsChecked="{Binding ShowME1Files}" ToolTip="Toggle showing files for Mass Effect"/>
+                                    <mah:ToggleSwitch x:Name="Switch_ME2Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 2 files" OnLabel="Show Mass Effect 2 files" IsChecked="{Binding ShowME2Files}" ToolTip="Toggle showing files for Mass Effect 2"/>
+                                    <mah:ToggleSwitch x:Name="Switch_ME3Filter" Margin="20,0,0,0" FontSize="12" OffLabel="Show Mass Effect 3 files" OnLabel="Show Mass Effect 3 files" IsChecked="{Binding ShowME3Files}" ToolTip="Toggle showing files for Mass Effect 3"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Expander>
+                        <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                            <Expander.Header>
+                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Backup &amp; Restore"/>
+                            </Expander.Header>
+                            <StackPanel>
+                                <Button x:Name="Button_ME1Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME1: Not Backed Up" Click="Button_ME1Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                <Button x:Name="Button_ME2Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME2: Not Backed Up" Click="Button_ME2Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                <Button x:Name="Button_ME3Backup" Margin="20,0,20,0" FontSize="12" Padding="0,3,0,3" Content="ME3: Not Backed Up" Click="Button_ME3Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                            </StackPanel>
+                        </Expander>
+                        <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                            <Expander.Header>
+                                <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Diagnostics &amp; MEM"/>
+                            </Expander.Header>
+                            <StackPanel>
+                                <Button x:Name="Button_GenerateDiagnostic" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Generate Game Diagnostics" ToolTip="Generates a diagnostic log to help figure out issues with one of the games&#10;The log is automatically uploaded for sharing when the diagnostic completes." Click="Button_GenerateDiagnostics_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                <Button x:Name="Button_UploadLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Upload installer log" ToolTip="Uploads the latest program log to the ALOT Log Viewing Service" Click="Button_UploadLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                <Button x:Name="Button_ReportIssue" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Report issue / ALOT Discord" ToolTip="Go to the ALOT discord" Click="Button_ReportIssue_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                <Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" FontWeight="Bold"  Content="Game utilities" Click="Button_Utilities_Click" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Opens panel with various useful end-user utilities"/>
+                                <Button x:Name="Button_ViewLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="View installer log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                                <Label HorizontalAlignment="Center" Margin="20,0,20,3" Padding="0,3,0,3" FontWeight="Bold" x:Name="Label_MEMVersion" Content="MEM (NoGUI) Version: TBD" FontSize="12" ToolTip="Version of MassEffectModderNoGui this program is using"/>
+                            </StackPanel>
+                        </Expander>
+                        <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                            <Expander.Header>
+                                <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Misc Settings" Padding="0,0,0,0"/>
+                            </Expander.Header>
+                            <StackPanel>
+                                <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowFirstTime" Content="Show Intro Dialog" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Shows the initial instructions screen"/>
+                                <Button Name="Button_LibraryDir" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowSetLibraryDir" Content="Set texture library location" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Allows you to change where mods are stored before installation"/>
+                                <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="CleanupDownloadedMods" Content="Cleanup Texture Library" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Removes old files from the texture library that are no longer in the manifest.&#10;Any files in this folder that you manually added that are not in the manifest will also be deleted."/>
+                                <CheckBox Margin="5" x:Name="Checkbox_RepackME2GameFiles" Content="Repack ME2 files" Click="Checkbox_RepackME2Files_Click" ToolTip="Repacking game files for ME2 makes installation take longer, but will save some disk space.&#10;This option only has an effect during the initial installation of ALOT. Subsequent installations are not affected." />
+                                <CheckBox Margin="5" x:Name="Checkbox_RepackME3GameFiles" Content="Repack ME3 files" Click="Checkbox_RepackME3Files_Click" ToolTip="Repacking game files for ME3 makes installation take longer, but will save some disk space.&#10;This option only has an effect during the initial installation of ALOT. Subsequent installations are not affected." />
+                                <CheckBox Margin="5" x:Name="Checkbox_MoveFilesAsImport" Content="Import via Move if on the same drive" Click="Checkbox_MoveFilesAsImport_Click" ToolTip="Files that are importing will be moved instead of copied.&#10;This only is used if files are on same drive - if files are on different drives then they are always copied." />
+                                <CheckBox Margin="5" x:Name="Checkbox_DebugLogging" Content="Debug logging" Click="Checkbox_DebugLogging_Click" ToolTip="Turns on debug logging. Makes log significantly bigger with more logs - only turn on if requested by developers."  />
+                                <CheckBox Margin="5" x:Name="Checkbox_BetaMode" Content="Beta Mode" Click="Checkbox_BetaMode_Click" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
+                            </StackPanel>
+                        </Expander>
+                        <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                            <Expander.Header>
+                                <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Tutorials &amp; Guides" Padding="0,0,0,0"/>
+                            </Expander.Header>
+                            <StackPanel x:Name="StackPanel_ManifestTutorials">
+                                <TextBlock x:Name="Label_NoTutorials" Text="No tutorials available in manifest"/>
+                            </StackPanel>
+                        </Expander>
+                        <Expander IsExpanded="True" Expanded="Expander_Expanded">
+                            <Expander.Header>
+                                <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Credits" Padding="0,0,0,0"/>
+                            </Expander.Header>
+                            <StackPanel>
+                                <TextBlock Margin="20,0,0,0" Padding="0,0,0,2" Text="Brought to you by" HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Aquadran" ToolTip="Developed MEM. One who made this all possible." HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="CreeperLava" ToolTip="Developed ALOT. Glued all the pieces together." HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mgamerz" ToolTip="Complained a bunch and then made this suave UI." HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="0,0,0,2" Text="Other Credits" HorizontalAlignment="Left"/>
 
-    </Grid>
-</Window>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mass Effect Wiki" ToolTip="This program uses content from the Mass Effect wiki at FANDOM and is licensed under the Creative Commons Attribution-Share Alike License." HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="ME3Tweaks" ToolTip="Powers the log uploading service to Pastebin" HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Erik JS" ToolTip="Developer of binkw32 ASI plugins for ME2 and ME3" HorizontalAlignment="Left"/>
+                                <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="SirCxyrtyx " ToolTip="Developer of the AutoTOC ASI plugin" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Expander>
+                    </StackPanel>
+                </ScrollViewer>
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="StatusFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
+                <TextBlock x:Name="StatusLabel" FontSize="14" Text="This is the statusbar. You should not see this text." Padding="5"></TextBlock>
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="WhatToBuildFlyout" TitleVisibility="Hidden" IsPinned="true" IsModal="True" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
+                <StackPanel Margin="10">
+                    <TextBlock x:Name="Label_WhatToBuildAndInstall" Text="Choose what to build and install for Mass Effect." TextAlignment="Center" FontSize="16" Padding="5"></TextBlock>
+                    <TextBlock Text="To add your own files (also known as user files), drop an archive containing properly named TPF, MEM, or DDS files onto the interface and choose the game they apply to. You can also drop TPF, PNG, JPG, BMP, DDS, MOD and MEM files directly." TextWrapping="Wrap" MaxWidth="500" TextAlignment="Center" FontSize="12" Padding="5"></TextBlock>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                        <CheckBox x:Name="Checkbox_BuildOptionALOT" Content="ALOT" Margin="5" IsChecked="True" IsEnabled="False" ToolTip="Main ALOT file.&#10;If you haven't installed ALOT yet this file is always required."></CheckBox>
+                        <CheckBox x:Name="Checkbox_BuildOptionALOTUpdate" Content="ALOT Update" Margin="5" IsChecked="True" IsEnabled="False" ToolTip="Update file for ALOT.&#10;If you are installing ALOT for the first time or this update is not applied, this is required.&#10;If you are applying other textures, you can turn this off."></CheckBox>
+                        <CheckBox x:Name="Checkbox_BuildOptionMEUITM" Content="MEUITM" Margin="5" IsChecked="True" IsEnabled="False" ToolTip="MEUITM is a large graphical overhaul for Mass Effect.&#10;If you are installing ALOT you should not turn this off."></CheckBox>
+                        <CheckBox x:Name="Checkbox_BuildOptionAddon" Content="Addon" Margin="5" IsChecked="True" ToolTip="Files from third party developers that are not included in the main ALOT file.&#10;These files are considered part of the ALOT compilation and are essential to the mod.&#10;If you are installing ALOT, you should not turn this off."></CheckBox>
+                        <CheckBox x:Name="Checkbox_BuildOptionUser" Content="User Files" Margin="5" ToolTip="Files supplied by you.&#10;These files are not vetted by the ALOT team and may not look proper in game.&#10;User files are always installed last, so they will always override other textures."></CheckBox>
+
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+
+                        <Button x:Name="Button_BuildAndInstall" Content="Build &amp; Install" HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Click="Button_BuildAndInstall_Click" ToolTip="Begins the build process.&#10;You will be prompted to begin installation when this step has completed."/>
+                        <Button Content="Cancel Install" Margin="5,0,0,0" HorizontalAlignment="Center" Style="{StaticResource AccentedSquareButtonStyle}" Click="Button_BuildAndInstallCancel_Click" ToolTip="Closes this dialog"/>
+
+                    </StackPanel>
+                </StackPanel>
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="InstallingOverlayFlyout" SnapsToDevicePixels="True" TitleVisibility="Collapsed" Theme="Accent" CloseButtonVisibility="Collapsed" Position="Top" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
+
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="FirstRunFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Top" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
+                <Border x:Name="FirstRunOverlayFlyout_Border" Padding="10">
+                    <Border.Background>
+                        <ImageBrush ImageSource="images/firstrunbg.jpg" AlignmentY="Center" Stretch="UniformToFill"/>
+                    </Border.Background>
+                    <StackPanel x:Name="panel" VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Vertical" UseLayoutRounding="True" Width="600"  Margin="35,20,0,0">
+                        <TextBlock x:Name="FirstRunText_Title" Text="Welcome to the ALOT Installer" FontSize="30" FontWeight="Light"></TextBlock>
+                        <TextBlock x:Name="FirstRunText_Summary" TextWrapping="Wrap" Text="This program is used to install ALOT, ALOT updates, and the ALOT Addon." FontSize="13"/>
+                        <StackPanel x:Name="FirstRun_MainContent">
+                            <TextBlock  x:Name="FirstRunText_TitleAddon" FontWeight="Light" Text="What is the ALOT Addon?" Margin="0,10,0,0" FontSize="24"/>
+                            <TextBlock  x:Name="FirstRunText_AddonSummary" FontSize="13"  TextWrapping="Wrap" HorizontalAlignment="Left">The ALOT Addon adds more textures provided by users who do not want their content in the main ALOT file.
+                                                This installer allows you to add those texture mods, which is installed alongside ALOT in a file called the Addon.
+                                                The ALOT team has cherry picked the best vanilla style textures from within those mods.
+                                                For the true ALOT experience, you should download all of the listed files for your game and import them.</TextBlock>
+                            <TextBlock  x:Name="FirstRunText_TitleImport" FontWeight="Light" Margin="0,10,0,0" FontSize="24">How do I import files?</TextBlock>
+
+                            <TextBlock  x:Name="FirstRunText_ImportSummary" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Left">
+                            Import files by downloading them, and then using Download Assistant to import them from your downloads folder. You can also drag/drop them onto this window, or put them into the texture library directory. Do not rename or unpack any files you download.</TextBlock>
+                            <TextBlock  x:Name="FirstRunText_TitleOKMods" FontWeight="Light" Text="When do I install ALOT or other mods?" FontSize="24" Margin="0,10,0,0"></TextBlock>
+                            <TextBlock  x:Name="FirstRunText_OKModsSummary" FontSize="13" TextWrapping="Wrap" HorizontalAlignment="Left">Almost all pcc or upk mods (DLC or file replacement mods) are compatible with ALOT as long as you install them before ALOT. 
+                            Once ALOT is installed, the only mods that can be installed are other texture mods that do not replace upk, sfm, or pcc files.  
+                            Installing or replacing these kind of files after ALOT is installed is unsupported and will almost always break the game.
+                            </TextBlock>
+                        </StackPanel>
+
+                        <TextBlock  x:Name="FirstRunText_TitleBeta" FontWeight="Light" Text="Be sure to read the directions" FontSize="24" Margin="0,10,0,0"></TextBlock>
+                        <TextBlock  x:Name="FirstRunText_BetaSummary" Text="You can find directions on use of this program in the settings menu, on the ALOT NexusMods pages, and on the ALOT Discord. If you have issues, please come to the ALOT Discord for help." TextWrapping="Wrap" FontSize="13"></TextBlock>
+                        <Button  x:Name="Button_FirstRun_Dismiss" Content="Continue" ToolTip="Acknowledges you read this message" HorizontalAlignment="Left" Margin="0,10,0,0" Click="Button_FirstTimeRunDismiss_Click"/>
+                    </StackPanel>
+                </Border>
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="UserTextures_Flyout" IsOpenChanged="UserTextures_Flyout_IsOpenChanged" IsPinned="False" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
+                <StackPanel VerticalAlignment="Top"  HorizontalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
+                    <TextBlock x:Name="UserTextures_Title" Text="Select which game this file applies to" FontSize="20" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
+                    <StackPanel x:Name="Panel_UserTexturesSelectGame" Orientation="Vertical" HorizontalAlignment="Center" Visibility="Collapsed">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button x:Name="Button_ManualFileME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME1_Click">
+                                <Image Source="images/logo_me1.png" Height="40" Margin="10"></Image>
+                            </Button>
+                            <Button x:Name="Button_ManualFileME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME2_Click">
+                                <Image Source="images/logo_me2.png" Height="40" Margin="10"></Image>
+                            </Button>
+                            <Button x:Name="Button_ManualFileME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="10" Click="Button_ManualFileME3_Click">
+                                <Image Source="images/logo_me3.png" Height="40" Margin="10"></Image>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock x:Name="UserTextures_Warning" Text="This file will be treated as a user supplied file as it is not listed in the ALOT manifest. User files are not tested by the developers and may not be compatible. User files are installed after ALOT, ALOT Updates, and MEUITM." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700"/>
+                        <TextBlock x:Name="UserTextures_ManifestFileFlashing" Text=" If the file you are importing is listed above (as a manifest file), you are importing the wrong file. Do not extract or rename ANY files listed in the main manifest." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700" Foreground="Yellow"/>
+                    </StackPanel>
+                    <StackPanel x:Name="Panel_UserTexturesBadArchive" Orientation="Vertical" HorizontalAlignment="Center" Visibility="Visible" Margin="5">
+                        <TextBlock x:Name="Textblock_UserTexturesBadArchive" Text="This archive file is not usable. It may not have any texture files in it, or contain texture files that don't meet the required naming standards for usage." FontSize="16" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="600"/>
+                        <Button x:Name="Button_UserTexturesBadArchive" Margin="0,10,0,10"  HorizontalAlignment="Center"  Content="Continue" Click="Button_UserTexturesBadFile_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Controls:Flyout>
+            <Controls:Flyout x:Name="OriginWarningFlyout" SnapsToDevicePixels="True" TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Collapsed" Position="Left" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">
+                <Border x:Name="OriginWarningFlyout_Border" Background="#1e262c" >
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Image x:Name="OriginWarning_Image"  Source="images/origin/me1update.png" Stretch="None"/>
+                        <TextBlock Foreground="#c3c6ce" TextAlignment="Center" FontSize="16" Text="When running the game, you may see this prompt in Origin when you start the game.&#x0a;Never press update or check the box; it will ruin your installation."/>
+                        <Button Content="Got it" Click="OriginWarning_Button_Click" HorizontalAlignment="Center" Margin="5" Padding="20,5,20,5">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="Background" Value="#f56c2d" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter Property="FontSize" Value="{DynamicResource FlatButtonFontSize}" />
+                                    <Setter Property="Foreground" Value="White" />
+                                    <Setter Property="Padding" Value="10 5 10 5" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type Button}" xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro">
+                                                <Border x:Name="Border"
+                            Margin="0"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                                    <Controls:ContentControlEx x:Name="PART_ContentPresenter"
+                                                   Padding="{TemplateBinding Padding}"
+                                                   HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                   VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                   Content="{TemplateBinding Content}"
+                                                   ContentCharacterCasing="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(Controls:ControlsHelper.ContentCharacterCasing)}"
+                                                   ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                                   ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                   ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}"
+                                                   RecognizesAccessKey="True"
+                                                   SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#c85e36" />
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource FlatButtonPressedBackgroundBrush}" />
+                                            <Setter Property="Foreground" Value="{DynamicResource FlatButtonPressedForegroundBrush}" />
+                                        </Trigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource GrayBrush2}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Controls:Flyout>
+
+            <Controls:Flyout Name="Utilities_Flyout" IsModal="True" SnapsToDevicePixels="True" TitleVisibility="Collapsed" Theme="Accent" CloseButtonVisibility="Collapsed" Position="Bottom" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Controls:MetroWindow}, Path=ActualWidth}">
+                <StackPanel Margin="10">
+                    <StackPanel.Resources>
+                        <Thickness x:Key="buttonMargin" Top="5" Left="5" Right="5" Bottom ="5"/>
+                        <System:Double x:Key="imageHeight">30</System:Double>
+                    </StackPanel.Resources>
+                    <TextBlock x:Name="Label_Utility" Text="ALOT Installer Utilities" TextAlignment="Center" FontSize="16" Padding="5"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button x:Name="Button_VerifyGameME1" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_VerifyME1_Click"  ToolTip="Verify that Mass Effect is vanilla">
+                            <StackPanel>
+                                <Image Source="images/logo_me1.png" Height="{StaticResource imageHeight}"  Margin="{StaticResource buttonMargin}" />
+                                <TextBlock x:Name="Textblock_VerifyME1" Text="VERIFY VANILLA"  HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="Button_VerifyGameME2" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_VerifyME2_Click"  ToolTip="Verify that Mass Effect 2 is vanilla">
+                            <StackPanel>
+                                <Image Source="images/logo_me2.png" Height="{StaticResource imageHeight}" Margin="{StaticResource buttonMargin}"/>
+                                <TextBlock x:Name="Textblock_VerifyME2" Text="VERIFY VANILLA"  HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="Button_VerifyGameME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_VerifyME3_Click" ToolTip="Verify that Mass Effect 3 is vanilla">
+                            <StackPanel>
+                                <Image Source="images/logo_me3.png" Height="{StaticResource imageHeight}" Margin="{StaticResource buttonMargin}"/>
+                                <TextBlock x:Name="Textblock_VerifyME3" Text="VERIFY VANILLA"  HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="Button_AutoTOCME3" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_ME3AutoTOC_Click" ToolTip="Runs AutoTOC on Mass Effect 3, generating a new filesize database.">
+                            <StackPanel>
+                                <Image Source="images/logo_me3.png" Height="{StaticResource imageHeight}" Margin="{StaticResource buttonMargin}"/>
+                                <TextBlock x:Name="Textblock_AutoTOCME3" Text="AUTOTOC" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="Button_RunMEM" Style="{StaticResource AccentedSquareButtonStyle}" Margin="{StaticResource buttonMargin}" Click="Button_MEMVersion_Click" ToolTip="Runs the GUI version of Mass Effect Modder.&#10;You can use this to change game paths and other advanced texture modding.">
+                            <StackPanel>
+                                <Image Source="images/logo_mem.png" Height="{StaticResource imageHeight}" Margin="{StaticResource buttonMargin}"/>
+                                <TextBlock x:Name="Button_MEM_GUI" Text="Launch MEM" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+
+                    </StackPanel>
+                    <Button Width="120" Content="Close utilities" Click="Button_CloseUtilities" Style="{StaticResource AccentedSquareButtonStyle}" HorizontalAlignment="Center" ToolTip="Closes this panel"/>
+                </StackPanel>
+            </Controls:Flyout>
+        </Controls:FlyoutsControl>
+    </Controls:MetroWindow.Flyouts>
+
+    -->
+    
+</mah:MetroWindow>
