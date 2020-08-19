@@ -20,7 +20,7 @@ namespace ALOTInstallerCore.Helpers
 
 
     /// <summary>
-    /// Utility class for interacting with MEM. Calls must be run on a background thread or they will stall due to how the CliWrap library appears tto work.
+    /// Utility class for interacting with MEM. Calls must be run on a background thread of
     /// </summary>
     public static class MEMIPCHandler
     {

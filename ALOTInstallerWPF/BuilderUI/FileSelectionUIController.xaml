@@ -7,13 +7,16 @@
              xmlns:manifest="clr-namespace:ALOTInstallerCore.Objects.Manifest;assembly=ALOTInstallerCore"
              xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <converters:ApplicableGamesVisibilityConverter x:Key="ApplicableGamesVisibilityConverter"/>
         <converters:ReadyColorConverter x:Key="ReadyColorConverter"/>
+        <converters:ReadyBackgroundColorConverter x:Key="ReadyBackgroundColorConverter"/>
         <converters:InstallerFileBackingFileConverter x:Key="InstallerFileBackingFileConverter"/>
         <converters:ReadyIconConverter x:Key="ReadyIconConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <!--<Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
             <Style.Resources>
                 <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource IdealForegroundColor}" />
@@ -83,11 +86,12 @@
                   BorderThickness="0"
                   ItemsSource="{Binding CurrentlyDisplayedFiles}" 
                   VirtualizingPanel.IsVirtualizingWhenGrouping="True" 
-                  VirtualizingPanel.IsVirtualizing="True">
+                  VirtualizingPanel.IsVirtualizing="True"
+                  Name="InstallerFilesListBox">
             <!-- This is what each list item looks like-->
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type manifest:ManifestFile}">
-                    <DockPanel>
+                    <DockPanel Background="{Binding Converter={StaticResource ReadyBackgroundColorConverter}}">
                         <Border DockPanel.Dock="Left" Background="{Binding Converter={StaticResource ReadyColorConverter}}" Padding="0,4" Width="5" Margin="0,0,4,0"/>
 
                         <StackPanel Orientation="Vertical" DockPanel.Dock="Left" Margin="0,3">
@@ -98,6 +102,33 @@
 
                             <TextBlock Text="{Binding StatusText}"/>
                             <TextBlock Text="{Binding Converter={StaticResource InstallerFileBackingFileConverter}}" FontSize="10"/>
+                            <StackPanel Orientation="Horizontal" Visibility="{Binding Ready, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}" Margin="0,4">
+                            <iconPacks:PackIconIonicons Kind="DownloadMD"/>
+                            <TextBlock  Margin="5,0">
+                                <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
+                                    <Hyperlink.Style >
+                                        <Style TargetType="Hyperlink"
+                                               BasedOn="{StaticResource {x:Type Hyperlink}}">
+                                            <Setter Property="Foreground" Value="#31ae90"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+
+                                        </Style>
+                                    </Hyperlink.Style>
+                                    <Hyperlink.ToolTip>
+                                        <TextBlock>
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}{0}&#10;File title: {1}">
+                                                    <Binding Path="DownloadLink" />
+                                                    <Binding Path="Tooltipname" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </Hyperlink.ToolTip>
+                                    Download
+                                </Hyperlink>
+                            </TextBlock>
+                            </StackPanel>
+
                         </StackPanel>
 
                         <StackPanel Orientation="Vertical" DockPanel.Dock="Right" Margin="3,3">
@@ -282,23 +313,12 @@
         </ListBox>
 
         <!--Bottom Buttons-->
-        <Grid Grid.Row="4" Grid.Column="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="auto" />
-                <ColumnDefinition Width="auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <!--<Button x:Name="Button_InstallME1" Grid.Column="0" Content="Please Wait" IsEnabled="false" FontWeight="Bold" Style="{StaticResource BottomButton_Left}" FontSize="11"/>
-            <Button x:Name="Button_InstallME2" Grid.Column="1" Content="Please Wait" IsEnabled="false" FontWeight="Bold" Style="{StaticResource BottomButton_Middle}" FontSize="11"/>
-            <Button x:Name="Button_InstallME3" Grid.Column="2" Content="Please Wait" IsEnabled="false" FontWeight="Bold" Style="{StaticResource BottomButton_Middle}" FontSize="11"/>
-            <Button x:Name="Button_DownloadAssistant" Content="Download Assistant" IsEnabled="false" FontSize="10" Grid.Column="3" ToolTip="Opens floating window that makes it easier to download Addon files" Style="{StaticResource BottomButton_BlackMiddle}"/>
-            <Button x:Name="Button_Settings" Grid.Column="4" Content="Settings" IsEnabled="false"  Style="{StaticResource BottomButton_BlackRight}" FontSize="10" ToolTip="Opens the settings and status panel"/>-->
+        <DockPanel Grid.Row="4" Grid.Column="0">
+            <Separator DockPanel.Dock="Top"/>
+            <Button Content="Settings" ToolTip="Opens the settings and status panel" DockPanel.Dock="Left" Padding="10,2" FontWeight="Bold" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11"/>
+            <Button Content="Import Assistant" ToolTip="Assists in preparing files for install" Padding="10,2" Margin="-1,0,0,0" DockPanel.Dock="Left" FontWeight="Bold" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11"/>
 
-        </Grid>
+            <Button HorizontalAlignment="Right" Content="Install textures" Padding="10,2" FontWeight="Bold" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11" ToolTip="Prepares to build and install textures.&#10;There are several dialogs and checks that occur before installation begins"/>
+        </DockPanel>
     </Grid>
 </UserControl>

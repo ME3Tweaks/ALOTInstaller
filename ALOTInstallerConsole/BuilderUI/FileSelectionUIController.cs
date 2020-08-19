@@ -627,7 +627,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void ChangeMode(ManifestMode newMode)
         {
-            ManifestHandler.CurrentMode = newMode;
+            ManifestHandler.SetCurrentMode(newMode);
             SetLeftsideTitle();
             RefreshShownFiles();
         }

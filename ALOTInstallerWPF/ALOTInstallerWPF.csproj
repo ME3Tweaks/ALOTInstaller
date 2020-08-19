@@ -5,6 +5,12 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <Platforms>x64</Platforms>
+    <Company>ME3Tweaks</Company>
+    <Version>4.0.650.0</Version>
+    <Authors>ME3Tweaks</Authors>
+    <Product>ALOT Installer</Product>
+    <Description>Texture install for the original Mass Effect Trilogy</Description>
+    <Copyright>ME3Tweaks 2017 - 2020</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -34,5 +40,12 @@
 	<ItemGroup>
     <ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />
   </ItemGroup>
+
+
+	<ItemGroup>
+	  <Reference Include="MahApps.Metro">
+	    <HintPath>..\packages\MahApps.Metro.1.6.5\lib\net47\MahApps.Metro.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
 
 </Project>

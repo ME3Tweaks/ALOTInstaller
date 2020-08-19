@@ -19,14 +19,13 @@ namespace ALOTInstallerCore.Helpers
         /// <summary>
         /// A list of all manifest files, across all modes
         /// </summary>
-        private static List<ManifestFile> allManifestFiles;
         private static FileSystemWatcher watcher;
         private static List<ManifestFile> manifestFiles;
         private static Action<ManifestFile> readyStatusChanged;
-        public static void SetupLibraryWatcher(List<ManifestFile> manifestFiles, Action<ManifestFile> readyStatusChanged)
+        public static void SetupLibraryWatcher(List<ManifestFile> watchedManifestFiles, Action<ManifestFile> readyStatusChangedCallback)
         {
-            TextureLibrary.manifestFiles = manifestFiles;
-            TextureLibrary.readyStatusChanged = readyStatusChanged;
+            TextureLibrary.manifestFiles = watchedManifestFiles;
+            TextureLibrary.readyStatusChanged = readyStatusChangedCallback;
             Debug.WriteLine("Starting filesystem watcher on " + Settings.TextureLibraryLocation);
             if (watcher != null)
             {
@@ -34,10 +33,15 @@ namespace ALOTInstallerCore.Helpers
             }
             watcher = new FileSystemWatcher(Settings.TextureLibraryLocation)
             {
-                NotifyFilter = NotifyFilters.LastWrite
-                                 | NotifyFilters.FileName
-                                 | NotifyFilters.Size,
+                // Just notify on everything because it seems things like move are done through attributes (??)
+                NotifyFilter = NotifyFilters.Attributes |
+                                NotifyFilters.CreationTime |
+                                NotifyFilters.FileName |
+                                NotifyFilters.LastWrite |
+                                NotifyFilters.Size |
+                                NotifyFilters.Security,
                 Filter = "*.*" //Filters is not supported on .NET Standard 2.1
+
             };
             // Add event handlers.
             watcher.Changed += OnLibraryFileChanged;
@@ -47,16 +51,12 @@ namespace ALOTInstallerCore.Helpers
             watcher.EnableRaisingEvents = true;
         }
 
-
-
         private static void OnLibraryFileChanged(object sender, FileSystemEventArgs e)
         {
             if (e.Name != null)
             {
                 Debug.WriteLine($"Change {e.ChangeType} for {e.Name}");
-                var matchingManifestFile = manifestFiles.Find(x =>
-                    Path.GetFileName(x.GetUsedFilepath())
-                        .Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
+                var matchingManifestFile = manifestFiles.Find(x => Path.GetFileName(x.GetUsedFilepath()).Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
                 if (matchingManifestFile?.UpdateReadyStatus() ?? false)
                 {
                     readyStatusChanged?.Invoke(matchingManifestFile);
@@ -68,6 +68,17 @@ namespace ALOTInstallerCore.Helpers
                     matchingManifestFile = manifestFiles.Find(x =>
                         Path.GetFileName(x.GetUsedFilepath())
                             .Equals(rea.OldName, StringComparison.InvariantCultureIgnoreCase));
+                    if (matchingManifestFile?.UpdateReadyStatus() ?? false)
+                    {
+                        readyStatusChanged?.Invoke(matchingManifestFile);
+                        return;
+                    }
+                }
+
+                if (e.ChangeType == WatcherChangeTypes.Deleted)
+                {
+                    // Edge case: Unpacked file is moved out of library. This makes GetUsedPath() fail as file does not exist, but file was just moved.
+                    matchingManifestFile = manifestFiles.Find(x => x.UnpackedSingleFilename != null && x.UnpackedSingleFilename.Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
                     if (matchingManifestFile?.UpdateReadyStatus() ?? false)
                     {
                         readyStatusChanged?.Invoke(matchingManifestFile);

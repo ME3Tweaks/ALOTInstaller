@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -16,7 +17,7 @@ namespace ALOTInstallerCore.Helpers
     /// <summary>
     /// Class for handling the download/parsing of the manifests
     /// </summary>
-    public static class ManifestHandler
+    public class ManifestHandler : INotifyPropertyChanged
     {
         /// <summary>
         /// The loaded master manifest package. Populated by LoadMasterManifest().
@@ -26,7 +27,25 @@ namespace ALOTInstallerCore.Helpers
         /// <summary>
         /// Convenience variable for library wrappers to use for storing the current selected mode
         /// </summary>
-        public static ManifestMode CurrentMode { get; set; }
+        public static ManifestMode CurrentMode { get; private set; }
+
+        /// <summary>
+        /// Updates the current mode, and notifies whoever is listening on OnManifestModeChanged, if any.
+        /// </summary>
+        /// <param name="mode"></param>
+        public static void SetCurrentMode(ManifestMode mode)
+        {
+            var oldMode = CurrentMode;
+            CurrentMode = mode;
+            if (oldMode != CurrentMode)
+            {
+                OnManifestModeChanged?.Invoke(CurrentMode);
+            }
+        }
+        /// <summary>
+        /// Callback than be assigned for when the manifest mode has changed.
+        /// </summary>
+        public static Action<ManifestMode> OnManifestModeChanged { get; set; }
 
         /// <summary>
         /// Fetches and parses the master manifest into the manifests for each supported mode. This method will block.
@@ -453,5 +472,7 @@ namespace ALOTInstallerCore.Helpers
 
             return files;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

@@ -7,7 +7,7 @@
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         ContentRendered="MainWindow_OnContentRendered"
-        Title="ALOT Installer" Height="450" Width="800">
+        Title="ALOT Installer" MinHeight="600" MinWidth="800" Height="600" Width="800">
     <Grid Name="ContentGrid"/>
     <!--
     <Controls:MetroWindow.Flyouts>
