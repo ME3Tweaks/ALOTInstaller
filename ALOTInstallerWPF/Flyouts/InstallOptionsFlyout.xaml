@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="ALOTInstallerWPF.Flyouts.InstallOptionsFlyout"
+﻿<local:FlyoutController x:Class="ALOTInstallerWPF.Flyouts.InstallOptionsFlyout"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,23 +8,29 @@
              xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="800">
-    <UserControl.Resources>
+    <local:FlyoutController.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-    </UserControl.Resources>
+    </local:FlyoutController.Resources>
     <DockPanel Margin="10">
-        <TextBlock Text="{Binding TitleText}" DockPanel.Dock="Top" TextAlignment="Center" FontSize="20" Margin="0,0,0,5"/>
-        <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
-            <Button Content="Cancel Install" Margin="5,0"/>
-            <Button Content="Install Textures"/>
+        <TextBlock Text="{Binding TitleText}" DockPanel.Dock="Top" TextAlignment="Center" FontSize="20"/>
+        <StackPanel  DockPanel.Dock="Bottom" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal"
+                     Visibility="{Binding DeterminingOptionsVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}">
+            <Button Content="Cancel" Margin="5,0" Command="{Binding AbortInstallCommand}"/>
+            <Button Content="Install Textures" Command="{Binding InstallTexturesCommand}" Style="{StaticResource MahApps.Styles.Button.Square.Accent}"
+                    mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11"/>
         </StackPanel>
-        <StackPanel VerticalAlignment="Center" Visibility="{Binding DeterminingOptionsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+        <StackPanel VerticalAlignment="Center" 
+                    HorizontalAlignment="Center"
+                    DockPanel.Dock="Top"
+                    Visibility="{Binding DeterminingOptionsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
             <mah:ProgressRing HorizontalAlignment="Center" Foreground="White"/>
-            <TextBlock Text="Calculating install options" TextAlignment="Center" Foreground="White"/>
+            <TextBlock Text="{Binding SpinnerText}" Margin="0,10,0,0" TextAlignment="Center" Foreground="White"/>
         </StackPanel>
-        <StackPanel Margin="0,5" HorizontalAlignment="Center" Visibility="{Binding DeterminingOptionsVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}">
+        <StackPanel Margin="0,5,0,0" HorizontalAlignment="Center" Visibility="{Binding DeterminingOptionsVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}">
+            <TextBlock Text="{Binding InstallOptionsTopText}" TextAlignment="Center" FontSize="12"/>
             <StackPanel Orientation="Vertical" Name="optionsList" HorizontalAlignment="Center"/>
         </StackPanel>
         
 
     </DockPanel>
-</UserControl>
+</local:FlyoutController>

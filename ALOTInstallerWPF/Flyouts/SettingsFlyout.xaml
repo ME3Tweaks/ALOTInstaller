@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:ALOTInstallerWPF.Flyouts"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:modmanager="clr-namespace:ALOTInstallerCore.Helpers;assembly=ALOTInstallerCore"
+             xmlns:builderUi="clr-namespace:ALOTInstallerWPF.BuilderUI"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300" MinWidth="300">
     <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible" ScrollViewer.PanningMode="VerticalFirst">
@@ -26,9 +27,9 @@
                 </Expander.Header>
                 <StackPanel>
                     <StackPanel>
-                        <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect files" OnContent="Show Mass Effect files" IsOn="{Binding ShowME1Files}" ToolTip="Toggle showing files for Mass Effect"/>
-                        <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect 2 files" OnContent="Show Mass Effect 2 files" IsOn="{Binding ShowME2Files}" ToolTip="Toggle showing files for Mass Effect 2"/>
-                        <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect 3 files" OnContent="Show Mass Effect 3 files" IsOn="{Binding ShowME3Files}" ToolTip="Toggle showing files for Mass Effect 3"/>
+                        <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect files" OnContent="Show Mass Effect files" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowME1Files)}" ToolTip="Toggle showing files for Mass Effect"/>
+                        <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect 2 files" OnContent="Show Mass Effect 2 files" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowME2Files)}" ToolTip="Toggle showing files for Mass Effect 2"/>
+                        <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect 3 files" OnContent="Show Mass Effect 3 files" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowME3Files)}" ToolTip="Toggle showing files for Mass Effect 3"/>
                     </StackPanel>
                 </StackPanel>
             </Expander>

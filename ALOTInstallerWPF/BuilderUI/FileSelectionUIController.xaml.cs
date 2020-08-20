@@ -1,27 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Objects;
-using Octokit;
 using Application = System.Windows.Application;
 
 namespace ALOTInstallerWPF.BuilderUI
@@ -31,16 +26,82 @@ namespace ALOTInstallerWPF.BuilderUI
     /// </summary>
     public partial class FileSelectionUIController : UserControl, INotifyPropertyChanged
     {
+
+        #region Static Property Changed
+
+        private static bool Loaded = false;
+        public static event PropertyChangedEventHandler StaticPropertyChanged;
+
+        /// <summary>
+        /// Sets given property and notifies listeners of its change. IGNORES setting the property to same value.
+        /// Should be called in property setters.
+        /// </summary>
+        /// <typeparam name="T">Type of given property.</typeparam>
+        /// <param name="field">Backing field to update.</param>
+        /// <param name="value">New value of property.</param>
+        /// <param name="propertyName">Name of property.</param>
+        /// <returns>True if success, false if backing field and new value aren't compatible.</returns>
+        private static bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
+            return true;
+        }
+        #endregion
+
+        private static bool _showME1Files = true;
+        private static bool _showME2Files = true;
+        private static bool _showME3Files = true;
+        public static bool ShowME1Files
+        {
+            get => _showME1Files;
+            set
+            {
+                if (SetProperty(ref _showME1Files, value))
+                {
+                    FSUIC.DisplayedFilesView.Refresh();
+                }
+            }
+        }
+        public static bool ShowME2Files
+        {
+            get => _showME2Files;
+            set
+            {
+                if (SetProperty(ref _showME2Files, value))
+                {
+                    FSUIC.DisplayedFilesView.Refresh();
+                }
+            }
+        }
+        public static bool ShowME3Files
+        {
+            get => _showME3Files;
+            set
+            {
+                if (SetProperty(ref _showME3Files, value))
+                {
+                    FSUIC.DisplayedFilesView.Refresh();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Way for the filter static props to access the current 
+        /// </summary>
+        private static FileSelectionUIController FSUIC;
+
         public ModeHeader SelectedHeader { get; set; }
         public ObservableCollectionExtended<ModeHeader> AvailableModes { get; } = new ObservableCollectionExtended<ModeHeader>();
         public string AppTopText { get; set; } =
             "Add files to install by dragging and dropping their files onto the interface. Make sure you do not extract or rename any files you download, or the installer will not recognize them.";
         public ObservableCollectionExtended<InstallerFile> CurrentModeFiles { get; } = new ObservableCollectionExtended<InstallerFile>();
         public ICollectionView DisplayedFilesView => CollectionViewSource.GetDefaultView(CurrentModeFiles);
-
         public FileSelectionUIController()
         {
             DataContext = this;
+            FSUIC = this;
             LoadCommands();
             InitializeComponent();
             AvailableModes.AddRange(ManifestHandler.MasterManifest.ManifestModePackageMappping.Select(x => new ModeHeader(x.Key, getModeDescription(x.Key))));
@@ -50,7 +111,23 @@ namespace ALOTInstallerWPF.BuilderUI
             //Group items by Author
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("Author");
             DisplayedFilesView.GroupDescriptions.Add(groupDescription);
-            manifestFileReadyStateChanged(null); //Trigger progerssbar update
+            manifestFileReadyStateChanged(null); //Trigger progressbar update
+
+            // Add filtering
+            DisplayedFilesView.Filter = FilterShownFilesByGame;
+        }
+
+        private bool FilterShownFilesByGame(object obj)
+        {
+            if (obj is InstallerFile ifx)
+            {
+                if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME1) && ShowME1Files) return true;
+                if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME2) && ShowME2Files) return true;
+                if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME3) && ShowME3Files) return true;
+                return false;
+            }
+            // Default to true so I don't get angry debugging missing items
+            return true;
         }
 
         #region COMMANDS

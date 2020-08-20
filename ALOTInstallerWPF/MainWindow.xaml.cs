@@ -72,12 +72,20 @@ namespace ALOTInstallerWPF
             return tcs.Task;
         }
 
-        public void ShowBottomDialog(UserControl control)
+        public void ShowBottomDialog(FlyoutController control)
         {
+            control.CloseFlyout = 
+                () => 
+                    BottomBasicDialog2.IsOpen = false;
             BottomBasicDialog2.Content = control;
             BottomBasicDialog2.IsOpen = true;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public void CloseFlyout2()
+        {
+            BottomBasicDialog2.IsOpen = false;
+        }
     }
 }
