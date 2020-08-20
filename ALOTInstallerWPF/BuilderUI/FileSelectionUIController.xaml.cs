@@ -19,6 +19,7 @@ using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
+using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Objects;
 using Octokit;
 using Application = System.Windows.Application;
@@ -122,8 +123,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 else
                 {
                     // USER CHOSE OPTION
-                    GameTarget selectedTarget = targets[chosenOption];
-
+                    mw.ShowBottomDialog(new InstallOptionsFlyout(targets[chosenOption], CurrentModeFiles.OfType<UserFile>().ToList()));
                 }
             }
         }

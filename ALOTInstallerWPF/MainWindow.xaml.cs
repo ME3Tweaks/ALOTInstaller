@@ -14,10 +14,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ALOTInstallerWPF.BuilderUI;
-using ALOTInstallerWPF.Controllers;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
+using Octokit;
 
 namespace ALOTInstallerWPF
 {
@@ -64,12 +64,18 @@ namespace ALOTInstallerWPF
             var content = new FlyoutDialogPanel(topText, buttons, selectedOption =>
             {
                 tcs.SetResult(selectedOption);
-                FlyoutOptionDialog.IsOpen = false;
+                BottomBasicDialog.IsOpen = false;
             });
-            FlyoutOptionDialog.Content = null; //clear
-            FlyoutOptionDialog.Content = content;
-            FlyoutOptionDialog.IsOpen = true;
+            BottomBasicDialog.Content = null; //clear
+            BottomBasicDialog.Content = content;
+            BottomBasicDialog.IsOpen = true;
             return tcs.Task;
+        }
+
+        public void ShowBottomDialog(UserControl control)
+        {
+            BottomBasicDialog2.Content = control;
+            BottomBasicDialog2.IsOpen = true;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

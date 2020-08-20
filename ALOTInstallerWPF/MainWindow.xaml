@@ -18,7 +18,8 @@
             <mah:Flyout x:Name="StatusFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">
                 <TextBlock x:Name="StatusLabel" FontSize="14" Text="This is the statusbar. You should not see this text." Padding="5"></TextBlock>
             </mah:Flyout>
-            <mah:Flyout x:Name="FlyoutOptionDialog" TitleVisibility="Hidden" IsPinned="true" IsModal="True" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom"/>
+            <mah:Flyout x:Name="BottomBasicDialog" TitleVisibility="Hidden" IsPinned="true" IsModal="True" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom"/>
+            <mah:Flyout x:Name="BottomBasicDialog2" TitleVisibility="Hidden" IsPinned="true" IsModal="True" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom"/>
             <!--<mah:Flyout x:Name="InstallingOverlayFlyout" SnapsToDevicePixels="True" TitleVisibility="Collapsed" Theme="Accent" CloseButtonVisibility="Collapsed" Position="Top" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=mah:MetroWindow}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=mah:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown">-->
 
             <!--</mah:Flyout>-->

@@ -9,6 +9,7 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:objects="clr-namespace:ALOTInstallerWPF.Objects"
+             xmlns:helpers="clr-namespace:ALOTInstallerCore.Helpers;assembly=ALOTInstallerCore"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -19,6 +20,7 @@
         <converters:ReadyIconConverter x:Key="ReadyIconConverter"/>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <converters:RecommendationColorConverter x:Key="RecommendationColorConverter"/>
+        <converters:AdvancedFileInfoVisibilityConverter x:Key="AdvancedFileInfoVisibilityConverter"/>
         <!--<Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
             <Style.Resources>
                 <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource IdealForegroundColor}" />
@@ -108,39 +110,47 @@
 
                         <StackPanel Orientation="Vertical" DockPanel.Dock="Left" Margin="0,3">
                             <StackPanel Orientation="Horizontal">
-                                <iconPacks:PackIconIonicons Margin="0,0,3,0"  Kind="{Binding Self, Converter={StaticResource ReadyIconConverter}}" Foreground="{Binding Self, Converter={StaticResource ReadyColorConverter}}" />
-                                <TextBlock Text="{Binding FriendlyName}" FontWeight="Bold"/>
+                                <iconPacks:PackIconIonicons Height="19" Margin="0,0,3,0" Kind="{Binding Self, Converter={StaticResource ReadyIconConverter}}" 
+                                                            Foreground="{Binding Self, Converter={StaticResource ReadyColorConverter}}" />
+                                <TextBlock Text="{Binding FriendlyName}" 
+                                           FontWeight="Bold" FontSize="14" VerticalAlignment="Center" />
                             </StackPanel>
                             <TextBlock Text="{Binding StatusText}" Visibility="{Binding Ready, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
-                            <TextBlock Text="{Binding RecommendationReason}" FontSize="11" MaxWidth="320" TextWrapping="Wrap"/>
-                            <TextBlock Text="{Binding Self, Converter={StaticResource InstallerFileBackingFileConverter}}" FontSize="10"/>
-                            </StackPanel>
+                            <TextBlock Text="{Binding RecommendationReason}" MaxWidth="320" TextWrapping="Wrap"/>
+                        </StackPanel>
 
                         <StackPanel Orientation="Vertical" DockPanel.Dock="Right" Margin="3,3">
                             <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Border Padding="3,1" Margin="5,0" BorderThickness="1" BorderBrush="LightGray" Background="{Binding Recommendation, Converter={StaticResource RecommendationColorConverter}}" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
-                                    <TextBlock TextAlignment="Right" Text="{Binding RecommendationString}" FontSize="10" FontStyle="Italic"/>
+                                <Border Padding="3,1" Margin="2,0" BorderThickness="1" BorderBrush="LightGray" Background="{Binding Recommendation, Converter={StaticResource RecommendationColorConverter}}" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    <TextBlock TextAlignment="Right" Text="{Binding RecommendationString}" FontStyle="Italic"/>
                                 </Border>
-                                <Border Padding="2,1" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME1'}" ToolTip="This file applies to Mass Effect" BorderThickness="1" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
-                                    <TextBlock FontSize="10"  Text="Mass Effect" VerticalAlignment="Center"/>
+                                <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME1'}" ToolTip="This file applies to Mass Effect" BorderThickness="1" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
+                                    <TextBlock Text="Mass Effect" VerticalAlignment="Center"/>
                                 </Border>
-                                <Border Padding="2,1" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME2'}" ToolTip="This file applies to Mass Effect 2" BorderThickness="1" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
-                                    <TextBlock FontSize="10"  Text="Mass Effect 2" VerticalAlignment="Center"/>
+                                <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME2'}" ToolTip="This file applies to Mass Effect 2" BorderThickness="1" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
+                                    <TextBlock Text="Mass Effect 2" VerticalAlignment="Center"/>
                                 </Border>
-                                <Border Padding="2,1" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME3'}" ToolTip="This file applies to Mass Effect 3" BorderThickness="1" BorderBrush="Chartreuse" Background="#0f4e60" CornerRadius="2" VerticalAlignment="Center">
-                                    <TextBlock FontSize="10"  Text="Mass Effect 3" VerticalAlignment="Center"/>
+                                <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME3'}" ToolTip="This file applies to Mass Effect 3" BorderThickness="1" BorderBrush="Chartreuse" Background="#0f4e60" CornerRadius="2" VerticalAlignment="Center">
+                                    <TextBlock Text="Mass Effect 3" VerticalAlignment="Center"/>
                                 </Border>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Visibility="{Binding Ready, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}" Margin="0,4" HorizontalAlignment="Right">
+                                <TextBlock Text="{Binding Self, Converter={StaticResource InstallerFileBackingFileConverter}}" 
+                                           FontSize="11" 
+                                           Margin="0,1,2,0"
+                                           HorizontalAlignment="Right"/>
+                            <StackPanel Orientation="Horizontal" 
+                                        Visibility="{Binding Ready, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}" 
+                                        Margin="0,4" HorizontalAlignment="Right">
                                 <iconPacks:PackIconIonicons Kind="DownloadMD"/>
                                 <TextBlock  Margin="5,0">
-                                    <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
+                                    <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" 
+                                               NavigateUri="{Binding DownloadLink}" 
+                                               Tag="{Binding Tooltipname}">
                                         <Hyperlink.Style >
                                             <Style TargetType="Hyperlink"
                                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
                                                 <Setter Property="Foreground" Value="#31ae90"/>
                                                 <Setter Property="FontWeight" Value="Bold"/>
-
                                             </Style>
                                         </Hyperlink.Style>
                                         <Hyperlink.ToolTip>
@@ -158,107 +168,7 @@
                                 </TextBlock>
                             </StackPanel>
                         </StackPanel>
-
-
-
                     </DockPanel>
-                    <!--<Grid x:Name="ListItemElement" Background="Transparent">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="20" />
-                            <RowDefinition Height="25" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="7" />
-                            <ColumnDefinition Width="5" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="5" />
-
-                        </Grid.ColumnDefinitions>
-                        <Border x:Name="ListItemLeftBlock" Grid.Column="0" Grid.RowSpan="2" Grid.Row="0" Padding="0" Margin="0">
-                            <Border.Background>
-                                <SolidColorBrush Color="{Binding LeftBlockColor}" />
-                            </Border.Background>
-                        </Border>
-                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding FriendlyName}" FontWeight="Bold" VerticalAlignment="Center" />
-                        
-
-                        <StackPanel  HorizontalAlignment="Left" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Orientation="Horizontal">
-                            <Image x:Name="ReadyImageIcon" Height="15" Width="15" Source="{Binding ReadyIconPath}"/>
-                            <TextBlock x:Name="Download_Hyperlink" Margin="5,0">
-                                <Hyperlink x:Name="Download_InnerHyperlink" NavigateUri="{Binding DownloadLink}" Tag="{Binding Tooltipname}">
-                                    <Hyperlink.Style >
-                                        <Style TargetType="Hyperlink"
-                                                BasedOn="{StaticResource {x:Type Hyperlink}}">
-                                            <Setter Property="Foreground" Value="#31ae90"/>
-                                            <Setter Property="FontWeight" Value="Bold"/>
-
-                                        </Style>
-                                    </Hyperlink.Style>
-                                    <Hyperlink.ToolTip>
-                                        <TextBlock>
-                                            <TextBlock.Text>
-                                                <MultiBinding StringFormat="{}{0}&#10;File title: {1}">
-                                                    <Binding Path="DownloadLink" />
-                                                    <Binding Path="Tooltipname" />
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                    </Hyperlink.ToolTip>
-                                    Download
-                                </Hyperlink>
-                            </TextBlock>
-                            <TextBlock x:Name="ReadyStatusText" Visibility="Collapsed" Margin="3,0" Text="{Binding ReadyStatusText}" VerticalAlignment="Bottom"/>
-                        </StackPanel>
-                        <TextBlock HorizontalAlignment="Right" Grid.Row="1" Grid.Column="3" Text="{Binding Filename}" FontWeight="Bold" VerticalAlignment="Center" />
-                    </Grid>
-
-                    <DataTemplate.Triggers>
-                        <DataTrigger Binding="{Binding IsRequiredFile}" Value="True">
-                            <Setter TargetName="GameIcon_ALOT" Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Optional}" Value="True">
-                            <Setter TargetName="GameIcon_Optional" Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Path=IsRequiredFile}" Value="False" />
-                                <Condition Binding="{Binding Path=Optional}" Value="False" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter TargetName="GameIcon_ALOT_Recommended" Property="Visibility" Value="Visible"/>
-                        </MultiDataTrigger>
-                        <DataTrigger Binding="{Binding Game_ME1}" Value="False">
-                            <Setter TargetName="GameIcon_ME1" Property="Background" Value="Black"/>
-                            <Setter TargetName="GameIcon_ME1_Text" Property="Foreground" Value="Gray"/>
-                            <Setter TargetName="GameIcon_ME1" Property="BorderBrush" Value="Black"/>
-                            <Setter TargetName="GameIcon_ME1" Property="ToolTip" Value="This file does not apply to Mass Effect"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Game_ME2}" Value="False">
-                            <Setter TargetName="GameIcon_ME2" Property="Background" Value="Black"/>
-                            <Setter TargetName="GameIcon_ME2_Text" Property="Foreground" Value="Gray"/>
-                            <Setter TargetName="GameIcon_ME2" Property="BorderBrush" Value="Black"/>
-                            <Setter TargetName="GameIcon_ME2" Property="ToolTip" Value="This file does not apply to Mass Effect 2"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Game_ME3}" Value="False">
-                            <Setter TargetName="GameIcon_ME3" Property="Background" Value="Black"/>
-                            <Setter TargetName="GameIcon_ME3_Text" Property="Foreground" Value="Gray"/>
-                            <Setter TargetName="GameIcon_ME3" Property="BorderBrush" Value="Black"/>
-                            <Setter TargetName="GameIcon_ME3" Property="ToolTip" Value="This file does not apply to Mass Effect 3"/>
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Ready}" Value="True">
-                            <Setter TargetName="Download_Hyperlink" Property="Visibility" Value="Collapsed"/>
-                            <Setter TargetName="ReadyStatusText" Property="Visibility" Value="Visible"/>
-                        </DataTrigger>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Path=MEUITM}" Value="true" />
-                                <Condition Binding="{Binding Path=AlreadyInstalled}" Value="true" />
-                                <Condition Binding="{Binding Path=Ready}" Value="false" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter TargetName="ReadyStatusText" Property="Visibility" Value="Visible" />
-                        </MultiDataTrigger>
-                    </DataTemplate.Triggers>
--->
                 </DataTemplate>
             </ListBox.ItemTemplate>
 
