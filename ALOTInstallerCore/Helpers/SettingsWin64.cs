@@ -38,6 +38,9 @@ namespace ALOTInstallerCore.Helpers
         }
         #endregion
 
+        private static string _textureLibraryLocation;
+        private static string _buildLocation;
+        private static bool _showAdvancedFileInfo;
         /// <summary>
         /// Location of the texture library that the manifests use
         /// </summary>
@@ -46,6 +49,13 @@ namespace ALOTInstallerCore.Helpers
         /// Location that can be used to build and stage textures in preparation for installation
         /// </summary>
         public static string BuildLocation { get; set; }
+
+        public static bool ShowAdvancedFileInfo
+        {
+            get => _showAdvancedFileInfo;
+            set => SetProperty(ref _showAdvancedFileInfo, value);
+
+        }
 
         /// <summary>
         /// Allows updating to beta, prerelease versions of items

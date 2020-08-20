@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ALOTInstallerWPF.Flyouts"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:modmanager="clr-namespace:ALOTInstallerCore.Helpers;assembly=ALOTInstallerCore"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="300" MinWidth="300">
     <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible" ScrollViewer.PanningMode="VerticalFirst">
@@ -67,6 +68,7 @@
                     <mah:ToggleSwitch OnContent="Import via Move" OffContent="Import via Copy" ToolTip="Files that are importing will be moved instead of copied.&#10;This only is used if files are on same drive - if files are on different drives then they are always copied." />
                     <!--<CheckBox Margin="5" x:Name="Checkbox_DebugLogging" Content="Debug logging" Click="Checkbox_DebugLogging_Click" ToolTip="Turns on debug logging. Makes log significantly bigger with more logs - only turn on if requested by developers."  />-->
                     <mah:ToggleSwitch  x:Name="Checkbox_BetaMode" Content="Beta Mode" Toggled="Checkbox_BetaMode_OnToggled" ToolTip="Enable beta mode features. Require restart for full effect, may break application."/>
+                    <mah:ToggleSwitch Content="Show advanced file info" ToolTip="Shows advanced file information" IsOn="{Binding Path=(modmanager:Settings.ShowAdvancedFileInfo)}"/>
                 </StackPanel>
             </Expander>
             <Expander IsExpanded="True" Expanded="Expander_Expanded">
