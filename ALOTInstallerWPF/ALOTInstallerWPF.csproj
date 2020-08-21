@@ -35,7 +35,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MahApps.Metro" Version="2.2.0" />
     <PackageReference Include="MahApps.Metro.IconPacks.Ionicons" Version="4.4.0" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />
     <PackageReference Include="Serilog" Version="2.9.0" />
@@ -55,15 +54,8 @@
 
 	<ItemGroup>
     <ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />
+    <ProjectReference Include="..\MahApps.Metro\src\MahApps.Metro\MahApps.Metro.csproj" />
   </ItemGroup>
-
-
-	<ItemGroup>
-	  <Reference Include="MahApps.Metro">
-	    <HintPath>..\packages\MahApps.Metro.1.6.5\lib\net47\MahApps.Metro.dll</HintPath>
-	  </Reference>
-	</ItemGroup>
-
 
 	<ItemGroup>
 	  <Resource Include="Images\logo_me1.png" />

@@ -56,7 +56,7 @@ namespace ALOTInstallerWPF.Flyouts
         public void UpdateGameStatuses()
         {
             var me1Target = Locations.ME1Target;
-            if (me1Target == null || me1Target.GetInstalledALOTInfo() == null)
+            if (me1Target?.GetInstalledALOTInfo() == null)
             {
                 ME1TextureInstallInfo = "ME1: No textures installed";
             }
@@ -66,7 +66,7 @@ namespace ALOTInstallerWPF.Flyouts
             }
 
             var me2Target = Locations.ME2Target;
-            if (me2Target == null || me2Target.GetInstalledALOTInfo() == null)
+            if (me2Target?.GetInstalledALOTInfo() == null)
             {
                 ME2TextureInstallInfo = "ME2: No textures installed";
             }
@@ -76,7 +76,7 @@ namespace ALOTInstallerWPF.Flyouts
             }
 
             var me3Target = Locations.ME3Target;
-            if (me3Target == null || me3Target.GetInstalledALOTInfo() == null)
+            if (me3Target?.GetInstalledALOTInfo() == null)
             {
                 ME3TextureInstallInfo = "ME3: No textures installed";
             }
@@ -84,6 +84,10 @@ namespace ALOTInstallerWPF.Flyouts
             {
                 ME3TextureInstallInfo = $"ME3: {me3Target.GetInstalledALOTInfo().ToString()}";
             }
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ME1Available)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ME2Available)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ME3Available)));
         }
     }
 }

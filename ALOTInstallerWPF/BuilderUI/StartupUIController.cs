@@ -5,6 +5,7 @@ using System.Windows;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects.Manifest;
+using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Serilog;

@@ -60,7 +60,10 @@ namespace ALOTInstallerWPF.BuilderUI
             {
                 if (SetProperty(ref _showME1Files, value))
                 {
-                    FSUIC.DisplayedFilesView.Refresh();
+                    Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        FSUIC.DisplayedFilesView.Refresh();
+                    });
                 }
             }
         }
@@ -71,7 +74,10 @@ namespace ALOTInstallerWPF.BuilderUI
             {
                 if (SetProperty(ref _showME2Files, value))
                 {
-                    FSUIC.DisplayedFilesView.Refresh();
+                    Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        FSUIC.DisplayedFilesView.Refresh();
+                    });
                 }
             }
         }
@@ -82,15 +88,18 @@ namespace ALOTInstallerWPF.BuilderUI
             {
                 if (SetProperty(ref _showME3Files, value))
                 {
-                    FSUIC.DisplayedFilesView.Refresh();
+                    Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        FSUIC.DisplayedFilesView.Refresh();
+                    });
                 }
             }
         }
 
         /// <summary>
-        /// Way for the filter static props to access the current 
+        /// Way for the filter static props to access the current instance of this
         /// </summary>
-        private static FileSelectionUIController FSUIC;
+        internal static FileSelectionUIController FSUIC;
 
         public ModeHeader SelectedHeader { get; set; }
         public ObservableCollectionExtended<ModeHeader> AvailableModes { get; } = new ObservableCollectionExtended<ModeHeader>();
@@ -104,7 +113,7 @@ namespace ALOTInstallerWPF.BuilderUI
             FSUIC = this;
             LoadCommands();
             InitializeComponent();
-            AvailableModes.AddRange(ManifestHandler.MasterManifest.ManifestModePackageMappping.Select(x => new ModeHeader(x.Key, getModeDescription(x.Key))));
+            AvailableModes.AddRange(ManifestHandler.MasterManifest.ManifestModePackageMappping.Select(x => new ModeHeader(x.Key,getModeDirections(x.Key), getModeDescription(x.Key))));
             OnManifestModeChanged(ManifestHandler.CurrentMode);
             ManifestHandler.OnManifestModeChanged = OnManifestModeChanged; //Setup change subscription
 
@@ -205,8 +214,25 @@ namespace ALOTInstallerWPF.BuilderUI
             }
         }
 
-
         private string getModeDescription(ManifestMode argKey)
+        {
+            var manifestVersion = ManifestHandler.MasterManifest.ManifestModePackageMappping[argKey].ManifestVersion;
+            switch (argKey)
+            {
+                case ManifestMode.Free:
+                    return
+                        "Install whatever you want. Has no file requirements, however files will not be specifically parsed like in other modes";
+                case ManifestMode.MEUITM:
+                    return $"Install MEUITM using MEUITM mode defaults. Can also install user files\n\nManifest version: {manifestVersion}";
+                case ManifestMode.ALOT:
+                    return
+                        $"Install ALOT and MEUITM (if applicable) with ALOT defaults. Can also install user files. This is the default mode\n\nManifest version: {manifestVersion}";
+                default:
+                    return null;
+            }
+        }
+
+        private string getModeDirections(ManifestMode argKey)
         {
             switch (argKey)
             {

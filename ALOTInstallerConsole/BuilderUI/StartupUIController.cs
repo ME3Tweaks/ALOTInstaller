@@ -75,7 +75,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     FileSelectionUIController bui = new FileSelectionUIController();
                     if (ManifestHandler.MasterManifest != null)
                     {
-                        ManifestHandler.CurrentMode = ManifestMode.ALOT;
+                        ManifestHandler.SetCurrentMode(ManifestMode.ALOT);
                     }
                     Program.SwapToNewView(bui);
                 }

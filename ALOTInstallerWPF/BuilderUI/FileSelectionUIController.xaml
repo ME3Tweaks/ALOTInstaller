@@ -21,27 +21,6 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <converters:RecommendationColorConverter x:Key="RecommendationColorConverter"/>
         <converters:AdvancedFileInfoVisibilityConverter x:Key="AdvancedFileInfoVisibilityConverter"/>
-        <!--<Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource MetroCheckBox}">
-            <Style.Resources>
-                <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource IdealForegroundColor}" />
-            </Style.Resources>
-        </Style>-->
-        <!--<Style x:Key="BottomButton_Left" TargetType="{x:Type Button}" BasedOn="{StaticResource AccentedSquareButtonStyle}">
-            <Setter Property="BorderThickness" Value="2,2,1,2" />
-        </Style>
-        <Style x:Key="BottomButton_Middle" TargetType="{x:Type Button}" BasedOn="{StaticResource AccentedSquareButtonStyle}">
-            <Setter Property="BorderThickness" Value="1,2,1,2" />
-        </Style>
-        <Style x:Key="BottomButton_BlackMiddle" TargetType="{x:Type Button}" BasedOn="{StaticResource SquareButtonStyle}">
-            <Setter Property="BorderThickness" Value="1,2,1,2" />
-            <Setter Property="Padding" Value="10,5,10,5" />
-        </Style>
-        <Style x:Key="BottomButton_BlackRight" TargetType="{x:Type Button}" BasedOn="{StaticResource SquareButtonStyle}">
-            <Setter Property="BorderThickness" Value="1,2,2,2" />
-            <Setter Property="Padding" Value="10,5,10,5" />
-
-        </Style>-->
-
 
         <Style x:Key="LinkLabel" TargetType="Button">
             <Setter Property="VerticalAlignment" Value="Top"/>
@@ -64,20 +43,30 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
         <Style TargetType="{x:Type ContentPresenter}">
             <Setter Property="Margin" Value="0,0,0,0" />
         </Style>
     </UserControl.Resources>
     <DockPanel>
-        <TabControl DockPanel.Dock="Top" HorizontalAlignment="Stretch" SelectedItem="{Binding SelectedHeader}" ItemsSource="{Binding AvailableModes}" DisplayMemberPath="ModeText">
+        <TabControl DockPanel.Dock="Top" 
+                    HorizontalAlignment="Stretch" 
+                    SelectedItem="{Binding SelectedHeader}" 
+                    ItemsSource="{Binding AvailableModes}" 
+                    >
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabPanel}">
                     <Setter Property="HorizontalAlignment" Value="Center" />
                 </Style>
             </TabControl.Resources>
+            <TabControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type objects:ModeHeader}">
+                    <TextBlock Text="{Binding ModeText}" ToolTip="{Binding ModeDescription}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
                 <DataTemplate DataType="{x:Type objects:ModeHeader}">
-                    <TextBlock Text="{Binding ModeDescription}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
+                    <TextBlock Text="{Binding ModeDirections}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </TabControl>
@@ -119,30 +108,39 @@
                             <TextBlock Text="{Binding RecommendationReason}" MaxWidth="320" TextWrapping="Wrap"/>
                         </StackPanel>
 
-                        <StackPanel Orientation="Vertical" DockPanel.Dock="Right" Margin="3,3">
-                            <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Border Padding="3,1" Margin="2,0" BorderThickness="1" BorderBrush="LightGray" Background="{Binding Recommendation, Converter={StaticResource RecommendationColorConverter}}" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
-                                    <TextBlock TextAlignment="Right" Text="{Binding RecommendationString}" FontStyle="Italic"/>
-                                </Border>
-                                <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME1'}" ToolTip="This file applies to Mass Effect" BorderThickness="1" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
-                                    <TextBlock Text="Mass Effect" VerticalAlignment="Center"/>
-                                </Border>
-                                <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME2'}" ToolTip="This file applies to Mass Effect 2" BorderThickness="1" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
-                                    <TextBlock Text="Mass Effect 2" VerticalAlignment="Center"/>
-                                </Border>
-                                <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME3'}" ToolTip="This file applies to Mass Effect 3" BorderThickness="1" BorderBrush="Chartreuse" Background="#0f4e60" CornerRadius="2" VerticalAlignment="Center">
-                                    <TextBlock Text="Mass Effect 3" VerticalAlignment="Center"/>
-                                </Border>
+                        <DockPanel Dock="Right">
+                            <StackPanel Orientation="Vertical"  Margin="3,3" DockPanel.Dock="Top">
+                                <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Border Padding="3,1" Margin="2,0" BorderThickness="1" BorderBrush="LightGray" Background="{Binding Recommendation, Converter={StaticResource RecommendationColorConverter}}" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                        <TextBlock TextAlignment="Right" Text="{Binding RecommendationString}" FontStyle="Italic"/>
+                                    </Border>
+                                    <Border Padding="3,1" Margin="2,0" Visibility="{Binding AlotVersionInfo.IsNotVersioned, Converter={StaticResource BoolToVisibilityConverter}}" BorderThickness="1" BorderBrush="LightGray" ToolTip="This file is part of the Addon" Background="DarkSlateBlue" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                        <TextBlock TextAlignment="Right" Text="Addon" FontStyle="Italic"/>
+                                    </Border>
+                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME1'}" ToolTip="This file applies to Mass Effect" BorderThickness="1" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
+                                        <TextBlock Text="Mass Effect" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME2'}" ToolTip="This file applies to Mass Effect 2" BorderThickness="1" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
+                                        <TextBlock Text="Mass Effect 2" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME3'}" ToolTip="This file applies to Mass Effect 3" BorderThickness="1" BorderBrush="Chartreuse" Background="#0f4e60" CornerRadius="2" VerticalAlignment="Center">
+                                        <TextBlock Text="Mass Effect 3" VerticalAlignment="Center"/>
+                                    </Border>
+                                </StackPanel>
                             </StackPanel>
-                                <TextBlock Text="{Binding Self, Converter={StaticResource InstallerFileBackingFileConverter}}" 
+                            <TextBlock Text="{Binding Self, Converter={StaticResource InstallerFileBackingFileConverter}}" 
                                            FontSize="11" 
+                                           DockPanel.Dock="Top"
                                            Margin="0,1,2,0"
                                            HorizontalAlignment="Right"/>
-                            <StackPanel Orientation="Horizontal" 
+                            <StackPanel
+                                    VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" 
                                         Visibility="{Binding Ready, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}" 
-                                        Margin="0,4" HorizontalAlignment="Right">
-                                <iconPacks:PackIconIonicons Kind="DownloadMD"/>
-                                <TextBlock  Margin="5,0">
+                                        Margin="0,4" HorizontalAlignment="Right"
+                                        >
+                                    <iconPacks:PackIconIonicons Kind="DownloadMD"/>
+                                    <TextBlock  Margin="5,0">
                                     <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" 
                                                NavigateUri="{Binding DownloadLink}" 
                                                Tag="{Binding Tooltipname}">
@@ -155,19 +153,22 @@
                                         </Hyperlink.Style>
                                         <Hyperlink.ToolTip>
                                             <TextBlock>
-                                                <TextBlock.Text>
-                                                    <MultiBinding StringFormat="{}{0}&#10;File title: {1}">
-                                                        <Binding Path="DownloadLink" />
-                                                        <Binding Path="Tooltipname" />
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="{}{0}&#10;File title: {1}">
+                                                            <Binding Path="DownloadLink" />
+                                                            <Binding Path="Tooltipname" />
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
                                             </TextBlock>
                                         </Hyperlink.ToolTip>
                                         Download
                                     </Hyperlink>
                                 </TextBlock>
+                                </StackPanel>
                             </StackPanel>
-                        </StackPanel>
+
+                        </DockPanel>
+
                     </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>

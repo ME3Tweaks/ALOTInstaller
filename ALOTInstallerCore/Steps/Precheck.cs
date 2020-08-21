@@ -168,7 +168,7 @@ namespace ALOTInstallerCore.Steps
         /// <returns></returns>
         public static bool CheckMEUITM(InstallOptionsPackage package, Func<string, string, string, List<string>, bool> missingRecommandedItemsDialogCallback)
         {
-            if (package.InstallerMode != ManifestMode.ALOT) return true; // Only work in ALOT mode.
+            if (package.InstallerMode != ManifestMode.ALOT || package.InstallTarget.Game != Enums.MEGame.ME1) return true; // Only work in ALOT mode. Always say this check is OK if not ME1
             var installedInfo = package.InstallTarget.GetInstalledALOTInfo();
             var shouldCheck = installedInfo == null || installedInfo.MEUITMVER == 0; //if MEUITM is ever updated, this should probably be changed.
 
@@ -195,7 +195,7 @@ namespace ALOTInstallerCore.Steps
             // Get a list of ONLY non-versioned recommended files (which will only be addon files)
             var applicableManifestFiles = package.FilesToInstall.Where(x =>
                     x is ManifestFile mf && mf.ApplicableGames.HasFlag(package.InstallTarget.Game.ToApplicableGame())
-                                         && mf.AlotVersionInfo.IsNotVersioned()
+                                         && mf.AlotVersionInfo.IsNotVersioned
                                          && mf.Recommendation == RecommendationType.Recommended)
                 .ToList();
 

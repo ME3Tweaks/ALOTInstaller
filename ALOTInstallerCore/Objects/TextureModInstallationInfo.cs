@@ -89,7 +89,7 @@ namespace ALOTInstallerCore.Objects
         public override string ToString()
         {
             string str = "";
-            if (IsNotVersioned())
+            if (IsNotVersioned)
             {
                 return "Non MEUITM/ALOT textures installed";
             }
@@ -116,7 +116,7 @@ namespace ALOTInstallerCore.Objects
         /// Returns if this object doesn't represent an actual ALOT/MEUITM installation (no values set)
         /// </summary>
         /// <returns></returns>
-        public bool IsNotVersioned() => ALOTVER == 0 && ALOTHOTFIXVER == 0 & ALOTUPDATEVER == 0 && MEUITMVER == 0;
+        public bool IsNotVersioned => ALOTVER == 0 && ALOTHOTFIXVER == 0 & ALOTUPDATEVER == 0 && MEUITMVER == 0;
 
         /// <summary>
         /// Calculates an installation marker based on the existing and installed file sets

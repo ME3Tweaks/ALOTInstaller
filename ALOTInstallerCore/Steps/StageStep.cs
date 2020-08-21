@@ -153,7 +153,7 @@ namespace ALOTInstallerCore.Builder
             foreach (var f in installOptions.FilesToInstall)
             {
                 f.ResetBuildVars();
-                if (f.AlotVersionInfo.IsNotVersioned() && AddonID < 0)
+                if (f.AlotVersionInfo.IsNotVersioned && AddonID < 0)
                 {
                     // First non-versioned file. Versioned files are always able to be overriden so
                     // first non versioned file will be first addon file (or user file).
@@ -769,7 +769,7 @@ namespace ALOTInstallerCore.Builder
 
             if (installOptions.InstallAddons)
             {
-                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.IsNotVersioned() && x is ManifestFile)); //Add Addon files that don't have a set ALOTVersionInfo.
+                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.IsNotVersioned && x is ManifestFile)); //Add Addon files that don't have a set ALOTVersionInfo.
             }
 
             if (installOptions.InstallUserfiles)

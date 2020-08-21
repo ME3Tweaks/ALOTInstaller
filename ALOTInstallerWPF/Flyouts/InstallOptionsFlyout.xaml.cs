@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,10 +17,12 @@ using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
+using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Actions;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using Serilog;
 
 namespace ALOTInstallerWPF.Flyouts
 {
@@ -45,6 +48,8 @@ namespace ALOTInstallerWPF.Flyouts
 
         private static string fourKLodsStr = "Uses best quality textures, uses more memory than 2K";
         private static string twoKLodsStr = "Uses good quality textures, uses less memory than 4K";
+        private List<InstallerFile> fileSet;
+
         public void OnUse4KLODsChanged()
         {
             CurrentLodsDescText = Use4KLODs ? fourKLodsStr : twoKLodsStr;
@@ -62,8 +67,13 @@ namespace ALOTInstallerWPF.Flyouts
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("InstallOptionsWorker");
             var files = ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode);
             files.AddRange(userFiles);
+            fileSet = files;
             nbw.DoWork += (a, b) =>
             {
+                FileSelectionUIController.ShowME1Files = target.Game == Enums.MEGame.ME1;
+                FileSelectionUIController.ShowME2Files = target.Game == Enums.MEGame.ME2;
+                FileSelectionUIController.ShowME3Files = target.Game == Enums.MEGame.ME3;
+
                 string prefix = "Existing texture installation info: ";
                 InstallOptionsTopText = prefix + "No textures installed";
                 var ii = target.GetInstalledALOTInfo();
@@ -123,37 +133,120 @@ namespace ALOTInstallerWPF.Flyouts
             {
                 SpinnerText = "Performing installation precheck";
                 DeterminingOptionsVisible = true;
-                var answer = await mw.ShowMessageAsync("YOU WILL BE UNABLE TO INSTALL FURTHER MODS/DLC/FILES AFTER THIS POINT", "Once textures are installed, you will be unable to add or change files in your game as all files will be modified. Ensure all mods and DLC are installed now, as you will not be able to change these after this point. DO NOT ATTEMPT TO INSTALL FILES OUTSIDE OF ALOT INSTALLER AFTER THIS POINT or you will have to completely delete and reinstall the game.",
-                    MessageDialogStyle.AffirmativeAndNegative);
-
-                if (answer == MessageDialogResult.Negative)
+                InstallOptionsPackage iop = new InstallOptionsPackage()
                 {
-                    CloseFlyout();
-                }
-                else
+                    InstallTarget = InstallTarget,
+                    InstallerMode = ManifestHandler.CurrentMode,
+                    ImportNewlyUnpackedFiles = OptimizeTextureLibrary,
+                    FilesToInstall = fileSet,
+                    InstallALOT = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.ALOT) && checkboxMapping[InstallOptionsStep.InstallOption.ALOT].IsOn,
+                    DebugNoInstall = !DebugPerformMainInstallation
+                };
+                NamedBackgroundWorker nbw = new NamedBackgroundWorker("InstallPrecheckWorker");
+                nbw.DoWork += (a, b) =>
                 {
-                    InstallOptionsPackage iop = new InstallOptionsPackage()
-                    {
-                        InstallTarget = ,
-                        ImportNewlyUnpackedFiles = OptimizeTextureLibrary,
-                        InstallALOT = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.ALOT) ? checkboxMapping[InstallOptionsStep.InstallOption.ALOT].IsOn : false,
-                        DebugNoInstall = !DebugPerformMainInstallation
-                    };
-                    NamedBackgroundWorker nbw = new NamedBackgroundWorker("InstallPrecheckWorker");
-                    nbw.DoWork += (a, b) =>
-                    {
-                        if (InstallTarget.Game == Enums.MEGame.ME1 && ManifestHandler.CurrentMode == ManifestMode.ALOT)
+                    object syncObj = new object();
+                    bool ok = true;
+                    #region MEUITM CHECK (ME1)
+                    ok = Precheck.CheckMEUITM(iop,
+                        (string title, string topMessage, string bottomMessage, List<string> itemsList) =>
                         {
-                            //void 
-                            //Prxecheck.CheckMEUITM()
-                        }
-                    };
-                    nbw.RunWorkerCompleted += (a, b) =>
-                    {
 
-                    };
-                    nbw.RunWorkerAsync();
-                }
+                            bool response = false;
+                            Application.Current.Dispatcher.Invoke(async () =>
+                            {
+                                response = await mw.ShowScrollMessageAsync(title, topMessage, bottomMessage,
+                                    itemsList, MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                                    {
+                                        AffirmativeButtonText = "Install without MEUITM",
+                                        NegativeButtonText = "Abort install"
+                                    }) == MessageDialogResult.Affirmative;
+                                lock (syncObj)
+                                {
+                                    Monitor.Pulse(syncObj);
+                                }
+                            });
+                            lock (syncObj)
+                            {
+                                Monitor.Wait(syncObj);
+                            }
+                            return response;
+                        });
+                    if (!ok)
+                    {
+                        Log.Information("User aborted install at check: MEUITM missing");
+                        b.Result = false;
+                        return;
+                    }
+                    #endregion
+                    #region ADDON CHECK
+                    // Precheck: All recommended files ready
+                    if (iop.InstallAddons)
+                    {
+                        if (!Precheck.CheckAllRecommendedItems(iop, (title, topMessage, bottomMessage, missingFilesList)
+                            =>
+                        {
+                            bool response = false;
+                            Application.Current.Dispatcher.Invoke(async () =>
+                            {
+                                response = await mw.ShowScrollMessageAsync(title, topMessage, bottomMessage,
+                                    missingFilesList, MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                                    {
+                                        AffirmativeButtonText = "Install without files",
+                                        NegativeButtonText = "Abort install"
+                                    }) == MessageDialogResult.Affirmative;
+                                lock (syncObj)
+                                {
+                                    Monitor.Pulse(syncObj);
+                                }
+                            });
+                            lock (syncObj)
+                            {
+                                Monitor.Wait(syncObj);
+                            }
+
+                            return response;
+                        }))
+                        {
+                            Log.Information("User aborted install at check: Not all recommended files are ready");
+                            b.Result = false;
+                            return;
+                        }
+                    }
+                    #endregion
+
+                    #region GAME PRECHECK
+                    var precheckFailedMessage = Precheck.PerformPreStagingCheck(iop);
+                    if (precheckFailedMessage != null)
+                    {
+                        Application.Current.Dispatcher.Invoke(async () =>
+                        {
+                            await mw.ShowMessageAsync("Cannot install textures", precheckFailedMessage);
+                        });
+                        b.Result = false;
+                        return;
+                    }
+
+                    #endregion
+                    b.Result = true;
+                };
+                nbw.RunWorkerCompleted += async (a, b) =>
+                {
+                    if (b.Error == null && b.Result is bool ok && ok)
+                    {
+                        var answer = await mw.ShowMessageAsync(
+                            "YOU WILL BE UNABLE TO INSTALL FURTHER MODS/DLC/FILES AFTER THIS POINT",
+                            "Once textures are installed, you will be unable to add or change files in your game as all files will be modified. Ensure all mods and DLC are installed now, as you will not be able to change these after this point. DO NOT ATTEMPT TO INSTALL FILES OUTSIDE OF ALOT INSTALLER AFTER THIS POINT or you will have to completely delete and reinstall the game.",
+                            MessageDialogStyle.AffirmativeAndNegative);
+
+                        if (answer == MessageDialogResult.Affirmative)
+                        {
+                            // BEGIN STAGING
+                        }
+                    }
+                    CloseFlyout();
+                };
+                nbw.RunWorkerAsync();
             }
         }
 

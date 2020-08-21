@@ -479,7 +479,28 @@ namespace ALOTInstallerCore.Helpers
         /// <returns></returns>
         public static (long ready, long recommendedCount) GetNonOptionalReadyness()
         {
-            var filesToCheck = GetManifestFilesForMode(CurrentMode).OfType<ManifestFile>().Where(x => x.Recommendation == RecommendationType.Recommended || x.Recommendation == RecommendationType.Required);
+            var manifestFiles = GetManifestFilesForMode(CurrentMode).OfType<ManifestFile>();
+            var filesToCheck = manifestFiles.Where(x =>
+                    x.Recommendation == RecommendationType.Recommended ||
+                    x.Recommendation == RecommendationType.Required)
+                .ToList();
+            // preinstall mod optiongroups can satisfy readyness with an optional file.
+            var notReady = filesToCheck.Where(x => !x.Ready).ToList();
+            foreach (var v in notReady.OfType<PreinstallMod>())
+            {
+                if (v.OptionGroup != null)
+                {
+                    var otherVersion = manifestFiles.FirstOrDefault(x =>
+                        x.Ready && x is PreinstallMod pm && pm.OptionGroup == v.OptionGroup && pm != v);
+                    if (otherVersion != null)
+                    {
+                        // Optional version of recommended file is ready.
+                        filesToCheck.Remove(v); //Remove recommended
+                        filesToCheck.Add(otherVersion); //Add optional
+                    }
+                }
+            }
+
             int readyx = filesToCheck.Count(x=>x.Ready);
             int recommendedCountx = filesToCheck.Count();
             return (readyx, recommendedCountx);

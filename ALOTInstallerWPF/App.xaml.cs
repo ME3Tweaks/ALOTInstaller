@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace ALOTInstallerWPF
 {
@@ -19,6 +20,13 @@ namespace ALOTInstallerWPF
 #else
     public static Visibility DebugModeVisibility => Visibility.Collapsed;
 #endif
-
+        public App() : base()
+        {
+            ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(UIElement),
+                new FrameworkPropertyMetadata(15000));
+            ToolTipService.ShowOnDisabledProperty.OverrideMetadata(
+                typeof(Control),
+                new FrameworkPropertyMetadata(true));
+        }
     }
 }
