@@ -225,7 +225,8 @@
             author="CDAMJC"
             installpriority="0"
             recommendationreason="Enhances large amount of textures in Mass Effect"
-            recommendation="Required">
+            recommendation="Required"
+            comparisonslink="https://www.nexusmods.com/masseffect/mods/1?tab=images">
                <file
                     downloadlink="https://www.nexusmods.com/masseffect/mods/1"
                     tooltipname="MEUITM Anniversary Edition"
@@ -538,7 +539,8 @@
             author="CDAMJC"
             installpriority="0"
             recommendationreason="Enhances large amount of textures in Mass Effect"
-            recommendation="Recommended">
+            recommendation="Recommended"
+            comparisonslink="https://www.nexusmods.com/masseffect/mods/1?tab=images">
                <file
                     downloadlink="https://www.nexusmods.com/masseffect/mods/1"
                     tooltipname="MEUITM Anniversary Edition"
