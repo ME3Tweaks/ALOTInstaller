@@ -3047,7 +3047,7 @@
             author="Audemus"
             recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 2"
             recommendation="Recommended"
-            group="ME2ALOV"
+            optiongroup="ME2ALOV"
             uipriority="2">
                <file
                     downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files"
