@@ -7,6 +7,8 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:modmanager="clr-namespace:ALOTInstallerCore.Helpers;assembly=ALOTInstallerCore"
              xmlns:builderUi="clr-namespace:ALOTInstallerWPF.BuilderUI"
+             xmlns:services="clr-namespace:ALOTInstallerCore.ModManager.Services;assembly=ALOTInstallerCore"
+             xmlns:me3Tweaks="clr-namespace:ALOTInstallerCore.ModManager.ME3Tweaks;assembly=ALOTInstallerCore"
              mc:Ignorable="d" 
              d:DesignHeight="1450" d:DesignWidth="300" MaxWidth="300">
     <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible" ScrollViewer.PanningMode="VerticalFirst" Width="300">
@@ -38,11 +40,25 @@
                 <Expander.Header>
                     <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Backup &amp; Restore"/>
                 </Expander.Header>
-                <!--<StackPanel>
-                    <Button x:Name="Button_ME1Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME1: Not Backed Up" Click="Button_ME1Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
-                    <Button x:Name="Button_ME2Backup" Margin="20,0,20,3" FontSize="12" Padding="0,3,0,3" Content="ME2: Not Backed Up" Click="Button_ME2Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
-                    <Button x:Name="Button_ME3Backup" Margin="20,0,20,0" FontSize="12" Padding="0,3,0,3" Content="ME3: Not Backed Up" Click="Button_ME3Backup_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
-                </StackPanel>-->
+                <ItemsControl ItemsSource="{Binding Path=(services:BackupService.GameBackupStatuses)}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type services:BackupService+GameBackupStatus}">
+                            <DockPanel Margin="20,3,0,3">
+
+                                <TextBlock Text="{Binding GameName}" DockPanel.Dock="Top" FontWeight="Bold"/>
+
+                                <!--<TextBlock Text="Permanent: Where manifest files are stored for each mode (excluding Free Mode)" TextWrapping="Wrap" DockPanel.Dock="Top"/>-->
+                                <DockPanel DockPanel.Dock="Bottom" Margin="0,2,0,0">
+                                    <Button DockPanel.Dock="Right" Command="{Binding BackupRestoreME1Command}" Content="{Binding ME1BackupRestoreButtonText}" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="{Binding ME1BackupButtonToolTip}"/>
+                                    <Button FontSize="11" FontWeight="Bold" Command="{Binding UnlinkME1BackupCommand}" HorizontalAlignment="Left" Content="Unlink Backup" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Removes the location information for this game's backup. The backup files will not be modified, but modding programs will no longer think there is a backup for this game"/>
+                                </DockPanel>
+                                <TextBlock Text="{Binding Path=BackupStatus}" DockPanel.Dock="Top"/>
+                                <TextBlock Text="{Binding Path=BackupLocationStatus}"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+
+                </ItemsControl>
             </Expander>
             <Expander IsExpanded="True" Expanded="Expander_Expanded">
                 <Expander.Header>
@@ -83,9 +99,9 @@
                         </DockPanel>
                         <TextBox Text="{Binding Path=(modmanager:Settings.BuildLocation)}" IsReadOnly="True" IsEnabled="False" />
                     </DockPanel>
-                    </StackPanel>
+                </StackPanel>
             </Expander>
-                    <Expander IsExpanded="True" Expanded="Expander_Expanded">
+            <Expander IsExpanded="True" Expanded="Expander_Expanded">
                 <Expander.Header>
                     <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Misc Settings" Padding="0,0,0,0"/>
                 </Expander.Header>

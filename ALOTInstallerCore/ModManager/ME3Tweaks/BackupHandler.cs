@@ -22,12 +22,12 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
     /// </summary>
     public static class BackupHandler
     {
-        public static bool AnyGameMissingBackup => !BackupService.ME1BackedUp || !BackupService.ME2BackedUp || !BackupService.ME3BackedUp;
 
         #region BACKUP
         public class GameBackup : INotifyPropertyChanged
         {
-            private Enums.MEGame Game;
+            public string GameName => Game.ToGameName();
+            public Enums.MEGame Game { get; }
             public ObservableCollectionExtended<GameTarget> AvailableTargetsToBackup { get; } = new ObservableCollectionExtended<GameTarget>();
 
             /// <summary>
@@ -462,17 +462,12 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
             private void ResetBackupStatus()
             {
-                BackupLocation = BackupService.GetGameBackupPath(Game);
-                //BackupService.RefreshBackupStatus(window, Game);
-                BackupStatus = BackupService.GetBackupStatus(Game);
-                UpdateStatusCallback?.Invoke(BackupLocation ?? BackupService.GetBackupStatusTooltip(Game));
+                BackupService.UpdateBackupStatus(Game, false);
             }
 
             public event PropertyChangedEventHandler PropertyChanged;
             public GameTarget BackupSourceTarget { get; set; }
-            public string BackupLocation { get; set; }
             public string BackupStatus { get; set; }
-            public string BackupStatusLine2 { get; set; }
             public int ProgressMax { get; set; } = 100;
             public int ProgressValue { get; set; } = 0;
             public bool ProgressIndeterminate { get; set; } = true;
@@ -549,7 +544,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 if (restore)
                 {
-                    string backupPath = BackupService.GetGameBackupPath(Game);
+                    string backupPath = BackupService.GetGameBackupPath(Game, out var isVanilla);
 
                     if (destinationDirectory == null)
                     {

@@ -117,7 +117,7 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <returns></returns>
         internal static MemoryStream FetchBasegameFile(Enums.MEGame game, string filename)
         {
-            var backupPath = BackupService.GetGameBackupPath(game);
+            var backupPath = BackupService.GetGameBackupPath(game, out var isVanilla);
             if (backupPath == null/* && target == null*/) return null; //can't fetch
 
             string cookedPath = MEDirectories.CookedPath(game, backupPath);
@@ -165,7 +165,7 @@ namespace ALOTInstallerCore.ModManager.Services
         internal static MemoryStream FetchME1ME2DLCFile(Enums.MEGame game, string dlcfoldername, string filename)
         {
             if (game == Enums.MEGame.ME3) throw new Exception(@"Cannot call this method with game = ME3");
-            var backupPath = BackupService.GetGameBackupPath(game);
+            var backupPath = BackupService.GetGameBackupPath(game, out var isVanilla);
             if (backupPath == null/* && target == null*/) return null; //can't fetch
 
             string dlcPath = MEDirectories.DLCPath(game);
@@ -493,10 +493,10 @@ namespace ALOTInstallerCore.ModManager.Services
         internal static void CheckAndTagBackup(Enums.MEGame game)
         {
             Log.Information(@"Validating backup for " + game.GetGameName());
-            var targetPath = BackupService.GetGameBackupPath(game, false);
+            var targetPath = BackupService.GetGameBackupPath(game, out var isVanillaBU, false);
             Log.Information(@"Backup location: " + targetPath);
             BackupService.SetStatus(game, "Checking backup", "Please wait");
-            BackupService.SetActivity(game, true);
+            //BackupService.SetActivity(game, true);
 #if WPF
             BackupService.SetIcon(game, FontAwesomeIcon.Spinner);
 #endif
@@ -537,14 +537,14 @@ namespace ALOTInstallerCore.ModManager.Services
                     //Tag
                     File.WriteAllText(Path.Combine(targetPath, @"cmm_vanilla"), "ALOTInstallerCore");
                     Log.Information(@"Wrote cmm_vanilla to validated backup");
-                    BackupService.SetBackedUp(game, true);
+                    BackupService.RefreshBackupStatus(null, true, game);
                 }
             }
             else
             {
                 Log.Information(@"Backup target is invalid. This backup cannot not be used. Reason: " + validationFailedReason);
             }
-            BackupService.SetActivity(game, false);
+            //BackupService.SetActivity(game, false);
 #if WPF
             BackupService.RefreshBackupStatus(null, game);
             BackupService.ResetIcon(game);

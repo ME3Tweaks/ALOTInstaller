@@ -62,50 +62,121 @@ namespace ALOTInstallerCore.ModManager.Services
         //    private set => SetProperty(ref _me3Installed, value);
         //}
 
-
-        //Todo: Maybe cache this so we aren't doing so many reads. Not sure how often this gets hit since it is used in some commands
-
-        private static bool _me1BackedUp;
-        public static bool ME1BackedUp
+        public static ObservableCollectionExtended<GameBackupStatus> GameBackupStatuses { get; } = new ObservableCollectionExtended<GameBackupStatus>()
         {
-            get => GetGameBackupPath(Enums.MEGame.ME1, true) != null;
-            private set => SetProperty(ref _me1BackedUp, value);
+
+        };
+
+        public class GameBackupStatus : INotifyPropertyChanged
+        {
+            public string GameName => Game.ToGameName();
+            public Enums.MEGame Game { get; internal set; }
+            public bool BackedUp { get; internal set; }
+            public bool BackupActivity { get; internal set; }
+            public string BackupStatus { get; internal set; }
+            public string BackupLocationStatus { get; internal set; }
+
+            internal GameBackupStatus(Enums.MEGame game)
+            {
+                Game = game;
+            }
+
+            internal void RefreshBackupStatus(bool installed, bool forceCmmVanilla)
+            {
+                if (installed)
+                {
+                    var bPath = GetGameBackupPath(Game, out var isVanilla, forceCmmVanilla);
+                    if (bPath != null)
+                    {
+                        if (!isVanilla)
+                        {
+                            BackupStatus = "Backed up (Not Vanilla)";
+                        }
+                        else
+                        {
+                            BackupStatus = "Backed up";
+                        }
+                        BackupLocationStatus = $"Backup stored at {bPath}";
+                        return;
+                    }
+                    bPath = GetGameBackupPath(Game, out _, forceCmmVanilla, forceReturnPath: true);
+                    if (bPath == null)
+                    {
+                        BackupStatus = "Not backed up";
+                        BackupLocationStatus = "Game has not been backed up";
+                    }
+                    else if (!Directory.Exists(bPath))
+                    {
+                        BackupStatus = "Backup unavailable";
+                        BackupLocationStatus = $"Backup path not accessible: {bPath}";
+                    }
+                }
+                else
+                {
+                    BackupStatus = "Game not installed";
+                    BackupLocationStatus = "Game not installed. Run at least once to ensure game is fully setup";
+                }
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
         }
 
-        private static bool _me2BackedUp;
-        public static bool ME2BackedUp
+        /// <summary>
+        /// Initializes the backup service.
+        /// </summary>
+        public static void InitBackupService(Action<Action> runCodeOnUIThreadCallback)
         {
-            get => GetGameBackupPath(Enums.MEGame.ME2, true) != null;
-            private set => SetProperty(ref _me2BackedUp, value);
+            void runOnUiThread()
+            {
+                GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME1));
+                GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME2));
+                GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME3));
+            }
+            runCodeOnUIThreadCallback.Invoke(runOnUiThread);
+            RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
         }
 
-        private static bool _me3BackedUp;
-        public static bool ME3BackedUp
-        {
-            get => GetGameBackupPath(Enums.MEGame.ME3, true) != null;
-            private set => SetProperty(ref _me3BackedUp, value);
-        }
+        //private static bool _me1BackedUp;
+        //public static bool ME1BackedUp
+        //{
+        //    get => GetGameBackupPath(Enums.MEGame.ME1, out var isVanilla, true) != null;
+        //    private set => SetProperty(ref _me1BackedUp, value);
+        //}
 
-        private static bool _me1BackupActivity;
-        public static bool ME1BackupActivity
-        {
-            get => _me1BackupActivity;
-            private set => SetProperty(ref _me1BackupActivity, value);
-        }
+        //private static bool _me2BackedUp;
+        //public static bool ME2BackedUp
+        //{
+        //    get => GetGameBackupPath(Enums.MEGame.ME2, out var isVanilla, true) != null;
+        //    private set => SetProperty(ref _me2BackedUp, value);
+        //}
 
-        private static bool _me2BackupActivity;
-        public static bool ME2BackupActivity
-        {
-            get => _me2BackupActivity;
-            private set => SetProperty(ref _me2BackupActivity, value);
-        }
+        //private static bool _me3BackedUp;
+        //public static bool ME3BackedUp
+        //{
+        //    get => GetGameBackupPath(Enums.MEGame.ME3, out var isVanilla, true) != null;
+        //    private set => SetProperty(ref _me3BackedUp, value);
+        //}
 
-        private static bool _me3BackupActivity;
-        public static bool ME3BackupActivity
-        {
-            get => _me3BackupActivity;
-            private set => SetProperty(ref _me3BackupActivity, value);
-        }
+        //private static bool _me1BackupActivity;
+        //public static bool ME1BackupActivity
+        //{
+        //    get => _me1BackupActivity;
+        //    private set => SetProperty(ref _me1BackupActivity, value);
+        //}
+
+        //private static bool _me2BackupActivity;
+        //public static bool ME2BackupActivity
+        //{
+        //    get => _me2BackupActivity;
+        //    private set => SetProperty(ref _me2BackupActivity, value);
+        //}
+
+        //private static bool _me3BackupActivity;
+        //public static bool ME3BackupActivity
+        //{
+        //    get => _me3BackupActivity;
+        //    private set => SetProperty(ref _me3BackupActivity, value);
+        //}
 
 #if WPF
         private static FontAwesomeIcon _me1ActivityIcon = FontAwesomeIcon.TimesCircle;
@@ -130,133 +201,88 @@ namespace ALOTInstallerCore.ModManager.Services
         }
 #endif
 
-        public static bool AnyGameMissingBackup => (!ME1BackedUp && Locations.ME1Target != null) || (!ME2BackedUp && Locations.ME2Target != null) || (!ME3BackedUp && Locations.ME3Target != null);
+        //public static bool AnyGameMissingBackup => (!ME1BackedUp && Locations.ME1Target != null) || (!ME2BackedUp && Locations.ME2Target != null) || (!ME3BackedUp && Locations.ME3Target != null);
 
-
+        public static GameBackupStatus GetBackupStatus(Enums.MEGame game)
+        {
+            return GameBackupStatuses.FirstOrDefault(x => x.Game == game);
+        }
 
         /// <summary>
-        /// Refreshes the status strings of a backup. This method will run on the UI thread.
+        /// Refreshes the backup status of the listed game, or all if none is specified.
         /// </summary>
-        /// <param name="window">Main window which houses the installation targets list. If htis is null, the game will behave as if it was installed.</param>
-        /// <param name="game">Game to refresh. If not specified all strings will be updated</param>
+        /// <param name="allTargets">List of targets to determine if the game is installed or not. Passing null will assume the game is installed</param>
+        /// <param name="forceCmmVanilla">If the backups will be forced to have the cmmVanilla file to be considered valid</param>
+        /// <param name="game">What game to refresh. Set to unknown to refresh all.</param>
         public static void RefreshBackupStatus(List<GameTarget> allTargets, bool forceCmmVanilla = true, Enums.MEGame game = Enums.MEGame.Unknown)
         {
-
-            if (game == Enums.MEGame.ME1 || game == Enums.MEGame.Unknown)
+            foreach (var v in GameBackupStatuses)
             {
-                RefreshBackupStatus(Enums.MEGame.ME1, allTargets.Any(x => x.Game == Enums.MEGame.ME1),
-                    forceCmmVanilla, ME1BackedUp, msg => ME1BackupStatus = msg, msg => ME1BackupStatusTooltip = msg);
-            }
-
-            if (game == Enums.MEGame.ME2 || game == Enums.MEGame.Unknown)
-            {
-                RefreshBackupStatus(Enums.MEGame.ME2, allTargets.Any(x => x.Game == Enums.MEGame.ME2), forceCmmVanilla,
-                    ME2BackedUp, msg => ME2BackupStatus = msg, msg => ME2BackupStatusTooltip = msg);
-            }
-            if (game == Enums.MEGame.ME3 || game == Enums.MEGame.Unknown)
-            {
-                RefreshBackupStatus(Enums.MEGame.ME3, allTargets.Any(x => x.Game == Enums.MEGame.ME3), forceCmmVanilla,
-                    ME3BackedUp, msg => ME3BackupStatus = msg, msg => ME3BackupStatusTooltip = msg);
-            }
-        }
-
-
-        private static void RefreshBackupStatus(Enums.MEGame game, bool installed, bool forceCmmVanilla, bool backedUp, Action<string> setStatus, Action<string> setStatusToolTip)
-        {
-            if (installed)
-            {
-                var bPath = GetGameBackupPath(game, forceCmmVanilla, forceReturnPath: true);
-                if (backedUp)
+                if (v.Game == game || game == Enums.MEGame.Unknown)
                 {
-                    setStatus("Backed up");
-                    setStatusToolTip($"Backup stored at {bPath}");
-                }
-                else if (bPath == null)
-                {
-
-                    setStatus("Not backed up");
-                    setStatusToolTip("Game has not been backed up");
-                }
-                else if (!Directory.Exists(bPath))
-                {
-                    setStatus("Backup unavailable");
-                    setStatusToolTip($"Backup path not accessible: {bPath}");
-                }
-                else
-                {
-                    //var nonVanillaPath = GetGameBackupPath(game, forceCmmVanilla: false);
-                    //if (nonVanillaPath != null)
-                    //{
-                    //    setStatus(M3L.GetString(M3L.string_backupNotVanilla));
-                    //    setStatusToolTip(M3L.GetString(M3L.string_interp_backupStatusNotVanilla, nonVanillaPath));
-                    //}
+                    v.RefreshBackupStatus(allTargets == null || allTargets.Any(x => x.Game == Enums.MEGame.ME1), forceCmmVanilla);
                 }
             }
-            else
-            {
-                setStatus("Game not installed");
-                setStatusToolTip("Game not installed. Run at least once to ensure game is fully setup");
-            }
         }
 
-        private static string _me1BackupStatus;
-        public static string ME1BackupStatus
-        {
-            get => _me1BackupStatus;
-            private set => SetProperty(ref _me1BackupStatus, value);
-        }
+        //private static string _me1BackupStatus;
+        //public static string ME1BackupStatus
+        //{
+        //    get => _me1BackupStatus;
+        //    private set => SetProperty(ref _me1BackupStatus, value);
+        //}
 
-        private static string _me2BackupStatus;
-        public static string ME2BackupStatus
-        {
-            get => _me2BackupStatus;
-            private set => SetProperty(ref _me2BackupStatus, value);
-        }
+        //private static string _me2BackupStatus;
+        //public static string ME2BackupStatus
+        //{
+        //    get => _me2BackupStatus;
+        //    private set => SetProperty(ref _me2BackupStatus, value);
+        //}
 
-        private static string _me3BackupStatus;
-        public static string ME3BackupStatus
-        {
-            get => _me3BackupStatus;
-            private set => SetProperty(ref _me3BackupStatus, value);
-        }
+        //private static string _me3BackupStatus;
+        //public static string ME3BackupStatus
+        //{
+        //    get => _me3BackupStatus;
+        //    private set => SetProperty(ref _me3BackupStatus, value);
+        //}
 
-        private static string _me1BackupStatusTooltip;
-        public static string ME1BackupStatusTooltip
-        {
-            get => _me1BackupStatusTooltip;
-            private set => SetProperty(ref _me1BackupStatusTooltip, value);
-        }
+        //private static string _me1BackupStatusTooltip;
+        //public static string ME1BackupStatusTooltip
+        //{
+        //    get => _me1BackupStatusTooltip;
+        //    private set => SetProperty(ref _me1BackupStatusTooltip, value);
+        //}
 
-        private static string _me2BackupStatusTooltip;
-        public static string ME2BackupStatusTooltip
-        {
-            get => _me2BackupStatusTooltip;
-            private set => SetProperty(ref _me2BackupStatusTooltip, value);
-        }
+        //private static string _me2BackupStatusTooltip;
+        //public static string ME2BackupStatusTooltip
+        //{
+        //    get => _me2BackupStatusTooltip;
+        //    private set => SetProperty(ref _me2BackupStatusTooltip, value);
+        //}
 
-        private static string _me3BackupStatusTooltip;
-        public static string ME3BackupStatusTooltip
-        {
-            get => _me3BackupStatusTooltip;
-            private set => SetProperty(ref _me3BackupStatusTooltip, value);
-        }
+        //private static string _me3BackupStatusTooltip;
+        //public static string ME3BackupStatusTooltip
+        //{
+        //    get => _me3BackupStatusTooltip;
+        //    private set => SetProperty(ref _me3BackupStatusTooltip, value);
+        //}
 
         /// <summary>
         /// Fetches the backup status string for the specific game. The status must be refreshed before the values will be initially set
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        public static string GetBackupStatus(Enums.MEGame game)
-        {
-            switch (game)
-            {
-                case Enums.MEGame.ME1: return ME1BackupStatus;
-                case Enums.MEGame.ME2: return ME2BackupStatus;
-                case Enums.MEGame.ME3: return ME3BackupStatus;
-            }
+        //public static string GetBackupStatus(Enums.MEGame game)
+        //{
+        //    switch (game)
+        //    {
+        //        case Enums.MEGame.ME1: return ME1BackupStatus;
+        //        case Enums.MEGame.ME2: return ME2BackupStatus;
+        //        case Enums.MEGame.ME3: return ME3BackupStatus;
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
         /// <summary>
         /// Fetches the backup status tooltip string for the specific game. The status must be refreshed before the values will be initially set
@@ -265,12 +291,14 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <returns></returns>
         public static string GetBackupStatusTooltip(Enums.MEGame game)
         {
-            switch (game)
-            {
-                case Enums.MEGame.ME1: return ME1BackupStatusTooltip;
-                case Enums.MEGame.ME2: return ME2BackupStatusTooltip;
-                case Enums.MEGame.ME3: return ME3BackupStatusTooltip;
-            }
+            //TODO FIX ALOT INSTALL CONSOLE
+
+            //switch (game)
+            //{
+            //    case Enums.MEGame.ME1: return ME1BackupStatusTooltip;
+            //    case Enums.MEGame.ME2: return ME2BackupStatusTooltip;
+            //    case Enums.MEGame.ME3: return ME3BackupStatusTooltip;
+            //}
 
             return null;
         }
@@ -283,39 +311,38 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <param name="pleaseWait"></param>
         public static void SetStatus(Enums.MEGame game, string status, string tooltip)
         {
-            switch (game)
-            {
-                case Enums.MEGame.ME1:
-                    ME1BackupStatus = status;
-                    ME1BackupStatusTooltip = tooltip;
-                    break;
-                case Enums.MEGame.ME2:
-                    ME2BackupStatus = status;
-                    ME2BackupStatusTooltip = tooltip;
-                    break;
-                case Enums.MEGame.ME3:
-                    ME3BackupStatus = status;
-                    ME3BackupStatusTooltip = tooltip;
-                    break;
-            }
+            //switch (game)
+            //{
+            //    case Enums.MEGame.ME1:
+            //        ME1BackupStatus = status;
+            //        ME1BackupStatusTooltip = tooltip;
+            //        break;
+            //    case Enums.MEGame.ME2:
+            //        ME2BackupStatus = status;
+            //        ME2BackupStatusTooltip = tooltip;
+            //        break;
+            //    case Enums.MEGame.ME3:
+            //        ME3BackupStatus = status;
+            //        ME3BackupStatusTooltip = tooltip;
+            //        break;
+            //}
         }
 
-        public static void SetActivity(Enums.MEGame game, bool p1)
-        {
-            switch (game)
-            {
-                case Enums.MEGame.ME1:
-                    ME1BackupActivity = p1;
-                    break;
-                case Enums.MEGame.ME2:
-                    ME2BackupActivity = p1;
-                    break;
-                case Enums.MEGame.ME3:
-                    ME3BackupActivity = p1;
-                    break;
-            }
-
-        }
+        //public static void SetActivity(Enums.MEGame game, bool p1)
+        //{
+        //    switch (game)
+        //    {
+        //        case Enums.MEGame.ME1:
+        //            ME1BackupActivity = p1;
+        //            break;
+        //        case Enums.MEGame.ME2:
+        //            ME2BackupActivity = p1;
+        //            break;
+        //        case Enums.MEGame.ME3:
+        //            ME3BackupActivity = p1;
+        //            break;
+        //    }
+        //}
 
 #if WPF
         public static void SetIcon(Enums.MEGame game, FontAwesomeIcon p1)
@@ -335,7 +362,7 @@ namespace ALOTInstallerCore.ModManager.Services
         }
 #endif
 
-        public static string GetGameBackupPath(Enums.MEGame game, bool forceCmmVanilla = true, bool logReturnedPath = false, bool forceReturnPath = false)
+        public static string GetGameBackupPath(Enums.MEGame game, out bool isVanilla, bool forceCmmVanilla = true, bool logReturnedPath = false, bool forceReturnPath = false)
         {
             // TODO: CHANGE THIS TO WINDOWS TO REVERSE LOGIC
 #if !WINDOWS
@@ -353,6 +380,7 @@ namespace ALOTInstallerCore.ModManager.Services
                     path = RegistryHandler.GetRegistrySettingString(@"HKEY_CURRENT_USER\Software\Mass Effect 3 Mod Manager", @"VanillaCopyLocation");
                     break;
                 default:
+                    isVanilla = false;
                     return null;
             }
 
@@ -375,7 +403,12 @@ namespace ALOTInstallerCore.ModManager.Services
             }
 #endif
 
-            if (forceReturnPath) return path; // do not check it
+            if (forceReturnPath)
+            {
+                isVanilla = true; //Just say it's vanilla
+                return path; // do not check it
+            }
+
 
             if (logReturnedPath)
             {
@@ -389,6 +422,7 @@ namespace ALOTInstallerCore.ModManager.Services
                     Log.Information(@" >> Path is null or directory doesn't exist.");
                 }
 
+                isVanilla = false;
                 return null;
             }
 
@@ -400,17 +434,20 @@ namespace ALOTInstallerCore.ModManager.Services
                     Log.Warning(@" >> " + path + @" is missing biogame/binaries subdirectory, invalid backup");
                 }
 
+                isVanilla = false;
                 return null;
             }
 
-            if (forceCmmVanilla && !File.Exists(Path.Combine(path, @"cmm_vanilla")))
+            isVanilla = File.Exists(Path.Combine(path, @"cmm_vanilla"));
+
+            if (forceCmmVanilla && !isVanilla)
             {
                 if (logReturnedPath)
                 {
-                    Log.Warning(@" >> " + path + @" is not marked as a vanilla backup. This backup will not be considered vanilla and thus will not be used by Mod Manager");
+                    Log.Warning(@" >> " + path + @" is not marked as a vanilla backup.");
                 }
 
-                return null; //do not accept alot installer backups that are missing cmm_vanilla as they are not vanilla.
+                return null;
             }
 
             if (logReturnedPath)
@@ -421,23 +458,23 @@ namespace ALOTInstallerCore.ModManager.Services
             return path;
         }
 
-        public static void SetBackedUp(Enums.MEGame game, bool b)
-        {
-            switch (game)
-            {
-                case Enums.MEGame.ME1:
-                    ME1BackedUp = b;
-                    break;
-                case Enums.MEGame.ME2:
-                    ME2BackedUp = b;
-                    break;
-                case Enums.MEGame.ME3:
-                    ME3BackedUp = b;
-                    break;
-            }
-            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(AnyGameMissingBackup)));
-            StaticBackupStateChanged?.Invoke(null, null);
-        }
+        //public static void SetBackedUp(Enums.MEGame game, bool b)
+        //{
+        //    switch (game)
+        //    {
+        //        case Enums.MEGame.ME1:
+        //            ME1BackedUp = b;
+        //            break;
+        //        case Enums.MEGame.ME2:
+        //            ME2BackedUp = b;
+        //            break;
+        //        case Enums.MEGame.ME3:
+        //            ME3BackedUp = b;
+        //            break;
+        //    }
+        //    StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(AnyGameMissingBackup)));
+        //    StaticBackupStateChanged?.Invoke(null, null);
+        //}
 
         //public static void SetInstallStatuses(ObservableCollectionExtended<GameTarget> installationTargets)
         //{
@@ -465,6 +502,11 @@ namespace ALOTInstallerCore.ModManager.Services
                 default:
                     return false;
             }
+        }
+
+        public static void UpdateBackupStatus(Enums.MEGame game, bool forceCmmVanilla)
+        {
+            GameBackupStatuses.FirstOrDefault(x => x.Game == game)?.RefreshBackupStatus(true, forceCmmVanilla);
         }
     }
 }

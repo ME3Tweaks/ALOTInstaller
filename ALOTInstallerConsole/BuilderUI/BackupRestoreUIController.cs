@@ -31,7 +31,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
             foreach (var e in Enums.AllGames)
             {
-                var gameBackupPath = BackupService.GetGameBackupPath(e, false, false, false);
+                var gameBackupPath = BackupService.GetGameBackupPath(e, out _, false, false, false);
                 var gameHasListedBackupDir = BackupService.HasGameEverBeenBackedUp(e); //does game have backup path in registry?
                 Add(new Label($"{e.ToGameName()}")
                 {
@@ -39,7 +39,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     Y = y++,
                     Height = 1,
                 });
-                Add(new Label(BackupService.GetBackupStatus(e))
+                Add(new Label(BackupService.GetBackupStatus(e).BackupStatus)
                 {
                     X = 1,
                     Y = y++,

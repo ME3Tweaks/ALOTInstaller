@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
@@ -23,8 +24,10 @@ namespace ALOTInstallerWPF.BuilderUI
             NamedBackgroundWorker bw = new NamedBackgroundWorker("StartupThread");
             bw.DoWork += (a, b) =>
             {
-                ALOTInstallerCoreLib.Startup(SetWrapperLogger);
+                ALOTInstallerCoreLib.Startup(SetWrapperLogger, RunOnUIThread);
                 Settings.Load();
+                BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
+
                 pd.SetMessage("Loading installer manifests");
                 var alotManifestModePackage = ManifestHandler.LoadMasterManifest(x => pd.SetMessage(x));
 
@@ -93,6 +96,11 @@ namespace ALOTInstallerWPF.BuilderUI
 
 
             return;
+        }
+
+        private static void RunOnUIThread(Action obj)
+        {
+            Application.Current.Dispatcher.Invoke(obj);
         }
     }
 }

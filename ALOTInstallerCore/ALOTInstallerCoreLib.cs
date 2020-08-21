@@ -1,6 +1,7 @@
 ﻿using System;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
+using ALOTInstallerCore.ModManager.Services;
 using Serilog;
 
 namespace ALOTInstallerCore
@@ -15,8 +16,9 @@ namespace ALOTInstallerCore
         /// <summary>
         /// Starts the library initialization. This method must ALWAYS be called before using the library.
         /// </summary>
-        /// <param name="setCallingLoggerCallback">Function to pass this library's loger back</param>
-        public static void Startup(Action<ILogger> setCallingLoggerCallback)
+        /// <param name="setCallingLoggerCallback">Function to pass this library's logger back</param>
+        /// <param name="runOnUiThreadCallback">Callback that contains method that should be wrapped in a UI-thread only runner. Some object initialization can only be performed on the UI thread</param>
+        public static void Startup(Action<ILogger> setCallingLoggerCallback, Action<Action> runOnUiThreadCallback)
         {
             if (startedUp) return;
             startedUp = true;
@@ -24,6 +26,7 @@ namespace ALOTInstallerCore
             setCallingLoggerCallback?.Invoke(LogCollector.CreateLogger());
             Settings.Load();
             Locations.LoadLocations();
+            BackupService.InitBackupService(runOnUiThreadCallback);
         }
     }
 }

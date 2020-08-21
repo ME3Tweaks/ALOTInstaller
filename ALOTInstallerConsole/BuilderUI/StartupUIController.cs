@@ -7,6 +7,7 @@ using System.Text;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects.Manifest;
 using Terminal.Gui;
 

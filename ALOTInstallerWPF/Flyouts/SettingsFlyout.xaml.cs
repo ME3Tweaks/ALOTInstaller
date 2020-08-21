@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 
@@ -29,9 +30,20 @@ namespace ALOTInstallerWPF.Flyouts
         public string ME2TextureInstallInfo { get; private set; }
         public string ME3TextureInstallInfo { get; private set; }
 
+        public ObservableCollectionExtended<BackupHandler.GameBackup> GameBackups { get; } = new ObservableCollectionExtended<BackupHandler.GameBackup>();
+        //#region BACKUP BINDINGS
+        //public bool ME1BackupUnlinkButtonVisibility { get; set; }
+        //public ICommand BackupRestoreME1Command { get; set; }
+        //public string ME1BackupRestoreButtonText { get; set; }
+        //public string ME1BackupButtonToolTip { get; set; }
+        //#endregion
+
         public SettingsFlyout()
         {
             DataContext = this;
+            GameBackups.Add(new BackupHandler.GameBackup(Enums.MEGame.ME1, new List<GameTarget>(new[] { Locations.GetTarget(Enums.MEGame.ME1) })));
+            GameBackups.Add(new BackupHandler.GameBackup(Enums.MEGame.ME2, new List<GameTarget>(new[] { Locations.GetTarget(Enums.MEGame.ME2) })));
+            GameBackups.Add(new BackupHandler.GameBackup(Enums.MEGame.ME3, new List<GameTarget>(new[] { Locations.GetTarget(Enums.MEGame.ME3) })));
             InitializeComponent();
         }
 

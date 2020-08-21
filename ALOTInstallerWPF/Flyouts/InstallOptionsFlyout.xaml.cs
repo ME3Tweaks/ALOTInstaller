@@ -139,8 +139,14 @@ namespace ALOTInstallerWPF.Flyouts
                     InstallerMode = ManifestHandler.CurrentMode,
                     ImportNewlyUnpackedFiles = OptimizeTextureLibrary,
                     FilesToInstall = fileSet,
+                    DebugNoInstall = !DebugPerformMainInstallation,
+
                     InstallALOT = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.ALOT) && checkboxMapping[InstallOptionsStep.InstallOption.ALOT].IsOn,
-                    DebugNoInstall = !DebugPerformMainInstallation
+                    InstallALOTUpdate = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.ALOTUpdate) && checkboxMapping[InstallOptionsStep.InstallOption.ALOTUpdate].IsOn,
+                    InstallMEUITM = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.MEUITM) && checkboxMapping[InstallOptionsStep.InstallOption.MEUITM].IsOn,
+                    InstallAddons = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.Addon) && checkboxMapping[InstallOptionsStep.InstallOption.Addon].IsOn,
+                    InstallUserfiles = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.UserFiles) && checkboxMapping[InstallOptionsStep.InstallOption.UserFiles].IsOn,
+
                 };
                 NamedBackgroundWorker nbw = new NamedBackgroundWorker("InstallPrecheckWorker");
                 nbw.DoWork += (a, b) =>

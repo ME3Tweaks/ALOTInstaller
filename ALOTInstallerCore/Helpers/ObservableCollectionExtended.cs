@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -26,6 +25,9 @@ namespace ALOTInstallerCore.Helpers
 
         #endregion INotifyPropertyChanged
 
+        /// <summary>
+        /// For UI binding 
+        /// </summary>
         public bool Any => this.Any();
 
         /// <summary> 
@@ -175,7 +177,9 @@ namespace ALOTInstallerCore.Helpers
         }
 
         #endregion // Sorting
-
+#if WPF
+        private object _syncLock = new object();
+#endif
         /// <summary> 
         /// Initializes a new instance of the System.Collections.ObjectModel.ObservableCollection(Of T) class. 
         /// </summary> 
@@ -186,6 +190,9 @@ namespace ALOTInstallerCore.Helpers
                 BindableCount = Count;
                 OnPropertyChanged(nameof(Any));
             };
+#if WPF
+            BindingOperations.EnableCollectionSynchronization(this, _syncLock);
+#endif
         }
 
         /// <summary> 
