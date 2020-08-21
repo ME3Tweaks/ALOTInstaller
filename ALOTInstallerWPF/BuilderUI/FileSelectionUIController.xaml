@@ -50,27 +50,34 @@
         </Style>
     </UserControl.Resources>
     <DockPanel>
-        <TabControl DockPanel.Dock="Top" 
+        <DockPanel DockPanel.Dock="Top" Visibility="{Binding IsStaging, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}">
+            <TabControl DockPanel.Dock="Top" 
                     HorizontalAlignment="Stretch" 
                     SelectedItem="{Binding SelectedHeader}" 
                     ItemsSource="{Binding AvailableModes}" 
-                    >
-            <TabControl.Resources>
-                <Style TargetType="{x:Type TabPanel}">
-                    <Setter Property="HorizontalAlignment" Value="Center" />
-                </Style>
-            </TabControl.Resources>
-            <TabControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type objects:ModeHeader}">
-                    <TextBlock Text="{Binding ModeText}" ToolTip="{Binding ModeDescription}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-            <TabControl.ContentTemplate>
-                <DataTemplate DataType="{x:Type objects:ModeHeader}">
-                    <TextBlock Text="{Binding ModeDirections}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
-                </DataTemplate>
-            </TabControl.ContentTemplate>
-        </TabControl>
+        >
+                <TabControl.Resources>
+                    <Style TargetType="{x:Type TabPanel}">
+                        <Setter Property="HorizontalAlignment" Value="Center" />
+                    </Style>
+                </TabControl.Resources>
+                <TabControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type objects:ModeHeader}">
+                        <TextBlock Text="{Binding ModeText}" ToolTip="{Binding ModeDescription}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+                <TabControl.ContentTemplate>
+                    <DataTemplate DataType="{x:Type objects:ModeHeader}">
+                        <TextBlock Text="{Binding ModeDirections}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
+                    </DataTemplate>
+                </TabControl.ContentTemplate>
+            </TabControl>
+        </DockPanel>
+        <DockPanel DockPanel.Dock="Top" Visibility="{Binding IsStaging, Converter={StaticResource BoolToVisibilityConverter}}">
+            <TextBlock Text="Preparing to install textures" FontWeight="Bold" TextAlignment="Center" FontSize="16" DockPanel.Dock="Top"/>
+            <TextBlock Text="{Binding StagingStatusText}" TextAlignment="Center"/>
+        </DockPanel>
+
         <ProgressBar DockPanel.Dock="Top" Value="{Binding ProgressValue}" Maximum="{Binding ProgressMax}" IsIndeterminate="{Binding ProgressIndeterminate}"/>
         <!--<ProgressBar alotaddonguiui:ProgressBarSmooth.SmoothValue="{Binding ProgressBarValue}" Value="{Binding Path=ProgressBarValue, Mode=OneWay}" Minimum="0" Maximum="{Binding Progressbar_Max}" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true" />-->
         <DockPanel DockPanel.Dock="Bottom">

@@ -5,6 +5,8 @@
                       xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       Style="{StaticResource WiderDialogStyle}">
+    <Dialog:CustomDialog.DialogTop>
+
     <StackPanel Margin="0,10,0,5">
         <ListView Name="ListView_ChoiceFiles" BorderThickness="0">
             <ListView.ItemsPanel>
@@ -62,4 +64,6 @@
                 Margin="5,0,5,0"/>
         </StackPanel>
     </StackPanel>
+    </Dialog:CustomDialog.DialogTop>
+
 </Dialog:CustomDialog>

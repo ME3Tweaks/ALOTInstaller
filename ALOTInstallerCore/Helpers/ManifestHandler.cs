@@ -393,6 +393,7 @@ namespace ALOTInstallerCore.Helpers
                                                        ).ToList(),
                                                    RecommendationString = e.Attribute("recommendation")?.Value,
                                                    RecommendationReason = e.Attribute("recommendationreason")?.Value,
+                                                   ComparisonsLink = e.Attribute("comparisonslink")?.Value,
                                                }));
 
                     mp.ManifestFiles = mp.ManifestFiles.OrderBy(p => p.UIPriority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList();
@@ -472,7 +473,7 @@ namespace ALOTInstallerCore.Helpers
 
             return files;
         }
-        
+
         /// <summary>
         /// Gets the level of readiness of non-optional manifest files. THis can be used to show the user how 'ready' the recommended experience for the current mode is before install
         /// </summary>
@@ -501,7 +502,7 @@ namespace ALOTInstallerCore.Helpers
                 }
             }
 
-            int readyx = filesToCheck.Count(x=>x.Ready);
+            int readyx = filesToCheck.Count(x => x.Ready);
             int recommendedCountx = filesToCheck.Count();
             return (readyx, recommendedCountx);
         }

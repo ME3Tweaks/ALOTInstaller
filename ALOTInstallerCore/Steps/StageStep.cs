@@ -55,7 +55,7 @@ namespace ALOTInstallerCore.Builder
 
         /// <summary>
         /// Callback to allow the UI to prompt the user to choose what options to use for a manifest file
-        /// that uses ZipFiles, CopyFiles and ChoiceFiles. The caller should set the selected value
+        /// that uses ZipFiles, CopyFiles and ChoiceFiles. The caller should set the SelectedIndex value
         /// on the objects, as they will be reset to their defaults before being passed to the UI.
         /// Return false to abort staging.
         /// </summary>

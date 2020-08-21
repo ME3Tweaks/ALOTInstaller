@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using AlotAddOnGUI;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
@@ -17,6 +18,7 @@ using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Objects;
+using MahApps.Metro.Controls.Dialogs;
 using Application = System.Windows.Application;
 
 namespace ALOTInstallerWPF.BuilderUI
@@ -101,6 +103,9 @@ namespace ALOTInstallerWPF.BuilderUI
         /// </summary>
         internal static FileSelectionUIController FSUIC;
 
+        public bool IsStaging { get; set; }
+        public string StagingStatusText { get; set; }
+
         public ModeHeader SelectedHeader { get; set; }
         public ObservableCollectionExtended<ModeHeader> AvailableModes { get; } = new ObservableCollectionExtended<ModeHeader>();
         public string AppTopText { get; set; } =
@@ -113,7 +118,7 @@ namespace ALOTInstallerWPF.BuilderUI
             FSUIC = this;
             LoadCommands();
             InitializeComponent();
-            AvailableModes.AddRange(ManifestHandler.MasterManifest.ManifestModePackageMappping.Select(x => new ModeHeader(x.Key,getModeDirections(x.Key), getModeDescription(x.Key))));
+            AvailableModes.AddRange(ManifestHandler.MasterManifest.ManifestModePackageMappping.Select(x => new ModeHeader(x.Key, getModeDirections(x.Key), getModeDescription(x.Key))));
             OnManifestModeChanged(ManifestHandler.CurrentMode);
             ManifestHandler.OnManifestModeChanged = OnManifestModeChanged; //Setup change subscription
 
@@ -152,10 +157,10 @@ namespace ALOTInstallerWPF.BuilderUI
 
         private bool CanOpenSettings()
         {
-            return true;
+            return !IsStaging;
         }
 
-        private void OpenSettings()
+        private async void OpenSettings()
         {
             if (Application.Current.MainWindow is MainWindow mw)
             {

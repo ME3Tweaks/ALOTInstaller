@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using ALOTInstallerCore.Builder;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
@@ -248,6 +249,8 @@ namespace ALOTInstallerWPF.Flyouts
                         if (answer == MessageDialogResult.Affirmative)
                         {
                             // BEGIN STAGING
+                            StagingUIController suic = new StagingUIController();
+                            suic.StartStaging(iop, FileSelectionUIController.FSUIC);
                         }
                     }
                     CloseFlyout();

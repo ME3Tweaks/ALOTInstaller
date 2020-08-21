@@ -75,4 +75,16 @@
 	  <Resource Include="Images\origin\me2update.png" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="Dialogs\ModConfigurationDialog.xaml.cs">
+	    <DependentUpon>ModConfigurationDialog.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Dialogs\ModConfigurationDialog.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
+	</ItemGroup>
+
 </Project>

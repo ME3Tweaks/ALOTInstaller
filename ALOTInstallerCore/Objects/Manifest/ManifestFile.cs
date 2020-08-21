@@ -599,6 +599,10 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// Indicates that a mod file should be staged rather than decompiled if encountered when staging the manifest file
         /// </summary>
         public override bool StageModFiles { get; set; }
+        /// <summary>
+        /// Link to where one can view comparisons for this file, such as vanilla to this, or between versions if this mod supports ChoiceFiles.
+        /// </summary>
+        public string ComparisonsLink { get; set; }
 
         /// <summary>
         /// Gets the backing MD5 for this file
