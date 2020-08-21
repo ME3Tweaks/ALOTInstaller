@@ -70,7 +70,11 @@ namespace ALOTInstallerCore.Helpers
         /// <summary>
         /// Allows updating to beta, prerelease versions of items
         /// </summary>
-        public static bool BetaMode { get; set; }
+        public static bool BetaMode
+        {
+            get => _betaMode;
+            set => SetProperty(ref _betaMode, value);
+        }
 
         /// <summary>
         /// Move files instead of copying them when files are imported. This only applies to files on the same drive (moving doesn't report progress)
@@ -234,6 +238,7 @@ namespace ALOTInstallerCore.Helpers
         */
 
         public static readonly string SettingsPath = Path.Combine(Locations.AppDataFolder(), "settings.ini");
+        private static bool _betaMode;
 
         public static void Load()
         {

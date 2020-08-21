@@ -291,7 +291,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         try
                         {
                             if (file.Contains(@"\cmmbackup\")) return false; //do not copy cmmbackup files
-                            if (file.StartsWith(dlcFolderpath))
+                            if (file.StartsWith(dlcFolderpath, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 //It's a DLC!
                                 string dlcname = file.Substring(dlcSubStringLen);
@@ -544,7 +544,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 if (restore)
                 {
-                    string backupPath = BackupService.GetGameBackupPath(Game, out var isVanilla);
+                    string backupPath = BackupService.GetGameBackupPath(Game, out var isVanilla, forceCmmVanilla: false);
 
                     if (destinationDirectory == null)
                     {

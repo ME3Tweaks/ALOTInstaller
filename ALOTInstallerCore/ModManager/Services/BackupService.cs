@@ -75,6 +75,8 @@ namespace ALOTInstallerCore.ModManager.Services
             public bool BackupActivity { get; internal set; }
             public string BackupStatus { get; internal set; }
             public string BackupLocationStatus { get; internal set; }
+            public string LinkActionText { get; internal set; }
+            public string BackupActionText { get; internal set; }
 
             internal GameBackupStatus(Enums.MEGame game)
             {
@@ -83,38 +85,47 @@ namespace ALOTInstallerCore.ModManager.Services
 
             internal void RefreshBackupStatus(bool installed, bool forceCmmVanilla)
             {
-                if (installed)
+
+                var bPath = GetGameBackupPath(Game, out var isVanilla, forceCmmVanilla);
+                if (bPath != null)
                 {
-                    var bPath = GetGameBackupPath(Game, out var isVanilla, forceCmmVanilla);
-                    if (bPath != null)
+                    if (!isVanilla)
                     {
-                        if (!isVanilla)
-                        {
-                            BackupStatus = "Backed up (Not Vanilla)";
-                        }
-                        else
-                        {
-                            BackupStatus = "Backed up";
-                        }
-                        BackupLocationStatus = $"Backup stored at {bPath}";
-                        return;
+                        BackupStatus = "Backed up (Not Vanilla)";
                     }
-                    bPath = GetGameBackupPath(Game, out _, forceCmmVanilla, forceReturnPath: true);
-                    if (bPath == null)
+                    else
                     {
-                        BackupStatus = "Not backed up";
-                        BackupLocationStatus = "Game has not been backed up";
+                        BackupStatus = "Backed up";
                     }
-                    else if (!Directory.Exists(bPath))
-                    {
-                        BackupStatus = "Backup unavailable";
-                        BackupLocationStatus = $"Backup path not accessible: {bPath}";
-                    }
+                    BackupLocationStatus = $"Backup stored at {bPath}";
+                    LinkActionText = "Unlink backup";
+                    BackupActionText = "Restore game";
+                    return;
                 }
-                else
+                bPath = GetGameBackupPath(Game, out _, forceCmmVanilla, forceReturnPath: true);
+                if (bPath == null)
+                {
+                    BackupStatus = "Not backed up";
+                    BackupLocationStatus = "Game has not been backed up";
+                    LinkActionText = "Link existing backup";
+                    BackupActionText = "Create backup"; //This should be disabled if game is not installed. This will be handled by the wrapper
+                    return;
+                }
+                else if (!Directory.Exists(bPath))
+                {
+                    BackupStatus = "Backup unavailable";
+                    BackupLocationStatus = $"Backup path not accessible: {bPath}";
+                    LinkActionText = "Unlink backup";
+                    BackupActionText = "Create new backup";
+                    return;
+                }
+
+                if (!installed)
                 {
                     BackupStatus = "Game not installed";
                     BackupLocationStatus = "Game not installed. Run at least once to ensure game is fully setup";
+                    LinkActionText = "Link existing backup"; //this seems dangerous to the average user
+                    BackupActionText = "Can't create backup";
                 }
             }
 

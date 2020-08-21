@@ -383,7 +383,7 @@ namespace ALOTInstallerConsole.BuilderUI
                         return path;
                     }
                 };
-                gr.PerformRestore(result == 0 ? destinationPath : null);
+                b.Result = gr.PerformRestore(result == 0 ? destinationPath : null);
 
 
                 // Restore code here

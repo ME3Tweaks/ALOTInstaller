@@ -7,6 +7,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerWPF.Objects;
+using ControlzEx.Theming;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Serilog;
@@ -26,6 +27,13 @@ namespace ALOTInstallerWPF.BuilderUI
             {
                 ALOTInstallerCoreLib.Startup(SetWrapperLogger, RunOnUIThread);
                 Settings.Load();
+                if (Settings.BetaMode)
+                {
+                    RunOnUIThread(() =>
+                    {
+                        ThemeManager.Current.ChangeTheme(App.Current, "Dark.Red");
+                    });
+                }
                 BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
 
                 pd.SetMessage("Loading installer manifests");

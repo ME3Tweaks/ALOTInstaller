@@ -20,6 +20,7 @@
         <converters:ReadyIconConverter x:Key="ReadyIconConverter"/>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <converters:RecommendationColorConverter x:Key="RecommendationColorConverter"/>
+        <converters:FileCountConverter x:Key="FileCountConverter"/>
         <converters:AdvancedFileInfoVisibilityConverter x:Key="AdvancedFileInfoVisibilityConverter"/>
 
         <Style x:Key="LinkLabel" TargetType="Button">
@@ -182,19 +183,17 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate>
-                                        <Expander IsExpanded="True" BorderThickness="0"  Margin="0" Padding="0">
-                                            <Expander.Header>
-                                                <StackPanel>
-                                                    <TextBlock FontWeight="Light" FontSize="16" VerticalAlignment="Bottom">
-                                                        <Run Text="{Binding Name,Mode=OneWay}"/>
-                                                        <Run Text="("/>
-                                                        <Run Text="{Binding ItemCount,Mode=OneWay}"/>
-                                                        <Run Text="files )"/>
-                                                    </TextBlock>
-                                                </StackPanel>
-                                            </Expander.Header>
+                                        <StackPanel>
+                                            <Border Background="{DynamicResource MahApps.Brushes.Accent2}">
+                                                <DockPanel VerticalAlignment="Center" Margin="5,5,5,5">
+                                                    <iconPacks:PackIconIonicons Height="19" Margin="0,1,0,0" Kind="PersonMD" />
+                                                    <TextBlock Text="{Binding Name}" FontSize="16" Margin="5,0,0,0" DockPanel.Dock="Left"/>
+                                                    <TextBlock Text="{Binding ItemCount, Mode=OneWay, Converter={StaticResource FileCountConverter}}" FontSize="16" Margin="5,0,0,0" HorizontalAlignment="Right"/>
+                                                </DockPanel>
+                                            </Border>
                                             <ItemsPresenter/>
-                                        </Expander>
+                                        </StackPanel>
+
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
