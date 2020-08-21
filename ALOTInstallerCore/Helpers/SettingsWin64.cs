@@ -41,30 +41,46 @@ namespace ALOTInstallerCore.Helpers
         private static string _textureLibraryLocation;
         private static string _buildLocation;
         private static bool _showAdvancedFileInfo;
+        private static bool _importFilesAsMove;
+
         /// <summary>
         /// Location of the texture library that the manifests use
         /// </summary>
-        public static string TextureLibraryLocation { get; set; }
+        public static string TextureLibraryLocation
+        {
+            get => _textureLibraryLocation;
+            set => SetProperty(ref _textureLibraryLocation, value);
+        }
+
         /// <summary>
         /// Location that can be used to build and stage textures in preparation for installation
         /// </summary>
-        public static string BuildLocation { get; set; }
+        public static string BuildLocation
+        {
+            get => _buildLocation;
+            set => SetProperty(ref _buildLocation, value);
+        }
 
         public static bool ShowAdvancedFileInfo
         {
             get => _showAdvancedFileInfo;
             set => SetProperty(ref _showAdvancedFileInfo, value);
-
         }
 
         /// <summary>
         /// Allows updating to beta, prerelease versions of items
         /// </summary>
         public static bool BetaMode { get; set; }
+
         /// <summary>
         /// Move files instead of copying them when files are imported. This only applies to files on the same drive (moving doesn't report progress)
         /// </summary>
-        public static bool MoveFilesWhenImporting { get; set; }
+        public static bool MoveFilesWhenImporting
+        {
+            get => _importFilesAsMove;
+            set => SetProperty(ref _importFilesAsMove, value);
+        }
+
         /// <summary>
         /// Makes more output messaging occur
         /// </summary>

@@ -28,14 +28,35 @@ namespace ALOTInstallerWPF.Flyouts
     /// </summary>
     public partial class InstallOptionsFlyout : FlyoutController, INotifyPropertyChanged
     {
-        private Dictionary<ToggleSwitch, InstallOptionsStep.InstallOption> checkboxMapping = new Dictionary<ToggleSwitch, InstallOptionsStep.InstallOption>();
+        private Dictionary<InstallOptionsStep.InstallOption, ToggleSwitch> checkboxMapping = new Dictionary<InstallOptionsStep.InstallOption, ToggleSwitch>();
         public bool DeterminingOptionsVisible { get; set; } = true;
         public string TitleText { get; } = "Select install options";
+        public string ModeText { get; } = "Mode Text";
         public string SpinnerText { get; set; } = "Calculating install options";
         public string InstallOptionsTopText { get; set; }
+        public string CurrentLodsDescText { get; set; }
+        public bool Use4KLODs { get; set; } = true; //Default to TRUE
+        public bool OptimizeTextureLibrary { get; set; } = true; //Default to TRUE
+#if DEBUG
+        public bool DebugPerformMainInstallation { get; set; } = true; //Default to TRUE
+#else
+        public bool DebugPerformMainInstallation => true; //ALWAYS TRUE IN RELEASE
+#endif
+
+        private static string fourKLodsStr = "Uses best quality textures, uses more memory than 2K";
+        private static string twoKLodsStr = "Uses good quality textures, uses less memory than 4K";
+        public void OnUse4KLODsChanged()
+        {
+            CurrentLodsDescText = Use4KLODs ? fourKLodsStr : twoKLodsStr;
+        }
+
         public InstallOptionsFlyout(GameTarget target, List<UserFile> userFiles)
         {
             DataContext = this;
+            InstallTarget = target;
+            TitleText = $"Select install options for {target.Game.ToGameName()}";
+            ModeText = $"Installer mode: {ManifestHandler.CurrentMode} Mode";
+            OnUse4KLODsChanged(); //Set the default text.
             LoadCommands();
             InitializeComponent();
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("InstallOptionsWorker");
@@ -67,7 +88,7 @@ namespace ALOTInstallerWPF.Flyouts
                             ToolTip = v.Value.reasonForState,
                         };
                         optionsList.Children.Add(cb);
-                        checkboxMapping[cb] = v.Key;
+                        checkboxMapping[v.Key] = cb;
                     }
                 }
 
@@ -75,6 +96,8 @@ namespace ALOTInstallerWPF.Flyouts
             };
             nbw.RunWorkerAsync();
         }
+
+        public GameTarget InstallTarget { get; set; }
 
         private string getUIString(InstallOptionsStep.InstallOption option, List<InstallerFile> installerFiles)
         {
@@ -90,7 +113,7 @@ namespace ALOTInstallerWPF.Flyouts
         public ICommand AbortInstallCommand { get; set; }
         private void LoadCommands()
         {
-            AbortInstallCommand = new GenericCommand(CloseFlyout);
+            AbortInstallCommand = new GenericCommand(() => CloseFlyout()); //Can't just pass as it seems to cause exception.
             InstallTexturesCommand = new GenericCommand(BeginTextureInstallFlow, CanInstallTextures);
         }
 
@@ -109,14 +132,34 @@ namespace ALOTInstallerWPF.Flyouts
                 }
                 else
                 {
+                    InstallOptionsPackage iop = new InstallOptionsPackage()
+                    {
+                        InstallTarget = ,
+                        ImportNewlyUnpackedFiles = OptimizeTextureLibrary,
+                        InstallALOT = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.ALOT) ? checkboxMapping[InstallOptionsStep.InstallOption.ALOT].IsOn : false,
+                        DebugNoInstall = !DebugPerformMainInstallation
+                    };
                     NamedBackgroundWorker nbw = new NamedBackgroundWorker("InstallPrecheckWorker");
+                    nbw.DoWork += (a, b) =>
+                    {
+                        if (InstallTarget.Game == Enums.MEGame.ME1 && ManifestHandler.CurrentMode == ManifestMode.ALOT)
+                        {
+                            //void 
+                            //Prxecheck.CheckMEUITM()
+                        }
+                    };
+                    nbw.RunWorkerCompleted += (a, b) =>
+                    {
+
+                    };
+                    nbw.RunWorkerAsync();
                 }
             }
         }
 
         private bool CanInstallTextures()
         {
-            return checkboxMapping.Any(x => (bool)x.Key.IsOn);
+            return checkboxMapping.Any(x => x.Value.IsOn);
         }
 
         private void AbortInstall()

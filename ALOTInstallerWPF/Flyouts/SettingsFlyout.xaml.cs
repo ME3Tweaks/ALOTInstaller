@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
+using ALOTInstallerCore.Objects;
 
 namespace ALOTInstallerWPF.Flyouts
 {
@@ -21,6 +22,9 @@ namespace ALOTInstallerWPF.Flyouts
     /// </summary>
     public partial class SettingsFlyout : UserControl, INotifyPropertyChanged
     {
+        public bool ME1Available => Locations.GetTarget(Enums.MEGame.ME1) != null;
+        public bool ME2Available => Locations.GetTarget(Enums.MEGame.ME2) != null;
+        public bool ME3Available => Locations.GetTarget(Enums.MEGame.ME3) != null;
         public string ME1TextureInstallInfo { get; private set; }
         public string ME2TextureInstallInfo { get; private set; }
         public string ME3TextureInstallInfo { get; private set; }

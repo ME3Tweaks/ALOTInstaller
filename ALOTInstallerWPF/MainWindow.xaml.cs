@@ -74,9 +74,7 @@ namespace ALOTInstallerWPF
 
         public void ShowBottomDialog(FlyoutController control)
         {
-            control.CloseFlyout = 
-                () => 
-                    BottomBasicDialog2.IsOpen = false;
+            control.CloseFlyout = () => BottomBasicDialog2.IsOpen = false;
             BottomBasicDialog2.Content = control;
             BottomBasicDialog2.IsOpen = true;
         }

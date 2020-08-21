@@ -6,13 +6,13 @@
              xmlns:local="clr-namespace:ALOTInstallerWPF.Flyouts"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
+             xmlns:alotInstallerWpf="clr-namespace:ALOTInstallerWPF"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="800">
     <local:FlyoutController.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     </local:FlyoutController.Resources>
     <DockPanel Margin="10">
-        <TextBlock Text="{Binding TitleText}" DockPanel.Dock="Top" TextAlignment="Center" FontSize="20"/>
         <StackPanel  DockPanel.Dock="Bottom" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal"
                      Visibility="{Binding DeterminingOptionsVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}">
             <Button Content="Cancel" Margin="5,0" Command="{Binding AbortInstallCommand}"/>
@@ -27,10 +27,24 @@
             <TextBlock Text="{Binding SpinnerText}" Margin="0,10,0,0" TextAlignment="Center" Foreground="White"/>
         </StackPanel>
         <StackPanel Margin="0,5,0,0" HorizontalAlignment="Center" Visibility="{Binding DeterminingOptionsVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}">
+            <TextBlock Text="{Binding TitleText}" DockPanel.Dock="Top" TextAlignment="Center" FontSize="20"/>
             <TextBlock Text="{Binding InstallOptionsTopText}" TextAlignment="Center" FontSize="12"/>
-            <StackPanel Orientation="Vertical" Name="optionsList" HorizontalAlignment="Center"/>
-        </StackPanel>
-        
+            <TextBlock Text="{Binding ModeText}" TextAlignment="Center" FontSize="12"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250"/>
+                    <ColumnDefinition Width="250"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Vertical" Name="optionsList" HorizontalAlignment="Center" Grid.Column="0"/>
+                <StackPanel Grid.Column="1">
+                    <mah:ToggleSwitch OffContent="2K Texture LODs" OnContent="4K Texture LODs" IsOn="{Binding Use4KLODs}" ToolTip="Texture quality settings. These can be changed after installation in the settings panel"/>
+                    <TextBlock Text="{Binding CurrentLodsDescText}" TextWrapping="Wrap"/>
+                    <mah:ToggleSwitch OffContent="Don't optimize texture library" OnContent="Optimize texture library for future installs" IsOn="{Binding OptimizeTextureLibrary}" ToolTip="Unpacked files will be moved into the texture library, replacing the packed versions. This will speed up future installations by skipping the extraction step"/>
+                    <mah:ToggleSwitch OffContent="DEBUG: Skip texture install" OnContent="DEBUG: Perform texture install" IsOn="{Binding DebugPerformMainInstallation}" Visibility="{Binding Path=(alotInstallerWpf:App.DebugModeVisibility)}"/>
 
+                </StackPanel>
+            </Grid>
+            
+</StackPanel>
     </DockPanel>
 </local:FlyoutController>

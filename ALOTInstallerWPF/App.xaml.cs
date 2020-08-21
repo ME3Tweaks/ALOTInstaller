@@ -8,10 +8,17 @@ using System.Windows;
 
 namespace ALOTInstallerWPF
 {
+
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application
     {
+#if DEBUG
+        public static Visibility DebugModeVisibility => Visibility.Visible;
+#else
+    public static Visibility DebugModeVisibility => Visibility.Collapsed;
+#endif
+
     }
 }
