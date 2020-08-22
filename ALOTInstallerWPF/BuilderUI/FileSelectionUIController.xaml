@@ -113,7 +113,8 @@
                                            FontWeight="Bold" FontSize="14" VerticalAlignment="Center" />
                             </StackPanel>
                             <TextBlock Text="{Binding StatusText}" Visibility="{Binding Ready, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
-                            <TextBlock Text="{Binding RecommendationReason}" MaxWidth="320" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding RecommendationReason}" MaxWidth="320" TextWrapping="Wrap" Visibility="{Binding IsStaging, RelativeSource={RelativeSource AncestorType=local:FileSelectionUIController} , Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
+                            <TextBlock Text="{Binding StatusText}" MaxWidth="320" TextWrapping="Wrap" Visibility="{Binding IsStaging, RelativeSource={RelativeSource AncestorType=local:FileSelectionUIController} , Converter={StaticResource BoolToVisibilityConverter}}"/>
                         </StackPanel>
 
                         <DockPanel Dock="Right">

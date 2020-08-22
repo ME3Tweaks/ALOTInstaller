@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using ALOTInstallerCore.Objects.Manifest;
 
 namespace ALOTInstallerCore.Objects
@@ -96,6 +97,10 @@ namespace ALOTInstallerCore.Objects
         /// </summary>
         public bool IsProcessing { get; set; }
         /// <summary>
+        /// Indicates if this file is currently waiting for processing
+        /// </summary>
+        public bool IsWaiting { get; set; }
+        /// <summary>
         /// The priority that this file will install at. The higher the number, the later it will install, which means it will override earlier files.
         /// </summary>
         public int InstallPriority { get; set; }
@@ -137,6 +142,21 @@ namespace ALOTInstallerCore.Objects
             {
                 pf.Processed = false;
             }
+        }
+
+        /// <summary>
+        /// Automatically called when IsWaiting is changed. This will trigger the Self variable to update, which is often bound to in the UI.
+        /// </summary>
+        public void OnIsWaitingChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Self)));
+        }
+        /// <summary>
+        /// Automatically called when IsProcessing is changed. This will trigger the Self variable to update, which is often bound to in the UI.
+        /// </summary>
+        public void OnIsProcessingChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Self)));
         }
 
         /// <summary>

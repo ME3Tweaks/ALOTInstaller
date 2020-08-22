@@ -109,6 +109,14 @@ namespace ALOTInstallerWPF.BuilderUI
         public void OnIsStagingChanged()
         {
             DisplayedFilesView.Refresh();
+            if (!IsStaging)
+            {
+                TextureLibrary.SetupLibraryWatcher(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode).OfType<ManifestFile>().ToList(), manifestFileReadyStateChanged);
+            }
+            else
+            {
+                TextureLibrary.StopLibraryWatcher();
+            }
         }
         public string StagingStatusText { get; set; }
 
@@ -287,7 +295,7 @@ namespace ALOTInstallerWPF.BuilderUI
             ProgressMax = Math.Max(1, readyness.recommendedCount);
         }
 
-        public bool ProgresssIndeterminate { get; set; }
+        public bool ProgressIndeterminate { get; set; }
         public long ProgressMax { get; set; }
         public long ProgressValue { get; set; }
 

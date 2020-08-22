@@ -68,7 +68,6 @@ namespace ALOTInstallerCore.Builder
         /// <param name="substagingDir"></param>
         private bool? ExtractArchive(InstallerFile instFile, string substagingDir)
         {
-            instFile.IsProcessing = true;
             string filepath = instFile.GetUsedFilepath();
 
             var extension = Path.GetExtension(filepath);
@@ -160,7 +159,8 @@ namespace ALOTInstallerCore.Builder
                     AddonID = buildID++; //Addon will install at this ID
                 }
                 f.BuildID = buildID++;
-
+                f.StatusText = "Pending staging";
+                f.IsWaiting = true;
                 Log.Information($"{f.Filename}, Build ID {f.BuildID}");
             }
 
@@ -186,6 +186,8 @@ namespace ALOTInstallerCore.Builder
             foreach (var installerFile in installOptions.FilesToInstall)
             {
                 if (abortStaging) break;
+                installerFile.IsProcessing = true;
+                installerFile.IsWaiting = false;
                 bool stage = true; // If file doesn't need processing this is not necessary
                 if (installerFile is ManifestFile mf)
                 {
@@ -388,6 +390,15 @@ namespace ALOTInstallerCore.Builder
 
                 Interlocked.Increment(ref numDone);
                 UpdateProgressCallback?.Invoke(numDone, numToDo);
+                installerFile.IsProcessing = false;
+                if (installerFile is PreinstallMod)
+                {
+                    installerFile.StatusText = "Textures staged, mod component install during install step";
+                }
+                else
+                {
+                    installerFile.StatusText = "Staged for installation";
+                }
             }
 
             if (abortStaging)
@@ -493,6 +504,10 @@ namespace ALOTInstallerCore.Builder
                     var chosenFile = ResolveMutualExclusiveMods?.Invoke(pair.Value);
                     if (chosenFile == null) return null;//abort
                     files.Add(chosenFile);
+                }
+                else
+                {
+                    files.Add(pair.Value[0]); //No mutual exclusivity
                 }
             }
             //foreach (var groupsWithIssues in )

@@ -16,6 +16,7 @@ namespace ALOTInstallerWPF.Converters
             if (value is InstallerFile ifx)
             {
                 if (ifx.IsProcessing) return PackIconIoniconsKind.CogiOS;
+                if (ifx.IsWaiting) return PackIconIoniconsKind.HourglassMD;
                 if (ifx.Disabled) return PackIconIoniconsKind.RemoveCircleMD;
                 if (ifx.Ready) return PackIconIoniconsKind.CheckmarkCircleMD;
                 return PackIconIoniconsKind.CloseCircleMD;

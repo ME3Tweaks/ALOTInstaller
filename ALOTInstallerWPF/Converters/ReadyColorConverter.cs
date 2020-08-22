@@ -15,6 +15,7 @@ namespace ALOTInstallerWPF.Converters
             if (value is InstallerFile ifx)
             {
                 if (ifx.IsProcessing) return Brushes.Yellow;
+                if (ifx.IsWaiting) return Brushes.LightSkyBlue;
                 if (ifx.Disabled) return Brushes.Gray;
                 if (ifx.Ready) return Brushes.LimeGreen;
                 return Brushes.Red;

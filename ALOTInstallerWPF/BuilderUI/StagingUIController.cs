@@ -59,6 +59,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     }
                 }
             };
+            fsuic.ProgressIndeterminate = true;
             builderWorker.RunWorkerAsync();
         }
 
