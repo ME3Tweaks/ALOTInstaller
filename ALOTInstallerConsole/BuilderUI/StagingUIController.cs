@@ -45,7 +45,7 @@ namespace ALOTInstallerConsole.BuilderUI
             NamedBackgroundWorker builderWorker = new NamedBackgroundWorker("BuilderWorker");
             StageStep ss = new StageStep(installOptions, builderWorker)
             {
-                UpdateStatusCallback = updateStatus,
+                UpdateOverallStatusCallback = updateStatus,
                 UpdateProgressCallback = updateProgress,
                 ResolveMutualExclusiveMods = resolveMutualExclusiveMod,
                 ErrorStagingCallback = errorStaging,
@@ -69,7 +69,7 @@ namespace ALOTInstallerConsole.BuilderUI
             builderWorker.RunWorkerAsync();
         }
 
-        private bool configureModOptions(ManifestFile mf, List<ConfigurableModInterface> optionsToConfigure)
+        private bool configureModOptions(ManifestFile mf, List<IConfigurableMod> optionsToConfigure)
         {
             bool continueStaging = true;
             int num = 1;

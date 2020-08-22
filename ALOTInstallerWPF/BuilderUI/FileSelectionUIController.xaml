@@ -11,7 +11,8 @@
              xmlns:objects="clr-namespace:ALOTInstallerWPF.Objects"
              xmlns:helpers="clr-namespace:ALOTInstallerCore.Helpers;assembly=ALOTInstallerCore"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="FSUICWindow">
     <UserControl.Resources>
         <converters:ApplicableGamesVisibilityConverter x:Key="ApplicableGamesVisibilityConverter"/>
         <converters:ReadyColorConverter x:Key="ReadyColorConverter"/>
@@ -21,7 +22,8 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <converters:RecommendationColorConverter x:Key="RecommendationColorConverter"/>
         <converters:FileCountConverter x:Key="FileCountConverter"/>
-        <converters:AdvancedFileInfoVisibilityConverter x:Key="AdvancedFileInfoVisibilityConverter"/>
+        <converters:BoolInverterConverter x:Key="BoolInverterConverter"/>
+        <converters:ToggleEnabledVisibilityConverter x:Key="ToggleEnabledVisibilityConverter"/>
 
         <Style x:Key="LinkLabel" TargetType="Button">
             <Setter Property="VerticalAlignment" Value="Top"/>
@@ -210,24 +212,26 @@
                 </GroupStyle>
             </ListBox.GroupStyle>
             <ListBox.Resources>
-                <ContextMenu x:Key="ItemContextMenu">
-                    <!--<MenuItem Header="Visit webpage"
-                                    Command="{Binding VisitWebpageCommand}" 
-                                    CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=ListViewItem}, Path=PlacementTarget.SelectedItem}" >
-                                    <MenuItem.Style>
-                                        <Style TargetType="{x:Type MenuItem}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ContextMenu},Path=PlacementTarget.DataContext.UserFile}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed"></Setter>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </MenuItem.Style>
-                                </MenuItem>-->
-                    <!--<MenuItem Header="Open download page" Click="ContextMenu_OpenDownloadPage" ToolTip="Opens the page where this file can be downloaded from."/>
-                    <MenuItem Header="Open file location" Click="ContextMenu_ViewFile" ToolTip="Opens location of file on disk"/>
-                    <MenuItem Header="Toggle Enabled/Disabled" Click="ContextMenu_ToggleFile"/>
-                    <MenuItem Header="Remove file" Click="ContextMenu_RemoveFile" ToolTip="Removes file from ALOT Installer list. This does not remove the file on disk."/>-->
+                <ContextMenu x:Key="FileItemContextMenu">
+                    <MenuItem Header="Open download page" 
+                              Command="{Binding Parent.PlacementTarget.Tag.DataContext.OpenModWebpageCommand,
+                                            RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" 
+                              Visibility="{Binding PlacementTarget.IsEnabled, RelativeSource={RelativeSource AncestorType=ContextMenu},
+                                            Converter={StaticResource BoolToVisibilityConverter}}"
+                              CommandParameter="{Binding}"/>
+                    <MenuItem Header="Open file location" ToolTip="Opens location of file on disk" 
+                              Command="{Binding Parent.PlacementTarget.Tag.DataContext.OpenFileOnDiskCommand,
+                                            RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" 
+                              Visibility="{Binding PlacementTarget.IsEnabled, RelativeSource={RelativeSource AncestorType=ContextMenu},
+                                            Converter={StaticResource BoolToVisibilityConverter}}"
+                              CommandParameter="{Binding}"/>
+                    <MenuItem IsCheckable="True" Header="Install this file" 
+                              IsChecked="{Binding Disabled, Converter={StaticResource BoolInverterConverter}}" 
+                              StaysOpenOnClick="True" 
+                              Visibility="{Binding Self, Converter={StaticResource ToggleEnabledVisibilityConverter}}"
+                              CommandParameter="{Binding}"
+                              />
+                    <!--<MenuItem Header="Remove file" Click="ContextMenu_RemoveFile" ToolTip="Removes file from ALOT Installer list. This does not remove the file on disk."/>-->
                 </ContextMenu>
             </ListBox.Resources>
             <ListBox.ItemContainerStyle>
@@ -236,7 +240,8 @@
                     <Setter Property="Margin" Value="0"/>
                     <Setter Property="Padding" Value="0"/>
                     <Setter Property="BorderThickness" Value="0"/>
-                    <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                    <Setter Property="ContextMenu" Value="{StaticResource FileItemContextMenu}"/>
+                    <Setter Property="Tag" Value="{Binding ElementName=FSUICWindow}" />
                 </Style>
             </ListBox.ItemContainerStyle>
         </ListBox>

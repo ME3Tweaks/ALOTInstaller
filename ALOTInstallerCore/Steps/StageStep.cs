@@ -40,7 +40,7 @@ namespace ALOTInstallerCore.Steps
         /// <summary>
         /// Callback to update the 'overall' status text of this step
         /// </summary>
-        public Action<string> UpdateStatusCallback { get; set; }
+        public Action<string> UpdateOverallStatusCallback { get; set; }
 
         /// <summary>
         /// Callback to update the 'overall' progress of this step
@@ -59,7 +59,7 @@ namespace ALOTInstallerCore.Steps
         /// on the objects, as they will be reset to their defaults before being passed to the UI.
         /// Return false to abort staging.
         /// </summary>
-        public Func<ManifestFile, List<ConfigurableModInterface>, bool> ConfigureModOptions { get; set; }
+        public Func<ManifestFile, List<IConfigurableMod>, bool> ConfigureModOptions { get; set; }
         /// <summary>
         /// Invoked when the list of files to stage has been calculated
         /// </summary>
@@ -92,7 +92,7 @@ namespace ALOTInstallerCore.Steps
                 switch (command)
                 {
                     case "TASK_PROGRESS":
-                        instFile.StatusText = $"Extracting {instFile.FriendlyName} {param}%";
+                        instFile.StatusText = $"Extracting archive {param}%";
                         break;
                     case "FILENAME":
                         // Unpacking file
@@ -110,7 +110,7 @@ namespace ALOTInstallerCore.Steps
                 case ".zip":
                     // Extract archive
                     int exitcode = -1;
-                    UpdateStatusCallback($"Extracting {instFile.FriendlyName}");
+                    //UpdateStatusCallback($"Extracting {instFile.FriendlyName}");
                     instFile.StatusText = "Extracting archive";
 
                     MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{filepath}\" --output \"{substagingDir}\" --ipc",
@@ -138,7 +138,7 @@ namespace ALOTInstallerCore.Steps
             {
                 Utilities.DeleteFilesAndFoldersRecursively(stagingDir);
             }
-            installOptions.FilesToInstall = getFilesToStage(installOptions.FilesToInstall.Where(x => x.Ready && (x.ApplicableGames & installOptions.InstallTarget.Game.ToApplicableGame()) != 0));
+            installOptions.FilesToInstall = getFilesToStage(installOptions.FilesToInstall.Where(x => x.Ready && !x.Disabled && (x.ApplicableGames & installOptions.InstallTarget.Game.ToApplicableGame()) != 0));
             installOptions.FilesToInstall = resolveMutualExclusiveGroups();
             if (installOptions.FilesToInstall == null)
             {
@@ -219,13 +219,18 @@ namespace ALOTInstallerCore.Steps
                     if (archiveExtractedN == null)
                     {
                         // There was an error
-                        UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file");
+                        //UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file");
+                        installerFile.StatusText = "Error extracting, checking archive";
                         using var sourcefStream = File.OpenRead(installerFile.GetUsedFilepath());
                         long sizeToHash = sourcefStream.Length;
                         if (sizeToHash > 0)
                         {
                             var hash = HashAlgorithmExtensions.ComputeHashAsync(MD5.Create(), sourcefStream,
-                                progress: x => UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file {(int)(x * 100f / sizeToHash)}%")).Result;
+                                progress: x =>
+                                {
+                                    //UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file {(int) (x * 100f / sizeToHash)}%");
+                                    installerFile.StatusText = $"Error extracting, checking archive {(int)(x * 100f / sizeToHash)}%";
+                                }).Result;
                             if (hash == mf.GetBackingHash())
                             {
                                 ErrorStagingCallback?.Invoke($"Error extracting {installerFile.GetUsedFilepath()}, but file matches manifest - possible disk issues?");
@@ -249,7 +254,11 @@ namespace ALOTInstallerCore.Steps
                         // mem files will be directly moved to install source. All other files will be staged for build so we need to 
                         // copy them back before we delete the extraction dir after we stage the files
                         TextureLibrary.AttemptImportUnpackedFiles(outputDir, new List<ManifestFile>(new[] { _mf }), true,
-                            (filename, x, y) => UpdateStatusCallback?.Invoke($"Optimizing {filename} for future installs {(int)(x * 100f / y)}%"),
+                            (filename, x, y) =>
+                            {
+                                //UpdateStatusCallback?.Invoke($"Optimizing {filename} for future installs {(int) (x * 100f / y)}%");
+                                installerFile.StatusText = $"Optimizing {filename} for future installs {(int)(x * 100f / y)}%";
+                            },
                             forceCopy: true
                         );
                     }
@@ -324,7 +333,10 @@ namespace ALOTInstallerCore.Steps
                             //Copy
                             Log.Information($"Copying unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
                             CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
-                                (x, y) => { UpdateStatusCallback?.Invoke($"Staging {installerFile.FriendlyName} for install {(int)(x * 100f / y)}%"); },
+                                (x, y) =>
+                                {
+                                    installerFile.StatusText = $"Copying file to staging {(int)(x * 100f / y)}%";
+                                },
                                 exception => { abortStaging = true; });
                         }
 
@@ -333,6 +345,10 @@ namespace ALOTInstallerCore.Steps
                     else if (archiveExtracted && installerFile.PackageFiles.All(x => x.MoveDirectly))
                     {
                         // Subfiles move to dest
+                    }
+                    else if (decompiled)
+                    {
+                        // Files will be staged
                     }
                     else
                     {
@@ -366,8 +382,11 @@ namespace ALOTInstallerCore.Steps
                     if (!archiveExtracted)
                     {
                         CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), Path.Combine(userFileBuildMemPath, Path.GetFileName(installerFile.GetUsedFilepath())),
-                            (x, y) => UpdateStatusCallback?.Invoke(
-                                $"Staging {Path.GetFileName(installerFile.GetUsedFilepath())} {(int)(x * 100f / y)}%"),
+                            (x, y) =>
+                            {
+                                //UpdateStatusCallback?.Invoke($"Staging {Path.GetFileName(installerFile.GetUsedFilepath())} {(int)(x * 100f / y)}%"),
+                                installerFile.StatusText = $"Staging for install {(int)(x * 100f / y)}%";
+                            },
                             x =>
                             {
                                 // Do something here. Not sure what
@@ -443,13 +462,13 @@ namespace ALOTInstallerCore.Steps
             {
                 var mf = m as ManifestFile;
                 mf.PackageFiles.RemoveAll(x => x.Transient);
-                var configurableOptions = new List<ConfigurableModInterface>();
+                var configurableOptions = new List<IConfigurableMod>();
                 configurableOptions.AddRange(mf.ChoiceFiles);
                 configurableOptions.AddRange(mf.CopyFiles);
                 configurableOptions.AddRange(mf.ZipFiles);
                 foreach (var v in configurableOptions)
                 {
-                    v.SelectedIndex = 0; //Reset to default option.
+                    v.SelectedIndex = v.DefaultSelectedIndex; //Reset to default option
                 }
 
                 var result = ConfigureModOptions?.Invoke(mf, configurableOptions);
@@ -598,7 +617,7 @@ namespace ALOTInstallerCore.Steps
                             string stagedPath = Path.Combine(finalDest, $"{mf.BuildID}_{stagedID}_{Path.GetFileName(copy.InArchivePath)}");
                             File.Move(singleFile, stagedPath);
                             copy.StagedPath = stagedPath;
-                            copy.ID = stagedID; //still useful?
+                            //copy.ID = stagedID; //still useful?
                             stagedID++;
                         }
                     }
@@ -701,7 +720,7 @@ namespace ALOTInstallerCore.Steps
                 switch (command)
                 {
                     case "TASK_PROGRESS":
-                        UpdateStatusCallback?.Invoke($"Building install package for {uiname}");
+                        UpdateOverallStatusCallback?.Invoke($"Building install package for {uiname}");
                         UpdateProgressCallback?.Invoke(TryConvert.ToInt32(param, 0), 100);
                         break;
                     case "PROCESSING_FILE":
@@ -755,7 +774,7 @@ namespace ALOTInstallerCore.Steps
                         // Unpacking file
                         if (file != null)
                         {
-                            file.StatusText = $"Decompiling {param} %";
+                            file.StatusText = $"Decompiling {param}";
                         }
                         break;
                     default:

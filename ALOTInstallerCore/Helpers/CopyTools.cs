@@ -64,7 +64,16 @@ namespace ALOTInstallerCore.Helpers
         }
 
 
-        public static int CopyAll_ProgressBar(DirectoryInfo source, DirectoryInfo target, Action<int> totalItemsToCopyCallback = null, Action fileCopiedCallback = null, Func<string, bool> aboutToCopyCallback = null, int total = -1, int done = 0, string[] ignoredExtensions = null, bool testrun = false)
+        public static int CopyAll_ProgressBar(DirectoryInfo source,
+            DirectoryInfo target,
+            Action<int> totalItemsToCopyCallback = null,
+            Action fileCopiedCallback = null,
+            Func<string, bool> aboutToCopyCallback = null,
+            int total = -1,
+            int done = 0,
+            string[] ignoredExtensions = null,
+            bool testrun = false,
+            Action<string, long, long> bigFileProgressCallback = null)
         {
             if (total == -1)
             {
@@ -115,7 +124,17 @@ namespace ALOTInstallerCore.Helpers
                         if (!testrun)
                         {
                             var destPath = Path.Combine(target.FullName, fi.Name);
-                            fi.CopyTo(destPath, true);
+                            if (bigFileProgressCallback != null && fi.Length > 1024 * 1024 * 128)
+                            {
+                                //128MB or bigger
+                                CopyTools.CopyFileWithProgress(fi.FullName, destPath, (bdone, btotal) => bigFileProgressCallback.Invoke(fi.FullName, bdone, btotal), exception => throw exception);
+                            }
+                            else
+                            {
+                                // No big copy
+                                fi.CopyTo(destPath, true);
+                            }
+
                             FileInfo dest = new FileInfo(destPath);
                             if (dest.IsReadOnly) dest.IsReadOnly = false;
                         }
@@ -137,7 +156,7 @@ namespace ALOTInstallerCore.Helpers
             foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
             {
                 DirectoryInfo nextTargetSubDir = testrun ? null : target.CreateSubdirectory(diSourceSubDir.Name);
-                numdone = CopyAll_ProgressBar(diSourceSubDir, nextTargetSubDir, totalItemsToCopyCallback, fileCopiedCallback, aboutToCopyCallback, total, numdone, null, testrun);
+                numdone = CopyAll_ProgressBar(diSourceSubDir, nextTargetSubDir, totalItemsToCopyCallback, fileCopiedCallback, aboutToCopyCallback, total, numdone, null, testrun, bigFileProgressCallback);
             }
             return numdone;
         }

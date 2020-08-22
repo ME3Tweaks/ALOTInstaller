@@ -71,8 +71,9 @@ namespace ALOTInstallerCore.Helpers
                     url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/ALOT-v4/manifest-beta.xml";
                 }
 
-                var fetchedManifest = webClient.DownloadString(new Uri(url));
+                //var fetchedManifest = webClient.DownloadString(new Uri(url));
                 //var fetchedManifest = File.ReadAllText(@"C:\Users\Mgamerz\source\repos\AlotAddOnGUI\manifest.xml");
+                var fetchedManifest = File.ReadAllText(@"E:\Documents\Visual Studio 2015\Projects\AlotAddOnGUI\manifest.xml");
 
                 if (Utilities.TestXMLIsValid(fetchedManifest))
                 {
@@ -373,8 +374,7 @@ namespace ALOTInstallerCore.Helpers
                                                        .Select(q => new ZipFile
                                                        {
                                                            ChoiceTitle = q.Attribute("choicetitle").Value,
-                                                           Optional = TryConvert.ToBool(q.Attribute("optional")?.Value, false),
-                                                           DefaultOption = TryConvert.ToBool(q.Attribute("default")?.Value, true),
+                                                           Optional = TryConvert.ToBool(q.Attribute("optional")?.Value, true),
                                                            InArchivePath = q.Attribute("inarchivepath").Value,
                                                            GameDestinationPath = q.Attribute("gamedestinationpath").Value,
                                                            DeleteShaders = TryConvert.ToBool(q.Attribute("deleteshaders")?.Value, false),
@@ -385,8 +385,8 @@ namespace ALOTInstallerCore.Helpers
                                                        .Select(q => new CopyFile
                                                        {
                                                            ChoiceTitle = (string)q.Attribute("choicetitle"),
-                                                           Optional = TryConvert.ToBool(q.Attribute("optional")?.Value, false),
-                                                           DefaultOption = TryConvert.ToBool(q.Attribute("default")?.Value, true),
+                                                           AllowNoInstall = q.Attribute("allownoinstall")?.Value == "true",
+                                                           Optional = TryConvert.ToBool(q.Attribute("optional")?.Value, true),
                                                            InArchivePath = q.Attribute("inarchivepath").Value,
                                                            GameDestinationPath = q.Attribute("gamedestinationpath").Value,
                                                        }

@@ -29,7 +29,7 @@ namespace ALOTInstallerCore.Objects
         /// <summary>
         /// Indicates that we should repack game files on install
         /// </summary>
-        public bool RepackGameFiles { get; set; } = true; //Default to true. Might change later
+        public bool CompressPackages { get; set; } = true; //Default to true. Might change later
         /// <summary>
         /// Installs 2K instead of 4K lods at end of install. 2K lods use significantly less memory at the cost of less visual fidelity.
         /// </summary>

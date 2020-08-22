@@ -10,8 +10,12 @@
              xmlns:services="clr-namespace:ALOTInstallerCore.ModManager.Services;assembly=ALOTInstallerCore"
              xmlns:me3Tweaks="clr-namespace:ALOTInstallerCore.ModManager.ME3Tweaks;assembly=ALOTInstallerCore"
              xmlns:alotInstallerWpf="clr-namespace:ALOTInstallerWPF"
+             xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="1450" d:DesignWidth="300">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
     <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible" ScrollViewer.PanningMode="VerticalFirst" Width="325" HorizontalAlignment="Stretch">
         <DockPanel HorizontalAlignment="Stretch" Width="310">
             <Expander DockPanel.Dock="Top" IsExpanded="True" Expanded="Expander_Expanded">
@@ -22,7 +26,9 @@
                     <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME1TextureInstallInfo, FallbackValue='ME1: Textures installed, no ALOT, no MEUITM'}"/>
                     <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME2TextureInstallInfo, FallbackValue='ME2: Game not installed'}"/>
                     <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME3TextureInstallInfo, FallbackValue='ME3: ALOT 11.3'}"/>
-                    <TextBlock Text="Game not showing as installed? Make sure you've run it at least once. If that doesn't fix it, repair the game with Steam or Origin's repair feature." TextWrapping="Wrap" HorizontalAlignment="Left" Margin="20,0,0,0"/>
+                    <TextBlock Text="Game not showing as installed? Make sure you've run it at least once. If that doesn't fix it, repair the game with Steam or Origin's repair feature." 
+                               TextWrapping="Wrap" HorizontalAlignment="Left" Margin="20,0,0,0"
+                               Visibility="{Binding ShowGameMissingText, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 </StackPanel>
             </Expander>
             <Expander DockPanel.Dock="Top" IsExpanded="True" Expanded="Expander_Expanded">
@@ -34,6 +40,7 @@
                         <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect files" OnContent="Show Mass Effect files" IsEnabled="{Binding ME1Available}" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowME1Files)}" ToolTip="Toggle showing files for Mass Effect"/>
                         <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect 2 files" OnContent="Show Mass Effect 2 files" IsEnabled="{Binding ME2Available}" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowME2Files)}" ToolTip="Toggle showing files for Mass Effect 2"/>
                         <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect 3 files" OnContent="Show Mass Effect 3 files" IsEnabled="{Binding ME3Available}" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowME3Files)}" ToolTip="Toggle showing files for Mass Effect 3"/>
+                        <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show only ready files" OnContent="Show ready &amp; non ready files" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowNonReadyFiles)}" ToolTip="Toggle showing files that are not ready for installation (not imported/disabled)"/>
                     </StackPanel>
                 </StackPanel>
             </Expander>
@@ -50,7 +57,7 @@
 
                                 <!--<TextBlock Text="Permanent: Where manifest files are stored for each mode (excluding Free Mode)" TextWrapping="Wrap" DockPanel.Dock="Top"/>-->
                                 <DockPanel DockPanel.Dock="Bottom" Margin="0,2,0,0">
-                                    <Button DockPanel.Dock="Right" Command="{Binding BackupRestoreCommand,RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SettingsFlyout}}}" Content="{Binding BackupActionText}" CommandParameter="{Binding}" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="{Binding ME1BackupButtonToolTip}"/>
+                                    <Button DockPanel.Dock="Right" Command="{Binding BackupRestoreCommand,RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SettingsFlyout}}}" Content="{Binding BackupActionText}" CommandParameter="{Binding}" Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>
                                     <Button FontSize="11" FontWeight="Bold" Command="{Binding LinkUnlinkBackupCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SettingsFlyout}}}" CommandParameter="{Binding}" HorizontalAlignment="Left" Content="{Binding LinkActionText}" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Link (specify existing backup) or unlink a backup of this game. Linking a backup requires it to be vanilla"/>
                                 </DockPanel>
                                 <TextBlock Text="{Binding Path=BackupStatus}" DockPanel.Dock="Top"/>

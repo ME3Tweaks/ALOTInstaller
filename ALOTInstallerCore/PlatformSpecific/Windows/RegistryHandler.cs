@@ -23,6 +23,13 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
             WriteRegistryKey(subkey, subpath, value, data ? 1 : 0);
         }
 
+        /// <summary>
+        /// Writes the specified data to the lsited key/subpath/value.
+        /// </summary>
+        /// <param name="subkey"></param>
+        /// <param name="subpath"></param>
+        /// <param name="value"></param>
+        /// <param name="data"></param>
         internal static void WriteRegistryKey(RegistryKey subkey, string subpath, string value, object data)
         {
 
@@ -61,24 +68,29 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static string GetRegistrySettingString(string name)
+        public static string GetRegistryString(string name)
         {
             string softwareKey = @"HKEY_CURRENT_USER\Software\ALOTAddon";
             return (string)Registry.GetValue(softwareKey, name, null);
         }
 
         /// <summary>
-        /// Gets a string value frmo the registry from the specified key and value name.
+        /// Gets a string value from the registry from the specified key and value name.
         /// </summary>
         /// <param name="key"></param>
-        /// <param name="name"></param>
+        /// <param name="valueName"></param>
         /// <returns></returns>
-        public static string GetRegistrySettingString(string key, string name)
+        public static string GetRegistryString(string key, string valueName)
         {
 
-            return (string)Registry.GetValue(key, name, null);
+            return (string)Registry.GetValue(key, valueName, null);
         }
 
+        /// <summary>
+        /// Gets a settings value for ALOT Installer from the registry
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static bool? GetRegistrySettingBool(string name)
         {
 
@@ -92,15 +104,16 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
             return null;
         }
 
+        /// <summary>
+        /// Deletes a registry key from the registry. USE WITH CAUTION
+        /// </summary>
+        /// <param name="primaryKey"></param>
+        /// <param name="subkey"></param>
+        /// <param name="valuename"></param>
         public static void DeleteRegistryKey(RegistryKey primaryKey, string subkey, string valuename)
         {
-            using (RegistryKey key = primaryKey.OpenSubKey(subkey, true))
-            {
-                if (key != null)
-                {
-                    key.DeleteValue(valuename, false);
-                }
-            }
+            using RegistryKey key = primaryKey.OpenSubKey(subkey, true);
+            key?.DeleteValue(valuename, false);
         }
     }
 }

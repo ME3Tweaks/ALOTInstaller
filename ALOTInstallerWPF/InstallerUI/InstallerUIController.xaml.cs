@@ -39,6 +39,37 @@ namespace ALOTInstallerWPF.InstallerUI
         public Visibility InstallerTextMiddleVisibility { get; private set; } = Visibility.Visible;
         public Visibility InstallerTextBottomVisibility { get; private set; } = Visibility.Visible;
 
+        private void OnInstallerTextTopChanged()
+        {
+            Debug.WriteLine($"INSTALLER TEXT TOP SET TO: {InstallerTextTop}");
+        }
+
+        private void OnInstallerTextMiddleChanged()
+        {
+            Debug.WriteLine($"INSTALLER TEXT MID TO: {InstallerTextMiddle}");
+        }
+
+        private void OnInstallerTextBottomChanged()
+        {
+            Debug.WriteLine($"INSTALLER BOTTOM SET TO: {InstallerTextBottom}");
+        }
+
+        private void OnInstallerTextTopVisibilityChanged()
+        {
+            Debug.WriteLine($"INSTALLER TEXT TOP VIS SET TO: {InstallerTextTopVisibility}");
+        }
+
+        private void OnInstallerTextMiddleVisibilityChanged()
+        {
+            Debug.WriteLine($"INSTALLER TEXT MID VIS TO: {InstallerTextMiddleVisibility}");
+        }
+
+        private void OnInstallerTextBottomVisibilityChanged()
+        {
+            Debug.WriteLine($"INSTALLER BOTTOM SET VIS TO: {InstallerTextBottomVisibility}");
+        }
+
+
         public static ImageBrush GetInstallerBackgroundImage(Enums.MEGame game, ManifestMode mode)
         {
             string bgPath = $"/alot_{game.ToString().ToLower()}_bg"; // ALOT / FREE MODE
@@ -77,7 +108,10 @@ namespace ALOTInstallerWPF.InstallerUI
 
         private void CloseInstaller()
         {
-
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                mw.CloseInstallerUI();
+            }
         }
 
         private bool CanToggleMusic()
@@ -104,11 +138,12 @@ namespace ALOTInstallerWPF.InstallerUI
             InstallStep ss = new InstallStep(InstallOptions)
             {
                 SetInstallString = x => installString = x,
-                SetTopTextCallback = x => InstallerTextMiddle = x,
+                SetTopTextCallback = x => InstallerTextTop = x,
                 SetMiddleTextCallback = x => InstallerTextMiddle = x,
                 SetBottomTextCallback = x => InstallerTextBottom = x,
                 SetTopTextVisibilityCallback = x => InstallerTextTopVisibility = x ? Visibility.Visible : Visibility.Collapsed,
-                SetMiddleTextVisibilityCallback = x => InstallerTextMiddleVisibility = x ? Visibility.Visible : Visibility.Collapsed,
+                SetMiddleTextVisibilityCallback = x => 
+                    InstallerTextMiddleVisibility = x ? Visibility.Visible : Visibility.Collapsed,
                 SetBottomTextVisibilityCallback = x => InstallerTextBottomVisibility = x ? Visibility.Visible : Visibility.Collapsed,
             };
             installerWorker.WorkerReportsProgress = true;

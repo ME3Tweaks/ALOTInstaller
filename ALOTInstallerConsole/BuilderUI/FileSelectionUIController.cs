@@ -533,7 +533,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     InstallAddons = getInstallOptionValue(InstallOptionsStep.InstallOption.Addon, installOptionMapping),
                     InstallUserfiles = getInstallOptionValue(InstallOptionsStep.InstallOption.UserFiles, installOptionMapping),
                     InstallerMode = ManifestHandler.CurrentMode,
-                    RepackGameFiles = compressPackagesCb.Checked,
+                    CompressPackages = compressPackagesCb.Checked,
                     Limit2K = use2KLodsCb.Checked,
                     ImportNewlyUnpackedFiles = reimportUnpackedFiles.Checked,
 #if DEBUG

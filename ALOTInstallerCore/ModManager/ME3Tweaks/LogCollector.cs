@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Text;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameDirectories;
@@ -12,6 +13,10 @@ using ALOTInstallerCore.ModManager.gamefileformats;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+#if WINDOWS
+using AuthenticodeExaminer;
+using Microsoft.Win32;
+#endif
 using NickStrupat;
 
 namespace ALOTInstallerCore.ModManager.ME3Tweaks
@@ -217,34 +222,34 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 addDiagLine($@"Game is installed at {gamePath}");
 
 #if WINDOWS
-                    string pathroot = Path.GetPathRoot(gamePath);
-                    pathroot = pathroot.Substring(0, 1);
-                    if (pathroot == @"\")
+                string pathroot = Path.GetPathRoot(gamePath);
+                pathroot = pathroot.Substring(0, 1);
+                if (pathroot == @"\")
+                {
+                    addDiagLine(@"Installation appears to be on a network drive (first character in path is \)", Severity.WARN);
+                }
+                else
+                {
+                    if (Utilities.IsWindows10OrNewer())
                     {
-                        addDiagLine(@"Installation appears to be on a network drive (first character in path is \)", Severity.WARN);
-                    }
-                    else
-                    {
-                        if (Utilities.IsWindows10OrNewer())
+                        int backingType = GetPartitionDiskBackingType(pathroot);
+                        string type = @"Unknown type";
+                        switch (backingType)
                         {
-                            int backingType = GetPartitionDiskBackingType(pathroot);
-                            string type = @"Unknown type";
-                            switch (backingType)
-                            {
-                                case 3:
-                                    type = @"Hard disk drive";
-                                    break;
-                                case 4:
-                                    type = @"Solid state drive";
-                                    break;
-                                default:
-                                    type += @": " + backingType;
-                                    break;
-                            }
-
-                            addDiagLine(@"Installed on disk type: " + type);
+                            case 3:
+                                type = @"Hard disk drive";
+                                break;
+                            case 4:
+                                type = @"Solid state drive";
+                                break;
+                            default:
+                                type += @": " + backingType;
+                                break;
                         }
+
+                        addDiagLine(@"Installed on disk type: " + type);
                     }
+                }
 #endif
 
                 selectedDiagnosticTarget.ReloadGameTarget(false); //reload vars
@@ -282,34 +287,34 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
 
 #if WINDOWS
-                        //Executable signatures
-                        var info = new FileInspector(exePath);
-                        var certOK = info.Validate();
-                        if (certOK == SignatureCheckResult.NoSignature)
+                    //Executable signatures
+                    var info = new FileInspector(exePath);
+                    var certOK = info.Validate();
+                    if (certOK == SignatureCheckResult.NoSignature)
+                    {
+                        addDiagLine(@"This executable is not signed", Severity.ERROR);
+                    }
+                    else
+                    {
+                        if (certOK == SignatureCheckResult.BadDigest)
                         {
-                            addDiagLine(@"This executable is not signed", Severity.ERROR);
-                        }
-                        else
-                        {
-                            if (certOK == SignatureCheckResult.BadDigest)
+                            if (selectedDiagnosticTarget.Game == Enums.MEGame.ME1 && versInfo.ProductName == @"Mass_Effect")
                             {
-                                if (selectedDiagnosticTarget.Game == Enums.MEGame.ME1 && versInfo.ProductName == @"Mass_Effect")
-                                {
-                                    //Check if this Mass_Effect
-                                    addDiagLine(@"Signature check for this executable was skipped as MEM modified this exe");
-                                }
-                                else
-                                {
-                                    addDiagLine(@"The signature for this executable is not valid. The executable has been modified", Severity.ERROR);
-                                    diagPrintSignatures(info, addDiagLine);
-                                }
+                                //Check if this Mass_Effect
+                                addDiagLine(@"Signature check for this executable was skipped as MEM modified this exe");
                             }
                             else
                             {
-                                addDiagLine(@"Signature check for this executable: " + certOK.ToString());
+                                addDiagLine(@"The signature for this executable is not valid. The executable has been modified", Severity.ERROR);
                                 diagPrintSignatures(info, addDiagLine);
                             }
                         }
+                        else
+                        {
+                            addDiagLine(@"Signature check for this executable: " + certOK.ToString());
+                            diagPrintSignatures(info, addDiagLine);
+                        }
+                    }
 #endif
 
                     //BINK
@@ -373,8 +378,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 long ramInBytes = (long)computerInfo.TotalPhysicalMemory;
                 addDiagLine(@"Total memory available: " + FileSizeFormatter.FormatSize(ramInBytes));
 #if WINDOWS
-                    addDiagLine(@"Processors", Severity.BOLD);
-                    addDiagLine(GetProcessorInformationForDiag());
+                addDiagLine(@"Processors", Severity.BOLD);
+                addDiagLine(GetProcessorInformationForDiag());
 #endif
                 if (ramInBytes == 0)
                 {
@@ -384,59 +389,59 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 }
 
 #if WINDOWS
-                    ManagementObjectSearcher objvide =
-                        new ManagementObjectSearcher(@"select * from Win32_VideoController");
-                    int vidCardIndex = 1;
-                    foreach (ManagementObject obj in objvide.Get())
-                    {
-                        addDiagLine();
-                        addDiagLine(@"Video Card " + vidCardIndex, Severity.BOLD);
-                        addDiagLine(@"Name: " + obj[@"Name"]);
+                ManagementObjectSearcher objvide =
+                    new ManagementObjectSearcher(@"select * from Win32_VideoController");
+                int vidCardIndex = 1;
+                foreach (ManagementObject obj in objvide.Get())
+                {
+                    addDiagLine();
+                    addDiagLine(@"Video Card " + vidCardIndex, Severity.BOLD);
+                    addDiagLine(@"Name: " + obj[@"Name"]);
 
-                        //Get Memory
-                        string vidKey =
-                            @"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\";
-                        vidKey += (vidCardIndex - 1).ToString().PadLeft(4, '0');
-                        object returnvalue = null;
+                    //Get Memory
+                    string vidKey =
+                        @"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\";
+                    vidKey += (vidCardIndex - 1).ToString().PadLeft(4, '0');
+                    object returnvalue = null;
+                    try
+                    {
+                        returnvalue = Registry.GetValue(vidKey, @"HardwareInformation.qwMemorySize", 0L);
+                    }
+                    catch (Exception ex)
+                    {
+                        addDiagLine(
+                            $@"Unable to read memory size from registry. Reading from WMI instead ({ex.GetType()})",
+                            Severity.WARN);
+                    }
+
+                    string displayVal = null;
+                    if (returnvalue is long size && size != 0)
+                    {
+                        displayVal = FileSizeFormatter.FormatSize(size);
+                    }
+                    else
+                    {
                         try
                         {
-                            returnvalue = Registry.GetValue(vidKey, @"HardwareInformation.qwMemorySize", 0L);
+                            UInt32 wmiValue = (UInt32)obj[@"AdapterRam"];
+                            displayVal = FileSizeFormatter.FormatSize(wmiValue);
+                            // May need to uncomment this later. WMI sometimes returns 4GB when actual value is bigger
+                            //if (numBytes.MebiBytes == 4095)
+                            //{
+                            //    displayVal += @" (possibly more, variable is 32-bit unsigned)";
+                            //}
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-                            addDiagLine(
-                                $@"Unable to read memory size from registry. Reading from WMI instead ({ex.GetType()})",
-                                Severity.WARN);
-                        }
+                            displayVal = @"Unable to read value from registry/WMI";
 
-                        string displayVal;
-                        if (returnvalue != null && (long)returnvalue != 0)
-                        {
-                            displayVal = ByteSize.FromBytes((long)returnvalue).GibiBytes.ToString(@"#.##");
                         }
-                        else
-                        {
-                            try
-                            {
-                                UInt32 wmiValue = (UInt32)obj[@"AdapterRam"];
-                                var numBytes = ByteSize.FromBytes((long)wmiValue);
-                                displayVal = numBytes.MebiBytes.ToString(@"#.##") + @" MB";
-                                if (numBytes.MebiBytes == 4095)
-                                {
-                                    displayVal += @" (possibly more, variable is 32-bit unsigned)";
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                displayVal = @"Unable to read value from registry/WMI";
-
-                            }
-                        }
-
-                        addDiagLine(@"Memory: " + displayVal);
-                        addDiagLine(@"DriverVersion: " + obj[@"DriverVersion"]);
-                        vidCardIndex++;
                     }
+
+                    addDiagLine(@"Memory: " + displayVal);
+                    addDiagLine(@"DriverVersion: " + obj[@"DriverVersion"]);
+                    vidCardIndex++;
+                }
 #endif
 
                 #endregion
@@ -1224,38 +1229,38 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #region Event logs for crashes
 
 #if WINDOWS
-                    //EVENT LOGS
-                    updateStatusCallback?.Invoke(M3L.GetString(M3L.string_collectingEventLogs));
-                    StringBuilder crashLogs = new StringBuilder();
-                    var sevenDaysAgo = DateTime.Now.AddDays(-3);
+                //EVENT LOGS
+                updateStatusCallback?.Invoke("Collecting relevant event logs");
+                StringBuilder crashLogs = new StringBuilder();
+                var sevenDaysAgo = DateTime.Now.AddDays(-3);
 
-                    //Get event logs
-                    EventLog ev = new EventLog(@"Application");
-                    List<EventLogEntry> entries = ev.Entries
-                        .Cast<EventLogEntry>()
-                        .Where(z => z.InstanceId == 1001 && z.TimeGenerated > sevenDaysAgo && (GenerateEventLogString(z)
-                            .ContainsAny(MEDirectories.ExecutableNames(selectedDiagnosticTarget.Game),
-                                StringComparison.InvariantCultureIgnoreCase)))
-                        .ToList();
+                //Get event logs
+                EventLog ev = new EventLog(@"Application");
+                List<EventLogEntry> entries = ev.Entries
+                    .Cast<EventLogEntry>()
+                    .Where(z => z.InstanceId == 1001 && z.TimeGenerated > sevenDaysAgo && (GenerateEventLogString(z)
+                        .ContainsAny(MEDirectories.ExecutableNames(selectedDiagnosticTarget.Game),
+                            StringComparison.InvariantCultureIgnoreCase)))
+                    .ToList();
 
-                    addDiagLine(
-                        $@"{Utilities.GetGameName(selectedDiagnosticTarget.Game)} crash logs found in Event Viewer",
-                        Severity.DIAGSECTION);
-                    if (entries.Any())
+                addDiagLine(
+                    $@"{selectedDiagnosticTarget.Game.ToGameName()} crash logs found in Event Viewer",
+                    Severity.DIAGSECTION);
+                if (entries.Any())
+                {
+                    foreach (var entry in entries)
                     {
-                        foreach (var entry in entries)
-                        {
-                            string str = string.Join("\n",
-                                GenerateEventLogString(entry).Split('\n').ToList().Take(17).ToList()); //do not localize
-                            addDiagLine(
-                                $@"{Utilities.GetGameName(selectedDiagnosticTarget.Game)} Event {entry.TimeGenerated}\n{str}"); // !!! ?
-                        }
+                        string str = string.Join("\n",
+                            GenerateEventLogString(entry).Split('\n').ToList().Take(17).ToList()); //do not localize
+                        addDiagLine(
+                            $@"{selectedDiagnosticTarget.Game.ToGameName()} Event {entry.TimeGenerated}\n{str}"); // !!! ?
+                    }
 
-                    }
-                    else
-                    {
-                        addDiagLine(@"No crash events found in Event Viewer");
-                    }
+                }
+                else
+                {
+                    addDiagLine(@"No crash events found in Event Viewer");
+                }
 #endif
 
                 #endregion
@@ -1465,118 +1470,118 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
         //WINDOWS METHODS GO BELOW
 #if WINDOWS
-            private static void diagPrintSignatures(FileInspector info, Action<string, Severity> addDiagLine)
+        private static void diagPrintSignatures(FileInspector info, Action<string, Severity> addDiagLine)
+        {
+            foreach (var sig in info.GetSignatures())
             {
-                foreach (var sig in info.GetSignatures())
-                {
-                    var signingTime = sig.TimestampSignatures.FirstOrDefault()?.TimestampDateTime?.UtcDateTime;
-                    addDiagLine(@" > Signed on " + signingTime, Severity.INFO);
+                var signingTime = sig.TimestampSignatures.FirstOrDefault()?.TimestampDateTime?.UtcDateTime;
+                addDiagLine(@" > Signed on " + signingTime, Severity.INFO);
 
-                    foreach (var signChain in sig.AdditionalCertificates)
+                foreach (var signChain in sig.AdditionalCertificates)
+                {
+                    try
                     {
-                        try
-                        {
-                            var outStr = signChain.Subject.Substring(3); //remove CN=
-                            outStr = outStr.Substring(0, outStr.IndexOf(','));
-                            addDiagLine(@" >> Signed by " + outStr, Severity.INFO);
-                        }
-                        catch
-                        {
-                            addDiagLine(@"  >> Signed by " + signChain.Subject, Severity.INFO);
-                        }
+                        var outStr = signChain.Subject.Substring(3); //remove CN=
+                        outStr = outStr.Substring(0, outStr.IndexOf(','));
+                        addDiagLine(@" >> Signed by " + outStr, Severity.INFO);
+                    }
+                    catch
+                    {
+                        addDiagLine(@"  >> Signed by " + signChain.Subject, Severity.INFO);
                     }
                 }
             }
+        }
 
-            private static string GenerateEventLogString(EventLogEntry entry) =>
-                $"Event type: {entry.EntryType}\nEvent Message: {entry.Message + entry}\nEvent Time: {entry.TimeGenerated.ToShortTimeString()}\nEvent {entry.UserName}\n"; //do not localize
+        private static string GenerateEventLogString(EventLogEntry entry) =>
+            $"Event type: {entry.EntryType}\nEvent Message: {entry.Message + entry}\nEvent Time: {entry.TimeGenerated.ToShortTimeString()}\nEvent {entry.UserName}\n"; //do not localize
 
-    private static int GetPartitionDiskBackingType(string partitionLetter)
-    {
-        using (var partitionSearcher = new ManagementObjectSearcher(
-            @"\\localhost\ROOT\Microsoft\Windows\Storage",
-            $@"SELECT DiskNumber FROM MSFT_Partition WHERE DriveLetter='{partitionLetter}'"))
+        private static int GetPartitionDiskBackingType(string partitionLetter)
         {
-            try
+            using (var partitionSearcher = new ManagementObjectSearcher(
+                @"\\localhost\ROOT\Microsoft\Windows\Storage",
+                $@"SELECT DiskNumber FROM MSFT_Partition WHERE DriveLetter='{partitionLetter}'"))
             {
-                var partition = partitionSearcher.Get().Cast<ManagementBaseObject>().Single();
-                using (var physicalDiskSearcher = new ManagementObjectSearcher(
-                    @"\\localhost\ROOT\Microsoft\Windows\Storage",
-                    $@"SELECT Size, Model, MediaType FROM MSFT_PhysicalDisk WHERE DeviceID='{ partition[@"DiskNumber"] }'")) //do not localize
+                try
                 {
-                    var physicalDisk = physicalDiskSearcher.Get().Cast<ManagementBaseObject>().Single();
-                    return
-                        (UInt16)physicalDisk[@"MediaType"];/*||
+                    var partition = partitionSearcher.Get().Cast<ManagementBaseObject>().Single();
+                    using (var physicalDiskSearcher = new ManagementObjectSearcher(
+                        @"\\localhost\ROOT\Microsoft\Windows\Storage",
+                        $@"SELECT Size, Model, MediaType FROM MSFT_PhysicalDisk WHERE DeviceID='{ partition[@"DiskNumber"] }'")) //do not localize
+                    {
+                        var physicalDisk = physicalDiskSearcher.Get().Cast<ManagementBaseObject>().Single();
+                        return
+                            (UInt16)physicalDisk[@"MediaType"];/*||
                         SSDModelSubstrings.Any(substring => result.Model.ToLower().Contains(substring)); ;*/
 
 
+                    }
                 }
+                catch (Exception e)
+                {
+                    Log.Error($@"Error reading partition type on {partitionLetter}: {e.Message}");
+                    return -1;
+                }
+            }
+        }
+
+        public static string GetProcessorInformationForDiag()
+        {
+            string str = "";
+            try
+            {
+                ManagementObjectSearcher mosProcessor =
+    new ManagementObjectSearcher(@"SELECT * FROM Win32_Processor");
+
+                foreach (ManagementObject moProcessor in mosProcessor.Get())
+                {
+                    if (str != "")
+                    {
+                        str += "\n"; //do not localize
+                    }
+
+                    if (moProcessor[@"name"] != null)
+                    {
+                        str += moProcessor[@"name"].ToString();
+                        str += "\n"; //do not localize
+                    }
+                    if (moProcessor[@"maxclockspeed"] != null)
+                    {
+                        str += @"Maximum reported clock speed: ";
+                        str += moProcessor[@"maxclockspeed"].ToString();
+                        str += " Mhz\n"; //do not localize
+                    }
+                    if (moProcessor[@"numberofcores"] != null)
+                    {
+                        str += @"Cores: ";
+
+                        str += moProcessor[@"numberofcores"].ToString();
+                        str += "\n"; //do not localize
+                    }
+                    if (moProcessor[@"numberoflogicalprocessors"] != null)
+                    {
+                        str += @"Logical processors: ";
+                        str += moProcessor[@"numberoflogicalprocessors"].ToString();
+                        str += "\n"; //do not localize
+                    }
+
+                }
+                return str
+                   .Replace(@"(TM)", @"™")
+                   .Replace(@"(tm)", @"™")
+                   .Replace(@"(R)", @"®")
+                   .Replace(@"(r)", @"®")
+                   .Replace(@"(C)", @"©")
+                   .Replace(@"(c)", @"©")
+                   .Replace(@"    ", @" ")
+                   .Replace(@"  ", @" ").Trim();
             }
             catch (Exception e)
             {
-                Log.Error($@"Error reading partition type on {partitionLetter}: {e.Message}");
-                return -1;
+                Log.Error($@"Error getting processor information: {e.Message}");
+                return $"Error getting processor information: {e.Message}\n"; //do not localize
             }
         }
-    }
-
-    public static string GetProcessorInformationForDiag()
-    {
-        string str = "";
-        try
-        {
-            ManagementObjectSearcher mosProcessor =
-new ManagementObjectSearcher(@"SELECT * FROM Win32_Processor");
-
-            foreach (ManagementObject moProcessor in mosProcessor.Get())
-            {
-                if (str != "")
-                {
-                    str += "\n"; //do not localize
-                }
-
-                if (moProcessor[@"name"] != null)
-                {
-                    str += moProcessor[@"name"].ToString();
-                    str += "\n"; //do not localize
-                }
-                if (moProcessor[@"maxclockspeed"] != null)
-                {
-                    str += @"Maximum reported clock speed: ";
-                    str += moProcessor[@"maxclockspeed"].ToString();
-                    str += " Mhz\n"; //do not localize
-                }
-                if (moProcessor[@"numberofcores"] != null)
-                {
-                    str += @"Cores: ";
-
-                    str += moProcessor[@"numberofcores"].ToString();
-                    str += "\n"; //do not localize
-                }
-                if (moProcessor[@"numberoflogicalprocessors"] != null)
-                {
-                    str += @"Logical processors: ";
-                    str += moProcessor[@"numberoflogicalprocessors"].ToString();
-                    str += "\n"; //do not localize
-                }
-
-            }
-            return str
-               .Replace(@"(TM)", @"™")
-               .Replace(@"(tm)", @"™")
-               .Replace(@"(R)", @"®")
-               .Replace(@"(r)", @"®")
-               .Replace(@"(C)", @"©")
-               .Replace(@"(c)", @"©")
-               .Replace(@"    ", @" ")
-               .Replace(@"  ", @" ").Trim();
-        }
-        catch (Exception e)
-        {
-            Log.Error($@"Error getting processor information: {e.Message}");
-            return $"Error getting processor information: {e.Message}\n"; //do not localize
-        }
-    }
 #endif
 
     }

@@ -346,7 +346,7 @@ namespace ALOTInstallerCore.Helpers
 
         private static string LoadDirectorySetting(SettingsKeys.SettingKeys key, string defaultSubfolder)
         {
-            string dir = RegistryHandler.GetRegistrySettingString(SettingsKeys.SettingsKeyMapping[key]);
+            string dir = RegistryHandler.GetRegistryString(SettingsKeys.SettingsKeyMapping[key]);
             if (dir != null && Directory.Exists(dir))
             {
                 return dir;

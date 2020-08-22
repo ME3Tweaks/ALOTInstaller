@@ -25,7 +25,7 @@ namespace AlotAddOnGUI
         public string DialogTitle { get; }
         public string ModeText { get; }
         public ManifestFile ConfiguringFile { get; set; }
-        public ObservableCollectionExtended<ConfigurableModInterface> ConfigurableItems { get; } = new ObservableCollectionExtended<ConfigurableModInterface>();
+        public ObservableCollectionExtended<IConfigurableMod> ConfigurableItems { get; } = new ObservableCollectionExtended<IConfigurableMod>();
         public ModConfigurationDialog(ManifestFile mf, ManifestMode mode)
         {
             DataContext = this;

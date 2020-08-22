@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using Microsoft.Win32;
 
 namespace ALOTInstallerCore.Helpers
 {
@@ -56,7 +58,7 @@ namespace ALOTInstallerCore.Helpers
 
         private static string GetFolderSetting(SettingsKeys.SettingKeys key, string defaultF)
         {
-            string dir = RegistryHandler.GetRegistrySettingString(SettingsKeys.SettingsKeyMapping[key]);
+            string dir = RegistryHandler.GetRegistryString(SettingsKeys.SettingsKeyMapping[key]);
             if (dir != null && Directory.Exists(dir))
             {
                 return dir;
@@ -95,80 +97,71 @@ namespace ALOTInstallerCore.Helpers
                 {
                     string key = game.ToString();
                     path = configIni["GameDataPath"][key]?.Value;
-                    if (!string.IsNullOrEmpty(path))
+                    if (!internalSetTarget(game, path))
                     {
-                        GameTarget gt = new GameTarget(game, path, false);
-                        var failedValidationReason = gt.ValidateTarget();
-                        if (failedValidationReason == null)
+#if WINDOWS
+                        //does not exist in ini (or ini does not exist).
+                        string softwareKey = @"HKEY_LOCAL_MACHINE\SOFTWARE\";
+                        string key64 = @"Wow6432Node\";
+                        string gameKey = @"BioWare\Mass Effect";
+                        string entry = "Path";
+
+                        if (game == Enums.MEGame.ME2)
+                            gameKey += @" 2";
+                        else if (game == Enums.MEGame.ME3)
                         {
-                            switch (game)
+                            gameKey += @" 3";
+                            entry = "Install Dir";
+                        }
+
+                        path = RegistryHandler.GetRegistryString(softwareKey + gameKey, entry);
+                        if (path == null)
+                        {
+                            path = RegistryHandler.GetRegistryString(softwareKey + key64 + gameKey, entry);
+                        }
+
+                        if (path != null)
+                        {
+                            path = path.TrimEnd(Path.DirectorySeparatorChar);
+
+                            string GameEXEPath = MEDirectories.ExecutablePath(game, path);
+                            Utilities.WriteDebugLog("GetGamePath Registry EXE Check Path: " + GameEXEPath);
+
+                            if (File.Exists(GameEXEPath))
                             {
-                                case Enums.MEGame.ME1:
-                                    ME1Target = gt;
-                                    continue;
-                                case Enums.MEGame.ME2:
-                                    ME2Target = gt;
-                                    continue;
-                                case Enums.MEGame.ME3:
-                                    ME3Target = gt;
-                                    continue;
+                                Utilities.WriteDebugLog("EXE file exists - returning this path: " + GameEXEPath);
+                                internalSetTarget(game, path);
                             }
                         }
-                    }
-
-#if WINDOWS
-                    //does not exist in ini (or ini does not exist).
-                    string softwareKey = @"HKEY_LOCAL_MACHINE\SOFTWARE\";
-                    string key64 = @"Wow6432Node\";
-                    string gameKey = @"BioWare\Mass Effect";
-                    string entry = "Path";
-
-                    if (gameID == 2)
-                        gameKey += @" 2";
-                    else if (gameID == 3)
-                    {
-                        gameKey += @" 3";
-                        entry = "Install Dir";
-                    }
-
-                    path = (string)RegistryHandler.GetValue(softwareKey + gameKey, entry, null);
-                    if (path == null)
-                    {
-                        path = (string)Registry.GetValue(softwareKey + key64 + gameKey, entry, null);
-                    }
-                    if (path != null)
-                    {
-                        Utilities.WriteDebugLog("Found game path via registry: " + path);
-                        path = path.TrimEnd(Path.DirectorySeparatorChar);
-
-                        string GameEXEPath = "";
-                        switch (gameID)
+                        else
                         {
-                            case 1:
-                                GameEXEPath = Path.Combine(path, @"Binaries\MassEffect.exe");
-                                break;
-                            case 2:
-                                GameEXEPath = Path.Combine(path, @"Binaries\MassEffect2.exe");
-                                break;
-                            case 3:
-                                GameEXEPath = Path.Combine(path, @"Binaries\Win32\MassEffect3.exe");
-                                break;
+                            Utilities.WriteDebugLog("Could not find game via registry.");
                         }
-                        Utilities.WriteDebugLog("GetGamePath Registry EXE Check Path: " + GameEXEPath);
-
-                        if (File.Exists(GameEXEPath))
-                        {
-                            Utilities.WriteDebugLog("EXE file exists - returning this path: " + GameEXEPath);
-                            return path; //we have path now
-                        }
-                    }
-                    else
-                    {
-                        Utilities.WriteDebugLog("Could not find game via registry.");
-                    }
 #endif
+                    }
                 }
             }
+        }
+
+        private static bool internalSetTarget(Enums.MEGame game, string path)
+        {
+            GameTarget gt = new GameTarget(game, path, false);
+            var failedValidationReason = gt.ValidateTarget();
+            if (failedValidationReason != null) return false;
+            switch (game)
+            {
+                case Enums.MEGame.ME1:
+                    ME1Target = gt;
+                    return true;
+                case Enums.MEGame.ME2:
+                    ME2Target = gt;
+                    return true;
+                case Enums.MEGame.ME3:
+                    ME3Target = gt;
+                    return true;
+            }
+
+            return false; // DEFAULT
         }
 
         private static void LoadLocationsLinux64()
@@ -269,6 +262,16 @@ namespace ALOTInstallerCore.Helpers
         internal static string GetObjectInfoFolder()
         {
             return Directory.CreateDirectory(Path.Combine(AppDataFolder(), "ObjectInfo")).FullName;
+        }
+
+        internal static string GetCachedExecutablesDirectory()
+        {
+            return Directory.CreateDirectory(Path.Combine(AppDataFolder(), "CachedExecutables")).FullName;
+        }
+
+        public static string GetCachedExecutable(string executableName)
+        {
+            return Path.Combine(GetCachedExecutablesDirectory(), executableName);
         }
     }
 }

@@ -441,22 +441,27 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <returns>Game source if supported, null otherwise</returns>
         internal static (string hash, string result) GetGameSource(GameTarget target)
         {
-            var md5 = Utilities.CalculateMD5(MEDirectories.ExecutablePath(target));
-            switch (target.Game)
+            var exePath = MEDirectories.ExecutablePath(target);
+            if (File.Exists(exePath))
             {
-                case Enums.MEGame.ME1:
-                    SUPPORTED_HASHES_ME1.TryGetValue(md5, out var me1result);
-                    return (md5, me1result);
-                case Enums.MEGame.ME2:
-                    SUPPORTED_HASHES_ME2.TryGetValue(md5, out var me2result);
-                    return (md5, me2result);
-                case Enums.MEGame.ME3:
-                    SUPPORTED_HASHES_ME3.TryGetValue(md5, out var me3result);
-                    return (md5, me3result);
-                default:
-                    throw new Exception(@"Cannot vanilla check against game that is not ME1/ME2/ME3");
+                var md5 = Utilities.CalculateMD5(exePath);
+                switch (target.Game)
+                {
+                    case Enums.MEGame.ME1:
+                        SUPPORTED_HASHES_ME1.TryGetValue(md5, out var me1result);
+                        return (md5, me1result);
+                    case Enums.MEGame.ME2:
+                        SUPPORTED_HASHES_ME2.TryGetValue(md5, out var me2result);
+                        return (md5, me2result);
+                    case Enums.MEGame.ME3:
+                        SUPPORTED_HASHES_ME3.TryGetValue(md5, out var me3result);
+                        return (md5, me3result);
+                    default:
+                        throw new Exception(@"Cannot vanilla check against game that is not ME1/ME2/ME3");
+                }
             }
 
+            return ("0", null);
         }
 
         private static Dictionary<string, string> SUPPORTED_HASHES_ME1 = new Dictionary<string, string>

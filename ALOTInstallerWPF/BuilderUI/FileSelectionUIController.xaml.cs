@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -10,16 +12,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using AlotAddOnGUI;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
-using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.Flyouts;
-using ALOTInstallerWPF.InstallerUI;
 using ALOTInstallerWPF.Objects;
-using MahApps.Metro.Controls.Dialogs;
 using Application = System.Windows.Application;
 
 namespace ALOTInstallerWPF.BuilderUI
@@ -99,6 +97,22 @@ namespace ALOTInstallerWPF.BuilderUI
             }
         }
 
+        private static bool _showNonReadyFiles = true;
+        public static bool ShowNonReadyFiles
+        {
+            get => _showNonReadyFiles;
+            set
+            {
+                if (SetProperty(ref _showNonReadyFiles, value))
+                {
+                    Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        FSUIC.DisplayedFilesView.Refresh();
+                    });
+                }
+            }
+        }
+
         /// <summary>
         /// Way for the filter static props to access the current instance of this
         /// </summary>
@@ -108,15 +122,17 @@ namespace ALOTInstallerWPF.BuilderUI
 
         public void OnIsStagingChanged()
         {
-            DisplayedFilesView.Refresh();
+            ShowNonReadyFiles = !IsStaging;
             if (!IsStaging)
             {
+                ProgressIndeterminate = false;
                 TextureLibrary.SetupLibraryWatcher(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode).OfType<ManifestFile>().ToList(), manifestFileReadyStateChanged);
             }
             else
             {
                 TextureLibrary.StopLibraryWatcher();
             }
+            DisplayedFilesView.Refresh();
         }
         public string StagingStatusText { get; set; }
 
@@ -149,7 +165,7 @@ namespace ALOTInstallerWPF.BuilderUI
         {
             if (obj is InstallerFile ifx)
             {
-                if (IsStaging && !ifx.Ready) return false; // Show only ready files
+                if (!ShowNonReadyFiles && !ifx.Ready || ifx.Disabled) return false; // Show only ready to install files
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME1) && ShowME1Files) return true;
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME2) && ShowME2Files) return true;
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME3) && ShowME3Files) return true;
@@ -163,12 +179,35 @@ namespace ALOTInstallerWPF.BuilderUI
 
         public ICommand InstallTexturesCommand { get; set; }
         public ICommand OpenSettingsCommand { get; set; }
+        public RelayCommand OpenModWebpageCommand { get; set; }
+        public RelayCommand OpenFileOnDiskCommand { get; set; }
 
         private void LoadCommands()
         {
+            OpenModWebpageCommand = new RelayCommand(OpenModWebpage);
+            OpenFileOnDiskCommand = new RelayCommand(OpenFileOnDisk, CanOpenFileOnDisk);
             OpenSettingsCommand = new GenericCommand(OpenSettings, CanOpenSettings);
             InstallTexturesCommand = new GenericCommand(BeginInstallTextures, CanInstallTextures);
         }
+
+        private bool CanOpenFileOnDisk(object obj) => !IsStaging && obj is InstallerFile ifx && File.Exists(ifx.GetUsedFilepath());
+
+        private void OpenFileOnDisk(object obj)
+        {
+            if (obj is InstallerFile ifx && File.Exists(ifx.GetUsedFilepath()))
+            {
+                Utilities.OpenAndSelectFileInExplorer(ifx.GetUsedFilepath());
+            }
+        }
+
+        private void OpenModWebpage(object obj)
+        {
+            if (obj is ManifestFile mf)
+            {
+                Utilities.OpenWebPage(mf.DownloadLink);
+            }
+        }
+
 
         private bool CanOpenSettings()
         {

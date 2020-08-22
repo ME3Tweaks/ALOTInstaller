@@ -131,8 +131,15 @@ namespace ALOTInstallerCore.Objects
         /// <summary>
         /// If this file is disabled by the user and will not install. Only files that are not required can have this value set
         /// </summary>
-        public bool Disabled { get; set; }
-
+        public bool Disabled
+        {
+            get;
+            set;
+        }
+        public void OnDisabledChanged()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Self)));
+        }
         /// <summary>
         /// Resets variables used only during the build step
         /// </summary>
@@ -158,6 +165,8 @@ namespace ALOTInstallerCore.Objects
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Self)));
         }
+
+
 
         /// <summary>
         /// Reference to self. Can be used to force data binding updates for wrapper applications. Will be property notified on changes to things such as Ready status.

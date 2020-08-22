@@ -29,7 +29,7 @@ namespace ALOTInstallerWPF.BuilderUI
             NamedBackgroundWorker builderWorker = new NamedBackgroundWorker("BuilderWorker");
             StageStep ss = new StageStep(iop, builderWorker)
             {
-                UpdateStatusCallback = status =>
+                UpdateOverallStatusCallback = status =>
                 {
                     fsuic.StagingStatusText = status;
                 },
@@ -79,6 +79,7 @@ namespace ALOTInstallerWPF.BuilderUI
         {
             Application.Current.Invoke(() =>
             {
+                fsuic.StagingStatusText = $"Preparing {fileProcessing.FriendlyName} for installation";
                 fsuic.InstallerFilesListBox.ScrollIntoView(fileProcessing);
             });
         }
@@ -92,14 +93,14 @@ namespace ALOTInstallerWPF.BuilderUI
         }
 
 
-        private bool configureModOptions(ManifestFile mf, List<ConfigurableModInterface> optionsToConfigure)
+        private bool configureModOptions(ManifestFile mf, List<IConfigurableMod> optionsToConfigure)
         {
             bool continueStaging = true;
-            if (Application.Current.MainWindow is MainWindow mw)
+            object syncObj = new object();
+            Application.Current.Dispatcher.Invoke(async () =>
             {
-                Application.Current.Invoke(async () =>
+                if (Application.Current.MainWindow is MainWindow mw)
                 {
-                    object syncObj = new object();
                     var configDialog = new ModConfigurationDialog(mf, ManifestHandler.CurrentMode);
                     configDialog.closeDialogWithResult = b =>
                     {
@@ -112,13 +113,13 @@ namespace ALOTInstallerWPF.BuilderUI
                     };
 
                     await mw.ShowMetroDialogAsync(configDialog);
-                    lock (syncObj)
-                    {
-                        Monitor.Wait(syncObj);
-                    }
-                });
-            }
 
+                }
+            });
+            lock (syncObj)
+            {
+                Monitor.Wait(syncObj);
+            }
             return continueStaging;
         }
 
@@ -174,7 +175,6 @@ namespace ALOTInstallerWPF.BuilderUI
                                 InstallOptions = iop
                             };
                             mw.OpenInstallerUI(iuic, InstallerUIController.GetInstallerBackgroundImage(iop.InstallTarget.Game, iop.InstallerMode));
-                            fsuic.IsStaging = false;
                         }
                     }
                 };

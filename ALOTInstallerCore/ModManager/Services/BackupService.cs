@@ -375,20 +375,19 @@ namespace ALOTInstallerCore.ModManager.Services
 
         public static string GetGameBackupPath(Enums.MEGame game, out bool isVanilla, bool forceCmmVanilla = true, bool logReturnedPath = false, bool forceReturnPath = false)
         {
-            // TODO: CHANGE THIS TO WINDOWS TO REVERSE LOGIC
-#if !WINDOWS
+#if WINDOWS
             string path;
             switch (game)
             {
                 case Enums.MEGame.ME1:
-                    path = RegistryHandler.GetRegistrySettingString(@"HKEY_CURRENT_USER\Software\ALOTAddon", @"ME1VanillaBackupLocation");
+                    path = RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\ALOTAddon", @"ME1VanillaBackupLocation");
                     break;
                 case Enums.MEGame.ME2:
-                    path = RegistryHandler.GetRegistrySettingString(@"HKEY_CURRENT_USER\Software\ALOTAddon", @"ME2VanillaBackupLocation");
+                    path = RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\ALOTAddon", @"ME2VanillaBackupLocation");
                     break;
                 case Enums.MEGame.ME3:
                     //Check for backup via registry - Use Mod Manager's game backup key to find backup.
-                    path = RegistryHandler.GetRegistrySettingString(@"HKEY_CURRENT_USER\Software\Mass Effect 3 Mod Manager", @"VanillaCopyLocation");
+                    path = RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\Mass Effect 3 Mod Manager", @"VanillaCopyLocation");
                     break;
                 default:
                     isVanilla = false;
@@ -396,6 +395,7 @@ namespace ALOTInstallerCore.ModManager.Services
             }
 
 #else
+            // Fetch via INI
             string path;
             switch (game)
             {
@@ -419,7 +419,6 @@ namespace ALOTInstallerCore.ModManager.Services
                 isVanilla = true; //Just say it's vanilla
                 return path; // do not check it
             }
-
 
             if (logReturnedPath)
             {
@@ -500,15 +499,15 @@ namespace ALOTInstallerCore.ModManager.Services
             switch (game)
             {
                 case Enums.MEGame.ME1:
-                    return RegistryHandler.GetRegistrySettingString(@"HKEY_CURRENT_USER\Software\ALOTAddon",
+                    return RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\ALOTAddon",
                         @"ME1VanillaBackupLocation") != null;
                 case Enums.MEGame.ME2:
-                    return RegistryHandler.GetRegistrySettingString(@"HKEY_CURRENT_USER\Software\ALOTAddon",
+                    return RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\ALOTAddon",
                         @"ME2VanillaBackupLocation") != null;
                     break;
                 case Enums.MEGame.ME3:
                     //Check for backup via registry - Use Mod Manager's game backup key to find backup.
-                    return RegistryHandler.GetRegistrySettingString(
+                    return RegistryHandler.GetRegistryString(
                         @"HKEY_CURRENT_USER\Software\Mass Effect 3 Mod Manager", @"VanillaCopyLocation") != null;
                 default:
                     return false;

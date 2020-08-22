@@ -37,6 +37,7 @@ namespace ALOTInstallerWPF.Flyouts
         public string ModeText { get; } = "Mode Text";
         public string SpinnerText { get; set; } = "Calculating install options";
         public string InstallOptionsTopText { get; set; }
+        public bool CompressPackages { get; set; } = true;
         public string CurrentLodsDescText { get; set; }
         public bool Use4KLODs { get; set; } = true; //Default to TRUE
         public bool OptimizeTextureLibrary { get; set; } = true; //Default to TRUE
@@ -140,6 +141,7 @@ namespace ALOTInstallerWPF.Flyouts
                     ImportNewlyUnpackedFiles = OptimizeTextureLibrary,
                     FilesToInstall = fileSet,
                     DebugNoInstall = !DebugPerformMainInstallation,
+                    CompressPackages = CompressPackages,
 
                     InstallALOT = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.ALOT) && checkboxMapping[InstallOptionsStep.InstallOption.ALOT].IsOn,
                     InstallALOTUpdate = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.ALOTUpdate) && checkboxMapping[InstallOptionsStep.InstallOption.ALOTUpdate].IsOn,

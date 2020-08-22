@@ -417,13 +417,7 @@ namespace ALOTInstallerCore.Helpers
                                         if (md5 != mf.UnpackedFileMD5)
                                             continue; //This is not correct unpacked file
                                     }
-
-                                    mfToUnpackedMap[mf] = uf;
-                                    break;
-                                }
-                                else
-                                {
-                                    // It's probably the right file... The chance of same sized files this big is probably pretty rare, right?
+                                    // It's the right file, or is probably the right file... The chance of same sized files this big is probably pretty rare, right?
                                     mfToUnpackedMap[mf] = uf;
                                     break;
                                 }

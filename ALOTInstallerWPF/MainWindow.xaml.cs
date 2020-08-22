@@ -120,6 +120,7 @@ namespace ALOTInstallerWPF
         public void CloseInstallerUI()
         {
             InstallingOverlayFlyout.IsOpen = false;
+            FileSelectionUIController.FSUIC.IsStaging = false;
             CommonUtil.Run(() =>
             {
                 InstallingOverlayFlyout.Content = null; //Remove this so it doesn't keep running. GC will remove it

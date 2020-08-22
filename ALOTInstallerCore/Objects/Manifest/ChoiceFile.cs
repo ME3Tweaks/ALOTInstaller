@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ALOTInstallerCore.Objects.Manifest
 {
-    public class ChoiceFile : ConfigurableModInterface
+    public class ChoiceFile : IConfigurableMod
     {
         //Interface
         public string ChoiceTitle { get; set; }

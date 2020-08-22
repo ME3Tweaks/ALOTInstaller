@@ -108,23 +108,33 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
         }
 
         /// <summary>
-        /// Gets path to executable for the specified Game Target
+        /// Gets path to executable for the specified game and it's root path
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        public static string ExecutablePath(GameTarget game)
+        public static string ExecutablePath(Enums.MEGame game, string rootPath)
         {
-            switch (game.Game)
+            switch (game)
             {
                 case Enums.MEGame.ME1:
-                    return ME1Directory.ExecutablePath(game.TargetPath);
+                    return ME1Directory.ExecutablePath(rootPath);
                 case Enums.MEGame.ME2:
-                    return ME2Directory.ExecutablePath(game.TargetPath);
+                    return ME2Directory.ExecutablePath(rootPath);
                 case Enums.MEGame.ME3:
-                    return ME3Directory.ExecutablePath(game.TargetPath);
+                    return ME3Directory.ExecutablePath(rootPath);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(game), game, null);
             }
+        }
+
+        /// <summary>
+        /// Gets path to executable for the specified Game Target
+        /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static string ExecutablePath(GameTarget target)
+        {
+            return ExecutablePath(target.Game, target.TargetPath);
         }
 
         /// <summary>

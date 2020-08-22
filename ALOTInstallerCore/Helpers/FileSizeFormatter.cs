@@ -20,5 +20,18 @@ namespace ALOTInstallerCore.Helpers
 
             return $"{number:n1}{suffixes[counter]}";
         }
+
+        public static string FormatSize(UInt64 bytes)
+        {
+            int counter = 0;
+            decimal number = (decimal)bytes;
+            while (Math.Round(number / 1024) >= 1)
+            {
+                number = number / 1024;
+                counter++;
+            }
+
+            return $"{number:n1}{suffixes[counter]}";
+        }
     }
 }

@@ -31,7 +31,7 @@ namespace ALOTInstallerCore.Steps
                 requiredDiskSpace += (long)(new FileInfo(archiveF).Length * 1.4); //Assume there is 40% compression 
             }
 
-            if (!package.RepackGameFiles)
+            if (!package.CompressPackages)
             {
                 // Game files will be unpacked.
                 requiredDiskSpace += (long)(Utilities.GetSizeOfDirectory(new DirectoryInfo(package.InstallTarget.TargetPath), new[] { ".pcc", ".upk", ".sfm", ".u" }) * .4);
@@ -175,7 +175,7 @@ namespace ALOTInstallerCore.Steps
             if (shouldCheck)
             {
                 var meuitmFile = package.FilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.MEUITMVER > 0);
-                if (meuitmFile != null)
+                if (meuitmFile == null)
                 {
                     var result = missingRecommandedItemsDialogCallback?.Invoke("MEUITM not available for installation",
                         $"Mass Effect Updated and Improved Textures Mod (MEUITM) is highly recommended when installing ALOT for ME1, as it provides a very large amount of the textures that improve the look of Mass Effect. Without MEUITM, the game will look significantly worse. This file should be imported into the library before installing textures.",

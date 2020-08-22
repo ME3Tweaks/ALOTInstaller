@@ -317,7 +317,9 @@
                            choicetitle="Vibrant" />
                </choicefile>
                <choicefile
-                    choicetitle="FemShep Style">
+                    choicetitle="FemShep Style"
+                    defaultchoiceindex="0"
+                    allownoinstall="true">
                           <packagefile
                            me1="true"
                            sourcename="MEUITM\mods\FemShep.mem"

@@ -285,6 +285,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                     string dlcFolderpath = MEDirectories.DLCPath(targetToBackup) + '\\';
                     int dlcSubStringLen = dlcFolderpath.Length;
+                    var officialDLCNames = MEDirectories.OfficialDLCNames(targetToBackup.Game);
 
                     bool aboutToCopyCallback(string file)
                     {
@@ -299,8 +300,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                                 if (dlcFolderNameEndPos > 0)
                                 {
                                     dlcname = dlcname.Substring(0, dlcFolderNameEndPos);
-                                    if (MEDirectories.OfficialDLCNames(targetToBackup.Game)
-                                        .TryGetValue(dlcname, out var hrName))
+                                    if (officialDLCNames.TryGetValue(dlcname, out var hrName))
                                     {
                                         UpdateStatusCallback?.Invoke($"Backing up {hrName}");
                                     }
@@ -342,6 +342,40 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         return true;
                     }
 
+                    void bigFileProgressCallback(string fileBeingCopied, long dataCopied, long totalDataToCopy)
+                    {
+                        if (fileBeingCopied.StartsWith(dlcFolderpath, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            //It's a DLC!
+                            string dlcname = fileBeingCopied.Substring(dlcSubStringLen);
+                            int index = dlcname.IndexOf('\\');
+                            try
+                            {
+                                string prefix = "Backing up ";
+                                dlcname = dlcname.Substring(0, index);
+                                if (officialDLCNames.TryGetValue(dlcname, out var hrName))
+                                {
+                                    prefix += hrName;
+                                }
+                                else
+                                {
+                                    prefix += dlcname;
+                                }
+
+                                UpdateStatusCallback?.Invoke($"{prefix} {(int)(dataCopied * 100d / totalDataToCopy)}%");
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                        else
+                        {
+                            UpdateStatusCallback?.Invoke($"Backing up {Path.GetFileName(fileBeingCopied)} {(int)(dataCopied * 100d / totalDataToCopy)}%");
+                        }
+                    }
+
+
                     void totalFilesToCopyCallback(int total)
                     {
                         ProgressValue = 0;
@@ -356,7 +390,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         totalItemsToCopyCallback: totalFilesToCopyCallback,
                         aboutToCopyCallback: aboutToCopyCallback,
                         fileCopiedCallback: fileCopiedCallback,
-                        ignoredExtensions: new[] { @"*.pdf", @"*.mp3", @"*.wav" });
+                        ignoredExtensions: new[] { @"*.pdf", @"*.mp3", @"*.wav" },
+                        bigFileProgressCallback: bigFileProgressCallback);
                     #endregion
                 }
 
@@ -565,7 +600,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                             }
 
-                            Analytics.TrackEvent(@"Chose to restore game to custom location", new Dictionary<string, string>() { { @"Game", Game.ToString() } });
+                            Analytics.TrackEvent?.Invoke(@"Chose to restore game to custom location", new Dictionary<string, string>() { { @"Game", Game.ToString() } });
 
                         }
                         else
@@ -633,8 +668,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                     string dlcFolderpath = MEDirectories.DLCPath(backupPath, Game) + '\\'; //\ at end makes sure we are restoring a subdir
                     int dlcSubStringLen = dlcFolderpath.Length;
-                    Debug.WriteLine(@"DLC Folder: " + dlcFolderpath);
-                    Debug.Write(@"DLC Fodler path len:" + dlcFolderpath);
+                    //Debug.WriteLine(@"DLC Folder: " + dlcFolderpath);
+                    //Debug.Write(@"DLC Folder path len:" + dlcFolderpath);
+
+                    // Cached stuff to avoid hitting same codepath thousands of times
+                    var officialDLCNames = MEDirectories.OfficialDLCNames(Game);
 
                     bool aboutToCopyCallback(string fileBeingCopied)
                     {
@@ -648,7 +686,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             try
                             {
                                 dlcname = dlcname.Substring(0, index);
-                                if (MEDirectories.OfficialDLCNames(Game).TryGetValue(dlcname, out var hrName))
+                                if (officialDLCNames.TryGetValue(dlcname, out var hrName))
                                 {
                                     UpdateStatusCallback?.Invoke($"Restoring {hrName}");
                                 }
@@ -694,6 +732,39 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         ProgressMax = total;
                     }
 
+                    void bigFileProgressCallback(string fileBeingCopied, long dataCopied, long totalDataToCopy)
+                    {
+                        if (fileBeingCopied.StartsWith(dlcFolderpath, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            //It's a DLC!
+                            string dlcname = fileBeingCopied.Substring(dlcSubStringLen);
+                            int index = dlcname.IndexOf('\\');
+                            try
+                            {
+                                string prefix = "Restoring ";
+                                dlcname = dlcname.Substring(0, index);
+                                if (officialDLCNames.TryGetValue(dlcname, out var hrName))
+                                {
+                                    prefix += hrName;
+                                }
+                                else
+                                {
+                                    prefix += dlcname;
+                                }
+
+                                UpdateStatusCallback?.Invoke($"{prefix} {(int)(dataCopied * 100d / totalDataToCopy)}%");
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                        else
+                        {
+                            UpdateStatusCallback?.Invoke($"Restoring {Path.GetFileName(fileBeingCopied)} {(int)(dataCopied * 100d / totalDataToCopy)}%");
+                        }
+                    }
+
                     #endregion
 
                     UpdateStatusCallback?.Invoke("Restoring game");
@@ -702,7 +773,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         totalItemsToCopyCallback: totalFilesToCopyCallback,
                         aboutToCopyCallback: aboutToCopyCallback,
                         fileCopiedCallback: fileCopiedCallback,
-                        ignoredExtensions: new[] { @"*.pdf", @"*.mp3" });
+                        ignoredExtensions: new[] { @"*.pdf", @"*.mp3" },
+                        bigFileProgressCallback: bigFileProgressCallback);
                     Log.Information(@"Restore of game data has completed");
 
                     //Check for cmmvanilla file and remove it present

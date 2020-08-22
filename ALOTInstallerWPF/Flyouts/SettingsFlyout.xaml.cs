@@ -25,6 +25,8 @@ using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Serilog;
+using Path = System.IO.Path;
 
 namespace ALOTInstallerWPF.Flyouts
 {
@@ -39,6 +41,8 @@ namespace ALOTInstallerWPF.Flyouts
         public string ME1TextureInstallInfo { get; private set; }
         public string ME2TextureInstallInfo { get; private set; }
         public string ME3TextureInstallInfo { get; private set; }
+        public bool ShowGameMissingText { get; set; }
+
 
         public SettingsFlyout()
         {
@@ -54,6 +58,8 @@ namespace ALOTInstallerWPF.Flyouts
         public RelayCommand CheckGameIsVanillaCommand { get; set; }
         public RelayCommand BackupRestoreCommand { get; set; }
         public GenericCommand OpenALOTDiscordCommand { get; set; }
+        public GenericCommand CleanupLibraryCommand { get; set; }
+        public GenericCommand CleanupBuildLocationCommand { get; set; }
         private void LoadCommands()
         {
             SetLibraryLocationCommand = new GenericCommand(ChangeLibraryLocation);
@@ -62,6 +68,62 @@ namespace ALOTInstallerWPF.Flyouts
             BackupRestoreCommand = new RelayCommand(PerformBackupRestore, CanBackupRestore);
             CheckGameIsVanillaCommand = new RelayCommand(CheckVanilla, CanCheckVanilla);
             OpenALOTDiscordCommand = new GenericCommand(OpenAlotDiscord);
+            CleanupLibraryCommand = new GenericCommand(CleanupLibrary);
+            CleanupBuildLocationCommand = new GenericCommand(CleanupBuildLocation);
+        }
+
+        private void CleanupBuildLocation()
+        {
+            throw new NotImplementedException();
+        }
+
+        private async void CleanupLibrary()
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                var unusedFilesInLib = TextureLibrary.GetUnusedFilesInLibrary();
+                if (unusedFilesInLib.Any())
+                {
+                    string message = "The following files located in the texture library are no longer used, or were moved into the texture library manually (and are not used), and can be safely deleted:\n";
+                    List<string> sizedItems = new List<string>();
+                    foreach (var v in unusedFilesInLib)
+                    {
+                        sizedItems.Add($"{v} ({FileSizeFormatter.FormatSize(new FileInfo(Path.Combine(Settings.TextureLibraryLocation, v)).Length)})");
+                    }
+
+                    var result = await mw.ShowScrollMessageAsync("Irrelevant files found in texture library", message, "Delete these files?",
+                        sizedItems, MessageDialogStyle.AffirmativeAndNegative,
+                        new MetroDialogSettings()
+                        {
+                            AffirmativeButtonText = "Delete unused files",
+                            NegativeButtonText = "Keep unused files",
+                            DefaultButtonFocus = MessageDialogResult.Affirmative
+                        });
+                    if (result == MessageDialogResult.Affirmative)
+                    {
+                        // Delete em'
+                        foreach (var v in unusedFilesInLib)
+                        {
+                            var fullPath = Path.Combine(Settings.TextureLibraryLocation, v);
+                            Log.Information($"Deleting unused file in texture library: {fullPath}");
+                            try
+                            {
+                                File.Delete(fullPath);
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error($"Error deleting file: {e.Message}");
+                            }
+                        }
+
+                        // Todo: Show status?
+                    }
+                }
+                else
+                {
+                    await mw.ShowMessageAsync("Texture Library is clean", "No unused files were found in the texture library.");
+                }
+            }
         }
 
         private async void OpenAlotDiscord()
@@ -443,55 +505,50 @@ namespace ALOTInstallerWPF.Flyouts
                 }
                 else
                 {
-                    if (Locations.GetTarget(gbs.Game) != null)
-                    {
-                        // Can restore
-
-
-                        performRestore(gbs.Game, mw);
-
-                    }
+                    performRestore(gbs.Game, Locations.GetTarget(gbs.Game) != null, mw);
                 }
             }
         }
 
-        private async void performRestore(Enums.MEGame game, MainWindow mw)
+        private async void performRestore(Enums.MEGame game, bool hasTarget, MainWindow mw)
         {
-            var result = await mw.ShowMessageAsync("Select restore type",
-                $"Restore over the existing copy of {game.ToGameName()}, or make a new copy of the game using your backup?",
-                MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary,
-                new MetroDialogSettings()
-                {
-                    AffirmativeButtonText = "Restore existing game",
-                    NegativeButtonText = "Make a copy",
-                    FirstAuxiliaryButtonText = "Cancel",
-                    DefaultButtonFocus = MessageDialogResult.Affirmative
-                });
-
-            if (result == MessageDialogResult.FirstAuxiliary) return; //Cancel
-
             string destinationPath = Locations.GetTarget(game)?.TargetPath;
 
-            if (result == MessageDialogResult.FirstAuxiliary)
+            if (hasTarget)
             {
-                //    var overwriteExistingGameConf = await mw.ShowMessageAsync($"Warning: Restoring {game.ToGameName()}",
-                //        $"Restoring from backup will completely delete your game installation (your save files will remain intact), copy your backup into its place, and reset your texture settings to the defaults.\n\nGame path: {Locations.GetTarget(game).TargetPath}",
-                //        MessageDialogStyle.AffirmativeAndNegative,
-                //        new MetroDialogSettings()
-                //        {
-                //            AffirmativeButtonText = "Restore game",
-                //            NegativeButtonText = "Don't restore game",
-                //            DefaultButtonFocus = MessageDialogResult.Affirmative
-                //        });
-                //    if (overwriteExistingGameConf == MessageDialogResult.Negative)
-                //        return;
-                //}
-                //else
-                //{
-                destinationPath = null; //Force backend to prompt
+                var result = await mw.ShowMessageAsync("Select restore type",
+                    $"Restore over the existing copy of {game.ToGameName()}, or make a new copy of the game using your backup?",
+                    MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary,
+                    new MetroDialogSettings()
+                    {
+                        AffirmativeButtonText = "Restore existing game",
+                        NegativeButtonText = "Make a copy",
+                        FirstAuxiliaryButtonText = "Cancel",
+                        DefaultButtonFocus = MessageDialogResult.Affirmative
+                    });
+
+                if (result == MessageDialogResult.FirstAuxiliary) return; //Cancel
+
+
+                if (result == MessageDialogResult.FirstAuxiliary)
+                {
+                    //    var overwriteExistingGameConf = await mw.ShowMessageAsync($"Warning: Restoring {game.ToGameName()}",
+                    //        $"Restoring from backup will completely delete your game installation (your save files will remain intact), copy your backup into its place, and reset your texture settings to the defaults.\n\nGame path: {Locations.GetTarget(game).TargetPath}",
+                    //        MessageDialogStyle.AffirmativeAndNegative,
+                    //        new MetroDialogSettings()
+                    //        {
+                    //            AffirmativeButtonText = "Restore game",
+                    //            NegativeButtonText = "Don't restore game",
+                    //            DefaultButtonFocus = MessageDialogResult.Affirmative
+                    //        });
+                    //    if (overwriteExistingGameConf == MessageDialogResult.Negative)
+                    //        return;
+                    //}
+                    //else
+                    //{
+                    destinationPath = null; //Force backend to prompt
+                }
             }
-
-
 
             // Perform the restore
             var pd = await mw.ShowProgressAsync($"Restoring {game.ToGameName()}",
@@ -602,8 +659,14 @@ namespace ALOTInstallerWPF.Flyouts
 
         public void UpdateGameStatuses()
         {
+            bool anyMissingInstall = false;
             var me1Target = Locations.ME1Target;
-            if (me1Target?.GetInstalledALOTInfo() == null)
+            if (me1Target == null)
+            {
+                ME1TextureInstallInfo = "ME1: Not installed";
+                anyMissingInstall = true;
+            }
+            else if (me1Target.GetInstalledALOTInfo() == null)
             {
                 ME1TextureInstallInfo = "ME1: No textures installed";
             }
@@ -613,7 +676,12 @@ namespace ALOTInstallerWPF.Flyouts
             }
 
             var me2Target = Locations.ME2Target;
-            if (me2Target?.GetInstalledALOTInfo() == null)
+            if (me2Target == null)
+            {
+                ME2TextureInstallInfo = "ME2: Not installed";
+                anyMissingInstall = true;
+            }
+            else if (me2Target.GetInstalledALOTInfo() == null)
             {
                 ME2TextureInstallInfo = "ME2: No textures installed";
             }
@@ -623,7 +691,12 @@ namespace ALOTInstallerWPF.Flyouts
             }
 
             var me3Target = Locations.ME3Target;
-            if (me3Target?.GetInstalledALOTInfo() == null)
+            if (me3Target == null)
+            {
+                ME3TextureInstallInfo = "ME3: Not installed";
+                anyMissingInstall = true;
+            }
+            else if (me3Target.GetInstalledALOTInfo() == null)
             {
                 ME3TextureInstallInfo = "ME3: No textures installed";
             }
@@ -635,6 +708,8 @@ namespace ALOTInstallerWPF.Flyouts
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ME1Available)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ME2Available)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ME3Available)));
+            ShowGameMissingText = anyMissingInstall;
+
         }
 
         private async void BetaMode_Toggled(object sender, RoutedEventArgs e)
