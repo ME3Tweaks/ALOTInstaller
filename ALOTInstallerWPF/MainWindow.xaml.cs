@@ -114,6 +114,7 @@ namespace ALOTInstallerWPF
             InstallingOverlayFlyout.Content = controller;
             InstallingOverlayFlyout.Background = background;
             InstallingOverlayFlyout.IsOpen = true;
+            controller.StartInstall();
         }
 
         public void CloseInstallerUI()

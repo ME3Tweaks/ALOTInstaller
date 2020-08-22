@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Linq;
 using ALOTInstallerConsole.InstallerUI;
 using ALOTInstallerConsole.UserControls;
-using ALOTInstallerCore.Builder;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;

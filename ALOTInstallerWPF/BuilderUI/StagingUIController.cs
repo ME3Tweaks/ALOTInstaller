@@ -6,11 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using AlotAddOnGUI;
-using ALOTInstallerCore.Builder;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
+using ALOTInstallerWPF.InstallerUI;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Serilog;
@@ -39,6 +39,8 @@ namespace ALOTInstallerWPF.BuilderUI
                     fsuic.ProgressValue = done;
                 },
                 ResolveMutualExclusiveMods = resolveMutualExclusiveMod,
+                FinalizedFileSet = finalizedFileSet,
+                NotifyFileBeingProcessed = notifyNewFileProcessing,
                 ErrorStagingCallback = errorStaging,
                 ConfigureModOptions = configureModOptions,
             };
@@ -46,21 +48,47 @@ namespace ALOTInstallerWPF.BuilderUI
             builderWorker.DoWork += ss.PerformStaging;
             builderWorker.RunWorkerCompleted += async (a, b) =>
             {
-                if (b.Error == null)
-                {
-                    performPreinstallCheck();
-                }
-                else
+                if (b.Error != null)
                 {
                     if (Application.Current.MainWindow is MainWindow mw)
                     {
-                        await mw.ShowMessageAsync("Error occured while building textures",
-                            $"Error occured while building textures: {b.Error.Message}");
+                        await mw.ShowMessageAsync("Error occurred while building textures",
+                            $"Error occurred while building textures: {b.Error.Message}");
+                    }
+                }
+                else if (b.Result is bool staged)
+                {
+
+                    if (staged)
+                    {
+                        // Install is ready to go
+                        performPreinstallCheck();
+                    }
+                    else
+                    {
+                        // Installation was aborted.
+                        fsuic.IsStaging = false;
                     }
                 }
             };
             fsuic.ProgressIndeterminate = true;
             builderWorker.RunWorkerAsync();
+        }
+
+        private void notifyNewFileProcessing(InstallerFile fileProcessing)
+        {
+            Application.Current.Invoke(() =>
+            {
+                fsuic.InstallerFilesListBox.ScrollIntoView(fileProcessing);
+            });
+        }
+
+        private void finalizedFileSet(List<InstallerFile> filesBeingInstalled)
+        {
+            Application.Current.Invoke(() =>
+            {
+                fsuic.CurrentModeFiles.ReplaceAll(filesBeingInstalled);
+            });
         }
 
 
@@ -140,6 +168,13 @@ namespace ALOTInstallerWPF.BuilderUI
                         {
                             // BEGIN INSTALLATION!
                             // Todo: This stuff
+                            var iuic = new InstallerUIController()
+                            {
+                                InstallerTextTop = "Preparing texture installer",
+                                InstallOptions = iop
+                            };
+                            mw.OpenInstallerUI(iuic, InstallerUIController.GetInstallerBackgroundImage(iop.InstallTarget.Game, iop.InstallerMode));
+                            fsuic.IsStaging = false;
                         }
                     }
                 };
@@ -150,10 +185,11 @@ namespace ALOTInstallerWPF.BuilderUI
         private InstallerFile resolveMutualExclusiveMod(List<InstallerFile> arg)
         {
             InstallerFile option = null;
-            if (Application.Current.MainWindow is MainWindow mw)
+            object syncObj = new object();
+            Application.Current.Dispatcher.Invoke(async () =>
             {
-                object syncObj = new object();
-                Application.Current.Invoke(async () =>
+
+                if (Application.Current.MainWindow is MainWindow mw)
                 {
                     var options = arg.Select(x => x.FriendlyName).ToList();
                     options.Add("Abort install");
@@ -163,8 +199,9 @@ namespace ALOTInstallerWPF.BuilderUI
                         {
                             AffirmativeButtonText = options[0],
                             NegativeButtonText = options[1],
-                            FirstAuxiliaryButtonText = options[2]
-                        });
+                            FirstAuxiliaryButtonText = options[2],
+                            DefaultButtonFocus = MessageDialogResult.Affirmative
+                        }, 75);
 
                     if (chosenOption == MessageDialogResult.Affirmative) option = arg[0];
                     if (chosenOption == MessageDialogResult.Negative) option = arg[1];
@@ -172,13 +209,13 @@ namespace ALOTInstallerWPF.BuilderUI
                     {
                         Monitor.Pulse(syncObj);
                     }
-                });
-                lock (syncObj)
-                {
-                    Monitor.Wait(syncObj);
-                }
-            }
 
+                }
+            });
+            lock (syncObj)
+            {
+                Monitor.Wait(syncObj);
+            }
             return option;
         }
     }

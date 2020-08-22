@@ -13,7 +13,7 @@ using ALOTInstallerCore.Objects.Manifest;
 using Serilog;
 using static ALOTInstallerCore.Objects.Enums;
 
-namespace ALOTInstallerCore.Builder
+namespace ALOTInstallerCore.Steps
 {
     // Extraction + Staging <<
     // Building
@@ -60,7 +60,14 @@ namespace ALOTInstallerCore.Builder
         /// Return false to abort staging.
         /// </summary>
         public Func<ManifestFile, List<ConfigurableModInterface>, bool> ConfigureModOptions { get; set; }
-
+        /// <summary>
+        /// Invoked when the list of files to stage has been calculated
+        /// </summary>
+        public Action<List<InstallerFile>> FinalizedFileSet { get; set; }
+        /// <summary>
+        /// Invoked when a new file is being processed. This can be used for things like ensuring something is in view in the UI
+        /// </summary>
+        public Action<InstallerFile> NotifyFileBeingProcessed { get; set; }
         /// <summary>
         /// Extracts an archive file (7z/zip/rar). Returns if a file was extracted or not.
         /// </summary>
@@ -104,6 +111,8 @@ namespace ALOTInstallerCore.Builder
                     // Extract archive
                     int exitcode = -1;
                     UpdateStatusCallback($"Extracting {instFile.FriendlyName}");
+                    instFile.StatusText = "Extracting archive";
+
                     MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{filepath}\" --output \"{substagingDir}\" --ipc",
                         null,
                         handleIPC,
@@ -131,8 +140,15 @@ namespace ALOTInstallerCore.Builder
             }
             installOptions.FilesToInstall = getFilesToStage(installOptions.FilesToInstall.Where(x => x.Ready && (x.ApplicableGames & installOptions.InstallTarget.Game.ToApplicableGame()) != 0));
             installOptions.FilesToInstall = resolveMutualExclusiveGroups();
+            if (installOptions.FilesToInstall == null)
+            {
+                e.Result = false;
+                return;
+            }
+
             if (!promptModConfiguration())
             {
+                e.Result = false;
                 return; //abort.
             }
             //DEBUG ONLY
@@ -144,8 +160,11 @@ namespace ALOTInstallerCore.Builder
             {
                 // Abort!
                 Log.Information("A mutual group conflict was not resolved. Staging aborted by user");
+                e.Result = false;
                 return;
             }
+
+            FinalizedFileSet?.Invoke(installOptions.FilesToInstall);
 
             Log.Information(@"The following files will be staged for installation:");
             int buildID = 0;
@@ -186,6 +205,7 @@ namespace ALOTInstallerCore.Builder
             foreach (var installerFile in installOptions.FilesToInstall)
             {
                 if (abortStaging) break;
+                NotifyFileBeingProcessed?.Invoke(installerFile);
                 installerFile.IsProcessing = true;
                 installerFile.IsWaiting = false;
                 bool stage = true; // If file doesn't need processing this is not necessary
@@ -404,6 +424,7 @@ namespace ALOTInstallerCore.Builder
             if (abortStaging)
             {
                 // Error callback goes here
+                e.Result = false;
                 return;
             }
 
@@ -412,6 +433,8 @@ namespace ALOTInstallerCore.Builder
                 // Addon needs built
                 BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{AddonID:D3}_ALOTAddon.mem"), installOptions.InstallTarget.Game);
             }
+
+            e.Result = true;
         }
 
         private bool promptModConfiguration()
@@ -728,8 +751,12 @@ namespace ALOTInstallerCore.Builder
                             file.StatusText = $"Decompiling {Path.GetFileName(sourceFile)} {param}%";
                         }
                         break;
-                    case "FILENAME":
+                    case "PROCESSING_FILE":
                         // Unpacking file
+                        if (file != null)
+                        {
+                            file.StatusText = $"Decompiling {param} %";
+                        }
                         break;
                     default:
                         Debug.WriteLine($"Unhandled IPC: {command} {param}");

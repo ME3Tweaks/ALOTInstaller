@@ -12,7 +12,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using ALOTInstallerCore.Builder;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
