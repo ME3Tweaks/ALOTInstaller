@@ -80,7 +80,7 @@
 
         <ProgressBar DockPanel.Dock="Top" Value="{Binding ProgressValue}" Maximum="{Binding ProgressMax}" IsIndeterminate="{Binding ProgressIndeterminate}"/>
         <!--<ProgressBar alotaddonguiui:ProgressBarSmooth.SmoothValue="{Binding ProgressBarValue}" Value="{Binding Path=ProgressBarValue, Mode=OneWay}" Minimum="0" Maximum="{Binding Progressbar_Max}" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true" />-->
-        <DockPanel DockPanel.Dock="Bottom">
+        <DockPanel DockPanel.Dock="Bottom" Visibility="{Binding IsStaging, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}">
             <Separator DockPanel.Dock="Top"/>
             <Button Content="Settings" ToolTip="Opens the settings and status panel" DockPanel.Dock="Left" Padding="10,2" 
                     Command="{Binding OpenSettingsCommand}"
@@ -107,7 +107,7 @@
 
                         <StackPanel Orientation="Vertical" DockPanel.Dock="Left" Margin="0,3">
                             <StackPanel Orientation="Horizontal">
-                                <iconPacks:PackIconIonicons Height="19" Margin="0,0,3,0" Kind="{Binding Self, Converter={StaticResource ReadyIconConverter}}" 
+                                <iconPacks:PackIconIonicons Height="19" Margin="0,0,3,0" Spin="{Binding IsProcessing}" SpinDuration="6" Kind="{Binding Self, Converter={StaticResource ReadyIconConverter}}" 
                                                             Foreground="{Binding Self, Converter={StaticResource ReadyColorConverter}}" />
                                 <TextBlock Text="{Binding FriendlyName}" 
                                            FontWeight="Bold" FontSize="14" VerticalAlignment="Center" />

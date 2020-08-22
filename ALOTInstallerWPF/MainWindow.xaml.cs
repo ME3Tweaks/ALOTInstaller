@@ -15,6 +15,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Flyouts;
+using ALOTInstallerWPF.Helpers;
+using ALOTInstallerWPF.InstallerUI;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
 using Octokit;
@@ -84,6 +86,43 @@ namespace ALOTInstallerWPF
         public void CloseFlyout2()
         {
             BottomBasicDialog2.IsOpen = false;
+        }
+
+        private void InstallingOverlayFlyout_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            //Allow installing UI overlay to be window drag
+            if (e.ChangedButton == MouseButton.Left)
+                this.DragMove();
+        }
+
+        private void InstallingOverlayoutFlyout_DoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // Double click changes maximize status
+            if (this.WindowState == System.Windows.WindowState.Normal)
+            {
+                this.WindowState = System.Windows.WindowState.Maximized;
+            }
+            else
+            {
+                this.WindowState = System.Windows.WindowState.Normal;
+            }
+        }
+
+        public void OpenInstallerUI(InstallerUIController controller, ImageBrush background)
+        {
+            InstallingOverlayFlyout.Content = null; //Lose the old reference
+            InstallingOverlayFlyout.Content = controller;
+            InstallingOverlayFlyout.Background = background;
+            InstallingOverlayFlyout.IsOpen = true;
+        }
+
+        public void CloseInstallerUI()
+        {
+            InstallingOverlayFlyout.IsOpen = false;
+            CommonUtil.Run(() =>
+            {
+                InstallingOverlayFlyout.Content = null; //Remove this so it doesn't keep running. GC will remove it
+            }, TimeSpan.FromSeconds(3));
         }
     }
 }

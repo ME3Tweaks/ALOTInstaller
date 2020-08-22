@@ -19,17 +19,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\alot_me1_bg.jpg" />
+    <None Remove="Images\alot_me1_bg_alt.jpg" />
+    <None Remove="Images\alot_me2_bg.jpg" />
+    <None Remove="Images\alot_me2_bg_alt.jpg" />
+    <None Remove="Images\alot_me3_bg.jpg" />
+    <None Remove="Images\alot_me3_bg_alt.jpg" />
     <None Remove="Images\logo_me1.png" />
     <None Remove="Images\logo_me2.png" />
     <None Remove="Images\logo_me3.png" />
     <None Remove="Images\logo_mem.png" />
-    <None Remove="Images\me1_bg.jpg" />
-    <None Remove="Images\me1_bg_alt.jpg" />
-    <None Remove="Images\me2_bg.jpg" />
-    <None Remove="Images\me2_bg_alt.jpg" />
-    <None Remove="Images\me3_bg.jpg" />
-    <None Remove="Images\me3_bg_alt.jpg" />
-    <None Remove="Images\meuitm.jpg" />
+    <None Remove="Images\meuitm_me1_bg.jpg" />
     <None Remove="Images\origin\me1update.png" />
     <None Remove="Images\origin\me2update.png" />
   </ItemGroup>
@@ -41,10 +41,6 @@
     <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="InstallerUI\" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -64,13 +60,13 @@
 	  <Resource Include="Images\logo_me2.png" />
 	  <Resource Include="Images\logo_me3.png" />
 	  <Resource Include="Images\logo_mem.png" />
-	  <Resource Include="Images\me1_bg.jpg" />
-	  <Resource Include="Images\me1_bg_alt.jpg" />
-	  <Resource Include="Images\me2_bg.jpg" />
-	  <Resource Include="Images\me2_bg_alt.jpg" />
-	  <Resource Include="Images\me3_bg.jpg" />
-	  <Resource Include="Images\me3_bg_alt.jpg" />
-	  <Resource Include="Images\meuitm.jpg" />
+	  <Resource Include="Images\alot_me1_bg.jpg" />
+	  <Resource Include="Images\alot_me1_bg_alt.jpg" />
+	  <Resource Include="Images\alot_me2_bg.jpg" />
+	  <Resource Include="Images\alot_me2_bg_alt.jpg" />
+	  <Resource Include="Images\alot_me3_bg.jpg" />
+	  <Resource Include="Images\alot_me3_bg_alt.jpg" />
+	  <Resource Include="Images\meuitm_me1_bg.jpg" />
 	  <Resource Include="Images\origin\me1update.png" />
 	  <Resource Include="Images\origin\me2update.png" />
 	</ItemGroup>

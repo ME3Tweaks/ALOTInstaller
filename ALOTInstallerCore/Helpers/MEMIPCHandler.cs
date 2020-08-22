@@ -1,6 +1,9 @@
 ﻿using Serilog;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using ALOTInstallerCore.Objects;
@@ -24,6 +27,37 @@ namespace ALOTInstallerCore.Helpers
     /// </summary>
     public static class MEMIPCHandler
     {
+
+        #region Static Property Changed
+
+        public static event PropertyChangedEventHandler StaticPropertyChanged;
+        public static event PropertyChangedEventHandler StaticBackupStateChanged;
+
+        /// <summary>
+        /// Sets given property and notifies listeners of its change. IGNORES setting the property to same value.
+        /// Should be called in property setters.
+        /// </summary>
+        /// <typeparam name="T">Type of given property.</typeparam>
+        /// <param name="field">Backing field to update.</param>
+        /// <param name="value">New value of property.</param>
+        /// <param name="propertyName">Name of property.</param>
+        /// <returns>True if success, false if backing field and new value aren't compatible.</returns>
+        private static bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+            field = value;
+            StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
+            return true;
+        }
+        #endregion
+
+        private static short _memVersion = -1;
+        public static short MassEffectModderNoGuiVersion
+        {
+            get => _memVersion;
+            set => SetProperty(ref _memVersion, value);
+        }
+
         /// <summary>
         /// Returns the version number for MEM, or 0 if it couldn't be retreived
         /// </summary>
@@ -36,10 +70,10 @@ namespace ALOTInstallerCore.Helpers
             {
                 if (command == "VERSION")
                 {
-                    version = short.Parse(param);
+                    MassEffectModderNoGuiVersion = short.Parse(param);
                 }
             });
-            return version;
+            return MassEffectModderNoGuiVersion;
         }
 
         /// <summary>

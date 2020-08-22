@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.Objects;
@@ -238,7 +239,9 @@ namespace ALOTInstallerCore.ModManager.Services
             return false;
         }
 
-        public static bool ValidateTargetAgainstVanilla(GameTarget target, Action<string> failedValidationCallback, Action<string> statusUpdate = null, Action<long, long> progressUpdate = null, bool md5Check = false)
+        public static bool ValidateTargetAgainstVanilla(GameTarget target, Action<string> failedValidationCallback,
+            Action<string> statusUpdate = null, Action<long, long> progressUpdate = null, bool md5Check = false,
+            CancellationToken cancellationToken = default)
         {
             bool isVanilla = true;
             CaseInsensitiveDictionary<List<(int size, string md5)>> vanillaDB = null;
@@ -265,6 +268,8 @@ namespace ALOTInstallerCore.ModManager.Services
                 int numDone = 0;
                 foreach (string file in allFiles)
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                        break;
                     progressUpdate?.Invoke(numDone, allFiles.Count);
                     numDone++;
                     var shortname = file.Substring(target.TargetPath.Length + 1);

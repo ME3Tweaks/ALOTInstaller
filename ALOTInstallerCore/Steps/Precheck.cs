@@ -201,7 +201,7 @@ namespace ALOTInstallerCore.Steps
 
             var nonReadyRecommendedFiles = applicableManifestFiles.Where(x => !x.Ready).Select(x => x as ManifestFile).ToList();
             // remove option group items if the other item in the optiongroup is available
-            for (int i = nonReadyRecommendedFiles.Count - 1; i > 0; i--)
+            for (int i = nonReadyRecommendedFiles.Count - 1; i >= 0; i--)
             {
                 var nonReadyFile = nonReadyRecommendedFiles[i];
                 if (nonReadyFile is PreinstallMod pm)

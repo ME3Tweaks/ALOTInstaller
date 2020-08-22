@@ -9,6 +9,7 @@
              xmlns:builderUi="clr-namespace:ALOTInstallerWPF.BuilderUI"
              xmlns:services="clr-namespace:ALOTInstallerCore.ModManager.Services;assembly=ALOTInstallerCore"
              xmlns:me3Tweaks="clr-namespace:ALOTInstallerCore.ModManager.ME3Tweaks;assembly=ALOTInstallerCore"
+             xmlns:alotInstallerWpf="clr-namespace:ALOTInstallerWPF"
              mc:Ignorable="d" 
              d:DesignHeight="1450" d:DesignWidth="300">
     <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Visible" ScrollViewer.PanningMode="VerticalFirst" Width="325" HorizontalAlignment="Stretch">
@@ -62,16 +63,23 @@
             </Expander>
             <Expander DockPanel.Dock="Top" IsExpanded="True" Expanded="Expander_Expanded">
                 <Expander.Header>
-                    <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Diagnostics &amp; MEM"/>
+                    <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Troubleshooting &amp; MEM"/>
                 </Expander.Header>
-                <!--<StackPanel>
-                    <Button x:Name="Button_GenerateDiagnostic" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Generate Game Diagnostics" ToolTip="Generates a diagnostic log to help figure out issues with one of the games&#10;The log is automatically uploaded for sharing when the diagnostic completes." Click="Button_GenerateDiagnostics_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
-                    <Button x:Name="Button_UploadLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Upload installer log" ToolTip="Uploads the latest program log to the ALOT Log Viewing Service" Click="Button_UploadLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
-                    <Button x:Name="Button_ReportIssue" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Report issue / ALOT Discord" ToolTip="Go to the ALOT discord" Click="Button_ReportIssue_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
-                    <Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" FontWeight="Bold"  Content="Game utilities" Click="Button_Utilities_Click" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Opens panel with various useful end-user utilities"/>
-                    <Button x:Name="Button_ViewLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="View installer log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>
-                    <Label HorizontalAlignment="Center" Margin="20,0,20,3" Padding="0,3,0,3" FontWeight="Bold" x:Name="Label_MEMVersion" Content="MEM (NoGUI) Version: TBD" FontSize="12" ToolTip="Version of MassEffectModderNoGui this program is using"/>
-                </StackPanel>-->
+                <StackPanel>
+                    <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Installer logs &amp; Game Diagnostics" ToolTip="Generates a diagnostic log to help figure out issues with one of the games&#10;The log is automatically uploaded for sharing when the diagnostic completes." Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>
+                    <!--<Button x:Name="Button_UploadLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="Upload installer log" ToolTip="Uploads the latest program log to the ALOT Log Viewing Service" Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>-->
+                    <Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Command="{Binding OpenALOTDiscordCommand}"  Content="Get Support @ ALOT Discord" ToolTip="Go to the ALOT discord" Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>
+                    <!--<Button Margin="20,0,20,3" FontSize="11" Padding="0,3,0,3" FontWeight="Bold"  Content="Game utilities" Click="Button_Utilities_Click" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Opens panel with various useful end-user utilities"/>-->
+                    <!--<Button x:Name="Button_ViewLog" Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Padding="0,3,0,3" Content="View installer log" ToolTip="View log for this program. Helpful when diagnosing issues" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>-->
+                    <TextBlock Margin="20,0,20,0" Padding="0,3,0,0" FontWeight="Bold" Text="Verify vanilla"/>
+                    <TextBlock Margin="20,0,20,3" Padding="0,3,0,0" TextWrapping="Wrap" Text="Check to see if a game contains no modified files. This won't detect additional files added."/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20,0,20,0">
+                        <Button Content="Mass Effect" Command="{Binding CheckGameIsVanillaCommand}" CommandParameter="ME1" Padding="5,0" Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>
+                        <Button Content="Mass Effect 2" Command="{Binding CheckGameIsVanillaCommand}" CommandParameter="ME2" Margin="5,0" Padding="5,0"  Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>
+                        <Button Content="Mass Effect 3" Command="{Binding CheckGameIsVanillaCommand}" CommandParameter="ME3" Padding="5,0"  Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>
+                    </StackPanel>
+                    <TextBlock TextAlignment="Center" Margin="20,0,20,3" Padding="0,3,0,3" FontWeight="Bold" Text="{Binding Path=(modmanager:MEMIPCHandler.MassEffectModderNoGuiVersion), StringFormat='MassEffectModderNoGui Version: {0}'}" FontSize="12" ToolTip="Version of MassEffectModderNoGui this program is using"/>
+                </StackPanel>
             </Expander>
             <Expander DockPanel.Dock="Top" IsExpanded="True" Expanded="Expander_Expanded">
                 <Expander.Header>
@@ -94,8 +102,8 @@
                         <TextBlock Text="Install package staging" DockPanel.Dock="Top" FontWeight="Bold"/>
                         <TextBlock  TextWrapping="Wrap" Text="Temporary: Where texture files are decompiled and then recompiled into an installable format. Files are deleted after installation finishes" DockPanel.Dock="Top"/>
                         <DockPanel DockPanel.Dock="Bottom" Margin="0,2,0,0">
-                            <Button DockPanel.Dock="Right" Command="{Binding SetLibraryLocationCommand}" Content="Change" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Change where the imported texture files for modes (excluding Free Mode) are stored"/>
-                            <Button  FontSize="11" FontWeight="Bold" Command="{Binding CleanupLibraryCommand}" HorizontalAlignment="Left" Content="Cleanup Package Staging" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Removes old files from the texture library that are no longer in the manifest.&#10;Any files in this folder that you manually added that are not in the manifest will also be deleted."/>
+                            <Button DockPanel.Dock="Right" Command="{Binding SetBuildLocationCommand}" Content="Change" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Change where the imported texture files for modes (excluding Free Mode) are stored"/>
+                            <Button  FontSize="11" FontWeight="Bold" Command="{Binding CleanupBuildLocationCommand}" HorizontalAlignment="Left" Content="Cleanup Package Staging" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Removes old files from the texture library that are no longer in the manifest.&#10;Any files in this folder that you manually added that are not in the manifest will also be deleted."/>
                         </DockPanel>
                         <TextBox Text="{Binding Path=(modmanager:Settings.BuildLocation)}" ToolTip="{Binding Path=(modmanager:Settings.BuildLocation)}" IsReadOnly="True" IsEnabled="False" />
                     </DockPanel>

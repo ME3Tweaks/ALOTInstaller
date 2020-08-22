@@ -17,6 +17,7 @@ using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.Flyouts;
+using ALOTInstallerWPF.InstallerUI;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls.Dialogs;
 using Application = System.Windows.Application;
@@ -104,6 +105,11 @@ namespace ALOTInstallerWPF.BuilderUI
         internal static FileSelectionUIController FSUIC;
 
         public bool IsStaging { get; set; }
+
+        public void OnIsStagingChanged()
+        {
+            DisplayedFilesView.Refresh();
+        }
         public string StagingStatusText { get; set; }
 
         public ModeHeader SelectedHeader { get; set; }
@@ -135,6 +141,7 @@ namespace ALOTInstallerWPF.BuilderUI
         {
             if (obj is InstallerFile ifx)
             {
+                if (IsStaging && !ifx.Ready) return false; // Show only ready files
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME1) && ShowME1Files) return true;
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME2) && ShowME2Files) return true;
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME3) && ShowME3Files) return true;
@@ -179,6 +186,9 @@ namespace ALOTInstallerWPF.BuilderUI
         {
             if (Application.Current.MainWindow is MainWindow mw)
             {
+                //InstallerUIController iuic = new InstallerUIController();
+                //mw.OpenInstallerUI(iuic, InstallerUIController.GetInstallerBackgroundImage(Enums.MEGame.ME1, ManifestHandler.CurrentMode));
+                //return;
                 var buttons = new List<Button>();
                 var targets = Locations.GetAllAvailableTargets();
                 foreach (var game in targets)

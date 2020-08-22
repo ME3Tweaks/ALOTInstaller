@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -46,13 +47,137 @@ namespace ALOTInstallerWPF.Flyouts
             InitializeComponent();
         }
 
+
+        public GenericCommand SetBuildLocationCommand { get; set; }
+        public GenericCommand SetLibraryLocationCommand { get; set; }
+        public RelayCommand LinkUnlinkBackupCommand { get; set; }
+        public RelayCommand CheckGameIsVanillaCommand { get; set; }
+        public RelayCommand BackupRestoreCommand { get; set; }
+        public GenericCommand OpenALOTDiscordCommand { get; set; }
         private void LoadCommands()
         {
+            SetLibraryLocationCommand = new GenericCommand(ChangeLibraryLocation);
+            SetBuildLocationCommand = new GenericCommand(ChangeBuildLocation);
             LinkUnlinkBackupCommand = new RelayCommand(PerformLinkUnlink);
             BackupRestoreCommand = new RelayCommand(PerformBackupRestore, CanBackupRestore);
+            CheckGameIsVanillaCommand = new RelayCommand(CheckVanilla, CanCheckVanilla);
+            OpenALOTDiscordCommand = new GenericCommand(OpenAlotDiscord);
         }
 
-        public RelayCommand LinkUnlinkBackupCommand { get; set; }
+        private async void OpenAlotDiscord()
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                await mw.ShowMessageAsync("Joining ALOT Discord",
+                    "If you're joining the ALOT Discord for assistance, please generate an installer log (if the application is having issues) and/or game diagnostic (if a game is having issues) and include the link to it with your message, as the developers and support community will always ask for one.");
+                Utilities.OpenWebPage(ALOTCommunity.DiscordInviteLink);
+            }
+        }
+
+
+        private async void CheckVanilla(object obj)
+        {
+            if (obj is string gameStr && Enum.TryParse<Enums.MEGame>(gameStr, out var game) && Application.Current.MainWindow is MainWindow mw)
+            {
+                var target = Locations.GetTarget(game);
+                if (target.GetInstalledALOTInfo() != null)
+                {
+                    await mw.ShowMessageAsync("Game is texture modded", "Unable to check the vanilla status of a game that has been texture modded, as all files will have been modified.");
+                    return;
+                }
+                var pd = await mw.ShowProgressAsync($"Verifying {game.ToGameName()}", "Please wait while your game is verified", true);
+                CancellationTokenSource cts = new CancellationTokenSource();
+                pd.Canceled += (sender, args) =>
+                {
+                    cts.Cancel();
+                };
+                List<string> nonVanillaFiles = new List<string>();
+                NamedBackgroundWorker nbw = new NamedBackgroundWorker("VerifyVanillaWorker");
+                nbw.DoWork += (a, b) => // MM CODE
+                    VanillaDatabaseService.ValidateTargetAgainstVanilla(target, f =>
+                        {
+                            nonVanillaFiles.Add(f);
+                        },
+                        su =>
+                        {
+                            Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                pd.SetMessage(su);
+                            });
+                        },
+                        (done, total) =>
+                        {
+                            Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    pd.Maximum = total;
+                                    pd.SetProgress(done);
+                                });
+                        }
+                        , true, cts.Token);
+                nbw.RunWorkerCompleted += async (a, b) =>
+                {
+                    if (pd.IsOpen)
+                    {
+                        await pd.CloseAsync();
+                    }
+                    if (!cts.IsCancellationRequested)
+                    {
+                        if (nonVanillaFiles.Any())
+                        {
+                            await mw.ShowScrollMessageAsync($"{game.ToGameName()} has modifications",
+                                "The following files appear to have been modified:",
+                                "There may be additional files also added to the game that this tool does not check for.",
+                                nonVanillaFiles);
+                        }
+                        else
+                        {
+                            await mw.ShowMessageAsync($"{game.ToGameName()} appears vanilla", "This installation of the game does not appear to have any modified files.");
+                        }
+                    }
+                };
+                nbw.RunWorkerAsync();
+            }
+        }
+
+        private bool CanCheckVanilla(object obj)
+        {
+            if (obj is string gameStr && Enum.TryParse<Enums.MEGame>(gameStr, out var game))
+            {
+                return Locations.GetTarget(game) != null;
+            }
+            return false;
+        }
+
+        private void ChangeBuildLocation()
+        {
+            CommonOpenFileDialog selector = new CommonOpenFileDialog()
+            {
+                Title = "Select location to build textures installation packages",
+                IsFolderPicker = true,
+                InitialDirectory = Settings.BuildLocation
+            };
+            if (selector.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                Settings.BuildLocation = selector.FileName;
+                Settings.Save();
+            }
+        }
+
+        private void ChangeLibraryLocation()
+        {
+            CommonOpenFileDialog selector = new CommonOpenFileDialog()
+            {
+                Title = "Select location to store library",
+                IsFolderPicker = true,
+                InitialDirectory = Settings.TextureLibraryLocation
+            };
+            if (selector.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                Settings.TextureLibraryLocation = selector.FileName;
+                TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetAllManifestFiles().OfType<InstallerFile>().ToList());
+                Settings.Save();
+            }
+        }
 
         private async void PerformLinkUnlink(object obj)
         {
@@ -207,9 +332,9 @@ namespace ALOTInstallerWPF.Flyouts
                     {
                         // Not sure this needs to be on UI thread
                         Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            pd.SetProgress(progressVal * 1f / progressMax);
-                        });
+                {
+                    pd.SetProgress(progressVal * 1f / progressMax);
+                });
                     },
                     SetProgressIndeterminateCallback = (indeterminate) =>
                     {
@@ -464,7 +589,6 @@ namespace ALOTInstallerWPF.Flyouts
             nbw.RunWorkerAsync();
         }
 
-        public RelayCommand BackupRestoreCommand { get; set; }
 
         private void Expander_Expanded(object sender, RoutedEventArgs e)
         {
