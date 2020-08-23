@@ -33,7 +33,7 @@
 
                 <!-- This is what each list item looks like-->
                 <ListView.ItemTemplate>
-                    <DataTemplate DataType="{x:Type manifest:IConfigurableMod}">
+                    <DataTemplate DataType="{x:Type manifest:ConfigurableMod}">
                         <ComboBox
                           Margin="4"
                           x:Name="Combobox_ChoiceFile"

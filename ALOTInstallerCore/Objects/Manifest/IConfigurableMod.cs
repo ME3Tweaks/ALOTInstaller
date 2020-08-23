@@ -19,7 +19,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// <summary>
         /// The list of visible choices to present to the user
         /// </summary>
-        public List<string> ChoicesHuman { get; internal set; }
+        public virtual List<string> ChoicesHuman { get; internal set; }
         /// <summary>
         /// The default index that should be selected when user is prompted. If AllowNoInstall is true, there is an additional not-listed index that is cancel. It is always the last index.
         /// </summary>

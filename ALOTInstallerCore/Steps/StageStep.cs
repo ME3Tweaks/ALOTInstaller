@@ -59,7 +59,7 @@ namespace ALOTInstallerCore.Steps
         /// on the objects, as they will be reset to their defaults before being passed to the UI.
         /// Return false to abort staging.
         /// </summary>
-        public Func<ManifestFile, List<IConfigurableMod>, bool> ConfigureModOptions { get; set; }
+        public Func<ManifestFile, List<ConfigurableMod>, bool> ConfigureModOptions { get; set; }
         /// <summary>
         /// Invoked when the list of files to stage has been calculated
         /// </summary>
@@ -462,7 +462,7 @@ namespace ALOTInstallerCore.Steps
             {
                 var mf = m as ManifestFile;
                 mf.PackageFiles.RemoveAll(x => x.Transient);
-                var configurableOptions = new List<IConfigurableMod>();
+                var configurableOptions = new List<ConfigurableMod>();
                 configurableOptions.AddRange(mf.ChoiceFiles);
                 configurableOptions.AddRange(mf.CopyFiles);
                 configurableOptions.AddRange(mf.ZipFiles);
@@ -603,7 +603,6 @@ namespace ALOTInstallerCore.Steps
                             string stagedPath = Path.Combine(finalDest, $"{mf.BuildID}_{stagedID}_{Path.GetFileName(zip.InArchivePath)}");
                             File.Move(zipfile, stagedPath);
                             zip.StagedPath = stagedPath;
-                            zip.ID = stagedID;
                             stagedID++;
                         }
                     }

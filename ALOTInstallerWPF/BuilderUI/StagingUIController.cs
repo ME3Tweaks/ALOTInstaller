@@ -93,7 +93,7 @@ namespace ALOTInstallerWPF.BuilderUI
         }
 
 
-        private bool configureModOptions(ManifestFile mf, List<IConfigurableMod> optionsToConfigure)
+        private bool configureModOptions(ManifestFile mf, List<ConfigurableMod> optionsToConfigure)
         {
             bool continueStaging = true;
             object syncObj = new object();
