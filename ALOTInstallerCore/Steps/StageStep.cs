@@ -166,7 +166,7 @@ namespace ALOTInstallerCore.Steps
             }
 
             FinalizedFileSet?.Invoke(installOptions.FilesToInstall);
-            if (PointOfNoReturnNotification())
+            if (!PointOfNoReturnNotification())
             {
                 Log.Information("User aborted install at point of no return callback");
                 e.Result = false;

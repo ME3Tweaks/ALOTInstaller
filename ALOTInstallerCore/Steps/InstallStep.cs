@@ -378,10 +378,11 @@ namespace ALOTInstallerCore.Steps
                 //At this point we are now OK, errors will result in warnings only.
                 bool hasWarning = false;
 
-                hasWarning |= applyLODs();
+                hasWarning |= !applyLODs();
                 TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), package.ImportNewlyUnpackedFiles,
                     (file, done, todo) => SetBottomTextCallback?.Invoke($"Optimizing {file} for future installs {(int)(done * 100f / todo)}%"));
 
+                SetBottomTextCallback?.Invoke("Installing binkw32 ASI loader");
 
                 hasWarning |= !package.InstallTarget.InstallBinkBypass();
                 if (package.InstallTarget.Game == Enums.MEGame.ME3)
@@ -415,6 +416,7 @@ namespace ALOTInstallerCore.Steps
 
         private bool checkForExistingMarkers()
         {
+            SetMiddleTextVisibilityCallback?.Invoke(false);
             string args = $"--check-for-markers --gameid {package.InstallTarget.Game.ToGameNum()} --ipc";
             if (Settings.DebugLogs)
             {
@@ -472,11 +474,14 @@ namespace ALOTInstallerCore.Steps
         private void applyCitadelTransitionFix()
         {
 #if WINDOWS
+
+
             // This depends on the ME3Explorer lib, which can't (and may never) work on linux
             //if (package.InstallTarget.Game == Enums.MEGame.ME3)
             //{
-            //    SetBottomTextCallback?.Invoke("Fixing Mars to Citadel transition");
-            //    //InstallWorker?.ReportProgress(0, new ThreadCommand(UPDATE_CURRENTTASK_NAME, CurrentTask));
+                SetMiddleTextVisibilityCallback?.Invoke(false);
+
+                SetBottomTextCallback?.Invoke("Fixing Mars to Citadel transition");
             //    Log.Information("Fixing post-mars hackett cutscene memory issue");
             //    ME3ExplorerMinified.DLL.Startup();
 
@@ -571,6 +576,9 @@ namespace ALOTInstallerCore.Steps
         {
             if (package.InstallTarget.Game >= Enums.MEGame.ME2)
             {
+                SetMiddleTextCallback?.Invoke("Checking mods for known issues");
+                SetMiddleTextVisibilityCallback?.Invoke(true);
+
                 string dlcPath = Path.Combine(package.InstallTarget.TargetPath, "BIOGame", "DLC");
                 package.InstallTarget.PopulateDLCMods(false);
                 var listOfItemsToFix = package.InstallTarget.Game == Enums.MEGame.ME2 ? ManifestHandler.MasterManifest.ME2DLCRequiringTextureExportFixes : ManifestHandler.MasterManifest.ME3DLCRequiringTextureExportFixes;
@@ -602,6 +610,7 @@ namespace ALOTInstallerCore.Steps
 
         private bool installZipCopyFiles()
         {
+            SetBottomTextCallback?.Invoke("Installing additional texture mod components");
             try
             {
                 //things like soft shadows, reshade
@@ -792,7 +801,7 @@ namespace ALOTInstallerCore.Steps
         private bool applyModManagerMods()
         {
             //Apply ALOT-verified Mod Manager mods that we support installing
-            SetMiddleTextVisibilityCallback?.Invoke(false);
+            SetMiddleTextVisibilityCallback?.Invoke(true);
 
             foreach (var modAddon in package.FilesToInstall.OfType<PreinstallMod>())
             {

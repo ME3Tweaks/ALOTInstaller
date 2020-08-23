@@ -72,10 +72,16 @@ namespace ALOTInstallerWPF.Flyouts
             fileSet = files;
             nbw.DoWork += (a, b) =>
             {
-                FileSelectionUIController.ShowME1Files = target.Game == Enums.MEGame.ME1;
-                FileSelectionUIController.ShowME2Files = target.Game == Enums.MEGame.ME2;
-                FileSelectionUIController.ShowME3Files = target.Game == Enums.MEGame.ME3;
-
+                Application.Current.BeginInvoke(() =>
+                {
+                    // Defer to improve performance
+                    using (FileSelectionUIController.FSUIC.DisplayedFilesView.DeferRefresh())
+                    {
+                        FileSelectionUIController.ShowME1Files = target.Game == Enums.MEGame.ME1;
+                        FileSelectionUIController.ShowME2Files = target.Game == Enums.MEGame.ME2;
+                        FileSelectionUIController.ShowME3Files = target.Game == Enums.MEGame.ME3;
+                    }
+                });
                 string prefix = "Existing texture installation info: ";
                 InstallOptionsTopText = prefix + "No textures installed";
                 var ii = target.GetInstalledALOTInfo();

@@ -21,6 +21,7 @@ using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerCore.Steps.Installer;
+using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.IconPacks;
@@ -145,6 +146,8 @@ namespace ALOTInstallerWPF.InstallerUI
 
         private void CloseInstaller()
         {
+           
+
             if (Application.Current.MainWindow is MainWindow mw)
             {
                 mw.CloseInstallerUI();
@@ -251,10 +254,6 @@ namespace ALOTInstallerWPF.InstallerUI
                     InstallerTextMiddle = b.Error.Message;
                     InstallerTextBottom = "Check installer log for more info";
                 }
-
-                //PostInstallUIController bui = new PostInstallUIController();
-                //bui.setInstalledString(installString);
-                //Program.SwapToNewView(bui);
             };
 
             if (!DebugMode)
@@ -293,14 +292,18 @@ namespace ALOTInstallerWPF.InstallerUI
             {
                 BigIconKind = PackIconIoniconsKind.CheckmarkCircleMD;
                 BigIconForeground = Brushes.Green;
-                InstallerTextTop = installString;
+                InstallerTextTop = $"Installed {installString}";
+                InstallerTextBottomVisibility = InstallerTextMiddleVisibility = Visibility.Collapsed;
                 CurrentTip = "Texture installation succeeded. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of ALOT Installer to this game, or you will corrupt it.";
             }
             else if (ir == InstallStep.InstallResult.InstallOKWithWarning)
             {
                 BigIconKind = PackIconIoniconsKind.WarningMD;
                 BigIconForeground = Brushes.Yellow;
-                InstallerTextTop = installString;
+                InstallerTextTop = $"Installed {installString}";
+                InstallerTextMiddle = "Installation completed with warnings";
+                InstallerTextBottomVisibility = Visibility.Collapsed;
+                InstallerTextMiddleVisibility = Visibility.Visible;
                 CurrentTip = "Texture installation succeeded with warnings. Check the installer log for more information on these warnings. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of ALOT Installer to this game, or you will corrupt it.";
             }
             else

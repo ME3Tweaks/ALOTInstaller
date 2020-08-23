@@ -357,7 +357,7 @@ namespace ALOTInstallerCore.Helpers
                                                        .Select(q => new ChoiceFile
                                                        {
                                                            ChoiceTitle = q.Attribute("choicetitle").Value,
-                                                           AllowNoInstall = q.Attribute("allownowinstall")?.Value == "true",
+                                                           AllowNoInstall = q.Attribute("allownoinstall")?.Value == "true",
                                                            DefaultSelectedIndex = TryConvert.ToInt32(q.Attribute("defaultselectedindex")?.Value, 0),
                                                            Choices = q.Elements("packagefile").Select(c => new PackageFile
                                                            {
@@ -377,7 +377,7 @@ namespace ALOTInstallerCore.Helpers
                                                        .Select(q => new ZipFile
                                                        {
                                                            ChoiceTitle = q.Attribute("choicetitle").Value,
-                                                           AllowNoInstall = q.Attribute("allownowinstall")?.Value == "true",
+                                                           AllowNoInstall = q.Attribute("allownoinstall")?.Value == "true",
                                                            DefaultSelectedIndex = TryConvert.ToInt32(q.Attribute("defaultselectedindex")?.Value, 0),
                                                            Optional = TryConvert.ToBool(q.Attribute("optional")?.Value, true),
                                                            InArchivePath = q.Attribute("inarchivepath").Value,

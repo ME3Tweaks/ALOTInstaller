@@ -102,13 +102,12 @@ namespace ALOTInstallerWPF.BuilderUI
                     }
                 }
 
-                lock (syncObj)
-                {
-                    Monitor.Wait(syncObj);
-                }
+                
             });
-
-
+            lock (syncObj)
+            {
+                Monitor.Wait(syncObj);
+            }
             return userAcceptedFinality;
         }
 
@@ -139,10 +138,10 @@ namespace ALOTInstallerWPF.BuilderUI
                 if (Application.Current.MainWindow is MainWindow mw)
                 {
                     var configDialog = new ModConfigurationDialog(mf, ManifestHandler.CurrentMode);
-                    configDialog.closeDialogWithResult = b =>
+                    configDialog.closeDialogWithResult = async b =>
                     {
                         continueStaging = b;
-                        mw.HideMetroDialogAsync(configDialog);
+                        await mw.HideMetroDialogAsync(configDialog);
                         lock (syncObj)
                         {
                             Monitor.Pulse(syncObj);

@@ -12,7 +12,7 @@
     <Grid Name="ContentGrid"/>
     <mah:MetroWindow.Flyouts>
         <mah:FlyoutsControl>
-            <mah:Flyout IsOpen="{Binding SettingsOpen}" Header="Settings" IsPinned="True" Theme="Accent" Position="Left" IsModal="True" CloseButtonVisibility="Visible">
+            <mah:Flyout IsOpen="{Binding SettingsOpen}" Header="Settings" IsPinned="False" Theme="Accent" Position="Left" IsModal="True" CloseButtonVisibility="Visible">
                 <flyouts:SettingsFlyout x:Name="settingsFlyout"/>
             </mah:Flyout>
             <mah:Flyout x:Name="StatusFlyout" TitleVisibility="Hidden" IsAutoCloseEnabled="true" AutoCloseInterval="5000" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom">

@@ -148,6 +148,7 @@ namespace ALOTInstallerWPF.BuilderUI
             FSUIC = this;
             LoadCommands();
             InitializeComponent();
+            
             AvailableModes.AddRange(ManifestHandler.MasterManifest.ManifestModePackageMappping.Select(x => new ModeHeader(x.Key, getModeDirections(x.Key), getModeDescription(x.Key))));
             OnManifestModeChanged(ManifestHandler.CurrentMode);
             ManifestHandler.OnManifestModeChanged = OnManifestModeChanged; //Setup change subscription
@@ -158,6 +159,11 @@ namespace ALOTInstallerWPF.BuilderUI
             manifestFileReadyStateChanged(null); //Trigger progressbar update
 
             // Add filtering
+            DisplayedFilesView.CurrentChanged += (sender, args) =>
+            {
+                Debug.WriteLine("CollectionView refreshing.");
+            };
+
             DisplayedFilesView.Filter = FilterShownFilesByGame;
         }
 
@@ -317,8 +323,12 @@ namespace ALOTInstallerWPF.BuilderUI
             SelectedHeader = AvailableModes.FirstOrDefault(x => x.Mode == newMode); //Change header. This won't retrigger this since mode should already be set
             var currentUserFiles = CurrentModeFiles.Where(x => x is UserFile);
             var newFileSet = ManifestHandler.GetManifestFilesForMode(newMode);
-            CurrentModeFiles.ReplaceAll(newFileSet);
-            CurrentModeFiles.AddRange(currentUserFiles);
+            using (DisplayedFilesView.DeferRefresh())
+            {
+                CurrentModeFiles.ReplaceAll(newFileSet);
+                CurrentModeFiles.AddRange(currentUserFiles);
+            }
+
             TextureLibrary.SetupLibraryWatcher(newFileSet.OfType<ManifestFile>().ToList(), manifestFileReadyStateChanged);
         }
 

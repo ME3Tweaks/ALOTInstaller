@@ -550,16 +550,17 @@
                            choicetitle="Battle hardened" />
                </choicefile>
                <zipfile
-                    recommendationreason="Adds some good-looking lighting effects"
-                    recommendation="Optional"
+                    optional="true"
+                    allownoinstall="true"
+                    defaultselectedindex="0"
                     default="false"
                     inarchivepath="MEUITM\mods\MEUITMReShade.zip"
                     gamedestinationpath="binaries"
                     choicetitle="MEUITM Reshade" />
                <zipfile
-                    recommendationreason="Enhances the shadows"
-                    recommendation="Optional"
-                    default="false"
+                    optional="true"
+                    allownoinstall="true"
+                    defaultselectedindex="0"
                     inarchivepath="MEUITM\mods\SoftShadowsauto.zip"
                     meuitmsoftshadows="true"
                     gamedestinationpath="Engine\Shaders"
@@ -568,6 +569,7 @@
                <copyfile
                     optional="true"
                     allownoinstall="true"
+                    defaultselectedindex="0"
                     inarchivepath="MEUITM\mods\Splash.bmp"
                     gamedestinationpath="BioGame\Splash\Splash.bmp"
                     choicetitle="MEUITM Splash Screen" />
@@ -866,13 +868,15 @@
                </choicefile>
                <zipfile
                     optional="true"
-                    default="false"
+                    allownoinstall="true"
+                    defaultselectedindex="1"
                     inarchivepath="MEUITM\mods\MEUITMReShade.zip"
                     gamedestinationpath="binaries"
                     choicetitle="MEUITM Reshade" />
                <zipfile
                     optional="true"
-                    default="false"
+                    allownoinstall="true"
+                    defaultselectedindex="1"
                     inarchivepath="MEUITM\mods\SoftShadowsauto.zip"
                     meuitmsoftshadows="true"
                     gamedestinationpath="Engine\Shaders"
