@@ -192,12 +192,11 @@ namespace ALOTInstallerWPF.InstallerUI
                     {
                         MusicAvailable = false; // will collapse button.
                     };
-                    var volumeFadeoutAnim = new DoubleAnimation(audioPlayer.Volume, 0, TimeSpan.FromSeconds(4.5));
+                    var volumeFadeoutAnim = new DoubleAnimation(audioPlayer.Volume, 0, TimeSpan.FromSeconds(4));
                     volumeFadeoutAnim.EasingFunction = new QuadraticEase();
                     volumeFadeoutAnim.Completed += (sender, args) =>
                     {
-                        //audioPlayer.Stop();
-                        //audioPlayer.Close();
+                        audioPlayer.Close();
                     };
                     musicButton.BeginAnimation(UIElement.OpacityProperty, musicButtonFadeoutAnim);
                     audioPlayer.BeginAnimation(MediaElement.VolumeProperty, volumeFadeoutAnim);
