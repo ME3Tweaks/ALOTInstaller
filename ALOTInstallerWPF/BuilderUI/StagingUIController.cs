@@ -124,7 +124,8 @@ namespace ALOTInstallerWPF.BuilderUI
         {
             Application.Current.Invoke(() =>
             {
-                fsuic.CurrentModeFiles.ReplaceAll(filesBeingInstalled);
+                fsuic.ShownSpecificFileSet = filesBeingInstalled;
+                fsuic.DisplayedFilesView.Refresh();
             });
         }
 

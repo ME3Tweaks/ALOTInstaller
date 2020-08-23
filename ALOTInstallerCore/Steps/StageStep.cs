@@ -222,7 +222,7 @@ namespace ALOTInstallerCore.Steps
                     mf.StagedName = installerFile.GetUsedFilepath();
                     Directory.CreateDirectory(outputDir);
                     // Extract Archive
-                    var archiveExtractedN = ExtractArchive(installerFile, outputDir);
+                    var archiveExtractedN = installerFile.PackageFiles.Any() ? ExtractArchive(installerFile, outputDir) : false;
                     if (archiveExtractedN == null)
                     {
                         // There was an error
@@ -357,6 +357,11 @@ namespace ALOTInstallerCore.Steps
                     {
                         // Files will be staged
                     }
+                    else if (mf is PreinstallMod pm && !pm.PackageFiles.Any())
+                    {
+                        // Nothing to stage. Will install before textures
+                        stage = false;
+                    }
                     else
                     {
                         Log.Error($"STAGING NOT HANDLED FOR {installerFile.FriendlyName}");
@@ -439,7 +444,14 @@ namespace ALOTInstallerCore.Steps
                 installerFile.IsProcessing = false;
                 if (installerFile is PreinstallMod)
                 {
-                    installerFile.StatusText = "Textures staged, mod component install during install step";
+                    if (installerFile.PackageFiles.Any())
+                    {
+                        installerFile.StatusText = "Textures staged, mod component install during install step";
+                    }
+                    else
+                    {
+                        installerFile.StatusText = "Mod will install during install step";
+                    }
                 }
                 else
                 {
@@ -637,10 +649,11 @@ namespace ALOTInstallerCore.Steps
                     {
                         Log.Warning("Not all package files were marked as processed!");
                     }
-                    installerFile.StatusText = "Cleaning temporary files";
-                    Utilities.DeleteFilesAndFoldersRecursively(sourceDirectory);
-                    installerFile.StatusText = "Staged for building";
                 }
+                installerFile.StatusText = "Cleaning temporary files";
+                Utilities.DeleteFilesAndFoldersRecursively(sourceDirectory);
+                installerFile.StatusText = "Staged for building";
+
             }
         }
 
@@ -849,6 +862,8 @@ namespace ALOTInstallerCore.Steps
                 filesToStage.AddRange(readyFiles.Where(x => x is UserFile));
             }
 
+            // DEBUG ONLY
+            filesToStage = readyFiles.Where(x => x is PreinstallMod).ToList();
 
 
             return filesToStage.OrderBy(x => x.InstallPriority).ToList();

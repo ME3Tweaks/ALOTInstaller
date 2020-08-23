@@ -18,6 +18,7 @@ using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Objects;
+using MahApps.Metro.Controls;
 using Application = System.Windows.Application;
 
 namespace ALOTInstallerWPF.BuilderUI
@@ -127,6 +128,11 @@ namespace ALOTInstallerWPF.BuilderUI
             {
                 ProgressIndeterminate = false;
                 TextureLibrary.SetupLibraryWatcher(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode).OfType<ManifestFile>().ToList(), manifestFileReadyStateChanged);
+                Application.Current.Invoke(() =>
+                {
+                    ShownSpecificFileSet = null;
+                    DisplayedFilesView.Refresh();
+                });
             }
             else
             {
@@ -142,6 +148,7 @@ namespace ALOTInstallerWPF.BuilderUI
             "Add files to install by dragging and dropping their files onto the interface. Make sure you do not extract or rename any files you download, or the installer will not recognize them.";
         public ObservableCollectionExtended<InstallerFile> CurrentModeFiles { get; } = new ObservableCollectionExtended<InstallerFile>();
         public ICollectionView DisplayedFilesView => CollectionViewSource.GetDefaultView(CurrentModeFiles);
+
         public FileSelectionUIController()
         {
             DataContext = this;
@@ -159,18 +166,19 @@ namespace ALOTInstallerWPF.BuilderUI
             manifestFileReadyStateChanged(null); //Trigger progressbar update
 
             // Add filtering
-            DisplayedFilesView.CurrentChanged += (sender, args) =>
-            {
-                Debug.WriteLine("CollectionView refreshing.");
-            };
-
             DisplayedFilesView.Filter = FilterShownFilesByGame;
         }
+
+        /// <summary>
+        /// List of files that will be shown in the list. Set to null to allow normal filtering
+        /// </summary>
+        internal List<InstallerFile> ShownSpecificFileSet;
 
         private bool FilterShownFilesByGame(object obj)
         {
             if (obj is InstallerFile ifx)
             {
+                if (ShownSpecificFileSet != null) return ShownSpecificFileSet.Contains(ifx); //Show only files in the specifically set UI list
                 if (!ShowNonReadyFiles && !ifx.Ready || ifx.Disabled) return false; // Show only ready to install files
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME1) && ShowME1Files) return true;
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME2) && ShowME2Files) return true;

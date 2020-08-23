@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using ALOTInstallerCore.Objects.Manifest;
 
 namespace ALOTInstallerCore.Objects
@@ -180,6 +181,10 @@ namespace ALOTInstallerCore.Objects
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Self)));
         }
-
-    }
+        /// <summary>
+        /// Returns if this file has any package files.
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool HasAnyPackageFiles() => PackageFiles.Any();
+        }
 }
