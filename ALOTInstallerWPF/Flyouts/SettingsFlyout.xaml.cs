@@ -88,9 +88,57 @@ namespace ALOTInstallerWPF.Flyouts
 #endif
         }
 
-        private void CleanupBuildLocation()
+        private async void CleanupBuildLocation()
         {
             // Todo: Attempt reimport before cleanup.
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                if (!Directory.Exists(Settings.BuildLocation))
+                {
+                    await mw.ShowMessageAsync("Error cleaning build directory", "The build directory does not exist.");
+                    return;
+                }
+                NamedBackgroundWorker nbw = new NamedBackgroundWorker("CleanupBuildLocWorker");
+                var pd = await mw.ShowProgressAsync("Importing leftover files from build directory",
+                    "Checking if any files in build directory need to be re-imported to library...");
+                nbw.DoWork += (sender, args) =>
+                {
+                    var bdSize = Utilities.GetSizeOfDirectory(Settings.BuildLocation);
+                    foreach (var file in Directory.GetFiles(Settings.BuildLocation, "*.*", SearchOption.AllDirectories))
+                    {
+                        TextureLibrary.AttemptImportManifestFile(file,
+                            ManifestHandler.GetAllManifestFiles(),
+                            (x, y) =>
+                            {
+                                if (x)
+                                {
+                                    Log.Information($"Reimported {y} to texture library");
+                                }
+                            },
+                            (file, done, total) =>
+                            {
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    pd.SetMessage($"Reimporting {file} to library");
+                                    pd.Maximum = total;
+                                    pd.SetProgress(done);
+                                });
+                            });
+                    }
+
+                    foreach (var d in Directory.GetDirectories(Settings.BuildLocation))
+                    {
+                        Utilities.DeleteFilesAndFoldersRecursively(d);
+                    }
+                    Application.Current.Dispatcher.Invoke(async () =>
+                    {
+                        await pd.CloseAsync();
+                        await mw.ShowMessageAsync("Build directory cleaned",
+                            $"The build directory has been cleaned up. {FileSizeFormatter.FormatSize(bdSize)} of data was deleted.");
+                    });
+                };
+                nbw.RunWorkerAsync();
+            }
         }
 
         private async void CleanupLibrary()

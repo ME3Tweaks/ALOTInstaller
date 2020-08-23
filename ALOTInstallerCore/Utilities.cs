@@ -273,8 +273,7 @@ namespace ALOTInstallerCore
             Thread.Sleep(4); // This makes the difference between whether it works or not. Sleep(0) is not enough.
             try
             {
-                //Debug.WriteLine("Deleting directory: " + target_dir);
-
+                Log.Information($"Deleting directory {target_dir}");
                 Directory.Delete(target_dir);
             }
             catch (Exception e)
@@ -798,7 +797,10 @@ namespace ALOTInstallerCore
         }
 
 
-
+        public static long GetSizeOfDirectory(string d, string[] extensionsToCalculate = null)
+        {
+            return GetSizeOfDirectory(new DirectoryInfo(d), extensionsToCalculate);
+        }
         public static long GetSizeOfDirectory(DirectoryInfo d, string[] extensionsToCalculate = null)
         {
             long size = 0;
