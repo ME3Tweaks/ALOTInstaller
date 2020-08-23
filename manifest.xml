@@ -14,37 +14,34 @@
             weight="0"
             tasktext="Performing installation prescan">
                <failureinfo
-                    resultcode="-54"
+                    resultcode="InstallFailed_PrescanFailed"
                     failedtopmessage="Preinstallation scan failed"
-                    failedbottommessage="Check or upload installer log for more information"
-                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during preinstallation scan. Please see installer log for more info." />
+                    failedbottommessage="Check installer log for more information"
+                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during preinstallation scan. Check the installer log for more info." />
         </stage>
         <stage
             name="STAGE_UNPACKDLC"
             weight="0.11004021318"
             tasktext="Unpacking DLC">
                <failureinfo
-                    resultcode="-40"
+                    resultcode="InstallFailed_UnpackingDLCFailed"
                     failedtopmessage="Failed to unpack DLC"
-                    failedbottommessage="Check or upload installer log for more information"
-                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during unpacking of DLC SFARs. Please see installer log for more info. The game is in an inconsistent state and may not be functional." />
+                    failedbottommessage="Check installer log for more information"
+                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during unpacking of DLC SFARs. Check the installer log for more info. The game is in an inconsistent state and may not be functional." />
         </stage>
         <stage
             name="STAGE_SCAN"
             weight="0.12055272684"
             tasktext="Scanning textures">
                <failureinfo
-                    resultcode="-52"
+                    resultcode="InstallFailed_FailedToScanTextures"
                     failedtopmessage="Failed to scan textures"
-                    failedbottommessage="Check or upload installer log for more information"
-                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during scanning of existing game textures. Please see installer log for more info." />
+                    failedbottommessage="Check installer log for more information"
+                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during scanning of existing game textures. Check the installer log for more info." />
                <failureinfo
                     ipcerror="ERROR_REFERENCED_TFC_NOT_FOUND"
                     warning="true"
-                    resultcode="-56"
-                    failedtopmessage="Detected incorrectly installed mod or missing dependent DLC"
-                    failedbottommessage="A mod is installed incorrectly. Check the installer log for details"
-                    failedheadermessage="MassEffectModderNoGui detected an improperly installed mod (e.g. files are not in the correct folder) or a dependent DLC couldn't be found. Check the installer log for more information." />
+                    failedtopmessage="Detected incorrectly installed mod or missing dependent DLC"/>
         </stage>
         <stage
             name="STAGE_INSTALLTEXTURES"
@@ -53,34 +50,33 @@
             me3weightscaling="1.1">
                <failureinfo
                     ipcerror="ERROR_TEXTURE_MAP_MISSING"
-                    resultcode="-44"
+                    resultcode="InstallFailed_TextureMapMissing"
                     failedtopmessage="Texture map is missing"
-                    failedbottommessage="Check or upload installer log for more information"
+                    failedbottommessage="Check installer log for more information"
                     failedheadermessage="Texture map file is missing - has this game been migrated to a new system or user account?" />
                <failureinfo
                     ipcerror="ERROR_TEXTURE_MAP_WRONG"
-                    resultcode="-45"
+                    resultcode="InstallFailed_InvalidTextureMap"
                     failedtopmessage="Texture map is corrupt"
-                    failedbottommessage="Check or upload installer log for more information"
+                    failedbottommessage="Check installer log for more information"
                     failedheadermessage="Texture map file is corrupted and unusable - you will need to delete the game and then reinstall so the texture map can be rebuilt." />
                <failureinfo
                     ipcerror="ERROR_ADDED_FILE"
-                    resultcode="-48"
-                    failedtopmessage="Files were added after ALOT was installed"
+                    resultcode="InstallFailed_FilesAddedAfterTextureScan"
+                    failedtopmessage="Files were added after previous texture installation"
                     failedbottommessage="Installation aborted"
-                    failedheadermessage="Installation of package files after ALOT has been installed is unsupported. Please follow the correct installation directions for ALOT." />
+                    failedheadermessage="Adding files/mods after textures have been installed is unsupported and will cause significant issues in the game. You must restore your game to vanilla to use the installer as this installation. Do not install files outside of ALOT Installer after textures are installed." />
                <failureinfo
                     ipcerror="ERROR_REMOVED_FILE"
-                    resultcode="-47"
-                    failedtopmessage="Files were removed after ALOT was installed"
+                    resultcode="InstallFailed_FilesRemovedAfterTextureScan"
+                    failedtopmessage="Files were removed after previous texture installation"
                     failedbottommessage="Installation aborted"
-                    failedheadermessage="Removal of package files after ALOT has been installed is unsupported. Please follow the correct installation directions for ALOT." />
-<!-- Is this actually correct/used?-->
+                    failedheadermessage="Removal of package files after textures have been installed will prevent further modifications to the game with ALOT Installer due to texture map desynchronization." />
                <failureinfo
-                    resultcode="-42"
+                    resultcode="InstallFailed_FailedToInstallTextures"
                     failedtopmessage="Failed to install textures"
-                    failedbottommessage="Check or upload installer log for more information"
-                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during installation of textures. Please see installer log for more info. The game is not in a usable state." />
+                    failedbottommessage="Check installer log for more information"
+                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during installation of textures. Check the installer log for more info. The game is not in a usable state." />
         </stage>
         <stage
             name="STAGE_REMOVEMIPMAPS"
@@ -88,40 +84,85 @@
             tasktext="Removing empty mipmaps"
             me1weightscaling="2.5">
                <failureinfo
-                    resultcode="-50"
+                    resultcode="InstallFailed_FailedToRemoveEmptyMipmaps"
                     failedtopmessage="Failed to remove empty mipmaps"
-                    failedbottommessage="Check or upload installer log for more information"
-                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during removal of empty mipmaps. Please see installer log for more info. The game is in an inconsistent state." />
+                    failedbottommessage="Check installer log for more information"
+                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during removal of empty mipmaps. Check the installer log for more info. The game is in an inconsistent state." />
         </stage>
         <stage
             name="STAGE_REPACK"
             weight="0.09"
             tasktext="Compressing game files">
                <failureinfo
-                    resultcode="-46"
+                    resultcode="InstallFailed_FailedToCompressGameFiles"
                     failedtopmessage="Failed to compress game files"
-                    failedbottommessage="Check or upload installer log for more information"
-                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during recompression of game files. Please see installer log for more info. The game is in an inconsistent state." />
+                    failedbottommessage="Check installer log for more information"
+                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during recompression of game files. Check the installer log for more info. The game is in an inconsistent state." />
         </stage>
         <stage
             name="STAGE_MARKERS"
             weight="0.025"
             tasktext="Installing remaining texture markers">
                <failureinfo
-                    resultcode="-55"
+                    resultcode="InstallFailed_FailedToInstallRemainingTextureMarkers"
                     failedtopmessage="Failed to install remaining texture markers"
-                    failedbottommessage="Check or upload installer log for more information"
-                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during application of ALOT markers on non-modded files. Please see installer log for more info. The game is in a functional but texture settings and proper markers have not been applied." />
+                    failedbottommessage="Check installer log for more information"
+                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code during application of texture markers on non-modded files. Check the installer log for more info. The game is in a functional state, but texture settings and proper markers have not been applied." />
         </stage>
         <stage
             name="STAGE_VERIFYTEXTURES"
             weight="0.05"
             tasktext="Verifying textures">
                <failureinfo
-                    resultcode="-58"
+                    resultcode="InstallFailed_TextureVerifyFailed"
                     failedtopmessage="Texture verification failed"
-                    failedbottommessage="Check or upload installer log for more information"
-                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code after textures were installed, during the texture verification step. Please see installer log for more info." />
+                    failedbottommessage="Check installer log for more information"
+                    failedheadermessage="MassEffectModderNoGui crashed or returned a non-zero error code after textures were installed, during the texture verification step. Check the installer log for more info." />
+        </stage>
+        <stage
+            name="STAGE_NONMEMOPERATIONS"
+            weight="0"
+            tasktext="Not a real UI stage">
+               <failureinfo
+                    resultcode="InstallFailed_ExistingMarkersFound"
+                    failedtopmessage="Files from existing texture installation found"
+                    failedbottommessage="Game needs to be fully deleted and reinstalled"
+                    failedheadermessage="Detected files that were part of a texture installation, however the current game is not marked as having a texture installation. The game should be fully deleted (not uninstalled) to remove these files." />
+               <failureinfo
+                    resultcode="InstallFailed_TextureExportFixFailed"
+                    failedtopmessage="Failed to apply texture fixes before install"
+                    failedbottommessage="Check installer log for more info"
+                    failedheadermessage="MassEffectModderNoGui failed to fix known issues in some of your installed mods before installation. Check the installer log for more information."/>
+                    <!-- If other preinstall mods appear this message needs changed -->
+                    <failureinfo
+                    resultcode="InstallFailed_PreinstallModFailed"
+                    failedtopmessage="Failed to install ALOV mod"
+                    failedbottommessage="Check installer log for more info"
+                    failedheadermessage="A Lot of Videos (ALOV) mod installs before textures are installed. The installer encountered an error during this procedure. Check the installer log for more information."/>
+
+                    <failureinfo
+                    resultcode="InstallFailed_MEMExitedBeforeStageDone"
+                    failedtopmessage="Unknown error during texture install"
+                    failedbottommessage="Check installer log for more info"
+                    failedheadermessage="MassEffectModderNoGui exited prematurely during texture install. Check the installer log for more information."/>
+
+                    <failureinfo
+                    resultcode="InstallFailed_ME1LAAApplyFailed"
+                    failedtopmessage="Failed to set ME1 to Large Address Aware (LAA)"
+                    failedbottommessage="Check installer log for more info"
+                    failedheadermessage="MassEffectModderNoGui was unable to set Mass Effect to be Large Address Aware (LAA). This will cause Mass Effect to crash due to memory limitations. Check the installer log for more information."/>
+
+                    <failureinfo
+                    resultcode="InstallFailed_FailedToApplyTextureInfo"
+                    failedtopmessage="Failed to set texture installation info"
+                    failedbottommessage="Check installer log for more info"
+                    failedheadermessage="ALOT Installer was unable to set the texture installation info for the game. Check the installer log for more information."/>
+
+                    <failureinfo
+                    resultcode="InstallFailed_ZipCopyFilesError"
+                    failedtopmessage="Failed to install additional components for a mod"
+                    failedbottommessage="Check installer log for more info"
+                    failedheadermessage="ALOT Installer was unable to install additional non-texture components for a specific texture mod. Check the installer log for more information."/>
         </stage>
     </stages>
     <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>

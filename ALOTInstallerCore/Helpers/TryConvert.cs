@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace ALOTInstallerCore.Helpers
@@ -58,6 +59,15 @@ namespace ALOTInstallerCore.Helpers
             if (Int64.TryParse(value, out var res))
             {
                 return res;
+            }
+            return defaultValue;
+        }
+
+        public static TEnum ToEnum<TEnum>(string value, TEnum defaultValue)
+        {
+            if (Enum.TryParse(typeof(TEnum), value, out var res))
+            {
+                return (TEnum) res;
             }
             return defaultValue;
         }

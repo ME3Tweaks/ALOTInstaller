@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using ALOTInstallerCore.Objects;
@@ -92,13 +93,14 @@ namespace ALOTInstallerCore.Steps.Installer
         }
     }
 
+    [DebuggerDisplay("StageFailure on IPC {FailureIPCTrigger} with result code {FailureResultCode}, is warning: {Warning}")]
     public class StageFailure
     {
         public string FailureHeaderText { get; set; }
         public string FailureTopText { get; set; }
         public string FailureBottomText { get; set; }
         public string FailureIPCTrigger { get; set; }
-        public int FailureResultCode { get; set; }
+        public InstallStep.InstallResult FailureResultCode { get; set; }
         public bool Warning { get; set; }
     }
 }

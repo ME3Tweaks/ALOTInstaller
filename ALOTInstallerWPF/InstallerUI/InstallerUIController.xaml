@@ -7,6 +7,7 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
+             xmlns:installer="clr-namespace:ALOTInstallerCore.Steps.Installer;assembly=ALOTInstallerCore"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -27,8 +28,11 @@
                           UnloadedBehavior="Stop"
                           MediaEnded="AudioPlayer_OnMediaEnded"/>
             <StackPanel Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
-                <iconPacks:PackIconIonicons Foreground="{Binding BigIconForeground}" Kind="{Binding BigIconKind}" Width="84" Height="84" Visibility="{Binding BigIconVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                <mah:ProgressRing IsActive="True" Margin="0,0,0,10" Foreground="Snow"/>
+                <iconPacks:PackIconIonicons Foreground="{Binding BigIconForeground}" 
+                                            Kind="{Binding BigIconKind}" Width="84" Height="84" 
+                                            Visibility="{Binding BigIconVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+                                            HorizontalAlignment="Center"/>
+                <mah:ProgressRing IsActive="True" Margin="0,0,0,10" Foreground="Snow" Visibility="{Binding BigIconVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
                 <TextBlock  VerticalAlignment="Stretch" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="{Binding InstallerTextTop}" Visibility="{Binding InstallerTextTopVisibility}">
                     <TextBlock.Effect>
                         <DropShadowEffect
@@ -65,7 +69,7 @@
                     <!--<Button mah:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallViewLogs" Visibility="Collapsed" Margin="0,0,5,0" Width="80" HorizontalAlignment="Center"  Content="View Logs" ToolTip="Click to view logs" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>-->
                     <Button mah:ControlsHelper.ContentCharacterCasing="Normal" Visibility="{Binding ContinueButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" HorizontalAlignment="Center" Width="80" Content="Continue" ToolTip="Click to dismiss dialog" Command="{Binding CloseInstallerCommand}"  Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>
                 </StackPanel>
-                <TextBlock MaxWidth="700" TextWrapping="Wrap" MinHeight="90" FontSize="16" FontWeight="Medium" Margin="5,40,0,5" HorizontalAlignment="Center"  TextAlignment="Center" Text="This may take a while.&#10;Enjoy some codex entries while you wait.">
+                <TextBlock MaxWidth="700" TextWrapping="Wrap" MinHeight="90" FontSize="16" FontWeight="Medium" Margin="5,40,0,5" HorizontalAlignment="Center"  TextAlignment="Center" Text="{Binding CurrentTip}">
                     <TextBlock.Effect>
                         <DropShadowEffect
                                   ShadowDepth="4"
@@ -75,6 +79,19 @@
                                  BlurRadius="4"/>
                     </TextBlock.Effect>
                 </TextBlock>
+                <ListView Visibility="{Binding DebugMode, Converter={StaticResource BoolToVisibilityConverter}}" ItemsSource="{Binding DebugAllStageFailures}">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="3" />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate DataType="{x:Type installer:StageFailure}">
+                            <Button Command="{Binding DebugHandleFailureCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=local:InstallerUIController}}" CommandParameter="{Binding}"  Content="{Binding FailureResultCode}" Margin="2"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
             </StackPanel>
             <Button Name="musicButton" Visibility="{Binding MusicAvailable, Converter={StaticResource BoolToVisibilityConverter}}" 
                     Margin="10" Grid.Column="0" Grid.Row="1" Height="40" Width="40" 

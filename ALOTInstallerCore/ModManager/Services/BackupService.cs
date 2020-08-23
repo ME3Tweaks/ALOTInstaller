@@ -98,8 +98,7 @@ namespace ALOTInstallerCore.ModManager.Services
                         BackupStatus = "Backed up";
                     }
                     BackupLocationStatus = $"Backup stored at {bPath}";
-                    LinkActionText = "fl" +
-                        " backup";
+                    LinkActionText = "Unlink backup";
                     BackupActionText = "Restore game";
                     return;
                 }

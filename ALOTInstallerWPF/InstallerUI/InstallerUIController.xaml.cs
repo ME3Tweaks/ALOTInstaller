@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +18,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
+using ALOTInstallerCore.Steps.Installer;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.IconPacks;
@@ -32,6 +34,15 @@ namespace ALOTInstallerWPF.InstallerUI
         public PackIconIoniconsKind MusicIcon { get; private set; }
         public PackIconIoniconsKind BigIconKind { get; private set; }
         public bool BigIconVisible { get; private set; }
+#if DEBUG
+        public ObservableCollectionExtended<StageFailure> DebugAllStageFailures { get; } = new ObservableCollectionExtended<StageFailure>();
+        /// <summary>
+        /// Used when debugging the overlay
+        /// </summary>
+        public bool DebugMode { get; private set; }
+#else
+        public bool DebugMode => false;
+#endif
         public bool ContinueButtonVisible { get; private set; }
         public bool MusicAvailable { get; private set; }
         public SolidColorBrush BigIconForeground { get; private set; }
@@ -74,11 +85,25 @@ namespace ALOTInstallerWPF.InstallerUI
         public GenericCommand ToggleMusicCommand { get; set; }
         public GenericCommand CloseInstallerCommand { get; set; }
         public InstallOptionsPackage InstallOptions { get; set; }
-
+#if DEBUG
+        public RelayCommand DebugHandleFailureCommand { get; set; }
+#endif
         private void LoadCommands()
         {
             ToggleMusicCommand = new GenericCommand(ToggleMusic, CanToggleMusic);
             CloseInstallerCommand = new GenericCommand(CloseInstaller);
+#if DEBUG
+            DebugHandleFailureCommand = new RelayCommand(DebugHandleFailure);
+
+#endif
+        }
+
+        private void DebugHandleFailure(object obj)
+        {
+            if (obj is StageFailure sf)
+            {
+                handleInstallResult(sf.FailureResultCode, "Test failure");
+            }
         }
 
         private void CloseInstaller()
@@ -110,8 +135,15 @@ namespace ALOTInstallerWPF.InstallerUI
             MusicIcon = musicOn ? PackIconIoniconsKind.VolumeHighMD : PackIconIoniconsKind.VolumeOffMD;
         }
 
-        internal void StartInstall(bool isOpeningDebug = false)
+        internal void StartInstall(bool debugMode = false)
         {
+#if DEBUG
+            DebugMode = debugMode;
+            foreach (var v in ProgressHandler.DefaultStages)
+            {
+                DebugAllStageFailures.AddRange(v.FailureInfos.Where(x=>!x.Warning));
+            }
+#endif
             string installString = null;
             NamedBackgroundWorker installerWorker = new NamedBackgroundWorker("InstallerWorker");
             InstallStep ss = new InstallStep(InstallOptions)
@@ -132,26 +164,14 @@ namespace ALOTInstallerWPF.InstallerUI
             installerWorker.RunWorkerCompleted += (a, b) =>
             {
                 ContinueButtonVisible = true;
-                if (MusicAvailable)
-                {
-                    musicButton.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(musicButton.Opacity, 0, TimeSpan.FromSeconds(1)));
-                    audioPlayer.BeginAnimation(MediaElement.VolumeProperty, new DoubleAnimation(audioPlayer.Volume, 0, TimeSpan.FromSeconds(3)));
-                }
+                fadeoutMusic();
                 // Installation has completed
                 if (b.Error == null)
                 {
                     if (b.Result is InstallStep.InstallResult ir)
                     {
-                        if (ir == InstallStep.InstallResult.InstallOK)
-                        {
-                            BigIconKind = PackIconIoniconsKind.CheckmarkCircleMD;
-                            BigIconForeground = Brushes.Green;
-                            InstallerTextTop = installString;
-                        }
-                        else
-                        {
-                            Debug.WriteLine($"Unhandled exit code: {ir}");
-                        }
+                        handleInstallResult(ir, installString);
+
                     }
                     else
                     {
@@ -172,13 +192,12 @@ namespace ALOTInstallerWPF.InstallerUI
                     InstallerTextBottom = "Check installer log for more info";
                 }
 
-                BigIconVisible = true;
-
                 //PostInstallUIController bui = new PostInstallUIController();
                 //bui.setInstalledString(installString);
                 //Program.SwapToNewView(bui);
             };
-            if (!isOpeningDebug)
+
+            if (!DebugMode)
             {
                 installerWorker.RunWorkerAsync();
             }
@@ -187,19 +206,7 @@ namespace ALOTInstallerWPF.InstallerUI
                 ContinueButtonVisible = true;
                 CommonUtil.Run(() =>
                 {
-                    var musicButtonFadeoutAnim = new DoubleAnimation(musicButton.Opacity, 0, TimeSpan.FromSeconds(2));
-                    musicButtonFadeoutAnim.Completed += (sender, args) =>
-                    {
-                        MusicAvailable = false; // will collapse button.
-                    };
-                    var volumeFadeoutAnim = new DoubleAnimation(audioPlayer.Volume, 0, TimeSpan.FromSeconds(4));
-                    volumeFadeoutAnim.EasingFunction = new QuadraticEase();
-                    volumeFadeoutAnim.Completed += (sender, args) =>
-                    {
-                        audioPlayer.Close();
-                    };
-                    musicButton.BeginAnimation(UIElement.OpacityProperty, musicButtonFadeoutAnim);
-                    audioPlayer.BeginAnimation(MediaElement.VolumeProperty, volumeFadeoutAnim);
+                    fadeoutMusic();
                 }, TimeSpan.FromSeconds(5));
             }
 
@@ -215,6 +222,66 @@ namespace ALOTInstallerWPF.InstallerUI
             }
 
             #endregion
+        }
+
+        private void handleInstallResult(InstallStep.InstallResult ir, string installString)
+        {
+            if (ir == InstallStep.InstallResult.InstallOK)
+            {
+                BigIconKind = PackIconIoniconsKind.CheckmarkCircleMD;
+                BigIconForeground = Brushes.Green;
+                InstallerTextTop = installString;
+            }
+            else if (ir == InstallStep.InstallResult.InstallOKWithWarning)
+            {
+                BigIconKind = PackIconIoniconsKind.WarningMD;
+                BigIconForeground = Brushes.Yellow;
+                InstallerTextTop = installString;
+            }
+            else
+            {
+                // Is this a stage failure?
+                StageFailure sf = null;
+                foreach (var stage in ProgressHandler.DefaultStages)
+                {
+                    var failure = stage.FailureInfos.FirstOrDefault(x => x.FailureResultCode == ir);
+                    if (failure != null)
+                    {
+                        sf = failure;
+                        break;
+                    }
+                }
+                if (sf != null)
+                {
+                    BigIconKind = PackIconIoniconsKind.CloseCircleMD;
+                    BigIconForeground = Brushes.Red;
+                    InstallerTextTop = sf.FailureTopText;
+                    InstallerTextBottom = sf.FailureBottomText;
+                    InstallerTextMiddleVisibility = Visibility.Collapsed;
+                    CurrentTip = sf.FailureHeaderText;
+                }
+            }
+
+            BigIconVisible = true;
+        }
+
+        public string CurrentTip { get; set; }
+
+        private void fadeoutMusic()
+        {
+            var musicButtonFadeoutAnim = new DoubleAnimation(musicButton.Opacity, 0, TimeSpan.FromSeconds(2));
+            musicButtonFadeoutAnim.Completed += (sender, args) =>
+            {
+                MusicAvailable = false; // will collapse button.
+            };
+            var volumeFadeoutAnim = new DoubleAnimation(audioPlayer.Volume, 0, TimeSpan.FromSeconds(4));
+            volumeFadeoutAnim.EasingFunction = new QuadraticEase();
+            volumeFadeoutAnim.Completed += (sender, args) =>
+            {
+                audioPlayer.Close();
+            };
+            musicButton.BeginAnimation(UIElement.OpacityProperty, musicButtonFadeoutAnim);
+            audioPlayer.BeginAnimation(MediaElement.VolumeProperty, volumeFadeoutAnim);
         }
 
         private string getMusicPath(Enums.MEGame game)

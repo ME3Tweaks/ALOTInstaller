@@ -9,6 +9,7 @@ using System.Net;
 using System.Xml.Linq;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using ALOTInstallerCore.Steps;
 using ALOTInstallerCore.Steps.Installer;
 using Serilog;
 
@@ -229,7 +230,7 @@ namespace ALOTInstallerCore.Helpers
                                  FailureBottomText = z.Attribute("failedbottommessage")?.Value,
                                  FailureTopText = z.Attribute("failedtopmessage")?.Value,
                                  FailureHeaderText = z.Attribute("failedheadermessage")?.Value,
-                                 FailureResultCode = Convert.ToInt32(z.Attribute("resultcode").Value),
+                                 FailureResultCode = TryConvert.ToEnum<InstallStep.InstallResult>(z.Attribute("resultcode")?.Value, InstallStep.InstallResult.UNSET_VALUE),
                                  Warning = TryConvert.ToBool(z.Attribute("warning")?.Value, false)
                              }).ToList()
                          }).ToList();

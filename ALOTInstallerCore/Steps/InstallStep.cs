@@ -89,10 +89,32 @@ namespace ALOTInstallerCore.Steps
 
         public enum InstallResult
         {
+            /// <summary>
+            /// The default value, indicating an invalid value. This is used essentially for 'null'
+            /// </summary>
+            UNSET_VALUE,
+
             InstallFailed_ExistingMarkersFound,
             InstallFailed_TextureExportFixFailed,
-            InstallFailed_MEMCrashed,
-            InstallFailed_MEMReturnedNonZero,
+            InstallFailed_PreinstallModFailed,
+
+            InstallFailed_MEMCrashed, //Used?
+            InstallFailed_MEMReturnedNonZero, //Used?
+
+            // Main install - defined in manifest
+            InstallFailed_PrescanFailed,
+            InstallFailed_UnpackingDLCFailed,
+            InstallFailed_FailedToScanTextures,
+            InstallFailed_TextureMapMissing,
+            InstallFailed_InvalidTextureMap,
+            InstallFailed_FilesAddedAfterTextureScan,
+            InstallFailed_FilesRemovedAfterTextureScan,
+            InstallFailed_FailedToInstallTextures,
+            InstallFailed_FailedToRemoveEmptyMipmaps,
+            InstallFailed_FailedToCompressGameFiles,
+            InstallFailed_FailedToInstallRemainingTextureMarkers,
+            InstallFailed_TextureVerifyFailed,
+
             InstallFailed_MEMExitedBeforeStageDone,
             InstallFailed_ME1LAAApplyFailed,
             InstallFailed_FailedToApplyTextureInfo,
@@ -210,14 +232,14 @@ namespace ALOTInstallerCore.Steps
 
             {
                 bool doneReached = false;
-
+                StageFailure failure = null;
                 void handleIPC(string command, string param)
                 {
                     switch (command)
                     {
                         case "STAGE_ADD": // Add a new stage 
                             {
-                                Log.Information("Adding stage added to install stages queue: " + param);
+                                Log.Information("Adding stage to install stages queue: " + param);
                                 pm.AddStage(param, package.InstallTarget.Game);
                                 break;
                             }
@@ -255,6 +277,21 @@ namespace ALOTInstallerCore.Steps
                             Log.Information("Processing file " + param);
                             break;
                         default:
+                            var failureIPCTriggered = pm.CurrentStage.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && !x.Warning);
+                            if (failureIPCTriggered != null)
+                            {
+                                // We have encountered a known failure IPC
+                                failure = failureIPCTriggered;
+                                break;
+                            }
+
+                            var warningIPCTriggered = pm.CurrentStage.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && x.Warning);
+                            if (warningIPCTriggered != null)
+                            {
+                                // We have encountered a known warning IPC
+                                Log.Warning($"{warningIPCTriggered.FailureTopText}: {param}");
+                                break;
+                            }
                             Debug.WriteLine($"Unhandled IPC: {command} {param}");
                             break;
                     }
@@ -292,7 +329,14 @@ namespace ALOTInstallerCore.Steps
                 if (lastExitCode != 0)
                 {
                     Log.Error($@"MEM exited with non zero exit code: {lastExitCode}");
-                    doWorkEventArgs.Result = InstallResult.InstallFailed_MEMReturnedNonZero;
+                    // Get Stage Failure
+                    if (failure == null)
+                    {
+                        // Crashed (or unhandled new exit IPC)
+                        failure = pm.CurrentStage.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == null);
+                    }
+
+                    doWorkEventArgs.Result = failure.FailureResultCode;
                     return;
                 }
 
@@ -414,7 +458,6 @@ namespace ALOTInstallerCore.Steps
             return !badFiles.Any();
         }
 
-
         private void showOnlineStorefrontNoUpdateScreen()
         {
             //Check if origin
@@ -429,7 +472,7 @@ namespace ALOTInstallerCore.Steps
         private void applyCitadelTransitionFix()
         {
 #if WINDOWS
-// This depends on the ME3Explorer lib, which can't (and may never) work on linux
+            // This depends on the ME3Explorer lib, which can't (and may never) work on linux
             //if (package.InstallTarget.Game == Enums.MEGame.ME3)
             //{
             //    SetBottomTextCallback?.Invoke("Fixing Mars to Citadel transition");

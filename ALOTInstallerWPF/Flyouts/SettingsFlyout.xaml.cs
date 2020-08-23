@@ -1,27 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
-using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerWPF.InstallerUI;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
@@ -77,7 +67,7 @@ namespace ALOTInstallerWPF.Flyouts
 #if DEBUG
             DebugShowInstallerFlyoutCommand = new GenericCommand(() =>
             {
-                var game = Enums.MEGame.ME1;
+                var game = Enums.MEGame.ME3;
                 InstallerUIController iuic = new InstallerUIController(new InstallOptionsPackage()
                 {
                     DebugNoInstall = true,
@@ -100,7 +90,7 @@ namespace ALOTInstallerWPF.Flyouts
 
         private void CleanupBuildLocation()
         {
-            throw new NotImplementedException();
+            // Todo: Attempt reimport before cleanup.
         }
 
         private async void CleanupLibrary()
