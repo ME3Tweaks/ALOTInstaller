@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.ModManager.Objects;
@@ -181,6 +182,7 @@ namespace ALOTInstallerCore.Helpers
     public static readonly string CachedASIsFolder = Directory.CreateDirectory(Path.Combine(AppDataFolder(), @"CachedASIs")).FullName;
 
     public static ObservableCollectionExtended<GameTarget> GameTargets { get; } = new ObservableCollectionExtended<GameTarget>();
+    public static string ResourcesDir => Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
 
     /// <summary>
     /// Sets the game path that MEM and ALOTInstallerCore will use for the game specified by the target.

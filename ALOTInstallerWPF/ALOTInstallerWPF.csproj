@@ -37,6 +37,7 @@
     <None Remove="Images\meuitm_me1_bg.jpg" />
     <None Remove="Images\origin\me1update.png" />
     <None Remove="Images\origin\me2update.png" />
+    <None Remove="InstallerUI\installtips.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,6 +53,13 @@
 		<Content Include="..\Libraries\Windows\CompressionWrappers.dll" Condition=" '$(OS)' == 'Windows_NT' ">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="InstallerUI\installtips.xml">
+	    <SubType>Designer</SubType>
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 

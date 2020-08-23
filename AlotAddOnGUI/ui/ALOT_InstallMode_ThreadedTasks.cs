@@ -259,7 +259,7 @@ namespace AlotAddOnGUI
             InstallingOverlay_FullStageOfStageLabel.Visibility = System.Windows.Visibility.Collapsed;
             //InstallingOverlay_OverallProgressLabel.Visibility = System.Windows.Visibility.Visible;
             InstallingOverlay_Tip.Text = "";
-            tipticker = new System.Windows.Threading.DispatcherTimer();
+            tipticker = new System.Timers.Timer();
             tipticker.Tick += newTipTimer_Tick;
             tipticker.Interval = new TimeSpan(0, 0, 20);
             tipticker.Start();

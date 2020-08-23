@@ -8,6 +8,7 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
              xmlns:installer="clr-namespace:ALOTInstallerCore.Steps.Installer;assembly=ALOTInstallerCore"
+             xmlns:steps="clr-namespace:ALOTInstallerCore.Steps;assembly=ALOTInstallerCore"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -79,15 +80,15 @@
                                  BlurRadius="4"/>
                     </TextBlock.Effect>
                 </TextBlock>
-                <ListView Visibility="{Binding DebugMode, Converter={StaticResource BoolToVisibilityConverter}}" ItemsSource="{Binding DebugAllStageFailures}">
+                <ListView MaxHeight="200" Visibility="{Binding DebugMode, Converter={StaticResource BoolToVisibilityConverter}}" ItemsSource="{Binding DebugAllResultCodes}">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid Columns="3" />
                         </ItemsPanelTemplate>
                     </ListView.ItemsPanel>
                     <ListView.ItemTemplate>
-                        <DataTemplate DataType="{x:Type installer:StageFailure}">
-                            <Button Command="{Binding DebugHandleFailureCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=local:InstallerUIController}}" CommandParameter="{Binding}"  Content="{Binding FailureResultCode}" Margin="2"/>
+                        <DataTemplate DataType="{x:Type steps:InstallStep+InstallResult}">
+                            <Button Command="{Binding DebugHandleFailureCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=local:InstallerUIController}}" CommandParameter="{Binding}" Content="{Binding}" Margin="2"/>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>

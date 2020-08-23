@@ -14,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Windows.Threading;
+using System.Xml.Linq;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
@@ -35,7 +37,7 @@ namespace ALOTInstallerWPF.InstallerUI
         public PackIconIoniconsKind BigIconKind { get; private set; }
         public bool BigIconVisible { get; private set; }
 #if DEBUG
-        public ObservableCollectionExtended<StageFailure> DebugAllStageFailures { get; } = new ObservableCollectionExtended<StageFailure>();
+        public ObservableCollectionExtended<InstallStep.InstallResult> DebugAllResultCodes { get; } = new ObservableCollectionExtended<InstallStep.InstallResult>();
         /// <summary>
         /// Used when debugging the overlay
         /// </summary>
@@ -71,15 +73,50 @@ namespace ALOTInstallerWPF.InstallerUI
             };
         }
 
+        private List<string> codexTips = new List<string>();
+
         public InstallerUIController(InstallOptionsPackage installOptions)
         {
             DataContext = this;
             InstallOptions = installOptions;
             LoadCommands();
+            loadTips();
+            CurrentTip = "This may take a while, enjoy some lore while you wait.";
             InitializeComponent();
             MusicAvailable = File.Exists(getMusicPath(InstallOptions.InstallTarget.Game));
             musicOn = MusicAvailable && Settings.PlayMusic;
             setMusicIcon();
+        }
+
+        private void loadTips()
+        {
+            var installTipsFile = Path.Combine(Locations.ResourcesDir, "InstallerUI", "installtips.xml");
+            Debug.WriteLine(installTipsFile);
+            if (File.Exists(installTipsFile))
+            {
+                XDocument tipsDoc = XDocument.Load(installTipsFile);
+                codexTips.ReplaceAll(tipsDoc.Root.Element(InstallOptions.InstallTarget.Game.ToString().ToLower()).Descendants("tip").Select(x => x.Value));
+            }
+            //using (StreamReader reader = new StreamReader(stream))
+            //{
+            //    string result = reader.ReadToEnd();
+            //    try
+            //    {
+            //        XElement rootElement = XElement.Parse(result);
+            //        IEnumerable<XElement> xNames;
+
+            //        xNames = rootElement.Element("me" + INSTALLING_THREAD_GAME).Descendants("tip");
+
+            //        foreach (XElement element in xNames)
+            //        {
+            //            TIPS_LIST.Add(element.Value);
+            //        }
+            //    }
+            //    catch
+            //    {
+            //        //no tips.
+            //    }
+            //}
         }
 
         public GenericCommand ToggleMusicCommand { get; set; }
@@ -100,9 +137,9 @@ namespace ALOTInstallerWPF.InstallerUI
 
         private void DebugHandleFailure(object obj)
         {
-            if (obj is StageFailure sf)
+            if (obj is InstallStep.InstallResult res)
             {
-                handleInstallResult(sf.FailureResultCode, "Test failure");
+                handleInstallResult(res, res.ToString());
             }
         }
 
@@ -135,15 +172,38 @@ namespace ALOTInstallerWPF.InstallerUI
             MusicIcon = musicOn ? PackIconIoniconsKind.VolumeHighMD : PackIconIoniconsKind.VolumeOffMD;
         }
 
+        private Random tipRandom = new Random();
         internal void StartInstall(bool debugMode = false)
         {
 #if DEBUG
             DebugMode = debugMode;
             foreach (var v in ProgressHandler.DefaultStages)
             {
-                DebugAllStageFailures.AddRange(v.FailureInfos.Where(x=>!x.Warning));
+                DebugAllResultCodes.AddRange(v.FailureInfos.Where(x => !x.Warning).Select(x=>x.FailureResultCode));
             }
+            DebugAllResultCodes.AddRange(Enum.GetValues(typeof(InstallStep.InstallResult)).Cast<InstallStep.InstallResult>());
+
 #endif
+            TipTimer = new System.Windows.Threading.DispatcherTimer();
+            TipTimer.Tick += (sender, args) =>
+            {
+                TipTimer.Interval = new TimeSpan(0, 0, 20);
+
+                // code goes here
+                if (codexTips.Count > 1)
+                {
+                    string newTip = codexTips.RandomElement();
+                    while (CurrentTip == newTip)
+                    {
+                        // Pick a new tip
+                        newTip = codexTips.RandomElement();
+                    }
+
+                    CurrentTip = newTip;
+                }
+            };
+            TipTimer.Interval = new TimeSpan(0, 0, 6); //Initial tip time
+            TipTimer.Start();
             string installString = null;
             NamedBackgroundWorker installerWorker = new NamedBackgroundWorker("InstallerWorker");
             InstallStep ss = new InstallStep(InstallOptions)
@@ -224,19 +284,24 @@ namespace ALOTInstallerWPF.InstallerUI
             #endregion
         }
 
+        public DispatcherTimer TipTimer { get; set; }
+
         private void handleInstallResult(InstallStep.InstallResult ir, string installString)
         {
+            TipTimer?.Stop(); //Stop the tip rotation
             if (ir == InstallStep.InstallResult.InstallOK)
             {
                 BigIconKind = PackIconIoniconsKind.CheckmarkCircleMD;
                 BigIconForeground = Brushes.Green;
                 InstallerTextTop = installString;
+                CurrentTip = "Texture installation succeeded. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of ALOT Installer to this game, or you will corrupt it.";
             }
             else if (ir == InstallStep.InstallResult.InstallOKWithWarning)
             {
                 BigIconKind = PackIconIoniconsKind.WarningMD;
                 BigIconForeground = Brushes.Yellow;
                 InstallerTextTop = installString;
+                CurrentTip = "Texture installation succeeded with warnings. Check the installer log for more information on these warnings. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of ALOT Installer to this game, or you will corrupt it.";
             }
             else
             {
