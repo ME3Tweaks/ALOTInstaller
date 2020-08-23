@@ -5,14 +5,19 @@ namespace ALOTInstallerCore.Objects.Manifest
 {
     public class ChoiceFile : ConfigurableMod
     {
-        //Interface
-        public override List<string> ChoicesHuman => Choices.Select(s => s.ChoiceTitle).ToList();
+        public override List<object> ChoicesHuman => Choices.Select(s => (object)s.ChoiceTitle).ToList();
 
         //Class Specific
         public List<PackageFile> Choices { get; set; } // Support null option for none?
         public PackageFile GetChosenFile()
         {
-            return Choices[SelectedIndex];
+            var uiChoice = ChoicesHuman[SelectedIndex];
+            if (!(uiChoice is NullChoiceOption))
+            {
+                return Choices[SelectedIndex];
+            }
+
+            return null; // No choice was taken
         }
     }
 }

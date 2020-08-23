@@ -9,7 +9,11 @@ namespace ALOTInstallerCore.Objects.Manifest
     public class ZipFile : ConfigurableMod, INotifyPropertyChanged
     {
         //  <zipfile optional="true" default="false" inarchivepath="MEUITM\mods\SoftShadowsauto.zip" gamepathdestination="Engine\Shaders" friendlyname="Soft Shadows"/>
-        
+        public ZipFile() :base()
+        {
+            ChoicesHuman = new List<object>();
+            ChoicesHuman.Add("Install"); //Install is only option by default. Don't install will be auto added if this is optional.
+        }
         public string InArchivePath { get; set; }
         public string GameDestinationPath { get; set; }
         public bool DeleteShaders { get; set; }

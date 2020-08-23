@@ -468,6 +468,7 @@ namespace ALOTInstallerCore.Steps
                 configurableOptions.AddRange(mf.ZipFiles);
                 foreach (var v in configurableOptions)
                 {
+                    v.AddNoInstallIfApplicable();
                     v.SelectedIndex = v.DefaultSelectedIndex; //Reset to default option
                 }
 
@@ -479,7 +480,11 @@ namespace ALOTInstallerCore.Steps
 
                 foreach (var v in configurableOptions.OfType<ChoiceFile>())
                 {
-                    mf.PackageFiles.Add(v.GetChosenFile());
+                    var chosenFile = v.GetChosenFile();
+                    if (chosenFile != null)
+                    {
+                        mf.PackageFiles.Add(chosenFile);
+                    }
                 }
             }
 

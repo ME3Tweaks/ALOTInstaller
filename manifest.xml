@@ -318,7 +318,7 @@
                </choicefile>
                <choicefile
                     choicetitle="FemShep Style"
-                    defaultchoiceindex="0"
+                    defaultselectedindex="0"
                     allownoinstall="true">
                           <packagefile
                            me1="true"
@@ -525,7 +525,8 @@
                     deleteshaders="true"
                     choicetitle="Soft Shadows" />
                <copyfile
-                    optional="false"
+                    optional="true"
+                    allownoinstall="true"
                     inarchivepath="MEUITM\mods\Splash.bmp"
                     gamedestinationpath="BioGame\Splash\Splash.bmp"
                     choicetitle="MEUITM Splash Screen" />
@@ -837,7 +838,9 @@
                     deleteshaders="true"
                     choicetitle="Soft Shadows" />
                <copyfile
-                    optional="false"
+                    optional="true"
+                    defaultselectedindex="1"
+                    allownoinstall="true"
                     inarchivepath="MEUITM\mods\Splash.bmp"
                     gamedestinationpath="BioGame\Splash\Splash.bmp"
                     choicetitle="MEUITM Splash Screen" />

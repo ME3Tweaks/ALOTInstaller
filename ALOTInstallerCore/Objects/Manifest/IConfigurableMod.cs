@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace ALOTInstallerCore.Objects.Manifest
 {
@@ -19,7 +20,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// <summary>
         /// The list of visible choices to present to the user
         /// </summary>
-        public virtual List<string> ChoicesHuman { get; internal set; }
+        public virtual List<object> ChoicesHuman { get; internal set; }
         /// <summary>
         /// The default index that should be selected when user is prompted. If AllowNoInstall is true, there is an additional not-listed index that is cancel. It is always the last index.
         /// </summary>
@@ -37,10 +38,27 @@ namespace ALOTInstallerCore.Objects.Manifest
 
         internal bool IsSelectedForInstallation()
         {
-            if (!AllowNoInstall) return true;
-            return SelectedIndex >= 0 && SelectedIndex < ChoicesHuman.Count;
+            if (!AllowNoInstall) return true; //Forced install
+            if (ChoicesHuman[SelectedIndex] is NullChoiceOption) return false;
+            return true; //Something was selected
+        }
+
+        internal void AddNoInstallIfApplicable()
+        {
+            if (AllowNoInstall && !ChoicesHuman.Any(x => x is NullChoiceOption))
+            {
+                ChoicesHuman.Add(new NullChoiceOption());
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+    }
+
+    /// <summary>
+    /// Options for 'Don't install'
+    /// </summary>
+    public class NullChoiceOption
+    {
+        public override string ToString() => "Don't install";
     }
 }
