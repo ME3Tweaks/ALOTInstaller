@@ -269,7 +269,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     {
                         MessageBox.ErrorQuery(title, message, "OK");
                     },
-                    WarningActionCallback = (title, message) => MessageBox.ErrorQuery(title, message, "Yes", "No") == 0,
+                    WarningActionCallback = (title, message, affirmativetext, negativetext) => MessageBox.ErrorQuery(title, message, affirmativetext, negativetext) == 0,
                     BackupProgressCallback = (progressVal, progressMax) =>
                     {
                         pd.ProgressMax = progressMax;
@@ -280,7 +280,7 @@ namespace ALOTInstallerConsole.BuilderUI
                         pd.Indeterminate = indeterminate;
                     },
                     UpdateStatusCallback = (newstatus) => pd.BottomMessage = newstatus,
-                    WarningListCallback = (title, message, bottommessage, list) => ScrollDialog.Prompt(title, message, bottommessage, list, Colors.Error, "Yes", "No") == 0,
+                    WarningListCallback = (title, message, bottommessage, list, affirmativetext, negativetext) => ScrollDialog.Prompt(title, message, bottommessage, list, Colors.Error, affirmativetext, negativetext) == 0,
                     SelectGameBackupFolderDestination = () =>
                     {
                         string selectedPath = null;

@@ -507,9 +507,6 @@ namespace ALOTInstallerCore.ModManager.Services
             Log.Information(@"Backup location: " + targetPath);
             BackupService.SetStatus(game, "Checking backup", "Please wait");
             //BackupService.SetActivity(game, true);
-#if WPF
-            BackupService.SetIcon(game, FontAwesomeIcon.Spinner);
-#endif
             GameTarget target = new GameTarget(game, targetPath, false);
             var validationFailedReason = target.ValidateTarget();
             if (target.IsValid)
@@ -555,10 +552,6 @@ namespace ALOTInstallerCore.ModManager.Services
                 Log.Information(@"Backup target is invalid. This backup cannot not be used. Reason: " + validationFailedReason);
             }
             //BackupService.SetActivity(game, false);
-#if WPF
-            BackupService.RefreshBackupStatus(null, game);
-            BackupService.ResetIcon(game);
-#endif
         }
     }
 }

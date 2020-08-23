@@ -98,7 +98,8 @@ namespace ALOTInstallerCore.ModManager.Services
                         BackupStatus = "Backed up";
                     }
                     BackupLocationStatus = $"Backup stored at {bPath}";
-                    LinkActionText = "Unlink backup";
+                    LinkActionText = "fl" +
+                        " backup";
                     BackupActionText = "Restore game";
                     return;
                 }
@@ -188,29 +189,6 @@ namespace ALOTInstallerCore.ModManager.Services
         //    get => _me3BackupActivity;
         //    private set => SetProperty(ref _me3BackupActivity, value);
         //}
-
-#if WPF
-        private static FontAwesomeIcon _me1ActivityIcon = FontAwesomeIcon.TimesCircle;
-        public static FontAwesomeIcon ME1ActivityIcon
-        {
-            get => _me1ActivityIcon;
-            private set => SetProperty(ref _me1ActivityIcon, value);
-        }
-
-        private static FontAwesomeIcon _me2ActivityIcon = FontAwesomeIcon.TimesCircle;
-        public static FontAwesomeIcon ME2ActivityIcon
-        {
-            get => _me2ActivityIcon;
-            private set => SetProperty(ref _me2ActivityIcon, value);
-        }
-
-        private static FontAwesomeIcon _me3ActivityIcon = FontAwesomeIcon.TimesCircle;
-        public static FontAwesomeIcon ME3ActivityIcon
-        {
-            get => _me3ActivityIcon;
-            private set => SetProperty(ref _me3ActivityIcon, value);
-        }
-#endif
 
         //public static bool AnyGameMissingBackup => (!ME1BackedUp && Locations.ME1Target != null) || (!ME2BackedUp && Locations.ME2Target != null) || (!ME3BackedUp && Locations.ME3Target != null);
 
@@ -355,23 +333,7 @@ namespace ALOTInstallerCore.ModManager.Services
         //    }
         //}
 
-#if WPF
-        public static void SetIcon(Enums.MEGame game, FontAwesomeIcon p1)
-        {
-            switch (game)
-            {
-                case Enums.MEGame.ME1:
-                    ME1ActivityIcon = p1;
-                    break;
-                case Enums.MEGame.ME2:
-                    ME2ActivityIcon = p1;
-                    break;
-                case Enums.MEGame.ME3:
-                    ME3ActivityIcon = p1;
-                    break;
-            }
-        }
-#endif
+
 
         public static string GetGameBackupPath(Enums.MEGame game, out bool isVanilla, bool forceCmmVanilla = true, bool logReturnedPath = false, bool forceReturnPath = false)
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,8 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.Objects.Manifest;
+using ALOTInstallerWPF.InstallerUI;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
@@ -60,6 +63,7 @@ namespace ALOTInstallerWPF.Flyouts
         public GenericCommand OpenALOTDiscordCommand { get; set; }
         public GenericCommand CleanupLibraryCommand { get; set; }
         public GenericCommand CleanupBuildLocationCommand { get; set; }
+        public GenericCommand DebugShowInstallerFlyoutCommand { get; set; }
         private void LoadCommands()
         {
             SetLibraryLocationCommand = new GenericCommand(ChangeLibraryLocation);
@@ -70,6 +74,28 @@ namespace ALOTInstallerWPF.Flyouts
             OpenALOTDiscordCommand = new GenericCommand(OpenAlotDiscord);
             CleanupLibraryCommand = new GenericCommand(CleanupLibrary);
             CleanupBuildLocationCommand = new GenericCommand(CleanupBuildLocation);
+#if DEBUG
+            DebugShowInstallerFlyoutCommand = new GenericCommand(() =>
+            {
+                var game = Enums.MEGame.ME1;
+                InstallerUIController iuic = new InstallerUIController(new InstallOptionsPackage()
+                {
+                    DebugNoInstall = true,
+                    InstallALOT = true,
+                    InstallTarget = Locations.GetTarget(game)
+                })
+                {
+                    InstallerTextTop = "Installing X TOP TEXT",
+                    InstallerTextMiddle = "This is middle text",
+                    InstallerTextBottom = "Bottom Text 15%",
+
+                };
+                if (Application.Current.MainWindow is MainWindow mw)
+                {
+                    mw.OpenInstallerUI(iuic, InstallerUIController.GetInstallerBackgroundImage(game, ManifestHandler.CurrentMode), true);
+                }
+            });
+#endif
         }
 
         private void CleanupBuildLocation()
@@ -270,27 +296,27 @@ namespace ALOTInstallerWPF.Flyouts
                 else
                 {
                     // Link to an existing backup
-                    var unlinkRes = await mw.ShowMessageAsync("Warning: Linking backup",
-                        $"Unlinking your backup for {gbs.Game.ToGameName()} will make modding programs, including ME3Explorer, ALOT Installer, and ME3Tweaks Mod Manager unable to find a backup for this game. These programs use this backup for various features. Unlinking a backup will not delete your existing backup. You can link to an existing backup once you've unlinked your existing backup.\n\nBackup Path: {buPath}\n\nUnlink your backup for {gbs.Game.ToGameName()}?",
-                        MessageDialogStyle.AffirmativeAndNegative,
-                        new MetroDialogSettings()
-                        {
-                            AffirmativeButtonText = "Unlink backup",
-                            NegativeButtonText = "Don't unlink backup",
-                            DefaultButtonFocus = MessageDialogResult.Negative
-                        });
-                    if (unlinkRes == MessageDialogResult.Affirmative)
-                    {
-                        performBackup(gbs.Game, true, mw);
-                    }
+                    //var unlinkRes = await mw.ShowMessageAsync("Warning: Linking backup",
+                    //    $"Link an existing backup for {gbs.Game.ToGameName()} to make modding programs, including ME3Explorer, ALOT Installer, and ME3Tweaks Mod Manager, recognize your backup. Linking a backup requires the backup to be unmodified from a vanilla version of the game.\n\nDO NOT SELECT YOUR MAIN GAME INSTALL, once designated as a backup, modding programs will refuse to modify it.",
+                    //    MessageDialogStyle.AffirmativeAndNegative,
+                    //    new MetroDialogSettings()
+                    //    {
+                    //        AffirmativeButtonText = "Link an existing backup",
+                    //        NegativeButtonText = "Don't link backup",
+                    //        DefaultButtonFocus = MessageDialogResult.Affirmative
+                    //    });
+                    //if (unlinkRes == MessageDialogResult.Affirmative)
+                    //{
+                    performBackup(gbs.Game, true, mw);
+                    //}
                 }
             }
         }
 
         private async void performBackup(Enums.MEGame game, bool linkMode, MetroWindow mw)
         {
-
-            var pd = await mw.ShowProgressAsync($"Creating backup of {game.ToGameName()}", "Please wait while your backup is created.");
+            var pd = await mw.ShowProgressAsync($"{(linkMode ? "Linking" : "Creating")} backup of {game.ToGameName()}", "Checking game...");
+            pd.SetIndeterminate();
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("BackupWorker");
             nbw.DoWork += (a, b) =>
             {
@@ -307,7 +333,7 @@ namespace ALOTInstallerWPF.Flyouts
                             OpenFileDialog ofd = new OpenFileDialog()
                             {
                                 Title = "Select game executable in backup directory",
-                                Filter = game.ToGameName().Replace(" ", "") + ".exe",
+                                Filter = $"{game.ToGameName()} executable|{game.ToGameName().Replace(" ", "")}.exe",
                                 CheckFileExists = true
                             };
                             var result = ofd.ShowDialog();
@@ -317,46 +343,24 @@ namespace ALOTInstallerWPF.Flyouts
                                 var path = Utilities.GetGamePathFromExe(game, ofd.FileName);
                                 if (path != null)
                                 {
-
-                                    GameTarget t = new GameTarget(game, path, true, true);
+                                    var target = new GameTarget(_game, path, false, true);
+                                    invalidReason = target.ValidateTarget(true);
+                                    if (invalidReason == null)
                                     {
-                                        var target = new GameTarget(_game, path, false, true);
-                                        invalidReason = target.ValidateTarget(true);
-                                        if (invalidReason == null)
-                                        {
-
-                                            // Valid target to test against
-                                            gt = target;
-                                            lock (syncObj)
-                                            {
-                                                Monitor.Pulse(syncObj);
-                                            }
-
-                                            return;
-                                        }
+                                        // Valid target to test against
+                                        gt = target;
+                                        return;
                                     }
                                 }
                                 else
                                 {
-                                    invalidReason =
-                                        "Game executable cannot possibly be located this close to root of volume";
-                                }
-
-                                lock (syncObj)
-                                {
-                                    Monitor.Pulse(syncObj);
+                                    invalidReason = "Game executable cannot possibly be located this close to root of volume";
                                 }
 
                                 await pd.CloseAsync();
                                 await mw.ShowMessageAsync("Cannot create backup", invalidReason);
                             }
-
-                            lock (syncObj)
-                            {
-                                Monitor.Wait(syncObj);
-                            }
                         });
-
                         return gt;
                     },
                     BlockingActionCallback = (title, message) =>
@@ -366,7 +370,7 @@ namespace ALOTInstallerWPF.Flyouts
                             await mw.ShowMessageAsync(title, message);
                         });
                     },
-                    WarningActionCallback = (title, message) =>
+                    WarningActionCallback = (title, message, affirmativetext, negativetext) =>
                     {
                         bool response = false;
                         Application.Current.Dispatcher.Invoke(async () =>
@@ -375,8 +379,8 @@ namespace ALOTInstallerWPF.Flyouts
                                 MessageDialogStyle.AffirmativeAndNegative,
                                 new MetroDialogSettings()
                                 {
-                                    AffirmativeButtonText = "Yes",
-                                    NegativeButtonText = "No",
+                                    AffirmativeButtonText = affirmativetext,
+                                    NegativeButtonText = negativetext,
                                 }) == MessageDialogResult.Affirmative;
                             lock (syncObj)
                             {
@@ -394,9 +398,9 @@ namespace ALOTInstallerWPF.Flyouts
                     {
                         // Not sure this needs to be on UI thread
                         Application.Current.Dispatcher.Invoke(() =>
-                {
-                    pd.SetProgress(progressVal * 1f / progressMax);
-                });
+                        {
+                            pd.SetProgress(progressVal * 1f / progressMax);
+                        });
                     },
                     SetProgressIndeterminateCallback = (indeterminate) =>
                     {
@@ -408,7 +412,7 @@ namespace ALOTInstallerWPF.Flyouts
                         // ?? setting progress will unset it
                     },
                     UpdateStatusCallback = newstatus => pd.SetMessage(newstatus),
-                    WarningListCallback = (title, message, bottommessage, list) =>
+                    WarningListCallback = (title, message, bottommessage, list, affirmativetext, negativetext) =>
                     {
                         bool response = false;
                         Application.Current.Dispatcher.Invoke(async () =>
@@ -417,8 +421,8 @@ namespace ALOTInstallerWPF.Flyouts
                                 MessageDialogStyle.AffirmativeAndNegative,
                                 new MetroDialogSettings()
                                 {
-                                    AffirmativeButtonText = "Yes",
-                                    NegativeButtonText = "No",
+                                    AffirmativeButtonText = affirmativetext,
+                                    NegativeButtonText = negativetext,
                                 }) == MessageDialogResult.Affirmative;
                             lock (syncObj)
                             {

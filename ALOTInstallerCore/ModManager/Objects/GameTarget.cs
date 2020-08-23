@@ -288,16 +288,15 @@ namespace ALOTInstallerCore.ModManager.Objects
             var dlcDir = MEDirectories.DLCPath(this);
             var installedMods = MEDirectories.GetInstalledDLC(this, includeDisabled).Where(x => !MEDirectories.OfficialDLC(Game).Contains(x.TrimStart('x'), StringComparer.InvariantCultureIgnoreCase));
             //Must run on UI thread
-#if WPF
-                Application.Current.Dispatcher.Invoke(delegate
-                {
-                    UIInstalledDLCMods.ClearEx();
-                    UIInstalledDLCMods.AddRange(installedMods.Select(x => new InstalledDLCMod(Path.Combine(dlcDir, x), Game, deleteConfirmationCallback, notifyDeleted, modNamePrefersTPMI)).ToList().OrderBy(x => x.ModName));
-                });
-#else
+            //#if WPF
+            //Application.Current.Dispatcher.Invoke(delegate
+            //{
+            //    UIInstalledDLCMods.ClearEx();
+            //    UIInstalledDLCMods.AddRange(installedMods.Select(x => new InstalledDLCMod(Path.Combine(dlcDir, x), Game, deleteConfirmationCallback, notifyDeleted, modNamePrefersTPMI)).ToList().OrderBy(x => x.ModName));
+            //});
+            //#else
             UIInstalledDLCMods.ReplaceAll(installedMods.Select(x => new InstalledDLCMod(Path.Combine(dlcDir, x), Game, modNamePrefersTPMI)).ToList().OrderBy(x => x.ModName));
-
-#endif
+            //#endif
         }
 
         public bool IsTargetWritable()
@@ -571,35 +570,35 @@ namespace ALOTInstallerCore.ModManager.Objects
 
         public string NumASIModsInstalledText { get; private set; }
 
-#if WPF
-            public void PopulateASIInfo()
-            {
-                var asi = new ASIGame(this);
-                var installedASIs = asi.GetInstalledASIMods(Game);
-                if (installedASIs.Any())
-                {
-                    NumASIModsInstalledText = "This install has M3L.GetString(M3L.string_interp_asiStatus, installedASIs.Count);
-                }
-                else
-                {
-                    NumASIModsInstalledText = M3L.GetString(M3L.string_thisInstallationHasNoASIModsInstalled);
-                }
-            }
+        //#if WPF
+        //            public void PopulateASIInfo()
+        //            {
+        //                var asi = new ASIGame(this);
+        //                var installedASIs = asi.GetInstalledASIMods(Game);
+        //                if (installedASIs.Any())
+        //                {
+        //                    NumASIModsInstalledText = "This install has M3L.GetString(M3L.string_interp_asiStatus, installedASIs.Count);
+        //                }
+        //                else
+        //                {
+        //                    NumASIModsInstalledText = M3L.GetString(M3L.string_thisInstallationHasNoASIModsInstalled);
+        //                }
+        //            }
 
-            public string Binkw32StatusText { get; private set; }
+        //            public string Binkw32StatusText { get; private set; }
 
-            public void PopulateBinkInfo()
-            {
-                if (Game != Enums.MEGame.ME1)
-                {
-                    Binkw32StatusText = Utilities.CheckIfBinkw32ASIIsInstalled(this) ? M3L.GetString(M3L.string_bypassInstalledASIAndDLCModsWillBeAbleToLoad) : M3L.GetString(M3L.string_bypassNotInstalledASIAndDLCModsWillBeUnableToLoad);
-                }
-                else
-                {
-                    Binkw32StatusText = Utilities.CheckIfBinkw32ASIIsInstalled(this) ? M3L.GetString(M3L.string_bypassInstalledASIModsWillBeAbleToLoad) : M3L.GetString(M3L.string_bypassNotInstalledASIModsWillBeUnableToLoad);
-                }
-            }
-#endif
+        //            public void PopulateBinkInfo()
+        //            {
+        //                if (Game != Enums.MEGame.ME1)
+        //                {
+        //                    Binkw32StatusText = Utilities.CheckIfBinkw32ASIIsInstalled(this) ? M3L.GetString(M3L.string_bypassInstalledASIAndDLCModsWillBeAbleToLoad) : M3L.GetString(M3L.string_bypassNotInstalledASIAndDLCModsWillBeUnableToLoad);
+        //                }
+        //                else
+        //                {
+        //                    Binkw32StatusText = Utilities.CheckIfBinkw32ASIIsInstalled(this) ? M3L.GetString(M3L.string_bypassInstalledASIModsWillBeAbleToLoad) : M3L.GetString(M3L.string_bypassNotInstalledASIModsWillBeUnableToLoad);
+        //                }
+        //            }
+        //#endif
 
         private string getBinkPath()
         {

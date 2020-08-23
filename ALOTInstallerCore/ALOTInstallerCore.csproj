@@ -32,7 +32,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DefineConstants>DEBUG;TRACE;WINDOWS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;WINDOWS;WPF</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AuthenticodeExaminer" Version="0.3.0" />

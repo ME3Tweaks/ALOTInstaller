@@ -65,9 +65,13 @@ namespace ALOTInstallerCore.Steps
         /// </summary>
         public Action<List<InstallerFile>> FinalizedFileSet { get; set; }
         /// <summary>
-        /// Invoked when a new file is being processed. This can be used for things like ensuring something is in view in the UI
-        /// </summary>
+        /// Invoked when a new file is being processed. This can be used for things like ensuring something is in view in the UI.
         public Action<InstallerFile> NotifyFileBeingProcessed { get; set; }
+        /// <summary>
+        /// Callback that is invoked when the staging step has reached a point of no return. This occurs after the user has selected all options. This must be set as this
+        /// function is not checked for null before use
+        /// </summary>
+        public Func<bool> PointOfNoReturnNotification { get; set; }
         /// <summary>
         /// Extracts an archive file (7z/zip/rar). Returns if a file was extracted or not.
         /// </summary>
@@ -151,9 +155,6 @@ namespace ALOTInstallerCore.Steps
                 e.Result = false;
                 return; //abort.
             }
-            //DEBUG ONLY
-            //installOptions.FilesToInstall =
-            //    installOptions.FilesToInstall.Where(x => x.FriendlyName.Contains("HR Maya")).ToList();
 
 
             if (installOptions.FilesToInstall == null)
@@ -165,6 +166,12 @@ namespace ALOTInstallerCore.Steps
             }
 
             FinalizedFileSet?.Invoke(installOptions.FilesToInstall);
+            if (PointOfNoReturnNotification())
+            {
+                Log.Information("User aborted install at point of no return callback");
+                e.Result = false;
+                return;
+            }
 
             Log.Information(@"The following files will be staged for installation:");
             int buildID = 0;

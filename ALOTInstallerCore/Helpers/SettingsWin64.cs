@@ -85,6 +85,16 @@ namespace ALOTInstallerCore.Helpers
             set => SetProperty(ref _importFilesAsMove, value);
         }
 
+        private static bool _playMusic = true;
+        /// <summary>
+        /// Global indicator if music should play during the installer or not.
+        /// </summary>
+        public static bool PlayMusic
+        {
+            get => _playMusic;
+            set => SetProperty(ref _playMusic, value);
+        }
+
         /// <summary>
         /// Makes more output messaging occur
         /// </summary>
@@ -246,7 +256,7 @@ namespace ALOTInstallerCore.Helpers
             BuildLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, @"Staging");
             MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
             //Language = LoadSettingString(settingsIni, "ModManager", "Language", "int");
-            //LastContentCheck = LoadSettingDateTime(settingsIni, "ModManager", "LastContentCheck", DateTime.MinValue);
+            PlayMusic = LoadSettingBool(SettingsKeys.SettingKeys.PlayMusic, false);
             BetaMode = LoadSettingBool(SettingsKeys.SettingKeys.BetaMode, false);
             //AutoUpdateLODs = LoadSettingBool(settingsIni, "ModManager", "AutoUpdateLODs", true);
             //WebClientTimeout = LoadSettingInt(settingsIni, "ModManager", "WebclientTimeout", 5);

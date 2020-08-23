@@ -43,6 +43,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 NotifyFileBeingProcessed = notifyNewFileProcessing,
                 ErrorStagingCallback = errorStaging,
                 ConfigureModOptions = configureModOptions,
+                PointOfNoReturnNotification = pointOfNoReturnPrompt,
             };
             builderWorker.WorkerReportsProgress = true;
             builderWorker.DoWork += ss.PerformStaging;
@@ -73,6 +74,42 @@ namespace ALOTInstallerWPF.BuilderUI
             };
             fsuic.ProgressIndeterminate = true;
             builderWorker.RunWorkerAsync();
+        }
+
+        private bool pointOfNoReturnPrompt()
+        {
+            bool userAcceptedFinality = false;
+            var syncObj = new object();
+            Application.Current.Invoke(async () =>
+            {
+                if (Application.Current.MainWindow is MainWindow mw)
+                {
+
+                    var answer = await mw.ShowMessageAsync(
+                        "WARNING: YOU WILL BE UNABLE TO INSTALL ADDITIONAL FILES TO THE GAME AFTER THIS POINT",
+                        "Once textures are installed, you will be unable to safely add or change files in your game as all files will be modified.  This means mods, DLC, and other things; your game is very likely to become unusable if you do and ALOT Installer will refuse to work on games modded in this way.\n\nEnsure all your non-texture mods are installed before continuing, as you will not be able to install them after this point.",
+                        MessageDialogStyle.AffirmativeAndNegative,
+                        new MetroDialogSettings()
+                        {
+                            AffirmativeButtonText = "I understand, install",
+                            NegativeButtonText = "Abort install",
+                            DefaultButtonFocus = MessageDialogResult.Negative
+                        }, 70);
+                    userAcceptedFinality = answer == MessageDialogResult.Affirmative;
+                    lock (syncObj)
+                    {
+                        Monitor.Pulse(syncObj);
+                    }
+                }
+
+                lock (syncObj)
+                {
+                    Monitor.Wait(syncObj);
+                }
+            });
+
+
+            return userAcceptedFinality;
         }
 
         private void notifyNewFileProcessing(InstallerFile fileProcessing)
@@ -169,10 +206,9 @@ namespace ALOTInstallerWPF.BuilderUI
                         {
                             // BEGIN INSTALLATION!
                             // Todo: This stuff
-                            var iuic = new InstallerUIController()
+                            var iuic = new InstallerUIController(iop)
                             {
                                 InstallerTextTop = "Preparing texture installer",
-                                InstallOptions = iop
                             };
                             mw.OpenInstallerUI(iuic, InstallerUIController.GetInstallerBackgroundImage(iop.InstallTarget.Game, iop.InstallerMode));
                         }

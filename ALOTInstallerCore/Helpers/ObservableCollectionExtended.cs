@@ -190,9 +190,6 @@ namespace ALOTInstallerCore.Helpers
                 BindableCount = Count;
                 OnPropertyChanged(nameof(Any));
             };
-#if WPF
-            BindingOperations.EnableCollectionSynchronization(this, _syncLock);
-#endif
         }
 
         /// <summary> 

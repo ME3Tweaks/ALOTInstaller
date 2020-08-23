@@ -108,13 +108,13 @@ namespace ALOTInstallerWPF
             }
         }
 
-        public void OpenInstallerUI(InstallerUIController controller, ImageBrush background)
+        public void OpenInstallerUI(InstallerUIController controller, ImageBrush background, bool isOpeningDebug = false)
         {
             InstallingOverlayFlyout.Content = null; //Lose the old reference
             InstallingOverlayFlyout.Content = controller;
             InstallingOverlayFlyout.Background = background;
             InstallingOverlayFlyout.IsOpen = true;
-            controller.StartInstall();
+            controller.StartInstall(isOpeningDebug);
         }
 
         public void CloseInstallerUI()

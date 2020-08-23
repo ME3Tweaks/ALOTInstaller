@@ -72,8 +72,8 @@ namespace ALOTInstallerCore.Helpers
                 }
 
                 //var fetchedManifest = webClient.DownloadString(new Uri(url));
-                //var fetchedManifest = File.ReadAllText(@"C:\Users\Mgamerz\source\repos\AlotAddOnGUI\manifest.xml");
-                var fetchedManifest = File.ReadAllText(@"E:\Documents\Visual Studio 2015\Projects\AlotAddOnGUI\manifest.xml");
+                var fetchedManifest = File.ReadAllText(@"C:\Users\Mgamerz\source\repos\AlotAddOnGUI\manifest.xml");
+                //var fetchedManifest = File.ReadAllText(@"E:\Documents\Visual Studio 2015\Projects\AlotAddOnGUI\manifest.xml");
 
                 if (Utilities.TestXMLIsValid(fetchedManifest))
                 {

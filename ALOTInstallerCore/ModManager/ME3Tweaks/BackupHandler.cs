@@ -41,7 +41,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             /// <summary>
             /// Called when there is a warning that needs a yes/no answer
             /// </summary>
-            public Func<string, string, bool> WarningActionCallback { get; set; }
+            public Func<string, string, string, string, bool> WarningActionCallback { get; set; }
             /// <summary>
             /// Called when the user must select a game executable (for backup). Return null to indicate the user aborted the prompt.
             /// </summary>
@@ -58,7 +58,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             /// <summary>
             /// Called when there is a warning that has a potentially long list of items in it, with a title, top and bottom message, as well as a list of strings. These items should be placed in a scrolling mechanism
             /// </summary>
-            public Func<string, string, string, List<string>, bool> WarningListCallback { get; set; }
+            public Func<string, string, string, List<string>, string, string, bool> WarningListCallback { get; set; }
 
             /// <summary>
             /// Called when there is a new status message that should be displayed, such as what is being backed up.
@@ -100,7 +100,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 {
                     // Point to existing game installation
                     Log.Information(@"PerformBackup() with IsCustomOption.");
-                    var linkOK = WarningActionCallback?.Invoke("Ensure correct game chosen", "The path you specify will be checked if it is a vanilla backup. Once this check is complete it will be marked as a backup and modding tools will refuse to modify it. Ensure this is not your active game path or you will be unable to mod the game.");
+                    var linkOK = WarningActionCallback?.Invoke("Ensure correct game chosen", "The path you specify will be checked if it is a vanilla backup. Once this check is complete it will be marked as a backup and modding tools will refuse to modify it. Ensure this is not your active game path or you will be unable to mod the game.",
+                        "I understand", "Abort linking");
                     if (!linkOK.HasValue || !linkOK.Value)
                     {
                         Log.Information(@"User aborted linking due to dialog");
@@ -186,7 +187,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     Log.Information(@"The following dlc will be missing in the backup if user continues: " + dlcList);
                     string message =
                         $"This target does not have have all OFFICIAL DLC installed. Ensure you have installed all OFFICIAL DLC you want to include in your backup, otherwise a game restore will not include all of it.\n\nThe following DLC is not installed:\n{dlcList}\n\nMake a backup of this target?";
-                    var okToBackup = WarningActionCallback?.Invoke("Warning: some official DLC missing", message);
+                    var okToBackup = WarningActionCallback?.Invoke("Warning: some official DLC missing", message, "Continue backing up", "Abort backup");
                     if (!okToBackup.HasValue || !okToBackup.Value)
                     {
                         Log.Information("User canceled backup due to some missing data");
@@ -214,7 +215,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     //Show UI for non vanilla
                     string message = "The following files were found to be modified and are not vanilla. You can continue making a backup, however other modding tools such as ME3Tweaks Mod Manager will not accept this as a valid backup source. It is highly recommended that all backups of a game be unmodified, as a broken modified backup is a worthless backup.";
                     string bottomMessage = "Make a backup anyways (NOT RECOMMENDED)?";
-                    var continueBackup = WarningListCallback?.Invoke("Found non vanilla files", message, bottomMessage, nonVanillaFiles);
+                    var continueBackup = WarningListCallback?.Invoke("Found non vanilla files", message, bottomMessage, nonVanillaFiles, "Backup anyways", "Abort backup");
                     if (!continueBackup.HasValue || !continueBackup.Value)
                     {
                         Log.Information("User aborted backup due to non-vanilla files found");
@@ -226,7 +227,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     //Show UI for non vanilla
                     string message = "The following DLC mods were found to be installed. These mods are not part of the original game. You can continue making a backup, however other modding tools such as ME3Tweaks Mod Manager will not accept this as a valid backup source. It is highly recommended that all backups of a game be unmodified, as a broken modified backup is a worthless backup.";
                     string bottomMessage = "Make a backup anyways (NOT RECOMMENDED)?";
-                    var continueBackup = WarningListCallback?.Invoke("Found installed DLC mods", message, bottomMessage, dlcModsInstalled);
+                    var continueBackup = WarningListCallback?.Invoke("Found installed DLC mods", message, bottomMessage, dlcModsInstalled, "Backup anyways", "Abort backup");
                     if (!continueBackup.HasValue || !continueBackup.Value)
                     {
                         Log.Information("User aborted backup due to found DLC mods");
@@ -270,7 +271,6 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         return false;
                     }
                 }
-
 
                 if (!targetToBackup.IsCustomOption)
                 {
@@ -508,7 +508,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             public bool ProgressIndeterminate { get; set; } = true;
             public bool ProgressVisible { get; set; } = false;
             public bool BackupInProgress { get; set; }
-
+            
         }
 
         #endregion
@@ -862,7 +862,19 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
         public static void UnlinkBackup(Enums.MEGame meGame)
         {
-#if !WINDOWS
+            Log.Information($"Unlinking backup for {meGame}");
+            var gbPath = BackupService.GetGameBackupPath(meGame, out _, forceReturnPath: true);
+            if (gbPath != null)
+            {
+                var cmmVanilla = Path.Combine(gbPath, "cmm_vanilla");
+                if (File.Exists(cmmVanilla))
+                {
+                    Log.Information("Deleted cmm_vanilla file: " + cmmVanilla);
+                    File.Delete(cmmVanilla);
+                }
+            }
+#if WINDOWS
+
             switch (meGame)
             {
                 case Enums.MEGame.ME1:

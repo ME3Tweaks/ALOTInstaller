@@ -22,6 +22,10 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
+            <MediaElement x:Name="audioPlayer" 
+                          LoadedBehavior="Manual" 
+                          UnloadedBehavior="Stop"
+                          MediaEnded="AudioPlayer_OnMediaEnded"/>
             <StackPanel Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
                 <iconPacks:PackIconIonicons Foreground="{Binding BigIconForeground}" Kind="{Binding BigIconKind}" Width="84" Height="84" Visibility="{Binding BigIconVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 <mah:ProgressRing IsActive="True" Margin="0,0,0,10" Foreground="Snow"/>
@@ -72,7 +76,10 @@
                     </TextBlock.Effect>
                 </TextBlock>
             </StackPanel>
-            <Button  Margin="10" Grid.Column="0" Grid.Row="1" Height="40" Width="40" Style="{StaticResource MahApps.Styles.Button.Circle}" ToolTip="Click to toggle music" Command="{Binding ToggleMusicCommand}">
+            <Button Name="musicButton" Visibility="{Binding MusicAvailable, Converter={StaticResource BoolToVisibilityConverter}}" 
+                    Margin="10" Grid.Column="0" Grid.Row="1" Height="40" Width="40" 
+                    Style="{StaticResource MahApps.Styles.Button.Circle}" 
+                    ToolTip="Click to toggle music" Command="{Binding ToggleMusicCommand}">
                 <Button.Content>
                     <iconPacks:PackIconIonicons Kind="{Binding MusicIcon}"/>
                 </Button.Content>

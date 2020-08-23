@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
+using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
@@ -234,7 +235,44 @@ namespace ALOTInstallerWPF.Flyouts
                         b.Result = false;
                         return;
                     }
+                    #endregion
 
+                    #region BACKUP PRECHECK
+
+                    if (BackupService.GetGameBackupPath(InstallTarget.Game, out _, false) == null)
+                    {
+                        // No backup
+                        Log.Warning($"NO BACKUP OF {InstallTarget.Game} IS AVAILABLE. PROMPTING USER");
+
+                        bool continueWithoutBackup = false;
+                        Application.Current.Dispatcher.Invoke(async () =>
+                        {
+                            var cwbR = await mw.ShowMessageAsync($"No backup of {InstallTarget.Game.ToGameName()}",
+                                $"No backup for {InstallTarget.Game.ToGameName()} is available. It is very highly recommended you make a backup of your game before installation using ALOT Installer, which will make reinstallation much faster and easier. As installation is a very complicated process, things can go wrong, which will require a full restore of the game. You can create a backup quickly and easily in the Settings menu.",
+                                MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                                {
+                                    AffirmativeButtonText = "Continue without backup",
+                                    NegativeButtonText = "Abort install",
+                                    DefaultButtonFocus = MessageDialogResult.Negative
+                                }, 60);
+                            continueWithoutBackup = cwbR == MessageDialogResult.Affirmative;
+                            lock (syncObj)
+                            {
+                                Monitor.Pulse(syncObj);
+                            }
+                        });
+                        lock (syncObj)
+                        {
+                            Monitor.Wait(syncObj);
+                        }
+
+                        if (!continueWithoutBackup)
+                        {
+                            Log.Information("User aborting install due to no backup");
+                            b.Result = false;
+                            return;
+                        }
+                    }
                     #endregion
                     b.Result = true;
                 };
@@ -242,17 +280,9 @@ namespace ALOTInstallerWPF.Flyouts
                 {
                     if (b.Error == null && b.Result is bool ok && ok)
                     {
-                        var answer = await mw.ShowMessageAsync(
-                            "YOU WILL BE UNABLE TO INSTALL FURTHER MODS/DLC/FILES AFTER THIS POINT",
-                            "Once textures are installed, you will be unable to add or change files in your game as all files will be modified. Ensure all mods and DLC are installed now, as you will not be able to change these after this point. DO NOT ATTEMPT TO INSTALL FILES OUTSIDE OF ALOT INSTALLER AFTER THIS POINT or you will have to completely delete and reinstall the game.",
-                            MessageDialogStyle.AffirmativeAndNegative);
-
-                        if (answer == MessageDialogResult.Affirmative)
-                        {
-                            // BEGIN STAGING
-                            StagingUIController suic = new StagingUIController();
-                            suic.StartStaging(iop, FileSelectionUIController.FSUIC);
-                        }
+                        // BEGIN STAGING
+                        StagingUIController suic = new StagingUIController();
+                        suic.StartStaging(iop, FileSelectionUIController.FSUIC);
                     }
                     CloseFlyout();
                 };

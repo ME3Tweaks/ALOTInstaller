@@ -31,6 +31,17 @@
                                Visibility="{Binding ShowGameMissingText, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 </StackPanel>
             </Expander>
+            <Expander DockPanel.Dock="Top" IsExpanded="True" Expanded="Expander_Expanded" Visibility="{Binding Path=(alotInstallerWpf:App.DebugModeVisibility)}">
+                <Expander.Header>
+                    <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Debug Tools"/>
+                </Expander.Header>
+                <StackPanel>
+                    <StackPanel>
+                        <Button Content="Show Installer Flyout" Command="{Binding DebugShowInstallerFlyoutCommand}" Margin="20,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+            
             <Expander DockPanel.Dock="Top" IsExpanded="True" Expanded="Expander_Expanded">
                 <Expander.Header>
                     <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="File Filtering"/>
