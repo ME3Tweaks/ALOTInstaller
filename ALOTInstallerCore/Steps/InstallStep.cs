@@ -231,6 +231,8 @@ namespace ALOTInstallerCore.Steps
             #region Main installation phase
 
             {
+                SetMiddleTextCallback?.Invoke("Setting up texture installer");
+                SetMiddleTextVisibilityCallback?.Invoke(true);
                 bool doneReached = false;
                 StageFailure failure = null;
                 void handleIPC(string command, string param)
@@ -806,6 +808,7 @@ namespace ALOTInstallerCore.Steps
             foreach (var modAddon in package.FilesToInstall.OfType<PreinstallMod>())
             {
                 SetMiddleTextCallback?.Invoke($"Installing {modAddon.FriendlyName}");
+                SetBottomTextCallback?.Invoke("Loading archive");
 
                 // We will stage the archive contents into game dir to start with, so moving files should be fast.
                 var stagingPath = Directory.CreateDirectory(Path.Combine(package.InstallTarget.TargetPath, "ModExtractStaging")).FullName;

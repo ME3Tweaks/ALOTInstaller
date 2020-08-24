@@ -767,7 +767,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                     #endregion
 
-                    UpdateStatusCallback?.Invoke("Restoring game");
+                    UpdateStatusCallback?.Invoke("Calculating how many files will be restored");
                     Log.Information($@"Copying backup to game directory: {backupPath} -> {destinationDirectory}");
                     CopyTools.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(destinationDirectory),
                         totalItemsToCopyCallback: totalFilesToCopyCallback,

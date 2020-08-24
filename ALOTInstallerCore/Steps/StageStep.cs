@@ -156,7 +156,6 @@ namespace ALOTInstallerCore.Steps
                 return; //abort.
             }
 
-
             if (installOptions.FilesToInstall == null)
             {
                 // Abort!
@@ -212,6 +211,7 @@ namespace ALOTInstallerCore.Steps
             foreach (var installerFile in installOptions.FilesToInstall)
             {
                 if (abortStaging) break;
+                Log.Information($"Processing staging for {installerFile.FriendlyName}");
                 NotifyFileBeingProcessed?.Invoke(installerFile);
                 installerFile.IsProcessing = true;
                 installerFile.IsWaiting = false;
@@ -569,11 +569,11 @@ namespace ALOTInstallerCore.Steps
                     // Has issue
                     var chosenFile = ResolveMutualExclusiveMods?.Invoke(pair.Value);
                     if (chosenFile == null) return null;//abort
-                    files.Add(chosenFile);
+                    files.Insert(0, chosenFile);
                 }
                 else
                 {
-                    files.Add(pair.Value[0]); //No mutual exclusivity
+                    files.Insert(0, pair.Value[0]); //No mutual exclusivity
                 }
             }
             //foreach (var groupsWithIssues in )
@@ -861,7 +861,6 @@ namespace ALOTInstallerCore.Steps
             {
                 filesToStage.AddRange(readyFiles.Where(x => x is UserFile));
             }
-
 
             return filesToStage.OrderBy(x => x.InstallPriority).ToList();
         }
