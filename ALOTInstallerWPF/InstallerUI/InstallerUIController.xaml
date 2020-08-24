@@ -29,10 +29,30 @@
                           UnloadedBehavior="Stop"
                           MediaEnded="AudioPlayer_OnMediaEnded"/>
             <StackPanel Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2" VerticalAlignment="Center" Orientation="Vertical" UseLayoutRounding="True">
-                <iconPacks:PackIconIonicons Foreground="{Binding BigIconForeground}" 
+                <Canvas HorizontalAlignment="Center" Height="84" Width="84">
+                    <Ellipse
+                        Width="82"
+                        Height="82"
+                        Fill="White"
+                        StrokeThickness="4"
+                        Canvas.Left="1"
+                        Canvas.Top="1"
+                        Visibility="{Binding ShowCircleBackground, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    <Ellipse
+                        Width="20"
+                        Height="60"
+                        Fill="Black"
+                        StrokeThickness="4"
+                        Canvas.Left="30"
+                        Canvas.Top="20"
+                        Visibility="{Binding ShowTriangleBackground, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                    <iconPacks:PackIconIonicons 
+                                            Foreground="{Binding BigIconForeground}" 
                                             Kind="{Binding BigIconKind}" Width="84" Height="84" 
-                                            Visibility="{Binding BigIconVisible, Converter={StaticResource BoolToVisibilityConverter}}"
-                                            HorizontalAlignment="Center"/>
+                                            Visibility="{Binding BigIconVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                </Canvas>
+
                 <mah:ProgressRing IsActive="True" Margin="0,0,0,10" Foreground="Snow" Visibility="{Binding BigIconVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
                 <TextBlock  VerticalAlignment="Stretch" FontSize="25" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" Text="{Binding InstallerTextTop}" Visibility="{Binding InstallerTextTopVisibility}">
                     <TextBlock.Effect>
@@ -80,18 +100,26 @@
                                  BlurRadius="4"/>
                     </TextBlock.Effect>
                 </TextBlock>
-                <ListView MaxHeight="200" Visibility="{Binding DebugMode, Converter={StaticResource BoolToVisibilityConverter}}" ItemsSource="{Binding DebugAllResultCodes}">
-                    <ListView.ItemsPanel>
+                <DockPanel>
+                <ListView MaxHeight="200" 
+                          Visibility="{Binding DebugMode, Converter={StaticResource BoolToVisibilityConverter}}" 
+                          ItemsSource="{Binding DebugAllResultCodes}">
+                    <!--<ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid Columns="3" />
                         </ItemsPanelTemplate>
-                    </ListView.ItemsPanel>
+                    </ListView.ItemsPanel>-->
                     <ListView.ItemTemplate>
                         <DataTemplate DataType="{x:Type steps:InstallStep+InstallResult}">
-                            <Button Command="{Binding DebugHandleFailureCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=local:InstallerUIController}}" CommandParameter="{Binding}" Content="{Binding}" Margin="2"/>
+                            <Button 
+                                Command="{Binding DebugHandleFailureCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=local:InstallerUIController}}" CommandParameter="{Binding}" 
+                                Content="{Binding}" 
+                                Margin="2"
+                                Background="Aqua"/>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+                </DockPanel>
 
             </StackPanel>
             <Button Name="musicButton" Visibility="{Binding MusicAvailable, Converter={StaticResource BoolToVisibilityConverter}}" 

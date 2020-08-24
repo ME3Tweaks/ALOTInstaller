@@ -37,6 +37,31 @@ namespace ALOTInstallerWPF.InstallerUI
         public PackIconIoniconsKind MusicIcon { get; private set; }
         public PackIconIoniconsKind BigIconKind { get; private set; }
         public bool BigIconVisible { get; private set; }
+        public bool ShowTriangleBackground { get; private set; }
+        public bool ShowCircleBackground { get; private set; }
+        public void OnBigIconVisibleChanged()
+        {
+            updateIconBackgroundVisibility();
+        }
+
+        public void OnBigIconKindChanged()
+        {
+            updateIconBackgroundVisibility();
+        }
+
+        private void updateIconBackgroundVisibility()
+        {
+            // Sets the background for the icon canvas to make it look filled in.
+            ShowCircleBackground = ShowTriangleBackground = false;
+            if (BigIconKind == PackIconIoniconsKind.CloseCircleMD || BigIconKind == PackIconIoniconsKind.CheckmarkCircleMD)
+            {
+                ShowCircleBackground = BigIconVisible;
+            }
+            else if (BigIconKind == PackIconIoniconsKind.WarningMD)
+            {
+                ShowTriangleBackground = BigIconVisible;
+            }
+        }
 #if DEBUG
         public ObservableCollectionExtended<InstallStep.InstallResult> DebugAllResultCodes { get; } = new ObservableCollectionExtended<InstallStep.InstallResult>();
         /// <summary>
@@ -146,7 +171,7 @@ namespace ALOTInstallerWPF.InstallerUI
 
         private void CloseInstaller()
         {
-           
+
 
             if (Application.Current.MainWindow is MainWindow mw)
             {
@@ -182,7 +207,7 @@ namespace ALOTInstallerWPF.InstallerUI
             DebugMode = debugMode;
             foreach (var v in ProgressHandler.DefaultStages)
             {
-                DebugAllResultCodes.AddRange(v.FailureInfos.Where(x => !x.Warning).Select(x=>x.FailureResultCode));
+                DebugAllResultCodes.AddRange(v.FailureInfos.Where(x => !x.Warning).Select(x => x.FailureResultCode));
             }
             DebugAllResultCodes.AddRange(Enum.GetValues(typeof(InstallStep.InstallResult)).Cast<InstallStep.InstallResult>());
 
@@ -302,8 +327,6 @@ namespace ALOTInstallerWPF.InstallerUI
                 BigIconForeground = Brushes.Yellow;
                 InstallerTextTop = $"Installed {installString}";
                 InstallerTextMiddle = "Installation completed with warnings";
-                InstallerTextBottomVisibility = Visibility.Collapsed;
-                InstallerTextMiddleVisibility = Visibility.Visible;
                 CurrentTip = "Texture installation succeeded with warnings. Check the installer log for more information on these warnings. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of ALOT Installer to this game, or you will corrupt it.";
             }
             else
@@ -324,12 +347,12 @@ namespace ALOTInstallerWPF.InstallerUI
                     BigIconKind = PackIconIoniconsKind.CloseCircleMD;
                     BigIconForeground = Brushes.Red;
                     InstallerTextTop = sf.FailureTopText;
-                    InstallerTextBottom = sf.FailureBottomText;
-                    InstallerTextMiddleVisibility = Visibility.Collapsed;
+                    InstallerTextMiddle = sf.FailureBottomText;
                     CurrentTip = sf.FailureHeaderText;
                 }
             }
-
+            InstallerTextBottomVisibility = Visibility.Collapsed;
+            InstallerTextMiddleVisibility = InstallerTextTopVisibility = Visibility.Visible;
             BigIconVisible = true;
         }
 
