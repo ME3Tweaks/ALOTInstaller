@@ -31,7 +31,7 @@
         </stage>
         <stage
             name="STAGE_SCAN"
-            weight="0.12055272684"
+            weight="0.012055"
             tasktext="Scanning textures">
                <failureinfo
                     resultcode="InstallFailed_FailedToScanTextures"
@@ -101,7 +101,7 @@
         </stage>
         <stage
             name="STAGE_MARKERS"
-            weight="0.025"
+            weight="0.015"
             tasktext="Installing remaining texture markers">
                <failureinfo
                     resultcode="InstallFailed_FailedToInstallRemainingTextureMarkers"
@@ -111,7 +111,7 @@
         </stage>
         <stage
             name="STAGE_VERIFYTEXTURES"
-            weight="0.05"
+            weight="0.02"
             tasktext="Verifying textures">
                <failureinfo
                     resultcode="InstallFailed_TextureVerifyFailed"
