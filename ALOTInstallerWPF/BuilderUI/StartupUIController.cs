@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects.Manifest;
+using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Objects;
 using ControlzEx.Theming;
 using MahApps.Metro.Controls;
@@ -74,12 +76,16 @@ namespace ALOTInstallerWPF.BuilderUI
 
 
                 pd.SetMessage("Preparing interface");
-                Application.Current.Dispatcher.InvokeAsync(() =>
+                Thread.Sleep(500); // This will allow this message to show up for moment so user can see it.
+                Application.Current.Dispatcher.Invoke(() =>
                 {
                     if (Application.Current.MainWindow is MainWindow mw)
                     {
                         mw.Title = $"ALOT Installer {Utilities.GetAppVersion()}";
                         mw.ContentGrid.Children.Add(new FileSelectionUIController());
+
+                        mw.DiagnosticsFlyoutControl.Content = new DiagnosticsFlyout();
+                        mw.FileImporterFlyoutControl.Content = new FileImporterFlyout();
                     }
                 });
             };

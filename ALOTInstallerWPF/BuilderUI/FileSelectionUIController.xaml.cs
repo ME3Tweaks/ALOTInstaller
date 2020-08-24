@@ -155,7 +155,7 @@ namespace ALOTInstallerWPF.BuilderUI
             FSUIC = this;
             LoadCommands();
             InitializeComponent();
-            
+
             AvailableModes.AddRange(ManifestHandler.MasterManifest.ManifestModePackageMappping.Select(x => new ModeHeader(x.Key, getModeDirections(x.Key), getModeDescription(x.Key))));
             OnManifestModeChanged(ManifestHandler.CurrentMode);
             ManifestHandler.OnManifestModeChanged = OnManifestModeChanged; //Setup change subscription
@@ -195,6 +195,7 @@ namespace ALOTInstallerWPF.BuilderUI
         public ICommand OpenSettingsCommand { get; set; }
         public RelayCommand OpenModWebpageCommand { get; set; }
         public RelayCommand OpenFileOnDiskCommand { get; set; }
+        public GenericCommand ImportAssistantCommand { get; set; }
 
         private void LoadCommands()
         {
@@ -202,6 +203,15 @@ namespace ALOTInstallerWPF.BuilderUI
             OpenFileOnDiskCommand = new RelayCommand(OpenFileOnDisk, CanOpenFileOnDisk);
             OpenSettingsCommand = new GenericCommand(OpenSettings, CanOpenSettings);
             InstallTexturesCommand = new GenericCommand(BeginInstallTextures, CanInstallTextures);
+            ImportAssistantCommand = new GenericCommand(OpenImportAssistant, () => !IsStaging);
+        }
+
+        private void OpenImportAssistant()
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                mw.FileImporterOpen = true;
+            }
         }
 
         private bool CanOpenFileOnDisk(object obj) => !IsStaging && obj is InstallerFile ifx && File.Exists(ifx.GetUsedFilepath());
@@ -356,12 +366,116 @@ namespace ALOTInstallerWPF.BuilderUI
         public long ProgressMax { get; set; }
         public long ProgressValue { get; set; }
 
+        /// <summary>
+        /// Gets if this is a file or directory. Returns null if path doesn't exist. False if it's a file. True if it's a directory.
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private static bool? getPathType(string path)
+        {
+            if (!File.Exists(path) && !Directory.Exists(path)) return null;
+            FileAttributes attr = File.GetAttributes(path);
+
+            //detect whether its a directory or file
+            if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
+                return true;
+            return false;
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             Utilities.OpenWebPage(e.Target);
+        }
+
+        protected override void OnDragOver(DragEventArgs e)
+        {
+            // If the DataObject contains string data, extract it.
+            if (IsStaging)
+            {
+                e.Handled = false;
+                return;
+            }
+            //Debug.WriteLine("ondrop");
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Handled = true; //We will handle this
+
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (files.Length > 1)
+                {
+                    // We support multi drop. I'm not going to bother checking all the extensions, the importer will handle this
+                    e.Effects = DragDropEffects.Copy;
+                }
+                else
+                {
+                    var f = files[0];
+                    var pathType = getPathType(f);
+                    if (pathType.HasValue)
+                    {
+                        if (pathType.Value)
+                        {
+                            // It's a directory.
+                            // We support this for dropping, I guess, technically.
+                        }
+                        else
+                        {
+                            // It's a file
+                            if (!TextureLibrary.ImportableFileTypes.Contains(Path.GetExtension(f), StringComparer.InvariantCultureIgnoreCase))
+                            {
+                                // Not supported.
+                                e.Effects = DragDropEffects.None;
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+        protected override void OnDrop(DragEventArgs e)
+        {
+            base.OnDrop(e);
+
+            //// If the DataObject contains string data, extract it.
+            //if (IsStaging)
+            //{
+            //    e.Handled = false;
+            //    return;
+            //}
+            //Debug.WriteLine("ondrop");
+            //if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            //{
+            //    e.Handled = true; //We will handle this
+
+            //    string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            //    if (files.Length > 1)
+            //    {
+            //        e.Effects = DragDropEffects.None;
+            //    }
+            //    else
+            //    {
+            //        var f = files[0];
+            //        if (!TextureLibrary.ImportableFileTypes.Contains(Path.GetExtension(f), StringComparer.InvariantCultureIgnoreCase))
+            //        {
+            //            e.Effects = DragDropEffects.None;
+            //            return;
+            //        }
+            //    }
+            //}
+        }
+
+        private void Drag_GiveFeedback(object sender, GiveFeedbackEventArgs e)
+        {
+            //if (e.Effects == DragDropEffects.Copy)
+            //{
+            //    e.UseDefaultCursors = false;
+            //    Mouse.SetCursor(Cursors.Hand);
+            //}
+            //else if (e.Effects == DragDropEffects.None
+            //    e.UseDefaultCursors = true;
+            //}
         }
     }
 }

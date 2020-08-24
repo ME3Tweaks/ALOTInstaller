@@ -54,6 +54,7 @@ namespace ALOTInstallerWPF.Flyouts
         public GenericCommand CleanupLibraryCommand { get; set; }
         public GenericCommand CleanupBuildLocationCommand { get; set; }
         public GenericCommand DebugShowInstallerFlyoutCommand { get; set; }
+        public GenericCommand LogsDiagnosticsCommand { get; set; }
         private void LoadCommands()
         {
             SetLibraryLocationCommand = new GenericCommand(ChangeLibraryLocation);
@@ -64,6 +65,7 @@ namespace ALOTInstallerWPF.Flyouts
             OpenALOTDiscordCommand = new GenericCommand(OpenAlotDiscord);
             CleanupLibraryCommand = new GenericCommand(CleanupLibrary);
             CleanupBuildLocationCommand = new GenericCommand(CleanupBuildLocation);
+            LogsDiagnosticsCommand = new GenericCommand(OpenDiagnosticsFlyout);
 #if DEBUG
             DebugShowInstallerFlyoutCommand = new GenericCommand(() =>
             {
@@ -86,6 +88,15 @@ namespace ALOTInstallerWPF.Flyouts
                 }
             });
 #endif
+        }
+
+        private void OpenDiagnosticsFlyout()
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                mw.SettingsOpen = false;
+                mw.DiagnosticsOpen = true;
+            }
         }
 
         private async void CleanupBuildLocation()

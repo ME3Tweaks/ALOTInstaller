@@ -23,7 +23,7 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 CanChooseDirectories = false,
                 CanChooseFiles = true,
-                AllowedFileTypes = new[] { "7z", ".rar", ".zip", ".dds", ".mem", ".tpf", ".mod", ".png", ".tga" },
+                AllowedFileTypes = TextureLibrary.ImportableFileTypes,
                 DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) //Default to user profile cause idk if there is easy way to get downloads folder on linux
             };
             Application.Run(selector);

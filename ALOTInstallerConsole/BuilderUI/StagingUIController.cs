@@ -69,7 +69,7 @@ namespace ALOTInstallerConsole.BuilderUI
             builderWorker.RunWorkerAsync();
         }
 
-        private bool configureModOptions(ManifestFile mf, List<IConfigurableMod> optionsToConfigure)
+        private bool configureModOptions(ManifestFile mf, List<ConfigurableMod> optionsToConfigure)
         {
             bool continueStaging = true;
             int num = 1;

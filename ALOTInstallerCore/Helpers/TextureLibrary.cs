@@ -24,6 +24,10 @@ namespace ALOTInstallerCore.Helpers
         private static List<ManifestFile> manifestFiles;
         private static Action<ManifestFile> readyStatusChanged;
         private static System.Timers.Timer fullRefreshTimer;
+        /// <summary>
+        /// Types of files that the installer will recognize for importing/user files
+        /// </summary>
+        public static string[] ImportableFileTypes { get; } = new[] { "7z", ".rar", ".zip", ".dds", ".mem", ".tpf", ".mod", ".png", ".tga" };
 
         /// <summary>
         /// Sets up the folder watcher for the texture library folder.

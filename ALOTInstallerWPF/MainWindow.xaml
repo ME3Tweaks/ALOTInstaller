@@ -21,7 +21,8 @@
             <mah:Flyout x:Name="BottomBasicDialog" TitleVisibility="Hidden" IsPinned="true" IsModal="True" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom"/>
             <mah:Flyout x:Name="BottomBasicDialog2" TitleVisibility="Hidden" IsPinned="true" IsModal="True" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom"/>
 
-
+            <mah:Flyout x:Name="DiagnosticsFlyoutControl" IsOpen="{Binding DiagnosticsOpen}" IsModal="True"  TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom"/>
+            <mah:Flyout x:Name="FileImporterFlyoutControl" IsOpen="{Binding FileImporterOpen}"  TitleVisibility="Hidden" Theme="Accent" CloseButtonVisibility="Hidden" Position="Bottom"/>
             <mah:Flyout x:Name="InstallingOverlayFlyout" SnapsToDevicePixels="True" TitleVisibility="Collapsed" Theme="Accent" CloseButtonVisibility="Collapsed" Position="Top" Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=mah:MetroWindow}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=mah:MetroWindow}, Path=ActualHeight}" MouseDoubleClick="InstallingOverlayoutFlyout_DoubleClick" MouseDown="InstallingOverlayFlyout_MouseDown"/>
 
             <!--</mah:Flyout>-->

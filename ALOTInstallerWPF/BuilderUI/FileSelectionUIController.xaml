@@ -12,7 +12,9 @@
              xmlns:helpers="clr-namespace:ALOTInstallerCore.Helpers;assembly=ALOTInstallerCore"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             x:Name="FSUICWindow">
+             x:Name="FSUICWindow"
+             GiveFeedback="Drag_GiveFeedback"
+             AllowDrop="True">
     <UserControl.Resources>
         <converters:ApplicableGamesVisibilityConverter x:Key="ApplicableGamesVisibilityConverter"/>
         <converters:ReadyColorConverter x:Key="ReadyColorConverter"/>
@@ -88,7 +90,13 @@
                     Command="{Binding OpenSettingsCommand}"
                     FontWeight="Bold" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" 
                     mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11"/>
-            <Button Content="Import Assistant" ToolTip="Assists in preparing files for install" Padding="10,2" Margin="-1,0,0,0" DockPanel.Dock="Left" FontWeight="Bold" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11"/>
+            <Button Content="Import Assistant" 
+                    ToolTip="Assists in preparing files for install" 
+                    Padding="10,2" Margin="-1,0,0,0" 
+                    DockPanel.Dock="Left" FontWeight="Bold" 
+                    Style="{StaticResource MahApps.Styles.Button.Square.Accent}" mah:ControlsHelper.ContentCharacterCasing="Upper" 
+                    FontSize="11"
+                    Command="{Binding ImportAssistantCommand}"/>
 
             <Button HorizontalAlignment="Right" Content="Install textures" Padding="10,2" FontWeight="Bold" 
                     Style="{StaticResource MahApps.Styles.Button.Square.Accent}" mah:ControlsHelper.ContentCharacterCasing="Upper" FontSize="11" ToolTip="Prepares to build and install textures.&#10;There are several dialogs and checks that occur before installation begins"

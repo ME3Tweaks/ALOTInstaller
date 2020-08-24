@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="ALOTInstallerWPF.Flyouts.FileImporterFlyout"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ALOTInstallerWPF.Flyouts"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+    <StackPanel HorizontalAlignment="Center" UseLayoutRounding="True">
+        <StackPanel Height="190" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <mah:ProgressRing Foreground="White" VerticalAlignment="Center"/>
+            <TextBlock Text="Checking files, please wait" HorizontalAlignment="Center"/>
+        </StackPanel>
+        <TextBlock Text="Select which game this file applies to" FontSize="20" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Visibility="{Binding UserFilesUsable, Converter={StaticResource BoolToVisibilityConverter}}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="10" CommandParameter="ME1">
+                    <Image Source="/Images/logo_me1.png" Height="40" Margin="10"></Image>
+                </Button>
+                <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="10" CommandParameter="ME2">
+                    <Image Source="/Images/logo_me2.png" Height="40" Margin="10"></Image>
+                </Button>
+                <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="10"  CommandParameter="ME3">
+                    <Image Source="/Images/logo_me3.png" Height="40" Margin="10"></Image>
+                </Button>
+            </StackPanel>
+            <TextBlock Text="This file will be treated as a user supplied file as it is not listed in the manifest for any mode. User files are not tested by the developers and may not be compatible. User files are installed after manifest files and will override their textures." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700"/>
+            <TextBlock Text=" If the file you are importing is listed above (as a manifest file), you are importing the wrong file. Do not extract or rename ANY files listed in the main manifest. Files are matched on their name, size, and hashes." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700" Foreground="Yellow"/>
+        </StackPanel>
+
+        <!-- Archive not usable -->
+        <StackPanel HorizontalAlignment="Center" Visibility="{Binding UserFilesUsable, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}" Margin="5">
+            <TextBlock Text="This archive file is not usable. It may not have any texture files in it, or contain texture files that don't meet the required naming standards for usage. All direct textures (such as dds, png, tga, not TPF) must contain the target texture hash in the filename, in the format of 0xHHHHHHHH." FontSize="16" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="600"/>
+            <Button mah:ControlsHelper.ContentCharacterCasing="Upper" Margin="0,10,0,10"  HorizontalAlignment="Center"  Content="Return to installer" Command="{Binding CloseFlyoutCommand}"/>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

@@ -119,7 +119,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         /// <param name="updateProgressCallback">Callback to indicate a progressable task has occured (such as full texture check)</param>
         /// <returns></returns>
         public static string PerformDiagnostic(GameTarget selectedDiagnosticTarget, bool textureCheck,
-            Action<string> updateStatusCallback = null, Action<int> updateProgressCallback = null)
+            Action<string> updateStatusCallback = null, Action<int> updateProgressCallback = null, Action progressIndeterminateCallback = null)
         //,
         //Action<TaskbarItemProgressState> updateTaskbarState = null)
         {
@@ -215,6 +215,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             addDiagLine($@"System culture: {CultureInfo.InstalledUICulture.Name}");
             try
             {
+                progressIndeterminateCallback?.Invoke();
+
                 #region Game Information
 
                 updateStatusCallback?.Invoke("Collecting game information");
@@ -1043,7 +1045,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 #endregion
 
-
+                progressIndeterminateCallback?.Invoke();
+                
                 #region Texture LODs
 
                 updateStatusCallback?.Invoke(@"Collecting LOD settings");

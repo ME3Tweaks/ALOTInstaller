@@ -32,7 +32,8 @@ namespace ALOTInstallerWPF
         /// Sets the open/close status of the settings panel
         /// </summary>
         public bool SettingsOpen { get; set; }
-
+        public bool DiagnosticsOpen { get; set; }
+        public bool FileImporterOpen { get; set; }
         private void OnSettingsOpenChanged()
         {
             if (SettingsOpen)
