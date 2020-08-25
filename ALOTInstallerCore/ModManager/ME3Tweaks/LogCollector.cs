@@ -138,6 +138,14 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             updateStatusCallback?.Invoke("Collecting game information");
             var diagStringBuilder = new StringBuilder();
 
+            void addDiagLines(IEnumerable<string> strings, Severity sev = Severity.INFO)
+            {
+                foreach (var s in strings)
+                {
+                    addDiagLine(s, sev);
+                }
+            }
+
             void addDiagLine(string message = "", Severity sev = Severity.INFO)
             {
                 if (diagStringBuilder == null)
@@ -992,9 +1000,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         }
                     }
 
+                    string memCrashText = null;
                     MEMIPCHandler.RunMEMIPCUntilExit(args,
                         ipcCallback: handleIPC,
-                        applicationExited: x => exitcode = x
+                        applicationExited: x => exitcode = x,
+                        setMEMCrashLog: x => memCrashText = x
                         );
 
                     if (exitcode != 0)
@@ -1035,7 +1045,17 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             }
                         }
                     }
+                    else if (exitcode != 0)
+                    {
+                        addDiagLine(@"Texture check failed");
+                        if (memCrashText != null)
+                        {
+                            addDiagLine("MassEffectModder crashed with info:");
+                            addDiagLines(memCrashText.Split("\n"), Severity.ERROR);
+                        }
+                    }
                     else
+
                     {
                         // Is this right?? We skipped check. We can't just print this
                         addDiagLine(@"Texture check did not find any texture issues in this installation");
@@ -1046,7 +1066,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #endregion
 
                 progressIndeterminateCallback?.Invoke();
-                
+
                 #region Texture LODs
 
                 updateStatusCallback?.Invoke(@"Collecting LOD settings");
@@ -1071,7 +1091,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 addLODStatusToDiag(selectedDiagnosticTarget, lods, addDiagLine);
                 if (exitcode != 0)
                 {
-                    addDiagLine($"MassEffectModderNoGuiexited --print-lods with code {exitcode}", Severity.ERROR);
+                    addDiagLine($"MassEffectModderNoGui exited --print-lods with code {exitcode}", Severity.ERROR);
                 }
 
                 #endregion

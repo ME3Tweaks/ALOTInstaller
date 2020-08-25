@@ -85,7 +85,7 @@ namespace ALOTInstallerWPF.BuilderUI
                         mw.ContentGrid.Children.Add(new FileSelectionUIController());
 
                         mw.DiagnosticsFlyoutControl.Content = new DiagnosticsFlyout();
-                        mw.FileImporterFlyoutControl.Content = new FileImporterFlyout();
+                        mw.FileImporterFlyoutContent = new FileImporterFlyout();
                     }
                 });
             };

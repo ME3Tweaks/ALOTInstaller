@@ -34,6 +34,8 @@
                 <Button Content="A game" Padding="10" Margin="5,0" Style="{StaticResource MahApps.Styles.Button.Square.Accent}"  Command="{Binding IssueButtonCommand}" CommandParameter="Game"/>
                 <Button Content="Both the installer and a game" Padding="10" Style="{StaticResource MahApps.Styles.Button.Square.Accent}"  Command="{Binding IssueButtonCommand}" CommandParameter="Both"/>
             </StackPanel>
+            <Button Content="Close logs &amp; diagnostics" HorizontalAlignment="Center" Margin="0,15,0,0" Command="{Binding CloseDiagnosticsPanel}"/>
+
         </StackPanel>
         <StackPanel Visibility="{Binding Step, Converter={StaticResource IntComparisonToVisibilityConverter}, ConverterParameter='E_1'}">
             <TextBlock MaxWidth="500"  Text="Select an installer log. Ensure you pick the one with the relevant date. For example, if you're looking for logs for an issue that occurred yesterday, pick yesterday's log." TextWrapping="Wrap" TextAlignment="Center" FontSize="14"/>
@@ -91,11 +93,14 @@
                 <TextBlock Margin="0,30,0,5" Text="{Binding DiagnosticStatusText}" TextAlignment="Center"/>
                 <ProgressBar IsIndeterminate="{Binding ProgressIndeterminate}" Value="{Binding ProgressValue}" Maximum="100"/>
             </StackPanel>
-            <StackPanel  Visibility="{Binding DiagnosticComplete, Converter={StaticResource BoolToVisibilityConverter}}"  Margin="0,10">
-                <TextBlock Text="Log viewing link" FontSize="16" TextAlignment="Center" Margin="0,5"/>
+            <StackPanel  Visibility="{Binding DiagnosticComplete, Converter={StaticResource BoolToVisibilityConverter}}"  Margin="0,15">
                 <TextBlock Text="Share this link with your recipient" FontSize="14" TextAlignment="Center"  Margin="0,0,0,5"/>
 
                 <TextBox IsReadOnly="True" Text="{Binding ResultingLogLink}"/>
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Margin="0,2,0,0">
+                    <Button Content="Copy link" Command="{Binding CopyLinkCommand}" DockPanel.Dock="Left"  Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Padding="5,0" Margin="5,0"/>
+                    <Button Content="View log" Command="{Binding ViewLogCommand}"  HorizontalAlignment="Right" Style="{StaticResource MahApps.Styles.Button.Square.Accent}"  Padding="5,0"/>
+                </StackPanel>
                 <Button Content="Close logs &amp; diagnostics" HorizontalAlignment="Center" Margin="0,15,0,0" Command="{Binding CloseDiagnosticsPanel}"/>
 
             </StackPanel>

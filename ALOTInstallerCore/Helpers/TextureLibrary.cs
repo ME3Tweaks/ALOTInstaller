@@ -27,7 +27,7 @@ namespace ALOTInstallerCore.Helpers
         /// <summary>
         /// Types of files that the installer will recognize for importing/user files
         /// </summary>
-        public static string[] ImportableFileTypes { get; } = new[] { "7z", ".rar", ".zip", ".dds", ".mem", ".tpf", ".mod", ".png", ".tga" };
+        public static string[] ImportableFileTypes { get; } = new[] { ".7z", ".rar", ".zip", ".bmp", ".dds", ".mem", ".tpf", ".mod", ".png", ".tga" };
 
         /// <summary>
         /// Sets up the folder watcher for the texture library folder.

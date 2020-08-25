@@ -49,6 +49,13 @@ namespace ALOTInstallerWPF
             InitializeComponent();
         }
 
+        public FileImporterFlyout FileImporterFlyoutContent { get; internal set; }
+
+        private void OnFileImporterFlyoutContentChanged()
+        {
+            FileImporterFlyoutControl.Content = FileImporterFlyoutContent;
+        }
+
         private void MainWindow_OnContentRendered(object? sender, EventArgs e)
         {
             StartupUIController.BeginFlow(this);
@@ -99,14 +106,10 @@ namespace ALOTInstallerWPF
         private void InstallingOverlayoutFlyout_DoubleClick(object sender, MouseButtonEventArgs e)
         {
             // Double click changes maximize status
-            if (this.WindowState == System.Windows.WindowState.Normal)
-            {
-                this.WindowState = System.Windows.WindowState.Maximized;
-            }
-            else
-            {
-                this.WindowState = System.Windows.WindowState.Normal;
-            }
+            this.WindowState = 
+                this.WindowState == 
+                System.Windows.WindowState.Normal ? 
+                    System.Windows.WindowState.Maximized : System.Windows.WindowState.Normal;
         }
 
         public void OpenInstallerUI(InstallerUIController controller, ImageBrush background, bool isOpeningDebug = false)
@@ -126,6 +129,18 @@ namespace ALOTInstallerWPF
             {
                 InstallingOverlayFlyout.Content = null; //Remove this so it doesn't keep running. GC will remove it
             }, TimeSpan.FromSeconds(3));
+        }
+
+        public void OpenFileImporterFolders(string folderPath)
+        {
+            FileImporterFlyoutContent.handleOpenFolder(folderPath);
+            FileImporterOpen = true;
+        }
+
+        public void OpenFileImporterFiles(string[] files)
+        {
+            FileImporterFlyoutContent.handleOpenFiles(files);
+            FileImporterOpen = true;
         }
     }
 }

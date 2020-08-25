@@ -89,10 +89,16 @@ namespace ALOTInstallerCore.Helpers
             Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null,
             Action<int> applicationExited = null, CancellationToken cancellationToken = default)
         {
-            RunMEMIPCUntilExit($"--check-game-data-vanilla --gameid {game.ToGameNum()} --ipc", applicationStarted, ipcCallback, applicationStdErr, applicationExited, cancellationToken);
+            RunMEMIPCUntilExit($"--check-game-data-vanilla --gameid {game.ToGameNum()} --ipc", applicationStarted, ipcCallback, applicationStdErr, applicationExited, null, cancellationToken);
         }
 
-        public static void RunMEMIPCUntilExit(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
+        public static void RunMEMIPCUntilExit(string arguments,
+            Action<int> applicationStarted = null,
+            Action<string, string> ipcCallback = null,
+            Action<string> applicationStdErr = null,
+            Action<int> applicationExited = null,
+            Action<string> setMEMCrashLog = null,
+            CancellationToken cancellationToken = default)
         {
             if (Settings.DebugLogs)
             {
@@ -115,8 +121,15 @@ namespace ALOTInstallerCore.Helpers
                 }
             }
 
+            StringBuilder crashLogBuilder = new StringBuilder();
+
+            void memCrashLogOutput(string str)
+            {
+                crashLogBuilder.Append(str);
+            }
+
             // Run MEM
-            MEMIPCHandler.RunMEMIPC(arguments, appStart, ipcCallback, applicationStdErr, appExited,
+            MEMIPCHandler.RunMEMIPC(arguments, appStart, ipcCallback, applicationStdErr, appExited, memCrashLogOutput,
                 cancellationToken);
 
             // Wait until exit
@@ -124,20 +137,26 @@ namespace ALOTInstallerCore.Helpers
             {
                 Monitor.Wait(lockObject);
             }
+
+            if (crashLogBuilder.Length > 0)
+            {
+                setMEMCrashLog?.Invoke(crashLogBuilder.ToString());
+            }
         }
 
         private static readonly UTF8Encoding unicode = new UTF8Encoding();
 
 
-        private static async void RunMEMIPC(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, CancellationToken cancellationToken = default)
+        private static async void RunMEMIPC(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, Action<string> memCrashLine = null, CancellationToken cancellationToken = default)
         {
             bool exceptionOcurred = false;
             void internalHandleIPC(string command, string parm)
             {
                 switch (command)
                 {
-                    case "EXCEPTION_OCCURRED": //An exception has occured and MEM is going to crash
+                    case "EXCEPTION_OCCURRED": //An exception has occurred and MEM is going to crash
                         exceptionOcurred = true;
+                        ipcCallback?.Invoke(command, parm);
                         break;
                     default:
                         ipcCallback?.Invoke(command, parm);
@@ -167,6 +186,7 @@ namespace ALOTInstallerCore.Helpers
                             if (exceptionOcurred)
                             {
                                 Log.Fatal(stdOut.Text);
+                                memCrashLine?.Invoke(stdOut.Text);
                             }
                         }
                         break;

@@ -13,7 +13,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="FSUICWindow"
-             GiveFeedback="Drag_GiveFeedback"
              AllowDrop="True">
     <UserControl.Resources>
         <converters:ApplicableGamesVisibilityConverter x:Key="ApplicableGamesVisibilityConverter"/>

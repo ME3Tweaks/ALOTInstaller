@@ -10,33 +10,95 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:EFIDisplayModeToVisibilityConverter x:Key="EFIDisplayModeToVisibilityConverter"/>
     </UserControl.Resources>
-    <StackPanel HorizontalAlignment="Center" UseLayoutRounding="True">
-        <StackPanel Height="190" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <mah:ProgressRing Foreground="White" VerticalAlignment="Center"/>
-            <TextBlock Text="Checking files, please wait" HorizontalAlignment="Center"/>
-        </StackPanel>
-        <TextBlock Text="Select which game this file applies to" FontSize="20" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Visibility="{Binding UserFilesUsable, Converter={StaticResource BoolToVisibilityConverter}}">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="10" CommandParameter="ME1">
-                    <Image Source="/Images/logo_me1.png" Height="40" Margin="10"></Image>
-                </Button>
-                <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="10" CommandParameter="ME2">
-                    <Image Source="/Images/logo_me2.png" Height="40" Margin="10"></Image>
-                </Button>
-                <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="10"  CommandParameter="ME3">
-                    <Image Source="/Images/logo_me3.png" Height="40" Margin="10"></Image>
-                </Button>
-            </StackPanel>
-            <TextBlock Text="This file will be treated as a user supplied file as it is not listed in the manifest for any mode. User files are not tested by the developers and may not be compatible. User files are installed after manifest files and will override their textures." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700"/>
-            <TextBlock Text=" If the file you are importing is listed above (as a manifest file), you are importing the wrong file. Do not extract or rename ANY files listed in the main manifest. Files are matched on their name, size, and hashes." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700" Foreground="Yellow"/>
+    <StackPanel HorizontalAlignment="Center" UseLayoutRounding="True" Margin="10">
+        <!-- Manually pened -->
+        <StackPanel  HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Visibility="{Binding CurrentDisplayMode, 
+                            Converter={StaticResource EFIDisplayModeToVisibilityConverter}, 
+                            ConverterParameter='ManuallyOpenedView'}">
+            <TextBlock Text="Import assistant" TextAlignment="Center" TextWrapping="Wrap" FontSize="20"/>
+
+            <TextBlock Text="Import manifest files into the texture library to prepare files for installation.&#10;Add additional texture files not listed in the manifest as user files." TextAlignment="Center" TextWrapping="Wrap"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" MaxWidth="300"/>
+                    <ColumnDefinition Width="1*"  MaxWidth="300"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Header="Import manifest files">
+                    <StackPanel>
+                        <Button Content="Import files" Command="{Binding ImportManifestFilesCommand}"/>
+                        <Button Content="Import files from folder" Command="{Binding ImportManifestFolderCommand}"/>
+                        <Button Content="Import from Downloads" Command="{Binding ImportManifestFromDownloadsCommand}"/>
+                    </StackPanel>
+
+                </GroupBox>
+                <GroupBox Grid.Column="1" Header="Add user files">
+                    <StackPanel>
+                        <Button Content="Add files" Command="{Binding AddUserFilesCommand}"/>
+                        <Button Content="Add files from folder" Command="{Binding AddUserFolderCommand}"/>
+                    </StackPanel>
+                </GroupBox>
+            </Grid>
+            <Button Content="Close Import Assistant" Command="{Binding CloseFlyoutCommand}" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+
         </StackPanel>
 
+
+        <!-- Importing -->
+        <StackPanel Width="300" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Visibility="{Binding CurrentDisplayMode, 
+                            Converter={StaticResource EFIDisplayModeToVisibilityConverter},
+                            ConverterParameter='ImportingView'}">
+            <ProgressBar IsIndeterminate="{Binding ProgressIndeterminate}" 
+                         Maximum="{Binding ProgressMax}" 
+                         Value="{Binding ProgressValue}"/>
+            <TextBlock Text="{Binding ImportStatusText}" TextAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Width="300" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Visibility="{Binding CurrentDisplayMode, 
+                            Converter={StaticResource EFIDisplayModeToVisibilityConverter}, 
+                            ConverterParameter='ImportResultsView'}">
+            <TextBlock Text="{Binding ResultsText}" TextAlignment="Center"/>
+
+            <ListView Width="400"
+                      MaxHeight="150"
+                ItemsSource="{Binding ImportResults}" DisplayMemberPath="FriendlyName" 
+                      Visibility="{Binding ImportResults.Any, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+            <Button Content="Close Import Assistant" Command="{Binding CloseFlyoutCommand}" 
+                    HorizontalAlignment="Center" Margin="0,20,0,0"/>
+
+        </StackPanel>
+
+        <!-- User file -->
+        <StackPanel Visibility="{Binding CurrentDisplayMode, Converter={StaticResource EFIDisplayModeToVisibilityConverter}, ConverterParameter='UserFileSelectGameView'}">
+            <TextBlock Text="Select which game this file applies to" FontSize="20" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"></TextBlock>
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Visibility="{Binding UserFilesUsable, Converter={StaticResource BoolToVisibilityConverter}}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="10" CommandParameter="ME1">
+                        <Image Source="/Images/logo_me1.png" Height="40" Margin="10"></Image>
+                    </Button>
+                    <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="10" CommandParameter="ME2">
+                        <Image Source="/Images/logo_me2.png" Height="40" Margin="10"></Image>
+                    </Button>
+                    <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="10"  CommandParameter="ME3">
+                        <Image Source="/Images/logo_me3.png" Height="40" Margin="10"></Image>
+                    </Button>
+                </StackPanel>
+                <TextBlock Text="This file will be treated as a user supplied file as it is not listed in the manifest for any mode. User files are not tested by the developers and may not be compatible. User files are installed after manifest files and will override their textures." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700"/>
+                <TextBlock Text=" If the file you are importing is listed above (as a manifest file), you are importing the wrong file. Do not extract or rename ANY files listed in the main manifest. Files are matched on their name, size, and hashes." FontSize="14" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="700" Foreground="Yellow"/>
+            </StackPanel>
+        </StackPanel>
+
+
         <!-- Archive not usable -->
-        <StackPanel HorizontalAlignment="Center" Visibility="{Binding UserFilesUsable, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}" Margin="5">
+        <StackPanel HorizontalAlignment="Center" 
+                    Visibility="{Binding CurrentDisplayMode, Converter={StaticResource EFIDisplayModeToVisibilityConverter}, ConverterParameter='BadUserFileView'}">
             <TextBlock Text="This archive file is not usable. It may not have any texture files in it, or contain texture files that don't meet the required naming standards for usage. All direct textures (such as dds, png, tga, not TPF) must contain the target texture hash in the filename, in the format of 0xHHHHHHHH." FontSize="16" FontWeight="Light" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="20,5" Width="600"/>
             <Button mah:ControlsHelper.ContentCharacterCasing="Upper" Margin="0,10,0,10"  HorizontalAlignment="Center"  Content="Return to installer" Command="{Binding CloseFlyoutCommand}"/>
         </StackPanel>
+
     </StackPanel>
 </UserControl>

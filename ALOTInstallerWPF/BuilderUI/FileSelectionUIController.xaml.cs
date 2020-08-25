@@ -210,6 +210,7 @@ namespace ALOTInstallerWPF.BuilderUI
         {
             if (Application.Current.MainWindow is MainWindow mw)
             {
+                mw.FileImporterFlyoutContent.CurrentDisplayMode = FileImporterFlyout.EFIDisplayMode.ManuallyOpenedView; 
                 mw.FileImporterOpen = true;
             }
         }
@@ -391,16 +392,15 @@ namespace ALOTInstallerWPF.BuilderUI
 
         protected override void OnDragOver(DragEventArgs e)
         {
-            // If the DataObject contains string data, extract it.
+            e.Handled = true; //we handle all drag drops.
+
             if (IsStaging)
             {
-                e.Handled = false;
+                e.Effects = DragDropEffects.None;
                 return;
             }
-            //Debug.WriteLine("ondrop");
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                e.Handled = true; //We will handle this
 
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 if (files.Length > 1)
@@ -418,6 +418,7 @@ namespace ALOTInstallerWPF.BuilderUI
                         {
                             // It's a directory.
                             // We support this for dropping, I guess, technically.
+                            e.Effects = DragDropEffects.Copy;
                         }
                         else
                         {
@@ -427,55 +428,80 @@ namespace ALOTInstallerWPF.BuilderUI
                                 // Not supported.
                                 e.Effects = DragDropEffects.None;
                             }
+                            else
+                            {
+                                // Supported
+                                e.Effects = DragDropEffects.Copy;
+                            }
                         }
                     }
-
                 }
             }
         }
 
         protected override void OnDrop(DragEventArgs e)
         {
-            base.OnDrop(e);
+            e.Handled = true; //we handle all drag drops.
 
-            //// If the DataObject contains string data, extract it.
-            //if (IsStaging)
-            //{
-            //    e.Handled = false;
-            //    return;
-            //}
-            //Debug.WriteLine("ondrop");
-            //if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            //{
-            //    e.Handled = true; //We will handle this
+            if (IsStaging)
+            {
+                // We don't allow drops in staging mode
+                return;
+            }
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
 
-            //    string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            //    if (files.Length > 1)
-            //    {
-            //        e.Effects = DragDropEffects.None;
-            //    }
-            //    else
-            //    {
-            //        var f = files[0];
-            //        if (!TextureLibrary.ImportableFileTypes.Contains(Path.GetExtension(f), StringComparer.InvariantCultureIgnoreCase))
-            //        {
-            //            e.Effects = DragDropEffects.None;
-            //            return;
-            //        }
-            //    }
-            //}
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (files.Length > 1 && files.All(x =>
+                    {
+                        var type = getPathType(x);
+                        return type != null && type.Value == false;
+                    }))
+                {
+                    // We support multi drop. I'm not going to bother checking all the extensions, the importer will handle this
+                    attemptImportFiles(files);
+                }
+                else
+                {
+                    var f = files[0];
+                    var pathType = getPathType(f);
+                    if (pathType.HasValue)
+                    {
+                        if (pathType.Value)
+                        {
+                            // It's a directory.
+                            // We support this for dropping, I guess, technically.
+                            attemptImportFolder(f);
+                        }
+                        else
+                        {
+                            // It's a file
+                            if (TextureLibrary.ImportableFileTypes.Contains(Path.GetExtension(f), StringComparer.InvariantCultureIgnoreCase))
+                            {
+                                // Not supported.
+                                e.Effects = DragDropEffects.None;
+                                attemptImportFiles(files);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        private void Drag_GiveFeedback(object sender, GiveFeedbackEventArgs e)
+        private void attemptImportFolder(string folderPath)
         {
-            //if (e.Effects == DragDropEffects.Copy)
-            //{
-            //    e.UseDefaultCursors = false;
-            //    Mouse.SetCursor(Cursors.Hand);
-            //}
-            //else if (e.Effects == DragDropEffects.None
-            //    e.UseDefaultCursors = true;
-            //}
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                mw.OpenFileImporterFolders(folderPath);
+            }
+        }
+
+        private void attemptImportFiles(string[] files)
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                mw.OpenFileImporterFiles(files);
+            }
         }
     }
 }
