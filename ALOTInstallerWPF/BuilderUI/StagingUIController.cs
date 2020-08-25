@@ -188,7 +188,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     await pd.CloseAsync();
                     if (b.Error != null)
                     {
-                        Log.Error($"Exception occured in precheck for pre-install: {b.Error.Message}");
+                        Log.Error($"Exception occurredin precheck for pre-install: {b.Error.Message}");
                         await mw.ShowMessageAsync("Error occurred performing install precheck",
                             $"An error occurred performing the installation precheck: {b.Error.Message}");
                         fsuic.IsStaging = false;

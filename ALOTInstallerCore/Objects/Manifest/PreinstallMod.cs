@@ -18,6 +18,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// a dialog must be shown so the user can pick which one to use. Doing more than one will waste disk space and time
         /// </summary>
         public string OptionGroup { get; set; }
+        public override string Category => "ALOV";
 
         public class ExtractionRedirect
         {

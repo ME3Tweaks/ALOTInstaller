@@ -504,6 +504,20 @@ namespace ALOTInstallerCore.Objects.Manifest
         //        }
         //    }
         public override string ToString() => FriendlyName;
+
+        public override string Category
+        {
+            get
+            {
+                if (AlotVersionInfo.IsNotVersioned)
+                {
+                    return "Addon";
+                }
+
+                return null;
+            }
+        }
+
         public override bool UpdateReadyStatus()
         {
             var updated = internalUpdateReadyStatus();
@@ -603,7 +617,10 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// Link to where one can view comparisons for this file, such as vanilla to this, or between versions if this mod supports ChoiceFiles.
         /// </summary>
         public string ComparisonsLink { get; set; }
-
+        /// <summary>
+        /// Mode this manifest file belongs in
+        /// </summary>
+        public ManifestMode Mode { get; set; }
         /// <summary>
         /// Gets the backing MD5 for this file
         /// </summary>

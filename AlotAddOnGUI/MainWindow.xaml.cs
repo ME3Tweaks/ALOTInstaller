@@ -789,7 +789,7 @@ namespace AlotAddOnGUI
             }
             else
             {
-                Log.Error("Error occured extracting music pack download: " + e.Error.ToString());
+                Log.Error("Error occurredextracting music pack download: " + e.Error.ToString());
             }
         }
 
@@ -1257,9 +1257,9 @@ namespace AlotAddOnGUI
                 case -1:
                 default:
                     Log.Error("BuildCompleted() got -1 (or default catch all) result.");
-                    HeaderLabel.Text = "An error occured while building and staging textures for installation.\nView the log (Settings -> Diagnostics -> View Installer Log) for more information.";
+                    HeaderLabel.Text = "An error occurredwhile building and staging textures for installation.\nView the log (Settings -> Diagnostics -> View Installer Log) for more information.";
                     AddonFilesLabel.Text = "Staging aborted";
-                    await this.ShowMessageAsync("Error occured while building installation package", "An error occured while building the installation package. You can view the installer log file for more information in the settings menu. You should report this issue to the developers on Discord in the #bugs channel (Settings -> Report an issue).");
+                    await this.ShowMessageAsync("Error occurredwhile building installation package", "An error occurredwhile building the installation package. You can view the installer log file for more information in the settings menu. You should report this issue to the developers on Discord in the #bugs channel (Settings -> Report an issue).");
                     RefreshesUntilRealRefresh = 4;
                     break;
                 case 1:
@@ -1936,14 +1936,14 @@ namespace AlotAddOnGUI
                                     else
                                     {
                                         Log.Error("Local manifest also doesn't exist! No manifest is available.");
-                                        await this.ShowMessageAsync("No Manifest Available", "An error occured downloading or reading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
+                                        await this.ShowMessageAsync("No Manifest Available", "An error occurreddownloading or reading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
                                         Environment.Exit(1);
                                     }
                                 }
                             }
                             else
                             {
-                                Log.Error("Exception occured getting manifest from server: " + e.Error.ToString());
+                                Log.Error("Exception occurredgetting manifest from server: " + e.Error.ToString());
                                 if (File.Exists(MANIFEST_LOC))
                                 {
                                     Log.Information("Reading cached manifest instead.");
@@ -1960,7 +1960,7 @@ namespace AlotAddOnGUI
                                 else
                                 {
                                     Log.Fatal("No local manifest exists to use, exiting...");
-                                    await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
+                                    await this.ShowMessageAsync("No Manifest Available", "An error occurreddownloading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
                                     Environment.Exit(1);
                                 }
                             }
@@ -1970,7 +1970,7 @@ namespace AlotAddOnGUI
                     }
                     catch (WebException e)
                     {
-                        Log.Error("WebException occured getting manifest from server: " + e.ToString());
+                        Log.Error("WebException occurredgetting manifest from server: " + e.ToString());
                         if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
                         {
                             Log.Information("Reading bundled manifest instead.");
@@ -1984,7 +1984,7 @@ namespace AlotAddOnGUI
                     //catch (Exception e)
                     //{
                     //    Debug.WriteLine(DateTime.Now);
-                    //    Log.Error("Other Exception occured getting manifest from server/reading manifest: " + e.ToString());
+                    //    Log.Error("Other Exception occurredgetting manifest from server/reading manifest: " + e.ToString());
                     //    if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
                     //    {
                     //        Log.Information("Reading bundled manifest instead.");
@@ -2005,7 +2005,7 @@ namespace AlotAddOnGUI
                 //if (!File.Exists(MANIFEST_LOC))
                 //{
                 //    Log.Fatal("No local manifest exists to use, exiting...");
-                //    await this.ShowMessageAsync("No Manifest Available", "An error occured downloading the manifest for addon. Information that is required to build the addon is not available. Check the program logs.");
+                //    await this.ShowMessageAsync("No Manifest Available", "An error occurreddownloading the manifest for addon. Information that is required to build the addon is not available. Check the program logs.");
                 //    Environment.Exit(1);
                 //}
 
@@ -2294,7 +2294,7 @@ namespace AlotAddOnGUI
             {
                 Log.Error("Error checking for write privledges. This may be a significant sign that an installed game is not in a good state.");
                 Log.Error(App.FlattenException(e));
-                await this.ShowMessageAsync("Error checking write privileges", "An error occured while checking write privileges to game folders. This may be a sign that the game is in a bad state.\n\nThe error was:\n" + e.Message);
+                await this.ShowMessageAsync("Error checking write privileges", "An error occurredwhile checking write privileges to game folders. This may be a sign that the game is in a bad state.\n\nThe error was:\n" + e.Message);
                 return false;
             }
             return true;
@@ -2734,9 +2734,9 @@ namespace AlotAddOnGUI
             }
             catch (Exception e)
             {
-                Log.Error("Error has occured parsing the XML!");
+                Log.Error("Error has occurredparsing the XML!");
                 Log.Error(App.FlattenException(e));
-                MessageDialogResult result = await this.ShowMessageAsync("Error reading file manifest", "An error occured while reading the manifest file for installation. This may indicate a network failure or a packaging failure by Mgamerz - Please submit an issue to github (http://github.com/ME3Tweaks/ALOTInstaller/issues) and include the most recent log file from the logs directory.\n\n" + e.Message, MessageDialogStyle.Affirmative);
+                MessageDialogResult result = await this.ShowMessageAsync("Error reading file manifest", "An error occurredwhile reading the manifest file for installation. This may indicate a network failure or a packaging failure by Mgamerz - Please submit an issue to github (http://github.com/ME3Tweaks/ALOTInstaller/issues) and include the most recent log file from the logs directory.\n\n" + e.Message, MessageDialogStyle.Affirmative);
                 AddonFilesLabel.Text = "Error parsing manifest XML! Check the logs.";
                 return;
             }
@@ -3525,7 +3525,7 @@ namespace AlotAddOnGUI
             catch (System.IO.IOException e)
             {
                 Log.Error("Unable to delete staging and target directories.\n" + e.ToString());
-                await this.ShowMessageAsync("Error occured while preparing directories", "ALOT Installer was unable to cleanup some directories. Make sure all file explorer windows are closed that may be open in the working directories.");
+                await this.ShowMessageAsync("Error occurredwhile preparing directories", "ALOT Installer was unable to cleanup some directories. Make sure all file explorer windows are closed that may be open in the working directories.");
                 return false;
             }
 

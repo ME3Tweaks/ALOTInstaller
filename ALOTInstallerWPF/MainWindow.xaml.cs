@@ -137,9 +137,9 @@ namespace ALOTInstallerWPF
             FileImporterOpen = true;
         }
 
-        public void OpenFileImporterFiles(string[] files)
+        public void OpenFileImporterFiles(string[] files, bool? userFileMode)
         {
-            FileImporterFlyoutContent.handleOpenFiles(files);
+            FileImporterFlyoutContent.handleOpenFiles(files, userFileMode);
             FileImporterOpen = true;
         }
     }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using ALOTInstallerCore.Objects.Manifest;
@@ -21,25 +22,30 @@ namespace ALOTInstallerCore.Helpers
         /// A list of all manifest files, across all modes
         /// </summary>
         private static FileSystemWatcher watcher;
+
         private static List<ManifestFile> manifestFiles;
         private static Action<ManifestFile> readyStatusChanged;
         private static System.Timers.Timer fullRefreshTimer;
+
         /// <summary>
         /// Types of files that the installer will recognize for importing/user files
         /// </summary>
-        public static string[] ImportableFileTypes { get; } = new[] { ".7z", ".rar", ".zip", ".bmp", ".dds", ".mem", ".tpf", ".mod", ".png", ".tga" };
+        public static string[] ImportableFileTypes { get; } = new[]
+            {".7z", ".rar", ".zip", ".bmp", ".dds", ".mem", ".tpf", ".mod", ".png", ".tga"};
 
         /// <summary>
         /// Sets up the folder watcher for the texture library folder.
         /// </summary>
         /// <param name="watchedManifestFiles"></param>
         /// <param name="readyStatusChangedCallback"></param>
-        public static void SetupLibraryWatcher(List<ManifestFile> watchedManifestFiles, Action<ManifestFile> readyStatusChangedCallback)
+        public static void SetupLibraryWatcher(List<ManifestFile> watchedManifestFiles,
+            Action<ManifestFile> readyStatusChangedCallback)
         {
             if (watcher != null)
             {
                 StopLibraryWatcher();
             }
+
             TextureLibrary.manifestFiles = watchedManifestFiles;
             TextureLibrary.readyStatusChanged = readyStatusChangedCallback;
             Debug.WriteLine("Starting filesystem watcher on " + Settings.TextureLibraryLocation);
@@ -48,11 +54,11 @@ namespace ALOTInstallerCore.Helpers
             {
                 // Just notify on everything because it seems things like move are done through attributes (??)
                 NotifyFilter = NotifyFilters.Attributes |
-                                NotifyFilters.CreationTime |
-                                NotifyFilters.FileName |
-                                NotifyFilters.LastWrite |
-                                NotifyFilters.Size |
-                                NotifyFilters.Security,
+                               NotifyFilters.CreationTime |
+                               NotifyFilters.FileName |
+                               NotifyFilters.LastWrite |
+                               NotifyFilters.Size |
+                               NotifyFilters.Security,
                 Filter = "*.*" //Filters is not supported on .NET Standard 2.1
 
             };
@@ -69,7 +75,9 @@ namespace ALOTInstallerCore.Helpers
                     Debug.WriteLine("Full ready status refresh");
                     await Task.Run(() =>
                     {
-                        var updatedFiles = TextureLibrary.ResetAllReadyStatuses(TextureLibrary.manifestFiles.OfType<InstallerFile>().ToList());
+                        var updatedFiles =
+                            TextureLibrary.ResetAllReadyStatuses(TextureLibrary.manifestFiles.OfType<InstallerFile>()
+                                .ToList());
                         if (updatedFiles.Any())
                         {
                             readyStatusChangedCallback?.Invoke(null);
@@ -95,7 +103,8 @@ namespace ALOTInstallerCore.Helpers
             if (e.Name != null)
             {
                 Debug.WriteLine($"Change {e.ChangeType} for {e.Name}");
-                var matchingManifestFile = manifestFiles.Find(x => Path.GetFileName(x.GetUsedFilepath()).Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
+                var matchingManifestFile = manifestFiles.Find(x =>
+                    Path.GetFileName(x.GetUsedFilepath()).Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
                 if (matchingManifestFile?.UpdateReadyStatus() ?? false)
                 {
                     readyStatusChanged?.Invoke(matchingManifestFile);
@@ -117,7 +126,9 @@ namespace ALOTInstallerCore.Helpers
                 if (e.ChangeType == WatcherChangeTypes.Deleted)
                 {
                     // Edge case: Unpacked file is moved out of library. This makes GetUsedPath() fail as file does not exist, but file was just moved.
-                    matchingManifestFile = manifestFiles.Find(x => x.UnpackedSingleFilename != null && x.UnpackedSingleFilename.Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
+                    matchingManifestFile = manifestFiles.Find(x =>
+                        x.UnpackedSingleFilename != null &&
+                        x.UnpackedSingleFilename.Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
                     if (matchingManifestFile?.UpdateReadyStatus() ?? false)
                     {
                         readyStatusChanged?.Invoke(matchingManifestFile);
@@ -131,7 +142,9 @@ namespace ALOTInstallerCore.Helpers
         /// </summary>
         /// <param name="folder"></param>
         /// <param name="manifestFiles"></param>
-        public static void ImportFromFolder(string folder, List<ManifestFile> manifestFiles, Action<string, long, long> progressCallback = null, Action<List<ManifestFile>> importFinishedResultsCallback = null)
+        public static void ImportFromFolder(string folder, List<ManifestFile> manifestFiles,
+            Action<string, long, long> progressCallback = null,
+            Action<List<ManifestFile>> importFinishedResultsCallback = null)
         {
             // Todo: support (1), (2), etc extensions on filenames due to duplicates.
             object syncObj = new object();
@@ -150,11 +163,13 @@ namespace ALOTInstallerCore.Helpers
                     {
                         Log.Error($"Error importing file: {failureReason}");
                     }
+
                     lock (syncObj)
                     {
                         Monitor.Pulse(syncObj);
                     }
                 }
+
                 // Main file
                 var matchingFile = filesInFolder.FirstOrDefault(x =>
                     Path.GetFileName(x).Equals(v.Filename, StringComparison.InvariantCultureIgnoreCase));
@@ -166,6 +181,7 @@ namespace ALOTInstallerCore.Helpers
                     {
                         Monitor.Wait(syncObj);
                     }
+
                     continue;
                 }
 
@@ -182,6 +198,7 @@ namespace ALOTInstallerCore.Helpers
                         {
                             Monitor.Wait(syncObj);
                         }
+
                         continue;
                     }
                 }
@@ -203,6 +220,7 @@ namespace ALOTInstallerCore.Helpers
                     }
                 }
             }
+
             importFinishedResultsCallback?.Invoke(importedFiles);
         }
 
@@ -211,38 +229,47 @@ namespace ALOTInstallerCore.Helpers
         /// </summary>
         /// <param name="filename">The file to be tested for importing</param>
         /// <param name="manifestFiles">Manifest files to check against</param>
-        /// <param name="fileImported">Notification when file is imported, and the result</param>
+        /// <param name="fileImported">Notification when file is imported, and the result (as a string of why it failed, null if successful)</param>
         /// <param name="progressCallback">Callback to be notified of progress (copy mode only)</param>
-        /// <returns>True if an import is being attempted, false if no attempt at import occured.</returns>
-        public static bool AttemptImportManifestFile(string filename, List<ManifestFile> manifestFiles, Action<bool, string> fileImported, Action<string, long, long> progressCallback = null)
+        /// <returns>Tee manifest file that is attempting to be imported, null if the listed filename matched nothing</returns>
+        public static ManifestFile AttemptImportManifestFile(string filename, List<ManifestFile> manifestFiles,
+            Action<bool, string> fileImported, Action<string, long, long> progressCallback = null)
         {
             var fsize = new FileInfo(filename).Length;
-            var matchingMF = manifestFiles.FirstOrDefault(x => Path.GetFileName(filename).Equals(x.Filename, StringComparison.InvariantCultureIgnoreCase) && x.FileSize == fsize);
+            var matchingMF = manifestFiles.FirstOrDefault(x =>
+                Path.GetFileName(filename).Equals(x.Filename, StringComparison.InvariantCultureIgnoreCase) &&
+                x.FileSize == fsize);
             if (matchingMF != null)
             {
                 // Try main
                 importFileToLibrary(matchingMF, filename, false, progressCallback, fileImported);
-                return true;
+                return matchingMF;
             }
 
             matchingMF = manifestFiles.FirstOrDefault(x => x.TorrentFilename != null &&
-                Path.GetFileName(filename).Equals(x.TorrentFilename, StringComparison.InvariantCultureIgnoreCase) && x.FileSize == fsize);
+                                                           Path.GetFileName(filename).Equals(x.TorrentFilename,
+                                                               StringComparison.InvariantCultureIgnoreCase) &&
+                                                           x.FileSize == fsize);
             if (matchingMF != null)
             {
                 // Torrent file => library main
                 importFileToLibrary(matchingMF, filename, false, progressCallback, fileImported);
-                return true;
+                return matchingMF;
             }
 
-            matchingMF = manifestFiles.FirstOrDefault(x => x.UnpackedFileSize != 0 && x.UnpackedSingleFilename != null && Path.GetFileName(filename).Equals(x.UnpackedSingleFilename, StringComparison.InvariantCultureIgnoreCase) && x.UnpackedFileSize == fsize);
+            matchingMF = manifestFiles.FirstOrDefault(x =>
+                x.UnpackedFileSize != 0 && x.UnpackedSingleFilename != null &&
+                Path.GetFileName(filename)
+                    .Equals(x.UnpackedSingleFilename, StringComparison.InvariantCultureIgnoreCase) &&
+                x.UnpackedFileSize == fsize);
             if (matchingMF != null)
             {
                 // Single file unpacked
                 importFileToLibrary(matchingMF, filename, true, progressCallback, fileImported);
-                return true;
+                return matchingMF;
             }
 
-            return false;
+            return null;
         }
 
         /// <summary>
@@ -253,7 +280,8 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="isUnpacked"></param>
         /// <param name="progressCallback"></param>
         /// <param name="importFinishedCallback"></param>
-        private static void importFileToLibrary(ManifestFile mf, string sourceFile, bool isUnpacked, Action<string, long, long> progressCallback = null, Action<bool, string> importFinishedCallback = null)
+        private static void importFileToLibrary(ManifestFile mf, string sourceFile, bool isUnpacked,
+            Action<string, long, long> progressCallback = null, Action<bool, string> importFinishedCallback = null)
         {
             Log.Information($"Importing {sourceFile} into texture library");
             // This may need to be WINDOWS ONLY for roots
@@ -261,17 +289,10 @@ namespace ALOTInstallerCore.Helpers
             string importingto = Path.GetPathRoot(Settings.TextureLibraryLocation);
 
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("ImportWorker");
-            nbw.RunWorkerCompleted += (a, b) =>
-            {
-                if (b.Error != null)
-                {
-                    Log.Error($"Error importing {sourceFile}: {b.Error.Message}");
-                    importFinishedCallback?.Invoke(false, $"An error occured while importing {sourceFile}: {b.Error.Message}");
-                }
-            };
             nbw.DoWork += (a, b) =>
             {
-                var destFile = Path.Combine(Settings.TextureLibraryLocation, isUnpacked ? mf.UnpackedSingleFilename : mf.Filename);
+                var destFile = Path.Combine(Settings.TextureLibraryLocation,
+                    isUnpacked ? mf.UnpackedSingleFilename : mf.Filename);
                 if (Settings.MoveFilesWhenImporting && importingfrom == importingto)
                 {
                     // Move
@@ -283,7 +304,8 @@ namespace ALOTInstallerCore.Helpers
                     catch (Exception e)
                     {
                         Log.Error($"Error moving {sourceFile} to library: {e.Message}");
-                        importFinishedCallback?.Invoke(false, $"An error occured moving the file to the library: {e.Message}.");
+                        importFinishedCallback?.Invoke(false,
+                            $"An error occurred moving the file to the library: {e.Message}.");
                     }
                 }
                 else
@@ -298,9 +320,10 @@ namespace ALOTInstallerCore.Helpers
                     {
                         if (e.Error != null)
                         {
-                            Log.Error($"An error occured copying the file to the destination:");
+                            Log.Error($"An error occurred copying the file to the destination:");
                             Log.Error(e.Error.Flatten());
-                            importFinishedCallback?.Invoke(false, $"An error occured copying the file to the library: {e.Error.Message}.");
+                            importFinishedCallback?.Invoke(false,
+                                $"An error occurred copying the file to the library: {e.Error.Message}.");
                         }
                         else if (File.Exists(destFile))
                         {
@@ -308,13 +331,24 @@ namespace ALOTInstallerCore.Helpers
                         }
                         else
                         {
-                            Log.Error("Destination file doesn't exist after file copy. This may need some more analysis to determine the exact cause.");
+                            Log.Error(
+                                "Destination file doesn't exist after file copy. This may need some more analysis to determine the exact cause.");
                             Log.Error("Destination file: " + destFile);
-                            importFinishedCallback?.Invoke(false, $"Destination file doesn't exist after copy: {destFile}. This may be a bug in the program, view the application log for more information");
+                            importFinishedCallback?.Invoke(false,
+                                $"Destination file doesn't exist after copy: {destFile}. This may be a bug in the program, view the application log for more information");
                         }
 
                     };
                     downloadClient.DownloadFileAsync(new Uri(sourceFile), destFile);
+                }
+            };
+            nbw.RunWorkerCompleted += (a, b) =>
+            {
+                if (b.Error != null)
+                {
+                    Log.Error($"Error importing {sourceFile}: {b.Error.Message}");
+                    importFinishedCallback?.Invoke(false,
+                        $"An error occurred while importing {sourceFile}: {b.Error.Message}");
                 }
             };
             nbw.RunWorkerAsync();
@@ -392,7 +426,9 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="directory"></param>
         /// <param name="manifestFiles"></param>
         /// <returns></returns>
-        public static bool AttemptImportUnpackedFiles(string directory, List<ManifestFile> manifestFiles, bool switchFilesToUnpacked = true, Action<string, long, long> progressCallback = null, bool forceCopy = false)
+        public static bool AttemptImportUnpackedFiles(string directory, List<ManifestFile> manifestFiles,
+            bool switchFilesToUnpacked = true, Action<string, long, long> progressCallback = null,
+            bool forceCopy = false)
         {
             try
             {
@@ -404,7 +440,8 @@ namespace ALOTInstallerCore.Helpers
                 {
                     if (mf.UnpackedSingleFilename != null)
                     {
-                        if (Path.GetFileName(mf.StagedName).Equals(mf.Filename, StringComparison.InvariantCultureIgnoreCase))
+                        if (Path.GetFileName(mf.StagedName)
+                            .Equals(mf.Filename, StringComparison.InvariantCultureIgnoreCase))
                         {
                             // The ready file is the normal file but there is unpacked single file support for this
                             // This file was extracted or copied so it's still in library
@@ -412,7 +449,8 @@ namespace ALOTInstallerCore.Helpers
                             foreach (var uf in files)
                             {
                                 var len = new FileInfo(uf).Length;
-                                if (len == mf.UnpackedFileSize && Path.GetExtension(mf.UnpackedSingleFilename) == Path.GetExtension(uf))
+                                if (len == mf.UnpackedFileSize && Path.GetExtension(mf.UnpackedSingleFilename) ==
+                                    Path.GetExtension(uf))
                                 {
                                     if (len < 1000000000)
                                     {
@@ -421,20 +459,24 @@ namespace ALOTInstallerCore.Helpers
                                         if (md5 != mf.UnpackedFileMD5)
                                             continue; //This is not correct unpacked file
                                     }
+
                                     // It's the right file, or is probably the right file... The chance of same sized files this big is probably pretty rare, right?
                                     mfToUnpackedMap[mf] = uf;
                                     break;
                                 }
                             }
                         }
-                        else if (!File.Exists(mf.StagedName) && Path.GetExtension(mf.StagedName).Equals(Path.GetExtension(mf.UnpackedSingleFilename), StringComparison.InvariantCultureIgnoreCase))
+                        else if (!File.Exists(mf.StagedName) && Path.GetExtension(mf.StagedName)
+                            .Equals(Path.GetExtension(mf.UnpackedSingleFilename),
+                                StringComparison.InvariantCultureIgnoreCase))
                         {
                             // Ready file is using unpacked file but the unpacked file isn't available so it returned the main one
                             // This needs to be moved back
                             foreach (var uf in files)
                             {
                                 var len = new FileInfo(uf).Length;
-                                if (len == mf.UnpackedFileSize && Path.GetExtension(mf.UnpackedSingleFilename) == Path.GetExtension(uf))
+                                if (len == mf.UnpackedFileSize && Path.GetExtension(mf.UnpackedSingleFilename) ==
+                                    Path.GetExtension(uf))
                                 {
                                     if (len < 1000000000)
                                     {
@@ -480,19 +522,22 @@ namespace ALOTInstallerCore.Helpers
                     {
                         if (!movableFile.Key.IsBackedByUnpacked())
                         {
-                            Log.Error("File copied back did not trigger switch to unpacked version! Something probably went wrong on file copy.");
+                            Log.Error(
+                                "File copied back did not trigger switch to unpacked version! Something probably went wrong on file copy.");
                         }
                         else
                         {
                             // Switched to unpacked
-                            Log.Information($"Deleting packed version of manifest file now that it is in unpacked mode: {oldFname}");
+                            Log.Information(
+                                $"Deleting packed version of manifest file now that it is in unpacked mode: {oldFname}");
                             try
                             {
                                 File.Delete(oldFname);
                             }
                             catch (Exception e)
                             {
-                                Log.Error($"Unable to delete packed version of {movableFile.Key.FriendlyName}: {e.Message}");
+                                Log.Error(
+                                    $"Unable to delete packed version of {movableFile.Key.FriendlyName}: {e.Message}");
                             }
                         }
                     }
@@ -506,5 +551,232 @@ namespace ALOTInstallerCore.Helpers
 
             return true;
         }
+
+        /// <summary>
+        /// Checks if the specified file is considered a valid user file. Valid user file archives have at least one valid file type in them. Texture files must have hash in filename 0xHHHHHHHH
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static bool IsUserFileUsable(string file, out string failureReason)
+        {
+            failureReason = null;
+            List<string> filenamesToCheck = new List<string>();
+            var MFextension = Path.GetExtension(file.ToLower());
+            bool isArchive = false;
+            if (MFextension == ".7z" || MFextension == ".rar" || MFextension == ".zip")
+            {
+                isArchive = true;
+                filenamesToCheck.ReplaceAll(MEMIPCHandler.GetFileListing(file));
+            }
+
+            bool hasAnOkayItem = false;
+            foreach (var v in filenamesToCheck)
+            {
+                hasAnOkayItem |= isFilenameOkay(Path.GetFileNameWithoutExtension(v.ToLower()), Path.GetExtension(v.ToLower()));
+            }
+
+            if (!hasAnOkayItem)
+            {
+                failureReason = isArchive ? "No file types/names in this archive are usable" : "File type/name is not usable";
+            }
+
+            return hasAnOkayItem;
+        }
+
+        /// <summary>
+        /// Determines if filename + extension are acceptable for use
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="extension"></param>
+        /// <returns></returns>
+        private static bool isFilenameOkay(string filename, string extension)
+        {
+            switch (extension)
+            {
+                case ".mod": return true; //File is usable
+                case ".tpf": return true; //File is usable
+                case ".mem": return true; //File is usable
+                case ".png":
+                case ".dds":
+                case ".bmp":
+                case ".tga":
+                    string regex = "0x[0-9a-f]{8}"; //This matches even if user has more chars after the 8th hex so...
+                    var isOK = Regex.IsMatch(filename, regex);
+                    if (!isOK)
+                    {
+                        Log.Warning(
+                            $"Rejecting image/texture file {filename} due to missing 0xhhhhhhhh texture CRC to replace");
+                    }
+
+                    return isOK;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Handle incoming files from drag/drop or an importing interface
+        /// </summary>
+        /// <param name="files">List of full file paths to attempt to ingest</param>
+        /// <param name="userFileMode">Null to attempt manifest then user file, false to force manifest mode, true to force user mode</param>
+        /// <param name="setStatusTextCallback"></param>
+        /// <param name="importingProgressCallback"></param>
+        /// <param name="selectGameCallback"></param>
+        /// <param name="unknown"></param>
+        public static List<ImportResult> IngestFiles(IEnumerable<string> files,
+            bool? userFileMode,
+            Action<string> setStatusTextCallback = null,
+            Action<string, long, long> importingProgressCallback = null,
+            Func<string, ApplicableGame?> selectGameCallback = null, Action<InstallerFile> addedFileToModeCallback = null)
+        {
+            var manifestFiles = ManifestHandler.GetAllManifestFiles();
+            List<ImportResult> importResults = new List<ImportResult>();
+            object syncObj = new object();
+            foreach (var file in files)
+            {
+                if (!Directory.GetParent(file).FullName.Equals(Settings.TextureLibraryLocation,
+                    StringComparison.InvariantCultureIgnoreCase))
+                {
+                    // Okay to import or add from location
+                    bool importInManifestMode = !userFileMode.HasValue || !userFileMode.Value;
+                    bool importInUserMode = !userFileMode.HasValue || userFileMode.Value;
+
+                    if (importInManifestMode)
+                    {
+                        bool successful = false;
+                        string failedReason = null;
+                        var attemptingImport = TextureLibrary.AttemptImportManifestFile(file, manifestFiles,
+                            (successfullyImported, failureReason) =>
+                            {
+                                successful = successfullyImported;
+                                failedReason = failureReason;
+                                lock (syncObj)
+                                {
+                                    Monitor.Pulse(syncObj);
+                                }
+                            },
+                            importingProgressCallback);
+
+                        if (attemptingImport != null)
+                        {
+                            // Wait till import completes
+                            lock (syncObj)
+                            {
+                                Monitor.Wait(syncObj);
+                            }
+
+                            importResults.Add(new ImportResult()
+                            {
+                                ImportName = attemptingImport.FriendlyName,
+                                Result = successful ? "Imported" : failedReason
+                            });
+                        }
+                        else if (!importInUserMode)
+                        {
+                            // Will not process as user file.
+                            importResults.Add(new ImportResult()
+                            {
+                                ImportName = Path.GetFileName(file),
+                                Result = "Not a manifest file"
+                            });
+                        }
+                    }
+
+                    if (importInUserMode)
+                    {
+                        // User file
+                        var fi = new FileInfo(file);
+                        //var matchingManifestFile = TextureLibrary.manifestFiles.FirstOrDefault(x => x.FileSize == fi.Length);
+                        //if (matchingManifestFile != null && ManifestHandler.CurrentMode != ManifestMode.Free)
+                        //{
+                        //    // Did user rename file?
+
+                        //}
+
+                        var preinstallMods = ManifestHandler.GetAllPreinstallMods();
+                        PreinstallMod matchingPIM = preinstallMods.FirstOrDefault(x => x.FileSize == fi.Length
+                            && (x.Filename.Equals(Path.GetFileName(file),
+                                    StringComparison.InvariantCultureIgnoreCase) ||
+                                x.TorrentFilename.Equals(Path.GetFileName(file),
+                                    StringComparison.InvariantCultureIgnoreCase)));
+                        if (matchingPIM != null)
+                        {
+                            // It's a preinstall mod user added.
+                            // Add the original ManifestFile to this mode
+                            ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].ManifestFiles.Add(matchingPIM);
+                            importResults.Add(new ImportResult()
+                            {
+                                Result = "Added for install",
+                                ImportName = matchingPIM.FriendlyName
+                            });
+                            addedFileToModeCallback?.Invoke(matchingPIM);
+                        }
+                        else
+                        {
+                            // Standard user file
+
+                            var usable = TextureLibrary.IsUserFileUsable(file, out var notUsableReason);
+                            if (!usable)
+                            {
+                                // File is not usable
+                                importResults.Add(new ImportResult()
+                                {
+                                    Result = "Not usable",
+                                    Reason = notUsableReason,
+                                    ImportName = Path.GetFileName(file)
+                                });
+                            }
+                            else
+                            {
+                                // File is usable
+                                var selectedGame = selectGameCallback?.Invoke(file);
+
+                                if (selectedGame != null)
+                                {
+                                    var failedToAddReason = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].AttemptAddUserFile(file, selectedGame.Value, out var addedUserFile);
+                                    importResults.Add(new ImportResult()
+                                    {
+                                        Result = failedToAddReason ?? "Added for install",
+                                        ImportName = Path.GetFileName(file)
+                                    });
+                                    if (addedUserFile != null)
+                                    {
+                                        addedFileToModeCallback?.Invoke(addedUserFile);
+                                    }
+                                }
+                                else
+                                {
+                                    importResults.Add(new ImportResult()
+                                    {
+                                        Result = "Skipped",
+                                        ImportName = Path.GetFileName(file)
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return importResults;
+        }
+    }
+
+    /// <summary>
+    /// Result of file import
+    /// </summary>
+    public class ImportResult
+    {
+        /// <summary>
+        /// The short name for the import
+        /// </summary>
+        public string ImportName { get; set; }
+        /// <summary>
+        /// The result of the import
+        /// </summary>
+        public string Result { get; set; }
+        /// <summary>
+        /// The reason (if any) of the result
+        /// </summary>
+        public string Reason { get; set; }
     }
 }

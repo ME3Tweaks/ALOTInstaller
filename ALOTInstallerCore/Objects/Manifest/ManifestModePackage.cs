@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace ALOTInstallerCore.Objects.Manifest
 {
@@ -20,7 +22,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// <summary>
         /// List of tutorials for this manifest mode
         /// </summary>
-        public List<ManifestTutorial> Tutorials = new List<ManifestTutorial>();
+        public List<ManifestTutorial> Tutorials = new List<ManifestTutorial>(); //Still used?
 
         /// <summary>
         /// List of user supplied files for this mode
@@ -31,5 +33,39 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// Description of this mode
         /// </summary>
         public string ModeDescription { get; set; } = "No rules. Install whatever you want"; //Defaults to 'None' description. Manifest loader will override this
+
+        /// <summary>
+        /// Sorts the manifest files by ui priority, author, name
+        /// </summary>
+        public void OrderManifestFiles()
+        {
+            ManifestFiles = ManifestFiles.OrderBy(p => p.UIPriority).ThenBy(o => o.Author).ThenBy(x => x.FriendlyName).ToList();
+        }
+
+        /// <summary>
+        /// Attempts to add a user file with the specified backing PIM
+        /// </summary>
+        /// <param name="matchingPim"></param>
+        public string AttemptAddUserFile(string filepath, ApplicableGame games, out UserFile addedUserFile)
+        {
+            addedUserFile = null;
+            if (UserFiles.Any(x => x.FullFilePath == filepath))
+            {
+                return "File is already added as a user file";
+            }
+
+            var ufi = new FileInfo(filepath);
+            UserFile uf = new UserFile()
+            {
+                FileSize = ufi.Length,
+                FriendlyName = Path.GetFileName(filepath),
+                FullFilePath = filepath,
+                ApplicableGames = games
+            };
+            uf.UpdateReadyStatus();
+            UserFiles.Add(uf);
+            addedUserFile = uf;
+            return null;
+        }
     }
 }

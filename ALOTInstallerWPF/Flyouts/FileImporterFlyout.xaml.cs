@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,9 +13,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using Microsoft.Win32;
@@ -36,7 +38,7 @@ namespace ALOTInstallerWPF.Flyouts
             ImportResultsView
         }
 
-        public ObservableCollectionExtended<ManifestFile> ImportResults { get; } = new ObservableCollectionExtended<ManifestFile>();    
+        public ObservableCollectionExtended<object> ImportResults { get; } = new ObservableCollectionExtended<object>();
 
         public EFIDisplayMode CurrentDisplayMode { get; set; }
         //public bool IsUserFile { get; set; }
@@ -46,6 +48,8 @@ namespace ALOTInstallerWPF.Flyouts
         public bool ProgressIndeterminate { get; set; }
         public long ProgressValue { get; set; }
         public long ProgressMax { get; set; }
+        public string CurrentUserFileName { get; set; }
+
         public FileImporterFlyout()
         {
             DataContext = this;
@@ -56,14 +60,57 @@ namespace ALOTInstallerWPF.Flyouts
         public GenericCommand ImportManifestFolderCommand { get; set; }
         public GenericCommand ImportManifestFilesCommand { get; set; }
         public GenericCommand ImportManifestFromDownloadsCommand { get; set; }
-
+        public GenericCommand AddUserFolderCommand { get; set; }
+        public GenericCommand AddUserFilesCommand { get; set; }
         private void LoadCommands()
         {
             ImportManifestFilesCommand = new GenericCommand(ImportManifestFiles, HasAnyMissingManifestFiles);
             ImportManifestFolderCommand = new GenericCommand(ImportManifestFolder, HasAnyMissingManifestFiles);
             ImportManifestFromDownloadsCommand = new GenericCommand(ImportManifestFilesFromDownloads, HasAnyMissingManifestFiles);
             CloseFlyoutCommand = new GenericCommand(closeFlyout);
+            AddUserFilesCommand = new GenericCommand(AddUserFiles);
+            AddUserFolderCommand = new GenericCommand(AddUserFilesFolder);
         }
+
+        private void AddUserFilesFolder()
+        {
+            CommonOpenFileDialog ofd = new CommonOpenFileDialog()
+            {
+                Title = "Select folder containing user files",
+                IsFolderPicker = true,
+                EnsurePathExists = true
+            };
+            if (ofd.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                if (ofd.FileName != Settings.TextureLibraryLocation)
+                {
+                    handleOpenFolder(ofd.FileName);
+                }
+                else
+                {
+                    // Show user message?
+                }
+            }
+        }
+
+        private void AddUserFiles()
+        {
+            OpenFileDialog ofd = new OpenFileDialog()
+            {
+                Title = "Select user file to add",
+                Filter =
+                    $"Supported file types|{string.Join(';', TextureLibrary.ImportableFileTypes.Select(x => $"*{x}"))}",
+                Multiselect = true,
+                CheckPathExists = true
+            };
+            var result = ofd.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                handleOpenFiles(ofd.FileNames, true);
+            }
+        }
+
+
 
         private void ImportManifestFilesFromDownloads()
         {
@@ -88,7 +135,7 @@ namespace ALOTInstallerWPF.Flyouts
             var result = ofd.ShowDialog();
             if (result.HasValue && result.Value)
             {
-                handleOpenFiles(ofd.FileNames);
+                handleOpenFiles(ofd.FileNames, false);
             }
         }
 
@@ -128,13 +175,12 @@ namespace ALOTInstallerWPF.Flyouts
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void handleOpenFiles(string[] files)
+        public void handleOpenFiles(string[] files, bool? userFileMode)
         {
-
-            internalHandleFiles(files);
+            internalHandleFiles(files, userFileMode);
         }
 
-        private void internalHandleFiles(string[] files)
+        private void internalHandleFiles(string[] files, bool? userFileMode)
         {
             CurrentDisplayMode = EFIDisplayMode.ImportingView;
             ProgressIndeterminate = true;
@@ -142,18 +188,51 @@ namespace ALOTInstallerWPF.Flyouts
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("ImportChecker");
             nbw.DoWork += (sender, args) =>
             {
-                foreach (var v in files)
+                args.Result = TextureLibrary.IngestFiles(files, userFileMode,
+                    x => ImportStatusText = x,
+                    (file, done, total) =>
+                    {
+                        ProgressMax = total;
+                        ProgressValue = done;
+                        ProgressIndeterminate = false;
+                        ImportStatusText = $"Importing {file}";
+                    },
+                x =>
                 {
-                    //TextureLibrary.ImportFromFolder();
+                    CurrentDisplayMode = EFIDisplayMode.UserFileSelectGameView;
+                    CurrentUserFileName = Path.GetFileName(x);
+                    Thread.Sleep(1000000);
+                    return ApplicableGame.ME1;
+                },
+                    instF =>
+                    {
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            FileSelectionUIController.FSUIC.CurrentModeFiles.Add(instF);
+                        });
+                    });
+            };
 
+            nbw.RunWorkerCompleted += (sender, args) =>
+            {
+                if (args.Error == null)
+                {
+                    if (args.Result is List<ImportResult> results)
+                    {
+                        CurrentDisplayMode = EFIDisplayMode.ImportResultsView;
+                        ResultsText = "Results of importing/adding files:";
+                        ImportResults.ReplaceAll(results);
+                    }
                 }
             };
+
             nbw.RunWorkerAsync();
         }
 
+
         public void handleOpenFolder(string folderPath)
         {
-            CurrentDisplayMode = EFIDisplayMode.ImportingView;
+            CurrentDisplayMode = FileImporterFlyout.EFIDisplayMode.ImportingView;
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("ImportCheckerFolder");
             nbw.DoWork += (sender, args) =>
             {
@@ -175,7 +254,7 @@ namespace ALOTInstallerWPF.Flyouts
                 {
                     if (args.Result is List<ManifestFile> importedFiles)
                     {
-                        CurrentDisplayMode = EFIDisplayMode.ImportResultsView;
+                        CurrentDisplayMode = FileImporterFlyout.EFIDisplayMode.ImportResultsView;
                         ResultsText = importedFiles.Any()
                             ? "The following manifest files were imported:"
                             : $"No manifest files were found in {folderPath}";
@@ -188,5 +267,4 @@ namespace ALOTInstallerWPF.Flyouts
 
         public string ResultsText { get; set; }
     }
-
 }

@@ -275,7 +275,7 @@ namespace AlotAddOnGUI.ui
             {
                 Log.Error("Error performing diagnostics:");
                 Log.Error(App.FlattenException(e.Error));
-                DiagnosticHeader.Text = "Error occured performing diagnostics.";
+                DiagnosticHeader.Text = "Error occurredperforming diagnostics.";
                 Image_Upload.Source = new BitmapImage(new Uri(@"../images/redx_large.png", UriKind.Relative));
 
             }
@@ -1224,7 +1224,7 @@ namespace AlotAddOnGUI.ui
             }
             catch (Exception ex)
             {
-                addDiagLine("[ERROR]Exception occured while running diagnostic.");
+                addDiagLine("[ERROR]Exception occurredwhile running diagnostic.");
                 addDiagLine(App.FlattenException(ex));
                 e.Result = saveAndUploadDiag();
 

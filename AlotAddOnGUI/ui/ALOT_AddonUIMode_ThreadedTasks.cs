@@ -622,7 +622,7 @@ namespace AlotAddOnGUI
                 Log.Error(e.ToString());
                 BuildWorker.ReportProgress(0, new ThreadCommand("ERROR_OCCURED", e.Message));
                 TasksDisplayEngine.ReleaseTask(af.FriendlyName);
-                af.ReadyStatusText = "Error occured during extraction";
+                af.ReadyStatusText = "Error occurredduring extraction";
                 af.SetError();
                 ERROR_OCCURED_PLEASE_STOP = true;
                 return new KeyValuePair<AddonFile, bool>(af, false);
@@ -704,7 +704,7 @@ namespace AlotAddOnGUI
                 bool deletedOutput = Utilities.DeleteFilesAndFoldersRecursively(outDir);
                 if (!deletedOutput)
                 {
-                    KeyValuePair<string, string> messageStr = new KeyValuePair<string, string>("Unable to cleanup existing output directory", "An error occured deleting the existing output directory. Something may still be accessing it. Close other programs and try again.");
+                    KeyValuePair<string, string> messageStr = new KeyValuePair<string, string>("Unable to cleanup existing output directory", "An error occurreddeleting the existing output directory. Something may still be accessing it. Close other programs and try again.");
                     BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, messageStr));
                     e.Result = -1; //1 = Error
                     return;
@@ -929,7 +929,7 @@ namespace AlotAddOnGUI
                                 af.ReadyStatusText = "File is corrupt";
                                 Log.Error("Checksum for " + af.FriendlyName + " is wrong. Imported MD5: " + md5 + ", manifest MD5: " + af.FileMD5);
                                 Log.Error("This file cannot be used");
-                                KeyValuePair<string, string> message = new KeyValuePair<string, string>("File for " + af.FriendlyName + " is corrupt", "An error occured extracting " + af.GetFile() + ". This file is corrupt. Delete this file and download a new copy of it.");
+                                KeyValuePair<string, string> message = new KeyValuePair<string, string>("File for " + af.FriendlyName + " is corrupt", "An error occurredextracting " + af.GetFile() + ". This file is corrupt. Delete this file and download a new copy of it.");
                                 BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, message));
                             }
                             else
@@ -938,14 +938,14 @@ namespace AlotAddOnGUI
                                 af.ReadyStatusText = "Failed to extract";
                                 Log.Warning("Checksum for " + af.FriendlyName + " is correct, but the file failed to extract. Imported MD5: " + md5 + ", manifest MD5: " + af.FileMD5);
                                 Log.Warning("This file should still be usable - but why did extraction or processing fail?");
-                                KeyValuePair<string, string> message = new KeyValuePair<string, string>(af.FriendlyName + " failed to process", "An error occured extracting or processing " + af.GetFile() + ". This file does not appear to be corrupt. Attempt installation again, and if it continues to fail, come to the ALOT Discord (Settings -> Report an issue) to help troubleshoot this issue.");
+                                KeyValuePair<string, string> message = new KeyValuePair<string, string>(af.FriendlyName + " failed to process", "An error occurredextracting or processing " + af.GetFile() + ". This file does not appear to be corrupt. Attempt installation again, and if it continues to fail, come to the ALOT Discord (Settings -> Report an issue) to help troubleshoot this issue.");
                                 BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, message));
                             }
                         }
                         else
                         {
                             Log.Warning("File does not exist, may have failed staging: " + af.FriendlyName + ".");
-                            KeyValuePair<string, string> message = new KeyValuePair<string, string>(af.FriendlyName + " failed to stage", "An error occured staging " + af.GetFile() + ". Try again or come to the ALOT discord server  (Settings -> Report an issue) if this error keeps occuring.");
+                            KeyValuePair<string, string> message = new KeyValuePair<string, string>(af.FriendlyName + " failed to stage", "An error occurredstaging " + af.GetFile() + ". Try again or come to the ALOT discord server  (Settings -> Report an issue) if this error keeps occuring.");
                             BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, message));
                         }
                         //perform MD5
@@ -953,7 +953,7 @@ namespace AlotAddOnGUI
                     else
                     {
                         BuildWorker.ReportProgress(completed, new ThreadCommand(UPDATE_ADDONUI_CURRENTTASK, "Failed to extract " + af.FriendlyName + ". Check the logs for more information."));
-                        KeyValuePair<string, string> messageStr = new KeyValuePair<string, string>("Error extracting " + af.FriendlyName, "An error occured extracting " + af.GetFile() + ". This file may be corrupt. Please check if you can open it in a archive program - if not, this file will need to be deleted.");
+                        KeyValuePair<string, string> messageStr = new KeyValuePair<string, string>("Error extracting " + af.FriendlyName, "An error occurredextracting " + af.GetFile() + ". This file may be corrupt. Please check if you can open it in a archive program - if not, this file will need to be deleted.");
                         BuildWorker.ReportProgress(0, new ThreadCommand(SHOW_DIALOG, messageStr));
                         CURRENT_GAME_BUILD = 0; //reset
                     }
@@ -1447,7 +1447,7 @@ namespace AlotAddOnGUI
                     case ERROR_OCCURED:
                         Build_ProgressBar.IsIndeterminate = false;
                         ProgressBarValue = 0;
-                        //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
+                        //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occurredbuilding the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                         break;
                     case SHOW_DIALOG:
                         KeyValuePair<string, string> messageStr = (KeyValuePair<string, string>)tc.Data;
@@ -1570,7 +1570,7 @@ namespace AlotAddOnGUI
                 {
                     Log.Error("Error creating backup:");
                     Log.Error(App.FlattenException(ex));
-                    BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Backup failed", "Backup of Mass Effect" + GetGameNumberSuffix(BACKUP_THREAD_GAME) + " failed. An error occured during the copy process. The error message was: " + ex.Message + ".\nSome files may have been copied, but this backup is not usable. You can delete the folder you were backing up files into.\nReview the installer log for more information.")));
+                    BackupWorker.ReportProgress(completed, new ThreadCommand(SHOW_DIALOG, new KeyValuePair<string, string>("Backup failed", "Backup of Mass Effect" + GetGameNumberSuffix(BACKUP_THREAD_GAME) + " failed. An error occurredduring the copy process. The error message was: " + ex.Message + ".\nSome files may have been copied, but this backup is not usable. You can delete the folder you were backing up files into.\nReview the installer log for more information.")));
                     Progressbar_Max = 100;
                     e.Result = null;
                     return;
@@ -1830,7 +1830,7 @@ namespace AlotAddOnGUI
                         if (!ERROR_SHOWING)
                         {
                             ERROR_SHOWING = true;
-                            await this.ShowMessageAsync("Error while building and staging textures", "An error occured building and staging files for installation. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
+                            await this.ShowMessageAsync("Error while building and staging textures", "An error occurredbuilding and staging files for installation. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                             ERROR_SHOWING = false;
                         }
                         break;

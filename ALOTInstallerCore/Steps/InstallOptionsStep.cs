@@ -56,7 +56,11 @@ namespace ALOTInstallerCore.Steps
             /// <summary>
             /// Install user files. Available to all modes.
             /// </summary>
-            UserFiles
+            UserFiles,
+            /// <summary>
+            /// Install PreinstallMod objects (e.g. ALOV)
+            /// </summary>
+            ALOVMods
         }
 
         public static Dictionary<InstallOption, (OptionState state, string reasonForState)> CalculateInstallOptions(
@@ -72,7 +76,12 @@ namespace ALOTInstallerCore.Steps
                 }
                 else
                 {
-                    options[InstallOption.UserFiles] = (OptionState.DisabledVisible, "User files have been added for install but none of them are ready to install");
+                    options[InstallOption.UserFiles] = (OptionState.DisabledVisible, "No user files are ready or available for install");
+                }
+
+                if (filesForTarget.Any(x => x is PreinstallMod && x.Ready && !x.Disabled))
+                {
+                    options[InstallOption.ALOVMods] = (OptionState.CheckedVisible, null);
                 }
 
                 return options;
@@ -266,13 +275,23 @@ namespace ALOTInstallerCore.Steps
 
                 // CHECK ADDONS
                 if (filesForTarget.Any(x =>
-                    x is ManifestFile mf && mf.AlotVersionInfo.IsNotVersioned || x is PreinstallMod))
+                    x is ManifestFile mf && mf.AlotVersionInfo.IsNotVersioned && !(x is PreinstallMod)))
                 {
                     options[InstallOption.Addon] = (OptionState.CheckedVisible, "Addon files are the non-required files, but should be installed to complete the experience");
                 }
                 else
                 {
                     options[InstallOption.Addon] = (OptionState.DisabledVisible, "No Addon files are imported");
+                }
+
+                // ALOV FILES
+                if (filesForTarget.Any(x => x is PreinstallMod))
+                {
+                    options[InstallOption.ALOVMods] = (OptionState.CheckedVisible, "ALOV upscales video files");
+                }
+                else
+                {
+                    options[InstallOption.ALOVMods] = (OptionState.DisabledVisible, "ALOV not imported");
                 }
 
                 // MEUITM

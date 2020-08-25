@@ -18,6 +18,7 @@ namespace ALOTInstallerWPF.Converters
         private static readonly SolidColorBrush RecommendedNotReadyBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#35b85000"));
         private static readonly SolidColorBrush ProcessingBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#35ffe900"));
         private static readonly SolidColorBrush OptionalNotReadyBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#350045a6"));
+        private static readonly SolidColorBrush UserNotReadyBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3503e3fc"));
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (value is InstallerFile ifx)
@@ -30,6 +31,10 @@ namespace ALOTInstallerWPF.Converters
                 {
                     if (mf.Recommendation == RecommendationType.Required) return RequiredNotReadyBrush;
                     if (mf.Recommendation == RecommendationType.Recommended) return RecommendedNotReadyBrush;
+                }
+                else if (ifx is UserFile uf)
+                {
+                    return UserNotReadyBrush;
                 }
 
                 return OptionalNotReadyBrush;

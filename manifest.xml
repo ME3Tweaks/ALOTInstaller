@@ -1,14 +1,14 @@
 <?xml
  version="1.0"
  encoding="utf-8"?>
-<alotaddonmanifest
- version="6.2.11">
+<alotinstallermanifest>
+    <!-- MEM Update Information -->
     <highestapprovedmemversion>421</highestapprovedmemversion>
-    <soaktestingmemversion
-     soakstartdate="2020-08-01">421</soaktestingmemversion>
-<!-- YYYY-MM-DD-->
+    <soaktestingmemversion soakstartdate="2020-08-01">421</soaktestingmemversion>
+    <!-- YYYY-MM-DD-->
+
+    <!-- Stages, weights, UI messages -->
     <stages>
-<!-- -58 is the next error code available-->
         <stage
             name="STAGE_PRESCAN"
             weight="0"
@@ -162,26 +162,22 @@
                     resultcode="InstallFailed_ZipCopyFilesError"
                     failedtopmessage="Failed to install additional components for a mod"
                     failedbottommessage="Check installer log for more info"
-                    failedheadermessage="ALOT Installer was unable to install additional non-texture components for a specific texture mod. Check the installer log for more information."/>
+                    failedheadermessagige="ALOT Installer was unable to install additional non-texture components for a specific texture mod. Check the installer log for more information."/>
         </stage>
     </stages>
-    <musicpackmirror>https://github.com/Mgamerz/AlotAddOnGUI/releases/download/2.0.145.1547/alot_installer_musicpack.7z</musicpackmirror>
-    <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack.7z</musicpackmirror>
+    <!-- Mirrors for music pack -->
+    <musicpackmirror>https://github.com/ME3Tweaks/ALOTInstaller/releases/download/3.0.586.5600/alotinstaller_music_pack-v4.zip</musicpackmirror>
+    <musicpackmirror>https://me3tweaks.com/alotinstaller/alotinstaller_music_pack-v4.7z</musicpackmirror>
+
+    <!-- Tutorials and comparisons -->
     <tutorial
-     meuitm="false"
      link="https://imgur.com/a/WBJQD"
      text="Installation Guide (2018)"
      tooltip="A tutorial with pictures that walks through the installation steps." />
     <tutorial
-     meuitm="false"
      link="https://yttrian.github.io/ALOT-Comparisons/"
      text="Comparison Screenshots"
      tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore." />
-    <tutorial
-     meuitm="true"
-     link="https://www.nexusmods.com/masseffect/mods/1"
-     text="MEUITM Installation Guide"
-     tooltip="Tutorial on how to install MEUITM with ALOT Installer." />
 <!-- DLC names matching this in ME3 DLC folders will have MEM texture export fix run over it before installation -->
     <me3dlctexturefixes>
         <dlc
@@ -189,9 +185,9 @@
         <dlc
             name="DLC_CON_BPPack2" />
     </me3dlctexturefixes>
-<!-- DLC names matching this in ME2 DLC folders will have MEM texture export fix run over it before installation -->
+    <!-- DLC names matching this in ME2 DLC folders will have MEM texture export fix run over it before installation -->
     <me2dlctexturefixes />
-<!-- Executables with hashes that are not in the list are almost always pirated and are not supported.-->
+    <!-- Executables with hashes that are not in the list are almost always pirated and are not supported.-->
     <supportedhashes>
         <supportedhash
             game="me1"
@@ -254,12 +250,20 @@
             game="me3"
             name="Origin (Russian)">70dc87862da9010aad1acd7d0c2c857b</supportedhash>
     </supportedhashes>
-<!-- Manifests begin below -->
+
+    <!-- DEFINE MANIFEST MODES -->
     <manifest
      mode="MEUITM"
      description="Installs MEUITM with MEUITM defaults"          
-     version="2.0">
-        <addonfile
+     version="2.0"/>
+     <manifest
+     mode="ALOT"
+     description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
+     version="7.0.0"/>
+
+     <!-- DEFINE MANIFEST FILES -->
+     <manifestfiles>
+        <manifestfile mode="MEUITM"
             meuitm="true"
             meuitmver="2"
             friendlyname="MEUITM Anniversary Edition (2018)"
@@ -573,13 +577,9 @@
                     inarchivepath="MEUITM\mods\Splash.bmp"
                     gamedestinationpath="BioGame\Splash\Splash.bmp"
                     choicetitle="MEUITM Splash Screen" />
-        </addonfile>
-    </manifest>
-    <manifest
-     mode="ALOT"
-     description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-     version="7.0.0">
-        <addonfile
+        </manifestfile>
+    
+        <manifestfile mode="ALOT"
             meuitmver="2"
             friendlyname="MEUITM Anniversary Edition (2018)"
             author="CDAMJC"
@@ -889,8 +889,8 @@
                     inarchivepath="MEUITM\mods\Splash.bmp"
                     gamedestinationpath="BioGame\Splash\Splash.bmp"
                     choicetitle="MEUITM Splash Screen" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             alotversion="11"
             friendlyname="ALOT for ME1 11.0"
             author="CreeperLava"
@@ -912,8 +912,8 @@
             me1="true"
             sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v11.mem"
             movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             alotversion="11"
             friendlyname="ALOT for ME2 11.0"
             author="CreeperLava"
@@ -935,8 +935,8 @@
                     me2="true"
                     sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v11.mem"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             alotversion="11"
             friendlyname="ALOT for ME3 11.0"
             author="CreeperLava"
@@ -958,8 +958,8 @@
                     me3="true"
                     sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v11.mem"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             alotversion="11"
             alotupdateversion="1"
             uipriority="0"
@@ -982,8 +982,8 @@
                     me1="true"
                     sourcename="ALOT_ME1_UPDATE_v11.mem"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             alotversion="11"
             alotupdateversion="1"
             uipriority="0"
@@ -1005,8 +1005,8 @@
                     me2="true"
                     sourcename="ALOT_ME2_UPDATE_v11.mem"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             alotversion="11"
             alotupdateversion="3"
             uipriority="0"
@@ -1028,8 +1028,8 @@
                     me3="true"
                     sourcename="ALOT_ME3_UPDATE_v11.mem"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Improved Static Lighting for ME1"
             author="CreeperLava"
             installpriority="3"
@@ -1049,8 +1049,8 @@
                     me1="true"
                     sourcename="LightMaps_ME1.mem"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Improved Static Lighting for ME2"
             author="CreeperLava"
             installpriority="3"
@@ -1070,8 +1070,8 @@
                     me2="true"
                     sourcename="LightMaps_ME2.mem"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Improved Static Lighting for ME3"
             author="CreeperLava"
             installpriority="3"
@@ -1091,8 +1091,8 @@
                     me3="true"
                     sourcename="LightMaps_ME3.mem"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Allers Complexion Tweak"
             author="Ellise"
             recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
@@ -1110,8 +1110,8 @@
                     me3="true"
                     sourcename="el_AllersComplexionTweak.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Brooks Complexion Tweak"
             author="Ellise"
             recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
@@ -1129,8 +1129,8 @@
                     me3="true"
                     sourcename="el_BrooksComplexionTweak.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Illusive Man Complexion Tweak"
             author="Ellise"
             recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
@@ -1190,8 +1190,8 @@
                     me3="true"
                     sourcename="HMM_HED_PROIllusivemanB_Face_Spec_0x3B912C80.dds"
                     destinationname="0x3B912C80.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Ashley Complexion Tweak"
             author="Ellise"
             recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
@@ -1210,8 +1210,8 @@
                     me3="true"
                     sourcename="el_Ashley Complexion Tweak.mem"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Jacob Complexion Tweak"
             author="Ellise"
             recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
@@ -1238,8 +1238,8 @@
                     me3="true"
                     sourcename="el_JacobComplexionTweak.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Kaidan Complexion Tweak"
             author="Ellise"
             recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
@@ -1257,8 +1257,8 @@
                     me3="true"
                     sourcename="el_KaidanComplexionTweak.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="FemShep Complexion Tweak"
             author="Ellise"
             recommendationreason="Very good face textures for default FemShep (not custom), but a little different from vanilla and thus up to personal preference"
@@ -1276,8 +1276,8 @@
                     me3="true"
                     sourcename="el_DefaultFemshepRetexture.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Sheploo Complexion Tweak"
             author="Ellise"
             recommendationreason="Very good face textures for default BroShep (not custom), but a little different from vanilla and thus up to personal preference"
@@ -1295,8 +1295,8 @@
                     me3="true"
                     sourcename="el_SheplooComplexionTweak_1.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="James Complexion Tweak"
             author="Ellise"
             recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
@@ -1314,8 +1314,8 @@
                     me3="true"
                     sourcename="el_JamesComplexionTweak_1.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Zaeed Complexion Tweak"
             author="Ellise"
             recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
@@ -1333,8 +1333,8 @@
                     me3="true"
                     sourcename="el_ZaeedComplexionTweak_1.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="FemShep High Quality textures"
             author="heleuss"
             recommendationreason="Very good face textures for custom FemSheps (not default), but a little different from vanilla and thus up to personal preference"
@@ -1353,8 +1353,8 @@
                     me3="true"
                     sourcename="[ME3] KH_femShep_face_textures.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="BroShep High Quality textures"
             author="heleuss"
             recommendationreason="Very good face textures for custom BroSheps (not default), but a little different from vanilla and thus up to personal preference"
@@ -1369,8 +1369,8 @@
                     me3="true"
                     sourcename="[ME3] KH_broShep_face_textures.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="FemShep High Quality textures"
             author="heleuss"
             recommendationreason="Very good face textures for custom FemSheps (not default), but a little different from vanilla and thus up to personal preference"
@@ -1389,8 +1389,8 @@
                     me2="true"
                     sourcename="[ME2] KH_femShep_makeup_mask.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="BroShep High Quality textures"
             author="heleuss"
             recommendationreason="Very good face textures for custom BroSheps (not default), but a little different from vanilla and thus up to personal preference"
@@ -1408,8 +1408,8 @@
                     me2="true"
                     sourcename="[ME2] KH_broShep_face_textures.tpf"
                     movedirectly="true" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="HR Predator Texture"
             author="TheDarkFalkon"
             installpriority="10"
@@ -1445,8 +1445,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xF4295780.dds"
                     destinationname="WPN_PSTa_Tint_0xF4295780.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="HR Shuriken Texture"
             author="TheDarkFalkon"
             installpriority="10"
@@ -1475,8 +1475,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x057B3D5A.dds"
                     destinationname="WPN_PSTc_Tint_0x057B3D5A.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="HR Katana Texture"
             author="TheDarkFalkon"
             installpriority="10"
@@ -1508,8 +1508,8 @@
                     me2="true"
                     sourcename="MASSEFFECT3.EXE_0x738FAA8B.dds"
                     destinationname="WPN_BLSb_Diff_0xA56179D6.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="HR Carnifex Texture"
             author="TheDarkFalkon"
             installpriority="10"
@@ -1538,8 +1538,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x809FC86B.dds"
                     destinationname="WPN_PSTb_Tint_0x809FC86B.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="HR Paladin Texture"
             author="TheDarkFalkon"
             installpriority="10"
@@ -1562,8 +1562,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xB8151BBB.dds"
                     destinationname="WPN_PSTm_Spec_0xB8151BBB.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="HR Phaeston Texture"
             author="TheDarkFalkon"
             installpriority="10"
@@ -1590,8 +1590,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xEEFDCFA9.dds"
                     destinationname="WPN_ASLg_Spec_0xEEFDCFA9.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="HR M-92 Mantis"
             author="TheDarkFalkon"
             installpriority="10"
@@ -1614,8 +1614,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xB2744B1D.dds"
                     destinationname="WPN_SNPa_Tint_0xB2744B1D.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Armor Sets Pack for ME3"
             author="Ottemis"
             installpriority="10"
@@ -2121,8 +2121,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xFD90FB39_Kassa_leg_Spec.dds"
                     destinationname="HMM_ARM_SHPb_Leg_Spec_0xFD90FB39.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="ME3 HR Alliance Blues - 4096"
             author="Ottemis"
             installpriority="10"
@@ -2188,8 +2188,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x2CE94E76_alliance_norm.dds"
                     destinationname="HMM_ARM_CTHa_Nav_Norm_Stack_0x2CE94E76.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="HR Alliance Cruiser"
             author="Ottemis"
             installpriority="10"
@@ -2211,8 +2211,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x326E381C_Acruiser_spec.dds"
                     destinationname="AlliCruiserA_CustomMask2_Cine_0x326E381C.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Armax Arena Cerberus Female"
             author="Ottemis"
             installpriority="10"
@@ -2250,8 +2250,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x73B170C7_Shade_Spec.dds"
                     destinationname="HMF_ARM_FBDj_Spec_0x73B170C7.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Armax Arena Cerberus Male"
             author="Ottemis"
             installpriority="10"
@@ -2285,8 +2285,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xFC4B849C_ShadeM_Diff.dds"
                     destinationname="HMM_ARM_SHP_FBDj_Diff_0xFC4B849C.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Ashley Alternate Armor"
             author="Ottemis"
             installpriority="10"
@@ -2320,8 +2320,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xEAA787FF_ash_norm.dds"
                     destinationname="HMF_ARM_ASHb_Norm_0xEAA787FF.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Ashley Alternate From Ashes Armor"
             author="Ottemis"
             installpriority="10"
@@ -2347,8 +2347,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x79AF2C8F_Ash_norm.dds"
                     destinationname="HMF_ARM_ASHf_Norm_0x79AF2C8F.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Ashley CE Armor"
             author="Ottemis"
             installpriority="10"
@@ -2382,8 +2382,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xD43F8502_squad.dds"
                     destinationname="Ashley2_0xD43F8502.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Ashley Default"
             author="Ottemis"
             installpriority="10"
@@ -2417,8 +2417,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x46AF2F43_squad.dds"
                     destinationname="Ashley0Glow_0x46AF2F43.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Citadel Enviromentals 102"
             author="Ottemis"
             installpriority="10"
@@ -2472,8 +2472,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xFB40CDAE_hovercar_spec.dds"
                     destinationname="HoverCar01_Int_Roof_Spec_Cine_0xFB40CDAE.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Combat Fatigues"
             author="Ottemis"
             installpriority="10"
@@ -2568,8 +2568,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xE8B022DA_Grissom_Male_Norm.dds"
                     destinationname="HMM_ARM_CTHb_Gri_Norm_0xE8B022DA.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="EDI Alternate Outfit"
             author="Ottemis"
             stagemodfiles="true"
@@ -2590,8 +2590,8 @@
                     me3="true"
                     sourcename="HMF_ARM_EDId_Spec_0x6ADA93CE_Otte.dds"
                     destinationname="HMF_ARM_EDId_Spec_0x6ADA93CE.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="EDI From Ashes Outfit"
             author="Ottemis"
             stagemodfiles="true"
@@ -2624,8 +2624,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds"
                     destinationname="HMF_ARM_EDIg_Norm_0xE3618AF0.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Fourth Casual Black"
             author="Ottemis"
             installpriority="10"
@@ -2676,8 +2676,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xF750CD22_Female_Blood.dds"
                     destinationname="HMM_ARM_CTHi_Diff_0xF750CD22.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Garrus Alternate Armor"
             author="Ottemis"
             installpriority="10"
@@ -2708,8 +2708,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xBC526E87_helm_alt_diff.dds"
                     destinationname="TUR_HGRb_Garrus_Diff_0xBC526E87.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Kai Leng"
             author="Ottemis"
             installpriority="10"
@@ -2755,8 +2755,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xB8E01EB0_ShadeM_Norm.dds"
                     destinationname="HMM_ARM_SHP_FBDj_Norm_0xB8E01EB0.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Kaidan Alt From Ashes Armor in Original Black"
             author="Ottemis"
             installpriority="10"
@@ -2778,8 +2778,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xB7E585E7_bulk_kai_spec_s.dds"
                     destinationname="HMM_ARM_KAIe_Spec_0xB7E585E7.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Kaidan CE Armor"
             author="Ottemis"
             installpriority="10"
@@ -2821,8 +2821,8 @@
                     me3="true"
                     sourcename="HMM_HGRc_KAI_Diff_0x0D7A8165_Otte.dds"
                     destinationname="HMM_HGRc_KAI_Diff_0x0D7A8165.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Kaidan Default Armor"
             author="Ottemis"
             installpriority="10"
@@ -2852,8 +2852,8 @@
                     me3="true"
                     sourcename="HMM_HGRa_KAI_Diff_0x2366F731.dds"
                     destinationname="HMM_HGRa_KAI_Diff_0x2366F731.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Liara Alt From Ashes Armor"
             author="Ottemis"
             installpriority="10"
@@ -2880,8 +2880,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xD1B0BC02_Norm.dds"
                     destinationname="ASA_ARM_LIAg_Norm_0xD1B0BC02.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Liara Alternate Armor"
             author="Ottemis"
             installpriority="10"
@@ -2908,8 +2908,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xF8FE187D_Liara_spec.dds"
                     destinationname="ASA_ARM_LIAf_Spec_0xF8FE187D.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="HR Maya Brooks"
             author="Ottemis"
             installpriority="10"
@@ -2935,8 +2935,8 @@
                     me3="true"
                     sourcename="HMF_ARM_FTLa_Spec_0xBE1A9E16_Otte.dds"
                     destinationname="HMF_ARM_FTLa_Spec_0xBE1A9E16.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="N7 Hoody"
             author="Ottemis"
             installpriority="10"
@@ -2974,8 +2974,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xE6E3CF23_N7_Male_Norm.dds"
                     destinationname="SHP_Hoddie_nm_0xE6E3CF23.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Science Uniforms"
             author="Ottemis"
             installpriority="10"
@@ -3009,8 +3009,8 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x9819D0EB_female_norm.dds"
                     destinationname="HMF_ARM_CTHh_Doc_Norm_Stack_0x9819D0EB.dds" />
-        </addonfile>
-        <addonfile
+        </manifestfile>
+        <manifestfile mode="ALOT"
             friendlyname="Vega Alt From Ashes Armor in Original Blue"
             author="Ottemis"
             installpriority="10"
@@ -3040,10 +3040,10 @@
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0xD76F9B1D_vega.dds"
                     destinationname="James3Glow_0xD76F9B1D.dds" />
-        </addonfile>
+        </manifestfile>
 <!-- These are Mod Manager mods. They must be explicitly supported to work through the installer core -->
 <!-- Preinstallmod objects are supersets of the manifestfiles, in that they support the same features (packagefile) but will have their archive extracted after dlc is unpacked, but before game scan takes place. -->
-        <preinstallmod
+        <preinstallmod mode="ALOT"
             friendlyname="A Lot of Videos for ME1 (1080p)"
             author="Audemus"
             recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect"
@@ -3069,7 +3069,7 @@
                     me2="false"
                     me3="false" />
         </preinstallmod>
-        <preinstallmod
+        <preinstallmod mode="ALOT"
             friendlyname="A Lot of Videos for ME1 (4K)"
             author="Audemus"
             recommendationreason="Optional due to large filesize and CPU requirements"
@@ -3094,7 +3094,7 @@
                     me2="false"
                     me3="false" />
         </preinstallmod>
-        <preinstallmod
+        <preinstallmod mode="ALOT"
             friendlyname="A Lot of Videos for ME2 (1080p)"
             author="Audemus"
             recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 2"
@@ -3135,7 +3135,7 @@
                     me2="true"
                     me3="false" />
         </preinstallmod>
-        <preinstallmod
+        <preinstallmod mode="ALOT"
             friendlyname="A Lot of Videos for ME2 (4K)"
             author="Audemus"
             recommendationreason="Optional due to large filesize and CPU requirements"
@@ -3176,7 +3176,7 @@
                     me2="true"
                     me3="false" />
         </preinstallmod>
-        <preinstallmod
+        <preinstallmod mode="ALOT"
             friendlyname="A Lot of Videos for ME3 (1080p)"
             author="Mellin"
             recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3"
@@ -3346,7 +3346,7 @@
                     sourcename="ALOV_ALOT_addon_v1.mem"
                     movedirectly="true" />
         </preinstallmod>
-        <preinstallmod
+        <preinstallmod mode="ALOT"
             friendlyname="A Lot of Videos for ME3 (4K)"
             author="Mellin"
             recommendationreason="Optional due to large filesize and CPU requirements"
@@ -3516,5 +3516,5 @@
                     sourcename="ALOV_ALOT_addon_v1.mem"
                     movedirectly="true" />
         </preinstallmod>
-    </manifest>
-</alotaddonmanifest>
+    </manifestfiles>
+</alotinstallermanifest>

@@ -525,6 +525,7 @@ namespace ALOTInstallerCore.Steps
                 case ".tpf": return true;
                 case ".png":
                 case ".dds":
+                case ".bmp":
                 case ".tga":
                     string regex = "0x[0-9a-f]{8}"; //This matches even if user has more chars after the 8th hex so...
                     var isOK = Regex.IsMatch(filename, regex);
@@ -854,7 +855,12 @@ namespace ALOTInstallerCore.Steps
 
             if (installOptions.InstallAddons)
             {
-                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.IsNotVersioned && x is ManifestFile)); //Add Addon files that don't have a set ALOTVersionInfo.
+                filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.IsNotVersioned && x is ManifestFile && !(x is PreinstallMod))); //Add Addon files that don't have a set ALOTVersionInfo.
+            }
+
+            if (installOptions.InstallPreinstallMods)
+            {
+                filesToStage.AddRange(readyFiles.Where(x => x is PreinstallMod)); //Add Addon files that don't have a set ALOTVersionInfo.
             }
 
             if (installOptions.InstallUserfiles)

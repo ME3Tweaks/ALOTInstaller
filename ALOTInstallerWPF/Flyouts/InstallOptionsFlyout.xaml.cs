@@ -124,6 +124,7 @@ namespace ALOTInstallerWPF.Flyouts
             if (option == InstallOptionsStep.InstallOption.Addon) return "ALOT Addon";
             if (option == InstallOptionsStep.InstallOption.MEUITM) return "MEUITM";
             if (option == InstallOptionsStep.InstallOption.UserFiles) return "User files";
+            if (option == InstallOptionsStep.InstallOption.ALOVMods) return "ALOV";
             return "UNKNOWN OPTION";
         }
 

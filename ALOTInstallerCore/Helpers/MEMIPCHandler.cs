@@ -287,5 +287,38 @@ namespace ALOTInstallerCore.Helpers
 
             return true;
         }
+
+        /// <summary>
+        /// Gets list of files in an archive
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public static List<string> GetFileListing(string file)
+        {
+            string args = $"--get-archive-listing --input \"{file}\" --ipc";
+            List<string> fileListing = new List<string>();
+
+            int exitcode = -1;
+
+
+            //TODO: ENABLE WHEN AQUADRAN IMPLEMENTS FILE LISTING
+            //MEMIPCHandler.RunMEMIPCUntilExit(args,
+            //    null,
+            //    (command, param) =>
+            //    {
+            //        if (command == "FILE")
+            //        {
+            //            fileListing.Add(param);
+            //        }
+            //    },
+            //    x => Log.Error($"StdError setting LODs: {x}"),
+            //    x => exitcode = x); //Change to catch exit code of non zero.        
+            //if (exitcode != 0)
+            //{
+            //    Log.Error($"MassEffectModderNoGui had error getting file listing of archive {file}, exit code {exitcode}");
+            //}
+            fileListing.Add("test.tpf");
+            return fileListing;
+        }
     }
 }

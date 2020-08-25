@@ -88,6 +88,10 @@ namespace ALOTInstallerCore.Objects
         /// File is ready to be processed or not
         /// </summary>
         public bool Ready { get; set; }
+        /// <summary>
+        /// UI category of file, such as Addon, ALOV, UserFile
+        /// </summary>
+        public abstract string Category { get; }
 
         /// <summary>
         /// String that can be used to display the status of this manifest file.

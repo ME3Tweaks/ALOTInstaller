@@ -336,7 +336,7 @@ namespace AlotAddOnGUI
                 case ERROR_OCCURED:
                     Build_ProgressBar.IsIndeterminate = false;
                     ProgressBarValue = 0;
-                    //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occured building the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
+                    //await this.ShowMessageAsync("Error building Addon MEM Package", "An error occurredbuilding the addon. The logs will provide more information. The error message given is:\n" + (string)tc.Data);
                     break;
                 case SHOW_DIALOG:
                     KeyValuePair<string, string> messageStr = (KeyValuePair<string, string>)tc.Data;
@@ -1197,7 +1197,7 @@ namespace AlotAddOnGUI
                         {
                             InstallingOverlay_TopLabel.Text = "Setting files read/write failed";
                             InstallingOverlay_BottomLabel.Text = "Game may be nested too deep or mod not properly installed";
-                            HeaderLabel.Text = "Error occured setting files to read/write - this is typically a sign that a mod is improperly installed\nor the game is nested too deep in the filesystem. This is due to a limitation in the Windows API.\nReview the log for more information on what the problematic files are.";
+                            HeaderLabel.Text = "Error occurredsetting files to read/write - this is typically a sign that a mod is improperly installed\nor the game is nested too deep in the filesystem. This is due to a limitation in the Windows API.\nReview the log for more information on what the problematic files are.";
                             break;
                         }
                     case RESULT_MARKERCHECK_FAILED:
@@ -1211,7 +1211,7 @@ namespace AlotAddOnGUI
                         {
                             InstallingOverlay_TopLabel.Text = "Unknown error has occured";
                             InstallingOverlay_BottomLabel.Text = "Check installation logs for more details";
-                            HeaderLabel.Text = "An unknown error occured during installation.";
+                            HeaderLabel.Text = "An unknown error occurredduring installation.";
                             break;
                         }
                     default:
@@ -1243,7 +1243,7 @@ namespace AlotAddOnGUI
                             {
                                 InstallingOverlay_TopLabel.Text = "Unknown error has occured";
                                 InstallingOverlay_BottomLabel.Text = "Check installation logs for more details";
-                                HeaderLabel.Text = "An unknown error occured during installation.";
+                                HeaderLabel.Text = "An unknown error occurredduring installation.";
                             }
                             break;
                         }
@@ -1415,11 +1415,11 @@ namespace AlotAddOnGUI
                     }
                     //catch (FlurlHttpTimeoutException)
                     //{
-                    //    Log.Warning("Timeout occured while attempting to upload installation telemetry.");
+                    //    Log.Warning("Timeout occurredwhile attempting to upload installation telemetry.");
                     //}
                     catch (Exception ex)
                     {
-                        Log.Error("Error occured while attempting to upload installation telemetry: " + ex.Message);
+                        Log.Error("Error occurredwhile attempting to upload installation telemetry: " + ex.Message);
                     }
                 };
                 telemetryworker.RunWorkerAsync();

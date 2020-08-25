@@ -8,6 +8,10 @@ namespace ALOTInstallerCore.Objects.Manifest
     public enum ManifestMode
     {
         /// <summary>
+        /// Specifies an invalid mode
+        /// </summary>
+        Invalid,
+        /// <summary>
         /// No manifest. Install whatever you want, but you get to deal with the side effects
         /// </summary>
         Free,
@@ -50,5 +54,11 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// Indicates that the manifest was loaded from disk rather than the live version. May indicate network issue
         /// </summary>
         public bool UsingBundled { get; internal set; }
+
+        /// <summary>
+        /// List of all known manifest files. May contain "duplicate" items as a single file may appear in multiple modes
+        /// with different settings
+        /// </summary>
+        public List<ManifestFile> AllManifestFiles { get; } = new List<ManifestFile>();
     }
 }

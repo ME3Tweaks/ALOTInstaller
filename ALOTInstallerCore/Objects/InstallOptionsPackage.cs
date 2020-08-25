@@ -18,6 +18,7 @@ namespace ALOTInstallerCore.Objects
         public bool InstallALOT { get; set; }
         public bool InstallALOTUpdate { get; set; }
         public bool InstallAddons { get; set; }
+        public bool InstallPreinstallMods { get; set; }
         public bool InstallMEUITM { get; set; }
         public bool InstallUserfiles { get; set; }
 

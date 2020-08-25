@@ -459,7 +459,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     }))
                 {
                     // We support multi drop. I'm not going to bother checking all the extensions, the importer will handle this
-                    attemptImportFiles(files);
+                    attemptImportFiles(files, ManifestHandler.CurrentMode == ManifestMode.Free ? (bool?)true : null);
                 }
                 else
                 {
@@ -480,7 +480,7 @@ namespace ALOTInstallerWPF.BuilderUI
                             {
                                 // Not supported.
                                 e.Effects = DragDropEffects.None;
-                                attemptImportFiles(files);
+                                attemptImportFiles(files, ManifestHandler.CurrentMode == ManifestMode.Free ? (bool?)true : null);
                             }
                         }
                     }
@@ -496,11 +496,11 @@ namespace ALOTInstallerWPF.BuilderUI
             }
         }
 
-        private void attemptImportFiles(string[] files)
+        private void attemptImportFiles(string[] files, bool? userFileMode)
         {
             if (Application.Current.MainWindow is MainWindow mw)
             {
-                mw.OpenFileImporterFiles(files);
+                mw.OpenFileImporterFiles(files, userFileMode);
             }
         }
     }

@@ -116,7 +116,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         /// <param name="selectedDiagnosticTarget">Target to perform diagnostic on</param>
         /// <param name="textureCheck">If a full texture check should be performed</param>
         /// <param name="updateStatusCallback">Callback to update the status</param>
-        /// <param name="updateProgressCallback">Callback to indicate a progressable task has occured (such as full texture check)</param>
+        /// <param name="updateProgressCallback">Callback to indicate a progressable task has occurred(such as full texture check)</param>
         /// <returns></returns>
         public static string PerformDiagnostic(GameTarget selectedDiagnosticTarget, bool textureCheck,
             Action<string> updateStatusCallback = null, Action<int> updateProgressCallback = null, Action progressIndeterminateCallback = null)
@@ -555,7 +555,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 void memExceptionOccured(string operation, string line)
                 {
-                    addDiagLine($@"An exception occured performing operation '{operation}': {line}",
+                    addDiagLine($@"An exception occurredperforming operation '{operation}': {line}",
                         Severity.ERROR);
                     addDiagLine(@"Check the Mod Manager application log for more information.", Severity.ERROR);
                     addDiagLine(@"Report this to ALOT or ME3Tweaks Discord for further assistance.",
@@ -1320,7 +1320,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             }
             catch (Exception ex)
             {
-                addDiagLine(@"Exception occured while running diagnostic.", Severity.ERROR);
+                addDiagLine(@"Exception occurredwhile running diagnostic.", Severity.ERROR);
                 addDiagLine(ex.Flatten(), Severity.ERROR);
                 return diagStringBuilder.ToString();
             }

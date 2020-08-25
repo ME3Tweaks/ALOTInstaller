@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using ALOTInstallerCore.Objects.Manifest;
 
 namespace ALOTInstallerCore.Objects
 {
@@ -21,6 +22,8 @@ namespace ALOTInstallerCore.Objects
             set { } //Must have setter even if unused
         }
 
+        public override string Category => "User file";
+
         /// <summary>
         /// Updates the ready status for this user file. Checks if file exists on disk and sets Ready based on this returned value
         /// </summary>
@@ -38,6 +41,5 @@ namespace ALOTInstallerCore.Objects
         /// </summary>
         /// <returns></returns>
         public override string GetUsedFilepath() => FullFilePath;
-
     }
 }

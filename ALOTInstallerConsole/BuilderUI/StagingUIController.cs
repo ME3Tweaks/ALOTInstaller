@@ -61,7 +61,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 }
                 else
                 {
-                    MessageBox.ErrorQuery("Error occured while building textures", $"Error occured while building textures: {b.Error.Message}", "OK");
+                    MessageBox.ErrorQuery("Error occurredwhile building textures", $"Error occurredwhile building textures: {b.Error.Message}", "OK");
                 }
                 FileSelectionUIController fsuic = new FileSelectionUIController();
                 Program.SwapToNewView(fsuic);
@@ -94,7 +94,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void errorStaging(string obj)
         {
-            MessageBox.ErrorQuery("Error occured during staging", obj, "OK");
+            MessageBox.ErrorQuery("Error occurredduring staging", obj, "OK");
         }
 
         private void performPreinstallCheck()
@@ -114,7 +114,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 }
                 if (b.Error != null)
                 {
-                    Log.Error($"Exception occured in precheck for pre-install: {b.Error.Message}");
+                    Log.Error($"Exception occurredin precheck for pre-install: {b.Error.Message}");
                     MessageBox.Query("Precheck failed", b.Result as string, "OK");
                     BuilderUI.FileSelectionUIController fsuic = new FileSelectionUIController();
                     fsuic.SetupUI();
