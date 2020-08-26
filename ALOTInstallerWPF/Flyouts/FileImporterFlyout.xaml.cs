@@ -62,6 +62,11 @@ namespace ALOTInstallerWPF.Flyouts
         public GenericCommand ImportManifestFromDownloadsCommand { get; set; }
         public GenericCommand AddUserFolderCommand { get; set; }
         public GenericCommand AddUserFilesCommand { get; set; }
+
+        /// <summary>
+        /// This command is set by the importer for each file 
+        /// </summary>
+        public RelayCommand GameSelectionCommand { get; set; }
         private void LoadCommands()
         {
             ImportManifestFilesCommand = new GenericCommand(ImportManifestFiles, HasAnyMissingManifestFiles);
@@ -199,10 +204,28 @@ namespace ALOTInstallerWPF.Flyouts
                     },
                 x =>
                 {
+                    var syncObj = new object();
                     CurrentDisplayMode = EFIDisplayMode.UserFileSelectGameView;
                     CurrentUserFileName = Path.GetFileName(x);
-                    Thread.Sleep(1000000);
-                    return ApplicableGame.ME1;
+                    ApplicableGame selectedGame = ApplicableGame.None;
+                    void selectedGameCallback(object o)
+                    {
+                        if (o is string str && Enum.TryParse<ApplicableGame>(str, out var sg))
+                        {
+                            selectedGame = sg;
+                            lock (syncObj)
+                            {
+                                Monitor.Pulse(syncObj);
+                            }
+                        }
+                    }
+                    GameSelectionCommand = new RelayCommand(selectedGameCallback);
+                    lock (syncObj)
+                    {
+                        Monitor.Wait(syncObj);
+                    }
+
+                    return selectedGame;
                 },
                     instF =>
                     {

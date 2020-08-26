@@ -232,8 +232,10 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="fileImported">Notification when file is imported, and the result (as a string of why it failed, null if successful)</param>
         /// <param name="progressCallback">Callback to be notified of progress (copy mode only)</param>
         /// <returns>Tee manifest file that is attempting to be imported, null if the listed filename matched nothing</returns>
-        public static ManifestFile AttemptImportManifestFile(string filename, List<ManifestFile> manifestFiles,
-            Action<bool, string> fileImported, Action<string, long, long> progressCallback = null)
+        public static ManifestFile AttemptImportManifestFile(string filename,
+            List<ManifestFile> manifestFiles,
+            Action<bool, string> fileImported,
+            Action<string, long, long> progressCallback = null)
         {
             var fsize = new FileInfo(filename).Length;
             var matchingMF = manifestFiles.FirstOrDefault(x =>
@@ -242,7 +244,10 @@ namespace ALOTInstallerCore.Helpers
             if (matchingMF != null)
             {
                 // Try main
-                importFileToLibrary(matchingMF, filename, false, progressCallback, fileImported);
+                if (!matchingMF.Ready)
+                {
+                    importFileToLibrary(matchingMF, filename, false, progressCallback, fileImported);
+                }
                 return matchingMF;
             }
 
@@ -253,7 +258,10 @@ namespace ALOTInstallerCore.Helpers
             if (matchingMF != null)
             {
                 // Torrent file => library main
-                importFileToLibrary(matchingMF, filename, false, progressCallback, fileImported);
+                if (!matchingMF.Ready)
+                {
+                    importFileToLibrary(matchingMF, filename, false, progressCallback, fileImported);
+                }
                 return matchingMF;
             }
 
@@ -265,7 +273,10 @@ namespace ALOTInstallerCore.Helpers
             if (matchingMF != null)
             {
                 // Single file unpacked
-                importFileToLibrary(matchingMF, filename, true, progressCallback, fileImported);
+                if (!matchingMF.Ready)
+                {
+                    importFileToLibrary(matchingMF, filename, true, progressCallback, fileImported);
+                }
                 return matchingMF;
             }
 
@@ -293,6 +304,7 @@ namespace ALOTInstallerCore.Helpers
             {
                 var destFile = Path.Combine(Settings.TextureLibraryLocation,
                     isUnpacked ? mf.UnpackedSingleFilename : mf.Filename);
+                if (File.Exists(destFile)) File.Delete(destFile);
                 if (Settings.MoveFilesWhenImporting && importingfrom == importingto)
                 {
                     // Move
@@ -644,7 +656,7 @@ namespace ALOTInstallerCore.Helpers
                     // Okay to import or add from location
                     bool importInManifestMode = !userFileMode.HasValue || !userFileMode.Value;
                     bool importInUserMode = !userFileMode.HasValue || userFileMode.Value;
-
+                    bool handled = false;
                     if (importInManifestMode)
                     {
                         bool successful = false;
@@ -663,17 +675,33 @@ namespace ALOTInstallerCore.Helpers
 
                         if (attemptingImport != null)
                         {
-                            // Wait till import completes
-                            lock (syncObj)
+                            if (!attemptingImport.Ready)
                             {
-                                Monitor.Wait(syncObj);
-                            }
+                                // Wait till import completes
+                                lock (syncObj)
+                                {
+                                    Monitor.Wait(syncObj);
+                                }
 
-                            importResults.Add(new ImportResult()
+                                handled = successful;
+                                importResults.Add(new ImportResult()
+                                {
+                                    ImportName = attemptingImport.FriendlyName,
+                                    Result = successful ? "Imported" : failedReason,
+                                    Accepted = successful
+                                });
+                            }
+                            else
                             {
-                                ImportName = attemptingImport.FriendlyName,
-                                Result = successful ? "Imported" : failedReason
-                            });
+                                handled = true;
+                                importResults.Add(new ImportResult()
+                                {
+                                    ImportName = attemptingImport.FriendlyName,
+                                    Result = "Already imported",
+                                    Accepted = true
+                                });
+                                ;
+                            }
                         }
                         else if (!importInUserMode)
                         {
@@ -681,12 +709,13 @@ namespace ALOTInstallerCore.Helpers
                             importResults.Add(new ImportResult()
                             {
                                 ImportName = Path.GetFileName(file),
-                                Result = "Not a manifest file"
+                                Result = "Not a manifest file",
+                                Accepted = false
                             });
                         }
-                    }
+                    } // END MANIFEST FILE PARSING
 
-                    if (importInUserMode)
+                    if (!handled && importInUserMode)
                     {
                         // User file
                         var fi = new FileInfo(file);
@@ -706,14 +735,20 @@ namespace ALOTInstallerCore.Helpers
                         if (matchingPIM != null)
                         {
                             // It's a preinstall mod user added.
-                            // Add the original ManifestFile to this mode
-                            ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].ManifestFiles.Add(matchingPIM);
+                            // Add the (cloned) original ManifestFile to this mode
+                            var newObj = new PreinstallMod(matchingPIM)
+                            {
+                                ForcedSourcePath = file
+                            };
+                            newObj.UpdateReadyStatus();
+                            ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].ManifestFiles.Add(newObj);
                             importResults.Add(new ImportResult()
                             {
                                 Result = "Added for install",
-                                ImportName = matchingPIM.FriendlyName
+                                ImportName = matchingPIM.FriendlyName,
+                                Accepted = true
                             });
-                            addedFileToModeCallback?.Invoke(matchingPIM);
+                            addedFileToModeCallback?.Invoke(newObj);
                         }
                         else
                         {
@@ -727,7 +762,8 @@ namespace ALOTInstallerCore.Helpers
                                 {
                                     Result = "Not usable",
                                     Reason = notUsableReason,
-                                    ImportName = Path.GetFileName(file)
+                                    ImportName = Path.GetFileName(file),
+                                    Accepted = false
                                 });
                             }
                             else
@@ -738,7 +774,8 @@ namespace ALOTInstallerCore.Helpers
                                 importResults.Add(new ImportResult()
                                 {
                                     Result = failedToAddReason ?? "Added for install",
-                                    ImportName = Path.GetFileName(file)
+                                    ImportName = Path.GetFileName(file),
+                                    Accepted = failedToAddReason == null
                                 });
                                 if (addedUserFile != null)
                                 {
@@ -779,5 +816,9 @@ namespace ALOTInstallerCore.Helpers
         /// The reason (if any) of the result
         /// </summary>
         public string Reason { get; set; }
+        /// <summary>
+        /// If the result was accepted by the installer
+        /// </summary>
+        public bool Accepted { get; set; }
     }
 }

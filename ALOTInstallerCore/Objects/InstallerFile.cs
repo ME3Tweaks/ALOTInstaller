@@ -89,8 +89,8 @@ namespace ALOTInstallerCore.Objects
             this.FileSize = source.FileSize;
             this.Filename = source.Filename;
             this.Ready = false; // Must be updated by UpdateReadyStatus();
-            InstallPriority = source.InstallPriority;
-            this.Author = Author;
+            this.InstallPriority = source.InstallPriority;
+            this.Author = source.Author;
         }
 
         public InstallerFile() { }

@@ -22,6 +22,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         public ManifestFile(ManifestFile source) : base(source)
         {
             RecommendationReason = source.RecommendationReason;
+            Recommendation = source.Recommendation;
             UnpackedSingleFilename = source.UnpackedSingleFilename;
             TorrentFilename = source.TorrentFilename;
             ChoiceFiles = source.ChoiceFiles.Select(x => new ChoiceFile(x)).ToList();

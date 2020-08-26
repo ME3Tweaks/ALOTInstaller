@@ -88,7 +88,7 @@ namespace ALOTInstallerCore.Objects.Manifest
             if (game == null || game == ApplicableGame.None)
             {
                 game = getGame.Invoke(filepath);
-                if (game == null)
+                if (game == null || game == ApplicableGame.None)
                     return "Skipped";
             }
 
