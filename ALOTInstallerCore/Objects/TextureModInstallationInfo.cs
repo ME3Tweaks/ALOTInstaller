@@ -86,6 +86,10 @@ namespace ALOTInstallerCore.Objects
             this.MEUITMVER = MEUITMVersion;
         }
 
+        public TextureModInstallationInfo(TextureModInstallationInfo alotVersionInfo)
+        {
+        }
+
         public override string ToString()
         {
             string str = "";

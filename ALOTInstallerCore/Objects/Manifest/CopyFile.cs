@@ -13,6 +13,11 @@ namespace ALOTInstallerCore.Objects.Manifest
             ChoicesHuman = new List<object>();
             ChoicesHuman.Add("Install"); //Install is only option by default. Don't install will be auto added if this is optional.
         }
+
+        public CopyFile(CopyFile x)
+        {
+        }
+
         public string StagedPath { get; set; }
         public string InArchivePath { get; set; }
         public string GameDestinationPath { get; set; }

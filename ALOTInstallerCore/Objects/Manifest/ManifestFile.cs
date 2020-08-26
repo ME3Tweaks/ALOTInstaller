@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using ALOTInstallerCore.Helpers;
 using Serilog;
@@ -13,6 +14,30 @@ namespace ALOTInstallerCore.Objects.Manifest
     /// </summary>
     public class ManifestFile : InstallerFile, INotifyPropertyChanged //this must be here to make fody run on this
     {
+
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="source"></param>
+        public ManifestFile(ManifestFile source) : base(source)
+        {
+            RecommendationReason = source.RecommendationReason;
+            UnpackedSingleFilename = source.UnpackedSingleFilename;
+            TorrentFilename = source.TorrentFilename;
+            ChoiceFiles = source.ChoiceFiles.Select(x => new ChoiceFile(x)).ToList();
+            Recommendation = source.Recommendation;
+            ComparisonsLink = source.ComparisonsLink;
+            CopyFiles = source.CopyFiles.Select(x => new CopyFile(x)).ToList();
+            DownloadLink = source.DownloadLink;
+            FileMD5 = source.FileMD5;
+            StageModFiles = source.StageModFiles;
+            Tooltipname = source.Tooltipname;
+            ZipFiles = source.ZipFiles.Select(x => new ZipFile(x)).ToList();
+
+            //probably more
+        }
+        public ManifestFile() { }
+
         /// <summary>
         /// String describing the reason for the recommendation
         /// </summary>
@@ -301,8 +326,6 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// Priority for sorting in the UI. Lower numbers are sorted higher.
         /// </summary>
         public int UIPriority { get; set; }
-
-        public string Author { get; set; }
 
         public string Tooltipname { get; set; }
 

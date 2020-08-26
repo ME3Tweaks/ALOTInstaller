@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace ALOTInstallerCore.Objects.Manifest
 {
@@ -31,6 +32,46 @@ namespace ALOTInstallerCore.Objects.Manifest
             public string LoggingName { get; internal set; }
             public string OptionalRequiredFiles { get; set; }
             public string OptionalRequiredFilesSizes { get; set; }
+
+            /// <summary>
+            /// Copy constructor
+            /// </summary>
+            /// <param name="source"></param>
+            public ExtractionRedirect(ExtractionRedirect source)
+            {
+                RelativeDestinationDirectory = source.RelativeDestinationDirectory;
+                ArchiveRootPath = source.ArchiveRootPath;
+                OptionalRequiredDLC = source.OptionalRequiredDLC;
+                OptionalAnyDLC = source.OptionalAnyDLC;
+                IsDLC = source.IsDLC;
+                ModVersion = source.ModVersion;
+                LoggingName = source.LoggingName;
+                OptionalRequiredFiles = source.OptionalRequiredFiles;
+                OptionalRequiredFilesSizes = source.OptionalRequiredFilesSizes;
+            }
+
+            public ExtractionRedirect() { }
+        }
+
+        public string ForcedSourcePath { get; set; }
+
+        public override string GetUsedFilepath() => ForcedSourcePath ?? base.GetUsedFilepath();
+
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public PreinstallMod(PreinstallMod source) : base(source)
+        {
+            ExtractionRedirects = source.ExtractionRedirects.Select(x => new ExtractionRedirect(x)).ToList();
+            ForcedSourcePath = source.ForcedSourcePath;
+            OptionGroup = source.OptionGroup;
+        }
+
+        public PreinstallMod()
+        {
+
         }
     }
 }

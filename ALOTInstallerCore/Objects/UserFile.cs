@@ -8,6 +8,11 @@ namespace ALOTInstallerCore.Objects
     /// </summary>
     public class UserFile : InstallerFile
     {
+
+        public UserFile()
+        {
+            Author = "User files";
+        }
         /// <summary>
         /// The full path to the user file
         /// </summary>
@@ -22,7 +27,12 @@ namespace ALOTInstallerCore.Objects
             set { } //Must have setter even if unused
         }
 
+
         public override string Category => "User file";
+        /// <summary>
+        /// UI displayable string of this userfile (if any)
+        /// </summary>
+        public string Description { get; set; }
 
         /// <summary>
         /// Updates the ready status for this user file. Checks if file exists on disk and sets Ready based on this returned value

@@ -87,12 +87,10 @@
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type helpers:ImportResult}">
                         <DockPanel>
-                            <TextBlock DockPanel.Dock="Left" Text="{Binding ImportName}"/>
-                            <DockPanel>
-                                <iconPacks:PackIconIonicons Kind="InformationCircleMD" Margin="4,1,0,0"  DockPanel.Dock="Right" Height="14" VerticalAlignment="Center" ToolTip="{Binding ToolTip}"/>
-                                <TextBlock HorizontalAlignment="Right" Text="{Binding Result}" ToolTip="{Binding ToolTip}"/>
+                            <TextBlock DockPanel.Dock="Top" Text="{Binding ImportName}" FontSize="14"/>
+                                <iconPacks:PackIconIonicons Kind="InformationCircleMD" Margin="0,1,3,0"  DockPanel.Dock="Left" Height="14" VerticalAlignment="Center" ToolTip="{Binding ToolTip}"/>
+                                <TextBlock HorizontalAlignment="Left" Text="{Binding Result}" ToolTip="{Binding ToolTip}"/>
 
-                            </DockPanel>
                         </DockPanel>
                     </DataTemplate>
                 </ListBox.Resources>

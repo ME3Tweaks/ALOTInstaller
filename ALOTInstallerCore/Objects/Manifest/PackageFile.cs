@@ -9,6 +9,22 @@ namespace ALOTInstallerCore.Objects.Manifest
     public class PackageFile
     {
         /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="x"></param>
+        public PackageFile(PackageFile source)
+        {
+            Transient = source.Transient;
+            SourceName = source.SourceName;
+            MoveDirectly = source.MoveDirectly;
+            CopyDirectly = source.CopyDirectly;
+            Processed = source.Processed;
+            ApplicableGames = source.ApplicableGames;
+        }
+
+        public PackageFile() { }
+
+        /// <summary>
         /// Transient Package Files only exist in the PackageFiles list of a manifest file for a single installation session and are added from the selected list of ChoiceFiles. They are temporary package files and are internally removed from an <c>InstallerFile</c>'s PackageFiles list when staging begins.
         /// </summary>
         public bool Transient { get; set; }
@@ -34,6 +50,9 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// If this file has been processed (extracted and moved for staging/install)
         /// </summary>
         public bool Processed { get; set; }
+        /// <summary>
+        /// Title of this package file for showing to the user when this file is able to be selected
+        /// </summary>
         public string ChoiceTitle { get; internal set; }
 
         /// <summary>

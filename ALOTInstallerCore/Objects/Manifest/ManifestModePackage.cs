@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ALOTInstallerCore.Helpers;
 
 namespace ALOTInstallerCore.Objects.Manifest
 {
@@ -46,7 +48,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// Attempts to add a user file with the specified backing PIM
         /// </summary>
         /// <param name="matchingPim"></param>
-        public string AttemptAddUserFile(string filepath, ApplicableGame games, out UserFile addedUserFile)
+        public string AttemptAddUserFile(string filepath, Func<string, ApplicableGame?> getGame, out UserFile addedUserFile)
         {
             addedUserFile = null;
             if (UserFiles.Any(x => x.FullFilePath == filepath))
@@ -54,13 +56,51 @@ namespace ALOTInstallerCore.Objects.Manifest
                 return "File is already added as a user file";
             }
 
+            string description = "";
+            ApplicableGame? game = null;
+            if (Path.GetExtension(filepath) == ".mod")
+            {
+                var info = ModFileFormats.GetGameForMod(filepath);
+                if (info.Usable)
+                {
+                    game = info.ApplicableGames;
+                    description = info.Description;
+                }
+                else
+                {
+                    return info.Description; //why it failed
+                }
+            }
+            else if (Path.GetExtension(filepath) == ".mem")
+            {
+                var info = ModFileFormats.GetInfoForMEMFile(filepath);
+                if (info.Usable)
+                {
+                    game = info.ApplicableGames;
+                    description = ""; //no description
+                }
+                else
+                {
+                    return info.Description; //why it failed
+                }
+            }
+
+            if (game == null || game == ApplicableGame.None)
+            {
+                game = getGame.Invoke(filepath);
+                if (game == null)
+                    return "Skipped";
+            }
+
+
             var ufi = new FileInfo(filepath);
             UserFile uf = new UserFile()
             {
                 FileSize = ufi.Length,
                 FriendlyName = Path.GetFileName(filepath),
                 FullFilePath = filepath,
-                ApplicableGames = games
+                ApplicableGames = game.Value,
+                Description = description,
             };
             uf.UpdateReadyStatus();
             UserFiles.Add(uf);

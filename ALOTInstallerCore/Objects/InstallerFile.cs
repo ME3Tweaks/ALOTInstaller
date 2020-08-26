@@ -71,6 +71,29 @@ namespace ALOTInstallerCore.Objects
         /// List of sub-files that this mod 
         /// </summary>
         public List<PackageFile> PackageFiles = new List<PackageFile>();
+        /// <summary>
+        /// Developer of this file
+        /// </summary>
+        public string Author { get; set; }
+
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="source"></param>
+        public InstallerFile(InstallerFile source)
+        {
+            this.ApplicableGames = source.ApplicableGames;
+            this.PackageFiles = source.PackageFiles.Select(x => new PackageFile(x)).ToList();
+            this.AlotVersionInfo = new TextureModInstallationInfo(source.AlotVersionInfo);
+            this.FriendlyName = source.FriendlyName;
+            this.FileSize = source.FileSize;
+            this.Filename = source.Filename;
+            this.Ready = false; // Must be updated by UpdateReadyStatus();
+            InstallPriority = source.InstallPriority;
+            this.Author = Author;
+        }
+
+        public InstallerFile() { }
 
         /// <summary>
         /// Friendly name to display
@@ -190,5 +213,5 @@ namespace ALOTInstallerCore.Objects
         /// </summary>
         /// <returns></returns>
         public virtual bool HasAnyPackageFiles() => PackageFiles.Any();
-        }
+    }
 }

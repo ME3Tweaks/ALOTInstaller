@@ -568,6 +568,10 @@ namespace ALOTInstallerCore.Helpers
                 isArchive = true;
                 filenamesToCheck.ReplaceAll(MEMIPCHandler.GetFileListing(file));
             }
+            else
+            {
+                filenamesToCheck.Add(file);
+            }
 
             bool hasAnOkayItem = false;
             foreach (var v in filenamesToCheck)
@@ -729,29 +733,26 @@ namespace ALOTInstallerCore.Helpers
                             else
                             {
                                 // File is usable
-                                var selectedGame = selectGameCallback?.Invoke(file);
 
-                                if (selectedGame != null)
+                                var failedToAddReason = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].AttemptAddUserFile(file, selectGameCallback, out var addedUserFile);
+                                importResults.Add(new ImportResult()
                                 {
-                                    var failedToAddReason = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].AttemptAddUserFile(file, selectedGame.Value, out var addedUserFile);
-                                    importResults.Add(new ImportResult()
-                                    {
-                                        Result = failedToAddReason ?? "Added for install",
-                                        ImportName = Path.GetFileName(file)
-                                    });
-                                    if (addedUserFile != null)
-                                    {
-                                        addedFileToModeCallback?.Invoke(addedUserFile);
-                                    }
-                                }
-                                else
+                                    Result = failedToAddReason ?? "Added for install",
+                                    ImportName = Path.GetFileName(file)
+                                });
+                                if (addedUserFile != null)
                                 {
-                                    importResults.Add(new ImportResult()
-                                    {
-                                        Result = "Skipped",
-                                        ImportName = Path.GetFileName(file)
-                                    });
+                                    addedFileToModeCallback?.Invoke(addedUserFile);
                                 }
+                                //}
+                                //else
+                                //{
+                                //    importResults.Add(new ImportResult()
+                                //    {
+                                //        Result = "Skipped",
+                                //        ImportName = Path.GetFileName(file)
+                                //    });
+                                //}
                             }
                         }
                     }

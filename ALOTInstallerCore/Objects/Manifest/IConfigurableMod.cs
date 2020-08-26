@@ -9,6 +9,17 @@ namespace ALOTInstallerCore.Objects.Manifest
     /// </summary>
     public abstract class ConfigurableMod : INotifyPropertyChanged
     {
+        protected ConfigurableMod(ConfigurableMod source)
+        {
+            ChoiceTitle = source.ChoiceTitle;
+            DefaultSelectedIndex = source.DefaultSelectedIndex;
+            ChoicesHuman = source.ChoicesHuman.ToList();
+            AllowNoInstall = source.AllowNoInstall;
+            Optional = source.Optional;
+        }
+
+        public ConfigurableMod() { }
+
         /// <summary>
         /// The title of this configurable option
         /// </summary>
