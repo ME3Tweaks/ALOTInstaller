@@ -34,7 +34,7 @@ namespace ALOTInstallerCore.Objects.Manifest
             StageModFiles = source.StageModFiles;
             Tooltipname = source.Tooltipname;
             ZipFiles = source.ZipFiles.Select(x => new ZipFile(x)).ToList();
-
+            RecommendationString = source.RecommendationString;
             //probably more
         }
         public ManifestFile() { }

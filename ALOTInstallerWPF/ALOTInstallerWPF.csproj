@@ -49,51 +49,50 @@
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
   </ItemGroup>
 
-	<ItemGroup>
-		<Content Include="..\Libraries\Windows\CompressionWrappers.dll" Condition=" '$(OS)' == 'Windows_NT' ">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Libraries\Windows\CompressionWrappers.dll" Condition=" '$(OS)' == 'Windows_NT' ">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
-	<ItemGroup>
-	  <Content Include="InstallerUI\installtips.xml">
-	    <SubType>Designer</SubType>
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	</ItemGroup>
+  <ItemGroup>
+    <Content Include="InstallerUI\installtips.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 
-	<ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />
     <ProjectReference Include="..\MahApps.Metro\src\MahApps.Metro\MahApps.Metro.csproj" />
   </ItemGroup>
 
-	<ItemGroup>
-	  <Resource Include="Images\logo_me1.png" />
-	  <Resource Include="Images\logo_me2.png" />
-	  <Resource Include="Images\logo_me3.png" />
-	  <Resource Include="Images\logo_mem.png" />
-	  <Resource Include="Images\alot_me1_bg.jpg" />
-	  <Resource Include="Images\alot_me1_bg_alt.jpg" />
-	  <Resource Include="Images\alot_me2_bg.jpg" />
-	  <Resource Include="Images\alot_me2_bg_alt.jpg" />
-	  <Resource Include="Images\alot_me3_bg.jpg" />
-	  <Resource Include="Images\alot_me3_bg_alt.jpg" />
-	  <Resource Include="Images\meuitm_me1_bg.jpg" />
-	  <Resource Include="Images\origin\me1update.png" />
-	  <Resource Include="Images\origin\me2update.png" />
-	</ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\logo_me1.png" />
+    <Resource Include="Images\logo_me2.png" />
+    <Resource Include="Images\logo_me3.png" />
+    <Resource Include="Images\logo_mem.png" />
+    <Resource Include="Images\alot_me1_bg.jpg" />
+    <Resource Include="Images\alot_me1_bg_alt.jpg" />
+    <Resource Include="Images\alot_me2_bg.jpg" />
+    <Resource Include="Images\alot_me2_bg_alt.jpg" />
+    <Resource Include="Images\alot_me3_bg.jpg" />
+    <Resource Include="Images\alot_me3_bg_alt.jpg" />
+    <Resource Include="Images\meuitm_me1_bg.jpg" />
+    <Resource Include="Images\origin\me1update.png" />
+    <Resource Include="Images\origin\me2update.png" />
+  </ItemGroup>
 
-	<ItemGroup>
-	  <Compile Update="Dialogs\ModConfigurationDialog.xaml.cs">
-	    <DependentUpon>ModConfigurationDialog.xaml</DependentUpon>
-	  </Compile>
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Update="Dialogs\ModConfigurationDialog.xaml.cs">
+      <DependentUpon>ModConfigurationDialog.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 
-	<ItemGroup>
-	  <Page Update="Dialogs\ModConfigurationDialog.xaml">
-	    <SubType>Designer</SubType>
-	  </Page>
-	</ItemGroup>
-
+  <ItemGroup>
+    <Page Update="Dialogs\ModConfigurationDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
 </Project>

@@ -156,6 +156,7 @@ namespace ALOTInstallerWPF.Flyouts
                     InstallMEUITM = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.MEUITM) && checkboxMapping[InstallOptionsStep.InstallOption.MEUITM].IsOn,
                     InstallAddons = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.Addon) && checkboxMapping[InstallOptionsStep.InstallOption.Addon].IsOn,
                     InstallUserfiles = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.UserFiles) && checkboxMapping[InstallOptionsStep.InstallOption.UserFiles].IsOn,
+                    InstallPreinstallMods = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.ALOVMods) && checkboxMapping[InstallOptionsStep.InstallOption.ALOVMods].IsOn,
 
                 };
                 NamedBackgroundWorker nbw = new NamedBackgroundWorker("InstallPrecheckWorker");
