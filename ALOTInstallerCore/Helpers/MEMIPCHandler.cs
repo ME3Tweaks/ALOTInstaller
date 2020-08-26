@@ -320,5 +320,39 @@ namespace ALOTInstallerCore.Helpers
             fileListing.Add("test.tpf");
             return fileListing;
         }
+
+        /// <summary>
+        /// Fetches the list of LODs for the specified game
+        /// </summary>
+        /// <param name="game"></param>
+        /// <returns></returns>
+        public static Dictionary<string,string> GetLODs(Enums.MEGame game)
+        {
+            Dictionary<string, string> lods = new Dictionary<string, string>();
+            var args = $@"--print-lods --gameid {game.ToGameNum()} --ipc";
+            int exitcode = -1;
+            MEMIPCHandler.RunMEMIPCUntilExit(args, ipcCallback: (command, param) =>
+                {
+                    switch (command)
+                    {
+                        case @"LODLINE":
+                            var lodSplit = param.Split(@"=");
+                            lods[lodSplit[0]] = param.Substring(lodSplit[0].Length + 1);
+                            break;
+                        default:
+                            //Debug.WriteLine(@"oof?");
+                            break;
+                    }
+                },
+                applicationExited: x => exitcode = x
+            );
+            if (exitcode != 0)
+            {
+                Log.Error($"Error fetching LODs for {game}, exit code {exitcode}");
+                return null; // Error getting LODs
+            }
+
+            return lods;
+        }
     }
 }

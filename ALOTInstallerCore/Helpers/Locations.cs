@@ -217,16 +217,19 @@ namespace ALOTInstallerCore.Helpers
         //File.WriteAllText(memIni, ini.ToString());
     }
 
+    private static List<GameTarget> allTargets;
     /// <summary>
     /// Gets a list of all available game targets
     /// </summary>
     /// <returns></returns>
     public static List<GameTarget> GetAllAvailableTargets()
     {
+        if (allTargets != null) return allTargets;
         List<GameTarget> gameTargets = new List<GameTarget>();
         if (ME1Target != null) gameTargets.Add(ME1Target);
         if (ME2Target != null) gameTargets.Add(ME2Target);
         if (ME3Target != null) gameTargets.Add(ME3Target);
+        allTargets = gameTargets;
         return gameTargets;
     }
 

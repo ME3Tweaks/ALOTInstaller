@@ -34,22 +34,39 @@ namespace ALOTInstallerWPF
         public bool SettingsOpen { get; set; }
         public bool DiagnosticsOpen { get; set; }
         public bool FileImporterOpen { get; set; }
+        public bool LODSwitcherOpen { get; set; }
+
+        #region CONTENTS (so we can load these after startup)
+        public FileImporterFlyout FileImporterFlyoutContent { get; internal set; }
+        public SettingsFlyout SettingsFlyoutContent { get; set; }
+
+        internal LODSwitcherFlyout LODSwitcherFlyoutContent;
+        #endregion
+
         private void OnSettingsOpenChanged()
         {
             if (SettingsOpen)
             {
                 // Opening
                 // Update the status of textures
-                settingsFlyout.UpdateGameStatuses();
+                SettingsFlyoutContent.UpdateGameStatuses();
             }
         }
+
+        public void OnLODSwitcherOpenChanged()
+        {
+            if (LODSwitcherOpen)
+            {
+                LODSwitcherFlyoutContent.UpdateGameStatuses();
+            }
+        }
+
         public MainWindow()
         {
             DataContext = this;
             InitializeComponent();
         }
 
-        public FileImporterFlyout FileImporterFlyoutContent { get; internal set; }
 
         private void OnFileImporterFlyoutContentChanged()
         {
@@ -106,9 +123,9 @@ namespace ALOTInstallerWPF
         private void InstallingOverlayoutFlyout_DoubleClick(object sender, MouseButtonEventArgs e)
         {
             // Double click changes maximize status
-            this.WindowState = 
-                this.WindowState == 
-                System.Windows.WindowState.Normal ? 
+            this.WindowState =
+                this.WindowState ==
+                System.Windows.WindowState.Normal ?
                     System.Windows.WindowState.Maximized : System.Windows.WindowState.Normal;
         }
 

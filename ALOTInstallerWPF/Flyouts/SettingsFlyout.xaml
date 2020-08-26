@@ -26,6 +26,11 @@
                     <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME1TextureInstallInfo, FallbackValue='ME1: Textures installed, no ALOT, no MEUITM'}"/>
                     <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME2TextureInstallInfo, FallbackValue='ME2: Game not installed'}"/>
                     <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME3TextureInstallInfo, FallbackValue='ME3: ALOT 11.3'}"/>
+                    <Button Content="LOD Switcher" 
+                            Margin="20,0,0,0"
+                            ToolTip="Allows you to change Texture Level of Detail (LOD) settings for each game"
+                            Command="{Binding OpenLODSwitcherCommand}" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" HorizontalAlignment="Left" Padding="10,0"
+                            Visibility="{Binding ShowGameMissingText, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
                     <TextBlock Text="Game not showing as installed? Make sure you've run it at least once. If that doesn't fix it, repair the game with Steam or Origin's repair feature." 
                                TextWrapping="Wrap" HorizontalAlignment="Left" Margin="20,0,0,0"
                                Visibility="{Binding ShowGameMissingText, Converter={StaticResource BoolToVisibilityConverter}}"/>

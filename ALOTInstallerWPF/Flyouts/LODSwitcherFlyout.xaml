@@ -1,0 +1,71 @@
+﻿<UserControl x:Class="ALOTInstallerWPF.Flyouts.LODSwitcherFlyout"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ALOTInstallerWPF.Flyouts"
+             xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:LODSettingToUIStringConverter x:Key="LODSettingToUIStringConverter"/>
+        <converters:GameToLogoConverter x:Key="GameToLogoConverter"/>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+    <DockPanel Margin="10">
+        <TextBlock Text="Texture LOD Switcher" DockPanel.Dock="Top" FontSize="20" TextAlignment="Center"/>
+        <TextBlock DockPanel.Dock="Top"  
+                   TextAlignment="Center"
+                   Text="Texture Level of Detail (LOD) settings determine what the largest texture the game can load for a group of textures (character, environment, norms, etc). A texture mod must be installed to raise LODs above the Vanilla level as all games include 'empty mips', which are blank textures that occupy the higher quality texture slots. Installing a texture mod will remove these empty mips." 
+                   TextWrapping="Wrap" MaxWidth="700"/>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" HorizontalAlignment="Center">
+            <Button Content="Show more info" Command="{Binding ShowMoreInfoCommand}"
+                    Visibility="{Binding ShowMoreInfo, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"
+                    Margin="5,0" 
+                    DockPanel.Dock="Bottom" HorizontalAlignment="Center"/>
+            <Button Content="Close LOD switcher" 
+                    Command="{Binding CloseFlyoutCommand}"
+                    DockPanel.Dock="Bottom" 
+                    HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <TextBlock DockPanel.Dock="Bottom" 
+                   Margin="0,0,0,10"
+                   Visibility="{Binding ShowMoreInfo, Converter={StaticResource BoolToVisibilityConverter}}"
+                   TextAlignment="Center"
+                   Text="The 2K and 4K options are the size of the texture and NOT related at all to the size of your screen.The 2K option provides an improvement to texture quality (if a high resolution texture mod is installed) over the vanilla settings, and uses less memory, which can improve game stability as all games are limited to 3.5GB of memory. The 4K option is the default and will provide the best looking textures when paired with a high quality texture mod such as ALOT." 
+                   TextWrapping="Wrap" MaxWidth="700"/>
+        <DockPanel DockPanel.Dock="Bottom" Height="130" Margin="0,10"  VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding LODGames.Any, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}">
+            <mah:ProgressRing HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+        </DockPanel>
+        <ItemsControl ItemsSource="{Binding LODGames}" Margin="0,10" Visibility="{Binding LODGames.Any, Converter={StaticResource BoolToVisibilityConverter}}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type local:LODSwitcherFlyout+LODGame}">
+                    <GroupBox BorderThickness="2">
+                        <GroupBox.Header>
+                            <Image Source="{Binding Game, Converter={StaticResource GameToLogoConverter}}" RenderOptions.BitmapScalingMode="HighQuality" Height="40" HorizontalAlignment="Center"/>
+                        </GroupBox.Header>
+
+                        <DockPanel Width="230">
+                            <TextBlock Text="{Binding TexturesInstalledString}" DockPanel.Dock="Top" TextAlignment="Center"/>
+                            <TextBlock Margin="0,0,0,10"  Text="{Binding CurrentSetting, Converter={StaticResource LODSettingToUIStringConverter}}" DockPanel.Dock="Top" TextAlignment="Center"/>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Left" Content="Apply Vanilla" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Command="{Binding ApplyLODSettingCommand}" CommandParameter="Vanilla"/>
+                                <Button DockPanel.Dock="Right" Content="Apply 4K" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Command="{Binding ApplyLODSettingCommand}" CommandParameter="FourK"/>
+                                <Button HorizontalAlignment="Right"  Content="Apply 2K" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Command="{Binding ApplyLODSettingCommand}" CommandParameter="TwoK"/>
+                        </DockPanel>
+
+                    </DockPanel>
+                    </GroupBox>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </DockPanel>
+</UserControl>

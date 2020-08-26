@@ -132,8 +132,6 @@ namespace ALOTInstallerCore.ModManager.Objects
 
         public void UpdateLODs(bool twoK = false)
         {
-            // Use MEM
-            //OLD CODE
             var textureInfo = GetInstalledALOTInfo();
             LodSetting setting = LodSetting.Vanilla;
             if (textureInfo != null)

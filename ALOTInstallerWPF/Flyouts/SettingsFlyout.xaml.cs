@@ -55,6 +55,7 @@ namespace ALOTInstallerWPF.Flyouts
         public GenericCommand CleanupBuildLocationCommand { get; set; }
         public GenericCommand DebugShowInstallerFlyoutCommand { get; set; }
         public GenericCommand LogsDiagnosticsCommand { get; set; }
+        public GenericCommand OpenLODSwitcherCommand { get; set; }
         private void LoadCommands()
         {
             SetLibraryLocationCommand = new GenericCommand(ChangeLibraryLocation);
@@ -66,6 +67,7 @@ namespace ALOTInstallerWPF.Flyouts
             CleanupLibraryCommand = new GenericCommand(CleanupLibrary);
             CleanupBuildLocationCommand = new GenericCommand(CleanupBuildLocation);
             LogsDiagnosticsCommand = new GenericCommand(OpenDiagnosticsFlyout);
+            OpenLODSwitcherCommand = new GenericCommand(OpenLODSwitcher, () => Locations.GetAllAvailableTargets().Any());
 #if DEBUG
             DebugShowInstallerFlyoutCommand = new GenericCommand(() =>
             {
@@ -88,6 +90,15 @@ namespace ALOTInstallerWPF.Flyouts
                 }
             });
 #endif
+        }
+
+        private void OpenLODSwitcher()
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                mw.LODSwitcherOpen = true;
+                mw.SettingsOpen = false;
+            }
         }
 
         private void OpenDiagnosticsFlyout()

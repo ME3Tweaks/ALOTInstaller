@@ -1070,28 +1070,14 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #region Texture LODs
 
                 updateStatusCallback?.Invoke(@"Collecting LOD settings");
-                args = $@"--print-lods --gameid {gameID} --ipc";
-                var lods = new Dictionary<string, string>();
-                MEMIPCHandler.RunMEMIPCUntilExit(args, ipcCallback: (command, param) =>
-                    {
-                        switch (command)
-                        {
-                            case @"LODLINE":
-                                var lodSplit = param.Split(@"=");
-                                lods[lodSplit[0]] = param.Substring(lodSplit[0].Length + 1);
-                                break;
-                            default:
-                                Debug.WriteLine(@"oof?");
-                                break;
-                        }
-                    },
-                    applicationExited: x => exitcode = x
-                );
-
-                addLODStatusToDiag(selectedDiagnosticTarget, lods, addDiagLine);
-                if (exitcode != 0)
+                var lods = MEMIPCHandler.GetLODs(selectedDiagnosticTarget.Game);
+                if (lods != null)
                 {
-                    addDiagLine($"MassEffectModderNoGui exited --print-lods with code {exitcode}", Severity.ERROR);
+                    addLODStatusToDiag(selectedDiagnosticTarget, lods, addDiagLine);
+                }
+                else
+                {
+                    addDiagLine($"MassEffectModderNoGui exited --print-lods with error. See application log for more info.", Severity.ERROR);
                 }
 
                 #endregion
@@ -1320,7 +1306,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             }
             catch (Exception ex)
             {
-                addDiagLine(@"Exception occurredwhile running diagnostic.", Severity.ERROR);
+                addDiagLine(@"Exception occurred while running diagnostic.", Severity.ERROR);
                 addDiagLine(ex.Flatten(), Severity.ERROR);
                 return diagStringBuilder.ToString();
             }

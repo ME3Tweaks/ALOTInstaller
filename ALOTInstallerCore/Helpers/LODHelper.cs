@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using Serilog;
 
 namespace ALOTInstallerCore.Helpers
 {
@@ -35,8 +38,56 @@ namespace ALOTInstallerCore.Helpers
                 options.Add(("4K (Highest quality)", LodSetting.FourK | mixinSS));
                 options.Add(("2K (Good quality)", LodSetting.TwoK | mixinSS));
             }
+
             options.Add(("Vanilla", LodSetting.Vanilla));
             return options;
+        }
+
+        /// <summary>
+        /// Gets the LOD setting for the specified game. If an error occurs, Vanilla is returned
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="lods"></param>
+        /// <returns></returns>
+        public static LodSetting GetLODSettingFromLODs(Enums.MEGame game, Dictionary<string, string> lods)
+        {
+            var textureChar1024 = lods.FirstOrDefault(x => x.Key == @"TEXTUREGROUP_Character_1024");
+            if (string.IsNullOrWhiteSpace(textureChar1024.Key)) //does this work for ME2/ME3??
+            {
+                //not found
+                return LodSetting.Vanilla;
+            }
+
+            try
+            {
+                int maxLodSize = 0;
+                int vanillaLODSize = game == Enums.MEGame.ME1 ? 1024 : 0;
+                if (!string.IsNullOrWhiteSpace(textureChar1024.Value))
+                {
+                    //ME2,3 default to blank
+                    maxLodSize = int.Parse(StringStructParser.GetCommaSplitValues(textureChar1024.Value)[game == Enums.MEGame.ME1 ? @"MinLODSize" : @"MaxLODSize"]);
+                }
+
+                if (maxLodSize != vanillaLODSize)
+                {
+                    //LODS MODIFIED!
+                    if (maxLodSize == 4096)
+                    {
+                        return LodSetting.FourK;
+                    }
+                    else if (maxLodSize == 2048)
+                    {
+                        return LodSetting.TwoK;
+                    }
+                }
+
+                return LodSetting.Vanilla;
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Error getting LOD setting for {game}: {e.Message}. Returning vanilla");
+                return LodSetting.Vanilla;
+            }
         }
     }
 }

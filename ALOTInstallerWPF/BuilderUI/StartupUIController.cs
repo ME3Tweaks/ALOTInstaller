@@ -83,9 +83,10 @@ namespace ALOTInstallerWPF.BuilderUI
                     {
                         mw.Title = $"ALOT Installer {Utilities.GetAppVersion()}";
                         mw.ContentGrid.Children.Add(new FileSelectionUIController());
-
+                        mw.SettingsFlyoutControl.Content = mw.SettingsFlyoutContent = new SettingsFlyout();
                         mw.DiagnosticsFlyoutControl.Content = new DiagnosticsFlyout();
                         mw.FileImporterFlyoutContent = new FileImporterFlyout();
+                        mw.LODSwitcherFlyout.Content = mw.LODSwitcherFlyoutContent = new LODSwitcherFlyout();
                     }
                 });
             };
