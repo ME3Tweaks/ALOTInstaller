@@ -16,7 +16,7 @@ namespace ALOTInstallerCore.Helpers
     {
         #region Static Property Changed
 
-        private static bool Loaded = false;
+        public static bool Loaded { get; private set; }
         public static event PropertyChangedEventHandler StaticPropertyChanged;
 
         /// <summary>
@@ -33,7 +33,10 @@ namespace ALOTInstallerCore.Helpers
             if (EqualityComparer<T>.Default.Equals(field, value)) return false;
             field = value;
             StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
-            if (Loaded) Save();
+            if (Loaded)
+            {
+                Save(propertyName);
+            }
             return true;
         }
         #endregion
@@ -380,34 +383,25 @@ namespace ALOTInstallerCore.Helpers
         /// <summary>
         /// Saves the settings. Note this does not update the Updates/EncryptedPassword value. Returns false if commiting failed
         /// </summary>
-        public static SettingsSaveResult Save()
+        public static SettingsSaveResult Save(string propertyName = null)
         {
             try
             {
-                SaveSettingString(SettingsKeys.SettingKeys.BuildLocation, BuildLocation);
-                SaveSettingString(SettingsKeys.SettingKeys.TextureLibraryDirectory, TextureLibraryLocation);
-
-
-                //SaveSettingBool(settingsIni, "ALOTInstallerCore", "LogModStartup", LogModStartup);
-                //SaveSettingBool(settingsIni, "ALOTInstallerCore", "LogMixinStartup", LogMixinStartup);
-                //SaveSettingBool(settingsIni, "ALOTInstallerCore", "LogModMakerCompiler", LogModMakerCompiler);
-                //SaveSettingBool(settingsIni, "ALOTInstallerCore", "EnableTelemetry", EnableTelemetry);
-                //SaveSettingString(settingsIni, "ALOTInstallerCore", SettingsKeys.SettingKeys.BuildLocation, Locations.BuildLocation);
-                //SaveSettingString(settingsIni, "ALOTInstallerCore", "LZMAStoragePath", UpdaterServiceLZMAStoragePath);
-                //SaveSettingString(settingsIni, "UpdaterService", "ManifestStoragePath", UpdaterServiceManifestStoragePath);
-                //SaveSettingBool(settingsIni, "UI", "DeveloperMode", DeveloperMode);
-                //SaveSettingBool(settingsIni, "UI", "DarkTheme", DarkTheme);
-                //SaveSettingBool(settingsIni, "Logging", "LogModInstallation", LogModInstallation);
-                //SaveSettingString(settingsIni, "ModLibrary", "LibraryPath", ModLibraryPath);
-                //SaveSettingString(settingsIni, "ModManager", "Language", Language);
-                //SaveSettingDateTime(settingsIni, "ModManager", "LastContentCheck", LastContentCheck);
-                //SaveSettingBool(settingsIni, "ModManager", "BetaMode", BetaMode);
-                //SaveSettingBool(settingsIni, "ModManager", "ShowedPreviewMessage2", ShowedPreviewPanel);
-                //SaveSettingBool(settingsIni, "ModManager", "AutoUpdateLODs", AutoUpdateLODs);
-                //SaveSettingInt(settingsIni, "ModManager", "WebclientTimeout", WebClientTimeout);
-                //SaveSettingBool(settingsIni, "ModMaker", "AutoAddControllerMixins", ModMakerControllerModOption);
-                //SaveSettingBool(settingsIni, "ModMaker", "AutoInjectCustomKeybinds", ModMakerAutoInjectCustomKeybindsOption);
-
+                if (propertyName == nameof(BuildLocation))
+                    SaveSettingString(SettingsKeys.SettingKeys.BuildLocation, BuildLocation);
+                if (propertyName == nameof(TextureLibraryLocation))
+                    SaveSettingString(SettingsKeys.SettingKeys.TextureLibraryDirectory, TextureLibraryLocation);
+                if (propertyName == nameof(BetaMode))
+                    SaveSettingBool(SettingsKeys.SettingKeys.BetaMode, BetaMode);
+                if (propertyName == nameof(DebugLogs))
+                    SaveSettingBool(SettingsKeys.SettingKeys.DebugLogging, DebugLogs);
+                if (propertyName == nameof(PlayMusic))
+                    SaveSettingBool(SettingsKeys.SettingKeys.PlayMusic, PlayMusic);
+                if (propertyName == nameof(MoveFilesWhenImporting))
+                    SaveSettingBool(SettingsKeys.SettingKeys.ImportAsMove, MoveFilesWhenImporting);
+                if (propertyName == nameof(LastContentCheck))
+                    SaveSettingDateTime(SettingsKeys.SettingKeys.TextureLibraryDirectory, LastContentCheck);
+                
                 return SettingsSaveResult.SAVED;
             }
             catch (UnauthorizedAccessException uae)

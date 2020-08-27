@@ -84,6 +84,9 @@
         </DockPanel>
 
         <ProgressBar DockPanel.Dock="Top" Value="{Binding ProgressValue}" Maximum="{Binding ProgressMax}" IsIndeterminate="{Binding ProgressIndeterminate}"/>
+        <TextBlock Text="{Binding BackgroundTaskText}" TextAlignment="Center" DockPanel.Dock="Top" 
+                   Background="{DynamicResource MahApps.Brushes.Accent2}"
+                   Visibility="{Binding BackgroundTaskText, Converter={StaticResource NullVisibilityConverter}}"/>
         <!--<ProgressBar alotaddonguiui:ProgressBarSmooth.SmoothValue="{Binding ProgressBarValue}" Value="{Binding Path=ProgressBarValue, Mode=OneWay}" Minimum="0" Maximum="{Binding Progressbar_Max}" x:Name="Build_ProgressBar" Grid.Column="0" Grid.Row="2" IsIndeterminate="true" />-->
         <DockPanel DockPanel.Dock="Bottom" Visibility="{Binding IsStaging, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}">
             <Separator DockPanel.Dock="Top"/>

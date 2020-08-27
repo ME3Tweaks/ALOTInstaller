@@ -45,7 +45,7 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
 
         internal static void WriteRegistrySettingBool(string keyname, bool value)
         {
-            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value.ToString());
+            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value);
         }
 
         internal static void WriteRegistrySettingString(string keyname, string value)

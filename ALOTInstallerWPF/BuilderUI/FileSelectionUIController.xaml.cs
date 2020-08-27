@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,11 +15,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
+using Serilog;
 using Application = System.Windows.Application;
 
 namespace ALOTInstallerWPF.BuilderUI
@@ -119,6 +122,18 @@ namespace ALOTInstallerWPF.BuilderUI
         /// </summary>
         internal static FileSelectionUIController FSUIC;
 
+        public string BackgroundTaskText { get; set; }
+
+        public void OnBackgroundTaskTextChanged()
+        {
+            ProgressIndeterminate = BackgroundTaskText != null;
+            if (BackgroundTaskText == null)
+            {
+                // Trigger update.
+                manifestFileReadyStateChanged(null);
+            }
+        }
+
         public bool IsStaging { get; set; }
 
         public void OnIsStagingChanged()
@@ -167,6 +182,58 @@ namespace ALOTInstallerWPF.BuilderUI
 
             // Add filtering
             DisplayedFilesView.Filter = FilterShownFilesByGame;
+
+            startPostStartup();
+        }
+
+        private void startPostStartup()
+        {
+            NamedBackgroundWorker nbw = new NamedBackgroundWorker("PostStartup");
+            nbw.DoWork += (sender, args) =>
+            {
+                try
+                {
+
+                    if (ManifestHandler.MasterManifest == null || ManifestHandler.MasterManifest.MusicPackMirrors.Count == 0)
+                    {
+                        // Nothing wae can do.
+                        return;
+                    }
+                    string me1ogg = Path.Combine(Locations.MusicDirectory, "me1.mp3");
+                    string me2ogg = Path.Combine(Locations.MusicDirectory, "me2.mp3");
+                    string me3ogg = Path.Combine(Locations.MusicDirectory, "me3.mp3");
+
+                    if (!File.Exists(me1ogg) || !File.Exists(me2ogg) || !File.Exists(me3ogg))
+                    {
+                        BackgroundTaskText = "Downloading installer music pack";
+                        bool writtenFile = false;
+                        string outpath = null;
+                        foreach (var v in ManifestHandler.MasterManifest.MusicPackMirrors)
+                        {
+                            outpath = Path.Combine(Locations.TempDirectory(), "MusicPack" + Path.GetExtension(v.URL));
+                            var memoryItem = OnlineContent.DownloadToMemory(v.URL, hash: v.Hash);
+                            if (memoryItem.errorMessage == null)
+                            {
+                                memoryItem.result.WriteToFile(outpath);
+                                writtenFile = true;
+                                break;
+                            }
+                        }
+
+                        if (!writtenFile) return;
+                        BackgroundTaskText = "Extracting music pack";
+                        MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{outpath}\" --output \"{Locations.MusicDirectory}\" --ipc");
+                        File.Delete(outpath);
+                        BackgroundTaskText = null;
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Error fetching music pack: {e.Message}");
+                }
+            };
+            nbw.RunWorkerAsync();
         }
 
         /// <summary>
@@ -210,7 +277,7 @@ namespace ALOTInstallerWPF.BuilderUI
         {
             if (Application.Current.MainWindow is MainWindow mw)
             {
-                mw.FileImporterFlyoutContent.CurrentDisplayMode = FileImporterFlyout.EFIDisplayMode.ManuallyOpenedView; 
+                mw.FileImporterFlyoutContent.CurrentDisplayMode = FileImporterFlyout.EFIDisplayMode.ManuallyOpenedView;
                 mw.FileImporterOpen = true;
             }
         }

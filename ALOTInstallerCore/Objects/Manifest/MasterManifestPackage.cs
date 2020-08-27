@@ -33,13 +33,13 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// <summary>
         /// List of mirrors for installer music pack
         /// </summary>
-        public List<string> MusicPackMirrors = new List<string>();
+        public List<MusicPackMirror> MusicPackMirrors { get; set; } = new List<MusicPackMirror>();
 
         /// <summary>
         /// Mapping of modes to their manifest packages
         /// </summary>
         public Dictionary<ManifestMode, ManifestModePackage> ManifestModePackageMappping = new Dictionary<ManifestMode, ManifestModePackage>();
-        
+
         /// <summary>
         /// List of ME2 DLC foldernames that are known to have bad texture exports that must be fixed prior to install
         /// </summary>
@@ -60,5 +60,11 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// with different settings
         /// </summary>
         public List<ManifestFile> AllManifestFiles { get; } = new List<ManifestFile>();
+    }
+
+    public class MusicPackMirror
+    {
+        public string Hash { get; set; }
+        public string URL { get; set; }
     }
 }

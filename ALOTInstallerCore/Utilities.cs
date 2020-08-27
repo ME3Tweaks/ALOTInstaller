@@ -878,7 +878,7 @@ namespace ALOTInstallerCore
         public static Version GetAppVersion() => Assembly.GetEntryAssembly().GetName().Version;
 
         /// <summary>
-        /// Returns the hosting processes' name, without extetnsion
+        /// Returns the hosting processes' name, without extension
         /// </summary>
         /// <returns></returns>
         public static string GetHostingProcessname() => Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.ModuleName);

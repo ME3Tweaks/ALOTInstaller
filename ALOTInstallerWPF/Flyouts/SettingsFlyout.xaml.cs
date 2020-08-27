@@ -721,8 +721,10 @@ namespace ALOTInstallerWPF.Flyouts
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private bool hasOpenedOnce = false;
         public void UpdateGameStatuses()
         {
+            hasOpenedOnce = true;
             bool anyMissingInstall = false;
             var me1Target = Locations.ME1Target;
             if (me1Target == null)
@@ -780,7 +782,7 @@ namespace ALOTInstallerWPF.Flyouts
         {
             if (Application.Current.MainWindow is MainWindow mw)
             {
-                if (!isDecidingBetaMode && Settings.BetaMode)
+                if (!isDecidingBetaMode && hasOpenedOnce && Settings.BetaMode)
                 {
                     isDecidingBetaMode = true;
                     var result = await mw.ShowMessageAsync("Switching to beta mode", "Beta mode of ALOT Installer will restart the application and cause the following things to occur:\n - Updates to the application become mandatory\n - You will receive updates that are not yet approved for users in Stable mode\n - You will always download the latest version of MassEffectModderNoGui\n - You will use the beta version of the manifest, which may differ from the Stable one\n - You are expected to report feedback to the developers in the ALOT Discord if things don't work as expected\n - You are OK with a less stable experience\n\nSwitch to Beta mode?",

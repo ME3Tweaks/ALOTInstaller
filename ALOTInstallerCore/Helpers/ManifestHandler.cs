@@ -163,7 +163,13 @@ namespace ALOTInstallerCore.Helpers
                 #region Master Manifest
                 string version = (string)rootElement.Attribute("version") ?? "";
                 Debug.WriteLine("Master manifest version: " + version);
-                MasterManifest.MusicPackMirrors = rootElement.Elements("musicpackmirror").Select(xe => xe.Value).ToList();
+                MasterManifest.MusicPackMirrors =
+                    (from mpm in rootElement.Descendants("musicpackmirror")
+                     select new MusicPackMirror()
+                     {
+                         URL = mpm.Value,
+                         Hash = mpm.Attribute("hash")?.Value
+                     }).ToList();
                 MEMUpdater.HighestSupportedMEMVersion = TryConvert.ToInt32(rootElement.Element("highestapprovedmemversion")?.Value, 999);
                 XElement soakElem = rootElement.Element("soaktestingmemversion");
                 if (soakElem != null)
@@ -513,5 +519,26 @@ namespace ALOTInstallerCore.Helpers
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Gets the default mode. This is based on the process name's prefix before the word 'Installer', case sensitive.
+        /// </summary>
+        /// <returns></returns>
+        public static ManifestMode GetDefaultMode()
+        {
+            var hostingName = Utilities.GetHostingProcessname();
+
+            var installerIndex = hostingName.IndexOf("Installer", StringComparison.InvariantCultureIgnoreCase);
+            if (installerIndex > 0)
+            {
+                var prefix = hostingName.Substring(0, installerIndex);
+
+                if (Enum.TryParse<ManifestMode>(prefix, out var mode) && ManifestHandler.MasterManifest.ManifestModePackageMappping.ContainsKey(mode))
+                {
+                    return mode;
+                }
+            }
+            return ManifestMode.Free;
+        }
     }
 }

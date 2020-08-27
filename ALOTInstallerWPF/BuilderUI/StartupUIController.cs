@@ -65,8 +65,7 @@ namespace ALOTInstallerWPF.BuilderUI
 
                 if (ManifestHandler.MasterManifest != null)
                 {
-                    // Todo: Have some way for app to change defaults (to MEUITM? Last mode set? ??)
-                    ManifestHandler.SetCurrentMode(ManifestMode.ALOT);
+                    ManifestHandler.SetCurrentMode(ManifestHandler.GetDefaultMode());
                     pd.SetMessage("Preparing texture library");
                     foreach (var v in ManifestHandler.MasterManifest.ManifestModePackageMappping)
                     {

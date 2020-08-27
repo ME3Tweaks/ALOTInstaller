@@ -11,7 +11,7 @@ using Serilog;
 namespace ALOTInstallerCore.ModManager.ME3Tweaks
 {
     //Localizable(false) //Leave this here for localizer tool!
-    partial class OnlineContent
+    public partial class OnlineContent
     {
         private const string ThirdPartyIdentificationServiceURL = "https://me3tweaks.com/modmanager/services/thirdpartyidentificationservice?highprioritysupport=true&allgames=true";
         private const string StaticFilesBaseURL_Github = "https://raw.githubusercontent.com/ME3Tweaks/ME3TweaksModManager/master/MassEffectModManagerCore/staticfiles/";
