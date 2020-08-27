@@ -73,8 +73,8 @@ namespace ALOTInstallerCore.Helpers
                 }
 
                 //var fetchedManifest = webClient.DownloadString(new Uri(url));
-                //var fetchedManifest = File.ReadAllText(@"C:\Users\Mgamerz\source\repos\AlotAddOnGUI\manifest.xml");
-                var fetchedManifest = File.ReadAllText(@"E:\Documents\Visual Studio 2015\Projects\AlotAddOnGUI\manifest.xml");
+                var fetchedManifest = File.ReadAllText(@"C:\Users\Mgamerz\source\repos\AlotAddOnGUI\manifest.xml");
+                //var fetchedManifest = File.ReadAllText(@"E:\Documents\Visual Studio 2015\Projects\AlotAddOnGUI\manifest.xml");
 
                 if (Utilities.TestXMLIsValid(fetchedManifest))
                 {
@@ -162,7 +162,6 @@ namespace ALOTInstallerCore.Helpers
 
                 #region Master Manifest
                 string version = (string)rootElement.Attribute("version") ?? "";
-                Debug.WriteLine("Master manifest version: " + version);
                 MasterManifest.MusicPackMirrors =
                     (from mpm in rootElement.Descendants("musicpackmirror")
                      select new MusicPackMirror()
@@ -170,6 +169,16 @@ namespace ALOTInstallerCore.Helpers
                          URL = mpm.Value,
                          Hash = mpm.Attribute("hash")?.Value
                      }).ToList();
+
+                MasterManifest.Tutorials =
+                    (from mpm in rootElement.Descendants("tutorial")
+                     select new ManifestTutorial()
+                     {
+                         Link = mpm.Attribute("link")?.Value,
+                         Text = mpm.Attribute("text")?.Value,
+                         ToolTip = mpm.Attribute("tooltip")?.Value
+                     }).ToList();
+
                 MEMUpdater.HighestSupportedMEMVersion = TryConvert.ToInt32(rootElement.Element("highestapprovedmemversion")?.Value, 999);
                 XElement soakElem = rootElement.Element("soaktestingmemversion");
                 if (soakElem != null)
@@ -183,12 +192,13 @@ namespace ALOTInstallerCore.Helpers
                     }
                 }
 
-                Utilities.SUPPORTED_HASHES_ME1.Clear();
-                Utilities.SUPPORTED_HASHES_ME2.Clear();
-                Utilities.SUPPORTED_HASHES_ME3.Clear();
+
 
                 if (rootElement.Element("supportedhashes") != null)
                 {
+                    Utilities.SUPPORTED_HASHES_ME1.Clear();
+                    Utilities.SUPPORTED_HASHES_ME2.Clear();
+                    Utilities.SUPPORTED_HASHES_ME3.Clear();
                     var supportedHashesList = rootElement.Element("supportedhashes").Descendants("supportedhash");
                     foreach (var item in supportedHashesList)
                     {

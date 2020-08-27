@@ -12,6 +12,7 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerWPF.InstallerUI;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
@@ -35,13 +36,19 @@ namespace ALOTInstallerWPF.Flyouts
         public string ME2TextureInstallInfo { get; private set; }
         public string ME3TextureInstallInfo { get; private set; }
         public bool ShowGameMissingText { get; set; }
+        public ObservableCollectionExtended<ManifestTutorial> AllTutorials { get; } = new ObservableCollectionExtended<ManifestTutorial>();
 
 
         public SettingsFlyout()
         {
             DataContext = this;
             LoadCommands();
+            if (ManifestHandler.MasterManifest != null)
+            {
+                AllTutorials.ReplaceAll(ManifestHandler.MasterManifest.Tutorials);
+            }
             InitializeComponent();
+
         }
 
 
@@ -56,6 +63,7 @@ namespace ALOTInstallerWPF.Flyouts
         public GenericCommand DebugShowInstallerFlyoutCommand { get; set; }
         public GenericCommand LogsDiagnosticsCommand { get; set; }
         public GenericCommand OpenLODSwitcherCommand { get; set; }
+        public RelayCommand OpenTutorialLinkCommand { get; set; }
         private void LoadCommands()
         {
             SetLibraryLocationCommand = new GenericCommand(ChangeLibraryLocation);
@@ -68,6 +76,7 @@ namespace ALOTInstallerWPF.Flyouts
             CleanupBuildLocationCommand = new GenericCommand(CleanupBuildLocation);
             LogsDiagnosticsCommand = new GenericCommand(OpenDiagnosticsFlyout);
             OpenLODSwitcherCommand = new GenericCommand(OpenLODSwitcher, () => Locations.GetAllAvailableTargets().Any());
+            OpenTutorialLinkCommand = new RelayCommand(OpenTutorialLink);
 #if DEBUG
             DebugShowInstallerFlyoutCommand = new GenericCommand(() =>
             {
@@ -90,6 +99,14 @@ namespace ALOTInstallerWPF.Flyouts
                 }
             });
 #endif
+        }
+
+        private void OpenTutorialLink(object obj)
+        {
+            if (obj is string str)
+            {
+                Utilities.OpenWebPage(str);
+            }
         }
 
         private void OpenLODSwitcher()

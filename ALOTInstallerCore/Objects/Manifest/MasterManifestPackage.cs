@@ -60,6 +60,11 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// with different settings
         /// </summary>
         public List<ManifestFile> AllManifestFiles { get; } = new List<ManifestFile>();
+
+        /// <summary>
+        /// List of all tutorials that the user can open and browse
+        /// </summary>
+        public List<ManifestTutorial> Tutorials { get; set; } = new List<ManifestTutorial>();
     }
 
     public class MusicPackMirror

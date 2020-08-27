@@ -211,7 +211,12 @@ namespace ALOTInstallerWPF.BuilderUI
                         foreach (var v in ManifestHandler.MasterManifest.MusicPackMirrors)
                         {
                             outpath = Path.Combine(Locations.TempDirectory(), "MusicPack" + Path.GetExtension(v.URL));
-                            var memoryItem = OnlineContent.DownloadToMemory(v.URL, hash: v.Hash);
+                            var memoryItem = OnlineContent.DownloadToMemory(v.URL, (done, total) =>
+                            {
+                                ProgressIndeterminate = false;
+                                ProgressMax = total;
+                                ProgressValue = done;
+                            }, hash: v.Hash);
                             if (memoryItem.errorMessage == null)
                             {
                                 memoryItem.result.WriteToFile(outpath);
@@ -221,6 +226,7 @@ namespace ALOTInstallerWPF.BuilderUI
                         }
 
                         if (!writtenFile) return;
+                        ProgressIndeterminate = true;
                         BackgroundTaskText = "Extracting music pack";
                         MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{outpath}\" --output \"{Locations.MusicDirectory}\" --ipc");
                         File.Delete(outpath);

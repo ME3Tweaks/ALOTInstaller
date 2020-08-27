@@ -11,6 +11,7 @@
              xmlns:me3Tweaks="clr-namespace:ALOTInstallerCore.ModManager.ME3Tweaks;assembly=ALOTInstallerCore"
              xmlns:alotInstallerWpf="clr-namespace:ALOTInstallerWPF"
              xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
+             xmlns:manifest="clr-namespace:ALOTInstallerCore.Objects.Manifest;assembly=ALOTInstallerCore"
              mc:Ignorable="d" 
              d:DesignHeight="1450" d:DesignWidth="300">
     <UserControl.Resources>
@@ -46,7 +47,7 @@
                     </StackPanel>
                 </StackPanel>
             </Expander>
-            
+
             <Expander DockPanel.Dock="Top" IsExpanded="True" Expanded="Expander_Expanded">
                 <Expander.Header>
                     <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="File Filtering"/>
@@ -153,8 +154,23 @@
                 <Expander.Header>
                     <Label FontSize="16" Margin="5,0,0,0" VerticalAlignment="Bottom" Content="Tutorials &amp; Guides" Padding="0,0,0,0"/>
                 </Expander.Header>
-                <StackPanel x:Name="StackPanel_ManifestTutorials">
-                    <TextBlock x:Name="Label_NoTutorials" Text="No tutorials available in manifest"/>
+                <StackPanel>
+                    <ItemsControl 
+                        Visibility="{Binding AllTutorials.Any, Converter={StaticResource BoolToVisibilityConverter}}"
+                        ItemsSource="{Binding AllTutorials}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type manifest:ManifestTutorial}">
+                                <Button Margin="20,3,0,3" 
+                                        Style="{StaticResource MahApps.Styles.Button.Square.Accent}" 
+                                        Content="{Binding Text}"
+                                        ToolTip="{Binding ToolTip}"
+                                        Command="{Binding OpenTutorialLinkCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:SettingsFlyout}}}"
+                                        CommandParameter="{Binding Link}"
+                                        />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Text="No tutorials found in manifest" Visibility="{Binding AllTutorials.Any, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
                 </StackPanel>
             </Expander>
             <Expander DockPanel.Dock="Top" IsExpanded="True" Expanded="Expander_Expanded">
