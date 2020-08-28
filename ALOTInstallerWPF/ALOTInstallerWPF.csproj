@@ -41,6 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
     <PackageReference Include="MahApps.Metro.IconPacks.Ionicons" Version="4.4.0" />
     <PackageReference Include="Microsoft.AppCenter" Version="3.4.1" />
     <PackageReference Include="Microsoft.AppCenter.Analytics" Version="3.4.1" />

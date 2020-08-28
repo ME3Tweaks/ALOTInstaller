@@ -130,6 +130,8 @@ namespace ALOTInstallerCore.Helpers
             set => SetProperty(ref _telemetry, value);
         }
 
+        public static DateTime LastBetaAdvert { get; set; }
+
 
         public static readonly string SettingsPath = Path.Combine(Locations.AppDataFolder(), "settings.ini");
         private static bool _betaMode;

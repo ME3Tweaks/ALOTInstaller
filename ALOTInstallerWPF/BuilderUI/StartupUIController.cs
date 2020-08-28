@@ -96,6 +96,7 @@ namespace ALOTInstallerWPF.BuilderUI
             bw.DoWork += (a, b) =>
             {
                 ALOTInstallerCoreLib.Startup(SetWrapperLogger, RunOnUIThread, startTelemetry, stopTelemetry);
+
                 if (Settings.BetaMode)
                 {
                     RunOnUIThread(() =>
@@ -103,6 +104,77 @@ namespace ALOTInstallerWPF.BuilderUI
                         ThemeManager.Current.ChangeTheme(App.Current, "Dark.Red");
                     });
                 }
+
+
+                AppUpdater.PerformGithubAppUpdateCheck("Mgamerz", "ALOTInstallerTest", "ALOTInstallerWPF", "ALOTInstallerWPF.exe",
+                    (title, text, updateButtonText, declineButtonText) =>
+                    {
+                        bool response = false;
+                        object syncObj = new object();
+                        Application.Current.Dispatcher.Invoke(async () =>
+                        {
+                            if (Application.Current.MainWindow is MainWindow mw)
+                            {
+                                var result = await mw.ShowMessageAsync(title, text, MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                                {
+                                    AffirmativeButtonText = updateButtonText,
+                                    NegativeButtonText = declineButtonText,
+                                    DefaultButtonFocus = MessageDialogResult.Affirmative
+                                });
+                                response = result == MessageDialogResult.Affirmative;
+                                lock (syncObj)
+                                {
+                                    Monitor.Pulse(syncObj);
+                                }
+                            }
+                        });
+                        lock (syncObj)
+                        {
+                            Monitor.Wait(syncObj);
+                        }
+                        return response;
+                    }, (title, initialmessage, canCancel) =>
+                    {
+                        // We don't use this as we are already in a progress dialog
+                    },
+                    s =>
+                    {
+                        pd.SetMessage(s);
+                    },
+                    (done, total) =>
+                    {
+                        pd.SetProgress(done * 1d / total);
+                    },
+                    () =>
+                    {
+                        pd.SetIndeterminate();
+                    },
+                    (title, message) =>
+                    {
+                        object syncObj = new object();
+                        Application.Current.Dispatcher.Invoke(async () =>
+                        {
+                            if (Application.Current.MainWindow is MainWindow mw)
+                            {
+                                await mw.ShowMessageAsync(title, message);
+                                lock (syncObj)
+                                {
+                                    Monitor.Pulse(syncObj);
+                                }
+                            }
+                        });
+                        lock (syncObj)
+                        {
+                            Monitor.Wait(syncObj);
+                        }
+                    },
+                    () =>
+                    {
+                        App.BetaAvailable = true;
+                    }
+
+
+                );
 
                 BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
 
@@ -179,22 +251,22 @@ namespace ALOTInstallerWPF.BuilderUI
                 });
             };
             bw.RunWorkerCompleted += (a, b) =>
-                {
-                    pd.CloseAsync();
-                    //if (b.Error == null)
-                    //{
-                    //    FileSelectionUIController bui = new FileSelectionUIController();
-                    //    if (ManifestHandler.MasterManifest != null)
-                    //    {
-                    //        ManifestHandler.CurrentMode = ManifestMode.ALOT;
-                    //    }
-                    //    Program.SwapToNewView(bui);
-                    //}
-                    //else
-                    //{
-                    //    startupStatusLabel.Text = "Error preparing application: " + b.Error.Message;
-                    //}
-                };
+                    {
+                        pd.CloseAsync();
+                        //if (b.Error == null)
+                        //{
+                        //    FileSelectionUIController bui = new FileSelectionUIController();
+                        //    if (ManifestHandler.MasterManifest != null)
+                        //    {
+                        //        ManifestHandler.CurrentMode = ManifestMode.ALOT;
+                        //    }
+                        //    Program.SwapToNewView(bui);
+                        //}
+                        //else
+                        //{
+                        //    startupStatusLabel.Text = "Error preparing application: " + b.Error.Message;
+                        //}
+                    };
             bw.RunWorkerAsync();
 
 

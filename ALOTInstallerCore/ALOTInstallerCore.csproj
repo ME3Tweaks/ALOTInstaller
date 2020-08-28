@@ -32,7 +32,7 @@
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<DefineConstants>TRACE;DEBUG;WINDOWS;WPF</DefineConstants>
+		<DefineConstants>TRACE;DEBUG;WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 		<DefineConstants>TRACE;WINDOWS;WPF</DefineConstants>
