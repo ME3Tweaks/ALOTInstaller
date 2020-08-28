@@ -120,7 +120,7 @@ namespace ALOTInstallerCore.Helpers
             }
             catch (WebException e)
             {
-                Log.Error("WebException occurredgetting manifest from server: " + e.Flatten());
+                Log.Error("WebException occurred getting manifest from server: " + e.Flatten());
                 //if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
                 //{
                 //    Log.Information("Reading bundled manifest instead.");
@@ -134,7 +134,7 @@ namespace ALOTInstallerCore.Helpers
             //catch (Exception e)
             //{
             //    Debug.WriteLine(DateTime.Now);
-            //    Log.Error("Other Exception occurredgetting manifest from server/reading manifest: " + e.ToString());
+            //    Log.Error("Other Exception occurred getting manifest from server/reading manifest: " + e.ToString());
             //    if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
             //    {
             //        Log.Information("Reading bundled manifest instead.");
@@ -459,7 +459,7 @@ namespace ALOTInstallerCore.Helpers
             }
             catch (Exception e)
             {
-                Log.Error("Error has occurredparsing the manifest XML!");
+                Log.Error("Error has occurred parsing the manifest XML!");
                 Log.Error(e.Flatten());
                 ErrorParsingManifest?.Invoke(e);
                 return false;

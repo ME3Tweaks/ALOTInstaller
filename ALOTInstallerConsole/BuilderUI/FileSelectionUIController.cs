@@ -572,7 +572,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
                     if (b.Error != null)
                     {
-                        Log.Error($"Exception occurredin precheck for pre-stage: {b.Error.Message}");
+                        Log.Error($"Exception occurred in precheck for pre-stage: {b.Error.Message}");
                         MessageBox.Query("Precheck failed", b.Result as string, "OK");
                     }
                     else if (b.Result != null)

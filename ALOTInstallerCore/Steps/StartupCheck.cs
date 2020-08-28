@@ -185,7 +185,7 @@ namespace ALOTInstallerCore.Steps
                 Log.Error(e.Flatten());
                 //messageCa
                 //await this.ShowMessageAsync("Error checking write privileges",
-                //    "An error occurredwhile checking write privileges to game folders. This may be a sign that the game is in a bad state.\n\nThe error was:\n" +
+                //    "An error occurred while checking write privileges to game folders. This may be a sign that the game is in a bad state.\n\nThe error was:\n" +
                 //    e.Message);
                 return false;
             }

@@ -36,7 +36,7 @@ namespace ALOTInstallerCore.Helpers
             {
                 if (e.Error != null)
                 {
-                    Log.Error($"An error occurredcopying the file to the destination:");
+                    Log.Error($"An error occurred copying the file to the destination:");
                     Log.Error(e.Error.Flatten());
                     errorCallback?.Invoke(e.Error);
                 }

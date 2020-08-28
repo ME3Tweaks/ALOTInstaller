@@ -555,7 +555,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 void memExceptionOccured(string operation, string line)
                 {
-                    addDiagLine($@"An exception occurredperforming operation '{operation}': {line}",
+                    addDiagLine($@"An exception occurred performing operation '{operation}': {line}",
                         Severity.ERROR);
                     addDiagLine(@"Check the Mod Manager application log for more information.", Severity.ERROR);
                     addDiagLine(@"Report this to ALOT or ME3Tweaks Discord for further assistance.",
