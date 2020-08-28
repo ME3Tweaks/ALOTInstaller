@@ -758,6 +758,10 @@ namespace ALOTInstallerCore
             }
         }
 
+        /// <summary>
+        /// Gets the amount of installed memory in bytes
+        /// </summary>
+        /// <returns></returns>
         public static ulong GetInstalledRamAmount()
         {
             var computerInfo = new ComputerInfo();
@@ -889,6 +893,22 @@ namespace ALOTInstallerCore
             {
                 Log.Debug(debugMsg);
             }
+        }
+
+        /// <summary>
+        /// Gets the name of the installer. e.g. if app is named ALOTInstaller.exe it will return ALOT. If it is MEUITMInstaller it will return MEUITM
+        /// </summary>
+        /// <returns></returns>
+        public static string GetAppPrefixedName()
+        {
+            var hostingName = Utilities.GetHostingProcessname();
+            var installerIndex = hostingName.IndexOf("Installer", StringComparison.InvariantCultureIgnoreCase);
+            if (installerIndex > 0)
+            {
+                return hostingName.Substring(0, installerIndex);
+            }
+
+            return "ALOT"; //Default
         }
     }
 }

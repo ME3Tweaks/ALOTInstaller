@@ -109,7 +109,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
             Add(new Label()
             {
-                Text = $"ALOT Installer {Utilities.GetAppVersion()}",
+                Text = $"{Utilities.GetAppPrefixedName()} Installer {Utilities.GetAppVersion()}",
                 TextAlignment = TextAlignment.Centered,
                 X = Pos.Center(),
                 Y = Pos.Center() - 3,

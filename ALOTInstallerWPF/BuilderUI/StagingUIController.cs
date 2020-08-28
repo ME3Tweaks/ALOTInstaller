@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using AlotAddOnGUI;
+using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
@@ -87,7 +88,7 @@ namespace ALOTInstallerWPF.BuilderUI
 
                     var answer = await mw.ShowMessageAsync(
                         "WARNING: YOU WILL BE UNABLE TO INSTALL ADDITIONAL FILES TO THE GAME AFTER THIS POINT",
-                        "Once textures are installed, you will be unable to safely add or change files in your game as all files will be modified.  This means mods, DLC, and other things; your game is very likely to become unusable if you do and ALOT Installer will refuse to work on games modded in this way.\n\nEnsure all your non-texture mods are installed before continuing, as you will not be able to install them after this point.",
+                        $"Once textures are installed, you will be unable to safely add or change files in your game as all files will be modified.  This means mods, DLC, and other things; your game is very likely to become unusable if you do and {Utilities.GetAppPrefixedName()} Installer will refuse to work on games modded in this way.\n\nEnsure all your non-texture mods are installed before continuing, as you will not be able to install them after this point.",
                         MessageDialogStyle.AffirmativeAndNegative,
                         new MetroDialogSettings()
                         {
@@ -176,7 +177,7 @@ namespace ALOTInstallerWPF.BuilderUI
             if (Application.Current.MainWindow is MainWindow mw)
             {
                 var pd = await mw.ShowProgressAsync("Performing installation precheck",
-                    "Please wait while ALOT Installer checks for issues that will block installation.");
+                    $"Please wait while {Utilities.GetAppPrefixedName()} Installer checks for issues that will block installation.");
 
                 NamedBackgroundWorker preinstallCheckWorker = new NamedBackgroundWorker("PrecheckWorker-Preinstall");
                 preinstallCheckWorker.DoWork += (a, b) =>

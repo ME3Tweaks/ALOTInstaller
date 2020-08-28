@@ -354,7 +354,7 @@ namespace ALOTInstallerWPF.Flyouts
                 {
 
                     var unlinkRes = await mw.ShowMessageAsync("Warning: Unlinking backup",
-                        $"Unlinking your backup for {gbs.Game.ToGameName()} will make modding programs, including ME3Explorer, ALOT Installer, and ME3Tweaks Mod Manager unable to find a backup for this game. These programs use this backup for various features. Unlinking a backup will not delete your existing backup. You can link to an existing backup once you've unlinked your existing backup.\n\nBackup Path: {buPath}\n\nUnlink your backup for {gbs.Game.ToGameName()}?",
+                        $"Unlinking your backup for {gbs.Game.ToGameName()} will make modding programs, including ME3Explorer, {Utilities.GetAppPrefixedName()} Installer, and ME3Tweaks Mod Manager unable to find a backup for this game. These programs use this backup for various features. Unlinking a backup will not delete your existing backup. You can link to an existing backup once you've unlinked your existing backup.\n\nBackup Path: {buPath}\n\nUnlink your backup for {gbs.Game.ToGameName()}?",
                         MessageDialogStyle.AffirmativeAndNegative,
                         new MetroDialogSettings()
                         {
@@ -802,7 +802,7 @@ namespace ALOTInstallerWPF.Flyouts
                 if (!isDecidingBetaMode && hasOpenedOnce && Settings.BetaMode)
                 {
                     isDecidingBetaMode = true;
-                    var result = await mw.ShowMessageAsync("Switching to beta mode", "Beta mode of ALOT Installer will restart the application and cause the following things to occur:\n - Updates to the application become mandatory\n - You will receive updates that are not yet approved for users in Stable mode\n - You will always download the latest version of MassEffectModderNoGui\n - You will use the beta version of the manifest, which may differ from the Stable one\n - You are expected to report feedback to the developers in the ALOT Discord if things don't work as expected\n - You are OK with a less stable experience\n\nSwitch to Beta mode?",
+                    var result = await mw.ShowMessageAsync("Switching to beta mode", $"Beta mode of {Utilities.GetAppPrefixedName()} Installer will restart the application and cause the following things to occur:\n - Updates to the application become mandatory\n - You will receive updates that are not yet approved for users in Stable mode\n - You will always download the latest version of MassEffectModderNoGui\n - You will use the beta version of the manifest, which may differ from the Stable one\n - You are expected to report feedback to the developers in the ALOT Discord if things don't work as expected\n - You are OK with a less stable experience\n\nSwitch to Beta mode?",
                         MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
                         {
                             AffirmativeButtonText = "Switch to Beta",

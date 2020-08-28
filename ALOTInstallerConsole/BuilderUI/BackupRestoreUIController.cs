@@ -405,7 +405,7 @@ namespace ALOTInstallerConsole.BuilderUI
         private void UnlinkBackup(Enums.MEGame meGame)
         {
             int response = MessageBox.ErrorQuery($"Warning: Removing backup of {meGame.ToGameName()}",
-                           $"Unlinking a backup will make modding tools such as ALOT Installer and ME3Tweaks Mod Manager no longer attempt to find the listed backup. It will NOT delete the backup files, if they exist. You will need to create a new backup after unlinking it.\n\nUnlink the backup?",
+                           $"Unlinking a backup will make modding tools such as {Utilities.GetAppPrefixedName()} Installer and ME3Tweaks Mod Manager no longer attempt to find the listed backup. It will NOT delete the backup files, if they exist. You will need to create a new backup after unlinking it.\n\nUnlink the backup?",
                            "No, leave it alone", "Yes, unlink it");
             if (response == 1)
             {

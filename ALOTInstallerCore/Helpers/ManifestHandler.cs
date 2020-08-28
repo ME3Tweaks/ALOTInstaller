@@ -112,7 +112,7 @@ namespace ALOTInstallerCore.Helpers
                     else
                     {
                         Log.Error("Local manifest also doesn't exist! No manifest is available.");
-                        //await this.ShowMessageAsync("No Manifest Available", "An error occurreddownloading or reading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
+                        //await this.ShowMessageAsync("No Manifest Available", "An error occurred downloading or reading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
                         //Environment.Exit(1);
                     }
 
@@ -536,17 +536,10 @@ namespace ALOTInstallerCore.Helpers
         /// <returns></returns>
         public static ManifestMode GetDefaultMode()
         {
-            var hostingName = Utilities.GetHostingProcessname();
-
-            var installerIndex = hostingName.IndexOf("Installer", StringComparison.InvariantCultureIgnoreCase);
-            if (installerIndex > 0)
+            var prefix = Utilities.GetAppPrefixedName();
+            if (Enum.TryParse<ManifestMode>(prefix, out var mode) && ManifestHandler.MasterManifest.ManifestModePackageMappping.ContainsKey(mode))
             {
-                var prefix = hostingName.Substring(0, installerIndex);
-
-                if (Enum.TryParse<ManifestMode>(prefix, out var mode) && ManifestHandler.MasterManifest.ManifestModePackageMappping.ContainsKey(mode))
-                {
-                    return mode;
-                }
+                return mode;
             }
             return ManifestMode.Free;
         }

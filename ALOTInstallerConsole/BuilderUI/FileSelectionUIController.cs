@@ -77,7 +77,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
                 }),
                 new MenuBarItem("_Help",new MenuItem[] {
-                    new MenuItem("ALOT Discord", "(Support for ALOT Installer)",()=>Utilities.OpenWebPage(ALOTCommunity.DiscordInviteLink)),
+                    new MenuItem("ALOT Discord", $"(Support for {Utilities.GetAppPrefixedName()} Installer)",()=>Utilities.OpenWebPage(ALOTCommunity.DiscordInviteLink)),
                 })
             });
 

@@ -22,7 +22,7 @@ namespace ALOTInstallerWPF.BuilderUI
 
         public static async void BeginFlow(MetroWindow window)
         {
-            var pd = await window.ShowProgressAsync("Starting up", "ALOT Installer is starting up. Please wait.");
+            var pd = await window.ShowProgressAsync("Starting up", $"{Utilities.GetAppPrefixedName()} Installer is starting up. Please wait.");
             pd.SetIndeterminate();
             NamedBackgroundWorker bw = new NamedBackgroundWorker("StartupThread");
             bw.DoWork += (a, b) =>
@@ -80,7 +80,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 {
                     if (Application.Current.MainWindow is MainWindow mw)
                     {
-                        mw.Title = $"ALOT Installer {Utilities.GetAppVersion()}";
+                        mw.Title = $"{Utilities.GetAppPrefixedName()} Installer {Utilities.GetAppVersion()}";
                         mw.ContentGrid.Children.Add(new FileSelectionUIController());
                         mw.SettingsFlyoutControl.Content = mw.SettingsFlyoutContent = new SettingsFlyout();
                         mw.DiagnosticsFlyoutControl.Content = new DiagnosticsFlyout();

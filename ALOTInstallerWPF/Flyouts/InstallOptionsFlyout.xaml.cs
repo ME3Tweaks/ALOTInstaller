@@ -12,6 +12,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
+using System.Windows.Threading;
+using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
@@ -256,7 +258,7 @@ namespace ALOTInstallerWPF.Flyouts
                         Application.Current.Dispatcher.Invoke(async () =>
                         {
                             var cwbR = await mw.ShowMessageAsync($"No backup of {InstallTarget.Game.ToGameName()}",
-                                $"No backup for {InstallTarget.Game.ToGameName()} is available. It is very highly recommended you make a backup of your game before installation using ALOT Installer, which will make reinstallation much faster and easier. As installation is a very complicated process, things can go wrong, which will require a full restore of the game. You can create a backup quickly and easily in the Settings menu.",
+                                $"No backup for {InstallTarget.Game.ToGameName()} is available. It is very highly recommended you make a backup of your game before installation using {Utilities.GetAppPrefixedName()} Installer, which will make reinstallation much faster and easier. As installation is a very complicated process, things can go wrong, which will require a full restore of the game. You can create a backup quickly and easily in the Settings menu.",
                                 MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
                                 {
                                     AffirmativeButtonText = "Continue without backup",
