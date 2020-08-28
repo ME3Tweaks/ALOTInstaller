@@ -85,92 +85,111 @@ namespace ALOTInstallerCore.Steps
         {
             Log.Information("Performing write check on all game directories...");
             var targets = Locations.GetAllAvailableTargets();
-
-            List<string> directoriesToGrant = new List<string>();
-            foreach (var t in targets)
+            try
             {
-                // Check all folders are writable
-                bool isFullyWritable = true;
-                var testDirectories = Directory.GetDirectories(t.TargetPath, "*", SearchOption.AllDirectories);
-                foreach (var d in testDirectories)
+                List<string> directoriesToGrant = new List<string>();
+                foreach (var t in targets)
                 {
-                    isFullyWritable &= Utilities.IsDirectoryWritable(d);
-                }
-            }
-
-            bool isAdmin = Utilities.IsAdministrator();
-            //bool me1AGEIAKeyNotWritable = false;
-
-            if (directoriesToGrant.Any())
-            {
-                // Some directories not writable
-                foreach (String str in directoriesToGrant)
-                {
-                    if (args != "")
+                    // Check all folders are writable
+                    bool isFullyWritable = true;
+                    var testDirectories = Directory.GetDirectories(t.TargetPath, "*", SearchOption.AllDirectories);
+                    foreach (var d in testDirectories)
                     {
-                        args += " ";
+                        isFullyWritable &= Utilities.IsDirectoryWritable(d);
                     }
-                    args += "\"" + str + "\"";
                 }
 
-                if (me1AGEIAKeyNotWritable)
+                bool isAdmin = Utilities.IsAdministrator();
+                //bool me1AGEIAKeyNotWritable = false;
+
+                if (directoriesToGrant.Any())
                 {
-                    args += " -create-hklm-reg-key \"SOFTWARE\\WOW6432Node\\AGEIA Technologies\"";
-                }
-                args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" " + args;
-                //need to run write permissions program
-                if (isAdmin)
-                {
-                    string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
-                    int result = Utilities.runProcess(exe, args);
-                    if (result == 0)
+                    string args = "";
+                    // Some directories not writable
+                    foreach (var dir in directoriesToGrant)
                     {
-                        Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
-                        return true;
+                        if (args != "")
+                        {
+                            args += " ";
+                        }
+
+                        args += $"\"{dir}\"";
                     }
-                    else
-                    {
-                        Log.Error("Elevated process returned code " + result + ", directories probably aren't writable.");
-                        return false;
-                    }
-                }
-                else
-                {
-                    string message = $"Some game folders/registry keys are not writeable by your user account. {Utilities.GetAppPrefixedName()} Installer will attempt to grant access to these folders/registry with the PermissionsGranter.exe program:\n";
-                    if (required)
-                    {
-                        message = $"Some game paths and registry keys are not writeable by your user account. These need to be writable or {Utilities.GetAppPrefixedName()} Installer will be unable to install textures. Please grant administrative privileges to PermissionsGranter.exe to give your account the necessary privileges to the following:\n";
-                    }
-                    foreach (string str in directoriesToGrant)
-                    {
-                        message += "\n" + str;
-                    }
+
                     //if (me1AGEIAKeyNotWritable)
                     //{
-                    //    message += "\nRegistry: HKLM\\SOFTWARE\\WOW6432Node\\AGEIA Technologies (Fixes an ME1 launch issue)";
+                    //    args += " -create-hklm-reg-key \"SOFTWARE\\WOW6432Node\\AGEIA Technologies\"";
                     //}
-                    await this.ShowMessageAsync("Granting permissions to Mass Effect directories", message);
-                    string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
-                    int result = Utilities.runProcessAsAdmin(exe, args);
-                    if (result == 0)
+                    args = $"\"{System.Security.Principal.WindowsIdentity.GetCurrent().Name}\" {args}";
+                    var permissionsGranterExe = Path.Combine(Locations.ResourcesDir, "Binaries", "PermissionsGranter.exe");
+
+                    //need to run write permissions program
+                    if (isAdmin)
                     {
-                        Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
-                        return true;
+                        int result = Utilities.RunProcess(permissionsGranterExe, args, true, true, true, true);
+                        if (result == 0)
+                        {
+                            Log.Information(
+                                "Elevated process returned code 0, directories are hopefully writable now.");
+                            return true;
+                        }
+                        else
+                        {
+                            Log.Error("Elevated process returned code " + result +
+                                      ", directories probably aren't writable.");
+                            return false;
+                        }
                     }
                     else
                     {
-                        Log.Error("Elevated process returned code " + result + ", directories probably aren't writable.");
-                        return false;
+                        string message =
+                            $"Some game folders/registry keys are not writeable by your user account. {Utilities.GetAppPrefixedName()} Installer will attempt to grant access to these folders/registry with the PermissionsGranter.exe program:\n";
+                        if (required)
+                        {
+                            message =
+                                $"Some game paths and registry keys are not writeable by your user account. These need to be writable or {Utilities.GetAppPrefixedName()} Installer will be unable to install textures. Please grant administrative privileges to PermissionsGranter.exe to give your account the necessary privileges to the following:\n";
+                        }
+
+                        foreach (string str in directoriesToGrant)
+                        {
+                            message += "\n" + str;
+                        }
+
+                        //if (me1AGEIAKeyNotWritable)
+                        //{
+                        //    message += "\nRegistry: HKLM\\SOFTWARE\\WOW6432Node\\AGEIA Technologies (Fixes an ME1 launch issue)";
+                        //}
+
+                        //await this.ShowMessageAsync("Granting permissions to Mass Effect directories", message);
+                        //string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
+                        int result = Utilities.RunProcess(permissionsGranterExe, args, true, true, true, true);
+                        if (result == 0)
+                        {
+                            Log.Information(
+                                "Elevated process returned code 0, directories are hopefully writable now.");
+                            return true;
+                        }
+                        else
+                        {
+                            Log.Error("Elevated process returned code " + result +
+                                      ", directories probably aren't writable.");
+                            return false;
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
-                Log.Error("Error checking for write privledges. This may be a significant sign that an installed game is not in a good state.");
-                Log.Error(App.FlattenException(e));
-                await this.ShowMessageAsync("Error checking write privileges", "An error occurredwhile checking write privileges to game folders. This may be a sign that the game is in a bad state.\n\nThe error was:\n" + e.Message);
+                Log.Error(
+                    "Error checking for write privledges. This may be a significant sign that an installed game is not in a good state.");
+                Log.Error(e.Flatten());
+                //messageCa
+                //await this.ShowMessageAsync("Error checking write privileges",
+                //    "An error occurredwhile checking write privileges to game folders. This may be a sign that the game is in a bad state.\n\nThe error was:\n" +
+                //    e.Message);
                 return false;
             }
+
             return true;
         }
 
@@ -192,7 +211,7 @@ namespace ALOTInstallerCore.Steps
             if (isAdmin && uacIsOn)
             {
                 Log.Warning("This session is running as administrator.");
-                await this.ShowMessageAsync($"{Utilities.GetAppPrefixedName()} Installer should be run as standard user", $"Running {Utilities.GetAppPrefixedName()} Installer as an administrator will disable drag and drop functionality and may cause issues due to the program running in a different user context. You should restart the application without running it as an administrator unless directed by the developers.");
+                //await this.ShowMessageAsync($"{Utilities.GetAppPrefixedName()} Installer should be run as standard user", $"Running {Utilities.GetAppPrefixedName()} Installer as an administrator will disable drag and drop functionality and may cause issues due to the program running in a different user context. You should restart the application without running it as an administrator unless directed by the developers.");
             }
         }
 #endif

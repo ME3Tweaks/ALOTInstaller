@@ -72,7 +72,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             }
         }
 
-        internal static string CollectLatestLog(bool restartLogger)
+        public static string CollectLatestLog(bool restartLogger)
         {
             Log.Information(@"Shutting down logger to allow application to pull log file.");
             Log.CloseAndFlush();

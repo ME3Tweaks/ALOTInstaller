@@ -336,7 +336,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         catch (Exception e)
                         {
                             Log.Error($"Error about to copy file: {e.Message}");
-                            Crashes.TrackError(e);
+                            CoreCrashes.TrackError(e);
                         }
 
                         return true;
@@ -413,7 +413,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 Log.Information($@"Backup completed.");
 
-                Analytics.TrackEvent?.Invoke(@"Created a backup", new Dictionary<string, string>()
+                CoreAnalytics.TrackEvent?.Invoke(@"Created a backup", new Dictionary<string, string>()
                         {
                                 {@"game", Game.ToString()},
                                 {@"Result", @"Success"},
@@ -600,7 +600,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                             }
 
-                            Analytics.TrackEvent?.Invoke(@"Chose to restore game to custom location", new Dictionary<string, string>() { { @"Game", Game.ToString() } });
+                            CoreAnalytics.TrackEvent?.Invoke(@"Chose to restore game to custom location", new Dictionary<string, string>() { { @"Game", Game.ToString() } });
 
                         }
                         else
@@ -697,7 +697,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             }
                             catch (Exception e)
                             {
-                                Crashes.TrackError2(e, new Dictionary<string, string>()
+                                CoreCrashes.TrackError2(e, new Dictionary<string, string>()
                                         {
                                             {@"Source", @"Restore UI display callback"},
                                             {@"Value", fileBeingCopied},

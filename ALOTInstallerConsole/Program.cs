@@ -17,10 +17,13 @@ namespace ALOTInstallerConsole
         private static void setWrapperLogger(ILogger logger) => Log.Logger = logger;
         static void Main(string[] args)
         {
-            //Initialize ALOT Installer library
-            ALOTInstallerCoreLib.Startup(setWrapperLogger);
-
             Application.Init();
+            //Initialize ALOT Installer library
+            ALOTInstallerCoreLib.Startup(setWrapperLogger, action =>
+            {
+
+            });
+
             var startupUI = new BuilderUI.StartupUIController();
             Program.SwapToNewView(startupUI);
         }

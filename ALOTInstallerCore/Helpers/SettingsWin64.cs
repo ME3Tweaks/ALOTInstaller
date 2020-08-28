@@ -37,6 +37,19 @@ namespace ALOTInstallerCore.Helpers
             {
                 Save(propertyName);
             }
+
+            if (propertyName == nameof(Telemetry))
+            {
+                if (Telemetry)
+                {
+                    CoreAnalytics.StartTelemetryCallback?.Invoke();
+                }
+                else
+                {
+                    CoreAnalytics.StopTelemetryCallback?.Invoke();
+                }
+            }
+
             return true;
         }
         #endregion
@@ -107,148 +120,16 @@ namespace ALOTInstallerCore.Helpers
         /// </summary>
         public static DateTime LastContentCheck { get; set; }
 
-
-        /*
-        private static bool _logModStartup = false;
-        public static bool LogModStartup
+        private static bool _telemetry = true;
+        /// <summary>
+        /// Enables/disables telemetry
+        /// </summary>
+        public static bool Telemetry
         {
-            get => _logModStartup;
-            set => SetProperty(ref _logModStartup, value);
+            get => _telemetry;
+            set => SetProperty(ref _telemetry, value);
         }
 
-
-        private static bool _logModUpdater = true;
-        public static bool LogModUpdater
-        {
-            get => _logModUpdater;
-            set => SetProperty(ref _logModUpdater, value);
-        }
-
-        private static bool _enableTelemetry = true;
-        public static bool EnableTelemetry
-        {
-            get => _enableTelemetry;
-            set => SetProperty(ref _enableTelemetry, value);
-        }
-        private static bool _betaMode = false;
-        public static bool BetaMode
-        {
-            get => _betaMode;
-            set => SetProperty(ref _betaMode, value);
-        }
-
-        private static bool _modMakerAutoInjectCustomKeybindsOption = false;
-
-        public static bool ModMakerAutoInjectCustomKeybindsOption
-        {
-            get => _modMakerAutoInjectCustomKeybindsOption;
-            set => SetProperty(ref _modMakerAutoInjectCustomKeybindsOption, value);
-        }
-
-        private static bool _modMakerControllerModOption = false;
-
-        public static bool ModMakerControllerModOption
-        {
-            get => _modMakerControllerModOption;
-            set => SetProperty(ref _modMakerControllerModOption, value);
-        }
-
-        private static string _updaterServiceUsername;
-        public static string UpdaterServiceUsername
-        {
-            get => _updaterServiceUsername;
-            set => SetProperty(ref _updaterServiceUsername, value);
-        }
-
-        private static int _webclientTimeout = 5; // Defaults to 5
-        public static int WebClientTimeout
-        {
-            get => _webclientTimeout;
-            set => SetProperty(ref _webclientTimeout, value);
-        }
-
-        private static string _updateServiceLZMAStoragePath;
-        public static string UpdaterServiceLZMAStoragePath
-        {
-            get => _updateServiceLZMAStoragePath;
-            set => SetProperty(ref _updateServiceLZMAStoragePath, value);
-        }
-
-        private static string _updateServiceManifestStoragePath;
-        public static string UpdaterServiceManifestStoragePath
-        {
-            get => _updateServiceManifestStoragePath;
-            set => SetProperty(ref _updateServiceManifestStoragePath, value);
-        }
-
-        private static bool _logMixinStartup = false;
-        public static bool LogMixinStartup
-        {
-            get => _logMixinStartup;
-            set => SetProperty(ref _logMixinStartup, value);
-        }
-
-        private static bool _logModInstallation = false;
-        public static bool LogModInstallation
-        {
-            get => _logModInstallation;
-            set => SetProperty(ref _logModInstallation, value);
-        }
-
-        private static bool _developerMode;
-        public static bool DeveloperMode
-        {
-            get => _developerMode;
-            set => SetProperty(ref _developerMode, value);
-        }
-
-        private static bool _darkTheme;
-        public static bool DarkTheme
-        {
-            get => _darkTheme;
-            set => SetProperty(ref _darkTheme, value);
-        }
-
-        private static bool _autoUpdateLods = true;
-        public static bool AutoUpdateLODs
-        {
-            get => _autoUpdateLods;
-            set => SetProperty(ref _autoUpdateLods, value);
-        }
-
-
-
-
-        private static string _modLibraryPath;
-        public static string ModLibraryPath
-        {
-            get => _modLibraryPath;
-            set => SetProperty(ref _modLibraryPath, value);
-        }
-
-        private static string _language;
-        public static string Language
-        {
-            get => _language;
-            set => SetProperty(ref _language, value);
-        }
-
-        public static DateTime LastContentCheck { get; internal set; }
-
-        private static bool _showedPreviewPanel;
-        public static bool ShowedPreviewPanel
-        {
-            get => _showedPreviewPanel;
-            set => SetProperty(ref _showedPreviewPanel, value);
-        }
-
-        private static bool _logModMakerCompiler;
-        public static bool LogModMakerCompiler
-        {
-            get => _logModMakerCompiler;
-            set => SetProperty(ref _logModMakerCompiler, value);
-        }
-        */
 
         public static readonly string SettingsPath = Path.Combine(Locations.AppDataFolder(), "settings.ini");
         private static bool _betaMode;
@@ -258,7 +139,7 @@ namespace ALOTInstallerCore.Helpers
             TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, @"Downloaded_Mods");
             BuildLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, @"Staging");
             MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
-            //Language = LoadSettingString(settingsIni, "ModManager", "Language", "int");
+            Telemetry = LoadSettingBool(SettingsKeys.SettingKeys.Telemetry, true);
             PlayMusic = LoadSettingBool(SettingsKeys.SettingKeys.PlayMusic, false);
             BetaMode = LoadSettingBool(SettingsKeys.SettingKeys.BetaMode, false);
             //AutoUpdateLODs = LoadSettingBool(settingsIni, "ModManager", "AutoUpdateLODs", true);
@@ -401,7 +282,7 @@ namespace ALOTInstallerCore.Helpers
                     SaveSettingBool(SettingsKeys.SettingKeys.ImportAsMove, MoveFilesWhenImporting);
                 if (propertyName == nameof(LastContentCheck))
                     SaveSettingDateTime(SettingsKeys.SettingKeys.TextureLibraryDirectory, LastContentCheck);
-                
+
                 return SettingsSaveResult.SAVED;
             }
             catch (UnauthorizedAccessException uae)

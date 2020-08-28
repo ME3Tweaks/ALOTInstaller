@@ -42,6 +42,9 @@
 
   <ItemGroup>
     <PackageReference Include="MahApps.Metro.IconPacks.Ionicons" Version="4.4.0" />
+    <PackageReference Include="Microsoft.AppCenter" Version="3.4.1" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="3.4.1" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="3.4.1" />
     <PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
     <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />

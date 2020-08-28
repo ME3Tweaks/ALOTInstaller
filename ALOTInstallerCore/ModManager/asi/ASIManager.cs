@@ -315,7 +315,7 @@ namespace MassEffectModManagerCore.modmanager.asi
 
                     File.Copy(cachedPath, finalPath, true);
                     Log.Information($@"Installed ASI to {finalPath}");
-                    Analytics.TrackEvent(@"Installed ASI", new Dictionary<string, string>() {
+                    CoreAnalytics.TrackEvent(@"Installed ASI", new Dictionary<string, string>() {
                                 { @"Filename", Path.GetFileNameWithoutExtension(finalPath)}
                             });
                     return true;
@@ -342,7 +342,7 @@ namespace MassEffectModManagerCore.modmanager.asi
                 Log.Information(@"Fetched remote ASI from server. Installing ASI to " + finalPath);
                 memoryStream.WriteToFile(finalPath);
                 Log.Information(@"ASI successfully installed.");
-                Analytics.TrackEvent?.Invoke(@"Installed ASI", new Dictionary<string, string>()
+                CoreAnalytics.TrackEvent?.Invoke(@"Installed ASI", new Dictionary<string, string>()
                 {
                     {@"Filename", Path.GetFileNameWithoutExtension(finalPath)}
                 });

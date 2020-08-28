@@ -59,10 +59,10 @@ namespace ALOTInstallerCore.ModManager.Objects
             this.RegistryActive = currentRegistryActive;
             this.IsCustomOption = isCustomOption;
             this.TargetPath = targetRootPath.TrimEnd('\\');
-            ReloadGameTarget();
+            ReloadGameTarget(true, false);
         }
 
-        public void ReloadGameTarget(bool lodUpdateAndLogging = true, bool forceLodUpdate = false)
+        public void ReloadGameTarget(bool logSource = true, bool forceLodUpdate = false)
         {
             if (Game != Enums.MEGame.Unknown && !IsCustomOption)
             {
@@ -87,14 +87,14 @@ namespace ALOTInstallerCore.ModManager.Objects
                         MEUITMVersion = 0;
                     }
 
-                    CLog.Information(@"Getting game source for target " + TargetPath, lodUpdateAndLogging);
+                    CLog.Information(@"Getting game source for target " + TargetPath, logSource);
                     var hashCheckResult = VanillaDatabaseService.GetGameSource(this);
 
                     GameSource = hashCheckResult.result;
                     ExecutableHash = hashCheckResult.hash;
                     if (GameSource == null)
                     {
-                        CLog.Error(@"Unknown source or illegitimate installation: " + hashCheckResult.hash, lodUpdateAndLogging);
+                        CLog.Error(@"Unknown source or illegitimate installation: " + hashCheckResult.hash, logSource);
 
                     }
                     else
@@ -108,16 +108,16 @@ namespace ALOTInstallerCore.ModManager.Objects
                             }
                         }
 
-                        CLog.Information(@"Source: " + GameSource, lodUpdateAndLogging);
+                        CLog.Information(@"Source: " + GameSource, logSource);
                     }
 
                     IsPolishME1 = Game == Enums.MEGame.ME1 && File.Exists(Path.Combine(TargetPath, @"BioGame", @"CookedPC", @"Movies", @"niebieska_pl.bik"));
                     if (IsPolishME1)
                     {
-                        CLog.Information(@"ME1 Polish Edition detected", lodUpdateAndLogging);
+                        CLog.Information(@"ME1 Polish Edition detected", logSource);
                     }
 
-                    if (lodUpdateAndLogging || forceLodUpdate)
+                    if (forceLodUpdate)
                     {
                         UpdateLODs();
                     }

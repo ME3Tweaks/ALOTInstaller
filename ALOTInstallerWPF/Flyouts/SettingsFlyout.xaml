@@ -147,7 +147,11 @@
                     <mah:ToggleSwitch OffContent="Stable mode"  OnContent="Beta mode" Toggled="BetaMode_Toggled" Margin="20,0,0,0" 
                                       ToolTip="Enable beta mode features. Require restart for full effect, may break application"
                                       IsOn="{Binding Path=(modmanager:Settings.BetaMode)}"/>
-                    <!--<mah:ToggleSwitch Content="Show advanced file info" ToolTip="Shows advanced file information" IsOn="{Binding Path=(modmanager:Settings.ShowAdvancedFileInfo)}" Margin="20,0,0,0"/>-->
+                    <mah:ToggleSwitch OffContent="Telemetry disabled"  OnContent="Telemetry enabled" Toggled="Telemetry_Toggled" Margin="20,0,0,0" 
+                                      ToolTip="Toggles telemetry data, which allows the developers to automatically receive basic information&#10;about your sessions and crash information, which is used to improve the product"
+                                      IsOn="{Binding Path=(modmanager:Settings.Telemetry)}"/>
+
+<!--<mah:ToggleSwitch Content="Show advanced file info" ToolTip="Shows advanced file information" IsOn="{Binding Path=(modmanager:Settings.ShowAdvancedFileInfo)}" Margin="20,0,0,0"/>-->
                 </StackPanel>
             </Expander>
             <Expander DockPanel.Dock="Top" IsExpanded="True" Expanded="Expander_Expanded">

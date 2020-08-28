@@ -177,17 +177,20 @@ namespace ALOTInstallerCore.Steps
             foreach (var f in installOptions.FilesToInstall)
             {
                 f.ResetBuildVars();
-                if (f.AlotVersionInfo.IsNotVersioned && AddonID < 0)
+                if (f.AlotVersionInfo.IsNotVersioned)
                 {
                     // First non-versioned file. Versioned files are always able to be overriden so
                     // first non versioned file will be first addon file (or user file).
-                    AddonID = buildID++; //Addon will install at this ID
+                    AddonID = ++buildID; //Addon will install at this ID
                 }
                 f.BuildID = buildID++;
                 f.StatusText = "Pending staging";
                 f.IsWaiting = true;
                 Log.Information($"{f.Filename}, Build ID {f.BuildID}");
             }
+
+            AddonID++; //Add one in case the final file was versioned
+            Log.Information($"The Addon will stage to build ID {AddonID}, if it needs to be built");
 
             int numDone = 0;
             int numToDo = installOptions.FilesToInstall.Count;
@@ -327,7 +330,7 @@ namespace ALOTInstallerCore.Steps
                     if (!archiveExtracted && !decompiled && installerFile is ManifestFile mfx && mfx.IsBackedByUnpacked())
                     {
                         // File must just be moved directly it seems
-                        var destF = Path.Combine(finalBuiltPackagesDestination, $"{installerFile.BuildID,3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
+                        var destF = Path.Combine(finalBuiltPackagesDestination, $"{installerFile.BuildID:D3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
 
                         if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory == new DriveInfo(finalBuiltPackagesDestination).RootDirectory)
                         {
@@ -415,7 +418,7 @@ namespace ALOTInstallerCore.Steps
                             if (Path.GetExtension(sf) == ".mem")
                             {
                                 // Can be staged directly
-                                var destF = Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID,3}_{stagedID}_{Path.GetFileName(sf)}");
+                                var destF = Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{Path.GetFileName(sf)}");
                                 Log.Information($"Moving prebuild .mem archive subfile to installation packages folder: {sf} -> {destF}");
                                 File.Move(sf, destF);
                                 stagedID++;
@@ -431,7 +434,7 @@ namespace ALOTInstallerCore.Steps
                         if (Directory.GetFiles(userFileBuildMemPath).Any())
                         {
                             // Requires build
-                            BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID,3}_{stagedID}_{uf.FriendlyName}.mem"), installOptions.InstallTarget.Game);
+                            BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{uf.FriendlyName}.mem"), installOptions.InstallTarget.Game);
                             stagedID++;
                         }
 
@@ -469,6 +472,7 @@ namespace ALOTInstallerCore.Steps
             if (Directory.GetFiles(addonStagingPath).Any())
             {
                 // Addon needs built
+
                 BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{AddonID:D3}_ALOTAddon.mem"), installOptions.InstallTarget.Game);
             }
 
@@ -625,7 +629,7 @@ namespace ALOTInstallerCore.Steps
                         if (zip.IsSelectedForInstallation())
                         {
                             string zipfile = Path.Combine(sourceDirectory, zip.InArchivePath);
-                            string stagedPath = Path.Combine(finalDest, $"{mf.BuildID,3}_{stagedID}_{Path.GetFileName(zip.InArchivePath)}");
+                            string stagedPath = Path.Combine(finalDest, $"{mf.BuildID:D3}_{stagedID}_{Path.GetFileName(zip.InArchivePath)}");
                             File.Move(zipfile, stagedPath);
                             zip.StagedPath = stagedPath;
                             stagedID++;
@@ -638,7 +642,7 @@ namespace ALOTInstallerCore.Steps
                         if (copy.IsSelectedForInstallation())
                         {
                             string singleFile = Path.Combine(sourceDirectory, copy.InArchivePath);
-                            string stagedPath = Path.Combine(finalDest, $"{mf.BuildID,3}_{stagedID}_{Path.GetFileName(copy.InArchivePath)}");
+                            string stagedPath = Path.Combine(finalDest, $"{mf.BuildID:D3}_{stagedID}_{Path.GetFileName(copy.InArchivePath)}");
                             File.Move(singleFile, stagedPath);
                             copy.StagedPath = stagedPath;
                             //copy.ID = stagedID; //still useful?
@@ -681,7 +685,7 @@ namespace ALOTInstallerCore.Steps
                     if (pf.MoveDirectly && extension == ".mem")
                     {
                         // Directly move .mem file to output
-                        var destinationF = Path.Combine(finalDest, $"{installerFile.BuildID,3}_{Path.GetFileName(pf.SourceName)}");
+                        var destinationF = Path.Combine(finalDest, $"{installerFile.BuildID:D3}_{Path.GetFileName(pf.SourceName)}");
                         Log.Information($"Moving .mem file to builtdir: {pf.SourceName} -> {destinationF}");
                         if (File.Exists(destinationF)) File.Delete(destinationF);
                         File.Move(matchingFile, destinationF);
@@ -757,6 +761,7 @@ namespace ALOTInstallerCore.Steps
                 }
             }
 
+            Log.Information($"Buildling MEM package {uiname} from {sourceDir}, output to {outputFile}");
             int exitcode = -1;
             MEMIPCHandler.RunMEMIPCUntilExit($"--convert-to-mem --gameid {targetGame.ToGameNum()} --input \"{sourceDir}\" --output \"{outputFile}\" --ipc",
                 null,

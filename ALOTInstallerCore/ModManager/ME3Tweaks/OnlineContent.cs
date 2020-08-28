@@ -53,13 +53,13 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 }
                 catch (Exception e)
                 {
-                    var attachments = new List<Crashes.ErrorAttachmentLog>();
+                    var attachments = new List<CoreCrashes.ErrorAttachmentLog>();
                     string log = LogCollector.CollectLatestLog(true);
                     if (log != null && log.Length < 1024 * 1024 * 7)
                     {
-                        attachments.Add(Crashes.ErrorAttachmentLog.AttachmentWithText(log, @"applog.txt"));
+                        attachments.Add(CoreCrashes.ErrorAttachmentLog.AttachmentWithText(log, @"applog.txt"));
                     }
-                    Crashes.TrackError3(e, new Dictionary<string, string>()
+                    CoreCrashes.TrackError3(e, new Dictionary<string, string>()
                     {
                         {@"Error type", @"Error reading cached online content" },
                         {@"Service", @"Basegame File Identification Service" },
@@ -132,13 +132,13 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 }
                 catch (Exception e)
                 {
-                    var attachments = new List<Crashes.ErrorAttachmentLog>();
+                    var attachments = new List<CoreCrashes.ErrorAttachmentLog>();
                     string log = LogCollector.CollectLatestLog(true);
                     if (log != null && log.Length < 1024 * 1024 * 7) // 7MB
                     {
-                        attachments.Add(Crashes.ErrorAttachmentLog.AttachmentWithText(log, "applog.txt"));
+                        attachments.Add(CoreCrashes.ErrorAttachmentLog.AttachmentWithText(log, "applog.txt"));
                     }
-                    Crashes.TrackError3(e, new Dictionary<string, string>()
+                    CoreCrashes.TrackError3(e, new Dictionary<string, string>()
                     {
                         {"Error type", "Error reading cached online content" },
                         {"Service", "Third Party Identification Service" },
@@ -266,7 +266,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             catch (Exception e)
             {
                 Log.Error("Exception trying to ensure static assets: " + e.Message);
-                Crashes.TrackError2(new Exception(@"Could not download static supporting files: " + e.Message), null);
+                CoreCrashes.TrackError2(new Exception(@"Could not download static supporting files: " + e.Message), null);
                 return false;
             }
 

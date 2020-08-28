@@ -248,3 +248,4 @@ ModelManifest.xml
 /AlotAddOnGUI/classes/APIKeysPrivate.cs
 /ALOTInstallerConsole/Deployment
 /ALOTInstallerWPF/Deployment
+/ALOTInstallerWPF/Telemetry/APIKeysPrivate.cs

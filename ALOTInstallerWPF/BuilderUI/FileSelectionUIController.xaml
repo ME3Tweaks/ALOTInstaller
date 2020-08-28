@@ -27,6 +27,7 @@
         <converters:FileCountConverter x:Key="FileCountConverter"/>
         <converters:BoolInverterConverter x:Key="BoolInverterConverter"/>
         <converters:ToggleEnabledVisibilityConverter x:Key="ToggleEnabledVisibilityConverter"/>
+        <converters:GameToLogoConverter x:Key="GameToLogoConverter"/>
 
         <Style x:Key="LinkLabel" TargetType="Button">
             <Setter Property="VerticalAlignment" Value="Top"/>
@@ -79,7 +80,9 @@
             </TabControl>
         </DockPanel>
         <DockPanel DockPanel.Dock="Top" Visibility="{Binding IsStaging, Converter={StaticResource BoolToVisibilityConverter}}">
-            <TextBlock Text="Preparing to install textures" FontWeight="Bold" TextAlignment="Center" FontSize="16" DockPanel.Dock="Top"/>
+            <TextBlock Text="Preparing to install textures for" FontWeight="Bold" TextAlignment="Center" FontSize="16" DockPanel.Dock="Top"/>
+            <Image DockPanel.Dock="Top" Source="{Binding StagingGame, Converter={StaticResource GameToLogoConverter}}" RenderOptions.BitmapScalingMode="HighQuality" Height="40" HorizontalAlignment="Center"/>
+
             <TextBlock Text="{Binding StagingStatusText}" TextAlignment="Center"/>
         </DockPanel>
 

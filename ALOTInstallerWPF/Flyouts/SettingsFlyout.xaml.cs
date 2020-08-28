@@ -36,7 +36,9 @@ namespace ALOTInstallerWPF.Flyouts
         public string ME2TextureInstallInfo { get; private set; }
         public string ME3TextureInstallInfo { get; private set; }
         public bool ShowGameMissingText { get; set; }
-        public ObservableCollectionExtended<ManifestTutorial> AllTutorials { get; } = new ObservableCollectionExtended<ManifestTutorial>();
+
+        public ObservableCollectionExtended<ManifestTutorial> AllTutorials { get; } =
+            new ObservableCollectionExtended<ManifestTutorial>();
 
 
         public SettingsFlyout()
@@ -47,6 +49,7 @@ namespace ALOTInstallerWPF.Flyouts
             {
                 AllTutorials.ReplaceAll(ManifestHandler.MasterManifest.Tutorials);
             }
+
             InitializeComponent();
 
         }
@@ -64,6 +67,7 @@ namespace ALOTInstallerWPF.Flyouts
         public GenericCommand LogsDiagnosticsCommand { get; set; }
         public GenericCommand OpenLODSwitcherCommand { get; set; }
         public RelayCommand OpenTutorialLinkCommand { get; set; }
+
         private void LoadCommands()
         {
             SetLibraryLocationCommand = new GenericCommand(ChangeLibraryLocation);
@@ -75,7 +79,8 @@ namespace ALOTInstallerWPF.Flyouts
             CleanupLibraryCommand = new GenericCommand(CleanupLibrary);
             CleanupBuildLocationCommand = new GenericCommand(CleanupBuildLocation);
             LogsDiagnosticsCommand = new GenericCommand(OpenDiagnosticsFlyout);
-            OpenLODSwitcherCommand = new GenericCommand(OpenLODSwitcher, () => Locations.GetAllAvailableTargets().Any());
+            OpenLODSwitcherCommand =
+                new GenericCommand(OpenLODSwitcher, () => Locations.GetAllAvailableTargets().Any());
             OpenTutorialLinkCommand = new RelayCommand(OpenTutorialLink);
 #if DEBUG
             DebugShowInstallerFlyoutCommand = new GenericCommand(() =>
@@ -95,7 +100,8 @@ namespace ALOTInstallerWPF.Flyouts
                 };
                 if (Application.Current.MainWindow is MainWindow mw)
                 {
-                    mw.OpenInstallerUI(iuic, InstallerUIController.GetInstallerBackgroundImage(game, ManifestHandler.CurrentMode), true);
+                    mw.OpenInstallerUI(iuic,
+                        InstallerUIController.GetInstallerBackgroundImage(game, ManifestHandler.CurrentMode), true);
                 }
             });
 #endif
@@ -137,6 +143,7 @@ namespace ALOTInstallerWPF.Flyouts
                     await mw.ShowMessageAsync("Error cleaning build directory", "The build directory does not exist.");
                     return;
                 }
+
                 NamedBackgroundWorker nbw = new NamedBackgroundWorker("CleanupBuildLocWorker");
                 var pd = await mw.ShowProgressAsync("Importing leftover files from build directory",
                     "Checking if any files in build directory need to be re-imported to library...");
@@ -169,6 +176,7 @@ namespace ALOTInstallerWPF.Flyouts
                     {
                         Utilities.DeleteFilesAndFoldersRecursively(d);
                     }
+
                     Application.Current.Dispatcher.Invoke(async () =>
                     {
                         await pd.CloseAsync();
@@ -187,14 +195,17 @@ namespace ALOTInstallerWPF.Flyouts
                 var unusedFilesInLib = TextureLibrary.GetUnusedFilesInLibrary();
                 if (unusedFilesInLib.Any())
                 {
-                    string message = "The following files located in the texture library are no longer used, or were moved into the texture library manually (and are not used), and can be safely deleted:\n";
+                    string message =
+                        "The following files located in the texture library are no longer used, or were moved into the texture library manually (and are not used), and can be safely deleted:\n";
                     List<string> sizedItems = new List<string>();
                     foreach (var v in unusedFilesInLib)
                     {
-                        sizedItems.Add($"{v} ({FileSizeFormatter.FormatSize(new FileInfo(Path.Combine(Settings.TextureLibraryLocation, v)).Length)})");
+                        sizedItems.Add(
+                            $"{v} ({FileSizeFormatter.FormatSize(new FileInfo(Path.Combine(Settings.TextureLibraryLocation, v)).Length)})");
                     }
 
-                    var result = await mw.ShowScrollMessageAsync("Irrelevant files found in texture library", message, "Delete these files?",
+                    var result = await mw.ShowScrollMessageAsync("Irrelevant files found in texture library", message,
+                        "Delete these files?",
                         sizedItems, MessageDialogStyle.AffirmativeAndNegative,
                         new MetroDialogSettings()
                         {
@@ -224,7 +235,8 @@ namespace ALOTInstallerWPF.Flyouts
                 }
                 else
                 {
-                    await mw.ShowMessageAsync("Texture Library is clean", "No unused files were found in the texture library.");
+                    await mw.ShowMessageAsync("Texture Library is clean",
+                        "No unused files were found in the texture library.");
                 }
             }
         }
@@ -242,41 +254,33 @@ namespace ALOTInstallerWPF.Flyouts
 
         private async void CheckVanilla(object obj)
         {
-            if (obj is string gameStr && Enum.TryParse<Enums.MEGame>(gameStr, out var game) && Application.Current.MainWindow is MainWindow mw)
+            if (obj is string gameStr && Enum.TryParse<Enums.MEGame>(gameStr, out var game) &&
+                Application.Current.MainWindow is MainWindow mw)
             {
                 var target = Locations.GetTarget(game);
                 if (target.GetInstalledALOTInfo() != null)
                 {
-                    await mw.ShowMessageAsync("Game is texture modded", "Unable to check the vanilla status of a game that has been texture modded, as all files will have been modified.");
+                    await mw.ShowMessageAsync("Game is texture modded",
+                        "Unable to check the vanilla status of a game that has been texture modded, as all files will have been modified.");
                     return;
                 }
-                var pd = await mw.ShowProgressAsync($"Verifying {game.ToGameName()}", "Please wait while your game is verified", true);
+
+                var pd = await mw.ShowProgressAsync($"Verifying {game.ToGameName()}",
+                    "Please wait while your game is verified", true);
                 CancellationTokenSource cts = new CancellationTokenSource();
-                pd.Canceled += (sender, args) =>
-                {
-                    cts.Cancel();
-                };
+                pd.Canceled += (sender, args) => { cts.Cancel(); };
                 List<string> nonVanillaFiles = new List<string>();
                 NamedBackgroundWorker nbw = new NamedBackgroundWorker("VerifyVanillaWorker");
                 nbw.DoWork += (a, b) => // MM CODE
-                    VanillaDatabaseService.ValidateTargetAgainstVanilla(target, f =>
-                        {
-                            nonVanillaFiles.Add(f);
-                        },
-                        su =>
-                        {
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                pd.SetMessage(su);
-                            });
-                        },
+                    VanillaDatabaseService.ValidateTargetAgainstVanilla(target, f => { nonVanillaFiles.Add(f); },
+                        su => { Application.Current.Dispatcher.Invoke(() => { pd.SetMessage(su); }); },
                         (done, total) =>
                         {
                             Application.Current.Dispatcher.Invoke(() =>
-                                {
-                                    pd.Maximum = total;
-                                    pd.SetProgress(done);
-                                });
+                            {
+                                pd.Maximum = total;
+                                pd.SetProgress(done);
+                            });
                         }
                         , true, cts.Token);
                 nbw.RunWorkerCompleted += async (a, b) =>
@@ -285,6 +289,7 @@ namespace ALOTInstallerWPF.Flyouts
                     {
                         await pd.CloseAsync();
                     }
+
                     if (!cts.IsCancellationRequested)
                     {
                         if (nonVanillaFiles.Any())
@@ -296,7 +301,8 @@ namespace ALOTInstallerWPF.Flyouts
                         }
                         else
                         {
-                            await mw.ShowMessageAsync($"{game.ToGameName()} appears vanilla", "This installation of the game does not appear to have any modified files.");
+                            await mw.ShowMessageAsync($"{game.ToGameName()} appears vanilla",
+                                "This installation of the game does not appear to have any modified files.");
                         }
                     }
                 };
@@ -310,6 +316,7 @@ namespace ALOTInstallerWPF.Flyouts
             {
                 return Locations.GetTarget(game) != null;
             }
+
             return false;
         }
 
@@ -339,7 +346,8 @@ namespace ALOTInstallerWPF.Flyouts
             if (selector.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 Settings.TextureLibraryLocation = selector.FileName;
-                TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetAllManifestFiles().OfType<InstallerFile>().ToList());
+                TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetAllManifestFiles().OfType<InstallerFile>()
+                    .ToList());
                 Settings.Save();
             }
         }
@@ -392,7 +400,8 @@ namespace ALOTInstallerWPF.Flyouts
 
         private async void performBackup(Enums.MEGame game, bool linkMode, MetroWindow mw)
         {
-            var pd = await mw.ShowProgressAsync($"{(linkMode ? "Linking" : "Creating")} backup of {game.ToGameName()}", "Checking game...");
+            var pd = await mw.ShowProgressAsync($"{(linkMode ? "Linking" : "Creating")} backup of {game.ToGameName()}",
+                "Checking game...");
             pd.SetIndeterminate();
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("BackupWorker");
             nbw.DoWork += (a, b) =>
@@ -431,7 +440,8 @@ namespace ALOTInstallerWPF.Flyouts
                                 }
                                 else
                                 {
-                                    invalidReason = "Game executable cannot possibly be located this close to root of volume";
+                                    invalidReason =
+                                        "Game executable cannot possibly be located this close to root of volume";
                                 }
 
                                 await pd.CloseAsync();
@@ -611,22 +621,8 @@ namespace ALOTInstallerWPF.Flyouts
                 if (result == MessageDialogResult.FirstAuxiliary) return; //Cancel
 
 
-                if (result == MessageDialogResult.FirstAuxiliary)
+                if (result == MessageDialogResult.Negative)
                 {
-                    //    var overwriteExistingGameConf = await mw.ShowMessageAsync($"Warning: Restoring {game.ToGameName()}",
-                    //        $"Restoring from backup will completely delete your game installation (your save files will remain intact), copy your backup into its place, and reset your texture settings to the defaults.\n\nGame path: {Locations.GetTarget(game).TargetPath}",
-                    //        MessageDialogStyle.AffirmativeAndNegative,
-                    //        new MetroDialogSettings()
-                    //        {
-                    //            AffirmativeButtonText = "Restore game",
-                    //            NegativeButtonText = "Don't restore game",
-                    //            DefaultButtonFocus = MessageDialogResult.Affirmative
-                    //        });
-                    //    if (overwriteExistingGameConf == MessageDialogResult.Negative)
-                    //        return;
-                    //}
-                    //else
-                    //{
                     destinationPath = null; //Force backend to prompt
                 }
             }
@@ -733,12 +729,13 @@ namespace ALOTInstallerWPF.Flyouts
             ((Expander)sender).BringIntoView();
         }
 
-        private bool isDecidingBetaMode;
+        private bool isDecidingToggleSetting;
 
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         private bool hasOpenedOnce = false;
+
         public void UpdateGameStatuses()
         {
             hasOpenedOnce = true;
@@ -799,10 +796,11 @@ namespace ALOTInstallerWPF.Flyouts
         {
             if (Application.Current.MainWindow is MainWindow mw)
             {
-                if (!isDecidingBetaMode && hasOpenedOnce && Settings.BetaMode)
+                if (!isDecidingToggleSetting && hasOpenedOnce && Settings.BetaMode)
                 {
-                    isDecidingBetaMode = true;
-                    var result = await mw.ShowMessageAsync("Switching to beta mode", $"Beta mode of {Utilities.GetAppPrefixedName()} Installer will restart the application and cause the following things to occur:\n - Updates to the application become mandatory\n - You will receive updates that are not yet approved for users in Stable mode\n - You will always download the latest version of MassEffectModderNoGui\n - You will use the beta version of the manifest, which may differ from the Stable one\n - You are expected to report feedback to the developers in the ALOT Discord if things don't work as expected\n - You are OK with a less stable experience\n\nSwitch to Beta mode?",
+                    isDecidingToggleSetting = true;
+                    var result = await mw.ShowMessageAsync("Switching to beta mode",
+                        $"Beta mode of {Utilities.GetAppPrefixedName()} Installer will restart the application and cause the following things to occur:\n - Updates to the application become mandatory\n - You will receive updates that are not yet approved for users in Stable mode\n - You will always download the latest version of MassEffectModderNoGui\n - You will use the beta version of the manifest, which may differ from the Stable one\n - You are expected to report feedback to the developers in the ALOT Discord if things don't work as expected\n - You are OK with a less stable experience\n\nSwitch to Beta mode?",
                         MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
                         {
                             AffirmativeButtonText = "Switch to Beta",
@@ -813,12 +811,31 @@ namespace ALOTInstallerWPF.Flyouts
                     {
                         Settings.BetaMode = false; //Turn back off
                     }
-                    else
+                    isDecidingToggleSetting = false;
+                }
+            }
+        }
+
+        private async void Telemetry_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                if (!isDecidingToggleSetting && hasOpenedOnce && !Settings.Telemetry)
+                {
+                    isDecidingToggleSetting = true;
+                    var result = await mw.ShowMessageAsync("Disabling telemetry",
+                        $"The developers of {Utilities.GetAppPrefixedName()} Installer use telemetry data to improve this product. This includes information such as install time, application crash reports, operating systems of users, file importing status, and other data points that help guide us to develop features that users will use or to improve different areas of the installer. Personally identifying information is not collected.\n\nTurn off application telemetry?",
+                        MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                        {
+                            AffirmativeButtonText = "Turn off telemetry",
+                            NegativeButtonText = "Leave telemetry on",
+                            DefaultButtonFocus = MessageDialogResult.Negative
+                        });
+                    if (result == MessageDialogResult.Negative)
                     {
-                        Settings.Save();
-                        // Todo: Restart application
+                        Settings.Telemetry = true; //turn back on
                     }
-                    isDecidingBetaMode = false;
+                    isDecidingToggleSetting = false;
                 }
             }
         }
