@@ -20,6 +20,7 @@ using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
+using Serilog;
 using Path = System.IO.Path;
 
 namespace ALOTInstallerWPF.Flyouts
@@ -56,7 +57,10 @@ namespace ALOTInstallerWPF.Flyouts
         public bool DiagnosticInProgress { get; set; }
         public bool ProgressIndeterminate { get; set; }
         public long ProgressValue { get; set; }
-        public string ResultingLogLink { get; set; }
+        /// <summary>
+        /// Result of the diagnostic. This on success will be a link, on failure will be text (not a link)
+        /// </summary>
+        public string DiagnosticResultText { get; set; }
         public string DiagnosticStatusText { get; set; }
         public string LogSelectorWatermark { get; set; }
 
@@ -71,6 +75,7 @@ namespace ALOTInstallerWPF.Flyouts
             if (LogFiles.IndexOf(UISelectedLogItem) == 0)
             {
                 LogSelectorWatermark = "Latest log";
+                return;
             }
 
             LogSelectorWatermark = "Older log";
@@ -87,7 +92,9 @@ namespace ALOTInstallerWPF.Flyouts
         public RelayCommand SelectGameCommand { get; set; }
         public GenericCommand ContinueFromLogSelectorCommand { get; set; }
         public GenericCommand BackCommand { get; set; }
+        public GenericCommand CopyLinkCommand { get; set; }
         public GenericCommand CloseDiagnosticsPanel { get; set; }
+        public GenericCommand ViewLogCommand { get; set; }
         public RelayCommand SetFullTextureCheckCommand { get; set; }
 
         public ObservableCollectionExtended<LogItem> LogFiles { get; } = new ObservableCollectionExtended<LogItem>();
@@ -100,6 +107,31 @@ namespace ALOTInstallerWPF.Flyouts
             BackCommand = new GenericCommand(GoBack, () => Step > 0 && Step != FINAL_STEP);
             CloseDiagnosticsPanel = new GenericCommand(CloseFlyout, () => !DiagnosticInProgress);
             SetFullTextureCheckCommand = new RelayCommand(ContinuePastFullTextureCheckStep);
+            CopyLinkCommand = new GenericCommand(CopyLink);
+            ViewLogCommand = new GenericCommand(ViewLink, LinkIsValid);
+        }
+
+        private void ViewLink()
+        {
+            if (DiagnosticResultText.StartsWith("http"))
+                Utilities.OpenWebPage(DiagnosticResultText);
+        }
+
+        private void CopyLink()
+        {
+            try
+            {
+                Clipboard.SetText(DiagnosticResultText);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Can't set text to clipboard: {e.Message}");
+            }
+        }
+
+        private bool LinkIsValid()
+        {
+            return DiagnosticResultText != null && DiagnosticResultText.StartsWith("http");
         }
 
         private void ContinuePastFullTextureCheckStep(object obj)
@@ -125,7 +157,7 @@ namespace ALOTInstallerWPF.Flyouts
         {
             UISelectedLogItem = null;
             LogChosen = null;
-            ResultingLogLink = null;
+            DiagnosticResultText = null;
             Step = 0;
             DiagnosticInProgress = DiagnosticComplete = false;
             LogFiles.ClearEx();
@@ -281,17 +313,11 @@ namespace ALOTInstallerWPF.Flyouts
                     ProgressIndeterminate = true;
                     var response = LogUploader.UploadLog(logUploadText.ToString(), "https://me3tweaks.com/alot/logupload3");
 
-
+                    DiagnosticResultText = response;
                     if (response.StartsWith("http"))
                     {
-                        ResultingLogLink = response;
                         Utilities.OpenWebPage(response);
                     }
-                    else
-                    {
-                        // Error uploading.
-                    }
-
                     DiagnosticComplete = true;
                     DiagnosticInProgress = false;
                 };

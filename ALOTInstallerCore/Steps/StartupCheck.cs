@@ -20,7 +20,8 @@ namespace ALOTInstallerCore.Steps
         /// <param name="messageCallback"></param>
         public static void PerformStartupCheck(Action<string, string> messageCallback)
         {
-
+            PerformRAMCheck(messageCallback);
+            PerformWriteCheck(messageCallback, true);
         }
 
         private static void PerformRAMCheck(Action<string, string> messageCallback)
@@ -81,7 +82,7 @@ namespace ALOTInstallerCore.Steps
 #endif
         }
 
-        private static bool PerformWriteCheck(bool required)
+        private static bool PerformWriteCheck(Action<string, string> messageCallback, bool required)
         {
             Log.Information("Performing write check on all game directories...");
             var targets = Locations.GetAllAvailableTargets();
@@ -159,20 +160,17 @@ namespace ALOTInstallerCore.Steps
                         //{
                         //    message += "\nRegistry: HKLM\\SOFTWARE\\WOW6432Node\\AGEIA Technologies (Fixes an ME1 launch issue)";
                         //}
-
-                        //await this.ShowMessageAsync("Granting permissions to Mass Effect directories", message);
+                        messageCallback?.Invoke("Write permissions required for modding", message);
                         //string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
                         int result = Utilities.RunProcess(permissionsGranterExe, args, true, true, true, true);
                         if (result == 0)
                         {
-                            Log.Information(
-                                "Elevated process returned code 0, directories are hopefully writable now.");
+                            Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
                             return true;
                         }
                         else
                         {
-                            Log.Error("Elevated process returned code " + result +
-                                      ", directories probably aren't writable.");
+                            Log.Error($"Elevated process returned code {result}, directories probably aren't writable.");
                             return false;
                         }
                     }

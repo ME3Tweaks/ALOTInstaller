@@ -9,6 +9,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects.Manifest;
+using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Objects;
 using ALOTInstallerWPF.Telemetry;
@@ -139,6 +140,27 @@ namespace ALOTInstallerWPF.BuilderUI
                         TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(v.Key));
                     }
                 }
+
+                pd.SetMessage("Performing startup checks");
+                StartupCheck.PerformStartupCheck((title, message) =>
+                {
+                    object o = new object();
+                    Application.Current.Dispatcher.Invoke(async () =>
+                    {
+                        if (Application.Current.MainWindow is MainWindow mw)
+                        {
+                            await mw.ShowMessageAsync(title, message);
+                            lock (o)
+                            {
+                                Monitor.Pulse(o);
+                            }
+                        }
+                    });
+                    lock (o)
+                    {
+                        Monitor.Wait(o);
+                    }
+                });
 
 
                 pd.SetMessage("Preparing interface");

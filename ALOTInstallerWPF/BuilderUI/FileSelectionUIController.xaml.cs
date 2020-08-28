@@ -439,6 +439,7 @@ namespace ALOTInstallerWPF.BuilderUI
         public bool ProgressIndeterminate { get; set; }
         public long ProgressMax { get; set; }
         public long ProgressValue { get; set; }
+        public Enums.MEGame StagingGame { get; set; }
 
         /// <summary>
         /// Gets if this is a file or directory. Returns null if path doesn't exist. False if it's a file. True if it's a directory.

@@ -26,6 +26,7 @@ namespace ALOTInstallerWPF.BuilderUI
         {
             this.iop = iop;
             this.fsuic = fsuic;
+            fsuic.StagingGame = iop.InstallTarget.Game;
             fsuic.IsStaging = true;
             NamedBackgroundWorker builderWorker = new NamedBackgroundWorker("BuilderWorker");
             StageStep ss = new StageStep(iop, builderWorker)
