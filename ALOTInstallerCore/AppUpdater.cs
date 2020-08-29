@@ -39,7 +39,7 @@ namespace ALOTInstallerCore
             Action progressIndeterminateCallback,
             Action<string, string> showMessageCallback,
             Action notifyBetaAvailable,
-            CancellationToken cancellationToken)
+            CancellationTokenSource cancellationTokenSource)
         {
 #if APPUPDATESUPPORT
             Log.Information("Checking for application updates from gitub");
@@ -145,7 +145,7 @@ namespace ALOTInstallerCore
                                 // First here should be OK since we checked it above...
                                 var asset = latest.Assets.First(x => x.Name.StartsWith(assetPrefix));
                                 var downloadResult = await OnlineContent.DownloadToMemory(asset.BrowserDownloadUrl, progressCallback,
-                                    logDownload: true, cancellationToken: cancellationToken);
+                                    logDownload: true, cancellationTokenSource: cancellationTokenSource);
                                 if (downloadResult.result == null & downloadResult.errorMessage == null)
                                 {
                                     // Canceled

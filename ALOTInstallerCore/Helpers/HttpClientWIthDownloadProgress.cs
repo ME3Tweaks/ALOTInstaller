@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace ALOTInstallerCore.Helpers
 {
@@ -25,25 +26,25 @@ namespace ALOTInstallerCore.Helpers
 
         public event ProgressChangedHandler ProgressChanged;
 
-        public HttpClientDownloadWithProgress(string downloadUrl, string destinationFilePath, CancellationToken cancellationToken = default)
+        public HttpClientDownloadWithProgress(string downloadUrl, string destinationFilePath, CancellationTokenSource cancellationToken = null)
         {
             _downloadUrl = downloadUrl;
             _destinationFilePath = destinationFilePath;
-            this.cancellationToken = cancellationToken;
+            this.cancellationToken = cancellationToken.Token;
         }
 
-        public HttpClientDownloadWithProgress(string downloadUrl, Stream outputStream, CancellationToken cancellationToken = default)
+        public HttpClientDownloadWithProgress(string downloadUrl, Stream outputStream, CancellationTokenSource cancellationToken = null)
         {
             _downloadUrl = downloadUrl;
             _outStream = outputStream;
-            this.cancellationToken = cancellationToken;
+            this.cancellationToken = cancellationToken.Token;
         }
 
         public async Task StartDownload()
         {
             _httpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(5) };
 
-            using var response = await _httpClient.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+            using var response = await _httpClient.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead);
             await DownloadFileFromHttpResponseMessage(response, _outStream);
         }
 
@@ -70,7 +71,7 @@ namespace ALOTInstallerCore.Helpers
                     FileShare.None, 8192, true);
                 do
                 {
-                    var bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length);
+                    var bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
                     if (bytesRead == 0)
                     {
                         isMoreToRead = false;
@@ -78,7 +79,7 @@ namespace ALOTInstallerCore.Helpers
                         continue;
                     }
 
-                    await fileStream.WriteAsync(buffer, 0, bytesRead);
+                    await fileStream.WriteAsync(buffer, 0, bytesRead, cancellationToken);
 
                     totalBytesRead += bytesRead;
                     readCount += 1;
@@ -86,6 +87,10 @@ namespace ALOTInstallerCore.Helpers
                     if (readCount % 100 == 0)
                         TriggerProgressChanged(totalDownloadSize, totalBytesRead);
                 } while (isMoreToRead);
+            }
+            catch (OperationCanceledException)
+            {
+                Log.Warning("Download canceled");
             }
             finally
             {

@@ -314,12 +314,16 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         /// <param name="hash">Hash check value (md5). Leave null if no hash check</param>
         /// <returns></returns>
 
-        public async static Task<(MemoryStream result, string errorMessage)> DownloadToMemory(string url, Action<long, long> progressCallback = null, string hash = null, bool logDownload = false, CancellationToken cancellationToken = default)
+        public async static Task<(MemoryStream result, string errorMessage)> DownloadToMemory(string url,
+            Action<long, long> progressCallback = null,
+            string hash = null,
+            bool logDownload = false,
+            CancellationTokenSource cancellationTokenSource = default)
         {
             MemoryStream responseStream = new MemoryStream();
             string downloadError = null;
 
-            using var wc = new HttpClientDownloadWithProgress(url, responseStream, cancellationToken);
+            using var wc = new HttpClientDownloadWithProgress(url, responseStream, cancellationTokenSource);
             wc.ProgressChanged += (totalFileSize, totalBytesDownloaded, progressPercentage) =>
             {
                 progressCallback?.Invoke(totalBytesDownloaded, totalFileSize ?? 0);
@@ -334,26 +338,21 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 Debug.WriteLine("Downloading to memory: " + url);
             }
 
-            try
+
+            wc.StartDownload().Wait();
+            if (cancellationTokenSource != null && cancellationTokenSource.Token.IsCancellationRequested)
             {
-                wc.StartDownload().Wait();
-            }
-            catch (OperationCanceledException oce)
-            {
-                Log.Information("Download canceled");
                 return (null, null);
             }
 
-            if (hash != null)
+            if (hash == null) return (responseStream, downloadError);
+            var md5 = Utilities.CalculateMD5(responseStream);
+            responseStream.Position = 0;
+            if (md5 != hash)
             {
-                var md5 = Utilities.CalculateMD5(responseStream);
-                responseStream.Position = 0;
-                if (md5 != hash)
-                {
-                    responseStream = null;
-                    downloadError =
-                        $"Hash of downloaded item ({url}) does not match expected hash. Expected: {hash}, got: {md5}"; //needs localized
-                }
+                responseStream = null;
+                downloadError =
+                    $"Hash of downloaded item ({url}) does not match expected hash. Expected: {hash}, got: {md5}"; //needs localized
             }
 
             //try

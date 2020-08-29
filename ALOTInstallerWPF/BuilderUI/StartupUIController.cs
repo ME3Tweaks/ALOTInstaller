@@ -182,7 +182,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     {
                         App.BetaAvailable = true;
                     }, 
-                    ct.Token
+                    ct
                 );
 
                 // If user aborts download
