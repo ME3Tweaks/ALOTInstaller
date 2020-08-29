@@ -37,14 +37,14 @@ namespace MassEffectModManagerCore.modmanager.asi
         /// </summary>
         public static void LoadManifest(bool forceLocal = false)
         {
-            Log.Information(@"Loading ASI Manager manifest");
+            Log.Information(@"[AICORE] Loading ASI Manager manifest");
             try
             {
                 internalLoadManifest(forceLocal);
             }
             catch (Exception e)
             {
-                Log.Error($@"Error loading ASI manifest: {e.Message}");
+                Log.Error($@"[AICORE] Error loading ASI manifest: {e.Message}");
             }
         }
 
@@ -66,7 +66,7 @@ namespace MassEffectModManagerCore.modmanager.asi
                 }
                 catch (Exception e)
                 {
-                    Log.Error(@"Error writing cached ASI manifest to disk: " + e.Message);
+                    Log.Error(@"[AICORE] Error writing cached ASI manifest to disk: " + e.Message);
                 }
 
                 try
@@ -75,20 +75,20 @@ namespace MassEffectModManagerCore.modmanager.asi
                 }
                 catch (Exception e)
                 {
-                    Log.Error(@"Error parsing online manifest: " + e.Message);
+                    Log.Error(@"[AICORE] Error parsing online manifest: " + e.Message);
                     internalLoadManifest(true); //force local load instead
                 }
             }
             else if (File.Exists(ManifestLocation))
             {
-                Log.Information(@"Loading ASI local manifest");
+                Log.Information(@"[AICORE] Loading ASI local manifest");
                 LoadManifestFromDisk(ManifestLocation, false);
             }
             else
             {
                 //can't get manifest or local manifest.
                 //Todo: some sort of handling here as we are running in panel startup
-                Log.Error(@"Cannot load ASI manifest: Could not fetch online manifest and no local manifest exists");
+                Log.Error(@"[AICORE] Cannot load ASI manifest: Could not fetch online manifest and no local manifest exists");
             }
         }
 
@@ -260,13 +260,13 @@ namespace MassEffectModManagerCore.modmanager.asi
         public static bool InstallASIToTarget(ASIModVersion asi, GameTarget target, bool? forceSource = null)
         {
             if (asi.Game != target.Game) throw new Exception($@"ASI {asi.Name} cannot be installed to game {target.Game}");
-            Log.Information($@"Processing ASI installation request: {asi.Name} v{asi.Version} -> {target.TargetPath}");
+            Log.Information(@"[AICORE] Processing ASI installation request: {asi.Name} v{asi.Version} -> {target.TargetPath}");
             string destinationFilename = $@"{asi.InstalledPrefix}-v{asi.Version}.asi";
             string cachedPath = Path.Combine(CachedASIsFolder, destinationFilename);
             string destinationDirectory = MEDirectories.ASIPath(target);
             if (!Directory.Exists(destinationDirectory))
             {
-                Log.Information(@"Creating ASI directory in game: " + destinationDirectory);
+                Log.Information(@"[AICORE] Creating ASI directory in game: " + destinationDirectory);
                 Directory.CreateDirectory(destinationDirectory);
             }
             string finalPath = Path.Combine(destinationDirectory, destinationFilename);
@@ -280,11 +280,11 @@ namespace MassEffectModManagerCore.modmanager.asi
                 {
                     if (v.Hash == asi.Hash && !forceSource.HasValue && !hasExistingVersionOfModInstalled) //If we are forcing a source, we should always install. Delete duplicates past the first one
                     {
-                        Log.Information($@"{v.AssociatedManifestItem.Name} is already installed. We will not remove the existing correct installed ASI for this install request");
+                        Log.Information(@"[AICORE] {v.AssociatedManifestItem.Name} is already installed. We will not remove the existing correct installed ASI for this install request");
                         hasExistingVersionOfModInstalled = true;
                         continue; //Don't delete this one. We are already installed. There is no reason to install it again.
                     }
-                    Log.Information($@"Deleting existing ASI from same group: {v.InstalledPath}");
+                    Log.Information(@"[AICORE] Deleting existing ASI from same group: {v.InstalledPath}");
                     v.Uninstall();
                 }
             }
@@ -311,10 +311,10 @@ namespace MassEffectModManagerCore.modmanager.asi
                 md5 = Utilities.CalculateMD5(cachedPath);
                 if (md5 == asi.Hash)
                 {
-                    Log.Information($@"Copying ASI from cached library to destination: {cachedPath} -> {finalPath}");
+                    Log.Information(@"[AICORE] Copying ASI from cached library to destination: {cachedPath} -> {finalPath}");
 
                     File.Copy(cachedPath, finalPath, true);
-                    Log.Information($@"Installed ASI to {finalPath}");
+                    Log.Information(@"[AICORE] Installed ASI to {finalPath}");
                     CoreAnalytics.TrackEvent(@"Installed ASI", new Dictionary<string, string>() {
                                 { @"Filename", Path.GetFileNameWithoutExtension(finalPath)}
                             });
@@ -325,7 +325,7 @@ namespace MassEffectModManagerCore.modmanager.asi
             if (!forceSource.HasValue || forceSource.Value)
             {
                 WebRequest request = WebRequest.Create(asi.DownloadLink);
-                Log.Information(@"Fetching remote ASI from server");
+                Log.Information(@"[AICORE] Fetching remote ASI from server");
 
                 using WebResponse response = request.GetResponse();
                 var memoryStream = new MemoryStream();
@@ -335,13 +335,13 @@ namespace MassEffectModManagerCore.modmanager.asi
                 if (md5 != asi.Hash)
                 {
                     //ERROR!
-                    Log.Error(@"Downloaded ASI did not match the manifest! It has the wrong hash.");
+                    Log.Error(@"[AICORE] Downloaded ASI did not match the manifest! It has the wrong hash.");
                     return false;
                 }
 
-                Log.Information(@"Fetched remote ASI from server. Installing ASI to " + finalPath);
+                Log.Information(@"[AICORE] Fetched remote ASI from server. Installing ASI to " + finalPath);
                 memoryStream.WriteToFile(finalPath);
-                Log.Information(@"ASI successfully installed.");
+                Log.Information(@"[AICORE] ASI successfully installed.");
                 CoreAnalytics.TrackEvent?.Invoke(@"Installed ASI", new Dictionary<string, string>()
                 {
                     {@"Filename", Path.GetFileNameWithoutExtension(finalPath)}
@@ -350,11 +350,11 @@ namespace MassEffectModManagerCore.modmanager.asi
                 //Cache ASI
                 if (!Directory.Exists(CachedASIsFolder))
                 {
-                    Log.Information(@"Creating cached ASIs folder");
+                    Log.Information(@"[AICORE] Creating cached ASIs folder");
                     Directory.CreateDirectory(CachedASIsFolder);
                 }
 
-                Log.Information(@"Caching ASI to local ASI library: " + cachedPath);
+                Log.Information(@"[AICORE] Caching ASI to local ASI library: " + cachedPath);
                 memoryStream.WriteToFile(cachedPath);
                 return true;
             }
@@ -386,7 +386,7 @@ namespace MassEffectModManagerCore.modmanager.asi
             if (group == null)
             {
                 // Cannot find ASI!
-                Log.Error($@"Cannot find ASI with update group ID {updateGroup} for game {gameTarget.Game}");
+                Log.Error($@"[AICORE] Cannot find ASI with update group ID {updateGroup} for game {gameTarget.Game}");
                 return false;
             }
 
@@ -395,7 +395,7 @@ namespace MassEffectModManagerCore.modmanager.asi
             //var dlcModEnabler = asigame.ASIModUpdateGroups.FirstOrDefault(x => x.UpdateGroupId == updateGroup); //DLC mod enabler is group 16
             //if (dlcModEnabler != null)
             //{
-            //    Log.Information($"Installing {nameForLogging} ASI");
+            //    Log.Information($"[AICORE] Installing {nameForLogging} ASI");
             //    var asiLockObject = new object();
 
             //    void asiInstalled()
@@ -417,7 +417,7 @@ namespace MassEffectModManagerCore.modmanager.asi
             //}
             //else
             //{
-            //    Log.Error($"Could not install {nameForLogging} ASI!!");
+            //    Log.Error($"[AICORE] Could not install {nameForLogging} ASI!!");
             //}
         }
 

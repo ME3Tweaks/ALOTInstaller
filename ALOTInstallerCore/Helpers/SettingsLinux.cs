@@ -205,8 +205,8 @@ namespace ALOTInstallerCore.Helpers
             }
             catch (Exception e)
             {
-                Log.Error("Error reading settings.ini file: " + e.Message);
-                Log.Error("ALOTInstallerCore will use the defaults instead");
+                Log.Error("[AICORE] Error reading settings.ini file: " + e.Message);
+                Log.Error("[AICORE] ALOTInstallerCore will use the defaults instead");
             }
 
 
@@ -364,12 +364,12 @@ namespace ALOTInstallerCore.Helpers
             }
             catch (UnauthorizedAccessException uae)
             {
-                Log.Error($"Unauthorized access exception: {uae.Flatten()}");
+                Log.Error($"[AICORE] Unauthorized access exception: {uae.Flatten()}");
                 return SettingsSaveResult.FAILED_UNAUTHORIZED;
             }
             catch (Exception e)
             {
-                Log.Error($"Error commiting settings: {e.Flatten()}");
+                Log.Error($"[AICORE] Error commiting settings: {e.Flatten()}");
             }
 
             return SettingsSaveResult.FAILED_OTHER;

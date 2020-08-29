@@ -40,11 +40,11 @@ namespace ALOTInstallerCore
             StringBuilder sb = new StringBuilder();
             var ci = new ComputerInfo();
 
-            Log.Information($"Operating system: {ci.OSFullName}");
+            Log.Information($"[AICORE] Operating system: {ci.OSFullName}");
             //sb.AppendLine("Version " + osBuildVersion);
             //sb.AppendLine(GetCPUString());
-            Log.Information("System Memory: " + FileSizeFormatter.FormatSize(ci.TotalPhysicalMemory));
-            Log.Information($"System Culture: {ci.InstalledUICulture.Name}");
+            Log.Information("[AICORE] System Memory: " + FileSizeFormatter.FormatSize(ci.TotalPhysicalMemory));
+            Log.Information($"[AICORE] System Culture: {ci.InstalledUICulture.Name}");
             //+ Thread.CurrentThread.CurrentCulture.Name);
             //return sb.ToString();
 
@@ -67,7 +67,7 @@ namespace ALOTInstallerCore
 
         internal static MemoryStream ExtractInternalFileToStream(string internalResourceName)
         {
-            Log.Information("Extracting embedded file: " + internalResourceName + " to memory");
+            Log.Information("[AICORE] Extracting embedded file: " + internalResourceName + " to memory");
 #if DEBUG
             var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
 #endif
@@ -87,7 +87,7 @@ namespace ALOTInstallerCore
         /// <returns></returns>
         internal static string ExtractInternalFile(string internalResourceName, string destination, bool overwrite)
         {
-            Log.Information("Extracting embedded file: " + internalResourceName + " to " + destination);
+            Log.Information("[AICORE] Extracting embedded file: " + internalResourceName + " to " + destination);
 #if DEBUG
             var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
 #endif
@@ -113,7 +113,7 @@ namespace ALOTInstallerCore
             }
             else
             {
-                Log.Warning("File already exists. Not overwriting file.");
+                Log.Warning("[AICORE] File already exists. Not overwriting file.");
             }
 
             return destination;
@@ -181,8 +181,8 @@ namespace ALOTInstallerCore
             }
             catch (Exception e)
             {
-                Log.Error("Error checking permissions to folder: " + dir);
-                Log.Error("Directory write test had error that was not UnauthorizedAccess: " + e.Message);
+                Log.Error("[AICORE] Error checking permissions to folder: " + dir);
+                Log.Error("[AICORE] Directory write test had error that was not UnauthorizedAccess: " + e.Message);
             }
             return false;
         }
@@ -260,7 +260,7 @@ namespace ALOTInstallerCore
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Unable to delete file: " + file + ". It may be open still: " + e.Message);
+                    Log.Error("[AICORE] Unable to delete file: " + file + ". It may be open still: " + e.Message);
                     return false;
                 }
             }
@@ -273,12 +273,12 @@ namespace ALOTInstallerCore
             Thread.Sleep(4); // This makes the difference between whether it works or not. Sleep(0) is not enough.
             try
             {
-                Log.Information($"Deleting directory {target_dir}");
+                Log.Information($"[AICORE] Deleting directory {target_dir}");
                 Directory.Delete(target_dir);
             }
             catch (Exception e)
             {
-                Log.Error("Unable to delete directory: " + target_dir + ". It may be open still. " + e.Message);
+                Log.Error("[AICORE] Unable to delete directory: " + target_dir + ". It may be open still. " + e.Message);
                 return false;
             }
             return result;
@@ -288,7 +288,7 @@ namespace ALOTInstallerCore
         {
             if (!File.Exists(filename))
             {
-                Log.Error($"Cannot hash file that doesn't exist: {filename}");
+                Log.Error($"[AICORE] Cannot hash file that doesn't exist: {filename}");
                 return null;
             }
 
@@ -301,8 +301,8 @@ namespace ALOTInstallerCore
             }
             catch (IOException e)
             {
-                Log.Error("I/O ERROR CALCULATING CHECKSUM OF FILE: " + filename);
-                Log.Error(e.Flatten());
+                Log.Error("[AICORE] I/O ERROR CALCULATING CHECKSUM OF FILE: " + filename);
+                Log.Error($"[AICORE] {e.Flatten()}");
                 return null;
             }
         }
@@ -365,13 +365,13 @@ namespace ALOTInstallerCore
         //                        else
         //                        {
         //                            compatKey.SetValue(gamePath, newcompatString);
-        //                            Log.Information("New stripped compatibility string: " + newcompatString);
+        //                            Log.Information("[AICORE] New stripped compatibility string: " + newcompatString);
         //                        }
         //                    }
         //                    else
         //                    {
         //                        compatKey.DeleteValue(gamePath);
-        //                        Log.Information("Removed compatibility settings for ME1.");
+        //                        Log.Information("[AICORE] Removed compatibility settings for ME1.");
         //                    }
         //                }
         //            }
@@ -422,7 +422,7 @@ namespace ALOTInstallerCore
 
             if (requireAdmin)
             {
-                Log.Information($"Running process as admin: {exe} {argsStr}");
+                Log.Information($"[AICORE] Running process as admin: {exe} {argsStr}");
                 //requires elevation
                 using (Process p = new Process())
                 {
@@ -443,7 +443,7 @@ namespace ALOTInstallerCore
             }
             else
             {
-                Log.Information($"Running process: {exe} {argsStr}");
+                Log.Information($"[AICORE] Running process: {exe} {argsStr}");
                 try
                 {
                     using (Process p = new Process())
@@ -464,10 +464,10 @@ namespace ALOTInstallerCore
                 }
                 catch (Win32Exception w32e)
                 {
-                    Log.Warning("Win32 exception running process: " + w32e.ToString());
+                    Log.Warning("[AICORE] Win32 exception running process: " + w32e.ToString());
                     if (w32e.NativeErrorCode == 740 && allowReattemptAsAdmin)
                     {
-                        Log.Information("Attempting relaunch with administrative rights.");
+                        Log.Information("[AICORE] Attempting relaunch with administrative rights.");
                         //requires elevation
                         using (Process p = new Process())
                         {
@@ -509,17 +509,17 @@ namespace ALOTInstallerCore
         //                    {
         //                        fs.SeekEnd();
         //                        fs.WriteStringASCII(App.MEMendFileMarker);
-        //                        Log.Information("Re-tagged file with ALOT Marker");
+        //                        Log.Information("[AICORE] Re-tagged file with ALOT Marker");
         //                    }
         //                    else
         //                    {
-        //                        Log.Information("File already tagged with ALOT marker, skipping re-tagging");
+        //                        Log.Information("[AICORE] File already tagged with ALOT marker, skipping re-tagging");
         //                    }
         //                }
         //            }
         //            catch
         //            {
-        //                Log.Error("Failed to tag file with ALOT marker!");
+        //                Log.Error("[AICORE] Failed to tag file with ALOT marker!");
         //            }
         //#endif
         //        }
@@ -543,7 +543,7 @@ namespace ALOTInstallerCore
             catch (UnauthorizedAccessException uae)
             {
                 //Must have admin rights.
-                Log.Information("We need admin rights to create this directory");
+                Log.Information("[AICORE] We need admin rights to create this directory");
 
 #if WINDOWS
                 string exe = Locations.GetCachedExecutable("PermissionsGranter.exe");
@@ -553,9 +553,9 @@ namespace ALOTInstallerCore
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Error extracting PermissionsGranter.exe: " + e.Message);
+                    Log.Error("[AICORE] Error extracting PermissionsGranter.exe: " + e.Message);
 
-                    Log.Information("Retrying with appdata temp directory instead.");
+                    Log.Information("[AICORE] Retrying with appdata temp directory instead.");
                     try
                     {
                         exe = Path.Combine(Path.GetTempPath(), "PermissionsGranter");
@@ -563,7 +563,7 @@ namespace ALOTInstallerCore
                     }
                     catch (Exception ex)
                     {
-                        Log.Error("Retry failed! Unable to make this directory writable due to inability to extract PermissionsGranter.exe. Reason: " + ex.Message);
+                        Log.Error("[AICORE] Retry failed! Unable to make this directory writable due to inability to extract PermissionsGranter.exe. Reason: " + ex.Message);
                         return false;
                     }
                 }
@@ -574,12 +574,12 @@ namespace ALOTInstallerCore
                     int result = Utilities.RunProcess(exe, args, waitForProcess: true, requireAdmin: true, noWindow: true);
                     if (result == 0)
                     {
-                        Log.Information("Elevated process returned code 0, restore directory is hopefully writable now.");
+                        Log.Information("[AICORE] Elevated process returned code 0, restore directory is hopefully writable now.");
                         return true;
                     }
                     else
                     {
-                        Log.Error("Elevated process returned code " + result + ", directory likely is not writable");
+                        Log.Error("[AICORE] Elevated process returned code " + result + ", directory likely is not writable");
                         return false;
                     }
                 }
@@ -594,7 +594,7 @@ namespace ALOTInstallerCore
                         }
                     }
 
-                    Log.Error("Error creating directory with PermissionsGranter: " + e.Message);
+                    Log.Error("[AICORE] Error creating directory with PermissionsGranter: " + e.Message);
                     return false;
 
                 }
@@ -612,7 +612,7 @@ namespace ALOTInstallerCore
         //            string path = MainWindow.BINARY_DIRECTORY + "7z.exe";
         //            string args = "l \"" + archive + "\"";
 
-        //            Log.Information("Running 7z archive inspector process: 7z " + args);
+        //            Log.Information("[AICORE] Running 7z archive inspector process: 7z " + args);
         //            ConsoleApp ca = new ConsoleApp(path, args);
         //            int startindex = 0;
         //            List<string> files = new List<string>();
@@ -647,7 +647,7 @@ namespace ALOTInstallerCore
 
         public static void TurnOffOriginAutoUpdate()
         {
-            Log.Information("Attempting to disable auto update support in Origin");
+            Log.Information("[AICORE] Attempting to disable auto update support in Origin");
             string appdatapath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Origin");
             if (Directory.Exists(appdatapath))
             {
@@ -677,22 +677,22 @@ namespace ALOTInstallerCore
                         attr.Value = "AutoPatch";
                         SetAttrSafe(node, attr);
                         xmlDoc.Save(configfile);
-                        Log.Information("Updated file with autopatch off: " + configfile);
+                        Log.Information("[AICORE] Updated file with autopatch off: " + configfile);
                     }
                     catch (Exception e)
                     {
-                        Log.Error("Unable to turn off origin in game for file " + configfile + ": " + e.Message);
+                        Log.Error("[AICORE] Unable to turn off origin in game for file " + configfile + ": " + e.Message);
                     }
                 }
             }
             else
             {
-                Log.Warning("Origin folder does not exist: " + appdatapath);
+                Log.Warning("[AICORE] Origin folder does not exist: " + appdatapath);
             }
         }
         //public static void TurnOffOriginAutoUpdateForGame(int game)
         //{
-        //    Log.Information("Attempting to disable auto update support for game: " + game);
+        //    Log.Information("[AICORE] Attempting to disable auto update support for game: " + game);
         //    string gamePath = GetGamePath(game);
         //    if (gamePath != null && Directory.Exists(gamePath))
         //    {
@@ -738,7 +738,7 @@ namespace ALOTInstallerCore
         //        }
         //        else
         //        {
-        //            Log.Information("Installer manifest does not exist. This does not appear to be an origin installation. Skipping this step");
+        //            Log.Information("[AICORE] Installer manifest does not exist. This does not appear to be an origin installation. Skipping this step");
         //        }
         //    }
         //}

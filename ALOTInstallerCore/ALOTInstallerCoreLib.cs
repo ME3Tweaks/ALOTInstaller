@@ -36,9 +36,19 @@ namespace ALOTInstallerCore
                 Log.Information("[AICORE] Telemetry callback being invoked (if any is set)");
                 startTelemetryCallback?.Invoke();
             }
-            Log.Information("[AICORE] Loading targets and locations");
 
-            Locations.LoadLocations();
+            
+        }
+
+        /// <summary>
+        /// This is a continuation of the startup for the library. This method should be called after Startup() and any critical work is done, such as checkingk for updates. The
+        /// rest of the library should not load until the update check is done as it may be the source of a crash the update is designed to fix
+        /// </summary>
+        public static void PostCriticalStartup(Action<Action> runOnUiThreadCallback)
+        {
+            Log.Information("[AICORE] Loading game targets");
+
+            Locations.LoadTargets();
             Log.Information("[AICORE] Starting backup service");
 
             BackupService.InitBackupService(runOnUiThreadCallback);

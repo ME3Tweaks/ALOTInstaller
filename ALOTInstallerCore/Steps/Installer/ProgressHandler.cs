@@ -46,7 +46,7 @@ namespace ALOTInstallerCore.Steps.Installer
             }
             else
             {
-                Log.Error("Error adding stage for progress: " + stagename + ". Could not find stage in weighting system.");
+                Log.Error("[AICORE] Error adding stage for progress: " + stagename + ". Could not find stage in weighting system.");
             }
         }
 
@@ -66,7 +66,7 @@ namespace ALOTInstallerCore.Steps.Installer
 
                 return true;
             }
-            Log.Information("Transitioning to " + stageName);
+            Log.Information("[AICORE] Transitioning to " + stageName);
             if (CurrentStage != null)
             {
                 CurrentStage.Progress = 100;
@@ -75,7 +75,7 @@ namespace ALOTInstallerCore.Steps.Installer
             CurrentStage = Stages.FirstOrDefault(x => x.StageName == stageName);
             if (CurrentStage == null)
             {
-                Log.Error("Unknown stage: " + stageName);
+                Log.Error("[AICORE] Unknown stage: " + stageName);
             }
 
             return false;

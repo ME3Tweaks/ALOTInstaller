@@ -134,7 +134,7 @@ namespace ALOTInstallerCore.ModManager.Services
                 }
                 else
                 {
-                    //Log.Error($@"Could not find basegame file in backup for {game}: {file}");
+                    //Log.Error($@"[AICORE] Could not find basegame file in backup for {game}: {file}");
                 }
             }
             else
@@ -149,7 +149,7 @@ namespace ALOTInstallerCore.ModManager.Services
                 else
                 {
                     //ambiguous or file not found
-                    Log.Error($@"Could not find basegame file (or found multiple) in backup for {game}: {filename}");
+                    Log.Error($@"[AICORE] Could not find basegame file (or found multiple) in backup for {game}: {filename}");
 
                 }
             }
@@ -181,7 +181,7 @@ namespace ALOTInstallerCore.ModManager.Services
             else
             {
                 //ambiguous or file not found
-                Log.Error($@"Could not find {filename} DLC file (or found multiple) in backup for {game}: {filename}");
+                Log.Error($@"[AICORE] Could not find {filename} DLC file (or found multiple) in backup for {game}: {filename}");
             }
 
             return null;
@@ -291,7 +291,7 @@ namespace ALOTInstallerCore.ModManager.Services
                         bool correctSize = fileInfo.Any(x => x.size == localFileInfo.Length);
                         if (!correctSize)
                         {
-                            Log.Error($"File has wrong size: {file} with size {localFileInfo.Length}");
+                            Log.Error($"[AICORE] File has wrong size: {file} with size {localFileInfo.Length}");
                             failedValidationCallback?.Invoke(file);
                             isVanilla = false;
                             continue;
@@ -316,7 +316,7 @@ namespace ALOTInstallerCore.ModManager.Services
 
                             if (fileInfo.All(x => md5 != x.md5))
                             {
-                                Log.Error($"File doesn't match any known MD5: {file} with md5 {md5}");
+                                Log.Error($"[AICORE] File doesn't match any known MD5: {file} with md5 {md5}");
                                 failedValidationCallback?.Invoke(file);
                             }
                         }
@@ -344,7 +344,7 @@ namespace ALOTInstallerCore.ModManager.Services
             }
             else
             {
-                Log.Error(@"Directory to validate doesn't exist: " + target.TargetPath);
+                Log.Error(@"[AICORE] Directory to validate doesn't exist: " + target.TargetPath);
             }
 
             return isVanilla;
@@ -502,9 +502,9 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <param name="game"></param>
         internal static void CheckAndTagBackup(Enums.MEGame game)
         {
-            Log.Information(@"Validating backup for " + game.GetGameName());
+            Log.Information(@"[AICORE] Validating backup for " + game.GetGameName());
             var targetPath = BackupService.GetGameBackupPath(game, out var isVanillaBU, false);
-            Log.Information(@"Backup location: " + targetPath);
+            Log.Information(@"[AICORE] Backup location: " + targetPath);
             BackupService.SetStatus(game, "Checking backup", "Please wait");
             //BackupService.SetActivity(game, true);
             GameTarget target = new GameTarget(game, targetPath, false);
@@ -514,7 +514,7 @@ namespace ALOTInstallerCore.ModManager.Services
                 List<string> nonVanillaFiles = new List<string>();
                 void nonVanillaFileFoundCallback(string filepath)
                 {
-                    Log.Error($@"Non-vanilla file found: {filepath}");
+                    Log.Error($@"[AICORE] Non-vanilla file found: {filepath}");
                     nonVanillaFiles.Add(filepath);
                 }
 
@@ -523,15 +523,15 @@ namespace ALOTInstallerCore.ModManager.Services
                 {
                     if (target.Supported)
                     {
-                        Log.Error($@"DLC is in an inconsistent state: {filepath}");
+                        Log.Error($@"[AICORE] DLC is in an inconsistent state: {filepath}");
                         inconsistentDLC.Add(filepath);
                     }
                     else
                     {
-                        Log.Error(@"Detected an inconsistent DLC, likely due to an unofficial copy of the game");
+                        Log.Error(@"[AICORE] Detected an inconsistent DLC, likely due to an unofficial copy of the game");
                     }
                 }
-                Log.Information(@"Validating backup...");
+                Log.Information(@"[AICORE] Validating backup...");
 
                 VanillaDatabaseService.LoadDatabaseFor(game, target.IsPolishME1);
                 bool isVanilla = VanillaDatabaseService.ValidateTargetAgainstVanilla(target, nonVanillaFileFoundCallback);
@@ -543,13 +543,13 @@ namespace ALOTInstallerCore.ModManager.Services
                     //Backup is OK
                     //Tag
                     File.WriteAllText(Path.Combine(targetPath, @"cmm_vanilla"), "ALOTInstallerCore");
-                    Log.Information(@"Wrote cmm_vanilla to validated backup");
+                    Log.Information(@"[AICORE] Wrote cmm_vanilla to validated backup");
                     BackupService.RefreshBackupStatus(null, true, game);
                 }
             }
             else
             {
-                Log.Information(@"Backup target is invalid. This backup cannot not be used. Reason: " + validationFailedReason);
+                Log.Information(@"[AICORE] Backup target is invalid. This backup cannot not be used. Reason: " + validationFailedReason);
             }
             //BackupService.SetActivity(game, false);
         }

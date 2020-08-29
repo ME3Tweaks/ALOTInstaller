@@ -47,14 +47,14 @@ namespace ALOTInstallerCore
 
             try
             {
-                Log.Information("Checking for updates to MassEffectModderNoGui. The local version is " + memVersion);
+                Log.Information("[AICORE] Checking for updates to MassEffectModderNoGui. The local version is " + memVersion);
                 if (Settings.BetaMode)
                 {
-                    Log.Information("Beta mode enabled, will include prerelease builds");
+                    Log.Information("[AICORE] Beta mode enabled, will include prerelease builds");
                 }
                 var client = new GitHubClient(new ProductHeaderValue("ALOTInstaller"));
                 var releases = client.Repository.Release.GetAll("MassEffectModder", "MassEffectModder").Result;
-                Log.Information("Fetched MEMNOGui releases from github...");
+                Log.Information("[AICORE] Fetched MEMNOGui releases from github...");
                 Release latestReleaseWithApplicableAsset = null;
                 if (releases.Any())
                 {
@@ -91,7 +91,7 @@ namespace ALOTInstallerCore
                                 int soakTestReleaseAge = (comparisonAge).Days;
                                 if (soakTestReleaseAge >= SoakThresholds.Length)
                                 {
-                                    Log.Information("New MassEffectModderNoGui update is past soak period, accepting this release as an update");
+                                    Log.Information("[AICORE] New MassEffectModderNoGui update is past soak period, accepting this release as an update");
                                     latestReleaseWithApplicableAsset = r;
                                     break;
                                 }
@@ -100,12 +100,12 @@ namespace ALOTInstallerCore
                                 //Soak gating
                                 if (applicableAsset.DownloadCount > soakThreshold)
                                 {
-                                    Log.Information($"New MassEffectModderNoGui update is soak testing and has reached the daily soak threshold of {soakThreshold}. This update is not applicable to us today, threshold will expand tomorrow.");
+                                    Log.Information($"[AICORE] New MassEffectModderNoGui update is soak testing and has reached the daily soak threshold of {soakThreshold}. This update is not applicable to us today, threshold will expand tomorrow.");
                                     continue;
                                 }
                                 else
                                 {
-                                    Log.Information("New MassEffectModderNoGui update is available and soaking, this client will participate in this soak test.");
+                                    Log.Information("[AICORE] New MassEffectModderNoGui update is available and soaking, this client will participate in this soak test.");
                                     latestReleaseWithApplicableAsset = r;
                                     break;
                                 }
@@ -113,13 +113,13 @@ namespace ALOTInstallerCore
                             // Check if this build is approved for stable
                             if (!Settings.BetaMode && releaseNameInt > HighestSupportedMEMVersion)
                             {
-                                Log.Information("New MassEffectModderNoGui update is available, but is not yet approved for stable channel: " + releaseNameInt);
+                                Log.Information("[AICORE] New MassEffectModderNoGui update is available, but is not yet approved for stable channel: " + releaseNameInt);
                                 continue;
                             }
 
                             if (releaseNameInt > memVersion)
                             {
-                                Log.Information($"New MassEffectModderNoGui update is available: {releaseNameInt}");
+                                Log.Information($"[AICORE] New MassEffectModderNoGui update is available: {releaseNameInt}");
                                 latestReleaseWithApplicableAsset = r;
                                 break;
                             }
@@ -127,7 +127,7 @@ namespace ALOTInstallerCore
                         }
                         else
                         {
-                            Log.Information("Latest release that is available and has been approved for use is v" + releaseNameInt + " - no update available for us");
+                            Log.Information("[AICORE] Latest release that is available and has been approved for use is v" + releaseNameInt + " - no update available for us");
                             break;
                         }
                     }
@@ -135,23 +135,23 @@ namespace ALOTInstallerCore
                     //No local version, no latest, but we have asset available somehwere
                     if (memVersion == 0 && latestReleaseWithApplicableAsset == null)
                     {
-                        Log.Information("MassEffectModderNoGui does not exist locally, and no applicable version can be found, force pulling latest from github");
+                        Log.Information("[AICORE] MassEffectModderNoGui does not exist locally, and no applicable version can be found, force pulling latest from github");
                         latestReleaseWithApplicableAsset = releases.FirstOrDefault(x => getApplicableAssetForPlatform(x) != null);
                     }
                     else if (memVersion == 0 && latestReleaseWithApplicableAsset == null)
                     {
                         //No local version, and we have no server version
-                        Log.Error("Cannot pull a copy of MassEffectModderNoGui from server, could not find one with assets. ALOTInstallerCore will not work properly without this!");
+                        Log.Error("[AICORE] Cannot pull a copy of MassEffectModderNoGui from server, could not find one with assets. ALOTInstallerCore will not work properly without this!");
                     }
                     else if (memVersion == 0)
                     {
-                        Log.Information("MassEffectModderNoGui does not exist locally. Pulling a copy from Github.");
+                        Log.Information("[AICORE] MassEffectModderNoGui does not exist locally. Pulling a copy from Github.");
                     }
 
                     if (latestReleaseWithApplicableAsset != null)
                     {
                         ReleaseAsset asset = getApplicableAssetForPlatform(latestReleaseWithApplicableAsset);
-                        Log.Information("MassEffectModderNoGui update available: " + latestReleaseWithApplicableAsset.TagName);
+                        Log.Information("[AICORE] MassEffectModderNoGui update available: " + latestReleaseWithApplicableAsset.TagName);
                         //there's an update
                         var downloadClient = new WebClient();
                         downloadClient.Headers["Accept"] = "application/vnd.github.v3+json";
@@ -170,13 +170,13 @@ namespace ALOTInstallerCore
                     else
                     {
                         //up to date
-                        Log.Information("No updates for MassEffectModderNoGui are available");
+                        Log.Information("[AICORE] No updates for MassEffectModderNoGui are available");
                     }
                 }
             }
             catch (Exception e)
             {
-                Log.Error("An error occurred running MassEffectModderNoGui updater: " + e.Message);
+                Log.Error("[AICORE] An error occurred running MassEffectModderNoGui updater: " + e.Message);
                 exceptionUpdating?.Invoke(e);
             }
         }

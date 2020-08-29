@@ -57,7 +57,7 @@ namespace ALOTInstallerCore.Helpers
             bool returnValue = false;
             using WebClient webClient = new WebClient();
             webClient.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
-            //Log.Information("Fetching latest manifest from github");
+            //Log.Information("[AICORE] Fetching latest manifest from github");
             //Build_ProgressBar.IsIndeterminate = true;
             setCurrentOperationCallback?.Invoke("Downloading latest installer manifest");
             //if (!File.Exists("DEV_MODE"))
@@ -68,7 +68,7 @@ namespace ALOTInstallerCore.Helpers
                 string url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/ALOT-v4/manifest.xml";
                 if (Settings.BetaMode)
                 {
-                    Log.Information("BETA MODE: Fetching beta mode manifest.");
+                    Log.Information("[AICORE] BETA MODE: Fetching beta mode manifest.");
                     url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/ALOT-v4/manifest-beta.xml";
                 }
 
@@ -78,15 +78,15 @@ namespace ALOTInstallerCore.Helpers
 
                 if (Utilities.TestXMLIsValid(fetchedManifest))
                 {
-                    Log.Information("Manifest fetched.");
+                    Log.Information("[AICORE] Manifest fetched.");
                     try
                     {
                         File.WriteAllText(Locations.GetCachedManifestPath(), fetchedManifest);
                     }
                     catch (Exception ex)
                     {
-                        Log.Error("Unable to write and remove old manifest! We're probably headed towards a crash.");
-                        Log.Error(ex.Flatten());
+                        Log.Error("[AICORE] Unable to write and remove old manifest! We're probably headed towards a crash.");
+                        Log.Error($"[AICORE] {ex.Flatten()}");
                         //UsingBundledManifest = true;
                     }
                     setCurrentOperationCallback?.Invoke("Parsing installer manifest");
@@ -95,23 +95,23 @@ namespace ALOTInstallerCore.Helpers
                 }
                 else
                 {
-                    Log.Error("Response from server was not valid XML! " + fetchedManifest);
+                    Log.Error("[AICORE] Response from server was not valid XML! " + fetchedManifest);
                     //Crashes.TrackError(new Exception("Invalid XML from server manifest!"));
                     if (File.Exists(Locations.GetCachedManifestPath()))
                     {
-                        Log.Information("Reading cached manifest instead.");
+                        Log.Information("[AICORE] Reading cached manifest instead.");
                         //ManifestDownloaded();
                     }
                     else if (!File.Exists(Locations.GetCachedManifestPath())/* && File.Exists(MANIFEST_BUNDLED_LOC)*/)
                     {
-                        Log.Information("Reading bundled manifest instead.");
+                        Log.Information("[AICORE] Reading bundled manifest instead.");
                         //File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
                         //UsingBundledManifest = true;
                         //ManifestDownloaded();
                     }
                     else
                     {
-                        Log.Error("Local manifest also doesn't exist! No manifest is available.");
+                        Log.Error("[AICORE] Local manifest also doesn't exist! No manifest is available.");
                         //await this.ShowMessageAsync("No Manifest Available", "An error occurred downloading or reading the manifest for ALOT Installer. There is no local bundled version available. Information that is required to build and install ALOT is not available. Check the program logs.");
                         //Environment.Exit(1);
                     }
@@ -120,10 +120,10 @@ namespace ALOTInstallerCore.Helpers
             }
             catch (WebException e)
             {
-                Log.Error("WebException occurred getting manifest from server: " + e.Flatten());
+                Log.Error("[AICORE] WebException occurred getting manifest from server: " + e.Flatten());
                 //if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
                 //{
-                //    Log.Information("Reading bundled manifest instead.");
+                //    Log.Information("[AICORE] Reading bundled manifest instead.");
                 //    File.Delete(MANIFEST_LOC);
                 //    File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
                 //    UsingBundledManifest = true;
@@ -134,10 +134,10 @@ namespace ALOTInstallerCore.Helpers
             //catch (Exception e)
             //{
             //    Debug.WriteLine(DateTime.Now);
-            //    Log.Error("Other Exception occurred getting manifest from server/reading manifest: " + e.ToString());
+            //    Log.Error("[AICORE] Other Exception occurred getting manifest from server/reading manifest: " + e.ToString());
             //    if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
             //    {
-            //        Log.Information("Reading bundled manifest instead.");
+            //        Log.Information("[AICORE] Reading bundled manifest instead.");
             //        File.Delete(MANIFEST_LOC);
             //        File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
             //        UsingBundledManifest = true;
@@ -148,7 +148,7 @@ namespace ALOTInstallerCore.Helpers
 
         private static bool ParseManifest(bool usingBundled, string manifestText, Action<Exception> ErrorParsingManifest = null)
         {
-            Log.Information("Reading master manifest...");
+            Log.Information("[AICORE] Reading master manifest...");
             MasterManifest = new MasterManifestPackage()
             {
                 UsingBundled = usingBundled
@@ -268,7 +268,7 @@ namespace ALOTInstallerCore.Helpers
                         ManifestModePackage mp = new ManifestModePackage();
                         mp.ModeDescription = manifestElement.Attribute("description")?.Value;
                         string manifestVersion = manifestElement.Attribute("version")?.Value;
-                        Log.Information($"{mode} manifest version: {manifestVersion}");
+                        Log.Information($"[AICORE] {mode} manifest version: {manifestVersion}");
                         mp.ManifestVersion = version;
                         MasterManifest.ManifestModePackageMappping[mode] = mp;
                     }
@@ -452,15 +452,15 @@ namespace ALOTInstallerCore.Helpers
 
                 if (usingBundled)
                 {
-                    Log.Information("Using bundled manifest instead of live manifest.");
+                    Log.Information("[AICORE] Using bundled manifest instead of live manifest.");
                 }
 
                 //throw new Exception("Test error.");
             }
             catch (Exception e)
             {
-                Log.Error("Error has occurred parsing the manifest XML!");
-                Log.Error(e.Flatten());
+                Log.Error("[AICORE] Error has occurred parsing the manifest XML!");
+                Log.Error($"[AICORE] {e.Flatten()}");
                 ErrorParsingManifest?.Invoke(e);
                 return false;
             }

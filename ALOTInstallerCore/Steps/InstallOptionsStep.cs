@@ -96,7 +96,7 @@ namespace ALOTInstallerCore.Steps
                 if (meuitmFile == null)
                 {
                     // Not in manifest...?
-                    Log.Error("Manifest for MEUITM mode is missing MEUITM!");
+                    Log.Error("[AICORE] Manifest for MEUITM mode is missing MEUITM!");
                     return options;
                 }
 
@@ -157,7 +157,7 @@ namespace ALOTInstallerCore.Steps
                 // CHECK ALOT MAIN
                 if (alotFile == null)
                 {
-                    Log.Error($"Manifest for ALOT mode is missing ALOT (game: {gameTarget.Game})!");
+                    Log.Error($"[AICORE] Manifest for ALOT mode is missing ALOT (game: {gameTarget.Game})!");
                     return options;
                 }
 
@@ -302,7 +302,7 @@ namespace ALOTInstallerCore.Steps
                     if (meuitmFile == null)
                     {
                         // Not in manifest...?
-                        Log.Error("ALOT manifest is missing MEUITM...?");
+                        Log.Error("[AICORE] ALOT manifest is missing MEUITM...?");
                     }
                     else
                     {

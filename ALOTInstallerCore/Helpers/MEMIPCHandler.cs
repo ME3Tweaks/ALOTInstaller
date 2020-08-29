@@ -185,7 +185,7 @@ namespace ALOTInstallerCore.Helpers
                         {
                             if (exceptionOcurred)
                             {
-                                Log.Fatal(stdOut.Text);
+                                Log.Fatal($"[AICORE] {stdOut.Text}");
                                 memCrashLine?.Invoke(stdOut.Text);
                             }
                         }
@@ -194,7 +194,7 @@ namespace ALOTInstallerCore.Helpers
                         Debug.WriteLine("STDERR " + stdErr.Text);
                         if (exceptionOcurred)
                         {
-                            Log.Fatal(stdErr.Text);
+                            Log.Fatal($"[AICORE] {stdErr.Text}");
                         }
                         else
                         {
@@ -239,7 +239,7 @@ namespace ALOTInstallerCore.Helpers
             MEMIPCHandler.RunMEMIPCUntilExit(args, applicationExited: x => exitcode = x);
             if (exitcode != 0)
             {
-                Log.Error($"Non-zero MassEffectModderNoGui exit code setting game path: {exitcode}");
+                Log.Error($"[AICORE] Non-zero MassEffectModderNoGui exit code setting game path: {exitcode}");
             }
             return exitcode == 0;
         }
@@ -277,11 +277,11 @@ namespace ALOTInstallerCore.Helpers
             MEMIPCHandler.RunMEMIPCUntilExit(args,
                 null,
                 (x, y) => Debug.WriteLine("hi"),
-                x => Log.Error($"StdError setting LODs: {x}"),
+                x => Log.Error($"[AICORE] StdError setting LODs: {x}"),
                 x => exitcode = x); //Change to catch exit code of non zero.        
             if (exitcode != 0)
             {
-                Log.Error($"MassEffectModderNoGui had error setting LODs, exited with code {exitcode}");
+                Log.Error($"[AICORE] MassEffectModderNoGui had error setting LODs, exited with code {exitcode}");
                 return false;
             }
 
@@ -311,11 +311,11 @@ namespace ALOTInstallerCore.Helpers
             //            fileListing.Add(param);
             //        }
             //    },
-            //    x => Log.Error($"StdError setting LODs: {x}"),
+            //    x => Log.Error($"[AICORE] StdError setting LODs: {x}"),
             //    x => exitcode = x); //Change to catch exit code of non zero.        
             //if (exitcode != 0)
             //{
-            //    Log.Error($"MassEffectModderNoGui had error getting file listing of archive {file}, exit code {exitcode}");
+            //    Log.Error($"[AICORE] MassEffectModderNoGui had error getting file listing of archive {file}, exit code {exitcode}");
             //}
             fileListing.Add("test.tpf");
             return fileListing;
@@ -348,7 +348,7 @@ namespace ALOTInstallerCore.Helpers
             );
             if (exitcode != 0)
             {
-                Log.Error($"Error fetching LODs for {game}, exit code {exitcode}");
+                Log.Error($"[AICORE] Error fetching LODs for {game}, exit code {exitcode}");
                 return null; // Error getting LODs
             }
 

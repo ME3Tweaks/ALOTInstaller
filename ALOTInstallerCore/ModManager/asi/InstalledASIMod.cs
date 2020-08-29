@@ -31,7 +31,7 @@ namespace ALOTInstallerCore.ModManager.asi
         /// </summary>
         public bool Uninstall()
         {
-            Log.Information($@"Deleting installed ASI: {InstalledPath}");
+            Log.Information(@"[AICORE] Deleting installed ASI: {InstalledPath}");
             try
             {
                 File.Delete(InstalledPath);
@@ -39,7 +39,7 @@ namespace ALOTInstallerCore.ModManager.asi
             }
             catch (Exception e)
             {
-                Log.Error($@"Error uninstalling ASI {InstalledPath}: {e.Message}");
+                Log.Error($@"[AICORE] Error uninstalling ASI {InstalledPath}: {e.Message}");
                 return false;
             }
         }

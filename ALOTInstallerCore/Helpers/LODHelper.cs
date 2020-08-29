@@ -85,7 +85,7 @@ namespace ALOTInstallerCore.Helpers
             }
             catch (Exception e)
             {
-                Log.Error($"Error getting LOD setting for {game}: {e.Message}. Returning vanilla");
+                Log.Error($"[AICORE] Error getting LOD setting for {game}: {e.Message}. Returning vanilla");
                 return LodSetting.Vanilla;
             }
         }

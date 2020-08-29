@@ -56,7 +56,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         /// <returns></returns>
         public static string CollectLogs(string logfile)
         {
-            Log.Information(@"Shutting down logger to allow application to pull log file.");
+            Log.Information(@"[AICORE] Shutting down logger to allow application to pull log file.");
             Log.CloseAndFlush();
             try
             {
@@ -67,14 +67,14 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             catch (Exception e)
             {
                 SetWrapperLogger?.Invoke(CreateLogger());
-                Log.Error(@"Could not read log file! " + e.Message);
+                Log.Error(@"[AICORE] Could not read log file! " + e.Message);
                 return null;
             }
         }
 
         public static string CollectLatestLog(bool restartLogger)
         {
-            Log.Information(@"Shutting down logger to allow application to pull log file.");
+            Log.Information(@"[AICORE] Shutting down logger to allow application to pull log file.");
             Log.CloseAndFlush();
             var logFile = new DirectoryInfo(LogDir)
                 .GetFiles(@"*.txt")
@@ -1203,7 +1203,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                                 {
                                     crashLineNumber = currentLineNumber;
                                     reason = @"Log file indicates crash occured";
-                                    Log.Information(@"Found crash in ME1 log " + file.Name + @" on line " +
+                                    Log.Information(@"[AICORE] Found crash in ME1 log " + file.Name + @" on line " +
                                                     currentLineNumber);
                                     break;
                                 }
@@ -1471,7 +1471,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             }
             catch (Exception e)
             {
-                Log.Error(@"Error checking LOD settings: " + e.Message);
+                Log.Error(@"[AICORE] Error checking LOD settings: " + e.Message);
                 addDiagLine($@"Error checking LOD settings: {e.Message}", Severity.INFO);
             }
         }
@@ -1528,7 +1528,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 }
                 catch (Exception e)
                 {
-                    Log.Error($@"Error reading partition type on {partitionLetter}: {e.Message}");
+                    Log.Error($@"[AICORE] Error reading partition type on {partitionLetter}: {e.Message}");
                     return -1;
                 }
             }
@@ -1587,7 +1587,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             }
             catch (Exception e)
             {
-                Log.Error($@"Error getting processor information: {e.Message}");
+                Log.Error($@"[AICORE] Error getting processor information: {e.Message}");
                 return $"Error getting processor information: {e.Message}\n"; //do not localize
             }
         }

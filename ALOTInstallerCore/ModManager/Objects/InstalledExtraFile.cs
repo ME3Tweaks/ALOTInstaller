@@ -48,7 +48,7 @@ namespace ALOTInstallerCore.ModManager.Objects
                 }
                 catch (Exception e)
                 {
-                    Log.Error($@"Error deleting extra file {FilePath}: {e.Message}");
+                    Log.Error($@"[AICORE] Error deleting extra file {FilePath}: {e.Message}");
                 }
             }
         }

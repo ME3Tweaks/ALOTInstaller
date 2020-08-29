@@ -547,7 +547,7 @@ namespace ALOTInstallerCore.Objects.Manifest
             var updated = internalUpdateReadyStatus();
             if (updated)
             {
-                Log.Information($"ManifestFile {FriendlyName} changing ready status. Is now ready: {Ready}");
+                Log.Information($"[AICORE] ManifestFile {FriendlyName} changing ready status. Is now ready: {Ready}");
             }
 
             return updated;

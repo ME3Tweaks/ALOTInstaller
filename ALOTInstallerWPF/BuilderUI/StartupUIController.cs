@@ -190,6 +190,9 @@ namespace ALOTInstallerWPF.BuilderUI
                 pd.SetIndeterminate();
                 pd.SetTitle("Starting up");
 
+                pd.SetMessage("Loading installer framework");
+                ALOTInstallerCoreLib.PostCriticalStartup(RunOnUIThread);
+
                 BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
 
                 pd.SetMessage("Loading installer manifests");

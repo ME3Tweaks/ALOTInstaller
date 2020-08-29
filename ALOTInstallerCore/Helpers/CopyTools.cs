@@ -36,8 +36,8 @@ namespace ALOTInstallerCore.Helpers
             {
                 if (e.Error != null)
                 {
-                    Log.Error($"An error occurred copying the file to the destination:");
-                    Log.Error(e.Error.Flatten());
+                    Log.Error($"[AICORE] An error occurred copying the file to the destination:");
+                    Log.Error($"[AICORE] {e.Error.Flatten()}");
                     errorCallback?.Invoke(e.Error);
                 }
                 else if (File.Exists(destFile))
@@ -46,7 +46,7 @@ namespace ALOTInstallerCore.Helpers
                 }
                 else
                 {
-                    Log.Error($"Destination file doesn't exist after file copy: {destFile}");
+                    Log.Error($"[AICORE] Destination file doesn't exist after file copy: {destFile}");
                     errorCallback?.Invoke(new Exception($"Destination file doesn't exist after file copy: {destFile}"));
                 }
 
@@ -141,7 +141,7 @@ namespace ALOTInstallerCore.Helpers
                     }
                     catch (Exception e)
                     {
-                        Log.Error(@"Error copying file: " + fi + @" -> " + Path.Combine(target.FullName, fi.Name) + @": " + e.Message);
+                        Log.Error(@"[AICORE] Error copying file: " + fi + @" -> " + Path.Combine(target.FullName, fi.Name) + @": " + e.Message);
                         throw e;
                     }
                 }

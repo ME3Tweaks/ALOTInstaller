@@ -43,7 +43,7 @@ namespace ALOTInstallerCore.Steps
                     foreach (ManagementBaseObject obj in query.Get())
                     {
                         string pagefileName = (string)obj.GetPropertyValue("Caption");
-                        Log.Information("Detected pagefile: " + pagefileName);
+                        Log.Information("[AICORE] Detected pagefile: " + pagefileName);
                         pageFileLocations.Add(pagefileName.ToLower());
                     }
                 }
@@ -59,32 +59,32 @@ namespace ALOTInstallerCore.Steps
                         {
                             // Not system managed
                             pageFileLocations.RemoveAll(x => Path.GetFullPath(x).Equals(Path.GetFullPath(pagefileName)));
-                            Log.Warning($"Pagefile has been modified by the end user. The maximum page file size on {pagefileName} is {max} MB. Does this user **actually** know what capping a pagefile does?");
+                            Log.Error($"[AICORE] Pagefile has been modified by the end user. The maximum page file size on {pagefileName} is {max} MB. Does this user **actually** know what capping a pagefile does?");
                         }
                     }
                 }
 
                 if (pageFileLocations.Any())
                 {
-                    Log.Information("We have a usable system managed page file - OK");
+                    Log.Information("[AICORE] We have a usable system managed page file - OK");
                 }
                 else
                 {
-                    Log.Error("We have no uncapped or available pagefiles to use! Very high chance application will run out of memory");
+                    Log.Error("[AICORE] We have no uncapped or available pagefiles to use! Very high chance application will run out of memory");
                     messageCallback?.Invoke($"Pagefile is off or size has been capped", "The system pagefile (virtual memory) settings are not currently managed by Windows, or the pagefile is off. {Utilities.GetAppPrefixedName()} Installer uses large amounts of memory and will very often run out of memory and crash if virtual memory is capped or turned off. You should not change your pagefile settings.");
                 }
             }
             catch (Exception e)
             {
-                Log.Error("Unable to check pagefile settings:");
-                Log.Error(e.Flatten());
+                Log.Error("[AICORE] Unable to check pagefile settings:");
+                Log.Error($"[AICORE] {e.Flatten()}");
             }
 #endif
         }
 
         private static bool PerformWriteCheck(Action<string, string> messageCallback, bool required)
         {
-            Log.Information("Performing write check on all game directories...");
+            Log.Information("[AICORE] Performing write check on all game directories...");
             var targets = Locations.GetAllAvailableTargets();
             try
             {
@@ -131,12 +131,12 @@ namespace ALOTInstallerCore.Steps
                         if (result == 0)
                         {
                             Log.Information(
-                                "Elevated process returned code 0, directories are hopefully writable now.");
+                                "[AICORE] Elevated process returned code 0, directories are hopefully writable now.");
                             return true;
                         }
                         else
                         {
-                            Log.Error("Elevated process returned code " + result +
+                            Log.Error("[AICORE] Elevated process returned code " + result +
                                       ", directories probably aren't writable.");
                             return false;
                         }
@@ -165,12 +165,12 @@ namespace ALOTInstallerCore.Steps
                         int result = Utilities.RunProcess(permissionsGranterExe, args, true, true, true, true);
                         if (result == 0)
                         {
-                            Log.Information("Elevated process returned code 0, directories are hopefully writable now.");
+                            Log.Information("[AICORE] Elevated process returned code 0, directories are hopefully writable now.");
                             return true;
                         }
                         else
                         {
-                            Log.Error($"Elevated process returned code {result}, directories probably aren't writable.");
+                            Log.Error($"[AICORE] Elevated process returned code {result}, directories probably aren't writable.");
                             return false;
                         }
                     }
@@ -179,8 +179,8 @@ namespace ALOTInstallerCore.Steps
             catch (Exception e)
             {
                 Log.Error(
-                    "Error checking for write privledges. This may be a significant sign that an installed game is not in a good state.");
-                Log.Error(e.Flatten());
+                    "[AICORE] Error checking for write privileges. This may be a significant sign that an installed game is not in a good state.");
+                Log.Error($"[AICORE] {e.Flatten()}");
                 //messageCa
                 //await this.ShowMessageAsync("Error checking write privileges",
                 //    "An error occurred while checking write privileges to game folders. This may be a sign that the game is in a bad state.\n\nThe error was:\n" +
@@ -204,11 +204,11 @@ namespace ALOTInstallerCore.Steps
             if (value != null)
             {
                 uacIsOn = value > 0;
-                Log.Information("UAC is on: " + uacIsOn);
+                Log.Information("[AICORE] UAC is on: " + uacIsOn);
             }
             if (isAdmin && uacIsOn)
             {
-                Log.Warning("This session is running as administrator.");
+                Log.Warning("[AICORE] This session is running as administrator.");
                 //await this.ShowMessageAsync($"{Utilities.GetAppPrefixedName()} Installer should be run as standard user", $"Running {Utilities.GetAppPrefixedName()} Installer as an administrator will disable drag and drop functionality and may cause issues due to the program running in a different user context. You should restart the application without running it as an administrator unless directed by the developers.");
             }
         }

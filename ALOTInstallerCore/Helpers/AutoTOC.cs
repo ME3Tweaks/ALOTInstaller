@@ -24,14 +24,14 @@ namespace ALOTInstallerCore.Helpers
         /// <returns></returns>
         public static bool RunTOCOnGameTarget(GameTarget target, Action<int> percentDoneCallback = null)
         {
-            Log.Information(@"Autotocing game: " + target.TargetPath);
+            Log.Information(@"[AICORE] Autotocing game: " + target.TargetPath);
 
             //get toc target folders, ensuring we clean up the inputs a bit.
             string baseDir = Path.GetFullPath(Path.Combine(target.TargetPath, @"BIOGame"));
             string dlcDirRoot = MEDirectories.DLCPath(target);
             if (!Directory.Exists(dlcDirRoot))
             {
-                Log.Error(@"Specified game directory does not appear to be a Mass Effect 3 root game directory (DLC folder missing).");
+                Log.Error(@"[AICORE] Specified game directory does not appear to be a Mass Effect 3 root game directory (DLC folder missing).");
                 return false;
             }
 
@@ -58,12 +58,12 @@ namespace ALOTInstallerCore.Helpers
                     //watch.Stop();
                     //if (tocResult == DLCPackage.DLCTOCUpdateResult.RESULT_UPDATE_NOT_NECESSARY)
                     //{
-                    //    Log.Information($@"TOC is already up to date in {tocTarget}");
+                    //    Log.Information(@"[AICORE] TOC is already up to date in {tocTarget}");
                     //}
                     //else if (tocResult == DLCPackage.DLCTOCUpdateResult.RESULT_UPDATED)
                     //{
                     //    var elapsedMs = watch.ElapsedMilliseconds;
-                    //    Log.Information($@"{tocTarget} - Ran SFAR TOC, took {elapsedMs}ms");
+                    //    Log.Information(@"[AICORE] {tocTarget} - Ran SFAR TOC, took {elapsedMs}ms");
                     //}
                 }
                 else if (ME3Directory.OfficialDLCNames.ContainsKey(Path.GetFileName(tocTarget)))
@@ -87,17 +87,17 @@ namespace ALOTInstallerCore.Helpers
                             //watch.Stop();
                             //if (tocResult == DLCPackage.DLCTOCUpdateResult.RESULT_ERROR_NO_ENTRIES)
                             //{
-                            //    Log.Information($@"No DLC entries in SFAR... Suspicious. Creating empty TOC for {tocTarget}");
+                            //    Log.Information(@"[AICORE] No DLC entries in SFAR... Suspicious. Creating empty TOC for {tocTarget}");
                             //    CreateUnpackedTOC(tocTarget);
                             //}
                             //else if (tocResult == DLCPackage.DLCTOCUpdateResult.RESULT_UPDATE_NOT_NECESSARY)
                             //{
-                            //    Log.Information($@"TOC is already up to date in {tocTarget}");
+                            //    Log.Information(@"[AICORE] TOC is already up to date in {tocTarget}");
                             //}
                             //else if (tocResult == DLCPackage.DLCTOCUpdateResult.RESULT_UPDATED)
                             //{
                             //    var elapsedMs = watch.ElapsedMilliseconds;
-                            //    Log.Information($@"{Path.GetFileName(tocTarget)} - Ran SFAR TOC, took {elapsedMs}ms");
+                            //    Log.Information(@"[AICORE] {Path.GetFileName(tocTarget)} - Ran SFAR TOC, took {elapsedMs}ms");
                             //}
                         }
                     }
@@ -117,7 +117,7 @@ namespace ALOTInstallerCore.Helpers
 
         public static void CreateUnpackedTOC(string dlcDirectory)
         {
-            Log.Information(@"Creating unpacked toc for " + dlcDirectory);
+            Log.Information(@"[AICORE] Creating unpacked toc for " + dlcDirectory);
 #if DEBUG
             if (dlcDirectory.Contains(@"DLC_CON_END") || dlcDirectory.Contains(@"DLC_EXP_Pack002"))
             {
@@ -134,11 +134,11 @@ namespace ALOTInstallerCore.Helpers
                 ms.Close();
                 watch.Stop();
                 var elapsedMs = watch.ElapsedMilliseconds;
-                Log.Information($@"{Path.GetFileName(dlcDirectory)} - {dlcDirectory} Ran Unpacked TOC, took {elapsedMs}ms");
+                Log.Information(@"[AICORE] {Path.GetFileName(dlcDirectory)} - {dlcDirectory} Ran Unpacked TOC, took {elapsedMs}ms");
             }
             else
             {
-                Log.Warning(@"Did not create TOC for " + dlcDirectory);
+                Log.Warning(@"[AICORE] Did not create TOC for " + dlcDirectory);
                 watch.Stop();
             }
         }

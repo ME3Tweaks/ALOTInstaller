@@ -90,7 +90,7 @@ namespace ALOTInstallerCore.Helpers
             }
             catch (OperationCanceledException)
             {
-                Log.Warning("Download canceled");
+                Log.Warning("[AICORE] Download canceled");
             }
             finally
             {

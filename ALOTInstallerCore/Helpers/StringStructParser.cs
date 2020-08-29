@@ -202,7 +202,7 @@ namespace ALOTInstallerCore.Helpers
                         {
                             if (parenthesisStack.Count == 0)
                             {
-                                Log.Error(@"Error parsing parenthesis split list: Found closing parenthesis that does not match open parenthesis at position " + i);
+                                Log.Error(@"[AICORE] Error parsing parenthesis split list: Found closing parenthesis that does not match open parenthesis at position " + i);
                                 throw new Exception(@"Error parsing parenthesis split list: Found closing parenthesis that does not match open parenthesis at position " + i); //should this be localized?
                             }
 
@@ -226,7 +226,7 @@ namespace ALOTInstallerCore.Helpers
             }
             if (parenthesisStack.Count > 0)
             {
-                Log.Error(@"Error parsing parenthesis split list: count of open and closing parenthesis does not match.");
+                Log.Error(@"[AICORE] Error parsing parenthesis split list: count of open and closing parenthesis does not match.");
                 throw new Exception(@"Unclosed opening parenthesis encountered while parsing parenthesis split list"); //should this be localized?
             }
             return splits;

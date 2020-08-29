@@ -184,7 +184,7 @@ namespace ALOTInstallerCore.Steps
             }
             catch (Exception e)
             {
-                Log.Warning($"Exception occurred while trying to make the game directory fully read-write: {e.Message}. We will continue anyways and hope nothing dies");
+                Log.Warning($"[AICORE] Exception occurred while trying to make the game directory fully read-write: {e.Message}. We will continue anyways and hope nothing dies");
             }
 #endif
 
@@ -241,7 +241,7 @@ namespace ALOTInstallerCore.Steps
                     {
                         case "STAGE_ADD": // Add a new stage 
                             {
-                                Log.Information("Adding stage to install stages queue: " + param);
+                                Log.Information("[AICORE] Adding stage to install stages queue: " + param);
                                 pm.AddStage(param, package.InstallTarget.Game);
                                 break;
                             }
@@ -252,17 +252,17 @@ namespace ALOTInstallerCore.Steps
                                 try
                                 {
                                     double scale = TryConvert.ToDouble(parameters[1], 1);
-                                    Log.Information("Reweighting stage " + parameters[0] + " by " + parameters[1]);
+                                    Log.Information("[AICORE] Reweighting stage " + parameters[0] + " by " + parameters[1]);
                                     pm.ScaleStageWeight(parameters[0], scale);
                                 }
                                 catch (Exception e)
                                 {
-                                    Log.Warning("STAGE_WEIGHT parameter invalid: " + e.Message);
+                                    Log.Warning("[AICORE] STAGE_WEIGHT parameter invalid: " + e.Message);
                                 }
                             }
                             else
                             {
-                                Log.Error("STAGE_WEIGHT IPC requires 2 parameters, STAGE and WEIGHT");
+                                Log.Error("[AICORE] STAGE_WEIGHT IPC requires 2 parameters, STAGE and WEIGHT");
                             }
                             break;
                         case "STAGE_CONTEXT": //Change to new stage
@@ -276,7 +276,7 @@ namespace ALOTInstallerCore.Steps
                             updateStageOfStage();
                             break;
                         case "PROCESSING_FILE": //Report a file is being processed
-                            Log.Information("Processing file " + param);
+                            Log.Information("[AICORE] Processing file " + param);
                             break;
                         default:
                             var failureIPCTriggered = pm.CurrentStage.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && !x.Warning);
@@ -291,7 +291,7 @@ namespace ALOTInstallerCore.Steps
                             if (warningIPCTriggered != null)
                             {
                                 // We have encountered a known warning IPC
-                                Log.Warning($"{warningIPCTriggered.FailureTopText}: {param}");
+                                Log.Warning($"[AICORE] {warningIPCTriggered.FailureTopText}: {param}");
                                 break;
                             }
                             Debug.WriteLine($"Unhandled IPC: {command} {param}");
@@ -320,7 +320,7 @@ namespace ALOTInstallerCore.Steps
                     MEMIPCHandler.RunMEMIPCUntilExit(args,
                         x => currentMemProcessId = x,
                         handleIPC,
-                        x => Log.Error($"StdError: {x}"),
+                        x => Log.Error($"[AICORE] StdError: {x}"),
                         x =>
                         {
                             currentMemProcessId = 0;
@@ -330,7 +330,7 @@ namespace ALOTInstallerCore.Steps
 
                 if (lastExitCode != 0)
                 {
-                    Log.Error($@"MEM exited with non zero exit code: {lastExitCode}");
+                    Log.Error($@"[AICORE] MEM exited with non zero exit code: {lastExitCode}");
                     // Get Stage Failure
                     if (failure == null)
                     {
@@ -344,7 +344,7 @@ namespace ALOTInstallerCore.Steps
 
                 if (!doneReached)
                 {
-                    Log.Error(@"MEM exited without reaching STAGE_DONE!");
+                    Log.Error(@"[AICORE] MEM exited without reaching STAGE_DONE!");
                     doWorkEventArgs.Result = InstallResult.InstallFailed_MEMExitedBeforeStageDone;
                     return;
                 }
@@ -408,7 +408,7 @@ namespace ALOTInstallerCore.Steps
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Unable to delete installation packages at {memInputPath}: {e.Message}");
+                    Log.Error($"[AICORE] Unable to delete installation packages at {memInputPath}: {e.Message}");
                 }
 
                 showOnlineStorefrontNoUpdateScreen();
@@ -438,7 +438,7 @@ namespace ALOTInstallerCore.Steps
 
                         break;
                     case "ERROR_FILEMARKER_FOUND":
-                        Log.Error("File was part of a different texture installation: " + param);
+                        Log.Error("[AICORE] File was part of a different texture installation: " + param);
                         badFiles.Add(param);
                         break;
                     default:
@@ -452,7 +452,7 @@ namespace ALOTInstallerCore.Steps
             MEMIPCHandler.RunMEMIPCUntilExit(args,
                 x => currentMemProcessId = x,
                 handleIPC,
-                x => Log.Error($"StdError: {x}"),
+                x => Log.Error($"[AICORE] StdError: {x}"),
                 x =>
                 {
                     currentMemProcessId = 0;
@@ -484,7 +484,7 @@ namespace ALOTInstallerCore.Steps
                 SetMiddleTextVisibilityCallback?.Invoke(false);
 
                 SetBottomTextCallback?.Invoke("Fixing Mars to Citadel transition");
-            //    Log.Information("Fixing post-mars hackett cutscene memory issue");
+            //    Log.Information("[AICORE] Fixing post-mars hackett cutscene memory issue");
             //    ME3ExplorerMinified.DLL.Startup();
 
             //#region BioA_CitHub fix
@@ -498,7 +498,7 @@ namespace ALOTInstallerCore.Steps
             //            var propsT = trigStream1.GetProperties();
             //            var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
             //            // Clear preloading
-            //            Log.Information("Clear LoadChunkNames from BioA_CitHub");
+            //            Log.Information("[AICORE] Clear LoadChunkNames from BioA_CitHub");
             //            streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
 
             //            // Clear visible asset
@@ -507,7 +507,7 @@ namespace ALOTInstallerCore.Steps
             //            {
             //                if (visibleChunkNames[i].Value == "BioA_CitHub_Dock_Det")
             //                {
-            //                    Log.Information("Remove BioA_CitHub_Dock_Det from BioA_CitHub VisibleChunkNames(8)");
+            //                    Log.Information("[AICORE] Remove BioA_CitHub_Dock_Det from BioA_CitHub VisibleChunkNames(8)");
             //                    visibleChunkNames.RemoveAt(i);
             //                }
             //            }
@@ -523,13 +523,13 @@ namespace ALOTInstallerCore.Steps
             //            {
             //                if (visibleChunkNames[i].Value == "BioA_Nor_204Conference" || visibleChunkNames[i].Value == "BioA_Nor_204WarRoom")
             //                {
-            //                    Log.Information("Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(15)");
+            //                    Log.Information("[AICORE] Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(15)");
             //                    visibleChunkNames.RemoveAt(i);
             //                }
             //            }
 
             //            trigStream2.WriteProperty(streamStates);
-            //            Log.Information("Saving package: " + bioa_cithubPath);
+            //            Log.Information("[AICORE] Saving package: " + bioa_cithubPath);
             //            bioa_cithub.save();
             //        }
             //    }
@@ -546,7 +546,7 @@ namespace ALOTInstallerCore.Steps
             //            var trigStream1 = biod_cithub.getUExport(162);
             //            var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
             //            // Clear preloading
-            //            Log.Information("Clear LoadChunkNames from BioD_CitHub");
+            //            Log.Information("[AICORE] Clear LoadChunkNames from BioD_CitHub");
             //            streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
 
             //            // Clear visible asset
@@ -555,20 +555,20 @@ namespace ALOTInstallerCore.Steps
             //            {
             //                if (visibleChunkNames[i].Value == "BioH_Marine" || visibleChunkNames[i].Value == "BioD_CitHub_Dock")
             //                {
-            //                    Log.Information("Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(8)");
+            //                    Log.Information("[AICORE] Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(8)");
             //                    visibleChunkNames.RemoveAt(i);
             //                }
             //            }
 
             //            trigStream1.WriteProperty(streamStates);
-            //            Log.Information("Saving package: " + biod_cithubPath);
+            //            Log.Information("[AICORE] Saving package: " + biod_cithubPath);
             //            biod_cithub.save();
             //        }
             //    }
 
             //#endregion
 
-            //    Log.Information("Finished fixing post-mars hackett cutscene memory issue");
+            //    Log.Information("[AICORE] Finished fixing post-mars hackett cutscene memory issue");
             //}
 #endif
         }
@@ -589,18 +589,18 @@ namespace ALOTInstallerCore.Steps
                     if (listOfItemsToFix.Contains(d.DLCFolderName, StringComparer.InvariantCultureIgnoreCase))
                     {
                         // Fix required
-                        Log.Information("DLC requires texture fixes: " + d.DLCFolderName);
+                        Log.Information("[AICORE] DLC requires texture fixes: " + d.DLCFolderName);
                         SetBottomTextCallback?.Invoke($"Fixing texture exports in {d.DLCFolderName}");
                         string args = $"--fix-textures-property --gameid {package.InstallTarget.Game.ToGameNum()} --filter \"{d.DLCFolderName}\" --ipc";
                         int resultCode = -1;
                         MEMIPCHandler.RunMEMIPCUntilExit(args,
                             null,
                             null,
-                            x => Log.Error($"StdError fixing DLC foldernames for {d.DLCFolderName}: {x}"),
+                            x => Log.Error($"[AICORE] StdError fixing DLC foldernames for {d.DLCFolderName}: {x}"),
                             x => resultCode = x);
                         if (resultCode != 0)
                         {
-                            Log.Error($"Non zero result code fixing textures for {d.DLCFolderName}: {resultCode}");
+                            Log.Error($"[AICORE] Non zero result code fixing textures for {d.DLCFolderName}: {resultCode}");
                             return false;
                         }
                     }
@@ -628,7 +628,7 @@ namespace ALOTInstallerCore.Steps
                                 {
                                     string installationPath = Path.Combine(package.InstallTarget.TargetPath, cf.GameDestinationPath);
                                     File.Copy(cf.StagedPath, installationPath, true);
-                                    Log.Information($"Installed copyfile: {cf.ChoiceTitle} {cf.StagedPath} to {installationPath}");
+                                    Log.Information($"[AICORE] Installed copyfile: {cf.ChoiceTitle} {cf.StagedPath} to {installationPath}");
                                 }
                             }
                         }
@@ -646,16 +646,16 @@ namespace ALOTInstallerCore.Steps
                                     MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{zf.StagedPath}\" --output \"{installationPath}\" --ipc",
                                         null,
                                         null,
-                                        x => Log.Error($"StdError on {zf.StagedPath}: {x}"),
+                                        x => Log.Error($"[AICORE] StdError on {zf.StagedPath}: {x}"),
                                         x => extractcode = x);
                                     if (extractcode == 0)
                                     {
-                                        Log.Information($"Installed zipfile: {zf.ChoiceTitle} {zf.StagedPath} to {installationPath}");
+                                        Log.Information($"[AICORE] Installed zipfile: {zf.ChoiceTitle} {zf.StagedPath} to {installationPath}");
 
                                     }
                                     else
                                     {
-                                        Log.Error("Extraction of " + zf.ChoiceTitle + " failed with code " + extractcode);
+                                        Log.Error("[AICORE] Extraction of " + zf.ChoiceTitle + " failed with code " + extractcode);
                                     }
 
                                     if (package.InstallTarget.Game == Enums.MEGame.ME1 && zf.DeleteShaders)
@@ -665,22 +665,22 @@ namespace ALOTInstallerCore.Steps
                                         if (File.Exists(localusershaderscache))
                                         {
                                             File.Delete(localusershaderscache);
-                                            Log.Information("Deleted user localshadercache: " + localusershaderscache);
+                                            Log.Information("[AICORE] Deleted user localshadercache: " + localusershaderscache);
                                         }
                                         else
                                         {
-                                            Log.Warning("unable to delete user local shadercache, it does not exist: " + localusershaderscache);
+                                            Log.Warning("[AICORE] unable to delete user local shadercache, it does not exist: " + localusershaderscache);
                                         }
 
                                         string gamelocalshadercache = Path.Combine(package.InstallTarget.TargetPath, @"BioGame\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
                                         if (File.Exists(gamelocalshadercache))
                                         {
                                             File.Delete(gamelocalshadercache);
-                                            Log.Information("Deleted game localshadercache: " + gamelocalshadercache);
+                                            Log.Information("[AICORE] Deleted game localshadercache: " + gamelocalshadercache);
                                         }
                                         else
                                         {
-                                            Log.Warning("Unable to delete game localshadercache, it does not exist: " + gamelocalshadercache);
+                                            Log.Warning("[AICORE] Unable to delete game localshadercache, it does not exist: " + gamelocalshadercache);
                                         }
                                     }
 
@@ -699,11 +699,11 @@ namespace ALOTInstallerCore.Steps
                                                 shaderConf["GENERAL"]["EffectSearchPaths"].Value = Path.Combine(package.InstallTarget.TargetPath, "Binaries", "reshade-shaders", "Shaders");
                                                 shaderConf["GENERAL"]["PresetFiles"].Value = Path.Combine(package.InstallTarget.TargetPath, "Binaries", "MassEffect.ini");
                                                 File.WriteAllText(d3d9ini, shaderConf.ToString());
-                                                Log.Information("Corrected MEUITM shader ini");
+                                                Log.Information("[AICORE] Corrected MEUITM shader ini");
                                             }
                                             catch (Exception ex)
                                             {
-                                                Log.Error("Error fixing MEUITM shader ini: " + ex.Message);
+                                                Log.Error("[AICORE] Error fixing MEUITM shader ini: " + ex.Message);
                                                 return false;
                                             }
                                         }
@@ -716,7 +716,7 @@ namespace ALOTInstallerCore.Steps
             }
             catch (Exception e)
             {
-                Log.Error($"Error applying copy/zip files: {e.Message}");
+                Log.Error($"[AICORE] Error applying copy/zip files: {e.Message}");
                 return false;
             }
 
@@ -742,7 +742,7 @@ namespace ALOTInstallerCore.Steps
             }
             catch (Exception e)
             {
-                Log.Error($"Error setting texture installation marker: {e.Message}");
+                Log.Error($"[AICORE] Error setting texture installation marker: {e.Message}");
                 return false;
             }
         }
@@ -753,7 +753,7 @@ namespace ALOTInstallerCore.Steps
         private bool applyLODs()
         {
             SetBottomTextCallback?.Invoke("Applying graphics settings");
-            Log.Information("Updating texture lods");
+            Log.Information("[AICORE] Updating texture lods");
 
             LodSetting setting = LodSetting.Vanilla;
             var meuitmSoftShadows = package.FilesToInstall.Any(x =>
@@ -761,13 +761,13 @@ namespace ALOTInstallerCore.Steps
             if (meuitmSoftShadows)
             {
                 setting |= LodSetting.SoftShadows;
-                Log.Information(" > MEUITM Soft Shadows");
+                Log.Information("[AICORE]  > MEUITM Soft Shadows");
             }
 
             if (package.Limit2K)
             {
                 setting |= LodSetting.TwoK;
-                Log.Information(" > Using 2K lods");
+                Log.Information("[AICORE]  > Using 2K lods");
             }
             else
             {
@@ -784,14 +784,14 @@ namespace ALOTInstallerCore.Steps
         private bool applyME1LAA()
         {
             SetBottomTextCallback?.Invoke("Applying LAA");
-            Log.Information("Applying LAA/Admin to game executable");
+            Log.Information("[AICORE] Applying LAA/Admin to game executable");
             string args = "--apply-me1-laa";
             int exitcode = -1;
             // We don't care about IPC on this
             MEMIPCHandler.RunMEMIPCUntilExit(args,
                 null,
                 null,
-                x => Log.Error($"StdError setting LAA: {x}"),
+                x => Log.Error($"[AICORE] StdError setting LAA: {x}"),
                 x => exitcode = x); //Change to catch exit code of non zero.        
 
             return exitcode == 0;
@@ -821,7 +821,7 @@ namespace ALOTInstallerCore.Steps
                             SetBottomTextCallback?.Invoke($"Extracting files {param}%");
                             break;
                         case "FILENAME":
-                            Log.Information($"Extracting file from archive: {param}");
+                            Log.Information($"[AICORE] Extracting file from archive: {param}");
                             break;
                         default:
                             Debug.WriteLine($"Unhandled IPC: {command} {param}");
@@ -833,11 +833,11 @@ namespace ALOTInstallerCore.Steps
                 MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{modAddon.GetUsedFilepath()}\" --output \"{stagingPath}\" --ipc",
                     null,
                     handleIPC,
-                    x => Log.Error($"StdError on {modAddon.FriendlyName}: {x}"),
+                    x => Log.Error($"[AICORE] StdError on {modAddon.FriendlyName}: {x}"),
                     x => exitcode = x); //Change to catch exit code of non zero.
                 if (exitcode != 0)
                 {
-                    Log.Error($"MassEffectModderNoGui exited with non zero code {exitcode} extracting {modAddon.FriendlyName}");
+                    Log.Error($"[AICORE] MassEffectModderNoGui exited with non zero code {exitcode} extracting {modAddon.FriendlyName}");
                     return false;
                 }
 
@@ -873,14 +873,14 @@ namespace ALOTInstallerCore.Steps
                             //check if any required dlc is missing
                             if (requiredDlc.Any(x => !Directory.Exists(Path.Combine(dlcDirectory, x))))
                             {
-                                Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. Rule requires all of the DLC: " + extractionRedirect.OptionalRequiredDLC);
+                                Log.Information($"[AICORE] {extractionRedirect.LoggingName}: Extraction rule is not applicable to this setup. Rule requires all of the DLC: {extractionRedirect.OptionalRequiredDLC}");
                                 continue;
                             }
 
                             //Check if any required file is missing
                             if (requiredFiles.Any(x => !File.Exists(Path.Combine(dlcDirectory, x))))
                             {
-                                Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. At least one file for this rule was not found: " + extractionRedirect.OptionalRequiredFiles);
+                                Log.Information($"[AICORE] {extractionRedirect.LoggingName}: Extraction rule is not applicable to this setup. At least one file for this rule was not found: {extractionRedirect.OptionalRequiredFiles}");
                                 continue;
                             }
 
@@ -896,8 +896,7 @@ namespace ALOTInstallerCore.Steps
                                     var info = new FileInfo(finalPath);
                                     if (info.Length != size)
                                     {
-                                        Log.Information(extractionRedirect.LoggingName +
-                                                        ": Extraction rule is not applicable to this setup, file size for file " + file + " does not match rule.");
+                                        Log.Information($"[AICORE] {extractionRedirect.LoggingName}: Extraction rule is not applicable to this setup, file size for file {file} does not match rule.");
                                         doNotInstall = true;
                                         break;
                                     }
@@ -917,12 +916,12 @@ namespace ALOTInstallerCore.Steps
                             //check if all dlc is missing
                             if (anyDLC.All(x => !Directory.Exists(Path.Combine(dlcDirectory, x))))
                             {
-                                Log.Information(extractionRedirect.LoggingName + ": Extraction rule is not applicable to this setup. Rule requires at least one of the DLC: " + extractionRedirect.OptionalRequiredDLC);
+                                Log.Information($"AICORE] {extractionRedirect.LoggingName}: Extraction rule is not applicable to this setup. Rule requires at least one of the DLC: {extractionRedirect.OptionalRequiredDLC}");
                                 continue;
                             }
                         }
 
-                        Log.Information("Applying extraction rule: " + extractionRedirect.LoggingName);
+                        Log.Information("[AICORE] Applying extraction rule: " + extractionRedirect.LoggingName);
                         var rootPath = Path.Combine(stagingPath, extractionRedirect.ArchiveRootPath);
                         var filesToMove = Directory.GetFiles(rootPath, "*", SearchOption.AllDirectories);
 
@@ -942,18 +941,18 @@ namespace ALOTInstallerCore.Steps
                             if (extension.Equals(".pcc", StringComparison.InvariantCultureIgnoreCase) ||
                                 extension.Equals(".tfc", StringComparison.InvariantCultureIgnoreCase))
                             {
-                                Log.Information("Skipping file that that cannot be installed after alot: " + relativePath);
+                                Log.Information("[AICORE] Skipping file that that cannot be installed after alot: " + relativePath);
                                 continue;
                             }
 
                             string finalDestinationPath = Path.Combine(ingameDestination, relativePath);
                             if (File.Exists(finalDestinationPath))
                             {
-                                Log.Information("Deleting existing file before move: " + finalDestinationPath);
+                                Log.Information("[AICORE] Deleting existing file before move: " + finalDestinationPath);
                                 File.Delete(finalDestinationPath);
                             }
 
-                            Log.Information($"Moving staged file into game directory: {file} -> {finalDestinationPath}");
+                            Log.Information($"[AICORE] Moving staged file into game directory: {file} -> {finalDestinationPath}");
                             Directory.CreateDirectory(Directory.GetParent(finalDestinationPath).FullName);
                             File.Move(file, finalDestinationPath);
                         }
@@ -969,7 +968,7 @@ namespace ALOTInstallerCore.Steps
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Error installing preinstall mod {modAddon.FriendlyName}: {e.Message}. ModExtractingStaging at root of install folder may need to be manually deleted");
+                    Log.Error($"[AICORE] Error installing preinstall mod {modAddon.FriendlyName}: {e.Message}. ModExtractingStaging at root of install folder may need to be manually deleted");
                     return false;
                 }
 
@@ -979,7 +978,7 @@ namespace ALOTInstallerCore.Steps
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Error deleting staging folder for {modAddon.FriendlyName}: {e.Message}");
+                    Log.Error($"[AICORE] Error deleting staging folder for {modAddon.FriendlyName}: {e.Message}");
                     // This is technically not an error. So we will not return this as an error.
                 }
             }

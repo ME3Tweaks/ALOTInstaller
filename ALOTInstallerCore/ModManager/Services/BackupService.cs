@@ -383,14 +383,14 @@ namespace ALOTInstallerCore.ModManager.Services
 
             if (logReturnedPath)
             {
-                Log.Information($@" >> Backup path lookup for {game} returned: {path}");
+                Log.Information(@"[AICORE]  >> Backup path lookup for {game} returned: {path}");
             }
 
             if (path == null || !Directory.Exists(path))
             {
                 if (logReturnedPath)
                 {
-                    Log.Information(@" >> Path is null or directory doesn't exist.");
+                    Log.Information(@"[AICORE] >> Path is null or directory doesn't exist.");
                 }
 
                 isVanilla = false;
@@ -402,7 +402,7 @@ namespace ALOTInstallerCore.ModManager.Services
             {
                 if (logReturnedPath)
                 {
-                    Log.Warning(@" >> " + path + @" is missing biogame/binaries subdirectory, invalid backup");
+                    Log.Warning(@"[AICORE] >> " + path + @" is missing biogame/binaries subdirectory, invalid backup");
                 }
 
                 isVanilla = false;
@@ -415,7 +415,7 @@ namespace ALOTInstallerCore.ModManager.Services
             {
                 if (logReturnedPath)
                 {
-                    Log.Warning(@" >> " + path + @" is not marked as a vanilla backup.");
+                    Log.Warning(@"[AICORE] >> " + path + @" is not marked as a vanilla backup.");
                 }
 
                 return null;
@@ -423,7 +423,7 @@ namespace ALOTInstallerCore.ModManager.Services
 
             if (logReturnedPath)
             {
-                Log.Information(@" >> " + path + @" is considered a valid backup path");
+                Log.Information(@"[AICORE] >> " + path + @" is considered a valid backup path");
             }
 
             return path;

@@ -88,7 +88,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 var targetToBackup = BackupSourceTarget;
                 if (!targetToBackup.IsCustomOption)
                 {
-                    Log.Information($"PerformBackup() on {BackupSourceTarget.TargetPath}");
+                    Log.Information($"[AICORE] PerformBackup() on {BackupSourceTarget.TargetPath}");
                     // Backup target
                     if (Utilities.IsGameRunning(targetToBackup.Game))
                     {
@@ -99,29 +99,29 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 else
                 {
                     // Point to existing game installation
-                    Log.Information(@"PerformBackup() with IsCustomOption.");
+                    Log.Information(@"[AICORE] PerformBackup() with IsCustomOption.");
                     var linkOK = WarningActionCallback?.Invoke("Ensure correct game chosen", "The path you specify will be checked if it is a vanilla backup. Once this check is complete it will be marked as a backup and modding tools will refuse to modify it. Ensure this is not your active game path or you will be unable to mod the game.",
                         "I understand", "Abort linking");
                     if (!linkOK.HasValue || !linkOK.Value)
                     {
-                        Log.Information(@"User aborted linking due to dialog");
+                        Log.Information(@"[AICORE] User aborted linking due to dialog");
                         return false;
                     }
 
-                    Log.Information(@"Prompting user to select executable of link target");
+                    Log.Information(@"[AICORE] Prompting user to select executable of link target");
 
                     targetToBackup = SelectGameExecutableCallback?.Invoke(Game);
 
                     if (targetToBackup == null)
                     {
-                        Log.Warning("User did not choose game executable to link as backup. Aborting");
+                        Log.Warning("[AICORE] User did not choose game executable to link as backup. Aborting");
                         return false;
                     }
 
                     if (AvailableTargetsToBackup.Any(x => x.TargetPath.Equals(targetToBackup.TargetPath, StringComparison.InvariantCultureIgnoreCase)))
                     {
                         // Can't point to an existing modding target
-                        Log.Error(@"This target is not valid to point to as a backup: It is listed a modding target already, it must be removed as a target first");
+                        Log.Error(@"[AICORE] This target is not valid to point to as a backup: It is listed a modding target already, it must be removed as a target first");
                         BlockingActionCallback?.Invoke("Cannot backup game", "Cannot use this target as backup: It is the current game path for this game.");
                         return false;
                     }
@@ -129,21 +129,21 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     var validationFailureReason = targetToBackup.ValidateTarget(ignoreCmmVanilla: true);
                     if (!targetToBackup.IsValid)
                     {
-                        Log.Error(@"This installation is not valid to point to as a backup: " + validationFailureReason);
+                        Log.Error(@"[AICORE] This installation is not valid to point to as a backup: " + validationFailureReason);
                         BlockingActionCallback?.Invoke("Cannot backup game", $"Cannot use this target as backup: {validationFailureReason}");
                         return false;
                     }
                 }
 
 
-                Log.Information(@"Starting the backup thread. Checking path: " + targetToBackup.TargetPath);
+                Log.Information(@"[AICORE] Starting the backup thread. Checking path: " + targetToBackup.TargetPath);
                 BackupInProgress = true;
 
                 List<string> nonVanillaFiles = new List<string>();
 
                 void nonVanillaFileFoundCallback(string filepath)
                 {
-                    Log.Error($@"Non-vanilla file found: {filepath}");
+                    Log.Error($@"[AICORE] Non-vanilla file found: {filepath}");
                     nonVanillaFiles.Add(filepath.Substring(targetToBackup.TargetPath.Length + 1)); //Oh goody i'm sure this won't cause issues
                 }
 
@@ -153,24 +153,24 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 {
                     if (targetToBackup.Supported)
                     {
-                        Log.Error($@"DLC is in an inconsistent state: {filepath}");
+                        Log.Error($@"[AICORE] DLC is in an inconsistent state: {filepath}");
                         inconsistentDLC.Add(filepath);
                     }
                     else
                     {
-                        Log.Error(@"Detected an inconsistent DLC, likely due to an unofficial copy of the game");
+                        Log.Error(@"[AICORE] Detected an inconsistent DLC, likely due to an unofficial copy of the game");
                     }
                 }
 
                 UpdateStatusCallback?.Invoke("Validating backup source");
                 SetProgressIndeterminateCallback?.Invoke(true);
-                Log.Information(@"Checking target is vanilla");
+                Log.Information(@"[AICORE] Checking target is vanilla");
                 bool isVanilla = VanillaDatabaseService.ValidateTargetAgainstVanilla(targetToBackup, nonVanillaFileFoundCallback);
 
-                Log.Information(@"Checking DLC consistency");
+                Log.Information(@"[AICORE] Checking DLC consistency");
                 bool isDLCConsistent = VanillaDatabaseService.ValidateTargetDLCConsistency(targetToBackup, inconsistentDLCCallback: inconsistentDLCFoundCallback);
 
-                Log.Information(@"Checking only vanilla DLC is installed");
+                Log.Information(@"[AICORE] Checking only vanilla DLC is installed");
                 List<string> dlcModsInstalled = VanillaDatabaseService.GetInstalledDLCMods(targetToBackup).Select(x =>
                 {
                     var tpmi = ThirdPartyServices.GetThirdPartyModInfo(x, targetToBackup.Game);
@@ -184,13 +184,13 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 {
                     var dlcList = string.Join("\n - ", allOfficialDLC.Except(installedDLC).Select(x => $@"{MEDirectories.OfficialDLCNames(targetToBackup.Game)[x]} ({x})")); //do not localize
                     dlcList = @" - " + dlcList;
-                    Log.Information(@"The following dlc will be missing in the backup if user continues: " + dlcList);
+                    Log.Information(@"[AICORE] The following dlc will be missing in the backup if user continues: " + dlcList);
                     string message =
                         $"This target does not have have all OFFICIAL DLC installed. Ensure you have installed all OFFICIAL DLC you want to include in your backup, otherwise a game restore will not include all of it.\n\nThe following DLC is not installed:\n{dlcList}\n\nMake a backup of this target?";
                     var okToBackup = WarningActionCallback?.Invoke("Warning: some official DLC missing", message, "Continue backing up", "Abort backup");
                     if (!okToBackup.HasValue || !okToBackup.Value)
                     {
-                        Log.Information("User canceled backup due to some missing data");
+                        Log.Information("[AICORE] User canceled backup due to some missing data");
                         return false;
                     }
                 }
@@ -218,7 +218,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     var continueBackup = WarningListCallback?.Invoke("Found non vanilla files", message, bottomMessage, nonVanillaFiles, "Backup anyways", "Abort backup");
                     if (!continueBackup.HasValue || !continueBackup.Value)
                     {
-                        Log.Information("User aborted backup due to non-vanilla files found");
+                        Log.Information("[AICORE] User aborted backup due to non-vanilla files found");
                         return false;
                     }
                 }
@@ -230,7 +230,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     var continueBackup = WarningListCallback?.Invoke("Found installed DLC mods", message, bottomMessage, dlcModsInstalled, "Backup anyways", "Abort backup");
                     if (!continueBackup.HasValue || !continueBackup.Value)
                     {
-                        Log.Information("User aborted backup due to found DLC mods");
+                        Log.Information("[AICORE] User aborted backup due to found DLC mods");
                         return false;
                     }
                 }
@@ -241,11 +241,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 if (!targetToBackup.IsCustomOption)
                 {
                     // Creating a new backup
-                    Log.Information(@"Prompting user to select backup destination");
+                    Log.Information(@"[AICORE] Prompting user to select backup destination");
                     backupPath = SelectGameBackupFolderDestination?.Invoke();
                     if (backupPath != null && Directory.Exists(backupPath))
                     {
-                        Log.Information(@"Backup path chosen: " + backupPath);
+                        Log.Information(@"[AICORE] Backup path chosen: " + backupPath);
                         bool okToBackup = validateBackupPath(backupPath, targetToBackup);
                         if (!okToBackup)
                         {
@@ -261,7 +261,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 }
                 else
                 {
-                    Log.Information(@"Linking existing backup at " + targetToBackup.TargetPath);
+                    Log.Information(@"[AICORE] Linking existing backup at " + targetToBackup.TargetPath);
                     backupPath = targetToBackup.TargetPath;
                     // Linking existing backup
                     bool okToBackup = validateBackupPath(targetToBackup.TargetPath, targetToBackup);
@@ -335,7 +335,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         }
                         catch (Exception e)
                         {
-                            Log.Error($"Error about to copy file: {e.Message}");
+                            Log.Error($"[AICORE] Error about to copy file: {e.Message}");
                             CoreCrashes.TrackError(e);
                         }
 
@@ -384,7 +384,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
 
                     BackupStatus = "Creating backup";
-                    Log.Information($@"Backing up {targetToBackup.TargetPath} to {backupPath}");
+                    Log.Information(@"[AICORE] Backing up {targetToBackup.TargetPath} to {backupPath}");
                     CopyTools.CopyAll_ProgressBar(new DirectoryInfo(targetToBackup.TargetPath),
                         new DirectoryInfo(backupPath),
                         totalItemsToCopyCallback: totalFilesToCopyCallback,
@@ -402,16 +402,16 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     var cmmvanilla = Path.Combine(backupPath, @"cmm_vanilla");
                     if (!File.Exists(cmmvanilla))
                     {
-                        Log.Information($@"Writing cmm_vanilla to " + cmmvanilla);
+                        Log.Information(@"[AICORE] Writing cmm_vanilla to " + cmmvanilla);
                         File.Create(cmmvanilla).Close();
                     }
                 }
                 else
                 {
-                    Log.Information("Not writing vanilla marker as this is not a vanilla backup");
+                    Log.Information("[AICORE] Not writing vanilla marker as this is not a vanilla backup");
                 }
 
-                Log.Information($@"Backup completed.");
+                Log.Information(@"[AICORE] Backup completed.");
 
                 CoreAnalytics.TrackEvent?.Invoke(@"Created a backup", new Dictionary<string, string>()
                         {
@@ -433,7 +433,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         Directory.GetDirectories(backupPath).Length > 0)
                     {
                         //Directory not empty
-                        Log.Error(@"Selected backup directory is not empty.");
+                        Log.Error(@"[AICORE] Selected backup directory is not empty.");
                         BlockingActionCallback?.Invoke("Invalid backup destination",
                             "The backup destination directory must be empty. Delete the files and folders in this directory, or select a different empty path.");
                         return false;
@@ -444,7 +444,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 var docsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"BioWare", targetToBackup.Game.ToGameName());
                 if (backupPath.Equals(docsPath, StringComparison.InvariantCultureIgnoreCase) || backupPath.IsSubPathOf(docsPath))
                 {
-                    Log.Error(@"User chose path in or around the documents path for the game - not allowed as game can load files from here.");
+                    Log.Error(@"[AICORE] User chose path in or around the documents path for the game - not allowed as game can load files from here.");
                     BlockingActionCallback?.Invoke($"Invalid backup destination", $"The backup destination cannot be a subdirectory of the Documents/BioWare/{targetToBackup.Game.ToGameName()} folder. Select a different directory.");
                     return false;
                 }
@@ -452,11 +452,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 //Check space
                 DriveInfo di = new DriveInfo(backupPath);
                 var requiredSpace = (long)(Utilities.GetSizeOfDirectory(new DirectoryInfo(targetToBackup.TargetPath)) * 1.1); //10% buffer
-                Log.Information($@"Backup space check. Backup size required: {FileSizeFormatter.FormatSize(requiredSpace)}, free space: {FileSizeFormatter.FormatSize(di.AvailableFreeSpace)}");
+                Log.Information(@"[AICORE] Backup space check. Backup size required: {FileSizeFormatter.FormatSize(requiredSpace)}, free space: {FileSizeFormatter.FormatSize(di.AvailableFreeSpace)}");
                 if (di.AvailableFreeSpace < requiredSpace)
                 {
                     //Not enough space.
-                    Log.Error($@"Not enough disk space to create backup at {backupPath}");
+                    Log.Error($@"[AICORE] Not enough disk space to create backup at {backupPath}");
                     BlockingActionCallback?.Invoke("Not enough free disk space", $"There is not enough free disk space to make a game backup at this location.\n\nFree space: {FileSizeFormatter.FormatSize(di.AvailableFreeSpace)}\nRequired space: {FileSizeFormatter.FormatSize(requiredSpace)}");
                     return false;
                 }
@@ -467,7 +467,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (backupPath.IsSubPathOf(target.TargetPath))
                     {
                         //Not enough space.
-                        Log.Error($@"A backup cannot be created in a subdirectory of a game. {backupPath} is a subdir of {targetToBackup.TargetPath}");
+                        Log.Error($@"[AICORE] A backup cannot be created in a subdirectory of a game. {backupPath} is a subdir of {targetToBackup.TargetPath}");
                         BlockingActionCallback?.Invoke("Invalid backup destination", $"You cannot place a backup into a subdirectory of the game you are backing up. Select another directory.");
                         return false;
                     }
@@ -478,7 +478,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 if (!writable)
                 {
                     //Not enough space.
-                    Log.Error($@"Backup destination selected is not writable.");
+                    Log.Error($@"[AICORE] Backup destination selected is not writable.");
                     BlockingActionCallback?.Invoke("Invalid backup destination", "Selected backup folder does not have write permissions from this account. Select a different directory.");
                     return false;
                 }
@@ -488,7 +488,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
             private void EndBackup()
             {
-                Log.Information($@"EndBackup()");
+                Log.Information(@"[AICORE] EndBackup()");
                 ResetBackupStatus();
                 ProgressIndeterminate = false;
                 ProgressVisible = false;
@@ -605,7 +605,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         }
                         else
                         {
-                            Log.Warning("User declined to choose destination directory");
+                            Log.Warning("[AICORE] User declined to choose destination directory");
                             return false;
                         }
                     }
@@ -616,7 +616,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     {
                         if (Directory.GetFiles(destinationDirectory).Any() || Directory.GetDirectories(destinationDirectory).Any())
                         {
-                            Log.Information(@"Deleting existing game directory: " + destinationDirectory);
+                            Log.Information(@"[AICORE] Deleting existing game directory: " + destinationDirectory);
                             try
                             {
                                 bool deletedDirectory = Utilities.DeleteFilesAndFoldersRecursively(destinationDirectory);
@@ -630,7 +630,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             catch (Exception ex)
                             {
                                 //todo: handle this better
-                                Log.Error($@"Exception deleting game directory: {destinationDirectory}: {ex.Message}");
+                                Log.Error($@"[AICORE] Exception deleting game directory: {destinationDirectory}: {ex.Message}");
                                 RestoreErrorCallback?.Invoke("Error deleting game directory", $"Could not delete the game directory for {Game.ToGameName()}: {ex.Message}. The game will be in a semi deleted state, please manually delete it and then restore to the same location as the game to fully restore the game.");
                                 //b.Result = RestoreResult.EXCEPTION_DELETING_GAME_DIRECTORY;
                                 return false;
@@ -639,7 +639,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                     else
                     {
-                        Log.Error(@"Game directory not found! Was it removed while the app was running?");
+                        Log.Error(@"[AICORE] Game directory not found! Was it removed while the app was running?");
                     }
 
                     //todo: remove IndirectSound settings? (MEUITM)
@@ -768,25 +768,25 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     #endregion
 
                     UpdateStatusCallback?.Invoke("Calculating how many files will be restored");
-                    Log.Information($@"Copying backup to game directory: {backupPath} -> {destinationDirectory}");
+                    Log.Information(@"[AICORE] Copying backup to game directory: {backupPath} -> {destinationDirectory}");
                     CopyTools.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(destinationDirectory),
                         totalItemsToCopyCallback: totalFilesToCopyCallback,
                         aboutToCopyCallback: aboutToCopyCallback,
                         fileCopiedCallback: fileCopiedCallback,
                         ignoredExtensions: new[] { @"*.pdf", @"*.mp3" },
                         bigFileProgressCallback: bigFileProgressCallback);
-                    Log.Information(@"Restore of game data has completed");
+                    Log.Information(@"[AICORE] Restore of game data has completed");
 
                     //Check for cmmvanilla file and remove it present
 
                     string cmmVanilla = Path.Combine(destinationDirectory, @"cmm_vanilla");
                     if (File.Exists(cmmVanilla))
                     {
-                        Log.Information(@"Removing cmm_vanilla file");
+                        Log.Information(@"[AICORE] Removing cmm_vanilla file");
                         File.Delete(cmmVanilla);
                     }
 
-                    Log.Information(@"Restore thread wrapping up");
+                    Log.Information(@"[AICORE] Restore thread wrapping up");
                     Locations.ReloadTarget(Game);
                     return true;
                     //b.Result = RestoreResult.RESTORE_OK;
@@ -862,14 +862,14 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
         public static void UnlinkBackup(Enums.MEGame meGame)
         {
-            Log.Information($"Unlinking backup for {meGame}");
+            Log.Information($"[AICORE] Unlinking backup for {meGame}");
             var gbPath = BackupService.GetGameBackupPath(meGame, out _, forceReturnPath: true);
             if (gbPath != null)
             {
                 var cmmVanilla = Path.Combine(gbPath, "cmm_vanilla");
                 if (File.Exists(cmmVanilla))
                 {
-                    Log.Information("Deleted cmm_vanilla file: " + cmmVanilla);
+                    Log.Information("[AICORE] Deleted cmm_vanilla file: " + cmmVanilla);
                     File.Delete(cmmVanilla);
                 }
             }

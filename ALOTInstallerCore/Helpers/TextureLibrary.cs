@@ -161,7 +161,7 @@ namespace ALOTInstallerCore.Helpers
                     }
                     else
                     {
-                        Log.Error($"Error importing file: {failureReason}");
+                        Log.Error($"[AICORE] Error importing file: {failureReason}");
                     }
 
                     lock (syncObj)
@@ -294,7 +294,7 @@ namespace ALOTInstallerCore.Helpers
         private static void importFileToLibrary(ManifestFile mf, string sourceFile, bool isUnpacked,
             Action<string, long, long> progressCallback = null, Action<bool, string> importFinishedCallback = null)
         {
-            Log.Information($"Importing {sourceFile} into texture library");
+            Log.Information($"[AICORE] Importing {sourceFile} into texture library");
             // This may need to be WINDOWS ONLY for roots
             string importingfrom = Path.GetPathRoot(sourceFile);
             string importingto = Path.GetPathRoot(Settings.TextureLibraryLocation);
@@ -315,7 +315,7 @@ namespace ALOTInstallerCore.Helpers
                     }
                     catch (Exception e)
                     {
-                        Log.Error($"Error moving {sourceFile} to library: {e.Message}");
+                        Log.Error($"[AICORE] Error moving {sourceFile} to library: {e.Message}");
                         importFinishedCallback?.Invoke(false,
                             $"An error occurred moving the file to the library: {e.Message}.");
                     }
@@ -332,8 +332,8 @@ namespace ALOTInstallerCore.Helpers
                     {
                         if (e.Error != null)
                         {
-                            Log.Error($"An error occurred copying the file to the destination:");
-                            Log.Error(e.Error.Flatten());
+                            Log.Error($"[AICORE] An error occurred copying the file to the destination:");
+                            Log.Error($"[AICORE] {e.Error.Flatten()}");
                             importFinishedCallback?.Invoke(false,
                                 $"An error occurred copying the file to the library: {e.Error.Message}.");
                         }
@@ -344,8 +344,8 @@ namespace ALOTInstallerCore.Helpers
                         else
                         {
                             Log.Error(
-                                "Destination file doesn't exist after file copy. This may need some more analysis to determine the exact cause.");
-                            Log.Error("Destination file: " + destFile);
+                                "[AICORE] Destination file doesn't exist after file copy. This may need some more analysis to determine the exact cause.");
+                            Log.Error("[AICORE] Destination file: " + destFile);
                             importFinishedCallback?.Invoke(false,
                                 $"Destination file doesn't exist after copy: {destFile}. This may be a bug in the program, view the application log for more information");
                         }
@@ -358,7 +358,7 @@ namespace ALOTInstallerCore.Helpers
             {
                 if (b.Error != null)
                 {
-                    Log.Error($"Error importing {sourceFile}: {b.Error.Message}");
+                    Log.Error($"[AICORE] Error importing {sourceFile}: {b.Error.Message}");
                     importFinishedCallback?.Invoke(false,
                         $"An error occurred while importing {sourceFile}: {b.Error.Message}");
                 }
@@ -516,14 +516,14 @@ namespace ALOTInstallerCore.Helpers
                         // Move
                         if (!File.Exists(destF))
                         {
-                            Log.Information($"Moving unpacked file to texture library: {movableFile.Value} -> {destF}");
+                            Log.Information($"[AICORE] Moving unpacked file to texture library: {movableFile.Value} -> {destF}");
                             File.Move(movableFile.Value, destF);
                         }
                     }
                     else
                     {
                         //Copy
-                        Log.Information($"Copying unpacked file to texture library: {movableFile.Value} -> {destF}");
+                        Log.Information($"[AICORE] Copying unpacked file to texture library: {movableFile.Value} -> {destF}");
                         CopyTools.CopyFileWithProgress(movableFile.Value, destF,
                             (x, y) => progressCallback?.Invoke(movableFile.Key.FriendlyName, x, y),
                             x => cancelDueToError = true
@@ -534,14 +534,13 @@ namespace ALOTInstallerCore.Helpers
                     {
                         if (!movableFile.Key.IsBackedByUnpacked())
                         {
-                            Log.Error(
-                                "File copied back did not trigger switch to unpacked version! Something probably went wrong on file copy.");
+                            Log.Error("[AICORE] File copied back did not trigger switch to unpacked version! Something probably went wrong on file copy.");
                         }
                         else
                         {
                             // Switched to unpacked
                             Log.Information(
-                                $"Deleting packed version of manifest file now that it is in unpacked mode: {oldFname}");
+                                $"[AICORE] Deleting packed version of manifest file now that it is in unpacked mode: {oldFname}");
                             try
                             {
                                 File.Delete(oldFname);
@@ -549,7 +548,7 @@ namespace ALOTInstallerCore.Helpers
                             catch (Exception e)
                             {
                                 Log.Error(
-                                    $"Unable to delete packed version of {movableFile.Key.FriendlyName}: {e.Message}");
+                                    $"[AICORE] Unable to delete packed version of {movableFile.Key.FriendlyName}: {e.Message}");
                             }
                         }
                     }
@@ -557,7 +556,7 @@ namespace ALOTInstallerCore.Helpers
             }
             catch (Exception e)
             {
-                Log.Error($"Error trying to move unpacked files to texture library: {e.Message}");
+                Log.Error($"[AICORE] Error trying to move unpacked files to texture library: {e.Message}");
                 return false;
             }
 
@@ -621,7 +620,7 @@ namespace ALOTInstallerCore.Helpers
                     if (!isOK)
                     {
                         Log.Warning(
-                            $"Rejecting image/texture file {filename} due to missing 0xhhhhhhhh texture CRC to replace");
+                            $"[AICORE] Rejecting image/texture file {filename} due to missing 0xhhhhhhhh texture CRC to replace");
                     }
 
                     return isOK;

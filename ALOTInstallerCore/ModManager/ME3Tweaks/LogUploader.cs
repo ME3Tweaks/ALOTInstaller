@@ -123,17 +123,17 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     //should be valid URL.
                     //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
                     //e.Result = responseString;
-                    Log.Information(@"Result from server for log upload: " + responseString);
+                    Log.Information(@"[AICORE] Result from server for log upload: " + responseString);
                     return responseString;
                 }
-                Log.Error(@"Error uploading log. The server responded with: " + responseString);
+                Log.Error(@"[AICORE] Error uploading log. The server responded with: " + responseString);
                 return $"The server rejected the upload: {responseString}";
             }
             catch (Exception ex)
             {
                 // ex.Message contains rich details, inclulding the URL, verb, response status,
                 // and request and response bodies (if available)
-                Log.Error($@"Handled error uploading log: {ex.Flatten()}");
+                Log.Error($@"[AICORE] Handled error uploading log: {ex.Flatten()}");
                 return $"Error uploading log: {ex.Message}";
             }
         }

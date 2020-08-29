@@ -131,13 +131,13 @@ namespace ALOTInstallerCore.Steps
                     var replacedAddedRemovedFiles = pc.checkForReplacedAddedRemovedFiles();
                     if (replacedAddedRemovedFiles.Any())
                     {
-                        Log.Error("The texture map has become desynchronized from the game state on disk:");
+                        Log.Error("[AICORE] The texture map has become desynchronized from the game state on disk:");
                         foreach (var v in replacedAddedRemovedFiles)
                         {
-                            Log.Error($" > {v}");
+                            Log.Error($"[AICORE]  > {v}");
                         }
 
-                        Log.Error("Cannot install textures when game has been modified outside of MEM-based texture tools after texture install has taken place");
+                        Log.Error("[AICORE] Cannot install textures when game has been modified outside of MEM-based texture tools after texture install has taken place");
                         // Texture map is inconsistent, and MEM will refuse installation because the game is not in sync with the texture map
                         return "The texture map from the previous installation has become desynchronized from the current game state. This means that files/mods were added, removed, or replaced/modified since the last texture installation took place. The game must be restored to vanilla so a new texture map can be created.";
                     }
@@ -312,7 +312,7 @@ namespace ALOTInstallerCore.Steps
             MEMIPCHandler.RunMEMIPCUntilExit(args,
                 null,
                 handleIPC,
-                x => Log.Error($"StdError checking texture map: {x}"),
+                x => Log.Error($"[AICORE] StdError checking texture map: {x}"),
                 x => lastExitCode = x
             );
             // Todo: Handle exit codes
@@ -327,7 +327,7 @@ namespace ALOTInstallerCore.Steps
                 switch (command)
                 {
                     case "ERROR":
-                        Log.Error($"Incompatible mod was detected: {param}");
+                        Log.Error($"[AICORE] Incompatible mod was detected: {param}");
                         blacklistedMods.Add(param);
                         break;
                     default:
@@ -341,7 +341,7 @@ namespace ALOTInstallerCore.Steps
             MEMIPCHandler.RunMEMIPCUntilExit(args,
                 null,
                 handleIPC,
-                x => Log.Error($"StdError checking for blacklisted mods: {x}"),
+                x => Log.Error($"[AICORE] StdError checking for blacklisted mods: {x}"),
                 x => lastExitCode = x
             );
             // Todo: Handle exit codes
@@ -361,7 +361,7 @@ namespace ALOTInstallerCore.Steps
                 var alotMainFile = manifestFilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER != 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0); //main file only
                 if (alotMainFile == null)
                 {
-                    Log.Error("ALOT manifest is missing the ALOT main file!");
+                    Log.Error("[AICORE] ALOT manifest is missing the ALOT main file!");
                     failureReason = "The main ALOT file is missing from the manifest! Contact the developers to get this resolved.";
                     return false;
                 }
@@ -371,8 +371,8 @@ namespace ALOTInstallerCore.Steps
                     if (texturesInfo.ALOTVER != alotMainFile.AlotVersionInfo.ALOTVER && alotMainFile.Ready)
                     {
                         // ALOT main versions are different
-                        Log.Warning($"Precheck failed: {alotMainFile.FriendlyName} file cannot be installed on top of an existing version of ALOT that is different: {texturesInfo.ALOTVER}.{texturesInfo.ALOTUPDATEVER}");
-                        failureReason = $"The manifest version of ALOT currently is {alotMainFile.AlotVersionInfo.ALOTVER}, but your current installation is {texturesInfo.ALOTVER}.{texturesInfo.ALOTUPDATEVER}. You cannot install new major versions of ALOT on top of each other, you must restore your game and perform a clean installation.";
+                        Log.Warning($"[AICORE] Precheck failed: {alotMainFile.FriendlyName} file cannot be installed on top of an existing version of ALOT that is different: {texturesInfo.ALOTVER}.{texturesInfo.ALOTUPDATEVER}");
+                        failureReason = $"[AICORE] The manifest version of ALOT currently is {alotMainFile.AlotVersionInfo.ALOTVER}, but your current installation is {texturesInfo.ALOTVER}.{texturesInfo.ALOTUPDATEVER}. You cannot install new major versions of ALOT on top of each other, you must restore your game and perform a clean installation.";
                         return false;
                     }
 
@@ -397,7 +397,7 @@ namespace ALOTInstallerCore.Steps
                     if (hasAlot && alotUpdateFile.AlotVersionInfo > texturesInfo && !alotUpdateFile.Ready)
                     {
                         // This file is required but is not ready
-                        Log.Warning("Precheck failed: ALOT update file is not imported but ALOT mode rules require the latest update to be imported for any subsequent installations on top of the existing ALOT install");
+                        Log.Warning("[AICORE] Precheck failed: ALOT update file is not imported but ALOT mode rules require the latest update to be imported for any subsequent installations on top of the existing ALOT install");
                         failureReason = $"ALOT updates are required to be installed if available. Your ALOT version does not have the latest update, and the ALOT update file is not imported into the texture library. You must import the {alotUpdateFile.FriendlyName} file before you can install textures in ALOT mode.";
                         return false;
                     }
@@ -406,7 +406,7 @@ namespace ALOTInstallerCore.Steps
                     if (!alotUpdateFile.Ready)
                     {
                         // This file is required but is not ready
-                        Log.Warning("Precheck failed: ALOT update file is not imported but ALOT mode rules require the latest update to be imported for first time installation");
+                        Log.Warning("[AICORE] Precheck failed: ALOT update file is not imported but ALOT mode rules require the latest update to be imported for first time installation");
                         failureReason = $"ALOT updates are required to be installed if available. The ALOT update file is not imported into the texture library. You must import the {alotUpdateFile.FriendlyName} file before you can install textures in ALOT mode.";
                         return false;
                     }
@@ -414,7 +414,7 @@ namespace ALOTInstallerCore.Steps
                     if (hasAlot && texturesInfo.ALOTVER != alotUpdateFile.AlotVersionInfo.ALOTVER &&
                         alotUpdateFile.Ready)
                     {
-                        Log.Warning("Precheck failed: ALOT update file is not applicable to installed version of ALOT");
+                        Log.Warning("[AICORE] Precheck failed: ALOT update file is not applicable to installed version of ALOT");
                         // Update cannot be applied to this installation
                         failureReason = $"The file {alotUpdateFile.FriendlyName} cannot be installed against the currently installed ALOT version ({texturesInfo.ALOTVER}.{texturesInfo.ALOTUPDATEVER}).";
                         return false;

@@ -44,7 +44,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
         public static Dictionary<string, CaseInsensitiveDictionary<List<BasegameFileIdentificationService.BasegameCloudDBFile>>> FetchBasegameFileIdentificationServiceManifest(bool overrideThrottling = false)
         {
-            Log.Information(@"Fetching basegame file identification manifest");
+            Log.Information(@"[AICORE] Fetching basegame file identification manifest");
 
             //read cached first.
             string cached = null;
@@ -90,13 +90,13 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     catch (Exception e)
                     {
                         //Unable to fetch latest help.
-                        Log.Error($"Error fetching online basegame file identification service from endpoint {host}: {e.Message}");
+                        Log.Error($"[AICORE] Error fetching online basegame file identification service from endpoint {host}: {e.Message}");
                     }
                 }
 
                 if (cached == null)
                 {
-                    Log.Error("Unable to load basegame file identification service and local file doesn't exist. Returning a blank copy.");
+                    Log.Error("[AICORE] Unable to load basegame file identification service and local file doesn't exist. Returning a blank copy.");
                     Dictionary<string, CaseInsensitiveDictionary<List<BasegameFileIdentificationService.BasegameCloudDBFile>>> d = new Dictionary<string, CaseInsensitiveDictionary<List<BasegameFileIdentificationService.BasegameCloudDBFile>>>
                     {
                         ["ME1"] = new CaseInsensitiveDictionary<List<BasegameFileIdentificationService.BasegameCloudDBFile>>(),
@@ -106,7 +106,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     return d;
                 }
             }
-            Log.Information("Using cached BGFIS instead");
+            Log.Information("[AICORE] Using cached BGFIS instead");
 
             try
             {
@@ -114,7 +114,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             }
             catch (Exception e)
             {
-                Log.Error("Could not parse cached basegame file identification service file. Returning blank BFIS data instead. Reason: " + e.Message);
+                Log.Error("[AICORE] Could not parse cached basegame file identification service file. Returning blank BFIS data instead. Reason: " + e.Message);
                 return new Dictionary<string, CaseInsensitiveDictionary<List<BasegameFileIdentificationService.BasegameCloudDBFile>>>
                 {
                     ["ME1"] = new CaseInsensitiveDictionary<List<BasegameFileIdentificationService.BasegameCloudDBFile>>(),
@@ -162,15 +162,15 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 catch (Exception e)
                 {
                     //Unable to fetch latest help.
-                    Log.Error("Error fetching online third party identification service: " + e.Message);
+                    Log.Error("[AICORE] Error fetching online third party identification service: " + e.Message);
 
                     if (cached != null)
                     {
-                        Log.Warning("Using cached third party identification service  file instead");
+                        Log.Warning("[AICORE] Using cached third party identification service  file instead");
                     }
                     else
                     {
-                        Log.Error("Unable to load third party identification service and local file doesn't exist. Returning a blank copy.");
+                        Log.Error("[AICORE] Unable to load third party identification service and local file doesn't exist. Returning a blank copy.");
                         Dictionary<string, CaseInsensitiveDictionary<ThirdPartyServices.ThirdPartyModInfo>> d = new Dictionary<string, CaseInsensitiveDictionary<ThirdPartyServices.ThirdPartyModInfo>>
                         {
                             ["ME1"] = new CaseInsensitiveDictionary<ThirdPartyServices.ThirdPartyModInfo>(),
@@ -188,7 +188,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             }
             catch (Exception e)
             {
-                Log.Error("Could not parse cached third party identification service file. Returning blank TPMI data instead. Reason: " + e.Message);
+                Log.Error("[AICORE] Could not parse cached third party identification service file. Returning blank TPMI data instead. Reason: " + e.Message);
                 return new Dictionary<string, CaseInsensitiveDictionary<ThirdPartyServices.ThirdPartyModInfo>>
                 {
                     ["ME1"] = new CaseInsensitiveDictionary<ThirdPartyServices.ThirdPartyModInfo>(),
@@ -209,7 +209,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             }
             catch (Exception e)
             {
-                Log.Error("Error downloading string: " + e.Message);
+                Log.Error("[AICORE] Error downloading string: " + e.Message);
                 return null;
             }
         }
@@ -231,11 +231,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     {
                         var calcedMd5 = Utilities.CalculateMD5(localPath);
                         download = calcedMd5 != info.md5;
-                        if (download) Log.Warning($@"Invalid hash for local asset {info.filename}: got {calcedMd5}, expected {info.md5}. Redownloading");
+                        if (download) Log.Warning($@"[AICORE] Invalid hash for local asset {info.filename}: got {calcedMd5}, expected {info.md5}. Redownloading");
                     }
                     else
                     {
-                        Log.Information($"Local asset missing: {info.filename}, downloading");
+                        Log.Information($"[AICORE] Local asset missing: {info.filename}, downloading");
                     }
 
                     if (download)
@@ -247,14 +247,14 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             try
                             {
                                 using var wc = new HttpClientDownloadWithProgress(fullURL, localPath);
-                                Log.Information("Downloading static asset: " + fullURL);
+                                Log.Information("[AICORE] Downloading static asset: " + fullURL);
                                 wc.StartDownload().RunSynchronously();
                                 downloadOK = true;
                                 break;
                             }
                             catch (Exception e)
                             {
-                                Log.Error($"Could not download {info} from endpoint {fullURL} {e.Message}");
+                                Log.Error($"[AICORE] Could not download {info} from endpoint {fullURL} {e.Message}");
                             }
                         }
                     }
@@ -268,7 +268,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             }
             catch (Exception e)
             {
-                Log.Error("Exception trying to ensure static assets: " + e.Message);
+                Log.Error("[AICORE] Exception trying to ensure static assets: " + e.Message);
                 CoreCrashes.TrackError2(new Exception(@"Could not download static supporting files: " + e.Message), null);
                 return false;
             }
@@ -331,7 +331,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
             if (logDownload)
             {
-                Log.Information(@"Downloading to memory: " + url);
+                Log.Information(@"[AICORE] Downloading to memory: " + url);
             }
             else
             {

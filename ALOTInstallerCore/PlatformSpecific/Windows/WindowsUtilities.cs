@@ -37,7 +37,7 @@ namespace ALOTInstallerCore
             }
             catch (Exception e)
             {
-                Log.Error("Error granting write access: " + e.Message);
+                Log.Error("[AICORE] Error granting write access: " + e.Message);
                 return false;
             }
             return true;
@@ -45,16 +45,16 @@ namespace ALOTInstallerCore
 
         public static bool MakeAllFilesInDirReadWrite(string directory)
         {
-            Log.Information("Marking all files in directory to read-write: " + directory);
-            //Log.Warning("If the application crashes after this statement, please come to to the ALOT discord - this is an issue we have not yet been able to reproduce and thus can't fix without outside assistance.");
+            Log.Information("[AICORE] Marking all files in directory to read-write: " + directory);
+            //Log.Warning("[AICORE] If the application crashes after this statement, please come to to the ALOT discord - this is an issue we have not yet been able to reproduce and thus can't fix without outside assistance.");
             var di = new DirectoryInfo(directory);
             foreach (var file in di.GetFiles("*", SearchOption.AllDirectories))
             {
                 if (!file.Exists)
                 {
-                    Log.Warning("File is no longer in the game directory: " + file.FullName);
-                    Log.Error("This file was found when the read-write filescan took place, but is no longer present. The application is going to crash.");
-                    Log.Error("Another session may be running, or there may be a bug. Please come to the ALOT Discord so we can analyze this as we cannot reproduce it.");
+                    Log.Warning("[AICORE] File is no longer in the game directory: " + file.FullName);
+                    Log.Error("[AICORE] This file was found when the read-write filescan took place, but is no longer present. The application is going to crash.");
+                    Log.Error("[AICORE] Another session may be running, or there may be a bug. Please come to the ALOT Discord so we can analyze this as we cannot reproduce it.");
                 }
 
                 //Utilities.WriteDebugLog("Clearing read-only marker (if any) on file: " + file.FullName);
@@ -66,9 +66,9 @@ namespace ALOTInstallerCore
                 {
                     if (file.FullName.Length > 260)
                     {
-                        Log.Error("Path of file is too long - Windows API length limitations for files will cause errors. File: " + file.FullName);
-                        Log.Error("The game is either nested too deep or a mod has been improperly installed causing a filepath to be too long.");
-                        Log.Error(ex.Flatten());
+                        Log.Error("[AICORE] Path of file is too long - Windows API length limitations for files will cause errors. File: " + file.FullName);
+                        Log.Error("[AICORE] The game is either nested too deep or a mod has been improperly installed causing a filepath to be too long.");
+                        Log.Error($"[AICORE] {ex.Flatten()}");
                     }
                     return false;
                 }
@@ -99,7 +99,7 @@ namespace ALOTInstallerCore
                 var productState = virusChecker["productState"];
                 uint productVal = (uint)productState;
                 var bytes = BitConverter.GetBytes(productVal);
-                Log.Information("Antivirus info: " + virusCheckerName + " with state " + bytes[1].ToString("X2") + " " + bytes[2].ToString("X2") + " " + bytes[3].ToString("X2"));
+                Log.Information("[AICORE] Antivirus info: " + virusCheckerName + " with state " + bytes[1].ToString("X2") + " " + bytes[2].ToString("X2") + " " + bytes[3].ToString("X2"));
             }
         }
 #endif

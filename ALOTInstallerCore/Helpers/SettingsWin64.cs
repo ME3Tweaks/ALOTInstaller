@@ -289,12 +289,12 @@ namespace ALOTInstallerCore.Helpers
             }
             catch (UnauthorizedAccessException uae)
             {
-                Log.Error($"Unauthorized access exception: {uae.Flatten()}");
+                Log.Error($"[AICORE] Unauthorized access exception: {uae.Flatten()}");
                 return SettingsSaveResult.FAILED_UNAUTHORIZED;
             }
             catch (Exception e)
             {
-                Log.Error($"Error commiting settings: {e.Flatten()}");
+                Log.Error($"[AICORE] Error commiting settings: {e.Flatten()}");
             }
 
             return SettingsSaveResult.FAILED_OTHER;

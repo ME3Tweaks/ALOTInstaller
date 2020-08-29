@@ -82,7 +82,7 @@ namespace ALOTInstallerCore.Helpers
 
                 return CreateTOCForEntries(entries);
             }
-            Log.Error(@"There are no tocable fies in directory " + directory);
+            Log.Error(@"[AICORE] There are no tocable fies in directory " + directory);
             return null;
         }
 

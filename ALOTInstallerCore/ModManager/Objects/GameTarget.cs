@@ -87,14 +87,14 @@ namespace ALOTInstallerCore.ModManager.Objects
                         MEUITMVersion = 0;
                     }
 
-                    CLog.Information(@"Getting game source for target " + TargetPath, logSource);
+                    CLog.Information(@"[AICORE] Getting game source for target " + TargetPath, logSource);
                     var hashCheckResult = VanillaDatabaseService.GetGameSource(this);
 
                     GameSource = hashCheckResult.result;
                     ExecutableHash = hashCheckResult.hash;
                     if (GameSource == null)
                     {
-                        CLog.Error(@"Unknown source or illegitimate installation: " + hashCheckResult.hash, logSource);
+                        CLog.Error(@"[AICORE] Unknown source or illegitimate installation: " + hashCheckResult.hash, logSource);
 
                     }
                     else
@@ -108,13 +108,13 @@ namespace ALOTInstallerCore.ModManager.Objects
                             }
                         }
 
-                        CLog.Information(@"Source: " + GameSource, logSource);
+                        CLog.Information(@"[AICORE] Source: " + GameSource, logSource);
                     }
 
                     IsPolishME1 = Game == Enums.MEGame.ME1 && File.Exists(Path.Combine(TargetPath, @"BioGame", @"CookedPC", @"Movies", @"niebieska_pl.bik"));
                     if (IsPolishME1)
                     {
-                        CLog.Information(@"ME1 Polish Edition detected", logSource);
+                        CLog.Information(@"[AICORE] ME1 Polish Edition detected", logSource);
                     }
 
                     if (forceLodUpdate)
@@ -124,7 +124,7 @@ namespace ALOTInstallerCore.ModManager.Objects
                 }
                 else
                 {
-                    Log.Error($@"Target is invalid: {TargetPath} does not exist (or is not accessible)");
+                    Log.Error($@"[AICORE] Target is invalid: {TargetPath} does not exist (or is not accessible)");
                     IsValid = false; //set to false if target becomes invalid
                 }
             }
@@ -225,7 +225,7 @@ namespace ALOTInstallerCore.ModManager.Objects
                 }
                 catch (Exception e)
                 {
-                    Log.Error($@"Error reading ALOT marker file for {Game}. ALOT Info will be returned as null (nothing installed). " + e.Message);
+                    Log.Error($@"[AICORE] Error reading ALOT marker file for {Game}. ALOT Info will be returned as null (nothing installed). " + e.Message);
                     return null;
                 }
             }
@@ -508,11 +508,11 @@ namespace ALOTInstallerCore.ModManager.Objects
                     fs.WriteUInt32(MEMI_TAG);
                 }
 
-                Log.Information(@"Stamped texture mod installation information on target");
+                Log.Information(@"[AICORE] Stamped texture mod installation information on target");
             }
             catch (Exception e)
             {
-                Log.Error($@"Error writing debug texture mod installation marker file: {e.Message}");
+                Log.Error($@"[AICORE] Error writing debug texture mod installation marker file: {e.Message}");
             }
         }
 
@@ -530,11 +530,11 @@ namespace ALOTInstallerCore.ModManager.Objects
                     fs.WriteUInt32(1234); //erase memi tag
                 }
 
-                Log.Information(@"Changed MEMI Tag for game to 1234.");
+                Log.Information(@"[AICORE] Changed MEMI Tag for game to 1234.");
             }
             catch (Exception e)
             {
-                Log.Error($@"Error stripping debug ALOT marker file for {Game}. {e.Message}");
+                Log.Error($@"[AICORE] Error stripping debug ALOT marker file for {Game}. {e.Message}");
             }
 #endif
         }
@@ -611,7 +611,7 @@ namespace ALOTInstallerCore.ModManager.Objects
         public bool InstallBinkBypass()
         {
             var binkPath = getBinkPath();
-            Log.Information($"Installing Binkw32 bypass for {Game} to {binkPath}");
+            Log.Information($"[AICORE] Installing Binkw32 bypass for {Game} to {binkPath}");
 
             if (Game == Enums.MEGame.ME1)
             {
@@ -634,11 +634,11 @@ namespace ALOTInstallerCore.ModManager.Objects
             }
             else
             {
-                Log.Error("Unknown game for gametarget (InstallBinkBypass)");
+                Log.Error("[AICORE] Unknown game for gametarget (InstallBinkBypass)");
                 return false;
             }
 
-            Log.Information($"Installed Binkw32 bypass for {Game}");
+            Log.Information($"[AICORE] Installed Binkw32 bypass for {Game}");
             return true;
         }
 
@@ -706,7 +706,7 @@ namespace ALOTInstallerCore.ModManager.Objects
             }
             catch (Exception e)
             {
-                Log.Error(@"Error fetching list of installed ASIs: " + e.Message);
+                Log.Error(@"[AICORE] Error fetching list of installed ASIs: " + e.Message);
             }
 
             return installedASIs;

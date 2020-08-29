@@ -42,7 +42,7 @@ namespace ALOTInstallerCore
             CancellationTokenSource cancellationTokenSource)
         {
 #if APPUPDATESUPPORT
-            Log.Information("Checking for application updates from gitub");
+            Log.Information("[AICORE] Checking for application updates from gitub");
             var currentAppVersionInfo = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             var client = new GitHubClient(new ProductHeaderValue($"{Utilities.GetAppPrefixedName()}Installer"));
             try
@@ -51,7 +51,7 @@ namespace ALOTInstallerCore
                 var releases = client.Repository.Release.GetAll(owner, repo).Result;
                 if (releases.Count > 0)
                 {
-                    Log.Information("Fetched application releases from github");
+                    Log.Information("[AICORE] Fetched application releases from github");
 
                     //The release we want to check is always the latest
                     Release latest = null;
@@ -88,16 +88,16 @@ namespace ALOTInstallerCore
 
                     if (latest != null)
                     {
-                        Log.Information("Latest available applicable update: " + latest.TagName);
+                        Log.Information("[AICORE] Latest available applicable update: " + latest.TagName);
                         Version releaseName = new Version(latest.TagName);
                         if (currentAppVersionInfo < releaseName)
                         {
                             bool upgrade = false;
                             bool canCancel = true;
-                            Log.Information("Latest release is applicable to us.");
+                            Log.Information("[AICORE] Latest release is applicable to us.");
                             if (myReleaseAge > 5)
                             {
-                                Log.Warning("This is an old release. We are force upgrading this client.");
+                                Log.Warning("[AICORE] This is an old release. We are force upgrading this client.");
                                 upgrade = true;
                                 canCancel = false;
                             }
@@ -130,7 +130,7 @@ namespace ALOTInstallerCore
                             }
                             if (upgrade)
                             {
-                                Log.Information("Downloading update for application");
+                                Log.Information("[AICORE] Downloading update for application");
                                 //there's an update
                                 string message = $"Downloading update for {Utilities.GetAppPrefixedName()} Installer...";
                                 if (!canCancel)
@@ -149,7 +149,7 @@ namespace ALOTInstallerCore
                                 if (downloadResult.result == null & downloadResult.errorMessage == null)
                                 {
                                     // Canceled
-                                    Log.Warning("The download was canceled.");
+                                    Log.Warning("[AICORE] The download was canceled.");
                                     return;
                                 }
                                 if (downloadResult.errorMessage != null)
@@ -179,14 +179,14 @@ namespace ALOTInstallerCore
                             }
                             else
                             {
-                                Log.Warning("Application update was declined by user");
+                                Log.Warning("[AICORE] Application update was declined by user");
                                 showMessageCallback?.Invoke("Old versions are not supported", $"Outdated versions of {Utilities.GetAppPrefixedName()} Installer are not supported and may stop working when online components, such as the installation manifest, are updated.");
                             }
                         }
                         else
                         {
                             //up to date
-                            Log.Information("Application is up to date.");
+                            Log.Information("[AICORE] Application is up to date.");
 
                             if (betaAvailableButOnStable && Settings.LastBetaAdvert < (DateTimeOffset.UtcNow.AddDays(-3)))
                             {
@@ -199,7 +199,7 @@ namespace ALOTInstallerCore
             }
             catch (Exception e)
             {
-                Log.Error("Error checking for update: " + e);
+                Log.Error("[AICORE] Error checking for update: " + e);
             }
 #endif
         }
@@ -224,7 +224,7 @@ namespace ALOTInstallerCore
                     var validationResult = authenticodeInspector.Validate();
                     if (validationResult != SignatureCheckResult.Valid)
                     {
-                        Log.Error($@"The update file does not have a valid signature: {validationResult}. Update will be aborted.");
+                        Log.Error($@"[AICORE] The update file does not have a valid signature: {validationResult}. Update will be aborted.");
                         return "The update file has an invalid signature. See the application log for more details.";
                     }
 #endif
@@ -248,7 +248,7 @@ namespace ALOTInstallerCore
         private static void applyUpdate(string newExecutable, Action<string> setDialogText = null)
         {
             string args = @"--update-boot";
-            Log.Information($@"Booting new version of the installer to perform first time extraction: {newExecutable} {args}");
+            Log.Information(@"[AICORE] Booting new version of the installer to perform first time extraction: {newExecutable} {args}");
 
             Process process = new Process();
             // Stop the process from opening a new window
@@ -263,7 +263,7 @@ namespace ALOTInstallerCore
             setDialogText?.Invoke($"Restarting {Utilities.GetAppPrefixedName()} Installer");
             Thread.Sleep(2000);
             args = $"--update-dest-path \"{System.Reflection.Assembly.GetExecutingAssembly().Location}\"";
-            Log.Information($@"Running proxy update: {newExecutable} {args}");
+            Log.Information(@"[AICORE] Running proxy update: {newExecutable} {args}");
 
             process = new Process();
             // Stop the process from opening a new window
@@ -274,7 +274,7 @@ namespace ALOTInstallerCore
             process.StartInfo.FileName = newExecutable;
             process.StartInfo.Arguments = args;
             process.Start();
-            Log.Information(@"Stopping installer to allow executable swap");
+            Log.Information(@"[AICORE] Stopping installer to allow executable swap");
             Log.CloseAndFlush();
 
             // If this throws exception and the app dies... oh well, I guess?

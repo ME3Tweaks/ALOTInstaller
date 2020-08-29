@@ -392,7 +392,7 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Exception getting mount priority from file: {mountpath}: {e.Message}");
+                    Log.Error($"[AICORE] Exception getting mount priority from file: {mountpath}: {e.Message}");
                 }
             }
 
