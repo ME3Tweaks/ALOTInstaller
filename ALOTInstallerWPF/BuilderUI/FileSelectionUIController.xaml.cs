@@ -189,7 +189,7 @@ namespace ALOTInstallerWPF.BuilderUI
         private void startPostStartup()
         {
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("PostStartup");
-            nbw.DoWork += (sender, args) =>
+            nbw.DoWork += async (sender, args) =>
             {
                 try
                 {
@@ -211,7 +211,7 @@ namespace ALOTInstallerWPF.BuilderUI
                         foreach (var v in ManifestHandler.MasterManifest.MusicPackMirrors)
                         {
                             outpath = Path.Combine(Locations.TempDirectory(), "MusicPack" + Path.GetExtension(v.URL));
-                            var memoryItem = OnlineContent.DownloadToMemory(v.URL, (done, total) =>
+                            var memoryItem = await OnlineContent.DownloadToMemory(v.URL, (done, total) =>
                             {
                                 ProgressIndeterminate = false;
                                 ProgressMax = total;

@@ -6,11 +6,12 @@
     <UseWPF>true</UseWPF>
     <Platforms>x64</Platforms>
     <Company>ME3Tweaks</Company>
-    <Version>4.0.650.0</Version>
+    <Version>4.0.640.0</Version>
     <Authors>ME3Tweaks</Authors>
     <Product>ALOT Installer</Product>
     <Description>Texture install for the original Mass Effect Trilogy</Description>
     <Copyright>ME3Tweaks 2017 - 2020</Copyright>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -53,13 +54,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="..\Libraries\Windows\CompressionWrappers.dll" Condition=" '$(OS)' == 'Windows_NT' ">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
+	<ItemGroup>
     <Content Include="InstallerUI\installtips.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

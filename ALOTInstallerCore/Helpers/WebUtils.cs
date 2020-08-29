@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace ALOTInstallerCore.Helpers
@@ -12,35 +13,34 @@ namespace ALOTInstallerCore.Helpers
     [Localizable(false)]
     public static class WebUtils
     {
-        public static Encoding GetEncodingFrom(
-            NameValueCollection responseHeaders,
+        public static Encoding GetEncodingFrom(HttpContentHeaders responseHeaders,
             Encoding defaultEncoding = null)
         {
             if (responseHeaders == null)
                 throw new ArgumentNullException(@"responseHeaders");
 
             //Note that key lookup is case-insensitive
-            var contentType = responseHeaders[@"Content-Type"];
-            if (contentType == null)
+            var charsetName = responseHeaders.ContentType.CharSet;
+            if (charsetName == null)
                 return defaultEncoding;
 
-            var contentTypeParts = contentType.Split(';');
-            if (contentTypeParts.Length <= 1)
-                return defaultEncoding;
+            //var contentTypeParts = contentType.Split(';');
+            //if (contentTypeParts.Length <= 1)
+            //    return defaultEncoding;
 
-            var charsetPart =
-                contentTypeParts.Skip(1).FirstOrDefault(
-                    p => p.TrimStart().StartsWith(@"charset", StringComparison.InvariantCultureIgnoreCase));
-            if (charsetPart == null)
-                return defaultEncoding;
+            //var charsetPart =
+            //    contentTypeParts.Skip(1).FirstOrDefault(
+            //        p => p.TrimStart().StartsWith(@"charset", StringComparison.InvariantCultureIgnoreCase));
+            //if (charsetPart == null)
+            //    return defaultEncoding;
 
-            var charsetPartParts = charsetPart.Split('=');
-            if (charsetPartParts.Length != 2)
-                return defaultEncoding;
+            //var charsetPartParts = charsetPart.Split('=');
+            //if (charsetPartParts.Length != 2)
+            //    return defaultEncoding;
 
-            var charsetName = charsetPartParts[1].Trim();
-            if (charsetName == "")
-                return defaultEncoding;
+            //var charsetName = charsetPartParts[1].Trim();
+            //if (charsetName == "")
+            //    return defaultEncoding;
 
             try
             {

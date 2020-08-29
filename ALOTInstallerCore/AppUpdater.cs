@@ -17,6 +17,20 @@ namespace ALOTInstallerCore
 {
     public class AppUpdater
     {
+        /// <summary>
+        /// Checks for application updates. The hosting app must implement the reboot and swap logic.
+        /// </summary>
+        /// <param name="owner"></param>
+        /// <param name="repo"></param>
+        /// <param name="assetPrefix"></param>
+        /// <param name="updateFilenameInArchive"></param>
+        /// <param name="showUpdatePromptCallback"></param>
+        /// <param name="showUpdateProgressDialogCallback"></param>
+        /// <param name="setUpdateDialogTextCallback"></param>
+        /// <param name="progressCallback"></param>
+        /// <param name="progressIndeterminateCallback"></param>
+        /// <param name="showMessageCallback"></param>
+        /// <param name="notifyBetaAvailable"></param>
         public static async void PerformGithubAppUpdateCheck(string owner, string repo, string assetPrefix, string updateFilenameInArchive,
             Func<string, string, string, string, bool> showUpdatePromptCallback,
             Action<string, string, bool> showUpdateProgressDialogCallback, // title, message, cancancel
@@ -24,7 +38,8 @@ namespace ALOTInstallerCore
             Action<long, long> progressCallback,
             Action progressIndeterminateCallback,
             Action<string, string> showMessageCallback,
-            Action notifyBetaAvailable)
+            Action notifyBetaAvailable,
+            CancellationToken cancellationToken)
         {
 #if APPUPDATESUPPORT
             Log.Information("Checking for application updates from gitub");
@@ -33,7 +48,7 @@ namespace ALOTInstallerCore
             try
             {
                 int myReleaseAge = 0;
-                var releases = await client.Repository.Release.GetAll(owner, repo);
+                var releases = client.Repository.Release.GetAll(owner, repo).Result;
                 if (releases.Count > 0)
                 {
                     Log.Information("Fetched application releases from github");
@@ -109,10 +124,9 @@ namespace ALOTInstallerCore
                                 }
 
                                 uiVersionInfo += $"\nReleased {ageStr}";
-                                string message = $"{Utilities.GetAppPrefixedName()} Installer {releaseName} is available. You are currently using version {currentAppVersionInfo}.{uiVersionInfo}";
+                                string title = $"{Utilities.GetAppPrefixedName()} Installer {releaseName} is available";
 
-                                upgrade = showUpdatePromptCallback != null && showUpdatePromptCallback.Invoke(message, latest.Body, "Update", "Later");
-
+                                upgrade = showUpdatePromptCallback != null && showUpdatePromptCallback.Invoke(title, $"You are currently using version {currentAppVersionInfo}.{uiVersionInfo}\nChangelog:\n\n{latest.Body}", "Update", "Later");
                             }
                             if (upgrade)
                             {
@@ -127,26 +141,40 @@ namespace ALOTInstallerCore
                                     }
                                 }
 
-                                showUpdateProgressDialogCallback?.Invoke("Downloading update", message, canCancel);
+                                showUpdateProgressDialogCallback?.Invoke($"Updating {Utilities.GetAppPrefixedName()} Installer", message, canCancel);
                                 // First here should be OK since we checked it above...
                                 var asset = latest.Assets.First(x => x.Name.StartsWith(assetPrefix));
-                                var downloadResult = OnlineContent.DownloadToMemory(asset.BrowserDownloadUrl, progressCallback,
-                                    logDownload: true);
+                                var downloadResult = await OnlineContent.DownloadToMemory(asset.BrowserDownloadUrl, progressCallback,
+                                    logDownload: true, cancellationToken: cancellationToken);
+                                if (downloadResult.result == null & downloadResult.errorMessage == null)
+                                {
+                                    // Canceled
+                                    Log.Warning("The download was canceled.");
+                                    return;
+                                }
                                 if (downloadResult.errorMessage != null)
                                 {
                                     // There was an error downloading the update.
+                                    showMessageCallback?.Invoke("Update failed", $"There was an error downloading the update: {downloadResult.errorMessage}");
+                                    return;
+
                                 }
-                                else if (downloadResult.result.Length != asset.Size)
+                                if (downloadResult.result.Length != asset.Size)
                                 {
                                     // The download is wrong size
+                                    showMessageCallback?.Invoke("Update failed", "The downloaded file was incomplete.");
+                                    return;
                                 }
-                                else
-                                {
-                                    // Download is OK
-                                    progressIndeterminateCallback?.Invoke();
-                                    setUpdateDialogTextCallback?.Invoke("Preparing to apply update");
-                                    var updateFailedResult = extractUpdate(downloadResult.result, Path.GetFileName(asset.Name), updateFilenameInArchive, setUpdateDialogTextCallback);
+                                // Download is OK
 
+                                progressIndeterminateCallback?.Invoke();
+                                showUpdateProgressDialogCallback?.Invoke($"Updating {Utilities.GetAppPrefixedName()} Installer", "Preparing to apply update", false);
+                                var updateFailedResult = extractUpdate(downloadResult.result, Path.GetFileName(asset.Name), updateFilenameInArchive, setUpdateDialogTextCallback);
+                                if (updateFailedResult != null)
+                                {
+                                    // The download is wrong size
+                                    showMessageCallback?.Invoke("Update failed", $"Applying the update failed: {updateFailedResult}");
+                                    return;
                                 }
                             }
                             else
@@ -184,11 +212,13 @@ namespace ALOTInstallerCore
             if (SevenZipHelper.LZMA.ExtractSevenZipArchive(archiveFile, outDir))
             {
                 // Extraction complete
+#if WINDOWS
                 setDialogText?.Invoke("Verifying update");
-                var fileToValidate = Directory.GetFiles(outDir, updateFileName, SearchOption.AllDirectories)
-                    .FirstOrDefault();
+#endif
+                var fileToValidate = Directory.GetFiles(outDir, updateFileName, SearchOption.AllDirectories).FirstOrDefault();
                 if (fileToValidate != null)
                 {
+#if WINDOWS
                     // Signature check
                     var authenticodeInspector = new FileInspector(fileToValidate);
                     var validationResult = authenticodeInspector.Validate();
@@ -197,6 +227,7 @@ namespace ALOTInstallerCore
                         Log.Error($@"The update file does not have a valid signature: {validationResult}. Update will be aborted.");
                         return "The update file has an invalid signature. See the application log for more details.";
                     }
+#endif
 
                     // Validated
                     setDialogText?.Invoke("Applying update");

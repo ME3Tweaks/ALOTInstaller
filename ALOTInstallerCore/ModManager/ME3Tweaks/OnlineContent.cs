@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Services;
 using Newtonsoft.Json;
@@ -78,9 +81,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     string host = myUri.Host;
                     try
                     {
-                        using var wc = new ShortTimeoutWebClient();
+                        //using var wc = new ShortTimeoutWebClient();
 
-                        string json = wc.DownloadStringAwareOfEncoding(staticurl);
+                        string json = HttpClientDownloadWithProgress.DownloadStringAwareOfEncoding(staticurl);
                         File.WriteAllText(Locations.GetBasegameIdentificationCacheFile(), json);
                         return JsonConvert.DeserializeObject<Dictionary<string, CaseInsensitiveDictionary<List<BasegameFileIdentificationService.BasegameCloudDBFile>>>>(json);
                     }
@@ -152,9 +155,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             {
                 try
                 {
-                    using var wc = new ShortTimeoutWebClient();
-
-                    string json = wc.DownloadStringAwareOfEncoding(ThirdPartyIdentificationServiceURL);
+                    string json = HttpClientDownloadWithProgress.DownloadStringAwareOfEncoding(ThirdPartyIdentificationServiceURL);
                     File.WriteAllText(Locations.GetThirdPartyIdentificationCachedFile(), json);
                     return JsonConvert.DeserializeObject<Dictionary<string, CaseInsensitiveDictionary<ThirdPartyServices.ThirdPartyModInfo>>>(json);
                 }
@@ -201,8 +202,10 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         {
             try
             {
-                using var wc = new ShortTimeoutWebClient();
-                return wc.DownloadStringAwareOfEncoding(url);
+                return null;
+                //using var wc = new HttpClientDownloadWithProgress(url, localPath);
+                //wc.StartDownload().RunSynchronously()
+                //return wc.DownloadStringAwareOfEncoding(url);
             }
             catch (Exception e)
             {
@@ -243,9 +246,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                             try
                             {
-                                using var wc = new ShortTimeoutWebClient();
+                                using var wc = new HttpClientDownloadWithProgress(fullURL, localPath);
                                 Log.Information("Downloading static asset: " + fullURL);
-                                wc.DownloadFile(fullURL, localPath);
+                                wc.StartDownload().RunSynchronously();
                                 downloadOK = true;
                                 break;
                             }
@@ -273,35 +276,35 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             return true;
         }
 
-        public static (MemoryStream result, string errorMessage) FetchString(string url)
-        {
-            using var wc = new ShortTimeoutWebClient();
-            string downloadError = null;
-            MemoryStream responseStream = null;
-            wc.DownloadDataCompleted += (a, args) =>
-            {
-                downloadError = args.Error?.Message;
-                if (downloadError == null)
-                {
-                    responseStream = new MemoryStream(args.Result);
-                }
-                lock (args.UserState)
-                {
-                    //releases blocked thread
-                    Monitor.Pulse(args.UserState);
-                }
-            };
-            var syncObject = new Object();
-            lock (syncObject)
-            {
-                Debug.WriteLine("Download file to memory: " + url);
-                wc.DownloadDataAsync(new Uri(url), syncObject);
-                //This will block the thread until download completes
-                Monitor.Wait(syncObject);
-            }
+        //public static (MemoryStream result, string errorMessage) FetchString(string url)
+        //{
+        //    using var wc = new ShortTimeoutWebClient();
+        //    string downloadError = null;
+        //    MemoryStream responseStream = null;
+        //    wc.DownloadDataCompleted += (a, args) =>
+        //    {
+        //        downloadError = args.Error?.Message;
+        //        if (downloadError == null)
+        //        {
+        //            responseStream = new MemoryStream(args.Result);
+        //        }
+        //        lock (args.UserState)
+        //        {
+        //            //releases blocked thread
+        //            Monitor.Pulse(args.UserState);
+        //        }
+        //    };
+        //    var syncObject = new Object();
+        //    lock (syncObject)
+        //    {
+        //        Debug.WriteLine("Download file to memory: " + url);
+        //        wc.DownloadDataAsync(new Uri(url), syncObject);
+        //        //This will block the thread until download completes
+        //        Monitor.Wait(syncObject);
+        //    }
 
-            return (responseStream, downloadError);
-        }
+        //    return (responseStream, downloadError);
+        //}
 
         /// <summary>
         /// Downloads from a URL to memory. This is a blocking call and must be done on a background thread.
@@ -311,51 +314,118 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         /// <param name="hash">Hash check value (md5). Leave null if no hash check</param>
         /// <returns></returns>
 
-        public static (MemoryStream result, string errorMessage) DownloadToMemory(string url, Action<long, long> progressCallback = null, string hash = null, bool logDownload = false)
+        public async static Task<(MemoryStream result, string errorMessage)> DownloadToMemory(string url, Action<long, long> progressCallback = null, string hash = null, bool logDownload = false, CancellationToken cancellationToken = default)
         {
-            using var wc = new ShortTimeoutWebClient();
+            MemoryStream responseStream = new MemoryStream();
             string downloadError = null;
-            MemoryStream responseStream = null;
-            wc.DownloadProgressChanged += (a, args) => { progressCallback?.Invoke(args.BytesReceived, args.TotalBytesToReceive); };
-            wc.DownloadDataCompleted += (a, args) =>
+
+            using var wc = new HttpClientDownloadWithProgress(url, responseStream, cancellationToken);
+            wc.ProgressChanged += (totalFileSize, totalBytesDownloaded, progressPercentage) =>
             {
-                downloadError = args.Error?.Message;
-                if (downloadError == null)
-                {
-                    responseStream = new MemoryStream(args.Result);
-                    if (hash != null)
-                    {
-                        var md5 = Utilities.CalculateMD5(responseStream);
-                        responseStream.Position = 0;
-                        if (md5 != hash)
-                        {
-                            responseStream = null;
-                            downloadError = $"Hash of downloaded item ({url}) does not match expected hash. Expected: {hash}, got: {md5}"; //needs localized
-                        }
-                    }
-                }
-                lock (args.UserState)
-                {
-                    //releases blocked thread
-                    Monitor.Pulse(args.UserState);
-                }
+                progressCallback?.Invoke(totalBytesDownloaded, totalFileSize ?? 0);
             };
-            var syncObject = new Object();
-            lock (syncObject)
+
+            if (logDownload)
             {
-                if (logDownload)
-                {
-                    Log.Information(@"Downloading to memory: " + url);
-                }
-                else
-                {
-                    Debug.WriteLine("Downloading to memory: " + url);
-                }
-                wc.DownloadDataAsync(new Uri(url), syncObject);
-                //This will block the thread until download completes
-                Monitor.Wait(syncObject);
+                Log.Information(@"Downloading to memory: " + url);
+            }
+            else
+            {
+                Debug.WriteLine("Downloading to memory: " + url);
             }
 
+            try
+            {
+                wc.StartDownload().Wait();
+            }
+            catch (OperationCanceledException oce)
+            {
+                Log.Information("Download canceled");
+                return (null, null);
+            }
+
+            if (hash != null)
+            {
+                var md5 = Utilities.CalculateMD5(responseStream);
+                responseStream.Position = 0;
+                if (md5 != hash)
+                {
+                    responseStream = null;
+                    downloadError =
+                        $"Hash of downloaded item ({url}) does not match expected hash. Expected: {hash}, got: {md5}"; //needs localized
+                }
+            }
+
+            //try
+            //{
+            //    using var registration = cancellationToken.Register(() =>
+            //    {
+            //        wc.CancelPendingRequests();
+            //    });
+
+            //    wc.Get
+
+            //    wc.DownloadProgressChanged += (a, args) =>
+            //    {
+            //        progressCallback?.Invoke(args.BytesReceived, args.TotalBytesToReceive);
+            //    };
+            //    wc.DownloadDataCompleted += (a, args) =>
+            //    {
+            //        if (args.Cancelled)
+            //        {
+            //            responseStream = null;
+            //            downloadError = null;
+            //        }
+            //        else
+            //        {
+            //            downloadError = args.Error?.Message;
+            //            if (downloadError == null)
+            //            {
+            //                responseStream = new MemoryStream(args.Result);
+            //                if (hash != null)
+            //                {
+            //                    var md5 = Utilities.CalculateMD5(responseStream);
+            //                    responseStream.Position = 0;
+            //                    if (md5 != hash)
+            //                    {
+            //                        responseStream = null;
+            //                        downloadError =
+            //                            $"Hash of downloaded item ({url}) does not match expected hash. Expected: {hash}, got: {md5}"; //needs localized
+            //                    }
+            //                }
+            //            }
+            //        }
+
+            //        //lock (args.UserState)
+            //        //{
+            //        //    //releases blocked thread
+            //        //    Monitor.Pulse(args.UserState);
+            //        //}
+            //    };
+            //}
+            //catch (Exception e)
+            //{
+            //    lock (syncObject)
+            //    {
+            //        //This will block the thread until download completes
+            //        Monitor.Pulse(syncObject);
+            //    }
+            //}
+
+            //if (logDownload)
+            //{
+            //    Log.Information(@"Downloading to memory: " + url);
+            //}
+            //else
+            //{
+            //    Debug.WriteLine("Downloading to memory: " + url);
+            //}
+            //wc.DownloadDataAsync(new Uri(url), syncObject);
+            //lock (syncObject)
+            //{
+            //    //This will block the thread until download completes
+            //    Monitor.Wait(syncObject);
+            //}
             return (responseStream, downloadError);
         }
     }

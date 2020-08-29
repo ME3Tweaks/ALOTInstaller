@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using ALOTInstallerCore.Objects;
@@ -687,18 +688,20 @@ namespace ALOTInstallerCore.Helpers
         }
     }
 
-    public static class WebClientExtensions
+    public static class HttpClientExtensions
     {
         private static readonly byte[] utf8Preamble = Encoding.UTF8.GetPreamble();
 
-        public static string DownloadStringAwareOfEncoding(this WebClient webClient, string uri)
+        public static string DownloadStringAwareOfEncoding(this HttpClient webClient, string uri)
         {
-            var rawData = webClient.DownloadData(uri);
+            var response = webClient.GetAsync(uri).Result;
+            response.EnsureSuccessStatusCode();
+            var rawData = response.Content.ReadAsByteArrayAsync().Result;
             if (rawData.StartsWith(utf8Preamble))
             {
                 return Encoding.UTF8.GetString(rawData, utf8Preamble.Length, rawData.Length - utf8Preamble.Length);
             }
-            var encoding = WebUtils.GetEncodingFrom(webClient.ResponseHeaders, new UTF8Encoding(false));
+            var encoding = WebUtils.GetEncodingFrom(response.Content.Headers, new UTF8Encoding(false));
             return encoding.GetString(rawData).Normalize();
         }
 

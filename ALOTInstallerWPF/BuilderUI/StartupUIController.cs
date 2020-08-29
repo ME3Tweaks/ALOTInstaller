@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -105,7 +106,12 @@ namespace ALOTInstallerWPF.BuilderUI
                     });
                 }
 
-
+                pd.SetMessage("Checking for application updates");
+                CancellationTokenSource ct = new CancellationTokenSource();
+                pd.Canceled += (sender, args) =>
+                {
+                    ct.Cancel();
+                };
                 AppUpdater.PerformGithubAppUpdateCheck("Mgamerz", "ALOTInstallerTest", "ALOTInstallerWPF", "ALOTInstallerWPF.exe",
                     (title, text, updateButtonText, declineButtonText) =>
                     {
@@ -136,6 +142,9 @@ namespace ALOTInstallerWPF.BuilderUI
                     }, (title, initialmessage, canCancel) =>
                     {
                         // We don't use this as we are already in a progress dialog
+                        pd.SetCancelable(canCancel);
+                        pd.SetMessage(initialmessage);
+                        pd.SetTitle(title);
                     },
                     s =>
                     {
@@ -144,6 +153,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     (done, total) =>
                     {
                         pd.SetProgress(done * 1d / total);
+                        pd.SetMessage($"Downloading update {FileSizeFormatter.FormatSize(done)} / {FileSizeFormatter.FormatSize(total)}");
                     },
                     () =>
                     {
@@ -171,10 +181,14 @@ namespace ALOTInstallerWPF.BuilderUI
                     () =>
                     {
                         App.BetaAvailable = true;
-                    }
-
-
+                    }, 
+                    ct.Token
                 );
+
+                // If user aborts download
+                pd.SetCancelable(false);
+                pd.SetIndeterminate();
+                pd.SetTitle("Starting up");
 
                 BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
 
