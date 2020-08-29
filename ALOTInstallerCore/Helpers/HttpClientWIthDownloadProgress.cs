@@ -40,12 +40,13 @@ namespace ALOTInstallerCore.Helpers
             this.cancellationToken = cancellationToken.Token;
         }
 
-        public async Task StartDownload()
+        public async Task<HttpResponseMessage> StartDownload()
         {
             _httpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(5) };
 
             using var response = await _httpClient.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead);
             await DownloadFileFromHttpResponseMessage(response, _outStream);
+            return response;
         }
 
         private async Task DownloadFileFromHttpResponseMessage(HttpResponseMessage response, Stream outStream)
@@ -120,10 +121,20 @@ namespace ALOTInstallerCore.Helpers
             _httpClient?.Dispose();
         }
 
-        public static string DownloadStringAwareOfEncoding(string url)
+        private static readonly byte[] utf8Preamble = Encoding.UTF8.GetPreamble();
+
+        public static string DownloadStringAwareOfEncoding(string uri)
         {
-            //var clientP = new HttpClientDownloadWithProgress (url)
-            return "hi";
+            HttpClient webClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(5) };
+            var response = webClient.GetAsync(uri).Result;
+            response.EnsureSuccessStatusCode();
+            var rawData = response.Content.ReadAsByteArrayAsync().Result;
+            if (rawData.StartsWith(utf8Preamble))
+            {
+                return Encoding.UTF8.GetString(rawData, utf8Preamble.Length, rawData.Length - utf8Preamble.Length);
+            }
+            var encoding = WebUtils.GetEncodingFrom(response.Content.Headers, new UTF8Encoding(false));
+            return encoding.GetString(rawData).Normalize();
         }
 
         public void Cancel()

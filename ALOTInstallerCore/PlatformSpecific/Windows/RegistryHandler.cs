@@ -40,7 +40,15 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
                 subkey = subkey.CreateSubKey(subkeys[i]);
                 i++;
             }
-            subkey.SetValue(value, data);
+
+            if (data is long l)
+            {
+                subkey.SetValue(value, data, RegistryValueKind.QWord);
+            }
+            else
+            {
+                subkey.SetValue(value, data);
+            }
         }
 
         internal static void WriteRegistrySettingBool(string keyname, bool value)
@@ -54,6 +62,11 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         }
 
         internal static void WriteRegistrySettingInt(string keyname, int value)
+        {
+            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value);
+        }
+
+        internal static void WriteRegistrySettingLong(string keyname, long value)
         {
             WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value);
         }
@@ -114,6 +127,12 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         {
             using RegistryKey key = primaryKey.OpenSubKey(subkey, true);
             key?.DeleteValue(valuename, false);
+        }
+
+        public static long? GetRegistrySettingLong(string name)
+        {
+            string softwareKey = @"HKEY_CURRENT_USER\Software\ALOTAddon";
+            return (long?)Registry.GetValue(softwareKey, name, null);
         }
     }
 }

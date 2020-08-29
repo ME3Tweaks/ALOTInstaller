@@ -115,10 +115,17 @@ namespace ALOTInstallerCore.Helpers
         /// Makes more output messaging occur
         /// </summary>
         public static bool DebugLogs { get; set; }
+
+        private static DateTime _lastContentCheck;
+
         /// <summary>
         /// When online content was last checked, used for preventing too many requests to ME3Tweaks
         /// </summary>
-        public static DateTime LastContentCheck { get; set; }
+        public static DateTime LastContentCheck
+        {
+            get => _lastContentCheck;
+            set => SetProperty(ref _lastContentCheck, value);
+        }
 
         private static bool _telemetry = true;
         /// <summary>
@@ -144,6 +151,7 @@ namespace ALOTInstallerCore.Helpers
             Telemetry = LoadSettingBool(SettingsKeys.SettingKeys.Telemetry, true);
             PlayMusic = LoadSettingBool(SettingsKeys.SettingKeys.PlayMusic, false);
             BetaMode = LoadSettingBool(SettingsKeys.SettingKeys.BetaMode, false);
+            LastContentCheck = LoadSettingDateTime(SettingsKeys.SettingKeys.LastContentCheck, DateTime.MinValue);
             //AutoUpdateLODs = LoadSettingBool(settingsIni, "ModManager", "AutoUpdateLODs", true);
             //WebClientTimeout = LoadSettingInt(settingsIni, "ModManager", "WebclientTimeout", 5);
             //ModMakerControllerModOption = LoadSettingBool(settingsIni, "ModMaker", "AutoAddControllerMixins", false);
@@ -194,23 +202,37 @@ namespace ALOTInstallerCore.Helpers
             }
         }
 
-        private static DateTime LoadSettingDateTime(DuplicatingIni ini, string section, string key, DateTime defaultValue)
+        private static DateTime LoadSettingDateTime(SettingsKeys.SettingKeys key, DateTime defaultValue)
         {
-            if (ini == null) return defaultValue;
-
-            if (string.IsNullOrEmpty(ini[section][key]?.Value)) return defaultValue;
-            try
+            var regSetting = RegistryHandler.GetRegistrySettingLong(SettingsKeys.SettingsKeyMapping[key]);
+            if (regSetting.HasValue)
             {
-                if (long.TryParse(ini[section][key]?.Value, out var dateLong))
-                {
-                    return DateTime.FromBinary(dateLong);
-                }
+                return DateTime.FromBinary(regSetting.Value);
             }
-            catch (Exception)
+            else
             {
+                return defaultValue;
             }
-            return defaultValue;
         }
+
+
+        //private static DateTime LoadSettingDateTime(DuplicatingIni ini, string section, string key, DateTime defaultValue)
+        //{
+        //    if (ini == null) return defaultValue;
+
+        //    if (string.IsNullOrEmpty(ini[section][key]?.Value)) return defaultValue;
+        //    try
+        //    {
+        //        if (long.TryParse(ini[section][key]?.Value, out var dateLong))
+        //        {
+        //            return DateTime.FromBinary(dateLong);
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //    }
+        //    return defaultValue;
+        //}
 
         private static int LoadSettingInt(DuplicatingIni ini, string section, string key, int defaultValue)
         {
@@ -283,7 +305,7 @@ namespace ALOTInstallerCore.Helpers
                 if (propertyName == nameof(MoveFilesWhenImporting))
                     SaveSettingBool(SettingsKeys.SettingKeys.ImportAsMove, MoveFilesWhenImporting);
                 if (propertyName == nameof(LastContentCheck))
-                    SaveSettingDateTime(SettingsKeys.SettingKeys.TextureLibraryDirectory, LastContentCheck);
+                    SaveSettingDateTime(SettingsKeys.SettingKeys.LastContentCheck, LastContentCheck);
 
                 return SettingsSaveResult.SAVED;
             }
@@ -317,7 +339,7 @@ namespace ALOTInstallerCore.Helpers
 
         private static void SaveSettingDateTime(SettingsKeys.SettingKeys key, DateTime value)
         {
-            RegistryHandler.WriteRegistrySettingString(SettingsKeys.SettingsKeyMapping[key], value.ToBinary().ToString());
+            RegistryHandler.WriteRegistrySettingLong(SettingsKeys.SettingsKeyMapping[key], value.ToBinary());
         }
     }
 }

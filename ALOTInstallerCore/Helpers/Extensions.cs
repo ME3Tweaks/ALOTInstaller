@@ -690,22 +690,7 @@ namespace ALOTInstallerCore.Helpers
 
     public static class HttpClientExtensions
     {
-        private static readonly byte[] utf8Preamble = Encoding.UTF8.GetPreamble();
-
-        public static string DownloadStringAwareOfEncoding(this HttpClient webClient, string uri)
-        {
-            var response = webClient.GetAsync(uri).Result;
-            response.EnsureSuccessStatusCode();
-            var rawData = response.Content.ReadAsByteArrayAsync().Result;
-            if (rawData.StartsWith(utf8Preamble))
-            {
-                return Encoding.UTF8.GetString(rawData, utf8Preamble.Length, rawData.Length - utf8Preamble.Length);
-            }
-            var encoding = WebUtils.GetEncodingFrom(response.Content.Headers, new UTF8Encoding(false));
-            return encoding.GetString(rawData).Normalize();
-        }
-
-        private static bool StartsWith(this byte[] thisArray, byte[] otherArray)
+        public static bool StartsWith(this byte[] thisArray, byte[] otherArray)
         {
             // Handle invalid/unexpected input
             // (nulls, thisArray.Length < otherArray.Length, etc.)

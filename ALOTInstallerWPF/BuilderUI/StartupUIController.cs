@@ -191,7 +191,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 pd.SetTitle("Starting up");
 
                 pd.SetMessage("Loading installer framework");
-                ALOTInstallerCoreLib.PostCriticalStartup(RunOnUIThread);
+                ALOTInstallerCoreLib.PostCriticalStartup(x=> pd.SetMessage(x), RunOnUIThread);
 
                 BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
 

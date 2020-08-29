@@ -126,6 +126,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
         public static Dictionary<string, CaseInsensitiveDictionary<ThirdPartyServices.ThirdPartyModInfo>> FetchThirdPartyIdentificationManifest(bool overrideThrottling = false)
         {
+            Log.Information(@"[AICORE] Fetching Third Party Mod Identification Service (TPMI) manifest");
+
             string cached = null;
             if (File.Exists(Locations.GetThirdPartyIdentificationCachedFile()))
             {
@@ -202,10 +204,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         {
             try
             {
-                return null;
-                //using var wc = new HttpClientDownloadWithProgress(url, localPath);
-                //wc.StartDownload().RunSynchronously()
-                //return wc.DownloadStringAwareOfEncoding(url);
+                return HttpClientDownloadWithProgress.DownloadStringAwareOfEncoding(url);
             }
             catch (Exception e)
             {
@@ -355,76 +354,6 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     $"Hash of downloaded item ({url}) does not match expected hash. Expected: {hash}, got: {md5}"; //needs localized
             }
 
-            //try
-            //{
-            //    using var registration = cancellationToken.Register(() =>
-            //    {
-            //        wc.CancelPendingRequests();
-            //    });
-
-            //    wc.Get
-
-            //    wc.DownloadProgressChanged += (a, args) =>
-            //    {
-            //        progressCallback?.Invoke(args.BytesReceived, args.TotalBytesToReceive);
-            //    };
-            //    wc.DownloadDataCompleted += (a, args) =>
-            //    {
-            //        if (args.Cancelled)
-            //        {
-            //            responseStream = null;
-            //            downloadError = null;
-            //        }
-            //        else
-            //        {
-            //            downloadError = args.Error?.Message;
-            //            if (downloadError == null)
-            //            {
-            //                responseStream = new MemoryStream(args.Result);
-            //                if (hash != null)
-            //                {
-            //                    var md5 = Utilities.CalculateMD5(responseStream);
-            //                    responseStream.Position = 0;
-            //                    if (md5 != hash)
-            //                    {
-            //                        responseStream = null;
-            //                        downloadError =
-            //                            $"Hash of downloaded item ({url}) does not match expected hash. Expected: {hash}, got: {md5}"; //needs localized
-            //                    }
-            //                }
-            //            }
-            //        }
-
-            //        //lock (args.UserState)
-            //        //{
-            //        //    //releases blocked thread
-            //        //    Monitor.Pulse(args.UserState);
-            //        //}
-            //    };
-            //}
-            //catch (Exception e)
-            //{
-            //    lock (syncObject)
-            //    {
-            //        //This will block the thread until download completes
-            //        Monitor.Pulse(syncObject);
-            //    }
-            //}
-
-            //if (logDownload)
-            //{
-            //    Log.Information(@"Downloading to memory: " + url);
-            //}
-            //else
-            //{
-            //    Debug.WriteLine("Downloading to memory: " + url);
-            //}
-            //wc.DownloadDataAsync(new Uri(url), syncObject);
-            //lock (syncObject)
-            //{
-            //    //This will block the thread until download completes
-            //    Monitor.Wait(syncObject);
-            //}
             return (responseStream, downloadError);
         }
     }

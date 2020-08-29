@@ -37,14 +37,14 @@ namespace ALOTInstallerCore
                 startTelemetryCallback?.Invoke();
             }
 
-            
+
         }
 
         /// <summary>
         /// This is a continuation of the startup for the library. This method should be called after Startup() and any critical work is done, such as checkingk for updates. The
         /// rest of the library should not load until the update check is done as it may be the source of a crash the update is designed to fix
         /// </summary>
-        public static void PostCriticalStartup(Action<Action> runOnUiThreadCallback)
+        public static void PostCriticalStartup(Action<string> currentOperationCallback, Action<Action> runOnUiThreadCallback)
         {
             Log.Information("[AICORE] Loading game targets");
 
@@ -53,6 +53,14 @@ namespace ALOTInstallerCore
 
             BackupService.InitBackupService(runOnUiThreadCallback);
 
+            currentOperationCallback?.Invoke("Loading ME3Tweaks services");
+            var willcheckforupdates = OnlineContent.CanFetchContentThrottleCheck();
+            BasegameFileIdentificationService.BasegameFileIdentificationServiceDB = OnlineContent.FetchBasegameFileIdentificationServiceManifest();
+            ThirdPartyIdentificationService.ModDatabase = OnlineContent.FetchThirdPartyIdentificationManifest();
+            if (willcheckforupdates)
+            {
+                Settings.LastContentCheck = DateTime.Now;
+            }
         }
     }
 }

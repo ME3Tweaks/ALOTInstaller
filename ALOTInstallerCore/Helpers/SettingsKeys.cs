@@ -17,7 +17,8 @@ namespace ALOTInstallerCore.Helpers
             DownloadsFolder,
             BuildLocation,
             PlayMusic,
-            Telemetry
+            Telemetry,
+            LastContentCheck
         }
 
         public static Dictionary<SettingKeys, string> SettingsKeyMapping = new Dictionary<SettingKeys, string>()
@@ -34,6 +35,7 @@ namespace ALOTInstallerCore.Helpers
             {SettingKeys.BuildLocation,"BuildLocation"}, //v4
             {SettingKeys.PlayMusic,"PlayMusic"},
             {SettingKeys.Telemetry,"Telemetry"}, //v4
+            {SettingKeys.LastContentCheck,"LastME3TweaksContentCheck"}, //v4
         };
 
     }
