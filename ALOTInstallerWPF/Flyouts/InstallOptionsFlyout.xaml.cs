@@ -48,7 +48,11 @@ namespace ALOTInstallerWPF.Flyouts
 #if DEBUG
         public bool DebugPerformMainInstallation { get; set; } = true; //Default to TRUE
 #else
-        public bool DebugPerformMainInstallation => true; //ALWAYS TRUE IN RELEASE
+        public bool DebugPerformMainInstallation
+        {
+            get => true;
+            set { }
+        }
 #endif
 
         private static string fourKLodsStr = "Uses best quality textures, uses more memory than 2K";

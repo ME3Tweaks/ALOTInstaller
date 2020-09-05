@@ -1,18 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <Platforms>x64</Platforms>
     <Company>ME3Tweaks</Company>
-    <Version>4.0.640.0</Version>
+    <Version>4.0.651.0</Version>
     <Authors>ME3Tweaks</Authors>
     <Product>ALOT Installer</Product>
-    <Description>Texture install for the original Mass Effect Trilogy</Description>
+    <Description>Texture installer for the original Mass Effect Trilogy</Description>
     <Copyright>ME3Tweaks 2017 - 2020</Copyright>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <Configurations>WinDebug;WPFDebug</Configurations>
+    <Configurations>WPFDebug</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -52,6 +51,16 @@
     </Content>
   </ItemGroup>
 
+  <PropertyGroup Condition="'$(Configuration)'=='WPFDebug'">
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='WPFRelease'">
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>WINDOWS</DefineConstants>
+  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />

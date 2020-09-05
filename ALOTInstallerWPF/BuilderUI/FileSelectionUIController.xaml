@@ -83,7 +83,7 @@
             <TextBlock Text="Preparing to install textures for" FontWeight="Bold" TextAlignment="Center" FontSize="16" DockPanel.Dock="Top"/>
             <Image DockPanel.Dock="Top" Source="{Binding StagingGame, Converter={StaticResource GameToLogoConverter}}" RenderOptions.BitmapScalingMode="HighQuality" Height="40" HorizontalAlignment="Center"/>
 
-            <TextBlock Text="{Binding StagingStatusText}" TextAlignment="Center"/>
+            <TextBlock Text="{Binding StagingStatusText}" TextAlignment="Center" Margin="0,10"/>
         </DockPanel>
 
         <ProgressBar DockPanel.Dock="Top" Value="{Binding ProgressValue}" Maximum="{Binding ProgressMax}" IsIndeterminate="{Binding ProgressIndeterminate}"/>
