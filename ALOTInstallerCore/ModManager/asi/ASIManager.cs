@@ -260,7 +260,7 @@ namespace MassEffectModManagerCore.modmanager.asi
         public static bool InstallASIToTarget(ASIModVersion asi, GameTarget target, bool? forceSource = null)
         {
             if (asi.Game != target.Game) throw new Exception($@"ASI {asi.Name} cannot be installed to game {target.Game}");
-            Log.Information(@"[AICORE] Processing ASI installation request: {asi.Name} v{asi.Version} -> {target.TargetPath}");
+            Log.Information($@"[AICORE] Processing ASI installation request: {asi.Name} v{asi.Version} -> {target.TargetPath}");
             string destinationFilename = $@"{asi.InstalledPrefix}-v{asi.Version}.asi";
             string cachedPath = Path.Combine(CachedASIsFolder, destinationFilename);
             string destinationDirectory = MEDirectories.ASIPath(target);
@@ -311,10 +311,10 @@ namespace MassEffectModManagerCore.modmanager.asi
                 md5 = Utilities.CalculateMD5(cachedPath);
                 if (md5 == asi.Hash)
                 {
-                    Log.Information(@"[AICORE] Copying ASI from cached library to destination: {cachedPath} -> {finalPath}");
+                    Log.Information($@"[AICORE] Copying ASI from cached library to destination: {cachedPath} -> {finalPath}");
 
                     File.Copy(cachedPath, finalPath, true);
-                    Log.Information(@"[AICORE] Installed ASI to {finalPath}");
+                    Log.Information($@"[AICORE] Installed ASI to {finalPath}");
                     CoreAnalytics.TrackEvent(@"Installed ASI", new Dictionary<string, string>() {
                                 { @"Filename", Path.GetFileNameWithoutExtension(finalPath)}
                             });

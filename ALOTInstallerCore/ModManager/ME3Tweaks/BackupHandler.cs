@@ -768,7 +768,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     #endregion
 
                     UpdateStatusCallback?.Invoke("Calculating how many files will be restored");
-                    Log.Information(@"[AICORE] Copying backup to game directory: {backupPath} -> {destinationDirectory}");
+                    Log.Information($@"[AICORE] Copying backup to game directory: {backupPath} -> {destinationDirectory}");
                     CopyTools.CopyAll_ProgressBar(new DirectoryInfo(backupPath), new DirectoryInfo(destinationDirectory),
                         totalItemsToCopyCallback: totalFilesToCopyCallback,
                         aboutToCopyCallback: aboutToCopyCallback,
