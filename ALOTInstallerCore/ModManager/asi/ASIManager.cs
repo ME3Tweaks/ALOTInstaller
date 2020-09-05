@@ -382,6 +382,7 @@ namespace MassEffectModManagerCore.modmanager.asi
         /// <param name="gameTarget"></param>
         public static bool InstallASIToTargetByGroupID(int updateGroup, GameTarget gameTarget)
         {
+            Log.Error($@"[AICORE] Installing ASI update group {updateGroup} to target {gameTarget.TargetPath}");
             var group = GetASIModsByGame(gameTarget.Game).FirstOrDefault(x => x.UpdateGroupId == updateGroup);
             if (group == null)
             {

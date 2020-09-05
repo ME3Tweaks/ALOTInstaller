@@ -26,6 +26,7 @@ using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.IconPacks;
+using Serilog;
 
 namespace ALOTInstallerWPF.InstallerUI
 {
@@ -123,6 +124,7 @@ namespace ALOTInstallerWPF.InstallerUI
             {
                 XDocument tipsDoc = XDocument.Load(installTipsFile);
                 codexTips.ReplaceAll(tipsDoc.Root.Element(InstallOptions.InstallTarget.Game.ToString().ToLower()).Descendants("tip").Select(x => x.Value));
+                codexTips.Shuffle();
             }
             //using (StreamReader reader = new StreamReader(stream))
             //{
@@ -196,6 +198,10 @@ namespace ALOTInstallerWPF.InstallerUI
             setMusicIcon();
         }
 
+        /// <summary>
+        /// Current index of tip
+        /// </summary>
+        private int tipIndex = 0;
         private void setMusicIcon()
         {
             MusicIcon = musicOn ? PackIconIoniconsKind.VolumeHighMD : PackIconIoniconsKind.VolumeOffMD;
@@ -217,20 +223,13 @@ namespace ALOTInstallerWPF.InstallerUI
             TipTimer.Tick += (sender, args) =>
             {
                 TipTimer.Interval = new TimeSpan(0, 0, 20);
-
                 // code goes here
                 if (codexTips.Count > 1)
                 {
-                    string newTip = codexTips.RandomElement();
-                    while (CurrentTip == newTip)
-                    {
-                        // Pick a new tip
-                        newTip = codexTips.RandomElement();
-                    }
-
-                    CurrentTip = newTip;
+                    CurrentTip = codexTips[tipIndex++ % codexTips.Count];
                 }
             };
+            tipIndex = 0;
             TipTimer.Interval = new TimeSpan(0, 0, 6); //Initial tip time
             TipTimer.Start();
             string installString = null;
@@ -259,11 +258,12 @@ namespace ALOTInstallerWPF.InstallerUI
                 {
                     if (b.Result is InstallStep.InstallResult ir)
                     {
+                        Log.Information($"[AIWPF] Installation result: {b.Result}");
                         handleInstallResult(ir, installString);
-
                     }
                     else
                     {
+                        Log.Error("[AIWPF] Installer thread exited with no exception but did not set result code");
                         BigIconKind = PackIconIoniconsKind.CloseCircleMD;
                         BigIconForeground = Brushes.Red;
                         InstallerTextTop = "Failed to install textures";
@@ -274,6 +274,9 @@ namespace ALOTInstallerWPF.InstallerUI
                 }
                 else
                 {
+
+                    Log.Error("[AIWPF] Installation step threw an exception:");
+                    b.Error.WriteToLog("[AIWPF] ");
                     BigIconKind = PackIconIoniconsKind.CloseCircleMD;
                     BigIconForeground = Brushes.Red;
                     InstallerTextTop = "Failed to install textures";
@@ -289,10 +292,7 @@ namespace ALOTInstallerWPF.InstallerUI
             else
             {
                 ContinueButtonVisible = true;
-                CommonUtil.Run(() =>
-                {
-                    fadeoutMusic();
-                }, TimeSpan.FromSeconds(5));
+                CommonUtil.Run(fadeoutMusic, TimeSpan.FromSeconds(5));
             }
 
             #region MUSIC
@@ -318,8 +318,8 @@ namespace ALOTInstallerWPF.InstallerUI
             {
                 BigIconKind = PackIconIoniconsKind.CheckmarkCircleMD;
                 BigIconForeground = Brushes.Green;
-                InstallerTextTop = $"Installed {installString}";
-                InstallerTextBottomVisibility = InstallerTextMiddleVisibility = Visibility.Collapsed;
+                //InstallerTextTop = $"Installed {installString}";
+                //InstallerTextBottomVisibility = InstallerTextMiddleVisibility = Visibility.Collapsed;
                 CurrentTip = $"Texture installation succeeded. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
             }
             else if (ir == InstallStep.InstallResult.InstallOKWithWarning)

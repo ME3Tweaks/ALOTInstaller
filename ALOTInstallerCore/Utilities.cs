@@ -302,7 +302,7 @@ namespace ALOTInstallerCore
             catch (IOException e)
             {
                 Log.Error("[AICORE] I/O ERROR CALCULATING CHECKSUM OF FILE: " + filename);
-                Log.Error($"[AICORE] {e.Flatten()}");
+                e.WriteToLog("[AICORE] ");
                 return null;
             }
         }

@@ -77,7 +77,8 @@ namespace ALOTInstallerCore.Steps
             catch (Exception e)
             {
                 Log.Error("[AICORE] Unable to check pagefile settings:");
-                Log.Error($"[AICORE] {e.Flatten()}");
+                e.WriteToLog("[AICORE] ");
+
             }
 #endif
         }
@@ -180,7 +181,7 @@ namespace ALOTInstallerCore.Steps
             {
                 Log.Error(
                     "[AICORE] Error checking for write privileges. This may be a significant sign that an installed game is not in a good state.");
-                Log.Error($"[AICORE] {e.Flatten()}");
+                e.WriteToLog("[AICORE] ");
                 //messageCa
                 //await this.ShowMessageAsync("Error checking write privileges",
                 //    "An error occurred while checking write privileges to game folders. This may be a sign that the game is in a bad state.\n\nThe error was:\n" +

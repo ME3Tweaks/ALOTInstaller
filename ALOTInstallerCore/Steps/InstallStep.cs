@@ -133,14 +133,14 @@ namespace ALOTInstallerCore.Steps
 
             #region setup top text
 
-            string primary = "";
+            string installString = "";
             if (package.InstallALOTUpdate)
             {
                 // alot update
                 var updateFile = package.FilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTUPDATEVER != 0);
                 if (updateFile != null)
                 {
-                    primary = $"ALOT {updateFile.AlotVersionInfo.ALOTVER}.{updateFile.AlotVersionInfo.ALOTUPDATEVER}";
+                    installString = $"ALOT {updateFile.AlotVersionInfo.ALOTVER}.{updateFile.AlotVersionInfo.ALOTUPDATEVER}";
                 }
             }
             else if (package.InstallALOT)
@@ -149,7 +149,7 @@ namespace ALOTInstallerCore.Steps
                 var mainfile = package.FilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER != 0);
                 if (mainfile != null)
                 {
-                    primary = $"ALOT {mainfile.AlotVersionInfo.ALOTVER}.0";
+                    installString = $"ALOT {mainfile.AlotVersionInfo.ALOTVER}.0";
                 }
             }
 
@@ -158,24 +158,24 @@ namespace ALOTInstallerCore.Steps
                 var meuitmFile = package.FilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.MEUITMVER != 0);
                 if (meuitmFile != null)
                 {
-                    if (primary == "")
+                    if (installString == "")
                     {
-                        primary = $"MEUITM v{meuitmFile.AlotVersionInfo.MEUITMVER}";
+                        installString = $"MEUITM v{meuitmFile.AlotVersionInfo.MEUITMVER}";
                     }
                     else
                     {
-                        primary += $" & MEUITM v{meuitmFile.AlotVersionInfo.MEUITMVER}";
+                        installString += $" & MEUITM v{meuitmFile.AlotVersionInfo.MEUITMVER}";
                     }
                 }
             }
 
-            if (primary == "")
+            if (installString == "")
             {
-                primary = "texture mods";
+                installString = "texture mods";
             }
 
-            SetInstallString?.Invoke(primary);
-            SetTopTextCallback?.Invoke($"Installing {primary} for {package.InstallTarget.Game.ToGameName()}");
+            SetInstallString?.Invoke(installString);
+            SetTopTextCallback?.Invoke($"Installing {installString} for {package.InstallTarget.Game.ToGameName()}");
 
             #endregion
 
@@ -208,10 +208,13 @@ namespace ALOTInstallerCore.Steps
 
             #region Preinstall ALOV mods
 
-            if (!applyModManagerMods())
+            if (!package.DebugNoInstall)
             {
-                doWorkEventArgs.Result = InstallResult.InstallFailed_TextureExportFixFailed;
-                return;
+                if (!applyModManagerMods())
+                {
+                    doWorkEventArgs.Result = InstallResult.InstallFailed_TextureExportFixFailed;
+                    return;
+                }
             }
 
             #endregion
@@ -416,6 +419,23 @@ namespace ALOTInstallerCore.Steps
                 }
 
                 showOnlineStorefrontNoUpdateScreen();
+
+                SetTopTextCallback?.Invoke($"Installation of {installString}");
+                if (hasWarning)
+                {
+                    SetMiddleTextCallback?.Invoke("completed with warnings");
+                    SetBottomTextCallback?.Invoke("See installer log for more info");
+                    SetBottomTextVisibilityCallback?.Invoke(true);
+
+                }
+                else
+                {
+                    SetMiddleTextCallback?.Invoke("was successful");
+                    SetBottomTextVisibilityCallback?.Invoke(false);
+                }
+                SetTopTextVisibilityCallback?.Invoke(true);
+                SetMiddleTextVisibilityCallback?.Invoke(true);
+
                 doWorkEventArgs.Result = hasWarning ? InstallResult.InstallOKWithWarning : InstallResult.InstallOK;
             }
         }
@@ -490,7 +510,7 @@ namespace ALOTInstallerCore.Steps
                     Log.Error($"Error saving package: {x}");
                 });
                 var biogamePath = Path.Combine(package.InstallTarget.TargetPath, "BioGame");
-                
+
                 #region BioA_CitHub fix
 
                 var bioACithubs = Directory.GetFiles(biogamePath, "BioA_CitHub.pcc", SearchOption.AllDirectories);

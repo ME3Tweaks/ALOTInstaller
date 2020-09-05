@@ -68,7 +68,7 @@ namespace ALOTInstallerCore
                     {
                         Log.Error("[AICORE] Path of file is too long - Windows API length limitations for files will cause errors. File: " + file.FullName);
                         Log.Error("[AICORE] The game is either nested too deep or a mod has been improperly installed causing a filepath to be too long.");
-                        Log.Error($"[AICORE] {ex.Flatten()}");
+                        ex.WriteToLog("[AICORE] ");
                     }
                     return false;
                 }

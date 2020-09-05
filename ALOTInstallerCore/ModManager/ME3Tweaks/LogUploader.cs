@@ -133,7 +133,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             {
                 // ex.Message contains rich details, inclulding the URL, verb, response status,
                 // and request and response bodies (if available)
-                Log.Error($@"[AICORE] Handled error uploading log: {ex.Flatten()}");
+                Log.Error($@"[AICORE] Handled error uploading log:");
+                ex.WriteToLog("[AICORE] ");
                 return $"Error uploading log: {ex.Message}";
             }
         }

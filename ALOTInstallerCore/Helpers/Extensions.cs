@@ -10,11 +10,34 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using ALOTInstallerCore.Objects;
+using Serilog;
 
 namespace ALOTInstallerCore.Helpers
 {
     public static class Extensions
     {
+        /// <summary>
+        /// Flattens an exception and writes it to the log as Error
+        /// </summary>
+        /// <returns>Printable string</returns>
+        public static void WriteToLog(this Exception exception, string prefix = "")
+        {
+            while (exception != null)
+            {
+                var line1 = exception.GetType().Name + ": " + exception.Message;
+                foreach (var line in line1.Split("\n"))
+                {
+                    Log.Error(prefix + line);
+                }
+                foreach (var line in exception.StackTrace.Split("\n"))
+                {
+                    Log.Error(prefix + line);
+                }
+
+                exception = exception.InnerException;
+            }
+        }
+
         /// <summary>
         /// Flattens an exception into a printable string
         /// </summary>
@@ -33,6 +56,46 @@ namespace ALOTInstallerCore.Helpers
 
             return stringBuilder.ToString();
         }
+
+        public static string FlattenWithTrace(this Exception exception)
+        {
+            //Get a StackTrace object for the exception
+            StackTrace st = new StackTrace(exception, true);
+
+            //Get the first stack frame
+            StackFrame frame = st.GetFrame(0);
+
+            //Get the file name
+            string fileName = frame.GetFileName();
+
+            //Get the method name
+            string methodName = frame.GetMethod().Name;
+
+            //Get the line number from the stack frame
+            int line = frame.GetFileLineNumber();
+
+            //Get the column number
+            int col = frame.GetFileColumnNumber();
+
+
+            var stringBuilder = new StringBuilder();
+            if (fileName != null && methodName != null)
+            {
+                stringBuilder.AppendLine($"{exception.GetType().Name} occurred in {fileName} {methodName}() on line {line}, column {col}");
+            }
+
+            while (exception != null)
+            {
+                stringBuilder.AppendLine(exception.GetType().Name + ": " + exception.Message);
+                stringBuilder.AppendLine(exception.StackTrace);
+
+                exception = exception.InnerException;
+            }
+
+            return stringBuilder.ToString();
+        }
+
+
 
         private static readonly char[] InvalidPathingChars;
 
@@ -73,7 +136,7 @@ namespace ALOTInstallerCore.Helpers
             if (game == Enums.MEGame.ME1) return 1;
             if (game == Enums.MEGame.ME2) return 2;
             if (game == Enums.MEGame.ME3) return 3;
-            return 0; 
+            return 0;
         }
 
         public static string ToGameName(this Enums.MEGame game)
@@ -1034,6 +1097,7 @@ namespace ALOTInstallerCore.Helpers
 
     public static class ListExtensions
     {
+        private static Random random;
         /// <summary> 
         /// Replaces all elements in existing list with the specified values. This does not call OnPropertyChanged.
         /// </summary> 
@@ -1044,6 +1108,20 @@ namespace ALOTInstallerCore.Helpers
 
             collection.Clear();
             foreach (var i in newValues) collection.Add(i);
+        }
+
+        public static void Shuffle<T>(this IList<T> list)
+        {
+            if (random == null) random = new Random();
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = random.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
         }
     }
 }

@@ -86,7 +86,7 @@ namespace ALOTInstallerCore.Helpers
                     catch (Exception ex)
                     {
                         Log.Error("[AICORE] Unable to write and remove old manifest! We're probably headed towards a crash.");
-                        Log.Error($"[AICORE] {ex.Flatten()}");
+                        ex.WriteToLog("[AICORE] ");
                         //UsingBundledManifest = true;
                     }
                     setCurrentOperationCallback?.Invoke("Parsing installer manifest");
@@ -120,7 +120,8 @@ namespace ALOTInstallerCore.Helpers
             }
             catch (WebException e)
             {
-                Log.Error("[AICORE] WebException occurred getting manifest from server: " + e.Flatten());
+                Log.Error("[AICORE] WebException occurred getting manifest from server:");
+                e.WriteToLog();
                 //if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
                 //{
                 //    Log.Information("[AICORE] Reading bundled manifest instead.");
@@ -460,7 +461,7 @@ namespace ALOTInstallerCore.Helpers
             catch (Exception e)
             {
                 Log.Error("[AICORE] Error has occurred parsing the manifest XML!");
-                Log.Error($"[AICORE] {e.Flatten()}");
+                e.WriteToLog("[AICORE] ");
                 ErrorParsingManifest?.Invoke(e);
                 return false;
             }

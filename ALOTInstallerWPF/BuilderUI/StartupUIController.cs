@@ -17,6 +17,7 @@ using ALOTInstallerWPF.Telemetry;
 using ControlzEx.Theming;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using MassEffectModManagerCore.modmanager.asi;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
@@ -181,7 +182,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     () =>
                     {
                         App.BetaAvailable = true;
-                    }, 
+                    },
                     ct
                 );
 
@@ -191,7 +192,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 pd.SetTitle("Starting up");
 
                 pd.SetMessage("Loading installer framework");
-                ALOTInstallerCoreLib.PostCriticalStartup(x=> pd.SetMessage(x), RunOnUIThread);
+                ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
 
                 BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
 

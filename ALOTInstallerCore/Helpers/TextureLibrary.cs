@@ -333,7 +333,7 @@ namespace ALOTInstallerCore.Helpers
                         if (e.Error != null)
                         {
                             Log.Error($"[AICORE] An error occurred copying the file to the destination:");
-                            Log.Error($"[AICORE] {e.Error.Flatten()}");
+                            e.Error.WriteToLog("[AICORE] ");
                             importFinishedCallback?.Invoke(false,
                                 $"An error occurred copying the file to the library: {e.Error.Message}.");
                         }
