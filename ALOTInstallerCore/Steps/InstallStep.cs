@@ -5,12 +5,16 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps.Installer;
 using MassEffectModManagerCore.modmanager.asi;
+using ME3ExplorerCore;
+using ME3ExplorerCore.Packages;
+using ME3ExplorerCore.Unreal;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps
@@ -475,102 +479,146 @@ namespace ALOTInstallerCore.Steps
 
         private void applyCitadelTransitionFix()
         {
-#if WINDOWS
-
-
-            // This depends on the ME3Explorer lib, which can't (and may never) work on linux
-            //if (package.InstallTarget.Game == Enums.MEGame.ME3)
-            //{
+            if (package.InstallTarget.Game == Enums.MEGame.ME3)
+            {
                 SetMiddleTextVisibilityCallback?.Invoke(false);
 
                 SetBottomTextCallback?.Invoke("Fixing Mars to Citadel transition");
-            //    Log.Information("[AICORE] Fixing post-mars hackett cutscene memory issue");
-            //    ME3ExplorerMinified.DLL.Startup();
+                Log.Information("[AICORE] Fixing post-mars hackett cutscene memory issue");
+                CoreLib.InitLib(package.UiThreadScheduler, x =>
+                {
+                    Log.Error($"Error saving package: {x}");
+                });
+                var biogamePath = Path.Combine(package.InstallTarget.TargetPath, "BioGame");
+                
+                #region BioA_CitHub fix
 
-            //#region BioA_CitHub fix
+                var bioACithubs = Directory.GetFiles(biogamePath, "BioA_CitHub.pcc", SearchOption.AllDirectories);
+                foreach (var bioa_cithubPath in bioACithubs)
+                {
+                    try
+                    {
+                        if (File.Exists(bioa_cithubPath))
+                        {
+                            var bioa_cithub = MEPackageHandler.OpenMEPackage(bioa_cithubPath);
+                            var trigStream1 = bioa_cithub.GetUExport(8);
+                            var propsT = trigStream1.GetProperties();
+                            var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
+                            // Clear preloading
+                            Log.Information("[AICORE] Clear LoadChunkNames from BioA_CitHub");
+                            if (streamStates != null && streamStates.Count > 1)
+                            {
+                                streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
 
-            //    {
-            //        var bioa_cithubPath = Path.Combine(Utilities.GetGamePath(3), "BioGame", "CookedPCConsole", "BioA_CitHub.pcc");
-            //        if (File.Exists(bioa_cithubPath))
-            //        {
-            //            var bioa_cithub = MEPackageHandler.OpenMEPackage(bioa_cithubPath);
-            //            var trigStream1 = bioa_cithub.getUExport(8);
-            //            var propsT = trigStream1.GetProperties();
-            //            var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
-            //            // Clear preloading
-            //            Log.Information("[AICORE] Clear LoadChunkNames from BioA_CitHub");
-            //            streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
+                                // Clear visible asset
+                                var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
+                                if (visibleChunkNames != null)
+                                {
+                                    for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                                    {
+                                        if (visibleChunkNames[i].Value == "BioA_CitHub_Dock_Det")
+                                        {
+                                            Log.Information(
+                                                "[AICORE] Remove BioA_CitHub_Dock_Det from BioA_CitHub VisibleChunkNames(8)");
+                                            visibleChunkNames.RemoveAt(i);
+                                        }
+                                    }
+                                }
 
-            //            // Clear visible asset
-            //            var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
-            //            for (int i = visibleChunkNames.Count - 1; i > 0; i--)
-            //            {
-            //                if (visibleChunkNames[i].Value == "BioA_CitHub_Dock_Det")
-            //                {
-            //                    Log.Information("[AICORE] Remove BioA_CitHub_Dock_Det from BioA_CitHub VisibleChunkNames(8)");
-            //                    visibleChunkNames.RemoveAt(i);
-            //                }
-            //            }
+                                trigStream1.WriteProperty(streamStates);
+                            }
 
-            //            trigStream1.WriteProperty(streamStates);
+                            var trigStream2 = bioa_cithub.GetUExport(15);
+                            streamStates = trigStream2.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
 
-            //            var trigStream2 = bioa_cithub.getUExport(15);
-            //            streamStates = trigStream2.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
+                            // Cleanup visible assets
+                            if (streamStates != null && streamStates.Any())
+                            {
+                                var visibleChunkNames = streamStates[0].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
+                                if (visibleChunkNames != null)
+                                {
+                                    for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                                    {
+                                        if (visibleChunkNames[i].Value == "BioA_Nor_204Conference" ||
+                                            visibleChunkNames[i].Value == "BioA_Nor_204WarRoom")
+                                        {
+                                            Log.Information("[AICORE] Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(15)");
+                                            visibleChunkNames.RemoveAt(i);
+                                        }
+                                    }
+                                }
 
-            //            // Cleanup visible assets
-            //            visibleChunkNames = streamStates[0].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
-            //            for (int i = visibleChunkNames.Count - 1; i > 0; i--)
-            //            {
-            //                if (visibleChunkNames[i].Value == "BioA_Nor_204Conference" || visibleChunkNames[i].Value == "BioA_Nor_204WarRoom")
-            //                {
-            //                    Log.Information("[AICORE] Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(15)");
-            //                    visibleChunkNames.RemoveAt(i);
-            //                }
-            //            }
+                                trigStream2.WriteProperty(streamStates);
+                            }
 
-            //            trigStream2.WriteProperty(streamStates);
-            //            Log.Information("[AICORE] Saving package: " + bioa_cithubPath);
-            //            bioa_cithub.save();
-            //        }
-            //    }
+                            Log.Information("[AICORE] Saving package: " + bioa_cithubPath);
+                            bioa_cithub.Save();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($"[AICORE] Error applying fix for BioA_Cithub to file ({bioa_cithubPath}) fix (post mars crash fix): " + e.Message);
+                    }
+                }
 
-            //#endregion
+                #endregion
+                #region BioD_CitHub fix
+                {
+                    var bioDCithubs = Directory.GetFiles(biogamePath, "BioD_CitHub.pcc", SearchOption.AllDirectories);
+                    foreach (var biod_cithubPath in bioDCithubs)
+                    {
+                        try
+                        {
+                            if (File.Exists(biod_cithubPath))
+                            {
+                                var biod_cithub = MEPackageHandler.OpenMEPackage(biod_cithubPath);
+                                var trigStream1 = biod_cithub.GetUExport(162);
+                                var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
+                                if (streamStates != null && streamStates.Count > 2)
+                                {
+                                    Log.Information(@"[AICORE] Applying BioD_CitHub post-mars fix: " + biod_cithubPath);
 
-            //#region BioD_CitHub fix
+                                    // Clear preloading
+                                    Log.Information("[AICORE] Clear LoadChunkNames from BioD_CitHub");
+                                    streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
 
-            //    {
-            //        var biod_cithubPath = Path.Combine(Utilities.GetGamePath(3), "BioGame", "CookedPCConsole", "BioD_CitHub.pcc");
-            //        if (File.Exists(biod_cithubPath))
-            //        {
-            //            var biod_cithub = MEPackageHandler.OpenMEPackage(biod_cithubPath);
-            //            var trigStream1 = biod_cithub.getUExport(162);
-            //            var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
-            //            // Clear preloading
-            //            Log.Information("[AICORE] Clear LoadChunkNames from BioD_CitHub");
-            //            streamStates[1].GetProp<ArrayProperty<NameProperty>>("LoadChunkNames").Clear();
+                                    // Clear visible asset
+                                    var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
+                                    if (visibleChunkNames != null)
+                                    {
+                                        for (int i = visibleChunkNames.Count - 1; i > 0; i--)
+                                        {
+                                            if (visibleChunkNames[i].Value == "BioH_Marine" ||
+                                                visibleChunkNames[i].Value == "BioD_CitHub_Dock")
+                                            {
+                                                Log.Information("[AICORE] Remove " + visibleChunkNames[i].Value +
+                                                                " from BioA_CitHub VisibleChunkNames(8)");
+                                                visibleChunkNames.RemoveAt(i);
+                                            }
+                                        }
+                                    }
 
-            //            // Clear visible asset
-            //            var visibleChunkNames = streamStates[2].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
-            //            for (int i = visibleChunkNames.Count - 1; i > 0; i--)
-            //            {
-            //                if (visibleChunkNames[i].Value == "BioH_Marine" || visibleChunkNames[i].Value == "BioD_CitHub_Dock")
-            //                {
-            //                    Log.Information("[AICORE] Remove " + visibleChunkNames[i].Value + " from BioA_CitHub VisibleChunkNames(8)");
-            //                    visibleChunkNames.RemoveAt(i);
-            //                }
-            //            }
+                                    trigStream1.WriteProperty(streamStates);
+                                    Log.Information("[AICORE] Saving package: " + biod_cithubPath);
+                                    biod_cithub.Save();
+                                }
+                                else
+                                {
+                                    Log.Information(@"[AICORE] Not applying BioD_Cithub fix to " + biod_cithubPath);
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error($"[AICORE] Error applying fix for BioD_Cithub to file ({biod_cithubPath}) fix (post mars crash fix): " +
+                                      e.Message);
+                        }
+                    }
+                }
 
-            //            trigStream1.WriteProperty(streamStates);
-            //            Log.Information("[AICORE] Saving package: " + biod_cithubPath);
-            //            biod_cithub.save();
-            //        }
-            //    }
-
-            //#endregion
-
-            //    Log.Information("[AICORE] Finished fixing post-mars hackett cutscene memory issue");
-            //}
-#endif
+                #endregion
+                Log.Information("[AICORE] Finished fixing post-mars hackett cutscene memory issue");
+            }
         }
 
 

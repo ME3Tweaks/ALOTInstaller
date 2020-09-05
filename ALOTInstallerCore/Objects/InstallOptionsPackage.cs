@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 
@@ -43,5 +44,9 @@ namespace ALOTInstallerCore.Objects
         /// DEBUG ONLY: Skip main install block and simulate OK install
         /// </summary>
         public bool DebugNoInstall { get; set; }
+        /// <summary>
+        /// UI task scheduler. This is required to initialize and use the ME3ExplorerCore library
+        /// </summary>
+        public TaskScheduler UiThreadScheduler { get; set; }
     }
 }

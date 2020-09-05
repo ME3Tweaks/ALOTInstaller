@@ -78,6 +78,12 @@
   <PropertyGroup>
     <SignManifests>false</SignManifests>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WinDebug|x64'">
+    <OutputPath>bin\x64\WinDebug\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'WPFDebug|x64'">
+    <OutputPath>bin\x64\WPFDebug\</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AuthenticodeExaminer, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\AuthenticodeExaminer.0.3.0\lib\net461\AuthenticodeExaminer.dll</HintPath>

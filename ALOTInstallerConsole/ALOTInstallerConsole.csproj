@@ -13,7 +13,7 @@
 		<Platforms>x64</Platforms>
 		<NoWarn>$(NoWarn);NU1605</NoWarn>
 		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
-		<Configurations>Debug;Release;WDebug</Configurations>
+		<Configurations>WinDebug;WPFDebug</Configurations>
 		<AssemblyVersion>4.0.650.0</AssemblyVersion>
 		<FileVersion>4.0.650.0</FileVersion>
 		<ApplicationIcon>ALOTInstallerIcon.ico</ApplicationIcon>
@@ -24,12 +24,6 @@
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>-->
-	<PropertyGroup Condition="'$(Configuration)'=='WDebug'">
-		<DefineConstants>TRACE;DEBUG</DefineConstants>
-		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-		<DebugType>embedded</DebugType>
-		<DebugSymbols>true</DebugSymbols>
-	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="ComputerInfo" Version="0.1.0-prerelease" />
 		<PackageReference Include="Fody" Version="6.2.4">
@@ -43,10 +37,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />
 		<ProjectReference Include="..\gui.cs\Terminal.Gui\Terminal.Gui.csproj" />
-	</ItemGroup>
-
-	<ItemGroup Condition="'$(Configuration)'=='WDebug'">
-		<PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

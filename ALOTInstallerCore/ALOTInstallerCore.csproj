@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<Platforms>x64</Platforms>
-		<Configurations>Debug;Release;WDebug</Configurations>
+		<Configurations>WinRelease;WinDebug;WPFDebug</Configurations>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -21,21 +21,27 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Libraries\Linux\" />
-		<Folder Include="Libraries\MacOS\" />
 		<Folder Include="Libraries\Windows\" />
-		<Folder Include="Startup\" />
 	</ItemGroup>
-	<PropertyGroup Condition="'$(Configuration)'=='WDebug'">
-		<DefineConstants>TRACE;DEBUG</DefineConstants>
-		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+	<PropertyGroup Condition="'$(Configuration)'=='WinDebug'">
+		<DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
 		<DebugType>embedded</DebugType>
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<DefineConstants>TRACE;DEBUG;WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
+	<PropertyGroup Condition="'$(Configuration)'=='WinRelease'">
+		<DefineConstants>WINDOWS</DefineConstants>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-		<DefineConstants>TRACE;WINDOWS;WPF</DefineConstants>
+	<PropertyGroup Condition="'$(Configuration)'=='WPFDebug'">
+		<DefineConstants>TRACE;DEBUG;WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='WPFRelease'">
+		<DefineConstants>WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AuthenticodeExaminer" Version="0.3.0" />
@@ -78,5 +84,8 @@
 	  <Content Include="libNative.dylib" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>-->
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\ME3ExplorerLib\ME3ExplorerCore\ME3ExplorerCore.csproj" />
 	</ItemGroup>
 </Project>
