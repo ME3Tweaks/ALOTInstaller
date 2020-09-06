@@ -61,6 +61,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     new MenuItem("_Import manifest files", "(Import files listed in manifest)", ImportManifestFiles, ()=> ManifestHandler.MasterManifest.ManifestModePackageMappping.Count > 1),
                     new MenuItem("_Add user files to current mode", "(Add your own files to install)",  AddUserFiles),
                     new MenuItem("_Cleanup texture library folder", "(Delete old files from texture library)", CleanupTextureLibrary),
+                    new MenuItem("Exit", "Exit installer", ()=>Environment.Exit(0)),
                 }),
                 new MenuBarItem("Change mode", modeMenuItems.ToArray()),
                 new MenuBarItem("Game Status",
