@@ -65,10 +65,7 @@ namespace ALOTInstallerCore.ModManager.Services
         //    private set => SetProperty(ref _me3Installed, value);
         //}
 
-        public static ObservableCollectionExtended<GameBackupStatus> GameBackupStatuses { get; } = new ObservableCollectionExtended<GameBackupStatus>()
-        {
-
-        };
+        public static ObservableCollectionExtended<GameBackupStatus> GameBackupStatuses { get; } = new ObservableCollectionExtended<GameBackupStatus>();
 
         public class GameBackupStatus : INotifyPropertyChanged
         {
@@ -274,25 +271,6 @@ namespace ALOTInstallerCore.ModManager.Services
 
         //    return null;
         //}
-
-        /// <summary>
-        /// Fetches the backup status tooltip string for the specific game. The status must be refreshed before the values will be initially set
-        /// </summary>
-        /// <param name="game"></param>
-        /// <returns></returns>
-        public static string GetBackupStatusTooltip(Enums.MEGame game)
-        {
-            //TODO FIX ALOT INSTALL CONSOLE
-
-            //switch (game)
-            //{
-            //    case Enums.MEGame.ME1: return ME1BackupStatusTooltip;
-            //    case Enums.MEGame.ME2: return ME2BackupStatusTooltip;
-            //    case Enums.MEGame.ME3: return ME3BackupStatusTooltip;
-            //}
-
-            return null;
-        }
 
         /// <summary>
         /// Sets the status of a backup.

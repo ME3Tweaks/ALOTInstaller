@@ -160,7 +160,8 @@ namespace ALOTInstallerCore.Helpers.AppSettings
 
         public static string GetBackupPath(Enums.MEGame game)
         {
-            return settingsIni["BackupPaths"][game.ToString()]?.Value;
+            var v = settingsIni["BackupPaths"][game.ToString()]?.Value;
+            return string.IsNullOrWhiteSpace(v) ? null : v;
         }
 
         public static void SaveBackupPath(Enums.MEGame game, string path)

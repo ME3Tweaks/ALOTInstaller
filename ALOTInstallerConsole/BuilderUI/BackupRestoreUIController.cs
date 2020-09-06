@@ -46,14 +46,13 @@ namespace ALOTInstallerConsole.BuilderUI
                     Height = 1
                 });
 
-                Add(new TextField()
+                Add(new TextField(BackupService.GetGameBackupPath(e, out var _) ?? "")
                 {
                     ReadOnly = true,
                     Width = 80,
                     Height = 1,
                     X = 1,
                     Y = y,
-                    Text = gameBackupPath ?? BackupService.GetBackupStatusTooltip(e)
                 });
                 y++;
 

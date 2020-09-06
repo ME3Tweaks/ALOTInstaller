@@ -886,8 +886,12 @@ namespace ALOTInstallerCore
         /// Returns the hosting processes' name, without extension
         /// </summary>
         /// <returns></returns>
+#if (!WINDOWS && DEBUG)
+        // running process will be 'dotnet' in this mode
+        public static string GetHostingProcessname() => "ALOTInstallerConsole";
+#else 
         public static string GetHostingProcessname() => Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.ModuleName);
-
+#endif
         public static void WriteDebugLog(string debugMsg)
         {
             if (Settings.DebugLogs)

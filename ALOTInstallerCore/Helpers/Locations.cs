@@ -44,8 +44,11 @@ namespace ALOTInstallerCore.Helpers
         {
             forcedMemPath = forcedPath;
         }
+#if WINDOWS
         public static string MEMPath() => forcedMemPath ?? Path.Combine(AppDataFolder(), @"MassEffectModderNoGui.exe");
-
+#elif LINUX
+        public static string MEMPath() => forcedMemPath ?? Path.Combine(AppDataFolder(), @"MassEffectModderNoGui");
+#endif
         //private static void LoadLocationsWin64()
         //{
         //    TextureLibraryLocation = GetFolderSetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, "Downloaded_Mods");

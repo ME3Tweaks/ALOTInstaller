@@ -31,7 +31,6 @@ namespace ALOTInstallerConsole.BuilderUI
 
 
             //ScrollDialog.Prompt("Scroll dialog", "This is top message", "This is bottom message", items, Colors.Menu, "OK");
-
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += (a, b) =>
             {
@@ -66,6 +65,14 @@ namespace ALOTInstallerConsole.BuilderUI
                     startupStatusLabel.Text = "Checking for MassEffectModderNoGui updates";
                 });
                 MEMUpdater.UpdateMEM(downloadProgressChanged);
+
+ALOTInstallerCoreLib.PostCriticalStartup(x=> {
+Application.MainLoop.Invoke(() =>
+                {
+                    startupStatusLabel.Text = x;
+                });
+}, 
+x=>Application.MainLoop.Invoke(()=>{x();}));
 
                 b.Result = alotManifestModePackage;
             };
