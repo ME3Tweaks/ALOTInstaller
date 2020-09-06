@@ -361,18 +361,17 @@ namespace ALOTInstallerCore.ModManager.Services
             switch (game)
             {
                 case Enums.MEGame.ME1:
-                    path = Utilities.GetRegistrySettingString(App.BACKUP_REGISTRY_KEY, @"ME1VanillaBackupLocation");
+                    path = Settings.ME1BackupLocation;
                     break;
                 case Enums.MEGame.ME2:
-                    path = Utilities.GetRegistrySettingString(App.BACKUP_REGISTRY_KEY, @"ME2VanillaBackupLocation");
+                    path = Settings.ME2BackupLocation;
                     break;
                 case Enums.MEGame.ME3:
                     //Check for backup via registry - Use Mod Manager's game backup key to find backup.
-                    path = Utilities.GetRegistrySettingString(App.REGISTRY_KEY_ME3CMM, @"VanillaCopyLocation");
+                    path = Settings.ME3BackupLocation;
                     break;
-                default:
-                    return null;
             }
+
 #endif
 
             if (forceReturnPath)
@@ -383,7 +382,7 @@ namespace ALOTInstallerCore.ModManager.Services
 
             if (logReturnedPath)
             {
-                Log.Information(@"[AICORE]  >> Backup path lookup for {game} returned: {path}");
+                Log.Information($@"[AICORE]  >> Backup path lookup for {game} returned: {path}");
             }
 
             if (path == null || !Directory.Exists(path))

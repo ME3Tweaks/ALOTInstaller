@@ -13,17 +13,35 @@
 		<Platforms>x64</Platforms>
 		<NoWarn>$(NoWarn);NU1605</NoWarn>
 		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
-		<Configurations>WinDebug;WPFDebug</Configurations>
+		<Configurations>WinDebug;LinuxDebug;LinuxRelease</Configurations>
 		<AssemblyVersion>4.0.650.0</AssemblyVersion>
 		<FileVersion>4.0.650.0</FileVersion>
 		<ApplicationIcon>ALOTInstallerIcon.ico</ApplicationIcon>
 	</PropertyGroup>
-	<!--<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <DefineConstants>TRACE;WINDOWS</DefineConstants>
+	<PropertyGroup Condition="'$(Configuration)'=='WinDebug'">
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
-  </PropertyGroup>-->
+  </PropertyGroup>
+  	<PropertyGroup Condition="'$(Configuration)'=='WinRelease'">
+    <DefineConstants>WINDOWS</DefineConstants>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+    	<PropertyGroup Condition="'$(Configuration)'=='LinuxDebug'">
+    <DefineConstants>TRACE;DEBUG;LINUX</DefineConstants>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+    	<PropertyGroup Condition="'$(Configuration)'=='Linuxrelease'">
+    <DefineConstants>LINUX</DefineConstants>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="ComputerInfo" Version="0.1.0-prerelease" />
 		<PackageReference Include="Fody" Version="6.2.4">
@@ -40,9 +58,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="..\Libraries\Windows\CompressionWrappers.dll" Condition=" '$(OS)' == 'Windows_NT' ">
+		<!-- <Content Include="..\Libraries\Windows\CompressionWrappers.dll" Condition=" '$(OS)' == 'Windows_NT' ">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
+		</Content> -->
 		<!-- Uncomment when we have other platform wrappers -->
 		<!--<Content Include="libNative.so" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
