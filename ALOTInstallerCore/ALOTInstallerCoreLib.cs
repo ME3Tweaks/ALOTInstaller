@@ -1,5 +1,6 @@
 ﻿using System;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Services;
 using Serilog;

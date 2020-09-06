@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿#if WINDOWS
+using Microsoft.Win32;
 
 namespace ALOTInstallerCore.PlatformSpecific.Windows
 {
@@ -136,3 +137,4 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         }
     }
 }
+#endif

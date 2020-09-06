@@ -9,9 +9,11 @@ using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
-using ALOTInstallerCore.PlatformSpecific.Windows;
-using Microsoft.Win32;
 using Serilog;
+#if WINDOWS
+using Microsoft.Win32;
+using ALOTInstallerCore.PlatformSpecific.Windows;
+#endif
 
 namespace ALOTInstallerCore.ModManager.ME3Tweaks
 {
@@ -508,7 +510,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             public bool ProgressIndeterminate { get; set; } = true;
             public bool ProgressVisible { get; set; } = false;
             public bool BackupInProgress { get; set; }
-            
+
         }
 
         #endregion
@@ -845,7 +847,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
         private static void WriteBackupLocation(Enums.MEGame game, string backupPath)
         {
-            //#if WIN
+#if WINDOWS
             switch (game)
             {
                 case Enums.MEGame.ME1:
@@ -855,9 +857,10 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 case Enums.MEGame.ME3:
                     RegistryHandler.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY_ME3CMM, @"VanillaCopyLocation", backupPath);
                     break;
-            }//#else
+            }
+#else
 
-            //#endif
+#endif
         }
 
         public static void UnlinkBackup(Enums.MEGame meGame)

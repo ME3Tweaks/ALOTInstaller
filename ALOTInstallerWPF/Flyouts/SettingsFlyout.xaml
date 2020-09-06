@@ -12,6 +12,7 @@
              xmlns:alotInstallerWpf="clr-namespace:ALOTInstallerWPF"
              xmlns:converters="clr-namespace:ALOTInstallerWPF.Converters"
              xmlns:manifest="clr-namespace:ALOTInstallerCore.Objects.Manifest;assembly=ALOTInstallerCore"
+             xmlns:appSettings="clr-namespace:ALOTInstallerCore.Helpers.AppSettings;assembly=ALOTInstallerCore"
              mc:Ignorable="d" 
              d:DesignHeight="1450" d:DesignWidth="300">
     <UserControl.Resources>
@@ -119,7 +120,7 @@
                             <Button DockPanel.Dock="Right" Command="{Binding SetLibraryLocationCommand}" Content="Change" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Change where the imported texture files for modes (excluding Free Mode) are stored"/>
                             <Button  FontSize="11" FontWeight="Bold" Command="{Binding CleanupLibraryCommand}" HorizontalAlignment="Left" Content="Cleanup Texture Library" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Removes old files from the texture library that are no longer in the manifest.&#10;Any files in this folder that you manually added that are not in the manifest will also be deleted."/>
                         </DockPanel>
-                        <TextBox Text="{Binding Path=(modmanager:Settings.TextureLibraryLocation)}" ToolTip="{Binding Path=(modmanager:Settings.TextureLibraryLocation)}"  IsReadOnly="True" IsEnabled="False" />
+                        <TextBox Text="{Binding Path=(appSettings:Settings.TextureLibraryLocation)}" ToolTip="{Binding Path=(appSettings:Settings.TextureLibraryLocation)}"  IsReadOnly="True" IsEnabled="False" />
                     </DockPanel>
 
                     <DockPanel Margin="20,3,0,3">
@@ -129,7 +130,7 @@
                             <Button DockPanel.Dock="Right" Command="{Binding SetBuildLocationCommand}" Content="Change" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Change where the imported texture files for modes (excluding Free Mode) are stored"/>
                             <Button  FontSize="11" FontWeight="Bold" Command="{Binding CleanupBuildLocationCommand}" HorizontalAlignment="Left" Content="Cleanup Package Staging" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Removes old files from the texture library that are no longer in the manifest.&#10;Any files in this folder that you manually added that are not in the manifest will also be deleted."/>
                         </DockPanel>
-                        <TextBox Text="{Binding Path=(modmanager:Settings.BuildLocation)}" ToolTip="{Binding Path=(modmanager:Settings.BuildLocation)}" IsReadOnly="True" IsEnabled="False" />
+                        <TextBox Text="{Binding Path=(appSettings:Settings.BuildLocation)}" ToolTip="{Binding Path=(appSettings:Settings.BuildLocation)}" IsReadOnly="True" IsEnabled="False" />
                     </DockPanel>
                 </StackPanel>
             </Expander>
@@ -142,14 +143,14 @@
 
                     <!--<CheckBox Margin="5" x:Name="Checkbox_RepackME2GameFiles" Content="Repack ME2 files" Click="Checkbox_RepackME2Files_Click" ToolTip="Repacking game files for ME2 makes installation take longer, but will save some disk space.&#10;This option only has an effect during the initial installation of ALOT. Subsequent installations are not affected." />
                     <CheckBox Margin="5" x:Name="Checkbox_RepackME3GameFiles" Content="Repack ME3 files" Click="Checkbox_RepackME3Files_Click" ToolTip="Repacking game files for ME3 makes installation take longer, but will save some disk space.&#10;This option only has an effect during the initial installation of ALOT. Subsequent installations are not affected." />-->
-                    <mah:ToggleSwitch IsOn="{Binding Path=(modmanager:Settings.MoveFilesWhenImporting)}"  OnContent="Import via Move" OffContent="Import via Copy" Margin="20,0,0,0" ToolTip="Files that are importing will be moved instead of copied.&#10;This only is used if files are on same drive - if files are on different drives then they are always copied." />
+                    <mah:ToggleSwitch IsOn="{Binding Path=(appSettings:Settings.MoveFilesWhenImporting)}"  OnContent="Import via Move" OffContent="Import via Copy" Margin="20,0,0,0" ToolTip="Files that are importing will be moved instead of copied.&#10;This only is used if files are on same drive - if files are on different drives then they are always copied." />
                     <!--<CheckBox Margin="5" x:Name="Checkbox_DebugLogging" Content="Debug logging" Click="Checkbox_DebugLogging_Click" ToolTip="Turns on debug logging. Makes log significantly bigger with more logs - only turn on if requested by developers."  />-->
                     <mah:ToggleSwitch OffContent="Stable mode"  OnContent="Beta mode" Toggled="BetaMode_Toggled" Margin="20,0,0,0" 
                                       ToolTip="Enable beta mode features. Require restart for full effect, may break application"
-                                      IsOn="{Binding Path=(modmanager:Settings.BetaMode)}"/>
+                                      IsOn="{Binding Path=(appSettings:Settings.BetaMode)}"/>
                     <mah:ToggleSwitch OffContent="Telemetry disabled"  OnContent="Telemetry enabled" Toggled="Telemetry_Toggled" Margin="20,0,0,0" 
                                       ToolTip="Toggles telemetry data, which allows the developers to automatically receive basic information&#10;about your sessions and crash information, which is used to improve the product"
-                                      IsOn="{Binding Path=(modmanager:Settings.Telemetry)}"/>
+                                      IsOn="{Binding Path=(appSettings:Settings.Telemetry)}"/>
 
 <!--<mah:ToggleSwitch Content="Show advanced file info" ToolTip="Shows advanced file information" IsOn="{Binding Path=(modmanager:Settings.ShowAdvancedFileInfo)}" Margin="20,0,0,0"/>-->
                 </StackPanel>

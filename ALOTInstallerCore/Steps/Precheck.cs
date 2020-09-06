@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.gamefileformats.sfar;
 using ALOTInstallerCore.ModManager.Objects;

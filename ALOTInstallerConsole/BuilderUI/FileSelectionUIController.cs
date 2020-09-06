@@ -7,6 +7,7 @@ using System.Linq;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;

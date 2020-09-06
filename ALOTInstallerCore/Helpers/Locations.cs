@@ -1,4 +1,6 @@
-﻿using ALOTInstallerCore.PlatformSpecific.Windows;
+﻿#if WINDOWS
+using ALOTInstallerCore.PlatformSpecific.Windows;
+#endif
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,10 +45,6 @@ namespace ALOTInstallerCore.Helpers
             forcedMemPath = forcedPath;
         }
         public static string MEMPath() => forcedMemPath ?? Path.Combine(AppDataFolder(), @"MassEffectModderNoGui.exe");
-        //#endif
-#if LINUX
-        public static string MEMPath() => Path.Combine(AppDataFolder(), @"MassEffectModderNoGui");
-#endif
 
         //private static void LoadLocationsWin64()
         //{
@@ -56,20 +54,20 @@ namespace ALOTInstallerCore.Helpers
         //    BuildLocation = GetFolderSetting(SettingsKeys.SettingKeys.BuildLocation, "BuildLocation");
         //}
 
-        private static string GetFolderSetting(SettingsKeys.SettingKeys key, string defaultF)
-        {
-            string dir = RegistryHandler.GetRegistryString(SettingsKeys.SettingsKeyMapping[key]);
-            if (dir != null && Directory.Exists(dir))
-            {
-                return dir;
-            }
-            else
-            {
-                var path = Path.Combine(Utilities.GetExecutingAssemblyFolder(), defaultF);
-                Directory.CreateDirectory(path);
-                return path;
-            }
-        }
+        //private static string GetFolderSetting(SettingsKeys.SettingKeys key, string defaultF)
+        //{
+        //    string dir = RegistryHandler.GetRegistryString(SettingsKeys.SettingsKeyMapping[key]);
+        //    if (dir != null && Directory.Exists(dir))
+        //    {
+        //        return dir;
+        //    }
+        //    else
+        //    {
+        //        var path = Path.Combine(Utilities.GetExecutingAssemblyFolder(), defaultF);
+        //        Directory.CreateDirectory(path);
+        //        return path;
+        //    }
+        //}
 
         public static GameTarget ME1Target { get; set; }
         public static GameTarget ME2Target { get; set; }

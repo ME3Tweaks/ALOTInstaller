@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects.Manifest;

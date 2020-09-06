@@ -85,6 +85,7 @@ namespace ALOTInstallerCore.Steps
 
         private static bool PerformWriteCheck(Action<string, string> messageCallback, bool required)
         {
+#if WINDOWS
             Log.Information("[AICORE] Performing write check on all game directories...");
             var targets = Locations.GetAllAvailableTargets();
             try
@@ -188,7 +189,7 @@ namespace ALOTInstallerCore.Steps
                 //    e.Message);
                 return false;
             }
-
+#endif
             return true;
         }
 

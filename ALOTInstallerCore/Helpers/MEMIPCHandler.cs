@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects;
 using CliWrap;
 using CliWrap.EventStream;

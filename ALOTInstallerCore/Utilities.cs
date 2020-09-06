@@ -22,6 +22,7 @@ using ALOTInstallerCore.Helpers;
 using Microsoft.Win32;
 using NickStrupat;
 using System.Management;
+using ALOTInstallerCore.Helpers.AppSettings;
 
 namespace ALOTInstallerCore
 {

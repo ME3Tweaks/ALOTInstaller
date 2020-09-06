@@ -18,6 +18,7 @@ using System.Windows.Threading;
 using System.Xml.Linq;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;

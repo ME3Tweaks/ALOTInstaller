@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Helpers.AppSettings;
 
 namespace ALOTInstallerWPF.Converters
 {

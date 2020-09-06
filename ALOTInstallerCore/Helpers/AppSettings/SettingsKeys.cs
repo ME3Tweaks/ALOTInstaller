@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ALOTInstallerCore.Helpers
+namespace ALOTInstallerCore.Helpers.AppSettings
 {
     public class SettingsKeys
     {
@@ -18,7 +18,12 @@ namespace ALOTInstallerCore.Helpers
             BuildLocation,
             PlayMusic,
             Telemetry,
-            LastContentCheck
+            LastContentCheck,
+#if !WINDOWS
+            ME1BackupPath,
+            ME2BackupPath,
+            ME3BackupPath
+#endif
         }
 
         public static Dictionary<SettingKeys, string> SettingsKeyMapping = new Dictionary<SettingKeys, string>()
@@ -36,6 +41,11 @@ namespace ALOTInstallerCore.Helpers
             {SettingKeys.PlayMusic,"PlayMusic"},
             {SettingKeys.Telemetry,"Telemetry"}, //v4
             {SettingKeys.LastContentCheck,"LastME3TweaksContentCheck"}, //v4
+#if !WINDOWS
+            {SettingKeys.ME1BackupPath,"ME1BackupPath"}, //v4
+            {SettingKeys.ME2BackupPath,"ME2BackupPath"}, //v4
+            {SettingKeys.ME3BackupPath,"ME3BackupPath"}, //v4
+#endif
         };
 
     }

@@ -7,6 +7,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects.Manifest;
 using Serilog;
 using ALOTInstallerCore.Objects;

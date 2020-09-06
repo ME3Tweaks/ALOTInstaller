@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Helpers.AppSettings;
 using Octokit;
 using Serilog;
 

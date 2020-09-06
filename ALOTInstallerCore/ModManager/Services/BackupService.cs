@@ -5,10 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
-using ALOTInstallerCore.PlatformSpecific.Windows;
 using Serilog;
+#if WINDOWS
+using ALOTInstallerCore.PlatformSpecific.Windows;
+#endif
 
 
 namespace ALOTInstallerCore.ModManager.Services
@@ -356,22 +359,8 @@ namespace ALOTInstallerCore.ModManager.Services
             }
 
 #else
-            // Fetch via INI
-            string path;
-            switch (game)
-            {
-                case Enums.MEGame.ME1:
-                    path = Settings.ME1BackupLocation;
-                    break;
-                case Enums.MEGame.ME2:
-                    path = Settings.ME2BackupLocation;
-                    break;
-                case Enums.MEGame.ME3:
-                    //Check for backup via registry - Use Mod Manager's game backup key to find backup.
-                    path = Settings.ME3BackupLocation;
-                    break;
-            }
-
+            // Fetch via the Settings INI
+            string path = Settings.GetBackupPath(game);
 #endif
 
             if (forceReturnPath)
@@ -454,8 +443,11 @@ namespace ALOTInstallerCore.ModManager.Services
         //    StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(AnyGameMissingBackup)));
         //    StaticBackupStateChanged?.Invoke(null, null);
         //}
+
         public static bool HasGameEverBeenBackedUp(Enums.MEGame game)
         {
+#if WINDOWS
+
             switch (game)
             {
                 case Enums.MEGame.ME1:
@@ -472,6 +464,10 @@ namespace ALOTInstallerCore.ModManager.Services
                 default:
                     return false;
             }
+#else
+            return Settings.GetBackupPath(game) != null;
+#endif
+
         }
 
         public static void UpdateBackupStatus(Enums.MEGame game, bool forceCmmVanilla)

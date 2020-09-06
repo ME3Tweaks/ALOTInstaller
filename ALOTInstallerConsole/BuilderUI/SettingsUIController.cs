@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using Terminal.Gui;
@@ -200,7 +201,6 @@ namespace ALOTInstallerConsole.BuilderUI
             if (!selector.Canceled && selector.FilePath != null && Directory.Exists(selector.FilePath.ToString()))
             {
                 buildLocation.Text = Settings.BuildLocation = selector.FilePaths.First();
-                Settings.Save();
             }
         }
 
