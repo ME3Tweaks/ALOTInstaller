@@ -177,7 +177,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = 1,
                 Clicked = ChangeBuildLocation
             });
-
+Add(fileLocationsFv);
             y++;
             y++;
 
@@ -217,7 +217,7 @@ namespace ALOTInstallerConsole.BuilderUI
             Application.Run(selector);
             if (!selector.Canceled && selector.FilePath != null && Directory.Exists(selector.FilePath.ToString()))
             {
-                textureLibraryLocation.Text = Settings.TextureLibraryLocation = selector.FilePaths.First();
+                textureLibraryLocation.Text = Settings.TextureLibraryLocation = selector.FilePath.ToString();
                 Settings.Save();
                 TextureLibrary.StopLibraryWatcher(); //This will be reloaded when we return to the manifest controller
             }

@@ -831,17 +831,17 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     if (instF.Disabled)
                     {
-                        driver.SetColors(ConsoleColor.Red, ConsoleColor.Blue);
+                        //driver.SetColors(ConsoleColor.Red, ConsoleColor.Blue);
                         RenderUstr(driver, "D", 1, 0, 2);
                     }
                     else if (instF is ManifestFile)
                     {
-                        driver.SetColors(ConsoleColor.Green, ConsoleColor.Blue);
+                        //driver.SetColors(ConsoleColor.Green, ConsoleColor.Blue);
                         RenderUstr(driver, "*", 1, 0, 2);
                     }
                     else if (instF is UserFile)
                     {
-                        driver.SetColors(ConsoleColor.Yellow, ConsoleColor.Blue);
+                        //driver.SetColors(ConsoleColor.Yellow, ConsoleColor.Blue);
                         RenderUstr(driver, "U", 1, 0, 2);
                     }
                 }
