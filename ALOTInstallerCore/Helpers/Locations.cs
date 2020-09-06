@@ -181,6 +181,7 @@ namespace ALOTInstallerCore.Helpers
 
         /// <summary>
         /// Sets the game path that MEM and ALOTInstallerCore will use for the game specified by the target.
+        /// This method must be run on a background thread or it will deadlock
         /// </summary>
         /// <param name="target"></param>
         public static bool SetTarget(GameTarget target)

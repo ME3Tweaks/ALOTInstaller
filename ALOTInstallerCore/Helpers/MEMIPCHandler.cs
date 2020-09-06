@@ -171,7 +171,7 @@ namespace ALOTInstallerCore.Helpers
 #if WINDOWS
             await foreach (var cmdEvent in cmd.ListenAsync(Encoding.Unicode, cancellationToken))
 #elif LINUX
-            await foreach (var cmdEvent in cmd.Observe(Encoding.UTF8, cancellationToken))
+            await foreach (var cmdEvent in cmd.ListenAsync(Encoding.UTF8, cancellationToken))
 #endif
             {
                 switch (cmdEvent)

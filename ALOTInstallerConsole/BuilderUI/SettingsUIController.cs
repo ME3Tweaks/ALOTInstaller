@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
@@ -222,7 +223,7 @@ namespace ALOTInstallerConsole.BuilderUI
             }
         }
 
-        private void ChangeME1Path()
+        private async void ChangeME1Path()
         {
             OpenDialog selector = new OpenDialog("Select MassEffect.exe", "Select the executable for Mass Effect, located in the Binaries directory.")
             {
@@ -237,7 +238,9 @@ namespace ALOTInstallerConsole.BuilderUI
                 var invalidReason = target.ValidateTarget();
                 if (invalidReason == null)
                 {
-                    if (!Locations.SetTarget(target))
+                    var targetSet = await Task.Run(() => Locations.SetTarget(target));
+
+                    if (!targetSet)
                     {
                         MessageBox.ErrorQuery("Error setting game path", "An error occurred setting the game path. See the log for more details.", "OK");
                     }

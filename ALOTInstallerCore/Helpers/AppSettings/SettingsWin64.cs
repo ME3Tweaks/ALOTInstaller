@@ -161,14 +161,6 @@ namespace ALOTInstallerCore.Helpers.AppSettings
             }
         }
 
-
-        public enum SettingsSaveResult
-        {
-            SAVED,
-            FAILED_UNAUTHORIZED,
-            FAILED_OTHER
-        }
-
         /// <summary>
         /// Saves the settings. Note this does not update the Updates/EncryptedPassword value. Returns false if commiting failed
         /// </summary>
