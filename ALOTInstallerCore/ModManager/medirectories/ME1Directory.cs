@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
+#if WINDOWS
+using Microsoft.Win32;
+#endif
 
 namespace ALOTInstallerCore.ModManager.GameDirectories
 {
@@ -68,12 +71,13 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
 
         public static void ReloadActivePath()
         {
+#if WINDOWS
             string hkey32 = @"HKEY_LOCAL_MACHINE\SOFTWARE\";
             string hkey64 = @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\";
             string subkey = @"BioWare\Mass Effect";
 
             string keyName = hkey32 + subkey;
-            string test = (string)Microsoft.Win32.Registry.GetValue(keyName, "Path", null);
+            string test = (string)Registry.GetValue(keyName, "Path", null);
             if (test != null)
             {
                 gamePath = test;
@@ -81,7 +85,8 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
             }
 
             keyName = hkey64 + subkey;
-            gamePath = (string)Microsoft.Win32.Registry.GetValue(keyName, "Path", null);
+            gamePath = (string)Registry.GetValue(keyName, "Path", null);
+#endif
         }
 
         public static string ExecutablePath(string gameRoot) => Path.Combine(gameRoot, "Binaries", "MassEffect.exe");

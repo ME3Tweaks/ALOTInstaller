@@ -28,16 +28,18 @@ namespace ALOTInstallerConsole
             Program.SwapToNewView(startupUI);
         }
 
+        private static UIController _currentController;
         /// <summary>
         /// Swaps the current top level UIController (if any) with another one.
         /// </summary>
         /// <param name="controller"></param>
         public static void SwapToNewView(UIController controller)
         {
-            controller.SignalStopping();
+            _currentController?.SignalStopping();
             Application.RequestStop();
             controller.SetupUI();
             controller.BeginFlow();
+            _currentController = controller;
             Application.Run(controller);
         }
 

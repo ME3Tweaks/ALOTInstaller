@@ -4,6 +4,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
@@ -231,7 +232,8 @@ namespace ALOTInstallerConsole.BuilderUI
             Application.Run(selector);
             if (!selector.Canceled && selector.FilePaths.Any() && File.Exists(selector.FilePaths.First()))
             {
-                var target = new GameTarget(Enums.MEGame.ME1, selector.FilePaths.First(), false, false);
+                var targetPath = Utilities.GetGamePathFromExe(Enums.MEGame.ME1, selector.FilePaths.First());
+                var target = new GameTarget(Enums.MEGame.ME1, targetPath, false, false);
                 var invalidReason = target.ValidateTarget();
                 if (invalidReason == null)
                 {
@@ -241,7 +243,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     }
                     else
                     {
-                        UITools.SetText(me1PathField, selector.FilePaths.First());
+                        me1PathField.Text = targetPath;
                     }
                 }
                 else
@@ -261,7 +263,9 @@ namespace ALOTInstallerConsole.BuilderUI
             Application.Run(selector);
             if (!selector.Canceled && selector.FilePaths.Any() && File.Exists(selector.FilePaths.First()))
             {
-                var target = new GameTarget(Enums.MEGame.ME2, selector.FilePaths.First(), false, false);
+                                var targetPath = Utilities.GetGamePathFromExe(Enums.MEGame.ME2, selector.FilePaths.First());
+
+                var target = new GameTarget(Enums.MEGame.ME2, targetPath, false, false);
                 var invalidReason = target.ValidateTarget();
                 if (invalidReason == null)
                 {
@@ -271,7 +275,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     }
                     else
                     {
-                        UITools.SetText(me2PathField, selector.FilePaths.First());
+                        me2PathField.Text =  targetPath;
                     }
                 }
                 else
@@ -291,7 +295,9 @@ namespace ALOTInstallerConsole.BuilderUI
             Application.Run(selector);
             if (!selector.Canceled && selector.FilePaths.Any() && File.Exists(selector.FilePaths.First()))
             {
-                var target = new GameTarget(Enums.MEGame.ME3, selector.FilePaths.First(), false, false);
+                var targetPath = Utilities.GetGamePathFromExe(Enums.MEGame.ME3, selector.FilePaths.First());
+
+                var target = new GameTarget(Enums.MEGame.ME3, targetPath, false, false);
                 var invalidReason = target.ValidateTarget();
                 if (invalidReason == null)
                 {
@@ -301,7 +307,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     }
                     else
                     {
-                        UITools.SetText(me3PathField, selector.FilePaths.First());
+                        me3PathField.Text = targetPath;
                     }
                 }
                 else

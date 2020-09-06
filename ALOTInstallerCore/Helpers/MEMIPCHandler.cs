@@ -171,7 +171,7 @@ namespace ALOTInstallerCore.Helpers
 #if WINDOWS
             await foreach (var cmdEvent in cmd.ListenAsync(Encoding.Unicode, cancellationToken))
 #elif LINUX
-            await foreach (var cmdEvent in cmd.ListenAsync(Encoding.UTF8, cancellationToken))
+            await foreach (var cmdEvent in cmd.Observe(Encoding.UTF8, cancellationToken))
 #endif
             {
                 switch (cmdEvent)
@@ -240,7 +240,7 @@ namespace ALOTInstallerCore.Helpers
         public static bool SetGamePath(Enums.MEGame targetGame, string targetPath)
         {
             int exitcode = 0;
-            string args = $"--set-game-data-path --game-id {targetGame.ToGameNum()} --path \"{targetPath}\"";
+            string args = $"--set-game-data-path --gameid {targetGame.ToGameNum()} --path \"{targetPath}\"";
             MEMIPCHandler.RunMEMIPCUntilExit(args, applicationExited: x => exitcode = x);
             if (exitcode != 0)
             {

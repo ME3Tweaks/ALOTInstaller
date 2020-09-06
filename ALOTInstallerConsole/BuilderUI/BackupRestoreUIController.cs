@@ -208,7 +208,11 @@ namespace ALOTInstallerConsole.BuilderUI
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("BackupWorker");
             nbw.DoWork += (a, b) =>
             {
-                var backupController = new BackupHandler.GameBackup(game, new[] { Locations.GetTarget(game) })
+                var backupTargets = new List<GameTarget>();
+                if (Locations.GetTarget(game) != null){
+                    backupTargets.Add(Locations.GetTarget(game));
+                }
+                var backupController = new BackupHandler.GameBackup(game, backupTargets)
                 {
                     SelectGameExecutableCallback = (_game) =>
                     {

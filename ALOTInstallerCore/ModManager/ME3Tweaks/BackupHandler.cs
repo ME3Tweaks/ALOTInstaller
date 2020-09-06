@@ -10,6 +10,7 @@ using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using Serilog;
+using ALOTInstallerCore.Helpers.AppSettings;
 #if WINDOWS
 using Microsoft.Win32;
 using ALOTInstallerCore.PlatformSpecific.Windows;
@@ -397,8 +398,10 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     #endregion
                 }
 
-                // Write key
+                // Write location
                 WriteBackupLocation(Game, backupPath);
+
+                // Write vanilla marker
                 if (isVanilla && !dlcModsInstalled.Any())
                 {
                     var cmmvanilla = Path.Combine(backupPath, @"cmm_vanilla");
@@ -441,20 +444,12 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         return false;
                     }
                 }
-
-                //Check is Documents folder
-                var docsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"BioWare", targetToBackup.Game.ToGameName());
-                if (backupPath.Equals(docsPath, StringComparison.InvariantCultureIgnoreCase) || backupPath.IsSubPathOf(docsPath))
-                {
-                    Log.Error(@"[AICORE] User chose path in or around the documents path for the game - not allowed as game can load files from here.");
-                    BlockingActionCallback?.Invoke($"Invalid backup destination", $"The backup destination cannot be a subdirectory of the Documents/BioWare/{targetToBackup.Game.ToGameName()} folder. Select a different directory.");
-                    return false;
-                }
+    if (!targetToBackup.IsCustomOption){
 
                 //Check space
                 DriveInfo di = new DriveInfo(backupPath);
                 var requiredSpace = (long)(Utilities.GetSizeOfDirectory(new DirectoryInfo(targetToBackup.TargetPath)) * 1.1); //10% buffer
-                Log.Information(@"[AICORE] Backup space check. Backup size required: {FileSizeFormatter.FormatSize(requiredSpace)}, free space: {FileSizeFormatter.FormatSize(di.AvailableFreeSpace)}");
+                Log.Information($@"[AICORE] Backup space check. Backup size required: {FileSizeFormatter.FormatSize(requiredSpace)}, free space: {FileSizeFormatter.FormatSize(di.AvailableFreeSpace)}");
                 if (di.AvailableFreeSpace < requiredSpace)
                 {
                     //Not enough space.
@@ -462,6 +457,27 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     BlockingActionCallback?.Invoke("Not enough free disk space", $"There is not enough free disk space to make a game backup at this location.\n\nFree space: {FileSizeFormatter.FormatSize(di.AvailableFreeSpace)}\nRequired space: {FileSizeFormatter.FormatSize(requiredSpace)}");
                     return false;
                 }
+
+                    //Check writable
+                    var writable = Utilities.IsDirectoryWritable(backupPath);
+                if (!writable)
+                {
+                    //Not enough space.
+                    Log.Error($@"[AICORE] Backup destination selected is not writable.");
+                    BlockingActionCallback?.Invoke("Invalid backup destination", "Selected backup folder does not have write permissions from this account. Select a different directory.");
+                    return false;
+                }
+}
+                //Check is Documents folder
+                var docsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"BioWare", targetToBackup.Game.ToGameName());
+                if (backupPath.Equals(docsPath, StringComparison.InvariantCultureIgnoreCase) || backupPath.IsSubPathOf(docsPath))
+                {
+                    Log.Error(@"[AICORE] User chose path in or around the documents path for the game - not allowed as game can load files from here.");
+                
+                    BlockingActionCallback?.Invoke($"Invalid backup destination", $"The backup destination cannot be a subdirectory of the Documents/BioWare/{targetToBackup.Game.ToGameName()} folder. Select a different directory.");
+                    return false;
+                }
+
 
                 //Check it is not subdirectory of the game (we might want to check its not subdir of a target)
                 foreach (var target in AvailableTargetsToBackup)
@@ -475,16 +491,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                 }
 
-                //Check writable
-                var writable = Utilities.IsDirectoryWritable(backupPath);
-                if (!writable)
-                {
-                    //Not enough space.
-                    Log.Error($@"[AICORE] Backup destination selected is not writable.");
-                    BlockingActionCallback?.Invoke("Invalid backup destination", "Selected backup folder does not have write permissions from this account. Select a different directory.");
-                    return false;
-                }
-                return true;
+                return true;                
             }
 
 
@@ -859,7 +866,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     break;
             }
 #else
-
+            Settings.SaveBackupPath(game, backupPath);
 #endif
         }
 

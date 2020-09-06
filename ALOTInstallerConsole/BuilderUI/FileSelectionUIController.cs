@@ -806,6 +806,8 @@ namespace ALOTInstallerConsole.BuilderUI
 
         public override void SignalStopping()
         {
+            TextureLibrary.StopLibraryWatcher();
+
             // This window will close. We need to clear the ready status changed action so we don't keep reference to us
             TextureLibrary.UnregisterCallbacks();
         }
