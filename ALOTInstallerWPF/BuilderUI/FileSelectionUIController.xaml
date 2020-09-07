@@ -233,7 +233,7 @@
                                 <TextBlock Text="{Binding FriendlyName}" 
                                            FontWeight="Bold" FontSize="14" VerticalAlignment="Center" TextWrapping="Wrap"/>
                             </StackPanel>
-                            <TextBlock Text="{Binding StatusText}" MaxWidth="320" HorizontalAlignment="Left" TextWrapping="Wrap" Visibility="{Binding IsStaging, RelativeSource={RelativeSource AncestorType=local:FileSelectionUIController} , Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <TextBlock Text="{Binding StatusText}" MaxWidth="320" HorizontalAlignment="Left" TextWrapping="Wrap"/>
                         </StackPanel>
 
                         <DockPanel Dock="Right">

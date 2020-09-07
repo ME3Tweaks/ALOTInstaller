@@ -143,11 +143,7 @@ namespace ALOTInstallerWPF.BuilderUI
             {
                 ProgressIndeterminate = false;
                 TextureLibrary.SetupLibraryWatcher(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode).OfType<ManifestFile>().ToList(), manifestFileReadyStateChanged);
-                Application.Current.Invoke(() =>
-                {
-                    ShownSpecificFileSet = null;
-                    DisplayedFilesView.Refresh();
-                });
+                ShownSpecificFileSet = null;
             }
             else
             {
@@ -252,7 +248,7 @@ namespace ALOTInstallerWPF.BuilderUI
             if (obj is InstallerFile ifx)
             {
                 if (ShownSpecificFileSet != null) return ShownSpecificFileSet.Contains(ifx); //Show only files in the specifically set UI list
-                if (!ShowNonReadyFiles && !ifx.Ready || ifx.Disabled) return false; // Show only ready to install files
+                if (!ShowNonReadyFiles && (!ifx.Ready || ifx.Disabled)) return false; // Show only ready to install files
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME1) && ShowME1Files) return true;
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME2) && ShowME2Files) return true;
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME3) && ShowME3Files) return true;
@@ -342,7 +338,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 List<Enums.MEGame> availableGames = new List<Enums.MEGame>();
                 foreach (var game in targets)
                 {
-                     {
+                    {
                         var image = new Image()
                         {
                             Height = 45,

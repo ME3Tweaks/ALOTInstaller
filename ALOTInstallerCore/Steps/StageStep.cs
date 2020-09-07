@@ -258,7 +258,6 @@ namespace ALOTInstallerCore.Steps
             if (Directory.GetFiles(addonStagingPath).Any())
             {
                 // Addon needs built
-
                 BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{_addonID:D3}_ALOTAddon.mem"), _installOptions.InstallTarget.Game);
             }
 
@@ -273,6 +272,7 @@ namespace ALOTInstallerCore.Steps
             installerFile.IsProcessing = true;
             installerFile.IsWaiting = false;
             bool stage = true; // If file doesn't need processing this is not necessary
+            bool error = false; //If there is error. Used to not set the status text
             if (installerFile is ManifestFile mf)
             {
                 var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
@@ -465,6 +465,7 @@ namespace ALOTInstallerCore.Steps
                 else
                 {
                     // Files are in archive. Find files to stage to mem
+                    installerFile.StatusText = "Staging files for build";
                     var subfilesToStage = Directory.GetFiles(userFileExtractionPath, "*.*", SearchOption.AllDirectories);
                     int stagedID = 0;
                     foreach (var sf in subfilesToStage)
@@ -488,7 +489,15 @@ namespace ALOTInstallerCore.Steps
                     if (Directory.GetFiles(userFileBuildMemPath).Any())
                     {
                         // Requires build
-                        BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{uf.FriendlyName}.mem"), _installOptions.InstallTarget.Game);
+                        installerFile.StatusText = "Building user file installation package";
+                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{uf.FriendlyName}.mem"), _installOptions.InstallTarget.Game);
+                        if (resultcode != 0)
+                        {
+                            error = true;
+                            installerFile.Disabled = true;
+                            installerFile.StatusText = $"Failed to build, exit code {resultcode}";
+                            _abortStaging = true;
+                        }
                     }
 
                     Utilities.DeleteFilesAndFoldersRecursively(userFileExtractionPath);
@@ -502,7 +511,7 @@ namespace ALOTInstallerCore.Steps
             {
                 installerFile.StatusText = installerFile.PackageFiles.Any() ? "Textures staged, mod component install during install step" : "Mod will install during install step";
             }
-            else
+            else if (!error)
             {
                 installerFile.StatusText = "Staged for installation";
             }
@@ -790,7 +799,7 @@ namespace ALOTInstallerCore.Steps
         /// <param name="sourceDir"></param>
         /// <param name="outputFile"></param>
         /// <param name="targetGame"></param>
-        private void BuildMEMPackageFile(string uiname, string sourceDir, string outputFile, MEGame targetGame)
+        private int BuildMEMPackageFile(string uiname, string sourceDir, string outputFile, MEGame targetGame)
         {
             void handleIPC(string command, string param)
             {
@@ -816,6 +825,7 @@ namespace ALOTInstallerCore.Steps
                 handleIPC,
                 x => Log.Error($"[AICORE] StdError building {uiname}: {x}"),
                 x => exitcode = x); //Change to catch exit code of non zero.
+            return exitcode;
         }
 
         /// <summary>
