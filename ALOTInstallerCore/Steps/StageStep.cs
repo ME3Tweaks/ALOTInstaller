@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks.Dataflow;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects;
@@ -26,11 +28,15 @@ namespace ALOTInstallerCore.Steps
     /// </summary>
     public class StageStep
     {
-        private InstallOptionsPackage installOptions;
-        private int AddonID = -1; //ID of the Addon
+        private InstallOptionsPackage _installOptions;
+        private int _addonID = -1; //ID of the Addon
+        private bool _abortStaging;
+        private int _numTasksCompleted;
+        private int _numTotalTasks;
+
         public StageStep(InstallOptionsPackage installOptions, NamedBackgroundWorker worker)
         {
-            this.installOptions = installOptions;
+            this._installOptions = installOptions;
         }
 
         /// <summary>
@@ -152,14 +158,14 @@ namespace ALOTInstallerCore.Steps
         /// <returns></returns>
         public void PerformStaging(object sender, DoWorkEventArgs e)
         {
-            var stagingDir = Path.Combine(Settings.BuildLocation, installOptions.InstallTarget.Game.ToString());
+            var stagingDir = Path.Combine(Settings.BuildLocation, _installOptions.InstallTarget.Game.ToString());
             if (Directory.Exists(stagingDir))
             {
                 Utilities.DeleteFilesAndFoldersRecursively(stagingDir);
             }
-            installOptions.FilesToInstall = getFilesToStage(installOptions.FilesToInstall.Where(x => x.Ready && !x.Disabled && (x.ApplicableGames & installOptions.InstallTarget.Game.ToApplicableGame()) != 0));
-            installOptions.FilesToInstall = resolveMutualExclusiveGroups();
-            if (installOptions.FilesToInstall == null)
+            _installOptions.FilesToInstall = getFilesToStage(_installOptions.FilesToInstall.Where(x => x.Ready && !x.Disabled && (x.ApplicableGames & _installOptions.InstallTarget.Game.ToApplicableGame()) != 0));
+            _installOptions.FilesToInstall = resolveMutualExclusiveGroups();
+            if (_installOptions.FilesToInstall == null)
             {
                 e.Result = false;
                 return;
@@ -171,7 +177,7 @@ namespace ALOTInstallerCore.Steps
                 return; //abort.
             }
 
-            if (installOptions.FilesToInstall == null)
+            if (_installOptions.FilesToInstall == null)
             {
                 // Abort!
                 Log.Information("[AICORE] A mutual group conflict was not resolved. Staging aborted by user");
@@ -179,7 +185,7 @@ namespace ALOTInstallerCore.Steps
                 return;
             }
 
-            FinalizedFileSet?.Invoke(installOptions.FilesToInstall);
+            FinalizedFileSet?.Invoke(_installOptions.FilesToInstall);
             if (!PointOfNoReturnNotification())
             {
                 Log.Information("[AICORE] User aborted install at point of no return callback");
@@ -189,14 +195,14 @@ namespace ALOTInstallerCore.Steps
 
             Log.Information(@"[AICORE] The following files will be staged for installation:");
             int buildID = 0;
-            foreach (var f in installOptions.FilesToInstall)
+            foreach (var f in _installOptions.FilesToInstall)
             {
                 f.ResetBuildVars();
                 if (f.AlotVersionInfo.IsNotVersioned)
                 {
                     // First non-versioned file. Versioned files are always able to be overriden so
                     // first non versioned file will be first addon file (or user file).
-                    AddonID = ++buildID; //Addon will install at this ID
+                    _addonID = ++buildID; //Addon will install at this ID
                 }
                 f.BuildID = buildID++;
                 f.StatusText = "Pending staging";
@@ -204,11 +210,10 @@ namespace ALOTInstallerCore.Steps
                 Log.Information($"[AICORE] {f.Filename}, Build ID {f.BuildID}");
             }
 
-            AddonID++; //Add one in case the final file was versioned
-            Log.Information($"[AICORE] The Addon will stage to build ID {AddonID}, if it needs to be built");
+            _addonID++; //Add one in case the final file was versioned
+            Log.Information($"[AICORE] The Addon will stage to build ID {_addonID}, if it needs to be built");
 
-            int numDone = 0;
-            int numToDo = installOptions.FilesToInstall.Count;
+            int numToDo = _installOptions.FilesToInstall.Count;
             // Final location where MEM will install packages from. 
             var finalBuiltPackagesDestination = Path.Combine(stagingDir, "InstallationPackages");
             if (Directory.Exists(finalBuiltPackagesDestination))
@@ -225,259 +230,26 @@ namespace ALOTInstallerCore.Steps
             }
             Directory.CreateDirectory(addonStagingPath);
 
-            bool abortStaging = false;
-            foreach (var installerFile in installOptions.FilesToInstall)
+
+            var block = new ActionBlock<InstallerFile>(
+                job => PrepareSingleFile(job, stagingDir, addonStagingPath, finalBuiltPackagesDestination),
+                new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 2 }); // How to maximize this?
+
+            foreach (var v in _installOptions.FilesToInstall)
             {
-                if (abortStaging) break;
-                Log.Information($"[AICORE] Processing staging for {installerFile.FriendlyName}");
-                NotifyFileBeingProcessed?.Invoke(installerFile);
-                installerFile.IsProcessing = true;
-                installerFile.IsWaiting = false;
-                bool stage = true; // If file doesn't need processing this is not necessary
-                if (installerFile is ManifestFile mf)
-                {
-                    var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
-                    mf.StagedName = installerFile.GetUsedFilepath();
-                    Directory.CreateDirectory(outputDir);
-                    // Extract Archive
-                    var archiveExtractedN = installerFile.PackageFiles.Any() ? ExtractArchive(installerFile, outputDir) : false;
-                    if (archiveExtractedN == null)
-                    {
-                        // There was an error
-                        //UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file");
-                        installerFile.StatusText = "Error extracting, checking archive";
-                        using var sourcefStream = File.OpenRead(installerFile.GetUsedFilepath());
-                        long sizeToHash = sourcefStream.Length;
-                        if (sizeToHash > 0)
-                        {
-                            var hash = HashAlgorithmExtensions.ComputeHashAsync(MD5.Create(), sourcefStream,
-                                progress: x =>
-                                {
-                                    //UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file {(int) (x * 100f / sizeToHash)}%");
-                                    installerFile.StatusText = $"Error extracting, checking archive {(int)(x * 100f / sizeToHash)}%";
-                                }).Result;
-                            if (hash == mf.GetBackingHash())
-                            {
-                                ErrorStagingCallback?.Invoke($"Error extracting {installerFile.GetUsedFilepath()}, but file matches manifest - possible disk issues?");
-                            }
-                            else
-                            {
-                                ErrorStagingCallback?.Invoke($"File is corrupt: {installerFile.GetUsedFilepath()}, this file should be deleted and redownloaded.\nExpected hash:{mf.GetBackingHash()}\nHash of file: {hash}");
-                            }
-                        }
-                        else
-                        {
-                            ErrorStagingCallback?.Invoke($"Unable to read {installerFile.GetUsedFilepath()}, size is 0 bytes");
-                        }
-                        abortStaging = true;
-                        throw new Exception($"{installerFile.FriendlyName} failed to extract");
-                    }
-
-                    var archiveExtracted = archiveExtractedN.Value;
-                    if (archiveExtracted && installOptions.ImportNewlyUnpackedFiles && installerFile is ManifestFile _mf && _mf.UnpackedSingleFilename != null && Path.GetExtension(_mf.UnpackedSingleFilename) != ".mem")
-                    {
-                        // mem files will be directly moved to install source. All other files will be staged for build so we need to 
-                        // copy them back before we delete the extraction dir after we stage the files
-                        TextureLibrary.AttemptImportUnpackedFiles(outputDir, new List<ManifestFile>(new[] { _mf }), true,
-                            (filename, x, y) =>
-                            {
-                                //UpdateStatusCallback?.Invoke($"Optimizing {filename} for future installs {(int) (x * 100f / y)}%");
-                                installerFile.StatusText = $"Optimizing {filename} for future installs {(int)(x * 100f / y)}%";
-                            },
-                            forceCopy: true
-                        );
-                    }
-
-                    bool decompiled = false;
-
-                    // Check if listed file is a decompilable format and not archive format 
-                    if (!archiveExtracted && FiletypeRequiresDecompilation(installerFile.GetUsedFilepath()))
-                    {
-                        // Decompile file instead 
-                        if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mod" && installerFile.StageModFiles)
-                        {
-                            var modDest = Path.Combine(stagingDir, Path.GetFileName(installerFile.GetUsedFilepath()));
-                            Log.Information($"[AICORE] Copying .mod file to staging (due to StageModFiles=true): {installerFile.GetUsedFilepath()} -> {modDest}");
-                            File.Copy(installerFile.GetUsedFilepath(), modDest);
-                        }
-                        else
-                        {
-                            ExtractTextureContainer(installOptions.InstallTarget.Game,
-                                installerFile.GetUsedFilepath(),
-                                outputDir, installerFile);
-                            decompiled = true;
-                        }
-                    }
-                    else if (archiveExtracted)
-                    {
-                        // This installer file was extracted from an archive, and there are files in it that are not marked as move directly
-                        // Decompile all files not marked as MoveDirectly
-                        var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
-                        foreach (var sf in subfilesToExtract)
-                        {
-                            var matchingPackageFile = installerFile.PackageFiles.Find(x => x.SourceName == Path.GetFileName(sf));
-                            if (Path.GetExtension(sf) == ".mod" && installerFile.StageModFiles)
-                            {
-                                var modDest = Path.Combine(stagingDir, Path.GetFileName(sf));
-                                Log.Information($"[AICORE] Moving .mod file to staging (due to StageModFiles=true): {sf} -> {modDest}");
-                                File.Move(sf, modDest);
-                            }
-                            else if (matchingPackageFile != null && matchingPackageFile.MoveDirectly)
-                            {
-                                // This file will be handled by stagePackageFile(); Do not decompile it
-                                // We could move it here but let's just keep code in one place
-                            }
-                            else if (FiletypeRequiresDecompilation(sf))
-                            {
-                                ExtractTextureContainer(installOptions.InstallTarget.Game, sf, outputDir, installerFile);
-                                decompiled = true;
-                            }
-                            else
-                            {
-                                // File skipped
-                                Log.Information($"[AICORE] File skipped for processing: {sf}");
-                            }
-                        }
-                    }
-
-
-                    // Single file unpacked
-                    if (!archiveExtracted && !decompiled && installerFile is ManifestFile mfx && mfx.IsBackedByUnpacked())
-                    {
-                        // File must just be moved directly it seems
-                        var destF = Path.Combine(finalBuiltPackagesDestination, $"{installerFile.BuildID:D3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
-
-                        if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory == new DriveInfo(finalBuiltPackagesDestination).RootDirectory)
-                        {
-                            // Move
-                            Log.Information($"[AICORE] Moving unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                            File.Move(installerFile.GetUsedFilepath(), destF);
-                        }
-                        else
-                        {
-                            //Copy
-                            Log.Information($"[AICORE] Copying unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                            CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
-                                (x, y) =>
-                                {
-                                    installerFile.StatusText = $"Copying file to staging {(int)(x * 100f / y)}%";
-                                },
-                                exception => { abortStaging = true; });
-                        }
-
-                        stage = false;
-                    }
-                    else if (archiveExtracted && installerFile.PackageFiles.All(x => x.MoveDirectly))
-                    {
-                        // Subfiles move to dest
-                    }
-                    else if (decompiled)
-                    {
-                        // Files will be staged
-                    }
-                    else if (mf is PreinstallMod pm && !pm.PackageFiles.Any())
-                    {
-                        // Nothing to stage. Will install before textures
-                        stage = false;
-                    }
-                    else
-                    {
-                        Log.Error($"[AICORE] STAGING NOT HANDLED FOR {installerFile.FriendlyName}");
-                    }
-
-                    if (stage)
-                    {
-                        // Staging for addon
-                        StageForBuilding(installerFile, outputDir, addonStagingPath, finalBuiltPackagesDestination, installOptions.InstallTarget.Game);
-                    }
-                }
-                else if (installerFile is UserFile uf)
-                {
-                    var userFileExtractionPath = Path.Combine(stagingDir, "USER_" + Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
-                    var userFileBuildMemPath = Path.Combine(userFileExtractionPath, "BuildSource");
-                    Directory.CreateDirectory(userFileBuildMemPath);
-
-                    // Extract Archive
-                    var archiveExtractedN = ExtractArchive(installerFile, userFileExtractionPath);
-                    if (archiveExtractedN == null)
-                    {
-                        ErrorStagingCallback?.Invoke($"Unable to extract {installerFile.GetUsedFilepath()}");
-                        abortStaging = true;
-                        throw new Exception($"{installerFile.FriendlyName} failed to extract");
-                    }
-
-
-                    var archiveExtracted = archiveExtractedN.Value;
-                    // File is a direct copy if it's not extracted by extract archive
-                    if (!archiveExtracted)
-                    {
-                        CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), Path.Combine(userFileBuildMemPath, Path.GetFileName(installerFile.GetUsedFilepath())),
-                            (x, y) =>
-                            {
-                                //UpdateStatusCallback?.Invoke($"Staging {Path.GetFileName(installerFile.GetUsedFilepath())} {(int)(x * 100f / y)}%"),
-                                installerFile.StatusText = $"Staging for install {(int)(x * 100f / y)}%";
-                            },
-                            x =>
-                            {
-                                // Do something here. Not sure what
-                            }
-                        );
-                    }
-                    else
-                    {
-                        // Files are in archive. Find files to stage to mem
-                        var subfilesToStage = Directory.GetFiles(userFileExtractionPath, "*.*", SearchOption.AllDirectories).Where(FiletypeRequiresDecompilation);
-                        int stagedID = 0;
-                        foreach (var sf in subfilesToStage)
-                        {
-                            if (Path.GetExtension(sf) == ".mem")
-                            {
-                                // Can be staged directly
-                                var destF = Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{Path.GetFileName(sf)}");
-                                Log.Information($"[AICORE] Moving prebuild .mem archive subfile to installation packages folder: {sf} -> {destF}");
-                                File.Move(sf, destF);
-                                stagedID++;
-                            }
-                            else if (userSubfileShouldBeStaged(sf))
-                            {
-                                var modDest = Path.Combine(userFileBuildMemPath, Path.GetFileName(sf));
-                                Log.Information($"[AICORE] Moving archive subfile to user staging: {sf} -> {modDest}");
-                                File.Move(sf, modDest);
-                            }
-                        }
-
-                        if (Directory.GetFiles(userFileBuildMemPath).Any())
-                        {
-                            // Requires build
-                            BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{uf.FriendlyName}.mem"), installOptions.InstallTarget.Game);
-                            stagedID++;
-                        }
-
-                        Utilities.DeleteFilesAndFoldersRecursively(userFileExtractionPath);
-                    }
-                }
-
-                Interlocked.Increment(ref numDone);
-                UpdateProgressCallback?.Invoke(numDone, numToDo);
-                installerFile.IsProcessing = false;
-                if (installerFile is PreinstallMod)
-                {
-                    if (installerFile.PackageFiles.Any())
-                    {
-                        installerFile.StatusText = "Textures staged, mod component install during install step";
-                    }
-                    else
-                    {
-                        installerFile.StatusText = "Mod will install during install step";
-                    }
-                }
-                else
-                {
-                    installerFile.StatusText = "Staged for installation";
-                }
+                block.Post(v);
             }
+            block.Complete();
+            block.Completion.Wait();
 
-            if (abortStaging)
+            //BlockingCollection<InstallerFile> stagingQueue = new BlockingCollection<InstallerFile>(, 2);
+
+            //foreach (var installerFile in _installOptions.FilesToInstall)
+            //{
+            //    PrepareSingleFile(installerFile, stagingDir, addonStagingPath, finalBuiltPackagesDestination);
+            //}
+
+            if (_abortStaging)
             {
                 // Error callback goes here
                 e.Result = false;
@@ -488,15 +260,260 @@ namespace ALOTInstallerCore.Steps
             {
                 // Addon needs built
 
-                BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{AddonID:D3}_ALOTAddon.mem"), installOptions.InstallTarget.Game);
+                BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{_addonID:D3}_ALOTAddon.mem"), _installOptions.InstallTarget.Game);
             }
 
             e.Result = true;
         }
 
+        private bool? PrepareSingleFile(InstallerFile installerFile, string stagingDir, string addonStagingPath, string finalBuiltPackagesDestination)
+        {
+            if (_abortStaging) return null;
+            Log.Information($"[AICORE] Processing staging for {installerFile.FriendlyName}");
+            NotifyFileBeingProcessed?.Invoke(installerFile);
+            installerFile.IsProcessing = true;
+            installerFile.IsWaiting = false;
+            bool stage = true; // If file doesn't need processing this is not necessary
+            if (installerFile is ManifestFile mf)
+            {
+                var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
+                mf.StagedName = installerFile.GetUsedFilepath();
+                Directory.CreateDirectory(outputDir);
+                // Extract Archive
+                var archiveExtractedN = installerFile.PackageFiles.Any() ? ExtractArchive(installerFile, outputDir) : false;
+                if (archiveExtractedN == null)
+                {
+                    // There was an error
+                    //UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file");
+                    installerFile.StatusText = "Error extracting, checking archive";
+                    using var sourcefStream = File.OpenRead(installerFile.GetUsedFilepath());
+                    long sizeToHash = sourcefStream.Length;
+                    if (sizeToHash > 0)
+                    {
+                        var hash = HashAlgorithmExtensions.ComputeHashAsync(MD5.Create(), sourcefStream,
+                            progress: x =>
+                            {
+                                //UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file {(int) (x * 100f / sizeToHash)}%");
+                                installerFile.StatusText = $"Error extracting, checking archive {(int)(x * 100f / sizeToHash)}%";
+                            }).Result;
+                        if (hash == mf.GetBackingHash())
+                        {
+                            ErrorStagingCallback?.Invoke($"Error extracting {installerFile.GetUsedFilepath()}, but file matches manifest - possible disk issues?");
+                        }
+                        else
+                        {
+                            ErrorStagingCallback?.Invoke($"File is corrupt: {installerFile.GetUsedFilepath()}, this file should be deleted and redownloaded.\nExpected hash:{mf.GetBackingHash()}\nHash of file: {hash}");
+                        }
+                    }
+                    else
+                    {
+                        ErrorStagingCallback?.Invoke($"Unable to read {installerFile.GetUsedFilepath()}, size is 0 bytes");
+                    }
+                    _abortStaging = true;
+                    throw new Exception($"{installerFile.FriendlyName} failed to extract");
+                }
+
+                var archiveExtracted = archiveExtractedN.Value;
+                if (archiveExtracted && _installOptions.ImportNewlyUnpackedFiles && installerFile is ManifestFile _mf && _mf.UnpackedSingleFilename != null && Path.GetExtension(_mf.UnpackedSingleFilename) != ".mem")
+                {
+                    // mem files will be directly moved to install source. All other files will be staged for build so we need to 
+                    // copy them back before we delete the extraction dir after we stage the files
+                    TextureLibrary.AttemptImportUnpackedFiles(outputDir, new List<ManifestFile>(new[] { _mf }), true,
+                        (filename, x, y) =>
+                        {
+                            //UpdateStatusCallback?.Invoke($"Optimizing {filename} for future installs {(int) (x * 100f / y)}%");
+                            installerFile.StatusText = $"Optimizing {filename} for future installs {(int)(x * 100f / y)}%";
+                        },
+                        forceCopy: true
+                    );
+                }
+
+                bool decompiled = false;
+
+                // Check if listed file is a decompilable format and not archive format 
+                if (!archiveExtracted && FiletypeRequiresDecompilation(installerFile.GetUsedFilepath()))
+                {
+                    // Decompile file instead 
+                    if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mod" && installerFile.StageModFiles)
+                    {
+                        var modDest = Path.Combine(stagingDir, Path.GetFileName(installerFile.GetUsedFilepath()));
+                        Log.Information($"[AICORE] Copying .mod file to staging (due to StageModFiles=true): {installerFile.GetUsedFilepath()} -> {modDest}");
+                        File.Copy(installerFile.GetUsedFilepath(), modDest);
+                    }
+                    else
+                    {
+                        ExtractTextureContainer(_installOptions.InstallTarget.Game,
+                            installerFile.GetUsedFilepath(),
+                            outputDir, installerFile);
+                        decompiled = true;
+                    }
+                }
+                else if (archiveExtracted)
+                {
+                    // This installer file was extracted from an archive, and there are files in it that are not marked as move directly
+                    // Decompile all files not marked as MoveDirectly
+                    var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
+                    foreach (var sf in subfilesToExtract)
+                    {
+                        var matchingPackageFile = installerFile.PackageFiles.Find(x => x.SourceName == Path.GetFileName(sf));
+                        if (Path.GetExtension(sf) == ".mod" && installerFile.StageModFiles)
+                        {
+                            var modDest = Path.Combine(stagingDir, Path.GetFileName(sf));
+                            Log.Information($"[AICORE] Moving .mod file to staging (due to StageModFiles=true): {sf} -> {modDest}");
+                            File.Move(sf, modDest);
+                        }
+                        else if (matchingPackageFile != null && matchingPackageFile.MoveDirectly)
+                        {
+                            // This file will be handled by stagePackageFile(); Do not decompile it
+                            // We could move it here but let's just keep code in one place
+                        }
+                        else if (FiletypeRequiresDecompilation(sf))
+                        {
+                            ExtractTextureContainer(_installOptions.InstallTarget.Game, sf, outputDir, installerFile);
+                            decompiled = true;
+                        }
+                        else
+                        {
+                            // File skipped
+                            Log.Information($"[AICORE] File skipped for processing: {sf}");
+                        }
+                    }
+                }
+
+
+                // Single file unpacked
+                if (!archiveExtracted && !decompiled && installerFile is ManifestFile mfx && mfx.IsBackedByUnpacked())
+                {
+                    // File must just be moved directly it seems
+                    var destF = Path.Combine(finalBuiltPackagesDestination, $"{installerFile.BuildID:D3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
+
+                    if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory == new DriveInfo(finalBuiltPackagesDestination).RootDirectory)
+                    {
+                        // Move
+                        Log.Information($"[AICORE] Moving unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                        File.Move(installerFile.GetUsedFilepath(), destF);
+                    }
+                    else
+                    {
+                        //Copy
+                        Log.Information($"[AICORE] Copying unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                        CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
+                            (x, y) =>
+                            {
+                                installerFile.StatusText = $"Copying file to staging {(int)(x * 100f / y)}%";
+                            },
+                            exception => { _abortStaging = true; });
+                    }
+
+                    stage = false;
+                }
+                else if (archiveExtracted && installerFile.PackageFiles.All(x => x.MoveDirectly))
+                {
+                    // Subfiles move to dest
+                }
+                else if (decompiled)
+                {
+                    // Files will be staged
+                }
+                else if (mf is PreinstallMod pm && !pm.PackageFiles.Any())
+                {
+                    // Nothing to stage. Will install before textures
+                    stage = false;
+                }
+                else
+                {
+                    Log.Error($"[AICORE] STAGING NOT HANDLED FOR {installerFile.FriendlyName}");
+                }
+
+                if (stage)
+                {
+                    // Staging for addon
+                    StageForBuilding(installerFile, outputDir, addonStagingPath, finalBuiltPackagesDestination, _installOptions.InstallTarget.Game);
+                }
+            }
+            else if (installerFile is UserFile uf)
+            {
+                var userFileExtractionPath = Path.Combine(stagingDir, "USER_" + Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
+                var userFileBuildMemPath = Path.Combine(userFileExtractionPath, "BuildSource");
+                Directory.CreateDirectory(userFileBuildMemPath);
+
+                // Extract Archive
+                var archiveExtractedN = ExtractArchive(installerFile, userFileExtractionPath);
+                if (archiveExtractedN == null)
+                {
+                    ErrorStagingCallback?.Invoke($"Unable to extract {installerFile.GetUsedFilepath()}");
+                    _abortStaging = true;
+                    throw new Exception($"{installerFile.FriendlyName} failed to extract");
+                }
+
+
+                var archiveExtracted = archiveExtractedN.Value;
+                // File is a direct copy if it's not extracted by extract archive
+                if (!archiveExtracted)
+                {
+                    CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), Path.Combine(userFileBuildMemPath, Path.GetFileName(installerFile.GetUsedFilepath())),
+                        (x, y) =>
+                        {
+                            //UpdateStatusCallback?.Invoke($"Staging {Path.GetFileName(installerFile.GetUsedFilepath())} {(int)(x * 100f / y)}%"),
+                            installerFile.StatusText = $"Staging for install {(int)(x * 100f / y)}%";
+                        },
+                        x =>
+                        {
+                            // Do something here. Not sure what
+                        }
+                    );
+                }
+                else
+                {
+                    // Files are in archive. Find files to stage to mem
+                    var subfilesToStage = Directory.GetFiles(userFileExtractionPath, "*.*", SearchOption.AllDirectories).Where(FiletypeRequiresDecompilation);
+                    int stagedID = 0;
+                    foreach (var sf in subfilesToStage)
+                    {
+                        if (Path.GetExtension(sf) == ".mem")
+                        {
+                            // Can be staged directly
+                            var destF = Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{Path.GetFileName(sf)}");
+                            Log.Information($"[AICORE] Moving prebuild .mem archive subfile to installation packages folder: {sf} -> {destF}");
+                            File.Move(sf, destF);
+                            stagedID++;
+                        }
+                        else if (userSubfileShouldBeStaged(sf))
+                        {
+                            var modDest = Path.Combine(userFileBuildMemPath, Path.GetFileName(sf));
+                            Log.Information($"[AICORE] Moving archive subfile to user staging: {sf} -> {modDest}");
+                            File.Move(sf, modDest);
+                        }
+                    }
+
+                    if (Directory.GetFiles(userFileBuildMemPath).Any())
+                    {
+                        // Requires build
+                        BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{uf.FriendlyName}.mem"), _installOptions.InstallTarget.Game);
+                    }
+
+                    Utilities.DeleteFilesAndFoldersRecursively(userFileExtractionPath);
+                }
+            }
+
+            Interlocked.Increment(ref _numTasksCompleted);
+            UpdateProgressCallback?.Invoke(_numTasksCompleted, _numTotalTasks);
+            installerFile.IsProcessing = false;
+            if (installerFile is PreinstallMod)
+            {
+                installerFile.StatusText = installerFile.PackageFiles.Any() ? "Textures staged, mod component install during install step" : "Mod will install during install step";
+            }
+            else
+            {
+                installerFile.StatusText = "Staged for installation";
+            }
+
+            return true;
+        }
+
         private bool promptModConfiguration()
         {
-            foreach (var m in installOptions.FilesToInstall.Where(x => x is ManifestFile mf && (mf.CopyFiles.Any() || mf.ChoiceFiles.Any() || mf.ZipFiles.Any())))
+            foreach (var m in _installOptions.FilesToInstall.Where(x => x is ManifestFile mf && (mf.CopyFiles.Any() || mf.ChoiceFiles.Any() || mf.ZipFiles.Any())))
             {
                 var mf = m as ManifestFile;
                 mf.PackageFiles.RemoveAll(x => x.Transient);
@@ -563,7 +580,7 @@ namespace ALOTInstallerCore.Steps
         {
             var files = new List<InstallerFile>();
             Dictionary<string, List<InstallerFile>> mutualExclusiveMods = new Dictionary<string, List<InstallerFile>>();
-            foreach (var v in installOptions.FilesToInstall)
+            foreach (var v in _installOptions.FilesToInstall)
             {
                 if (v is PreinstallMod pm)
                 {
@@ -690,7 +707,7 @@ namespace ALOTInstallerCore.Steps
         private void stagePackageFile(InstallerFile installerFile, PackageFile pf, string compilingStagingDest, string finalDest, string[] filesInSource, ref int numPackageFilesStaged, int numPackageFiles)
         {
             // Stage package files
-            if (!pf.Processed && pf.ApplicableGames.HasFlag(installOptions.InstallTarget.Game.ToApplicableGame()))
+            if (!pf.Processed && pf.ApplicableGames.HasFlag(_installOptions.InstallTarget.Game.ToApplicableGame()))
             {
                 var matchingFile = filesInSource.FirstOrDefault(x => Path.GetFileName(x).Equals(Path.GetFileName(pf.SourceName), StringComparison.InvariantCultureIgnoreCase));
                 if (matchingFile != null)
@@ -858,32 +875,32 @@ namespace ALOTInstallerCore.Steps
         private List<InstallerFile> getFilesToStage(IEnumerable<InstallerFile> readyFiles)
         {
             var filesToStage = new List<InstallerFile>();
-            if (installOptions.InstallALOT)
+            if (_installOptions.InstallALOT)
             {
                 filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0)); //Add MAJOR ALOT file
             }
 
-            if (installOptions.InstallALOTUpdate)
+            if (_installOptions.InstallALOTUpdate)
             {
                 filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0)); //Add MINOR ALOT file
             }
 
-            if (installOptions.InstallMEUITM)
+            if (_installOptions.InstallMEUITM)
             {
                 filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.MEUITMVER != 0)); //Add MEUITM file
             }
 
-            if (installOptions.InstallAddons)
+            if (_installOptions.InstallAddons)
             {
                 filesToStage.AddRange(readyFiles.Where(x => x.AlotVersionInfo != null && x.AlotVersionInfo.IsNotVersioned && x is ManifestFile && !(x is PreinstallMod))); //Add Addon files that don't have a set ALOTVersionInfo.
             }
 
-            if (installOptions.InstallPreinstallMods)
+            if (_installOptions.InstallPreinstallMods)
             {
                 filesToStage.AddRange(readyFiles.Where(x => x is PreinstallMod)); //Add Addon files that don't have a set ALOTVersionInfo.
             }
 
-            if (installOptions.InstallUserfiles)
+            if (_installOptions.InstallUserfiles)
             {
                 filesToStage.AddRange(readyFiles.Where(x => x is UserFile));
             }
