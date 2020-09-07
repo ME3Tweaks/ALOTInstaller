@@ -151,7 +151,7 @@ namespace ALOTInstallerCore.Steps
         private bool checkOneOptionSelected(out string failurereason)
         {
             if (!package.InstallALOT && !package.InstallALOTUpdate && !package.InstallAddons &&
-                !package.InstallMEUITM && !package.InstallUserfiles)
+                !package.InstallMEUITM && !package.InstallPreinstallMods && !package.InstallUserfiles)
             {
                 failurereason = "No options for installation were selected.";
                 return false;

@@ -78,6 +78,8 @@ namespace ALOTInstallerCore.Helpers
 
         private static void LoadGamePaths()
         {
+
+            /*
             //Read config file.
             string path = null;
             string mempath = null;
@@ -119,27 +121,26 @@ namespace ALOTInstallerCore.Helpers
                         if (path == null)
                         {
                             path = RegistryHandler.GetRegistryString(softwareKey + key64 + gameKey, entry);
-                        }
+                        }*/
 
-                        if (path != null)
-                        {
-                            path = path.TrimEnd(Path.DirectorySeparatorChar);
+            foreach (var game in Enums.AllGames)
+            {
+                string path = MEMIPCHandler.GetGameLocation(game);
+                if (path != null)
+                {
+                    path = path.TrimEnd(Path.DirectorySeparatorChar);
 
-                            string GameEXEPath = MEDirectories.ExecutablePath(game, path);
-                            Utilities.WriteDebugLog("GetGamePath Registry EXE Check Path: " + GameEXEPath);
+                    string exePath = MEDirectories.ExecutablePath(game, path);
 
-                            if (File.Exists(GameEXEPath))
-                            {
-                                Utilities.WriteDebugLog("EXE file exists - returning this path: " + GameEXEPath);
-                                internalSetTarget(game, path);
-                            }
-                        }
-                        else
-                        {
-                            Utilities.WriteDebugLog("Could not find game via registry.");
-                        }
-#endif
+                    if (File.Exists(exePath))
+                    {
+                        Utilities.WriteDebugLog("Game executable exists - returning this path: " + exePath);
+                        internalSetTarget(game, path);
                     }
+                }
+                else
+                {
+                    Utilities.WriteDebugLog($"Could not find game path for game {game}");
                 }
             }
         }
@@ -164,12 +165,6 @@ namespace ALOTInstallerCore.Helpers
 
             return false; // DEFAULT
         }
-
-        private static void LoadLocationsLinux64()
-        {
-
-        }
-
 
         /// <summary>
         /// Location where cached ASI files are placed

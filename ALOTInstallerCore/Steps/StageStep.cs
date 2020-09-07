@@ -118,7 +118,21 @@ namespace ALOTInstallerCore.Steps
                     //UpdateStatusCallback($"Extracting {instFile.FriendlyName}");
                     instFile.StatusText = "Extracting archive";
 
-                    MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{filepath}\" --output \"{substagingDir}\" --ipc",
+                    var args = $"--unpack-archive --input \"{filepath}\" --output \"{substagingDir}\"";
+                    // Determine extensions
+                    if (instFile.HasAnyPackageFiles())
+                    {
+                        var extensions = instFile.PackageFiles.Select(x => Path.GetExtension(x.SourceName)).Distinct()
+                            .ToList();
+                        if (extensions.Count == 1)
+                        {
+                            // We have only one extension type! We can filter what we extract with MEM
+                            args += $" --filter-with-ext {extensions.First().Substring(1)}"; //remove the '.'
+                        }
+                    }
+
+                    args += " --ipc";
+                    MEMIPCHandler.RunMEMIPCUntilExit(args,
                         null,
                         handleIPC,
                         x => Log.Error($"[AICORE] StdError on {filepath}: {x}"),

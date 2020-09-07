@@ -300,29 +300,25 @@ namespace ALOTInstallerCore.Helpers
         /// <returns></returns>
         public static List<string> GetFileListing(string file)
         {
-            string args = $"--get-archive-listing --input \"{file}\" --ipc";
+            string args = $"--list-archive --input \"{file}\" --ipc";
             List<string> fileListing = new List<string>();
 
             int exitcode = -1;
-
-
-            //TODO: ENABLE WHEN AQUADRAN IMPLEMENTS FILE LISTING
-            //MEMIPCHandler.RunMEMIPCUntilExit(args,
-            //    null,
-            //    (command, param) =>
-            //    {
-            //        if (command == "FILE")
-            //        {
-            //            fileListing.Add(param);
-            //        }
-            //    },
-            //    x => Log.Error($"[AICORE] StdError setting LODs: {x}"),
-            //    x => exitcode = x); //Change to catch exit code of non zero.        
-            //if (exitcode != 0)
-            //{
-            //    Log.Error($"[AICORE] MassEffectModderNoGui had error getting file listing of archive {file}, exit code {exitcode}");
-            //}
-            fileListing.Add("test.tpf");
+            MEMIPCHandler.RunMEMIPCUntilExit(args,
+                null,
+                (command, param) =>
+                {
+                    if (command == "FILENAME")
+                    {
+                        fileListing.Add(param);
+                    }
+                },
+                x => Log.Error($"[AICORE] StdError getting file listing for file {file}: {x}"),
+                x => exitcode = x); //Change to catch exit code of non zero.        
+            if (exitcode != 0)
+            {
+                Log.Error($"[AICORE] MassEffectModderNoGui had error getting file listing of archive {file}, exit code {exitcode}");
+            }
             return fileListing;
         }
 
@@ -331,7 +327,7 @@ namespace ALOTInstallerCore.Helpers
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        public static Dictionary<string,string> GetLODs(Enums.MEGame game)
+        public static Dictionary<string, string> GetLODs(Enums.MEGame game)
         {
             Dictionary<string, string> lods = new Dictionary<string, string>();
             var args = $@"--print-lods --gameid {game.ToGameNum()} --ipc";
@@ -358,6 +354,25 @@ namespace ALOTInstallerCore.Helpers
             }
 
             return lods;
+        }
+
+        /// <summary>
+        /// Returns location of the game as defined by MEM, or null if game can't be found.
+        /// </summary>
+        /// <param name="game"></param>
+        /// <returns></returns>
+        public static string GetGameLocation(Enums.MEGame game)
+        {
+            string result = null;
+            // If the current version doesn't support the --version --ipc, we just assume it is 0.
+            MEMIPCHandler.RunMEMIPCUntilExit($"--get-game-data-path --gameid {game.ToGameNum()} --ipc", ipcCallback: (command, param) =>
+            {
+                if (command == "FILENAME")
+                {
+                    result = param;
+                }
+            });
+            return result;
         }
     }
 }
