@@ -335,24 +335,31 @@ namespace ALOTInstallerWPF.BuilderUI
                 //mw.OpenInstallerUI(iuic, InstallerUIController.GetInstallerBackgroundImage(Enums.MEGame.ME1, ManifestHandler.CurrentMode));
                 //return;
                 var buttons = new List<Button>();
-                var targets = Locations.GetAllAvailableTargets();
+                var mp = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode];
+                var targets = Locations.GetAllAvailableTargets().Where(
+                    g => mp.UserFiles.Any(x => x.ApplicableGames.HasFlag(g.Game.ToApplicableGame())) ||
+                         mp.ManifestFiles.Any(x => x.ApplicableGames.HasFlag(g.Game.ToApplicableGame()))).ToList();
+                List<Enums.MEGame> availableGames = new List<Enums.MEGame>();
                 foreach (var game in targets)
                 {
-                    var image = new Image()
-                    {
-                        Height = 45,
-                        Source = new BitmapImage(new Uri(
-                            $"pack://application:,,,/ALOTInstallerWPF;component/Images/logo_{game.Game.ToString().ToLower()}.png")),
-                    };
-                    RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
-                    buttons.Add(new Button()
-                    {
-                        ToolTip = game.TargetPath,
-                        Margin = new Thickness(5),
-                        Content = image,
-                        Padding = new Thickness(4),
-                        Style = (Style)FindResource("MahApps.Styles.Button.Square.Accent")
-                    });
+                     {
+                        var image = new Image()
+                        {
+                            Height = 45,
+                            Source = new BitmapImage(new Uri(
+                                $"pack://application:,,,/ALOTInstallerWPF;component/Images/logo_{game.Game.ToString().ToLower()}.png")),
+                        };
+                        RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+                        buttons.Add(new Button()
+                        {
+                            ToolTip = game.TargetPath,
+                            Margin = new Thickness(5),
+                            Content = image,
+                            Padding = new Thickness(4),
+                            Style = (Style)FindResource("MahApps.Styles.Button.Square.Accent")
+                        });
+                        availableGames.Add(game.Game);
+                    }
                 }
 
                 buttons.Add(new Button()
@@ -360,17 +367,26 @@ namespace ALOTInstallerWPF.BuilderUI
                     Height = 50,
                     Content = "Abort install"
                 });
+                int chosenOption = -1;
 
-                var chosenOption = await mw.GetFlyoutResponse("Select which game to install textures for", buttons.ToArray());
-                if (chosenOption == buttons.Count - 1)
+                if (availableGames.Count > 1)
                 {
-                    // ABORT
+
+                    chosenOption = await mw.GetFlyoutResponse("Select which game to install textures for",
+                        buttons.ToArray());
+                    if (chosenOption == buttons.Count - 1)
+                    {
+                        // ABORT
+                        return;
+                    }
                 }
                 else
                 {
-                    // USER CHOSE OPTION
-                    mw.ShowBottomDialog(new InstallOptionsFlyout(targets[chosenOption], CurrentModeFiles.OfType<UserFile>().ToList()));
+                    chosenOption = 0;
                 }
+                // USER CHOSE OPTION OR ONLY WAS ONE OPTION
+                mw.ShowBottomDialog(new InstallOptionsFlyout(targets[chosenOption],
+                    CurrentModeFiles.OfType<UserFile>().ToList()));
             }
         }
 

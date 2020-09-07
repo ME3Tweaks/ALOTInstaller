@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -357,19 +358,61 @@ namespace ALOTInstallerCore.Helpers
         }
 
         /// <summary>
-        /// Returns location of the game as defined by MEM, or null if game can't be found.
+        /// Used to pass data back to installer core. DO NOT CHANGE VALUES AS
+        /// THEY ARE INDIRECTLY REFERENCED
+        /// </summary>
+        public enum GameDirPath
+        {
+            ME1GamePath,
+            ME1ConfigPath,
+            ME2GamePath,
+            ME2ConfigPath,
+            ME3GamePath,
+            ME3ConfigPath,
+        }
+
+        /// <summary>
+        /// Returns location of the game and config paths (on linux) as defined by MEM, or null if game can't be found.
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        public static string GetGameLocation(Enums.MEGame game)
+        public static Dictionary<GameDirPath, string> GetGameLocations()
         {
-            string result = null;
-            // If the current version doesn't support the --version --ipc, we just assume it is 0.
-            MEMIPCHandler.RunMEMIPCUntilExit($"--get-game-data-path --gameid {game.ToGameNum()} --ipc", ipcCallback: (command, param) =>
+            Dictionary<GameDirPath, string> result = new Dictionary<GameDirPath, string>();
+            MEMIPCHandler.RunMEMIPCUntilExit($"--get-game-paths --ipc", ipcCallback: (command, param) =>
             {
-                if (command == "FILENAME")
+                var spitIndex = param.IndexOf(' ');
+                if (spitIndex < 0) return; // This is nothing
+                var gameId = param.Substring(0, spitIndex);
+                var path = Path.GetFullPath(param.Substring(spitIndex + 1, param.Length - (spitIndex + 1)));
+                switch (command)
                 {
-                    result = param;
+                    case "GAMEPATH":
+                        {
+                            var keyname = Enum.Parse<GameDirPath>($"ME{gameId}GamePath");
+                            if (param.Length > 1)
+                            {
+                                result[keyname] = path;
+                            }
+                            else
+                            {
+                                result[keyname] = null;
+                            }
+                            break;
+                        }
+                    case "GAMECONFIGPATH":
+                        {
+                            var keyname = Enum.Parse<GameDirPath>($"ME{gameId}ConfigPath");
+                            if (param.Length > 1)
+                            {
+                                result[keyname] = path;
+                            }
+                            else
+                            {
+                                result[keyname] = null;
+                            }
+                            break;
+                        }
                 }
             });
             return result;

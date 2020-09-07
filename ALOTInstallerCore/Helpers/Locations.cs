@@ -75,6 +75,9 @@ namespace ALOTInstallerCore.Helpers
         public static GameTarget ME1Target { get; set; }
         public static GameTarget ME2Target { get; set; }
         public static GameTarget ME3Target { get; set; }
+        public static string ConfigPathME1 { get; set; }
+        public static string ConfigPathME2 { get; set; }
+        public static string ConfigPathME3 { get; set; }
 
         private static void LoadGamePaths()
         {
@@ -123,27 +126,62 @@ namespace ALOTInstallerCore.Helpers
                             path = RegistryHandler.GetRegistryString(softwareKey + key64 + gameKey, entry);
                         }*/
 
-            foreach (var game in Enums.AllGames)
+            var gameLocations = MEMIPCHandler.GetGameLocations();
+            foreach (var item in gameLocations)
             {
-                string path = MEMIPCHandler.GetGameLocation(game);
-                if (path != null)
+                var keyName = item.Key.ToString();
+                var game = Enum.Parse<Enums.MEGame>(keyName.Substring(0, 3));
+                var type = keyName.Substring(3);
+                if (type == "GamePath")
                 {
-                    path = path.TrimEnd(Path.DirectorySeparatorChar);
-
-                    string exePath = MEDirectories.ExecutablePath(game, path);
-
-                    if (File.Exists(exePath))
+                    if (item.Value == null)
                     {
-                        Utilities.WriteDebugLog("Game executable exists - returning this path: " + exePath);
-                        internalSetTarget(game, path);
+                        Utilities.WriteDebugLog($"Could not find game path for game {game}");
+                    }
+                    else
+                    {
+                        var path = item.Value.TrimEnd(Path.DirectorySeparatorChar);
+                        string exePath = MEDirectories.ExecutablePath(game, path);
+
+                        if (File.Exists(exePath))
+                        {
+                            Utilities.WriteDebugLog("Game executable exists - returning this path: " + exePath);
+                            internalSetTarget(game, path);
+                        }
                     }
                 }
-                else
+                else if (type == "ConfigPath")
                 {
-                    Utilities.WriteDebugLog($"Could not find game path for game {game}");
+                    if (item.Value == null)
+                    {
+                        Utilities.WriteDebugLog($"Could not find game config path for game {game}");
+                    }
+                    else
+                    {
+                        Locations.SetConfigPath(game, item.Value);
+                    }
                 }
+
             }
         }
+
+        private static void SetConfigPath(Enums.MEGame game, string itemValue)
+        {
+            switch (game)
+            {
+                case Enums.MEGame.ME1:
+                    ConfigPathME1 = itemValue;
+                    break;
+                case Enums.MEGame.ME2:
+                    ConfigPathME2 = itemValue;
+                    break;
+                case Enums.MEGame.ME3:
+                    ConfigPathME3 = itemValue;
+                    break;
+            }
+
+        }
+
 
         private static bool internalSetTarget(Enums.MEGame game, string path)
         {

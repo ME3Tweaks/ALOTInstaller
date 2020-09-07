@@ -97,10 +97,12 @@ namespace ALOTInstallerCore.Objects.Manifest
             UserFile uf = new UserFile()
             {
                 FileSize = ufi.Length,
-                FriendlyName = Path.GetFileName(filepath),
+                Filename = filepath, //Used for logging in some areas but otherwise will be unused
+                FriendlyName = Path.GetFileNameWithoutExtension(filepath),
                 FullFilePath = filepath,
                 ApplicableGames = game.Value,
                 Description = description,
+                AlotVersionInfo = TextureModInstallationInfo.NoVersion
             };
             uf.UpdateReadyStatus();
             UserFiles.Add(uf);

@@ -32,6 +32,9 @@ namespace ALOTInstallerCore.Objects
         /// The version of MEM that was used to perform the installation of the textures
         /// </summary>
         public short MEM_VERSION_USED;
+
+        public static readonly TextureModInstallationInfo NoVersion = new TextureModInstallationInfo(0, 0, 0, 0); //not versioned
+
         /// <summary>
         /// Creates a installation information object, with the information about what was used to install it.
         /// </summary>

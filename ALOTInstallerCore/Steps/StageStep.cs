@@ -113,7 +113,6 @@ namespace ALOTInstallerCore.Steps
                         break;
                 }
             }
-
             switch (extension)
             {
                 case ".7z":
@@ -163,7 +162,7 @@ namespace ALOTInstallerCore.Steps
             {
                 Utilities.DeleteFilesAndFoldersRecursively(stagingDir);
             }
-            _installOptions.FilesToInstall = getFilesToStage(_installOptions.FilesToInstall.Where(x => x.Ready && !x.Disabled && (x.ApplicableGames & _installOptions.InstallTarget.Game.ToApplicableGame()) != 0));
+            _installOptions.FilesToInstall = getFilesToStage(_installOptions.FilesToInstall.Where(x => x.Ready && !x.Disabled && (x.ApplicableGames & _installOptions.InstallTarget.Game.ToApplicableGame()) != ApplicableGame.None));
             _installOptions.FilesToInstall = resolveMutualExclusiveGroups();
             if (_installOptions.FilesToInstall == null)
             {
@@ -213,7 +212,7 @@ namespace ALOTInstallerCore.Steps
             _addonID++; //Add one in case the final file was versioned
             Log.Information($"[AICORE] The Addon will stage to build ID {_addonID}, if it needs to be built");
 
-            int numToDo = _installOptions.FilesToInstall.Count;
+            _numTotalTasks = _installOptions.FilesToInstall.Count;
             // Final location where MEM will install packages from. 
             var finalBuiltPackagesDestination = Path.Combine(stagingDir, "InstallationPackages");
             if (Directory.Exists(finalBuiltPackagesDestination))
@@ -466,7 +465,7 @@ namespace ALOTInstallerCore.Steps
                 else
                 {
                     // Files are in archive. Find files to stage to mem
-                    var subfilesToStage = Directory.GetFiles(userFileExtractionPath, "*.*", SearchOption.AllDirectories).Where(FiletypeRequiresDecompilation);
+                    var subfilesToStage = Directory.GetFiles(userFileExtractionPath, "*.*", SearchOption.AllDirectories);
                     int stagedID = 0;
                     foreach (var sf in subfilesToStage)
                     {
@@ -478,7 +477,7 @@ namespace ALOTInstallerCore.Steps
                             File.Move(sf, destF);
                             stagedID++;
                         }
-                        else if (userSubfileShouldBeStaged(sf))
+                        else if (userSubfileShouldBeStaged(_installOptions.InstallTarget.Game, sf))
                         {
                             var modDest = Path.Combine(userFileBuildMemPath, Path.GetFileName(sf));
                             Log.Information($"[AICORE] Moving archive subfile to user staging: {sf} -> {modDest}");
@@ -551,13 +550,30 @@ namespace ALOTInstallerCore.Steps
         /// </summary>
         /// <param name="sf"></param>
         /// <returns></returns>
-        private bool userSubfileShouldBeStaged(string sf)
+        private bool userSubfileShouldBeStaged(MEGame targetGame, string sf)
         {
             var extension = Path.GetExtension(sf.ToLower());
             var filename = Path.GetFileNameWithoutExtension(sf.ToLower());
             switch (extension)
             {
-                case ".mod": return true;
+                case ".mod":
+                    {
+                        var modGame = ModFileFormats.GetGameForMod(sf);
+                        var shouldStage = modGame.Usable && targetGame.ToApplicableGame().HasFlag(modGame.ApplicableGames);
+                        if (!shouldStage)
+                        {
+                            if (!modGame.Usable)
+                            {
+                                Log.Warning($"Archive file {sf} cannot apply to {targetGame}: {modGame.Description}");
+                            }
+                            else //Not applicable
+                            {
+                                Log.Warning($"Archive file {sf} is not applicable to {targetGame}, applies to {modGame.ApplicableGames}");
+                            }
+                        }
+
+                        return shouldStage;
+                    }
                 case ".tpf": return true;
                 case ".png":
                 case ".dds":

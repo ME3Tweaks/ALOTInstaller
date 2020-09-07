@@ -83,8 +83,7 @@
             <TextBlock Text="Preparing to install textures for" FontWeight="Bold" TextAlignment="Center" FontSize="16" DockPanel.Dock="Top"/>
             <Image DockPanel.Dock="Top" Source="{Binding StagingGame, Converter={StaticResource GameToLogoConverter}}" 
                    RenderOptions.BitmapScalingMode="HighQuality" Height="40"  
-                   Margin="0,50" HorizontalAlignment="Center"/>
-
+                   Margin="0,5" HorizontalAlignment="Center"/>
             <TextBlock Text="{Binding StagingStatusText}" TextAlignment="Center" Margin="0,5"/>
         </DockPanel>
 
@@ -154,7 +153,7 @@
                                 <iconPacks:PackIconIonicons Height="19" Margin="0,0,3,0" Spin="{Binding IsProcessing}" SpinDuration="6" Kind="{Binding Self, Converter={StaticResource ReadyIconConverter}}" 
                                                             Foreground="{Binding Self, Converter={StaticResource ReadyColorConverter}}" />
                                 <TextBlock Text="{Binding FriendlyName}" 
-                                           FontWeight="Bold" FontSize="14" VerticalAlignment="Center" />
+                                           FontWeight="Bold" FontSize="14" VerticalAlignment="Center" TextWrapping="Wrap" />
                             </StackPanel>
                             <TextBlock Text="{Binding StatusText}" Visibility="{Binding Ready, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
                             <TextBlock Text="{Binding RecommendationReason}" MaxWidth="320" TextWrapping="Wrap" Visibility="{Binding IsStaging, RelativeSource={RelativeSource AncestorType=local:FileSelectionUIController} , Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
@@ -232,10 +231,9 @@
                                 <iconPacks:PackIconIonicons Height="19" Margin="0,0,3,0" Spin="{Binding IsProcessing}" SpinDuration="6" Kind="{Binding Self, Converter={StaticResource ReadyIconConverter}}" 
                                                             Foreground="{Binding Self, Converter={StaticResource ReadyColorConverter}}" />
                                 <TextBlock Text="{Binding FriendlyName}" 
-                                           FontWeight="Bold" FontSize="14" VerticalAlignment="Center" />
+                                           FontWeight="Bold" FontSize="14" VerticalAlignment="Center" TextWrapping="Wrap"/>
                             </StackPanel>
-                            <TextBlock Text="{Binding Description}" />
-                            <TextBlock Text="{Binding StatusText}" MaxWidth="320" TextWrapping="Wrap" Visibility="{Binding IsStaging, RelativeSource={RelativeSource AncestorType=local:FileSelectionUIController} , Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <TextBlock Text="{Binding StatusText}" MaxWidth="320" HorizontalAlignment="Left" TextWrapping="Wrap" Visibility="{Binding IsStaging, RelativeSource={RelativeSource AncestorType=local:FileSelectionUIController} , Converter={StaticResource BoolToVisibilityConverter}}"/>
                         </StackPanel>
 
                         <DockPanel Dock="Right">
