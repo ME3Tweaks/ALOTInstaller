@@ -28,6 +28,7 @@ namespace ALOTInstallerWPF.BuilderUI
             this.fsuic = fsuic;
             fsuic.StagingGame = iop.InstallTarget.Game;
             fsuic.IsStaging = true;
+            fsuic.StagingStatusText = "Preparing to stage packages";
             NamedBackgroundWorker builderWorker = new NamedBackgroundWorker("BuilderWorker");
             StageStep ss = new StageStep(iop, builderWorker)
             {
@@ -104,7 +105,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     }
                 }
 
-                
+
             });
             lock (syncObj)
             {

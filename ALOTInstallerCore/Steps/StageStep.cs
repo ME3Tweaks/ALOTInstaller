@@ -352,9 +352,11 @@ namespace ALOTInstallerCore.Steps
                     // This installer file was extracted from an archive, and there are files in it that are not marked as move directly
                     // Decompile all files not marked as MoveDirectly
                     var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
+                    long unpackedSize = mf.UnpackedFileSize;
+                    
                     foreach (var sf in subfilesToExtract)
                     {
-                        var matchingPackageFile = installerFile.PackageFiles.Find(x => x.SourceName == Path.GetFileName(sf));
+                        var matchingPackageFile = installerFile.PackageFiles.Find(x => Path.GetFileName(x.SourceName) == Path.GetFileName(sf));
                         if (Path.GetExtension(sf) == ".mod" && installerFile.StageModFiles)
                         {
                             var modDest = Path.Combine(stagingDir, Path.GetFileName(sf));
@@ -363,6 +365,18 @@ namespace ALOTInstallerCore.Steps
                         }
                         else if (matchingPackageFile != null && matchingPackageFile.MoveDirectly)
                         {
+                            if (unpackedSize != 0)
+                            {
+                                // Ensure file extracted correct size
+                                var len = new FileInfo(sf).Length;
+                                if (len!= unpackedSize)
+                                {
+                                    installerFile.StatusText = "Extraction produced incorrect file";
+                                    Log.Error($"ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE FOR FILE {matchingPackageFile.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
+                                    _abortStaging = true;
+                                    return false;
+                                }
+                            }
                             // This file will be handled by stagePackageFile(); Do not decompile it
                             // We could move it here but let's just keep code in one place
                         }
@@ -495,7 +509,7 @@ namespace ALOTInstallerCore.Steps
                         {
                             error = true;
                             installerFile.Disabled = true;
-                            installerFile.StatusText = $"Failed to build, exit code {resultcode}";
+                            installerFile.StatusText = $"Failed to build, exit code {resultcode}. File has been disabled";
                             _abortStaging = true;
                         }
                     }

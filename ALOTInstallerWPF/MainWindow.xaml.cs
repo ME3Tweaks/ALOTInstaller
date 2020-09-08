@@ -131,6 +131,7 @@ namespace ALOTInstallerWPF
 
         public void OpenInstallerUI(InstallerUIController controller, ImageBrush background, bool isOpeningDebug = false)
         {
+            BorderThickness = new Thickness(0);
             InstallingOverlayFlyout.Content = null; //Lose the old reference
             InstallingOverlayFlyout.Content = controller;
             InstallingOverlayFlyout.Background = background;
@@ -140,6 +141,7 @@ namespace ALOTInstallerWPF
 
         public void CloseInstallerUI()
         {
+            BorderThickness = new Thickness(1);
             InstallingOverlayFlyout.IsOpen = false;
             FileSelectionUIController.FSUIC.IsStaging = false;
             CommonUtil.Run(() =>

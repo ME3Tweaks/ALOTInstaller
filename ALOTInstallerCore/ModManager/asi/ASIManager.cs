@@ -315,7 +315,7 @@ namespace MassEffectModManagerCore.modmanager.asi
 
                     File.Copy(cachedPath, finalPath, true);
                     Log.Information($@"[AICORE] Installed ASI to {finalPath}");
-                    CoreAnalytics.TrackEvent(@"Installed ASI", new Dictionary<string, string>() {
+                    CoreAnalytics.TrackEvent?.Invoke(@"Installed ASI", new Dictionary<string, string>() {
                                 { @"Filename", Path.GetFileNameWithoutExtension(finalPath)}
                             });
                     return true;

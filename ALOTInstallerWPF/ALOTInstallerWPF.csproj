@@ -56,6 +56,7 @@
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
+	  <XamlDebuggingInformation>True</XamlDebuggingInformation>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='WPFRelease'">
     <DebugType>embedded</DebugType>

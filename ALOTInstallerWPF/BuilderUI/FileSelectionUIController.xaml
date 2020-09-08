@@ -84,7 +84,7 @@
             <Image DockPanel.Dock="Top" Source="{Binding StagingGame, Converter={StaticResource GameToLogoConverter}}" 
                    RenderOptions.BitmapScalingMode="HighQuality" Height="40"  
                    Margin="0,5" HorizontalAlignment="Center"/>
-            <TextBlock Text="{Binding StagingStatusText}" TextAlignment="Center" Margin="0,5"/>
+            <TextBlock Text="{Binding StagingStatusText}" TextAlignment="Center" Margin="0,0,0,3"/>
         </DockPanel>
 
         <ProgressBar DockPanel.Dock="Top" Value="{Binding ProgressValue}" Maximum="{Binding ProgressMax}" IsIndeterminate="{Binding ProgressIndeterminate}"/>
