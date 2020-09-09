@@ -4,11 +4,13 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects.Manifest;
+using ME3ExplorerCore;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
@@ -28,7 +30,7 @@ namespace ALOTInstallerConsole.BuilderUI
             //{
             //    items.Add("TEST I AM A LINE SHOW ME PLS LINE " + i);
             //}
-
+            var syncContext = TaskScheduler.FromCurrentSynchronizationContext();
 
             //ScrollDialog.Prompt("Scroll dialog", "This is top message", "This is bottom message", items, Colors.Menu, "OK");
             BackgroundWorker bw = new BackgroundWorker();
@@ -43,14 +45,6 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     startupStatusLabel.Text = x;
                 }));
-
-                // Load the ready state while we are still in background thread
-                //Application.MainLoop.Invoke(() =>
-                //{
-                //    startupStatusLabel.Text = "Checking texture library";
-                //});
-
-                //TextureLibrary.ResetAllReadyStatuses(Program.CurrentManifestModePackage.ManifestFiles);
 
                 void downloadProgressChanged(long bytes, long total)
                 {
@@ -67,13 +61,14 @@ namespace ALOTInstallerConsole.BuilderUI
                 MEMUpdater.UpdateMEM(downloadProgressChanged);
 
                 ALOTInstallerCoreLib.PostCriticalStartup(x =>
-                {
-                    Application.MainLoop.Invoke(() =>
-                                    {
-                                        startupStatusLabel.Text = x;
-                                    });
-                },
-                x => Application.MainLoop.Invoke(() => { x(); }));
+                    {
+                        Application.MainLoop.Invoke(() =>
+                        {
+                            startupStatusLabel.Text = x;
+                        });
+                    }, 
+                    x => Task.Factory.StartNew(() => x,
+                        default, TaskCreationOptions.None, syncContext).Wait());
 
                 b.Result = alotManifestModePackage;
             };
