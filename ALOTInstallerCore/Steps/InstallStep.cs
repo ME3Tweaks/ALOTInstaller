@@ -512,7 +512,7 @@ namespace ALOTInstallerCore.Steps
                 {
                     Log.Error($"Error saving package: {x}");
                 });
-                var biogamePath = Path.Combine(package.InstallTarget.TargetPath, "BioGame");
+                var biogamePath = Path.Combine(package.InstallTarget.TargetPath, "BIOGame");
 
                 #region BioA_CitHub fix
 
