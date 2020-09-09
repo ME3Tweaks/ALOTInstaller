@@ -125,7 +125,8 @@ namespace ALOTInstallerCore.Steps
             InstallFailed_FailedToApplyTextureInfo,
             InstallFailed_ZipCopyFilesError,
             InstallOK,
-            InstallOKWithWarning
+            InstallOKWithWarning,
+            InstallFailed_UnknownError
         }
 
         public void InstallTextures(object sender, DoWorkEventArgs doWorkEventArgs)
@@ -345,10 +346,10 @@ namespace ALOTInstallerCore.Steps
                     if (failure == null)
                     {
                         // Crashed (or unhandled new exit IPC)
-                        failure = pm.CurrentStage.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == null);
+                        failure = pm.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == null);
                     }
 
-                    doWorkEventArgs.Result = failure.FailureResultCode;
+                    doWorkEventArgs.Result = failure?.FailureResultCode ?? InstallResult.InstallFailed_UnknownError;
                     return;
                 }
 
