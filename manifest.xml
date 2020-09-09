@@ -1228,12 +1228,9 @@
                     copydirectly="true" />
                <packagefile
                     me2="true"
-                    sourcename="HMM_HED_PROJacob_Face_Diff_Stack_0xEE83865A.dds"
-                    destinationname="0xEE83865A.dds" />
-               <packagefile
-                    me2="true"
                     sourcename="HMM_HED_PROJacob_Face_Norm_Stack_0x92D843C2.dds"
-                    destinationname="0x7EB5A028.dds" />
+                    destinationname="0x7EB5A028.dds"
+                    tpfsource="el_JacobComplexionTweak.tpf" />
                <packagefile
                     me3="true"
                     sourcename="el_JacobComplexionTweak.tpf"
@@ -2609,23 +2606,28 @@
                <packagefile
                     me3="true"
                     sourcename="HMF_ARM_EDIe_Diff_0x1608E029_Overlay_Otte.dds"
-                    destinationname="HMF_ARM_EDIe_Diff_0x1608E029.dds" />
+                    destinationname="HMF_ARM_EDIe_Diff_0x1608E029.dds"
+                    tpfsource="ME3_EDI_FromAshes_ALT_Ottemis.tpf" />
                <packagefile
                     me3="true"
                     sourcename="HMF_ARM_EDIe_Spec_0xAE0C176D_Overlay_Otte.dds"
-                    destinationname="HMF_ARM_EDIb_Spec_0xAE0C176D.dds" />
+                    destinationname="HMF_ARM_EDIb_Spec_0xAE0C176D.dds"
+                    tpfsource="ME3_EDI_FromAshes_ALT_Ottemis.tpf" />
                <packagefile
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds"
-                    destinationname="HMF_ARM_EDIb_Norm_0x4C200F45.dds" />
+                    destinationname="HMF_ARM_EDIb_Norm_0x4C200F45.dds"
+                    tpfsource="ME3_EDI_FromAshes_ALT_Ottemis.tpf" />
                <packagefile
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds"
-                    destinationname="HMF_ARM_EDId_Norm_0x191C1B10.dds" />
+                    destinationname="HMF_ARM_EDId_Norm_0x191C1B10.dds"
+                    tpfsource="ME3_EDI_FromAshes_ALT_Ottemis.tpf" />
                <packagefile
                     me3="true"
                     sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds"
-                    destinationname="HMF_ARM_EDIg_Norm_0xE3618AF0.dds" />
+                    destinationname="HMF_ARM_EDIg_Norm_0xE3618AF0.dds"
+                    tpfsource="ME3_EDI_FromAshes_ALT_Ottemis.tpf" />
         </manifestfile>
         <manifestfile mode="ALOT"
             friendlyname="Fourth Casual Black"

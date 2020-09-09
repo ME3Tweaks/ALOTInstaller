@@ -133,7 +133,8 @@ namespace ALOTInstallerCore.Steps
                     {
                         var extensions = instFile.PackageFiles.Select(x => Path.GetExtension(x.SourceName)).Distinct()
                             .ToList();
-                        if (extensions.Count == 1)
+                        // If any package files list TPFSource disable this space optimization
+                        if (extensions.Count == 1 && instFile.PackageFiles.All(x => x.TPFSource == null))
                         {
                             // We have only one extension type! We can filter what we extract with MEM
                             args += $" --filter-with-ext {extensions.First().Substring(1)}"; //remove the '.'
@@ -183,7 +184,15 @@ namespace ALOTInstallerCore.Steps
             if (_installOptions.FilesToInstall == null)
             {
                 // Abort!
-                Log.Information("[AICORE] A mutual group conflict was not resolved. Staging aborted by user");
+                Log.Warning("[AICORE] A mutual group conflict was not resolved. Staging aborted by user");
+                e.Result = false;
+                return;
+            }
+
+            if (!_installOptions.FilesToInstall.Any())
+            {
+                // Abort!
+                Log.Error("[AICORE] There are no files to install! Is this a bug?");
                 e.Result = false;
                 return;
             }
@@ -318,7 +327,10 @@ namespace ALOTInstallerCore.Steps
                 }
 
                 var archiveExtracted = archiveExtractedN.Value;
-                if (archiveExtracted && _installOptions.ImportNewlyUnpackedFiles && installerFile is ManifestFile _mf && _mf.UnpackedSingleFilename != null && Path.GetExtension(_mf.UnpackedSingleFilename) != ".mem")
+                if (archiveExtracted && _installOptions.ImportNewlyUnpackedFiles
+                                     && installerFile is ManifestFile _mf
+                                     && _mf.UnpackedSingleFilename != null
+                                     && Path.GetExtension(_mf.UnpackedSingleFilename) != ".mem")
                 {
                     // mem files will be directly moved to install source. All other files will be staged for build so we need to 
                     // copy them back before we delete the extraction dir after we stage the files
@@ -335,7 +347,7 @@ namespace ALOTInstallerCore.Steps
                 bool decompiled = false;
 
                 // Check if listed file is a decompilable format and not archive format 
-                if (!archiveExtracted && FiletypeRequiresDecompilation(installerFile.GetUsedFilepath()))
+                if (!archiveExtracted && installerFile.PackageFiles.Any(x => !x.MoveDirectly) && FiletypeRequiresDecompilation(installerFile.GetUsedFilepath()))
                 {
                     // Decompile file instead 
                     if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mod" && installerFile.StageModFiles)
@@ -356,48 +368,85 @@ namespace ALOTInstallerCore.Steps
                 {
                     // This installer file was extracted from an archive, and there are files in it that are not marked as move directly
                     // Decompile all files not marked as MoveDirectly
+
+                    //// See if any files need decompiled (TPF)
                     var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
+                    var tpfsToDecomp = installerFile.PackageFiles.Where(x => x.TPFSource != null).Select(x => x.TPFSource).Distinct().ToList();
+                    foreach (var v in tpfsToDecomp)
+                    {
+                        var matchingTpfFile = subfilesToExtract.Find(x => Path.GetFileName(x) == v);
+                        if (matchingTpfFile == null)
+                        {
+                            Log.Error($"Could not find TPF source! Missing TPF: {v}");
+                            continue;
+                        }
+
+                        ExtractTextureContainer(_installOptions.InstallTarget.Game, matchingTpfFile, outputDir, installerFile);
+                        decompiled = true;
+                    }
+
+                    if (tpfsToDecomp.Any())
+                    {
+                        // Recalculate
+                        subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
+                    }
+
+
                     long unpackedSize = mf.UnpackedFileSize;
-                    
+
                     foreach (var sf in subfilesToExtract)
                     {
-                        var matchingPackageFile = installerFile.PackageFiles.Find(x => Path.GetFileName(x.SourceName) == Path.GetFileName(sf));
                         if (Path.GetExtension(sf) == ".mod" && installerFile.StageModFiles)
                         {
                             var modDest = Path.Combine(stagingDir, Path.GetFileName(sf));
                             Log.Information($"[AICORE] Moving .mod file to staging (due to StageModFiles=true): {sf} -> {modDest}");
                             File.Move(sf, modDest);
+                            continue;
                         }
-                        else if (matchingPackageFile != null && matchingPackageFile.MoveDirectly)
+
+
+                        var matchingPackageFiles = installerFile.PackageFiles.Where(x => Path.GetFileName(x.SourceName) == Path.GetFileName(sf)).ToList();
+                        foreach (var mpf in matchingPackageFiles)
                         {
-                            if (unpackedSize != 0)
+                            if (mpf.MoveDirectly)
                             {
-                                // Ensure file extracted correct size
-                                var len = new FileInfo(sf).Length;
-                                if (len!= unpackedSize)
+                                if (unpackedSize != 0)
                                 {
-                                    installerFile.StatusText = "Extraction produced incorrect file";
-                                    Log.Error($"ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE FOR FILE {matchingPackageFile.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
-                                    _abortStaging = true;
-                                    return false;
+                                    // Ensure file extracted correct size
+                                    var len = new FileInfo(sf).Length;
+                                    if (len != unpackedSize)
+                                    {
+                                        installerFile.StatusText = "Extraction produced incorrect file";
+                                        Log.Error($"ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
+                                        _abortStaging = true;
+                                        return false;
+                                    }
                                 }
+
+                                // This file will be handled by stagePackageFile(); Do not try to operate on it
+                                // We could move it here but let's just keep code in one place
                             }
-                            // This file will be handled by stagePackageFile(); Do not decompile it
-                            // We could move it here but let's just keep code in one place
+
+                            // Else: Not move directly
+                            // Could be multi-copy package file, e.g. one to many from source file
                         }
-                        else if (FiletypeRequiresDecompilation(sf))
+
+                        if (!matchingPackageFiles.Any())
                         {
-                            ExtractTextureContainer(_installOptions.InstallTarget.Game, sf, outputDir, installerFile);
-                            decompiled = true;
-                        }
-                        else
-                        {
-                            // File skipped
-                            Log.Information($"[AICORE] File skipped for processing: {sf}");
+                            if (FiletypeRequiresDecompilation(sf) && !tpfsToDecomp.Contains(Path.GetFileName(sf)))
+                            {
+                                // we check if tpfstodecomp to prevent double decompile
+                                ExtractTextureContainer(_installOptions.InstallTarget.Game, sf, outputDir, installerFile);
+                                decompiled = true;
+                            }
+                            else
+                            {
+                                // File skipped
+                                Log.Information($"[AICORE] File skipped for processing: {sf}");
+                            }
                         }
                     }
                 }
-
 
                 // Single file unpacked
                 if (!archiveExtracted && !decompiled && installerFile is ManifestFile mfx && mfx.IsBackedByUnpacked())
@@ -819,7 +868,7 @@ namespace ALOTInstallerCore.Steps
         /// <param name="sourceDir"></param>
         /// <param name="outputFile"></param>
         /// <param name="targetGame"></param>
-        private int BuildMEMPackageFile(string uiname, string sourceDir, string outputFile, MEGame targetGame, Action<int,int> progressCallback = null)
+        private int BuildMEMPackageFile(string uiname, string sourceDir, string outputFile, MEGame targetGame, Action<int, int> progressCallback = null)
         {
             void handleIPC(string command, string param)
             {
@@ -951,6 +1000,14 @@ namespace ALOTInstallerCore.Steps
             {
                 filesToStage.AddRange(readyFiles.Where(x => x is UserFile));
             }
+
+            //DEBUG ONLY
+            //filesToStage.ReplaceAll(filesToStage.Where(x =>
+            //{
+            //    return x.FriendlyName.Contains("EDI Altern");
+            //    //var finfo = new FileInfo(x.GetUsedFilepath()).Length;
+            //    //return finfo < (250 * 1024 * 1024);
+            //}).ToList());
 
             return filesToStage.OrderBy(x => x.InstallPriority).ToList();
         }

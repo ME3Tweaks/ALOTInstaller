@@ -20,6 +20,7 @@ namespace ALOTInstallerCore.Objects.Manifest
             CopyDirectly = source.CopyDirectly;
             Processed = source.Processed;
             ApplicableGames = source.ApplicableGames;
+            TPFSource = source.TPFSource;
         }
 
         public PackageFile() { }
@@ -44,7 +45,13 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// Directly copy this file to the staging directory. This is used if a texture can be applied to multiple areas
         /// </summary>
         public bool CopyDirectly { get; set; }
-
+        /// <summary>
+        /// The source TPF file this package file is contained in, if any. This will trigger a decompile of that TPF
+        /// </summary>
+        public string TPFSource { get; set; }
+        /// <summary>
+        /// Games this package file is applicable to
+        /// </summary>
         public ApplicableGame ApplicableGames { get; set; }
         /// <summary>
         /// If this file has been processed (extracted and moved for staging/install)

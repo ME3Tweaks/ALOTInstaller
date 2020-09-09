@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using ALOTInstallerConsole.InstallerUI;
 using ALOTInstallerConsole.UserControls;
@@ -53,9 +54,17 @@ namespace ALOTInstallerConsole.BuilderUI
             builderWorker.DoWork += ss.PerformStaging;
             builderWorker.RunWorkerCompleted += (a, b) =>
             {
-                if (b.Error == null)
+                if (b.Error == null && b.Result is bool ok)
                 {
-                    performPreinstallCheck();
+                    if (ok)
+                    {
+                        performPreinstallCheck();
+                        return; //precheck will set the next UI
+                    }
+                    else
+                    {
+                        MessageBox.ErrorQuery("Unspecified error has occurred", "An unspecified error occurred during staging. Check the log for more information.", "OK");
+                    }
                 }
                 else
                 {
@@ -72,9 +81,14 @@ namespace ALOTInstallerConsole.BuilderUI
         private void newFileBeingProcessed(InstallerFile obj)
         {
             int startingY = 2 + processingFVMap.Count * 3;
-            var availableFv = processingFVMap.First(x => x.Value == null);
-            InstallerFilePrepContainer ifpc = new InstallerFilePrepContainer(this, availableFv.Key, obj, startingY);
-            processingFVMap[availableFv.Key] = ifpc;
+            // Lock as Values doesn't provide thread safety
+            lock (processingFVMap)
+            {
+                var availableFv = processingFVMap.First(x => x.Value == null);
+                InstallerFilePrepContainer ifpc = new InstallerFilePrepContainer(this, availableFv.Key, obj, startingY);
+                Debug.WriteLine("Assigning slot");
+                processingFVMap[availableFv.Key] = ifpc;
+            }
         }
 
         private bool configureModOptions(ManifestFile mf, List<ConfigurableMod> optionsToConfigure)
@@ -124,7 +138,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     Log.Error($"Exception occurred in precheck for pre-install: {b.Error.Message}");
                     MessageBox.Query("Precheck failed", b.Result as string, "OK");
-                    BuilderUI.FileSelectionUIController fsuic = new FileSelectionUIController();
+                    var fsuic = new FileSelectionUIController();
                     fsuic.SetupUI();
                     Program.SwapToNewView(fsuic);
                 }
@@ -132,7 +146,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     // Precheck failed
                     MessageBox.Query("Precheck failed", b.Result as string, "OK");
-                    FileSelectionUIController fsuic = new FileSelectionUIController();
+                    var fsuic = new FileSelectionUIController();
                     Program.SwapToNewView(fsuic);
                 }
                 else
@@ -207,12 +221,13 @@ namespace ALOTInstallerConsole.BuilderUI
 
             internal void Destroy()
             {
+                // This must be done immediately and not within the main loop or we will desync
+                uic.NotifyNoLongerProcessing(this);
                 Application.MainLoop.Invoke(() =>
                 {
                     ifx.PropertyChanged -= propertyChangedListener;
                     ui.Remove(statusLabel);
                     ui.Remove(headerLabel);
-                    uic.NotifyNoLongerProcessing(this);
                     ui = null;
                 });
             }
@@ -234,6 +249,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void NotifyNoLongerProcessing(InstallerFilePrepContainer installerFilePrepContainer)
         {
+            Debug.WriteLine("Freeing slot");
             processingFVMap[installerFilePrepContainer.ui] = null; //Unset
         }
 
