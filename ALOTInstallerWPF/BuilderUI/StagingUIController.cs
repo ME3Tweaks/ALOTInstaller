@@ -30,6 +30,7 @@ namespace ALOTInstallerWPF.BuilderUI
             fsuic.IsStaging = true;
             fsuic.StagingStatusText = "Preparing to stage packages";
             NamedBackgroundWorker builderWorker = new NamedBackgroundWorker("BuilderWorker");
+            bool hasStaged = false;
             StageStep ss = new StageStep(iop, builderWorker)
             {
                 UpdateOverallStatusCallback = status =>
@@ -38,6 +39,11 @@ namespace ALOTInstallerWPF.BuilderUI
                 },
                 UpdateProgressCallback = (done, total) =>
                 {
+                    if (hasStaged)
+                    {
+                        fsuic.ProgressIndeterminate = false;
+                    }
+
                     fsuic.ProgressMax = total;
                     fsuic.ProgressValue = done;
                 },
@@ -47,6 +53,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 ErrorStagingCallback = errorStaging,
                 ConfigureModOptions = configureModOptions,
                 PointOfNoReturnNotification = pointOfNoReturnPrompt,
+                NotifyAddonBuild = () => hasStaged = true //will make next progress updates set progressbar
             };
             builderWorker.WorkerReportsProgress = true;
             builderWorker.DoWork += ss.PerformStaging;

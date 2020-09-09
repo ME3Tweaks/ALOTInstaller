@@ -80,6 +80,10 @@ namespace ALOTInstallerCore.Steps
         /// </summary>
         public Func<bool> PointOfNoReturnNotification { get; set; }
         /// <summary>
+        /// Callback for when addon file is being built. This occurs after staging has completed
+        /// </summary>
+        public Action NotifyAddonBuild { get; set; }
+        /// <summary>
         /// Extracts an archive file (7z/zip/rar). Returns if a file was extracted or not.
         /// </summary>
         /// <param name="instFile"></param>
@@ -257,8 +261,9 @@ namespace ALOTInstallerCore.Steps
 
             if (Directory.GetFiles(addonStagingPath).Any())
             {
+                NotifyAddonBuild?.Invoke();
                 // Addon needs built
-                BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{_addonID:D3}_ALOTAddon.mem"), _installOptions.InstallTarget.Game);
+                BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{_addonID:D3}_ALOTAddon.mem"), _installOptions.InstallTarget.Game, UpdateProgressCallback);
             }
 
             e.Result = true;
@@ -504,6 +509,7 @@ namespace ALOTInstallerCore.Steps
                     {
                         // Requires build
                         installerFile.StatusText = "Building user file installation package";
+                        // don't add progress indicator here. We don't need more than the text
                         var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{uf.FriendlyName}.mem"), _installOptions.InstallTarget.Game);
                         if (resultcode != 0)
                         {
@@ -813,7 +819,7 @@ namespace ALOTInstallerCore.Steps
         /// <param name="sourceDir"></param>
         /// <param name="outputFile"></param>
         /// <param name="targetGame"></param>
-        private int BuildMEMPackageFile(string uiname, string sourceDir, string outputFile, MEGame targetGame)
+        private int BuildMEMPackageFile(string uiname, string sourceDir, string outputFile, MEGame targetGame, Action<int,int> progressCallback = null)
         {
             void handleIPC(string command, string param)
             {
@@ -821,9 +827,10 @@ namespace ALOTInstallerCore.Steps
                 {
                     case "TASK_PROGRESS":
                         UpdateOverallStatusCallback?.Invoke($"Building install package for {uiname}");
-                        UpdateProgressCallback?.Invoke(TryConvert.ToInt32(param, 0), 100);
+                        progressCallback?.Invoke(TryConvert.ToInt32(param, 0), 100);
                         break;
                     case "PROCESSING_FILE":
+                        Log.Information($"[AICORE] MEMCompiler PROCESSING_FILE {param}");
                         // Unpacking file
                         break;
                     default:
@@ -832,7 +839,7 @@ namespace ALOTInstallerCore.Steps
                 }
             }
 
-            Log.Information($"[AICORE] Buildling MEM package {uiname} from {sourceDir}, output to {outputFile}");
+            Log.Information($"[AICORE] Building MEM package {uiname} from {sourceDir}, output to {outputFile}");
             int exitcode = -1;
             MEMIPCHandler.RunMEMIPCUntilExit($"--convert-to-mem --gameid {targetGame.ToGameNum()} --input \"{sourceDir}\" --output \"{outputFile}\" --ipc",
                 null,
