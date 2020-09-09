@@ -13,6 +13,7 @@ using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.Flyouts;
+using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using ALOTInstallerWPF.Telemetry;
 using ControlzEx.Theming;
@@ -77,15 +78,14 @@ namespace ALOTInstallerWPF.BuilderUI
                 AppCenter.Start(APIKeys.AppCenterKey, typeof(Analytics), typeof(Crashes));
             }
 #else
-                if (!APIKeys.HasAppCenterKey)
-                {
-                    Debug.WriteLine(" >>> This build is missing an API key for AppCenter!");
-                }
-                else
-                {
-                    Debug.WriteLine("This build has an API key for AppCenter");
-                }
-
+            if (!APIKeys.HasAppCenterKey)
+            {
+                Debug.WriteLine(" >>> This build is missing an API key for AppCenter!");
+            }
+            else
+            {
+                Debug.WriteLine("This build has an API key for AppCenter");
+            }
 #endif
             telemetryStarted = true;
 
@@ -99,7 +99,11 @@ namespace ALOTInstallerWPF.BuilderUI
             bw.DoWork += (a, b) =>
             {
                 ALOTInstallerCoreLib.Startup(SetWrapperLogger, RunOnUIThread, startTelemetry, stopTelemetry);
-
+                // Setup telemetry handlers
+                CoreAnalytics.TrackEvent = TelemetryController.TrackEvent;
+                CoreCrashes.TrackError = TelemetryController.TrackError;
+                CoreCrashes.TrackError2 = TelemetryController.TrackError2;
+                CoreCrashes.TrackError3 = TelemetryController.TrackError3;
                 if (Settings.BetaMode)
                 {
                     RunOnUIThread(() =>

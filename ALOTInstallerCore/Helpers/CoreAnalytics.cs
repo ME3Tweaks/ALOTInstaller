@@ -37,8 +37,8 @@ namespace ALOTInstallerCore.Helpers
 
         public class ErrorAttachmentLog
         {
-            private string text;
-            private string filename;
+            public string text;
+            public string filename;
 
             public ErrorAttachmentLog(string text, string filename)
             {
