@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
@@ -137,13 +138,22 @@ namespace ALOTInstallerCore.ModManager.Services
         /// </summary>
         public static void InitBackupService(Action<Action> runCodeOnUIThreadCallback)
         {
+            object obj = new object(); //Syncobj to ensure the UI thread method has finished invoking
             void runOnUiThread()
             {
                 GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME1));
                 GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME2));
                 GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME3));
+                lock (obj)
+                {
+                    Monitor.Pulse(obj);
+                }
             }
             runCodeOnUIThreadCallback.Invoke(runOnUiThread);
+            lock (obj)
+            {
+                Monitor.Wait(obj);
+            }
             RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
         }
 

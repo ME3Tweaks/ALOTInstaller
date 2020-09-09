@@ -66,13 +66,14 @@ namespace ALOTInstallerConsole.BuilderUI
                 });
                 MEMUpdater.UpdateMEM(downloadProgressChanged);
 
-ALOTInstallerCoreLib.PostCriticalStartup(x=> {
-Application.MainLoop.Invoke(() =>
+                ALOTInstallerCoreLib.PostCriticalStartup(x =>
                 {
-                    startupStatusLabel.Text = x;
-                });
-}, 
-x=>Application.MainLoop.Invoke(()=>{x();}));
+                    Application.MainLoop.Invoke(() =>
+                                    {
+                                        startupStatusLabel.Text = x;
+                                    });
+                },
+                x => Application.MainLoop.Invoke(() => { x(); }));
 
                 b.Result = alotManifestModePackage;
             };
