@@ -144,16 +144,8 @@ namespace ALOTInstallerCore.ModManager.Services
                 GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME1));
                 GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME2));
                 GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME3));
-                lock (obj)
-                {
-                    Monitor.Pulse(obj);
-                }
             }
             runCodeOnUIThreadCallback.Invoke(runOnUiThread);
-            lock (obj)
-            {
-                Monitor.Wait(obj);
-            }
             RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
         }
 
