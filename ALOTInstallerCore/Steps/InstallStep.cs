@@ -651,7 +651,7 @@ namespace ALOTInstallerCore.Steps
             {
                 SetMiddleTextCallback?.Invoke("Checking mods for known issues");
                 SetMiddleTextVisibilityCallback?.Invoke(true);
-.                SetBottomTextVisibilityCallback?.Invoke(false);
+                SetBottomTextVisibilityCallback?.Invoke(false);
 
                 string dlcPath = Path.Combine(package.InstallTarget.TargetPath, "BIOGame", "DLC");
                 package.InstallTarget.PopulateDLCMods(false);

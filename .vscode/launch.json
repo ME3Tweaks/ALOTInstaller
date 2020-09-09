@@ -15,8 +15,15 @@
             "args": [],
             "cwd": "${workspaceFolder}/ALOTInstallerConsole",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
-            "console": "internalConsole",
-            "stopAtEntry": false
+            "console": "externalTerminal",
+            "stopAtEntry": false,
+            "logging": {
+                "engineLogging": false,
+                "moduleLoad": false,
+                "exceptions": false,
+                "browserStdOut": false,
+                "programOutput": true,
+            }
         },
         {
             "name": "LinuxRelease",
@@ -28,7 +35,7 @@
             "args": [],
             "cwd": "${workspaceFolder}/ALOTInstallerConsole",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
-            "console": "internalConsole",
+            "console": "externalTerminal",
             "stopAtEntry": false
         },
         {
