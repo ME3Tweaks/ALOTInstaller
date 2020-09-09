@@ -58,7 +58,7 @@ namespace ALOTInstallerCore.ModManager.Objects
             this.Game = game;
             this.RegistryActive = currentRegistryActive;
             this.IsCustomOption = isCustomOption;
-            this.TargetPath = targetRootPath.TrimEnd('\\');
+            this.TargetPath = targetRootPath.TrimEnd('\\', '/');
             ReloadGameTarget(true, false);
         }
 

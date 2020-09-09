@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using ALOTInstallerConsole.InstallerUI;
@@ -35,17 +36,8 @@ namespace ALOTInstallerConsole.BuilderUI
             Application.MainLoop.Invoke(() => { currentStatusLabel.Text = newStatus; });
         }
 
-        private bool notifyPointOfNoReturn(){
-            return true; // TODO SHOW DIALOG
-        }
-
         public override void BeginFlow()
         {
-            foreach (var f in installOptions.FilesToInstall)
-            {
-                f.PropertyChanged += InstallerFilePropertyChanged;
-            }
-
             NamedBackgroundWorker builderWorker = new NamedBackgroundWorker("BuilderWorker");
             StageStep ss = new StageStep(installOptions, builderWorker)
             {
@@ -54,7 +46,8 @@ namespace ALOTInstallerConsole.BuilderUI
                 ResolveMutualExclusiveMods = resolveMutualExclusiveMod,
                 ErrorStagingCallback = errorStaging,
                 ConfigureModOptions = configureModOptions,
-                PointOfNoReturnNotification = notifyPointOfNoReturn
+                NotifyFileBeingProcessed = newFileBeingProcessed,
+                PointOfNoReturnNotification = () => true //We already warned user
             };
             builderWorker.WorkerReportsProgress = true;
             builderWorker.DoWork += ss.PerformStaging;
@@ -72,6 +65,16 @@ namespace ALOTInstallerConsole.BuilderUI
                 Program.SwapToNewView(fsuic);
             };
             builderWorker.RunWorkerAsync();
+        }
+
+        private ConcurrentDictionary<FrameView, InstallerFilePrepContainer> processingFVMap = new ConcurrentDictionary<FrameView, InstallerFilePrepContainer>();
+
+        private void newFileBeingProcessed(InstallerFile obj)
+        {
+            int startingY = 2 + processingFVMap.Count * 3;
+            var availableFv = processingFVMap.First(x => x.Value == null);
+            InstallerFilePrepContainer ifpc = new InstallerFilePrepContainer(this, availableFv.Key, obj, startingY);
+            processingFVMap[availableFv.Key] = ifpc;
         }
 
         private bool configureModOptions(ManifestFile mf, List<ConfigurableMod> optionsToConfigure)
@@ -165,21 +168,79 @@ namespace ALOTInstallerConsole.BuilderUI
             return arg[selectedIndex];
         }
 
-        private void InstallerFilePropertyChanged(object sender, PropertyChangedEventArgs e)
+        internal class InstallerFilePrepContainer
         {
-            if (sender is InstallerFile ifx && ifx.IsProcessing)
+            private InstallerFile ifx;
+            private Label statusLabel;
+            private Label headerLabel;
+            public FrameView ui;
+            private StagingUIController uic;
+
+            internal InstallerFilePrepContainer(StagingUIController uic, FrameView ui, InstallerFile ifx, int yOffset)
             {
-                if (e.PropertyName == nameof(InstallerFile.StatusText))
+                this.uic = uic;
+                this.ifx = ifx;
+                this.ui = ui;
+                ifx.PropertyChanged += propertyChangedListener;
+                Application.MainLoop.Invoke(() =>
                 {
-                    updateStatus(ifx.StatusText);
+
+                    headerLabel = new Label(ifx.FriendlyName)
+                    {
+                        X = 0,
+                        Y = 0,
+                        Height = 1,
+                        Width = Dim.Fill(),
+                    };
+                    statusLabel = new Label("Processing")
+                    {
+                        X = 0,
+                        Y = 1,
+                        Height = 1,
+                        Width = Dim.Fill(),
+                    };
+                    ui.Add(headerLabel, statusLabel);
+
+                });
+            }
+
+
+            internal void Destroy()
+            {
+                Application.MainLoop.Invoke(() =>
+                {
+                    ifx.PropertyChanged -= propertyChangedListener;
+                    ui.Remove(statusLabel);
+                    ui.Remove(headerLabel);
+                    uic.NotifyNoLongerProcessing(this);
+                    ui = null;
+                });
+            }
+
+            private void propertyChangedListener(object sender, PropertyChangedEventArgs e)
+            {
+                switch (e.PropertyName)
+                {
+                    case nameof(InstallerFile.StatusText):
+                        Application.MainLoop.Invoke(() =>
+                            statusLabel.Text = ifx.StatusText);
+                        break;
+                    case nameof(InstallerFile.IsProcessing) when !ifx.IsProcessing:
+                        Destroy();
+                        break;
                 }
             }
+        }
+
+        private void NotifyNoLongerProcessing(InstallerFilePrepContainer installerFilePrepContainer)
+        {
+            processingFVMap[installerFilePrepContainer.ui] = null; //Unset
         }
 
         public override void SetupUI()
         {
             var ypos = Pos.Center() - 2;
-            Label l = new Label("Building texture installation packages")
+            Label l = new Label("Preparing to install textures")
             {
                 Y = ypos,
                 X = 0,
@@ -187,7 +248,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = Dim.Fill(),
                 TextAlignment = TextAlignment.Centered
             };
-            currentStatusLabel = new Label("Preparing to build textures")
+            currentStatusLabel = new Label("Staging files for installation")
             {
                 Y = ypos + 1,
                 X = 0,
@@ -203,9 +264,21 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = 1,
                 ColorScheme = Colors.Dialog
             };
-            Add(l);
-            Add(currentStatusLabel);
-            Add(progressbar);
+            Add(l, currentStatusLabel, progressbar);
+
+            int numStagingThreads = 2;
+            for (int i = 0; i < numStagingThreads; i++)
+            {
+                FrameView fv = new FrameView($"Thread {i + 1}")
+                {
+                    Width = 55,
+                    Height = 5,
+                    X = Pos.Center() + (i % 2 == 0 ? -57 : 2),
+                    Y = Pos.Center() + 2 + (i / 2 * 5)
+                };
+                Add(fv);
+                processingFVMap[fv] = null; //Initial mapping
+            }
         }
     }
 }
