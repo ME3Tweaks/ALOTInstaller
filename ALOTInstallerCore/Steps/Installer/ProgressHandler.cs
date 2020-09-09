@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
@@ -183,6 +184,30 @@ namespace ALOTInstallerCore.Steps.Installer
                 StageName = "STAGE_INSTALLMARKERS",
                 Weight = 0.0400000
             });
+        }
+
+        [Conditional("DEBUG")]
+        public void DebugPrintWeights()
+        {
+            Debug.WriteLine("===================STAGE WEIGHTING=================");
+            foreach (var v in Stages)
+            {
+                Debug.Write($"{v.StageName}====");
+                Debug.Write($" -> Weight: {v.Weight}");
+
+                // contribution
+                double totalWeight = Stages.Sum(x => x.Weight);
+                if (totalWeight > 0)
+                {
+                    // have to cast this...? what?
+                    var contrib = (int)Math.Round((v.Weight * 100 / totalWeight));
+                    Debug.Write($" -> Will contribute {contrib}% of the total progress");
+                }
+
+                Debug.Write($" -> ME1 Weighting: {v.ME1Scaling}");
+                Debug.Write($" -> ME2 Weighting: {v.ME2Scaling}");
+                Debug.Write($" -> ME3 Weighting: {v.ME3Scaling}");
+            }
         }
     }
 }

@@ -272,6 +272,8 @@ namespace ALOTInstallerCore.Steps
                             {
                                 Log.Error("[AICORE] STAGE_WEIGHT IPC requires 2 parameters, STAGE and WEIGHT");
                             }
+
+                            pm.DebugPrintWeights();
                             break;
                         case "STAGE_CONTEXT": //Change to new stage
                             doneReached = pm.CompleteAndMoveToStage(param);
