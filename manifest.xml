@@ -2584,10 +2584,12 @@
                     size="20913288" />
                <packagefile
                     me3="true"
+                    tpfsource="EDI_BlackCatsuit_Otte_3.0.1.tpf"
                     sourcename="HMF_ARM_EDId_Diff_0xEDC36D3F_Otte.dds"
                     destinationname="HMF_ARM_EDId_Diff_0xEDC36D3F.dds" />
                <packagefile
                     me3="true"
+                    tpfsource="EDI_BlackCatsuit_Otte_3.0.1.tpf"
                     sourcename="HMF_ARM_EDId_Spec_0x6ADA93CE_Otte.dds"
                     destinationname="HMF_ARM_EDId_Spec_0x6ADA93CE.dds" />
         </manifestfile>
