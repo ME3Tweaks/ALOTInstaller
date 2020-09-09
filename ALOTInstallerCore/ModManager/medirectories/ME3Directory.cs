@@ -5,6 +5,9 @@ using System.ComponentModel;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+#if WINDOWS
+using Microsoft.Win32;
+#endif
 
 namespace ALOTInstallerCore.ModManager.GameDirectories
 
@@ -72,13 +75,14 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
 
         public static void ReloadActivePath()
         {
+            #if WINDDOWS
             string hkey32 = @"HKEY_LOCAL_MACHINE\SOFTWARE\";
             string hkey64 = @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\";
             string subkey = @"BioWare\Mass Effect 3";
 
             // Check 64-bit first
             string keyName = hkey64 + subkey;
-            string test = (string)Microsoft.Win32.Registry.GetValue(keyName, "Install Dir", null);
+            string test = (string)Registry.GetValue(keyName, "Install Dir", null);
             if (test != null)
             {
                 gamePath = test;
@@ -87,6 +91,7 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
 
             keyName = hkey32 + subkey;
             gamePath = (string)Microsoft.Win32.Registry.GetValue(keyName, "Install Dir", null);
+        #endif
         }
 
         public static Dictionary<string, string> OfficialDLCNames = new CaseInsensitiveDictionary<string>()

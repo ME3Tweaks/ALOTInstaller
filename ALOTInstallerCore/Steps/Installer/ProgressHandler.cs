@@ -98,23 +98,6 @@ namespace ALOTInstallerCore.Steps.Installer
         }
 
         /// <summary>
-        /// Call this method before your first progress submission. This will update the weights so they all add up to 1.
-        /// </summary>
-        public void ScaleWeights()
-        {
-            //recalculate total weight
-            //foreach (MutableKeyValuePair<int, double> job in jobWeightList)
-            //{
-            //    TOTAL_ACTIVE_WEIGHT += job.Value;
-            //}
-            ////calculate each job's value
-            //foreach (MutableKeyValuePair<int, double> job in jobWeightList)
-            //{
-            //    job.Value = job.Value / TOTAL_ACTIVE_WEIGHT;
-            //}
-        }
-
-        /// <summary>
         /// Gets the total percentage done. The value returned will be between 0 and 100, rounded
         /// </summary>
         /// <returns></returns>
@@ -137,7 +120,6 @@ namespace ALOTInstallerCore.Steps.Installer
             {
                 stage.Weight *= scale;
             }
-            ScaleWeights();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
