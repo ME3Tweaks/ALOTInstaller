@@ -422,7 +422,8 @@ namespace ALOTInstallerCore.Helpers
             var files = Directory.GetFiles(Settings.TextureLibraryLocation).Select(o => Path.GetFileName(o)).ToList();
             foreach (var f in ManifestHandler.GetAllManifestFiles())
             {
-                files.Remove(Path.GetFileName(f.GetUsedFilepath()));
+                var fname = Path.GetFileName(f.GetUsedFilepath());
+                var numRemoved = files.RemoveAll(n => n.Equals(fname, StringComparison.OrdinalIgnoreCase));
             }
 
             foreach (var f in files)
