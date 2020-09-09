@@ -345,13 +345,13 @@ namespace ALOTInstallerCore.ModManager.Objects
                 case Enums.MEGame.ME3:
                     validationFiles = new[]
                     {
-                            Path.Combine(TargetPath, @"Binaries", @"win32", @"MassEffect3.exe"),
-                            Path.Combine(TargetPath, @"BioGame", @"CookedPCConsole", @"Textures.tfc"),
-                            Path.Combine(TargetPath, @"BioGame", @"CookedPCConsole", @"Startup.pcc"),
-                            Path.Combine(TargetPath, @"BioGame", @"CookedPCConsole", @"Coalesced.bin"),
-                            Path.Combine(TargetPath, @"BioGame", @"Patches", @"PCConsole", @"Patch_001.sfar"),
-                            Path.Combine(TargetPath, @"BioGame", @"CookedPCConsole", @"Textures.tfc"),
-                            Path.Combine(TargetPath, @"BioGame", @"CookedPCConsole", @"citwrd_rp1_bailey_m_D_Int.afc")
+                            Path.Combine(TargetPath, @"Binaries", @"Win32", @"MassEffect3.exe"),
+                            Path.Combine(TargetPath, @"BIOGame", @"CookedPCConsole", @"Textures.tfc"),
+                            Path.Combine(TargetPath, @"BIOGame", @"CookedPCConsole", @"Startup.pcc"),
+                            Path.Combine(TargetPath, @"BIOGame", @"CookedPCConsole", @"Coalesced.bin"),
+                            Path.Combine(TargetPath, @"BIOGame", @"Patches", @"PCConsole", @"Patch_001.sfar"),
+                            Path.Combine(TargetPath, @"BIOGame", @"CookedPCConsole", @"Textures.tfc"),
+                            Path.Combine(TargetPath, @"BIOGame", @"CookedPCConsole", @"citwrd_rp1_bailey_m_D_Int.afc")
                         };
                     break;
             }

@@ -63,7 +63,7 @@ namespace ALOTInstallerCore.Helpers
                 if (dlcFolderStartSubStrPos > 0)
                 {
                     files = files.Select(x => x.Substring(dlcFolderStartSubStrPos)).ToList();
-                    files = files.Select(x => x.Substring(x.IndexOf('\\') + 1)).ToList(); //remove first slash
+                    files = files.Select(x => x.Substring(x.IndexOf(Path.DirectorySeparatorChar) + 1)).ToList(); //remove first slash
                 }
                 else
                 {

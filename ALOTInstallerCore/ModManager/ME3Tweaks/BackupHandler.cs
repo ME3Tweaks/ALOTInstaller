@@ -286,7 +286,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         BackupProgressCallback?.Invoke(ProgressValue, ProgressMax);
                     }
 
-                    string dlcFolderpath = MEDirectories.DLCPath(targetToBackup) + '\\';
+                    string dlcFolderpath = MEDirectories.DLCPath(targetToBackup) + Path.DirectorySeparatorChar;
                     int dlcSubStringLen = dlcFolderpath.Length;
                     var officialDLCNames = MEDirectories.OfficialDLCNames(targetToBackup.Game);
 
@@ -299,7 +299,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             {
                                 //It's a DLC!
                                 string dlcname = file.Substring(dlcSubStringLen);
-                                var dlcFolderNameEndPos = dlcname.IndexOf('\\');
+                                var dlcFolderNameEndPos = dlcname.IndexOf(Path.DirectorySeparatorChar);
                                 if (dlcFolderNameEndPos > 0)
                                 {
                                     dlcname = dlcname.Substring(0, dlcFolderNameEndPos);
@@ -339,7 +339,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         catch (Exception e)
                         {
                             Log.Error($"[AICORE] Error about to copy file: {e.Message}");
-                            CoreCrashes.TrackError(e);
+                            CoreCrashes.TrackError?.Invoke(e);
                         }
 
                         return true;
@@ -351,7 +351,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         {
                             //It's a DLC!
                             string dlcname = fileBeingCopied.Substring(dlcSubStringLen);
-                            int index = dlcname.IndexOf('\\');
+                            int index = dlcname.IndexOf(Path.DirectorySeparatorChar);
                             try
                             {
                                 string prefix = "Backing up ";
@@ -675,7 +675,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         }
                     }
 
-                    string dlcFolderpath = MEDirectories.DLCPath(backupPath, Game) + '\\'; //\ at end makes sure we are restoring a subdir
+                    string dlcFolderpath = MEDirectories.DLCPath(backupPath, Game) + Path.DirectorySeparatorChar; //\ at end makes sure we are restoring a subdir
                     int dlcSubStringLen = dlcFolderpath.Length;
                     //Debug.WriteLine(@"DLC Folder: " + dlcFolderpath);
                     //Debug.Write(@"DLC Folder path len:" + dlcFolderpath);
@@ -691,7 +691,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         {
                             //It's a DLC!
                             string dlcname = fileBeingCopied.Substring(dlcSubStringLen);
-                            int index = dlcname.IndexOf('\\');
+                            int index = dlcname.IndexOf(Path.DirectorySeparatorChar);
                             try
                             {
                                 dlcname = dlcname.Substring(0, index);
@@ -706,7 +706,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             }
                             catch (Exception e)
                             {
-                                CoreCrashes.TrackError2(e, new Dictionary<string, string>()
+                                CoreCrashes.TrackError2?.Invoke(e, new Dictionary<string, string>()
                                         {
                                             {@"Source", @"Restore UI display callback"},
                                             {@"Value", fileBeingCopied},
@@ -747,7 +747,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         {
                             //It's a DLC!
                             string dlcname = fileBeingCopied.Substring(dlcSubStringLen);
-                            int index = dlcname.IndexOf('\\');
+                            int index = dlcname.IndexOf(Path.DirectorySeparatorChar);
                             try
                             {
                                 string prefix = "Restoring ";

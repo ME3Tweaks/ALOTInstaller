@@ -60,7 +60,7 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
         internal static string ASIPath(GameTarget target) => Path.Combine(target.TargetPath, "Binaries", "win32", "asi");
 
 
-        public static string ExecutablePath(string gameRoot) => Path.Combine(gameRoot, "Binaries", "win32", "MassEffect3.exe");
+        public static string ExecutablePath(string gameRoot) => Path.Combine(gameRoot, "Binaries", "Win32", "MassEffect3.exe");
         public static List<string> VanillaDlls = new List<string>
         {
             "atiags.dll",

@@ -63,7 +63,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     {
                         attachments.Add(CoreCrashes.ErrorAttachmentLog.AttachmentWithText(log, @"applog.txt"));
                     }
-                    CoreCrashes.TrackError3(e, new Dictionary<string, string>()
+                    CoreCrashes.TrackError3?.Invoke(e, new Dictionary<string, string>()
                     {
                         {@"Error type", @"Error reading cached online content" },
                         {@"Service", @"Basegame File Identification Service" },
@@ -144,7 +144,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     {
                         attachments.Add(CoreCrashes.ErrorAttachmentLog.AttachmentWithText(log, "applog.txt"));
                     }
-                    CoreCrashes.TrackError3(e, new Dictionary<string, string>()
+                    CoreCrashes.TrackError3?.Invoke(e, new Dictionary<string, string>()
                     {
                         {"Error type", "Error reading cached online content" },
                         {"Service", "Third Party Identification Service" },
@@ -269,7 +269,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             catch (Exception e)
             {
                 Log.Error("[AICORE] Exception trying to ensure static assets: " + e.Message);
-                CoreCrashes.TrackError2(new Exception(@"Could not download static supporting files: " + e.Message), null);
+                CoreCrashes.TrackError2?.Invoke(new Exception(@"Could not download static supporting files: " + e.Message), null);
                 return false;
             }
 

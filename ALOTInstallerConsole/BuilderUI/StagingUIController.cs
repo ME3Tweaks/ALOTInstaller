@@ -35,6 +35,10 @@ namespace ALOTInstallerConsole.BuilderUI
             Application.MainLoop.Invoke(() => { currentStatusLabel.Text = newStatus; });
         }
 
+        private bool notifyPointOfNoReturn(){
+            return true; // TODO SHOW DIALOG
+        }
+
         public override void BeginFlow()
         {
             foreach (var f in installOptions.FilesToInstall)
@@ -50,6 +54,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 ResolveMutualExclusiveMods = resolveMutualExclusiveMod,
                 ErrorStagingCallback = errorStaging,
                 ConfigureModOptions = configureModOptions,
+                PointOfNoReturnNotification = notifyPointOfNoReturn
             };
             builderWorker.WorkerReportsProgress = true;
             builderWorker.DoWork += ss.PerformStaging;

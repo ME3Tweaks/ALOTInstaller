@@ -618,6 +618,7 @@ namespace ALOTInstallerConsole.BuilderUI
             if (option.Key == InstallOptionsStep.InstallOption.Addon) return "ALOT Addon" + suffix;
             if (option.Key == InstallOptionsStep.InstallOption.MEUITM) return "MEUITM" + suffix;
             if (option.Key == InstallOptionsStep.InstallOption.UserFiles) return "User files" + suffix;
+            if (option.Key == InstallOptionsStep.InstallOption.ALOVMods) return "ALOV" + suffix;
             return "UNKNOWN OPTION";
         }
 

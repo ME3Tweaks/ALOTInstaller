@@ -53,7 +53,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = ChangeME1Path
+                Clicked = ()=> changeGamePath(Enums.MEGame.ME1)
             });
             y++;
 
@@ -81,7 +81,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = ChangeME2Path
+                Clicked = ()=> changeGamePath(Enums.MEGame.ME2)
             });
             y++;
 
@@ -110,7 +110,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = ChangeME3Path
+                Clicked = ()=> changeGamePath(Enums.MEGame.ME3)
             });
 
             Add(gamePathsFv);
@@ -177,7 +177,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = 1,
                 Clicked = ChangeBuildLocation
             });
-Add(fileLocationsFv);
+            Add(fileLocationsFv);
             y++;
             y++;
 
@@ -223,18 +223,18 @@ Add(fileLocationsFv);
             }
         }
 
-        private async void ChangeME1Path()
-        {
-            OpenDialog selector = new OpenDialog("Select MassEffect.exe", "Select the executable for Mass Effect, located in the Binaries directory.")
+        private  async void changeGamePath(Enums.MEGame game) {
+            var gameexename = game.ToGameName().Replace(" ", "");
+            OpenDialog selector = new OpenDialog($"Select {gameexename}.exe", $"Select the executable for {game.ToGameName()}, located in the Binaries directory.")
             {
                 CanChooseDirectories = false,
-                AllowedFileTypes = new[] { ".exe" },
+                AllowedFileTypes = new[] { $"{gameexename}.exe" },
             };
             Application.Run(selector);
             if (!selector.Canceled && selector.FilePaths.Any() && File.Exists(selector.FilePaths.First()))
             {
-                var targetPath = Utilities.GetGamePathFromExe(Enums.MEGame.ME1, selector.FilePaths.First());
-                var target = new GameTarget(Enums.MEGame.ME1, targetPath, false, false);
+                var targetPath = Utilities.GetGamePathFromExe(game, selector.FilePaths.First());
+                var target = new GameTarget(game, targetPath, false, false);
                 var invalidReason = target.ValidateTarget();
                 if (invalidReason == null)
                 {
@@ -246,78 +246,24 @@ Add(fileLocationsFv);
                     }
                     else
                     {
-                        me1PathField.Text = targetPath;
+                        switch (game){
+                            case Enums.MEGame.ME1:
+                                me1PathField.Text = targetPath;
+                                break;
+                            case Enums.MEGame.ME2:
+                                me2PathField.Text = targetPath;
+                                break;
+                            case Enums.MEGame.ME3:
+                                me3PathField.Text = targetPath;
+                                break;
+                                
+                        }
                     }
                 }
                 else
                 {
                     MessageBox.ErrorQuery("Invalid target selected", invalidReason, "OK");
                 }
-            }
-        }
-
-        private void ChangeME2Path()
-        {
-            OpenDialog selector = new OpenDialog("Select MassEffect2.exe", "Select the executable for Mass Effect 2, located in the Binaries directory.")
-            {
-                CanChooseDirectories = false,
-                AllowedFileTypes = new[] { ".exe" },
-            };
-            Application.Run(selector);
-            if (!selector.Canceled && selector.FilePaths.Any() && File.Exists(selector.FilePaths.First()))
-            {
-                                var targetPath = Utilities.GetGamePathFromExe(Enums.MEGame.ME2, selector.FilePaths.First());
-
-                var target = new GameTarget(Enums.MEGame.ME2, targetPath, false, false);
-                var invalidReason = target.ValidateTarget();
-                if (invalidReason == null)
-                {
-                    if (!Locations.SetTarget(target))
-                    {
-                        MessageBox.ErrorQuery("Error setting game path", "An error occurred setting the game path. See the log for more details.", "OK");
-                    }
-                    else
-                    {
-                        me2PathField.Text =  targetPath;
-                    }
-                }
-                else
-                {
-                    MessageBox.ErrorQuery("Invalid target selected", invalidReason, "OK");
-                }
-            }
-        }
-
-        private void ChangeME3Path()
-        {
-            OpenDialog selector = new OpenDialog("Select MassEffect3.exe", "Select the executable for Mass Effect 3, located in binaries/win32.")
-            {
-                CanChooseDirectories = false,
-                AllowedFileTypes = new[] { ".exe" },
-            };
-            Application.Run(selector);
-            if (!selector.Canceled && selector.FilePaths.Any() && File.Exists(selector.FilePaths.First()))
-            {
-                var targetPath = Utilities.GetGamePathFromExe(Enums.MEGame.ME3, selector.FilePaths.First());
-
-                var target = new GameTarget(Enums.MEGame.ME3, targetPath, false, false);
-                var invalidReason = target.ValidateTarget();
-                if (invalidReason == null)
-                {
-                    if (!Locations.SetTarget(target))
-                    {
-                        MessageBox.ErrorQuery("Error setting game path", "An error occurred setting the game path. See the log for more details.", "OK");
-                    }
-                    else
-                    {
-                        me3PathField.Text = targetPath;
-                    }
-                }
-                else
-                {
-                    MessageBox.ErrorQuery("Invalid target selected", invalidReason, "OK");
-                }
-
             }
         }
 
