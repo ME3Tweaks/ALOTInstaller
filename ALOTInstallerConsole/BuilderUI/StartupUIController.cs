@@ -66,9 +66,9 @@ namespace ALOTInstallerConsole.BuilderUI
                         {
                             startupStatusLabel.Text = x;
                         });
-                    }, 
-                    x => Task.Factory.StartNew(() => x,
-                        default, TaskCreationOptions.None, syncContext).Wait());
+                    },
+                    x => x()
+                    );
 
                 b.Result = alotManifestModePackage;
             };

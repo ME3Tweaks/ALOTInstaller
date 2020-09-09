@@ -209,7 +209,8 @@ namespace ALOTInstallerConsole.BuilderUI
             nbw.DoWork += (a, b) =>
             {
                 var backupTargets = new List<GameTarget>();
-                if (Locations.GetTarget(game) != null){
+                if (Locations.GetTarget(game) != null)
+                {
                     backupTargets.Add(Locations.GetTarget(game));
                 }
                 var backupController = new BackupHandler.GameBackup(game, backupTargets)
@@ -333,10 +334,16 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void RestoreBackup(Enums.MEGame game)
         {
-            string destinationPath = Locations.GetTarget(game)?.TargetPath;
-            int result = MessageBox.Query("Select restore type", "Restore over the existing game, or make a copy of the game using your backup?", "Restore existing game", "Make a copy", "Cancel");
-
-            if (result == 2) return; //Cancel
+            string gamePath = Locations.GetTarget(game)?.TargetPath;
+            bool overwriteGame = false;
+            if (gamePath != null)
+            {
+                int result = MessageBox.Query("Select restore type",
+                    "Restore over the existing game, or make a copy of the game using your backup?",
+                    "Restore existing game", "Make a copy", "Cancel");
+                if (result == 2) return; //Cancel
+                if (result == 0) overwriteGame = true;
+            }
 
             // Perform the restore
             ProgressDialog pd = new ProgressDialog("Restore in progress",
@@ -386,7 +393,7 @@ namespace ALOTInstallerConsole.BuilderUI
                         return path;
                     }
                 };
-                b.Result = gr.PerformRestore(result == 0 ? destinationPath : null);
+                b.Result = gr.PerformRestore(overwriteGame ? gamePath : null);
 
 
                 // Restore code here
