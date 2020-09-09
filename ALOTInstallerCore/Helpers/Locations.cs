@@ -158,28 +158,40 @@ namespace ALOTInstallerCore.Helpers
                     }
                     else
                     {
-                        Locations.SetConfigPath(game, item.Value);
+                        Locations.SetConfigPath(game, item.Value, false);
                     }
                 }
 
             }
         }
 
-        private static void SetConfigPath(Enums.MEGame game, string itemValue)
+
+        public static bool SetConfigPath(Enums.MEGame game, string itemValue, bool setMEM)
         {
-            switch (game)
+            bool returnValue = true;
+#if !WINDOWS
+            if (setMEM)
             {
-                case Enums.MEGame.ME1:
-                    ConfigPathME1 = itemValue;
-                    break;
-                case Enums.MEGame.ME2:
-                    ConfigPathME2 = itemValue;
-                    break;
-                case Enums.MEGame.ME3:
-                    ConfigPathME3 = itemValue;
-                    break;
+                returnValue = MEMIPCHandler.SetConfigPath(game, itemValue);
+            }
+#endif
+            if (returnValue)
+            {
+                switch (game)
+                {
+                    case Enums.MEGame.ME1:
+                        ConfigPathME1 = itemValue;
+                        break;
+                    case Enums.MEGame.ME2:
+                        ConfigPathME2 = itemValue;
+                        break;
+                    case Enums.MEGame.ME3:
+                        ConfigPathME3 = itemValue;
+                        break;
+                }
             }
 
+            return returnValue;
         }
 
 

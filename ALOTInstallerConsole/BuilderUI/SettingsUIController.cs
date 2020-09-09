@@ -15,6 +15,9 @@ namespace ALOTInstallerConsole.BuilderUI
         private TextField me1PathField;
         private TextField me2PathField;
         private TextField me3PathField;
+        private TextField me1ConfigPathField;
+        private TextField me2ConfigPathField;
+        private TextField me3ConfigPathField;
         private TextField textureLibraryLocation;
         private TextField buildLocation;
 
@@ -53,7 +56,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = ()=> changeGamePath(Enums.MEGame.ME1)
+                Clicked = () => changeGamePath(Enums.MEGame.ME1)
             });
             y++;
 
@@ -81,7 +84,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = ()=> changeGamePath(Enums.MEGame.ME2)
+                Clicked = () => changeGamePath(Enums.MEGame.ME2)
             });
             y++;
 
@@ -110,19 +113,120 @@ namespace ALOTInstallerConsole.BuilderUI
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = ()=> changeGamePath(Enums.MEGame.ME3)
+                Clicked = () => changeGamePath(Enums.MEGame.ME3)
             });
 
             Add(gamePathsFv);
+
+            FrameView gameConfigPathsFv = new FrameView("Config file paths")
+            {
+                X = 1,
+                Y = 10,
+                Width = 67,
+                Height = 10
+            };
+            y = 0;
+            // ME1 Path
+            gameConfigPathsFv.Add(new Label("Mass Effect 1 config path")
+            {
+                X = 2,
+                Y = y++,
+                Width = 25,
+                Height = 1
+            });
+            me1ConfigPathField = new TextField(Locations.ConfigPathME1 ?? "")
+            {
+                X = 2,
+                Y = y,
+                Width = 50,
+                Height = 1,
+                ReadOnly = true
+            };
+            gameConfigPathsFv.Add(me1ConfigPathField);
+#if !WINDOWS
+            gameConfigPathsFv.Add(new Button("Change")
+            {
+                X = 53,
+                Y = y,
+                Width = 10,
+                Height = 1,
+                Clicked = () => changeConfigPath(Enums.MEGame.ME1)
+            });
+#endif
+            y++;
+
+            // ME2 Path
+            y++;
+            gameConfigPathsFv.Add(new Label("Mass Effect 2 config path")
+            {
+                X = 2,
+                Y = y++,
+                Width = 25,
+                Height = 1
+            });
+            me2ConfigPathField = new TextField(Locations.ConfigPathME2 ?? "")
+            {
+                X = 2,
+                Y = y,
+                Width = 50,
+                Height = 1,
+                ReadOnly = true
+            };
+
+            gameConfigPathsFv.Add(me2ConfigPathField);
+#if !WINDOWS
+
+            gameConfigPathsFv.Add(new Button("Change")
+            {
+                X = 53,
+                Y = y,
+                Width = 10,
+                Height = 1,
+                Clicked = () => changeConfigPath(Enums.MEGame.ME2)
+            });
+#endif
+            y++;
+
+            // ME3 Path
+            y++;
+            gameConfigPathsFv.Add(new Label("Mass Effect 3 config path")
+            {
+                X = 2,
+                Y = y++,
+                Width = 25,
+                Height = 1
+            });
+
+            me3ConfigPathField = new TextField(Locations.ConfigPathME3 ?? "")
+            {
+                X = 2,
+                Y = y,
+                Width = 50,
+                Height = 1,
+                ReadOnly = true
+            };
+            gameConfigPathsFv.Add(me3ConfigPathField);
+#if !WINDOWS
+            gameConfigPathsFv.Add(new Button("Change")
+            {
+                X = 53,
+                Y = y,
+                Width = 10,
+                Height = 1,
+                Clicked = () => changeConfigPath(Enums.MEGame.ME3)
+            });
+#endif
+
+            Add(gameConfigPathsFv);
 
 
             // Texture library location
             FrameView fileLocationsFv = new FrameView("Disk locations")
             {
                 X = 1,
-                Y = 10,
+                Y = 20,
                 Width = 67,
-                Height = 9
+                Height = 7
             };
             y = 0;
             fileLocationsFv.Add(new Label("Texture library directory (ALOT/MEUITM mode only)")
@@ -223,7 +327,48 @@ namespace ALOTInstallerConsole.BuilderUI
             }
         }
 
-        private  async void changeGamePath(Enums.MEGame game) {
+#if !WINDOWS
+        private async void changeConfigPath(Enums.MEGame game)
+        {
+            OpenDialog selector = new OpenDialog($"Select config directory for {game}",
+                "Select the directory where the game configuration files are stored.")
+            {
+                CanChooseDirectories = true,
+                CanChooseFiles = false,
+            };
+            Application.Run(selector);
+            if (!selector.Canceled && selector.FilePath != null &&
+                Directory.Exists(selector.FilePath.ToString()))
+            {
+                var selectedPath = selector.FilePath.ToString();
+                var pathSet = await Task.Run(() => Locations.SetConfigPath(game, selectedPath, true));
+
+                if (!pathSet)
+                {
+                    MessageBox.ErrorQuery("Error setting game config path",
+                        "An error occurred setting the game config path. See the log for more details.", "OK");
+                }
+                else
+                {
+                    switch (game)
+                    {
+                        case Enums.MEGame.ME1:
+                            me1ConfigPathField.Text = selectedPath;
+                            break;
+                        case Enums.MEGame.ME2:
+                            me2ConfigPathField.Text = selectedPath;
+                            break;
+                        case Enums.MEGame.ME3:
+                            me3ConfigPathField.Text = selectedPath;
+                            break;
+
+                    }
+                }
+            }
+        }
+#endif
+        private async void changeGamePath(Enums.MEGame game)
+        {
             var gameexename = game.ToGameName().Replace(" ", "");
             OpenDialog selector = new OpenDialog($"Select {gameexename}.exe", $"Select the executable for {game.ToGameName()}, located in the Binaries directory.")
             {
@@ -246,7 +391,8 @@ namespace ALOTInstallerConsole.BuilderUI
                     }
                     else
                     {
-                        switch (game){
+                        switch (game)
+                        {
                             case Enums.MEGame.ME1:
                                 me1PathField.Text = targetPath;
                                 break;
@@ -256,7 +402,7 @@ namespace ALOTInstallerConsole.BuilderUI
                             case Enums.MEGame.ME3:
                                 me3PathField.Text = targetPath;
                                 break;
-                                
+
                         }
                     }
                 }

@@ -417,5 +417,19 @@ namespace ALOTInstallerCore.Helpers
             });
             return result;
         }
+
+#if !WINDOWS
+        public static bool SetConfigPath(Enums.MEGame game, string itemValue)
+        {
+            int exitcode = 0;
+            string args = $"--set-game-user-path --gameid {game.ToGameNum()} --path \"{itemValue}\"";
+            MEMIPCHandler.RunMEMIPCUntilExit(args, applicationExited: x => exitcode = x);
+            if (exitcode != 0)
+            {
+                Log.Error($"[AICORE] Non-zero MassEffectModderNoGui exit code setting game config path: {exitcode}");
+            }
+            return exitcode == 0;
+        }
+#endif
     }
 }
