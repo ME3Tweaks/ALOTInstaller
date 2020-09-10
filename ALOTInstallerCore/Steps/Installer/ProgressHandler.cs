@@ -23,8 +23,8 @@ namespace ALOTInstallerCore.Steps.Installer
         /// Stages that applicable for this handler
         /// </summary>
         public ObservableCollectionExtended<Stage> Stages { get; } = new ObservableCollectionExtended<Stage>();
-        private double TOTAL_ACTIVE_WEIGHT => Stages.Sum(x => x.Weight);
-        public int TOTAL_PROGRESS { get; private set; } = -1;
+        //private double TOTAL_ACTIVE_WEIGHT => Stages.Sum(x => x.Weight);
+        //public int TOTAL_PROGRESS { get; private set; } = -1;
         public Stage CurrentStage { get; private set; }
 
 
@@ -38,10 +38,9 @@ namespace ALOTInstallerCore.Steps.Installer
             if (pw != null)
             {
                 // Generate a local stage based on the global default ones.
-                Stage localStage = new Stage(pw)
-                {
-                    StageUIIndex = Stages.Count + 1 //+1 cause these are only really used for the UI
-                };
+                Stage localStage = new Stage(pw);
+                localStage.StageUIIndex = Stages.Count + 1; //+1 cause these are only really used for the UI
+
                 pw.reweightStageForGame(game);
                 Stages.Add(localStage);
             }
@@ -174,8 +173,8 @@ namespace ALOTInstallerCore.Steps.Installer
             Debug.WriteLine("===================STAGE WEIGHTING=================");
             foreach (var v in Stages)
             {
-                Debug.Write($"{v.StageName}====");
-                Debug.Write($" -> Weight: {v.Weight}");
+                Debug.WriteLine($"{v.StageName}====");
+                Debug.WriteLine($" -> Weight: {v.Weight}");
 
                 // contribution
                 double totalWeight = Stages.Sum(x => x.Weight);
@@ -183,12 +182,12 @@ namespace ALOTInstallerCore.Steps.Installer
                 {
                     // have to cast this...? what?
                     var contrib = (int)Math.Round((v.Weight * 100 / totalWeight));
-                    Debug.Write($" -> Will contribute {contrib}% of the total progress");
+                    Debug.WriteLine($" -> Will contribute {contrib}% of the total progress");
                 }
 
-                Debug.Write($" -> ME1 Weighting: {v.ME1Scaling}");
-                Debug.Write($" -> ME2 Weighting: {v.ME2Scaling}");
-                Debug.Write($" -> ME3 Weighting: {v.ME3Scaling}");
+                Debug.WriteLine($" -> ME1 Weighting: {v.ME1Scaling}");
+                Debug.WriteLine($" -> ME2 Weighting: {v.ME2Scaling}");
+                Debug.WriteLine($" -> ME3 Weighting: {v.ME3Scaling}");
             }
         }
     }

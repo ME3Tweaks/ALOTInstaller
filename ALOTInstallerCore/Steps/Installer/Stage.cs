@@ -86,7 +86,7 @@ namespace ALOTInstallerCore.Steps.Installer
             ME1Scaling = original.ME1Scaling;
             ME2Scaling = original.ME2Scaling;
             ME3Scaling = original.ME3Scaling;
-            Weight = original.ME1Scaling;
+            Weight = original.Weight;
             StageName = original.StageName;
             TaskName = original.TaskName;
             FailureInfos = original.FailureInfos; //These are never modified so we can just pass them through

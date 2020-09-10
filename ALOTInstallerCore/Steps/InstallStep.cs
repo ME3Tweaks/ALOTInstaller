@@ -281,6 +281,9 @@ namespace ALOTInstallerCore.Steps
                             updateStageOfStage();
                             updateCurrentStage();
                             break;
+                        case "MOD_OVERRIDE":
+                            Log.Information($"[AICORE] {param} overrides some textures in the install set");
+                            break;
                         case "TASK_PROGRESS": //Report progress of a stage
                             pm.SubmitProgress(int.Parse(param));
                             updateCurrentStage();
