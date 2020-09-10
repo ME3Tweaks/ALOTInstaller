@@ -31,7 +31,7 @@
         </stage>
         <stage
             name="STAGE_SCAN"
-            weight="0.012055"
+            weight="0.052055"
             tasktext="Scanning textures">
                <failureinfo
                     resultcode="InstallFailed_FailedToScanTextures"
