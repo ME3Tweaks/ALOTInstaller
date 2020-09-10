@@ -233,7 +233,7 @@ namespace ALOTInstallerCore.Helpers
                 if (rootElement.Element("stages") != null)
                 {
                     ProgressHandler.DefaultStages =
-                        (from stage in rootElement.Element("stages").Descendants("stage")
+                        (from stage in rootElement.Element("stages")?.Descendants("stage")
                          select new Stage
                          {
                              StageName = stage.Attribute("name")?.Value,
