@@ -407,9 +407,9 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
                 case Enums.MEGame.ME2:
                     return Path.Combine(gameTarget.TargetPath, "Binaries");
                 case Enums.MEGame.ME3:
-                    return Path.Combine(gameTarget.TargetPath, "Binaries", "win32");
+                    return Path.Combine(gameTarget.TargetPath, "Binaries", "Win32");
             }
-            throw new ArgumentOutOfRangeException("gameTarget.Game");
+            throw new ArgumentOutOfRangeException(nameof(gameTarget.Game));
         }
 
         public static List<string> VanillaDlls(Enums.MEGame game)

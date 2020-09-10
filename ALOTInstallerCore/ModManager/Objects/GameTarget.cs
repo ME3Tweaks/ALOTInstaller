@@ -603,7 +603,7 @@ namespace ALOTInstallerCore.ModManager.Objects
 
             if (Game == Enums.MEGame.ME1) return Path.Combine(TargetPath, "Binaries", "binkw32.dll");
             if (Game == Enums.MEGame.ME2) return Path.Combine(TargetPath, "Binaries", "binkw32.dll");
-            if (Game == Enums.MEGame.ME3) return Path.Combine(TargetPath, "Binaries", "win32", "binkw32.dll");
+            if (Game == Enums.MEGame.ME3) return Path.Combine(TargetPath, "Binaries", "Win32", "binkw32.dll");
             return null;
 
         }
@@ -628,7 +628,7 @@ namespace ALOTInstallerCore.ModManager.Objects
             }
             else if (Game == Enums.MEGame.ME3)
             {
-                var obinkPath = Path.Combine(TargetPath, "Binaries", "win32", "binkw23.dll");
+                var obinkPath = Path.Combine(TargetPath, "Binaries", "Win32", "binkw23.dll");
                 Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me3.binkw32.dll", binkPath, true);
                 Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me3.binkw23.dll", obinkPath, true);
             }
@@ -662,7 +662,7 @@ namespace ALOTInstallerCore.ModManager.Objects
             }
             else if (Game == Enums.MEGame.ME3)
             {
-                binkPath = Path.Combine(TargetPath, "Binaries", "win32", "binkw32.dll");
+                binkPath = Path.Combine(TargetPath, "Binaries", "Win32", "binkw32.dll");
                 expectedHash = ME3ASILoaderHash;
             }
 
