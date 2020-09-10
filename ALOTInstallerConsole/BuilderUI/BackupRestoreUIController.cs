@@ -11,6 +11,7 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Unreal.Classes;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
@@ -271,9 +272,10 @@ namespace ALOTInstallerConsole.BuilderUI
                     },
                     BlockingActionCallback = (title, message) =>
                     {
-                        MessageBox.ErrorQuery(title, message, "OK");
+                        waitForUiThread(() => MessageBox.ErrorQuery(title, message, "OK") == 0);
                     },
-                    WarningActionCallback = (title, message, affirmativetext, negativetext) => MessageBox.ErrorQuery(title, message, affirmativetext, negativetext) == 0,
+                    WarningActionCallback = (title, message, affirmativetext, negativetext) =>
+                        waitForUiThread(() => MessageBox.ErrorQuery(title, message, affirmativetext, negativetext) == 0),
                     BackupProgressCallback = (progressVal, progressMax) =>
                     {
                         pd.ProgressMax = progressMax;
@@ -284,7 +286,9 @@ namespace ALOTInstallerConsole.BuilderUI
                         pd.Indeterminate = indeterminate;
                     },
                     UpdateStatusCallback = (newstatus) => pd.BottomMessage = newstatus,
-                    WarningListCallback = (title, message, bottommessage, list, affirmativetext, negativetext) => ScrollDialog.Prompt(title, message, bottommessage, list, Colors.Error, affirmativetext, negativetext) == 0,
+                    WarningListCallback = (title, message, bottommessage, list, affirmativetext, negativetext) =>
+                        waitForUiThread(() => ScrollDialog.Prompt(title, message, bottommessage, list, Colors.Error,
+                                affirmativetext, negativetext) == 0),
                     SelectGameBackupFolderDestination = () =>
                     {
                         string selectedPath = null;
@@ -354,9 +358,9 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 BackupHandler.GameRestore gr = new BackupHandler.GameRestore(game)
                 {
-                    ConfirmationCallback = (title, message) => MessageBox.ErrorQuery(title, message, "OK", "Cancel") == 0,
-                    BlockingErrorCallback = (title, message) => MessageBox.ErrorQuery(title, message, "OK"),
-                    RestoreErrorCallback = (title, message) => MessageBox.ErrorQuery(title, message, "OK"),
+                    ConfirmationCallback = (title, message) => waitForUiThread(() => MessageBox.ErrorQuery(title, message, "OK", "Cancel") == 0),
+                    BlockingErrorCallback = (title, message) => waitForUiThread(() => MessageBox.ErrorQuery(title, message, "OK") == 0),
+                    RestoreErrorCallback = (title, message) => waitForUiThread(() => MessageBox.ErrorQuery(title, message, "OK") == 0),
                     UpdateStatusCallback = message => pd.BottomMessage = message,
                     UpdateProgressCallback = (done, total) =>
                     {
@@ -404,7 +408,22 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     Application.RequestStop();
                 }
-                MessageBox.Query("Restore completed", $"{game.ToGameName()} has been restored from backup.", "OK");
+
+                if (b.Error != null)
+                {
+
+                }
+                else if (b.Result is bool returnres)
+                {
+                    if (returnres)
+                    {
+                        MessageBox.Query("Restore completed", $"{game.ToGameName()} has been restored from backup.", "OK");
+                    }
+                    else
+                    {
+                        //? Aborted?
+                    }
+                }
                 Program.SwapToNewView(new BackupRestoreUIController());
             };
             nbw.RunWorkerAsync();
@@ -438,6 +457,27 @@ namespace ALOTInstallerConsole.BuilderUI
 
         public override void SignalStopping()
         {
+        }
+
+        private bool waitForUiThread(Func<bool> action)
+        {
+            object o = new object();
+            string path = null;
+            bool result = false;
+            Application.MainLoop.Invoke(() =>
+            {
+                result = action();
+                lock (o)
+                {
+                    Monitor.Pulse(o);
+                }
+            });
+            lock (o)
+            {
+                Monitor.Wait(o);
+            }
+
+            return result;
         }
     }
 }
