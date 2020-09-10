@@ -62,6 +62,9 @@ namespace ALOTInstallerConsole.UserControls
 
             // Calculate sizes
             int maxW = listItems.Any() ? listItems.Max(x => x.Length) : 1; //widest string width
+
+            int buttonsW = buttons.Sum(x => x.Length + 4);
+            maxW = Math.Max(maxW, buttonsW);
             int tmaxW = Math.Max(maxW, topmessage.Length);
             tmaxW = Math.Max(maxW, bottommessage.Length);
             tmaxW = Math.Max(maxW, title.Length);
@@ -110,8 +113,8 @@ namespace ALOTInstallerConsole.UserControls
 
             y += topMessageHeight;
             y++; // spacing for list
-            //Build view
-           
+                 //Build view
+
 
             View scrollableContent = new View()
             {
