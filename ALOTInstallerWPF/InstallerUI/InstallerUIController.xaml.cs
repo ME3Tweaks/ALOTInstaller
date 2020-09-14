@@ -247,6 +247,7 @@ namespace ALOTInstallerWPF.InstallerUI
                     InstallerTextMiddleVisibility = x ? Visibility.Visible : Visibility.Collapsed,
                 SetBottomTextVisibilityCallback = x =>
                     InstallerTextBottomVisibility = x ? Visibility.Visible : Visibility.Collapsed,
+                ShowStorefrontDontClickUpdateCallback = showStorefrontNoUpdateUI,
             };
             installerWorker.WorkerReportsProgress = true;
             installerWorker.DoWork += ss.InstallTextures;
@@ -308,6 +309,11 @@ namespace ALOTInstallerWPF.InstallerUI
             }
 
             #endregion
+        }
+
+        private void showStorefrontNoUpdateUI(Enums.MEGame obj)
+        {
+            throw new NotImplementedException();
         }
 
         public DispatcherTimer TipTimer { get; set; }

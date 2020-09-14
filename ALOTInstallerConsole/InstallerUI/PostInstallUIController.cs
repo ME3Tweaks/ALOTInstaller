@@ -1,4 +1,8 @@
-﻿using ALOTInstallerConsole.BuilderUI;
+﻿using System.Linq;
+using ALOTInstallerConsole.BuilderUI;
+using ALOTInstallerCore;
+using ALOTInstallerCore.Steps;
+using ALOTInstallerCore.Steps.Installer;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.InstallerUI
@@ -6,6 +10,20 @@ namespace ALOTInstallerConsole.InstallerUI
     public class PostInstallUIController : UIController
     {
         private string installedString;
+        private InstallStep.InstallResult installResult;
+        private string installString;
+
+        public PostInstallUIController(InstallStep.InstallResult installResult, string installString)
+        {
+            this.installResult = installResult;
+            this.installString = installString;
+        }
+
+        void setupUI()
+        {
+           
+        }
+
         public void setInstalledString(string str)
         {
             installedString = str;

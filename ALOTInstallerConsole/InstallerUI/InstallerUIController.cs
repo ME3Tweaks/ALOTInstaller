@@ -1,6 +1,10 @@
-﻿using ALOTInstallerCore.Helpers;
+﻿using System.Linq;
+using ALOTInstallerConsole.BuilderUI;
+using ALOTInstallerCore;
+using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Steps;
+using ALOTInstallerCore.Steps.Installer;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.InstallerUI
@@ -11,6 +15,7 @@ namespace ALOTInstallerConsole.InstallerUI
         private Label topLabel;
         private Label middleLabel;
         private Label bottomLabel;
+        private Button continueButton;
 
         public void SetInstallPackage(InstallOptionsPackage p)
         {
@@ -49,9 +54,23 @@ namespace ALOTInstallerConsole.InstallerUI
                 TextAlignment = TextAlignment.Centered
             };
 
-            Add(topLabel);
-            Add(middleLabel);
-            Add(bottomLabel);
+            continueButton = new Button("Continue")
+            {
+                X = Pos.Center(),
+                Y = positionY + 3,
+                Width = 12,
+                Height = 1,
+                Clicked = returnToFileSelection,
+                Visible = false
+            };
+
+            Add(topLabel, middleLabel, bottomLabel, continueButton);
+        }
+
+        private void returnToFileSelection()
+        {
+            FileSelectionUIController bui = new FileSelectionUIController();
+            Program.SwapToNewView(bui);
         }
 
         private void setTextFromThread(Label label, string text)
@@ -68,7 +87,7 @@ namespace ALOTInstallerConsole.InstallerUI
             NamedBackgroundWorker installerWorker = new NamedBackgroundWorker("InstallerWorker");
             InstallStep ss = new InstallStep(package)
             {
-                SetInstallString = x=> installString = x,
+                SetInstallString = x => installString = x,
                 SetTopTextCallback = x => setTextFromThread(topLabel, x),
                 SetMiddleTextCallback = x => setTextFromThread(middleLabel, x),
                 SetBottomTextCallback = x => setTextFromThread(bottomLabel, x),
@@ -81,22 +100,67 @@ namespace ALOTInstallerConsole.InstallerUI
             installerWorker.DoWork += ss.InstallTextures;
             installerWorker.RunWorkerCompleted += (a, b) =>
             {
-                if (b.Error != null){
-
-                } else if (b.Result is InstallResult installResult){
-                    PostInstallUIController bui = new PostInstallUIController();
-                bui.setInstalledString(installString);
-                Program.SwapToNewView(bui);
+                if (b.Error != null)
+                {
 
                 }
-                
+                else if (b.Result is InstallStep.InstallResult installResult)
+                {
+                    handleResult(installResult, installString);
+                    continueButton.Visible = true;
+                    //PostInstallUIController bui = new PostInstallUIController(installResult, installString);
+                    //Program.SwapToNewView(bui);
+                }
+
             };
             installerWorker.RunWorkerAsync();
         }
 
+        private void handleResult(InstallStep.InstallResult installResult, string installString)
+        {
+            middleLabel.Visible = topLabel.Visible = bottomLabel.Visible = true;
+            if (installResult == InstallStep.InstallResult.InstallOK)
+            {
+                middleLabel.Visible = false;
+                topLabel.Text = $"Installed {installString}";
+                bottomLabel.Text = $"Texture installation succeeded. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
+            }
+            else if (installResult == InstallStep.InstallResult.InstallOKWithWarning)
+            {
+                topLabel.Text = $"Installed {installString}";
+                middleLabel.Text = "Installation completed with warnings";
+                bottomLabel.Text = $"Texture installation succeeded with warnings. Check the installer log for more information on these warnings. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
+            }
+            else
+            {
+                // Is this a stage failure?
+                StageFailure sf = null;
+                foreach (var stage in ProgressHandler.DefaultStages)
+                {
+                    var failure = stage.FailureInfos?.FirstOrDefault(x => x.FailureResultCode == installResult);
+                    if (failure != null)
+                    {
+                        sf = failure;
+                        break;
+                    }
+                }
+                if (sf != null)
+                {
+                    topLabel.Text = sf.FailureTopText;
+                    middleLabel.Text = sf.FailureBottomText;
+                    bottomLabel.Text = sf.FailureHeaderText;
+                }
+            }
+        }
+
+        private void showStorefrontNoUpdateUI(Enums.MEGame obj)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override void SignalStopping()
         {
-            
+
         }
 
         private void setVisibilityFromThread(Label label, bool visible)
