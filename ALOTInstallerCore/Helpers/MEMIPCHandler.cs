@@ -152,10 +152,17 @@ namespace ALOTInstallerCore.Helpers
         private static async void RunMEMIPC(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, Action<string> memCrashLine = null, CancellationToken cancellationToken = default)
         {
             bool exceptionOcurred = false;
+            DateTime lastCacheoutput = DateTime.Now;
             void internalHandleIPC(string command, string parm)
             {
                 switch (command)
                 {
+                    case "CACHE_USAGE":
+                        if (DateTime.Now > (lastCacheoutput.AddSeconds(10))){
+                            Log.Information($"[AICORE] MEM cache usage: {FileSizeFormatter.FormatSize(long.Parse(parm))}");
+                            lastCacheoutput = DateTime.Now;
+                        }
+                        break;
                     case "EXCEPTION_OCCURRED": //An exception has occurred and MEM is going to crash
                         exceptionOcurred = true;
                         ipcCallback?.Invoke(command, parm);
@@ -181,7 +188,12 @@ namespace ALOTInstallerCore.Helpers
                         applicationStarted?.Invoke(started.ProcessId);
                         break;
                     case StandardOutputCommandEvent stdOut:
+                    #if DEBUG
+                        if (!stdOut.Text.StartsWith("[IPC]CACHE_USAGE")){
+                            
+                        }
                         Debug.WriteLine(stdOut.Text);
+                    #endif
                         if (stdOut.Text.StartsWith(@"[IPC]"))
                         {
                             var ipc = breakdownIPC(stdOut.Text);

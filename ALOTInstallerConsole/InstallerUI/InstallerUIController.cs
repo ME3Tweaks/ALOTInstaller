@@ -74,16 +74,22 @@ namespace ALOTInstallerConsole.InstallerUI
                 SetBottomTextCallback = x => setTextFromThread(bottomLabel, x),
                 SetTopTextVisibilityCallback = x => setVisibilityFromThread(topLabel, x),
                 SetMiddleTextVisibilityCallback = x => setVisibilityFromThread(middleLabel, x),
-                SetBottomTextVisibilityCallback = x => setVisibilityFromThread(bottomLabel, x)
+                SetBottomTextVisibilityCallback = x => setVisibilityFromThread(bottomLabel, x),
+                ShowStorefrontDontClickUpdateCallback = showStorefrontNoUpdateUI
             };
             installerWorker.WorkerReportsProgress = true;
             installerWorker.DoWork += ss.InstallTextures;
             installerWorker.RunWorkerCompleted += (a, b) =>
             {
+                if (b.Error != null){
 
-                PostInstallUIController bui = new PostInstallUIController();
+                } else if (b.Result is InstallResult installResult){
+                    PostInstallUIController bui = new PostInstallUIController();
                 bui.setInstalledString(installString);
                 Program.SwapToNewView(bui);
+
+                }
+                
             };
             installerWorker.RunWorkerAsync();
         }

@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.GameINI;
@@ -17,6 +16,8 @@ using ME3ExplorerCore;
 using ME3ExplorerCore.Packages;
 using ME3ExplorerCore.Unreal;
 using Serilog;
+using NickStrupat;
+
 
 namespace ALOTInstallerCore.Steps
 {
@@ -313,14 +314,25 @@ namespace ALOTInstallerCore.Steps
                     }
                 }
 
+                var computerInfo = new ComputerInfo();
+                var cacheAmountPercent = getCacheSizeToUse(computerInfo);
+
                 int currentMemProcessId = 0;
                 int lastExitCode = int.MinValue;
-                string args = $"--install-mods --gameid {package.InstallTarget.Game.ToGameNum()} --input \"{memInputPath}\" --alot-mode --ipc --verify";
+                string args = $"--install-mods --gameid {package.InstallTarget.Game.ToGameNum()} --input \"{memInputPath}\" --alot-mode --verify";
 
                 if (package.CompressPackages)
                 {
+                    Log.Information("We will recompress game files in this pass");
                     args += " --repack-mode";
                 }
+
+                if (cacheAmountPercent != null){
+                    Log.Information($"Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
+                    args += $" --cache-amount {cacheAmountPercent}";
+                }
+
+                args += " --ipc";
 
                 // Uncomment the next 2 lines and then comment out the IPC call to simulate OK install
                 if (package.DebugNoInstall)
@@ -491,6 +503,16 @@ namespace ALOTInstallerCore.Steps
                 });
 
             return !badFiles.Any();
+        }
+
+        private int? getCacheSizeToUse(ComputerInfo ci){
+            var totalMem = ci.TotalPhysicalMemory;
+            var availableMem = ci.AvailablePhysicalMemory - (1024 * 1024 * 1024); //Available memory - 1GiB
+            if (totalMem > 0 && availableMem > 0 && availableMem < totalMem){
+                return (int?) (availableMem * 100 / totalMem);
+            } else {
+                return null;
+            }
         }
 
         private void showOnlineStorefrontNoUpdateScreen()
