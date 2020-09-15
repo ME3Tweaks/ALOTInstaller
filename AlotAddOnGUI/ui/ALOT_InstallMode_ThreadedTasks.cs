@@ -520,8 +520,16 @@ namespace AlotAddOnGUI
             // Apply hackett convo fix if game is ME3 and game is not already texture modded (scan has not yet taken place)
             if (INSTALLING_THREAD_GAME == 3 && versionInfo == null)
             {
-                fixME3MarsHackettStreamingStates(InstallWorker);
+                try
+                {
+                    fixME3MarsHackettStreamingStates(InstallWorker);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"Error patching mars hackett conversation: {ex.Message}");
+                }
             }
+
             InstallWorker.ReportProgress(completed, new ThreadCommand(UPDATE_OVERALL_TASK, MAINTASK_TEXT));
             InstallWorker.ReportProgress(completed, new ThreadCommand(SHOW_ALL_STAGE_LABELS));
 
@@ -1560,8 +1568,8 @@ namespace AlotAddOnGUI
                 }
             }
 
-#endregion
-#region BioD_CitHub fix
+            #endregion
+            #region BioD_CitHub fix
             {
                 var bioDCithubs = Directory.GetFiles(biogamePath, "BioD_CitHub.pcc", SearchOption.AllDirectories);
                 foreach (var biod_cithubPath in bioDCithubs)
