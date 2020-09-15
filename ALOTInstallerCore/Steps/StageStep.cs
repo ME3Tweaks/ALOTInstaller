@@ -291,7 +291,6 @@ namespace ALOTInstallerCore.Steps
             {
                 var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
                 mf.StagedName = installerFile.GetUsedFilepath();
-                Directory.CreateDirectory(outputDir);
                 // Extract Archive
                 var archiveExtractedN = installerFile.PackageFiles.Any() ? ExtractArchive(installerFile, outputDir) : false;
                 if (archiveExtractedN == null)
@@ -358,6 +357,7 @@ namespace ALOTInstallerCore.Steps
                     }
                     else
                     {
+                        Directory.CreateDirectory(outputDir);
                         ExtractTextureContainer(_installOptions.InstallTarget.Game,
                             installerFile.GetUsedFilepath(),
                             outputDir, installerFile);
@@ -398,7 +398,7 @@ namespace ALOTInstallerCore.Steps
                     {
                         if (Path.GetExtension(sf) == ".mod" && installerFile.StageModFiles)
                         {
-                            var modDest = Path.Combine(stagingDir, Path.GetFileName(sf));
+                            var modDest = Path.Combine(addonStagingPath, Path.GetFileName(sf));
                             Log.Information($"[AICORE] Moving .mod file to staging (due to StageModFiles=true): {sf} -> {modDest}");
                             File.Move(sf, modDest);
                             continue;
@@ -1002,12 +1002,12 @@ namespace ALOTInstallerCore.Steps
             }
 
             //DEBUG ONLY
-            //filesToStage.ReplaceAll(filesToStage.Where(x =>
-            //{
-            //    return x.FriendlyName.Contains("EDI Altern");
+            // filesToStage.ReplaceAll(filesToStage.Where(x =>
+            // {
+            //    return x.FriendlyName.Contains("EDI From");
             //    //var finfo = new FileInfo(x.GetUsedFilepath()).Length;
             //    //return finfo < (250 * 1024 * 1024);
-            //}).ToList());
+            // }).ToList());
 
             return filesToStage.OrderBy(x => x.InstallPriority).ToList();
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using ALOTInstallerConsole.InstallerUI;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore.Helpers;
@@ -172,12 +173,24 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private InstallerFile resolveMutualExclusiveMod(List<InstallerFile> arg)
         {
+            object syncObj = new object();
             var options = arg.Select(x => (ustring)x.FriendlyName).ToList();
             int abortIndex = options.Count;
             options.Add((ustring)"Abort install");
             int selectedIndex = abortIndex;
-            selectedIndex = MessageBox.Query("Select which file to use",
-            "Only one of the following mods can be installed. Select which one to use:", options.ToArray());
+            Application.MainLoop.Invoke(() =>
+            {
+                selectedIndex = MessageBox.Query("Select which file to use", "Only one of the following mods can be installed. Select which one to use:", options.ToArray());
+
+                lock (syncObj)
+                {
+                    Monitor.Pulse(syncObj);
+                }
+            });
+            lock(syncObj){
+                Monitor.Wait(syncObj);
+            }
+            
             if (selectedIndex == abortIndex) return null;
             return arg[selectedIndex];
         }

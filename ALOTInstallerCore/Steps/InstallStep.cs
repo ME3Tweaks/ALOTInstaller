@@ -507,7 +507,7 @@ namespace ALOTInstallerCore.Steps
 
         private int? getCacheSizeToUse(ComputerInfo ci){
             var totalMem = ci.TotalPhysicalMemory;
-            var availableMem = ci.AvailablePhysicalMemory - (1024 * 1024 * 1024); //Available memory - 1GiB
+            var availableMem = ci.AvailablePhysicalMemory - (1024 * 1024 * 1536); //Available memory - 1.5GiB
             if (totalMem > 0 && availableMem > 0 && availableMem < totalMem){
                 return (int?) (availableMem * 100 / totalMem);
             } else {

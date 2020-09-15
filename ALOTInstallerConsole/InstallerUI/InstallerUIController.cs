@@ -6,6 +6,7 @@ using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerCore.Steps.Installer;
 using Terminal.Gui;
+using System.Threading;
 
 namespace ALOTInstallerConsole.InstallerUI
 {
@@ -118,18 +119,15 @@ namespace ALOTInstallerConsole.InstallerUI
 
         private void handleResult(InstallStep.InstallResult installResult, string installString)
         {
-            middleLabel.Visible = topLabel.Visible = bottomLabel.Visible = true;
             if (installResult == InstallStep.InstallResult.InstallOK)
             {
-                middleLabel.Visible = false;
-                topLabel.Text = $"Installed {installString}";
-                bottomLabel.Text = $"Texture installation succeeded. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
+                //bottomLabel.Text = $"Texture installation succeeded. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
             }
             else if (installResult == InstallStep.InstallResult.InstallOKWithWarning)
             {
-                topLabel.Text = $"Installed {installString}";
-                middleLabel.Text = "Installation completed with warnings";
-                bottomLabel.Text = $"Texture installation succeeded with warnings. Check the installer log for more information on these warnings. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
+                //topLabel.Text = $"Installed {installString}";
+                //middleLabel.Text = "Installation completed with warnings";
+                //bottomLabel.Text = $"Texture installation succeeded with warnings. Check the installer log for more information on these warnings. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
             }
             else
             {
@@ -146,16 +144,33 @@ namespace ALOTInstallerConsole.InstallerUI
                 }
                 if (sf != null)
                 {
+                    middleLabel.Visible = topLabel.Visible = bottomLabel.Visible = true;
                     topLabel.Text = sf.FailureTopText;
                     middleLabel.Text = sf.FailureBottomText;
                     bottomLabel.Text = sf.FailureHeaderText;
+                } else {
+                    topLabel.Visible = middleLabel.Visible = true;
+                    bottomLabel.Visible = false;
+
+                    topLabel.Text = "An unknown error has occured";
+                    middleLabel.Text = "View installer log for more info";
                 }
             }
         }
 
-        private void showStorefrontNoUpdateUI(Enums.MEGame obj)
+        private void showStorefrontNoUpdateUI(Enums.MEGame game)
         {
-            throw new System.NotImplementedException();
+            object o = new object();
+            Application.MainLoop.Invoke(() =>
+            {
+                MessageBox.Query("Do not accept updates for Origin/Steam", "Do not let your purchasing platform (Origin/Steam) update your game or install DLC, or your game will become corrupted.", "OK");
+                lock(o){
+                    Monitor.Pulse(o);
+                }
+            });
+            lock(o){
+                Monitor.Wait(o);
+            }
         }
 
         public override void SignalStopping()

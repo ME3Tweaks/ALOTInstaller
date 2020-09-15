@@ -534,6 +534,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     InstallMEUITM = getInstallOptionValue(InstallOptionsStep.InstallOption.MEUITM, installOptionMapping),
                     InstallAddons = getInstallOptionValue(InstallOptionsStep.InstallOption.Addon, installOptionMapping),
                     InstallUserfiles = getInstallOptionValue(InstallOptionsStep.InstallOption.UserFiles, installOptionMapping),
+                    InstallPreinstallMods = getInstallOptionValue(InstallOptionsStep.InstallOption.ALOVMods, installOptionMapping),
                     InstallerMode = ManifestHandler.CurrentMode,
                     CompressPackages = compressPackagesCb.Checked,
                     Limit2K = use2KLodsCb.Checked,

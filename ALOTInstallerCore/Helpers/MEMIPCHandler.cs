@@ -190,9 +190,8 @@ namespace ALOTInstallerCore.Helpers
                     case StandardOutputCommandEvent stdOut:
                     #if DEBUG
                         if (!stdOut.Text.StartsWith("[IPC]CACHE_USAGE")){
-                            
+                            Debug.WriteLine(stdOut.Text);
                         }
-                        Debug.WriteLine(stdOut.Text);
                     #endif
                         if (stdOut.Text.StartsWith(@"[IPC]"))
                         {
