@@ -45,6 +45,7 @@
                 <StackPanel>
                     <StackPanel>
                         <Button Content="Show Installer Flyout" Command="{Binding DebugShowInstallerFlyoutCommand}" Margin="20,0,0,0"/>
+                        <Button Content="Show Origin Flyout" Command="{Binding DebugShowOriginFlyoutCommand}" Margin="20,0,0,0"/>
                     </StackPanel>
                 </StackPanel>
             </Expander>

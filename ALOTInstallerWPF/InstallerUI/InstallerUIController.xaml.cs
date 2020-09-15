@@ -26,6 +26,7 @@ using ALOTInstallerCore.Steps.Installer;
 using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
+using MahApps.Metro.Controls;
 using MahApps.Metro.IconPacks;
 using Serilog;
 
@@ -95,7 +96,7 @@ namespace ALOTInstallerWPF.InstallerUI
                 bgPath += "_alt";
             }
             bgPath += ".jpg";
-            bgPath = $"pack://application:,,,/ALOTInstallerWPF;component/Images{bgPath}";
+            bgPath = $"pack://application:,,,/ALOTInstallerWPF;component/Images{bgPath}"; //IF ASSEMBLY CHANGES THIS MUST BE UPDATED!!
             return new ImageBrush(new BitmapImage(new Uri(bgPath)))
             {
                 Stretch = Stretch.UniformToFill
@@ -127,26 +128,6 @@ namespace ALOTInstallerWPF.InstallerUI
                 codexTips.ReplaceAll(tipsDoc.Root.Element(InstallOptions.InstallTarget.Game.ToString().ToLower()).Descendants("tip").Select(x => x.Value));
                 codexTips.Shuffle();
             }
-            //using (StreamReader reader = new StreamReader(stream))
-            //{
-            //    string result = reader.ReadToEnd();
-            //    try
-            //    {
-            //        XElement rootElement = XElement.Parse(result);
-            //        IEnumerable<XElement> xNames;
-
-            //        xNames = rootElement.Element("me" + INSTALLING_THREAD_GAME).Descendants("tip");
-
-            //        foreach (XElement element in xNames)
-            //        {
-            //            TIPS_LIST.Add(element.Value);
-            //        }
-            //    }
-            //    catch
-            //    {
-            //        //no tips.
-            //    }
-            //}
         }
 
         public GenericCommand ToggleMusicCommand { get; set; }
@@ -208,7 +189,6 @@ namespace ALOTInstallerWPF.InstallerUI
             MusicIcon = musicOn ? PackIconIoniconsKind.VolumeHighMD : PackIconIoniconsKind.VolumeOffMD;
         }
 
-        private Random tipRandom = new Random();
         internal void StartInstall(bool debugMode = false)
         {
 #if DEBUG
@@ -224,7 +204,6 @@ namespace ALOTInstallerWPF.InstallerUI
             TipTimer.Tick += (sender, args) =>
             {
                 TipTimer.Interval = new TimeSpan(0, 0, 20);
-                // code goes here
                 if (codexTips.Count > 1)
                 {
                     CurrentTip = codexTips[tipIndex++ % codexTips.Count];
@@ -313,7 +292,13 @@ namespace ALOTInstallerWPF.InstallerUI
 
         private void showStorefrontNoUpdateUI(Enums.MEGame obj)
         {
-            throw new NotImplementedException();
+            Application.Current.Invoke(() =>
+            {
+                if (Application.Current.MainWindow is MainWindow mw)
+                {
+                    mw.OpenOriginFlyout(obj);
+                }
+            });
         }
 
         public DispatcherTimer TipTimer { get; set; }

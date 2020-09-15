@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Helpers;
@@ -138,6 +139,23 @@ namespace ALOTInstallerWPF
             InstallingOverlayFlyout.IsOpen = true;
             controller.StartInstall(isOpeningDebug);
         }
+
+        public void OpenOriginFlyout(Enums.MEGame game)
+        {
+            var content = new OriginNoUpdateFlyout(game);
+            OriginFlyout.Content = content;
+            OriginFlyout.IsOpen = true;
+        }
+
+        public void CloseOriginFlyoutUI()
+        {
+            OriginFlyout.IsOpen = false;
+            CommonUtil.Run(() =>
+            {
+                OriginFlyout.Content = null; //Remove this so it doesn't keep running. GC will remove it
+            }, TimeSpan.FromSeconds(3));
+        }
+
 
         public void CloseInstallerUI()
         {

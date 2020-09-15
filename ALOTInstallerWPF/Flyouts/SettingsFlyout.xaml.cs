@@ -65,6 +65,7 @@ namespace ALOTInstallerWPF.Flyouts
         public GenericCommand CleanupLibraryCommand { get; set; }
         public GenericCommand CleanupBuildLocationCommand { get; set; }
         public GenericCommand DebugShowInstallerFlyoutCommand { get; set; }
+        public GenericCommand DebugShowOriginFlyoutCommand { get; set; }
         public GenericCommand LogsDiagnosticsCommand { get; set; }
         public GenericCommand OpenLODSwitcherCommand { get; set; }
         public RelayCommand OpenTutorialLinkCommand { get; set; }
@@ -103,6 +104,13 @@ namespace ALOTInstallerWPF.Flyouts
                 {
                     mw.OpenInstallerUI(iuic,
                         InstallerUIController.GetInstallerBackgroundImage(game, ManifestHandler.CurrentMode), true);
+                }
+            });
+            DebugShowOriginFlyoutCommand = new GenericCommand(() =>
+            {
+                if (Application.Current.MainWindow is MainWindow mw)
+                {
+                    mw.OpenOriginFlyout(Enums.MEGame.ME1);
                 }
             });
 #endif
