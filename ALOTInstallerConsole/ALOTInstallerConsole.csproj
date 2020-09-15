@@ -2,7 +2,6 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
 		<StartupObject>ALOTInstallerConsole.Program</StartupObject>
 		<Authors>Mgamerz</Authors>
 		<Company>ME3Tweaks</Company>
@@ -23,24 +22,32 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
+			<TargetFramework>netcoreapp3.1</TargetFramework>
+
   </PropertyGroup>
   	<PropertyGroup Condition="'$(Configuration)'=='WinRelease'">
     <DefineConstants>WINDOWS</DefineConstants>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
+				<TargetFramework>netcoreapp3.1</TargetFramework>
+
   </PropertyGroup>
     	<PropertyGroup Condition="'$(Configuration)'=='LinuxDebug'">
     <DefineConstants>TRACE;DEBUG;LINUX</DefineConstants>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
+				<TargetFramework>net5.0</TargetFramework>
+
   </PropertyGroup>
     	<PropertyGroup Condition="'$(Configuration)'=='Linuxrelease'">
     <DefineConstants>LINUX</DefineConstants>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugType>embedded</DebugType>
     <DebugSymbols>true</DebugSymbols>
+				<TargetFramework>net5.0</TargetFramework>
+
   </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="ComputerInfo" Version="0.1.0-prerelease" />

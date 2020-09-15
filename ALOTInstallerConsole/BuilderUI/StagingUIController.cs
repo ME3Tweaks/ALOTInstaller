@@ -300,9 +300,9 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 FrameView fv = new FrameView($"Thread {i + 1}")
                 {
-                    Width = 55,
+                    Width = 56,
                     Height = 5,
-                    X = Pos.Center() + (i % 2 == 0 ? -57 : 2),
+                    X = Pos.Center() + (i % 2 == 0 ? -57 : 1),
                     Y = Pos.Center() + 2 + (i / 2 * 5)
                 };
                 Add(fv);

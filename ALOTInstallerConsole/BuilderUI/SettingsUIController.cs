@@ -306,7 +306,7 @@ namespace ALOTInstallerConsole.BuilderUI
             Application.Run(selector);
             if (!selector.Canceled && selector.FilePath != null && Directory.Exists(selector.FilePath.ToString()))
             {
-                buildLocation.Text = Settings.BuildLocation = selector.FilePaths.First();
+                buildLocation.Text = Settings.BuildLocation = selector.FilePath.ToString();
             }
         }
 

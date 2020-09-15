@@ -275,6 +275,7 @@ namespace ALOTInstallerCore.Steps
                 BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{_addonID:D3}_ALOTAddon.mem"), _installOptions.InstallTarget.Game, UpdateProgressCallback);
             }
 
+            Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
             e.Result = true;
         }
 

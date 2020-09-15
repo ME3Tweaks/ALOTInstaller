@@ -3,7 +3,7 @@
     "tasks": [
         {
             "label": "buildLinuxDebug",
-            "command": "dotnet",
+            "command": "dotnet-sdk.dotnet",
             "type": "process",
             "args": [
                 "build",
@@ -17,7 +17,7 @@
         },
         {
             "label": "buildLinuxRelease",
-            "command": "dotnet",
+            "command": "dotnet-sdk.dotnet",
             "type": "process",
             "args": [
                 "build",

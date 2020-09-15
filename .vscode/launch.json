@@ -11,7 +11,7 @@
             "request": "launch",
             "preLaunchTask": "buildLinuxDebug",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/ALOTInstallerConsole/bin/LinuxDebug/netcoreapp3.1/ALOTInstallerConsole.dll",
+            "program": "${workspaceFolder}/ALOTInstallerConsole/bin/LinuxDebug/net5.0/ALOTInstallerConsole.dll",
             "args": [],
             "cwd": "${workspaceFolder}/ALOTInstallerConsole",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
@@ -31,7 +31,7 @@
             "request": "launch",
             "preLaunchTask": "buildLinuxRelease",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/ALOTInstallerConsole/bin/LinuxRelease/netcoreapp3.1/ALOTInstallerConsole.dll",
+            "program": "${workspaceFolder}/ALOTInstallerConsole/bin/LinuxRelease/net5.0/ALOTInstallerConsole.dll",
             "args": [],
             "cwd": "${workspaceFolder}/ALOTInstallerConsole",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
