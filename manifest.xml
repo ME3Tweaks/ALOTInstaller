@@ -1205,7 +1205,8 @@
                     size="10154183"
                     unpackedsinglefilename="el_Ashley Complexion Tweak.mem"
                     unpackedsize="10148747"
-                    unpackedmd5="731e784bbeadb8b49e137af3adde1358" />
+                    unpackedmd5="731e784bbeadb8b49e137af3adde1358"
+                    extrainstructions="Ensure you download the &quot;- .MEM&quot; version! The installer will not recognize the 'Main' version."/>
                <packagefile
                     me3="true"
                     sourcename="el_Ashley Complexion Tweak.mem"

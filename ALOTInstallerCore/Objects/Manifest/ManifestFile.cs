@@ -36,6 +36,7 @@ namespace ALOTInstallerCore.Objects.Manifest
             Tooltipname = source.Tooltipname;
             ZipFiles = source.ZipFiles.Select(x => new ZipFile(x)).ToList();
             RecommendationString = source.RecommendationString;
+            ExtraInstructions = source.ExtraInstructions;
             //probably more
         }
         public ManifestFile() { }
@@ -646,6 +647,11 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// Mode this manifest file belongs in
         /// </summary>
         public ManifestMode Mode { get; set; }
+        /// <summary>
+        /// Extra instructions when downloading the file, e.g. to help clear up ambiguity
+        /// </summary>
+        public string ExtraInstructions { get; set; }
+
         /// <summary>
         /// Gets the backing MD5 for this file
         /// </summary>

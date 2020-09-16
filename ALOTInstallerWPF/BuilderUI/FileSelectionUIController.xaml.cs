@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -19,8 +20,11 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerWPF.Flyouts;
+using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
+using Notifications.Wpf.Core;
 using Serilog;
 using Application = System.Windows.Application;
 
@@ -180,10 +184,14 @@ namespace ALOTInstallerWPF.BuilderUI
             DisplayedFilesView.Filter = FilterShownFilesByGame;
 
             startPostStartup();
+
+
         }
 
-        private void startPostStartup()
+        private async void startPostStartup()
         {
+
+
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("PostStartup");
             nbw.DoWork += async (sender, args) =>
             {
@@ -471,9 +479,35 @@ namespace ALOTInstallerWPF.BuilderUI
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        private async void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            Utilities.OpenWebPage(e.Target);
+            if (e.Source is Hyperlink hl && hl.Tag is ManifestFile mf)
+            {
+                try
+                {
+                    Log.Information("Opening URL: " + e.Uri.ToString());
+                    Utilities.OpenWebPage(e.Uri.ToString());
+                    var message = $"Download the file titled '{mf.Tooltipname}'";
+
+                    if (mf.ExtraInstructions != null)
+                    {
+                        message += $"\n\n{mf.ExtraInstructions}";
+                    }
+                    Toaster.ShowNotification("Directions", message, -1, NotificationType.Information);
+                }
+                catch (Exception other)
+                {
+                    Log.Error("Exception opening browser - handled. The error was " + other.Message);
+                    System.Windows.Clipboard.SetText(e.Uri.ToString());
+                    if (Application.Current.MainWindow is MainWindow mw)
+                    {
+                        await mw.ShowMessageAsync("Unable to open web browser",
+                            "Unable to open your default web browser. Open your browser and paste the link (already copied to clipboard) into your URL bar. " +
+                            $"Download the file named {mf.Tooltipname}, then drag and drop it onto this program's interface.");
+
+                    }
+                }
+            }
         }
 
         protected override void OnDragOver(DragEventArgs e)

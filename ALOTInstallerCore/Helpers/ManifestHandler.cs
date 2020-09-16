@@ -73,8 +73,8 @@ namespace ALOTInstallerCore.Helpers
                     url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/ALOT-v4/manifest-beta.xml";
                 }
 
-                var fetchedManifest = webClient.DownloadString(new Uri(url));
-                //var fetchedManifest = File.ReadAllText(@"C:\Users\Mgamerz\source\repos\AlotAddOnGUI\manifest.xml");
+                //var fetchedManifest = webClient.DownloadString(new Uri(url));
+                var fetchedManifest = File.ReadAllText(@"C:\Users\Mgamerz\source\repos\AlotAddOnGUI\manifest.xml");
                 //var fetchedManifest = File.ReadAllText(@"E:\Documents\Visual Studio 2015\Projects\AlotAddOnGUI\manifest.xml");
 
                 if (Utilities.TestXMLIsValid(fetchedManifest))
@@ -331,6 +331,7 @@ namespace ALOTInstallerCore.Helpers
                                                                       }).ToList(),
                                                                   RecommendationString = e.Attribute("recommendation")?.Value,
                                                                   RecommendationReason = e.Attribute("recommendationreason")?.Value,
+                                                                  ExtraInstructions = e.Element("file").Attribute("extrainstructions")?.Value,
                                                               }));
 
                     // ADD TEXTURE MODS
@@ -429,6 +430,7 @@ namespace ALOTInstallerCore.Helpers
                                                                   RecommendationString = e.Attribute("recommendation")?.Value,
                                                                   RecommendationReason = e.Attribute("recommendationreason")?.Value,
                                                                   ComparisonsLink = e.Attribute("comparisonslink")?.Value,
+                                                                  ExtraInstructions = e.Element("file").Attribute("extrainstructions")?.Value,
                                                               }));
 
                     // Build list of files for each mode

@@ -195,7 +195,7 @@
                                     <TextBlock  Margin="5,0">
                                     <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" 
                                                NavigateUri="{Binding DownloadLink}" 
-                                               Tag="{Binding Tooltipname}">
+                                               Tag="{Binding}">
                                         <Hyperlink.Style >
                                             <Style TargetType="Hyperlink"
                                                    BasedOn="{StaticResource {x:Type Hyperlink}}">
