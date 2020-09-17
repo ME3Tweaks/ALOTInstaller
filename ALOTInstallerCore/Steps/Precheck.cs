@@ -107,7 +107,7 @@ namespace ALOTInstallerCore.Steps
             if (blacklistedMods.Any())
             {
                 // Mod(s) that have been blacklisted as incompatible are installed
-                return $"The following mods were detected as installed and are known to be incompatible with texture mods:{string.Join("\n - ", blacklistedMods)}\n\nThese mods cannot be installed if installing textures and should not be used for any reason.";
+                return $"The following mods were detected as installed and are known to be incompatible with texture mods:\n{string.Join("\n - ", blacklistedMods)}\n\nThese mods cannot be installed if installing textures and should not be used for any reason.";
             }
 
             if (pc.target.Game == Enums.MEGame.ME3)
