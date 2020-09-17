@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
@@ -66,6 +67,8 @@ namespace ALOTInstallerCore.Steps
         public static Dictionary<InstallOption, (OptionState state, string reasonForState)> CalculateInstallOptions(
             GameTarget gameTarget, ManifestMode manifestMode, List<InstallerFile> filesForTarget)
         {
+            filesForTarget = filesForTarget.Where(x => x.ApplicableGames.HasFlag(gameTarget.Game.ToApplicableGame()))
+                .ToList();;
             var targetAlotInfo = gameTarget.GetInstalledALOTInfo();
             var options = new Dictionary<InstallOption, (OptionState, string)>();
             if (manifestMode == ManifestMode.Free)
@@ -275,7 +278,7 @@ namespace ALOTInstallerCore.Steps
 
                 // CHECK ADDONS
                 if (filesForTarget.Any(x =>
-                    x is ManifestFile mf && mf.AlotVersionInfo.IsNotVersioned && !(x is PreinstallMod)))
+                    x is ManifestFile mf && mf.AlotVersionInfo.IsNotVersioned && !(x is PreinstallMod) && x.Ready && !x.Disabled))
                 {
                     options[InstallOption.Addon] = (OptionState.CheckedVisible, "Addon files are the non-required files, but should be installed to complete the experience");
                 }
@@ -285,7 +288,7 @@ namespace ALOTInstallerCore.Steps
                 }
 
                 // ALOV FILES
-                if (filesForTarget.Any(x => x is PreinstallMod))
+                if (filesForTarget.Any(x => x is PreinstallMod && x.Ready && !x.Disabled))
                 {
                     options[InstallOption.ALOVMods] = (OptionState.CheckedVisible, "ALOV upscales video files");
                 }
@@ -316,7 +319,7 @@ namespace ALOTInstallerCore.Steps
                                 options[InstallOption.MEUITM] = (OptionState.DisabledVisible,
                                     "Cannot install a different version of MEUITM on top of existing installed version");
                             }
-                            else if (meuitmFile.Ready)
+                            else if (meuitmFile.Ready && !meuitmFile.Disabled)
                             {
                                 options[InstallOption.MEUITM] = (OptionState.UncheckedVisible, "MEUITM already installed");
                             }
@@ -343,7 +346,7 @@ namespace ALOTInstallerCore.Steps
                 }
 
                 // CHECK USER FILES
-                if (filesForTarget.Any(x => x is UserFile && x.Ready))
+                if (filesForTarget.Any(x => x is UserFile && x.Ready && !x.Disabled))
                 {
                     options[InstallOption.UserFiles] = (OptionState.CheckedVisible, "User files are files you manually added for install and are located at the bottom of the list");
                 }

@@ -35,9 +35,9 @@
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='WPFRelease'">
-	  <DefineConstants>TRACE;DEBUG;WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
-	  <DebugType>embedded</DebugType>
-	  <DebugSymbols>true</DebugSymbols>
+		<DefineConstants>TRACE;DEBUG;WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='LinuxDebug'">
 		<DefineConstants>LINUX;DEBUG</DefineConstants>
@@ -54,7 +54,6 @@
 		<PackageReference Include="CliWrap" Version="3.1.0" />
 		<PackageReference Include="ComputerInfo" Version="0.1.0-prerelease" />
 		<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />
-		<!--<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />-->
 		<PackageReference Include="Octokit" Version="0.48.0" />
 		<PackageReference Include="PropertyChanged.Fody" Version="3.2.9" />
 		<PackageReference Include="Serilog" Version="2.9.0" />
@@ -81,15 +80,8 @@
 		<Content Include="Binaries\PermissionsGranter.exe" Condition=" '$(OS)' == 'Windows_NT' ">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
-		<!-- Uncomment when we have other platform wrappers -->
-		<!--<Content Include="libNative.so" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="libNative.dylib" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>-->
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\ME3ExplorerLib\ME3ExplorerCore\ME3ExplorerCore.csproj" />
+		<ProjectReference Include="..\ME3ExplorerLib\ME3ExplorerCore\ME3ExplorerCore.csproj" />
 	</ItemGroup>
 </Project>

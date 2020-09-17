@@ -1,54 +1,49 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<StartupObject>ALOTInstallerConsole.Program</StartupObject>
 		<Authors>Mgamerz</Authors>
 		<Company>ME3Tweaks</Company>
 		<Product>ALOT Installer Console</Product>
-		<Version>4.0.650.0</Version>
+		<Version>4.0.651.0</Version>
 		<Description>Texture installer for the Mass Effect Trilogy (Console version)</Description>
 		<Copyright>2017-2020 ME3Tweaks</Copyright>
 		<Platforms>x64</Platforms>
 		<NoWarn>$(NoWarn);NU1605</NoWarn>
 		<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
-		<Configurations>WinDebug;LinuxDebug;LinuxRelease</Configurations>
-		<AssemblyVersion>4.0.650.0</AssemblyVersion>
-		<FileVersion>4.0.650.0</FileVersion>
+		<Configurations>WinDebug;WinRelease;LinuxDebug;LinuxRelease</Configurations>
+		<AssemblyVersion>4.0.651.0</AssemblyVersion>
+		<FileVersion>4.0.651.0</FileVersion>
 		<ApplicationIcon>ALOTInstallerIcon.ico</ApplicationIcon>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='WinDebug'">
-    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-			<TargetFramework>netcoreapp3.1</TargetFramework>
-
-  </PropertyGroup>
-  	<PropertyGroup Condition="'$(Configuration)'=='WinRelease'">
-    <DefineConstants>WINDOWS</DefineConstants>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-				<TargetFramework>netcoreapp3.1</TargetFramework>
-
-  </PropertyGroup>
-    	<PropertyGroup Condition="'$(Configuration)'=='LinuxDebug'">
-    <DefineConstants>TRACE;DEBUG;LINUX</DefineConstants>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-				<TargetFramework>net5.0</TargetFramework>
-
-  </PropertyGroup>
-    	<PropertyGroup Condition="'$(Configuration)'=='Linuxrelease'">
-    <DefineConstants>LINUX</DefineConstants>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-				<TargetFramework>net5.0</TargetFramework>
-
-  </PropertyGroup>
+		<DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='WinRelease'">
+		<DefineConstants>WINDOWS</DefineConstants>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='LinuxDebug'">
+		<DefineConstants>TRACE;DEBUG;LINUX</DefineConstants>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<TargetFramework>net5.0</TargetFramework>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='LinuxRelease'">
+		<DefineConstants>LINUX</DefineConstants>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<TargetFramework>net5.0</TargetFramework>
+	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="ComputerInfo" Version="0.1.0-prerelease" />
 		<PackageReference Include="Fody" Version="6.2.5">
@@ -63,22 +58,4 @@
 		<ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />
 		<ProjectReference Include="..\gui.cs\Terminal.Gui\Terminal.Gui.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<!-- <Content Include="..\Libraries\Windows\CompressionWrappers.dll" Condition=" '$(OS)' == 'Windows_NT' ">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content> -->
-		<!-- Uncomment when we have other platform wrappers -->
-		<!--<Content Include="libNative.so" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>
-	  <Content Include="libNative.dylib" Condition=" '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </Content>-->
-	</ItemGroup>
-
-	<!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if &quot;$(Configuration)&quot;==&quot;WDebug&quot; xcopy &quot;$(SolutionDir)ALOTInstallerCore\Libraries\Windows&quot; &quot;$(OutDir)&quot; /Y" />
-  </Target>-->
-
 </Project>
