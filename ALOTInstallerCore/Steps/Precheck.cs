@@ -359,7 +359,7 @@ namespace ALOTInstallerCore.Steps
             {
                 bool hasAlot = texturesInfo != null && texturesInfo.ALOTVER > 0;
                 // ALOT main is required if alot is not installed
-                var alotMainFile = manifestFilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER != 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0); //main file only
+                var alotMainFile = manifestFilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER != 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0 && x.ApplicableGames.HasFlag(target.Game.ToApplicableGame())); //main file only
                 if (alotMainFile == null)
                 {
                     Log.Error("[AICORE] ALOT manifest is missing the ALOT main file!");
@@ -391,7 +391,7 @@ namespace ALOTInstallerCore.Steps
                 }
 
                 // ALOT update is required if available in manifest but not installed
-                var alotUpdateFile = manifestFilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTUPDATEVER != 0);
+                var alotUpdateFile = manifestFilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.ALOTUPDATEVER != 0 && x.ApplicableGames.HasFlag(target.Game.ToApplicableGame()));
                 if (alotUpdateFile != null)
                 {
                     // An ALOT update exists for our game

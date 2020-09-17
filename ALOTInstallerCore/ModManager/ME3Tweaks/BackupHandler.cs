@@ -387,7 +387,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
 
                     BackupStatus = "Creating backup";
-                    Log.Information(@"[AICORE] Backing up {targetToBackup.TargetPath} to {backupPath}");
+                    Log.Information($@"[AICORE] Backing up {targetToBackup.TargetPath} to {backupPath}");
                     CopyTools.CopyAll_ProgressBar(new DirectoryInfo(targetToBackup.TargetPath),
                         new DirectoryInfo(backupPath),
                         totalItemsToCopyCallback: totalFilesToCopyCallback,
