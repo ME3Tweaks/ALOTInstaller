@@ -314,16 +314,16 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         /// <param name="hash">Hash check value (md5). Leave null if no hash check</param>
         /// <returns></returns>
 
-        public async static Task<(MemoryStream result, string errorMessage)> DownloadToMemory(string url,
+        public static async Task<(MemoryStream result, string errorMessage)> DownloadToMemory(string url,
             Action<long, long> progressCallback = null,
             string hash = null,
             bool logDownload = false,
-            CancellationTokenSource cancellationTokenSource = default)
+            CancellationTokenSource cancellationTokenSource = null)
         {
             MemoryStream responseStream = new MemoryStream();
             string downloadError = null;
 
-            using var wc = new HttpClientDownloadWithProgress(url, responseStream, cancellationTokenSource);
+            using var wc = new HttpClientDownloadWithProgress(url, responseStream, cancellationTokenSource?.Token ?? default);
             wc.ProgressChanged += (totalFileSize, totalBytesDownloaded, progressPercentage) =>
             {
                 progressCallback?.Invoke(totalBytesDownloaded, totalFileSize ?? 0);

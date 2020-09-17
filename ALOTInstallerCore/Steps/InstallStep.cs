@@ -323,12 +323,12 @@ namespace ALOTInstallerCore.Steps
 
                 if (package.CompressPackages)
                 {
-                    Log.Information("We will recompress game files in this pass");
+                    Log.Information("[AICORE] We will recompress game files in this pass");
                     args += " --repack-mode";
                 }
 
                 if (cacheAmountPercent != null){
-                    Log.Information($"Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
+                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
                     args += $" --cache-amount {cacheAmountPercent}";
                 }
 

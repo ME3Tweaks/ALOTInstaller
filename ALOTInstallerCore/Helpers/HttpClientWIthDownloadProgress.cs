@@ -33,11 +33,11 @@ namespace ALOTInstallerCore.Helpers
             this.cancellationToken = cancellationToken.Token;
         }
 
-        public HttpClientDownloadWithProgress(string downloadUrl, Stream outputStream, CancellationTokenSource cancellationToken = null)
+        public HttpClientDownloadWithProgress(string downloadUrl, Stream outputStream, CancellationToken cancellationToken = default)
         {
             _downloadUrl = downloadUrl;
             _outStream = outputStream;
-            this.cancellationToken = cancellationToken.Token;
+            this.cancellationToken = cancellationToken;
         }
 
         public async Task<HttpResponseMessage> StartDownload()
