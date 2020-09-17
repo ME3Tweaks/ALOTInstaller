@@ -17,15 +17,22 @@ namespace ALOTInstallerConsole
         private static void setWrapperLogger(ILogger logger) => Log.Logger = logger;
         static void Main(string[] args)
         {
-            Application.Init();
-            //Initialize ALOT Installer library
-            ALOTInstallerCoreLib.Startup(setWrapperLogger, action =>
+            var bufferHeight = Console.BufferHeight;
+            try
             {
+                Application.Init();
+                //Initialize ALOT Installer library
+                ALOTInstallerCoreLib.Startup(setWrapperLogger, action => { });
 
-            });
-
-            var startupUI = new BuilderUI.StartupUIController();
-            Program.SwapToNewView(startupUI);
+                var startupUI = new BuilderUI.StartupUIController();
+                Program.SwapToNewView(startupUI);
+            }
+            catch (Exception e)
+            {
+                // Unhandled exception!
+                Console.BufferHeight = bufferHeight; //Restore
+                Console.Error.WriteLine(e.FlattenWithTrace());
+            }
         }
 
         private static UIController _currentController;
