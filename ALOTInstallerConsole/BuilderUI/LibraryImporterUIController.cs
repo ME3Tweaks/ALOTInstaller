@@ -15,8 +15,7 @@ namespace ALOTInstallerConsole.BuilderUI
 {
     public static class LibraryImporterController
     {
-
-        public static void LoadUserFile()
+        public static UserFile LoadUserFile()
         {
             OpenDialog selector = new OpenDialog("Select file",
                 "Supported extensions: .7z, .rar, .zip, .dds, .mem, .tpf, .mod, .png, .tga")
@@ -31,7 +30,7 @@ namespace ALOTInstallerConsole.BuilderUI
             if (!selector.Canceled && selector.FilePaths.Any() && File.Exists(selector.FilePaths.First()))
             {
                 var selectedFile = selector.FilePaths.First();
-                if (!ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].UserFiles.Any(X => X.FullFilePath == selectedFile))
+                ApplicableGame? getGame(string name)
                 {
 
                     ApplicableGame games = ApplicableGame.None;
@@ -40,27 +39,25 @@ namespace ALOTInstallerConsole.BuilderUI
                     if (Locations.ME2Target != null) paths.Add("ME2");
                     if (Locations.ME3Target != null) paths.Add("ME3");
                     paths.Add("Abort");
-                    var selectedIndex = MessageBox.Query("Select game", $"Select which game {Path.GetFileName(selectedFile)} applies to.", paths.Select(x => (ustring)x.ToString()).ToArray());
-                    if (paths[selectedIndex] == "Abort" || selectedIndex < 0) return;
-                    games = Enum.Parse<ApplicableGame>(paths[selectedIndex]);
-
-                    UserFile uf = new UserFile()
-                    {
-                        AlotVersionInfo = new TextureModInstallationInfo(0, 0, 0, 0),
-                        ApplicableGames = games,
-                        FullFilePath = selector.FilePath.ToString(),
-                        FriendlyName = Path.GetFileNameWithoutExtension(selectedFile),
-                        Filename = Path.GetFileName(selectedFile),
-                        FileSize = new FileInfo(selectedFile).Length
-                    };
-                    ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].UserFiles.Add(uf);
+                    var selectedIndex = MessageBox.Query("Select game", $"Select which game {name} applies to.", paths.Select(x => (ustring)x.ToString()).ToArray());
+                    if (paths[selectedIndex] == "Abort" || selectedIndex < 0) return null;
+                    return Enum.Parse<ApplicableGame>(paths[selectedIndex]);
                 }
-                else
+
+
+                var failureReason = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode]
+                    .AttemptAddUserFile(selectedFile,
+                        getGame,
+                        out var addedUserfile);
+                if (failureReason == null)
                 {
-                    MessageBox.Query("Already added", "This user file is already loaded for install.", "OK");
+                    return addedUserfile;
                 }
-
+                MessageBox.Query("Error adding user file", failureReason);
+                return null;
             }
+
+            return null;
         }
 
         public static void ImportManifestFilesFromFolder()

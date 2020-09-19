@@ -45,7 +45,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         }
 
         /// <summary>
-        /// Attempts to add a user file with the specified backing PIM
+        /// Attempts to add a user file. Returns a failure reason if the file could not be added, or null if it was.
         /// </summary>
         /// <param name="matchingPim"></param>
         public string AttemptAddUserFile(string filepath, Func<string, ApplicableGame?> getGame, out UserFile addedUserFile)

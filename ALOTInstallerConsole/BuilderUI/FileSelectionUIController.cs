@@ -294,7 +294,12 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void AddUserFiles()
         {
-            LibraryImporterController.LoadUserFile();
+            var uf = LibraryImporterController.LoadUserFile();
+            if (uf != null)
+            {
+                dataSource.ShownFiles.Add(uf);
+                Application.Refresh();
+            }
         }
 
         private void ImportManifestFiles()
@@ -634,6 +639,10 @@ namespace ALOTInstallerConsole.BuilderUI
             ManifestHandler.SetCurrentMode(newMode);
             SetLeftsideTitle();
             RefreshShownFiles();
+            if (dataSource.ShownFiles.Any())
+            {
+                ManifestFilesListView.SelectedItem = 0;
+            }
         }
 
         private void SetLeftsideTitle()
@@ -644,10 +653,9 @@ namespace ALOTInstallerConsole.BuilderUI
         private void RefreshShownFiles()
         {
             TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode));
-            var userFiles = dataSource.ShownFiles.Where(x => x is UserFile);
             dataSource.ShownFiles.Clear();
-            dataSource.ShownFiles.AddRange(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode).Where(x => (x.ApplicableGames & VisibleGames) != 0));
-            dataSource.ShownFiles.AddRange(userFiles);
+            dataSource.ShownFiles.AddRange(ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].ManifestFiles.Where(x => (x.ApplicableGames & VisibleGames) != 0));
+            dataSource.ShownFiles.AddRange(ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].UserFiles.Where(x => (x.ApplicableGames & VisibleGames) != 0));
             Application.Refresh();
 
             var selectedIndex = ManifestFilesListView.SelectedItem;
