@@ -31,13 +31,13 @@ steps:
   inputs:
     command: 'build'
     projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
-    arguments: '-c WinRelease'
+    arguments: '-c WinRelease --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
     projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
-    arguments: '-c WPFRelease'
+    arguments: '-c WPFRelease --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
 
 #- task: VSTest@2
 #  inputs:
