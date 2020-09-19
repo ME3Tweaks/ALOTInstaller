@@ -328,7 +328,7 @@ namespace ALOTInstallerWPF.BuilderUI
 
         private bool CanInstallTextures()
         {
-            return CurrentModeFiles.Any(x => x.Ready);
+            return CurrentModeFiles.Any(x => x.Ready && !x.Disabled);
         }
 
         private async void BeginInstallTextures()
@@ -343,6 +343,15 @@ namespace ALOTInstallerWPF.BuilderUI
                 var targets = Locations.GetAllAvailableTargets().Where(
                     g => mp.UserFiles.Any(x => x.ApplicableGames.HasFlag(g.Game.ToApplicableGame())) ||
                          mp.ManifestFiles.Any(x => x.ApplicableGames.HasFlag(g.Game.ToApplicableGame()))).ToList();
+
+                if (!targets.Any())
+                {
+                    // There are no targets that can be installed to
+                    await mw.ShowMessageAsync("No files are ready for any installed game",
+                        "There are no files that are ready to install to any currently installed games. Add files that can be installed to a game you current have installed and try again.");
+                    return;
+                }
+
                 List<Enums.MEGame> availableGames = new List<Enums.MEGame>();
                 foreach (var game in targets)
                 {

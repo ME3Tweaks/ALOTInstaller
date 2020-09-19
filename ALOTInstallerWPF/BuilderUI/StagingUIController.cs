@@ -215,7 +215,6 @@ namespace ALOTInstallerWPF.BuilderUI
                         if (iop.FilesToInstall != null)
                         {
                             // BEGIN INSTALLATION!
-                            // Todo: This stuff
                             var iuic = new InstallerUIController(iop)
                             {
                                 InstallerTextTop = "Preparing texture installer",
