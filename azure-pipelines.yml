@@ -25,7 +25,7 @@ steps:
   inputs:
     command: 'build'
     projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
-    arguments: '-c  --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+    arguments: '-c LinuxRelease --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
 
 - task: DotNetCoreCLI@2
   inputs:
