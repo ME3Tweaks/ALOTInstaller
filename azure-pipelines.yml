@@ -15,6 +15,20 @@ steps:
 - checkout: self
   submodules: true 
  
+# Change artifact name when the version major/minor changes
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      $xml = [xml](Get-Content .\SharedAssemblyInfo.proj)
+      $verstr= $xml.Project.PropertyGroup.Version
+      $ver = New-Object System.Version($verstr)
+      $ver = New-Object System.Version($ver.Major, $ver.Minor, $ver.Build, [int]$(Build.BuildId))
+      $xml.Project.PropertyGroup.Version = $ver.ToString()
+      $xml.Save("SharedAssemblyInfo.proj")
+      Write-Host "Version: $($ver)"
+
+
 - task: NuGetToolInstaller@1
 
 - task: NuGetCommand@2
@@ -26,7 +40,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
-    arguments: '-c LinuxRelease --output "Output/Linux/ALOTInstallerConsole" --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+    arguments: '-c LinuxRelease --output "Output/Linux" --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
     zipAfterPublish: false
 
 - task: ArchiveFiles@2
@@ -42,7 +56,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '**/ALOTInstallerConsole.csproj'
-    arguments: '-c WinRelease --output "Output/Windows/ALOTInstallerConsole" --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+    arguments: '-c WinRelease --output "Output/Windows" --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
     zipAfterPublish: false
 
 - task: ArchiveFiles@2
@@ -58,7 +72,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '**/ALOTInstallerWPF.csproj'
-    arguments: '-c WPFRelease --output "Output/Windows/ALOTInstallerWPF" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
+    arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
     zipAfterPublish: false
 
 - task: ArchiveFiles@2
