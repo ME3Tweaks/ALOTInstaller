@@ -58,7 +58,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: '**/ALOTInstallerConsole.csproj'
+    projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
     arguments: '-c WinRelease --output "Output/Windows" --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
     zipAfterPublish: false
 
@@ -74,7 +74,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: '**/ALOTInstallerWPF.csproj'
+    projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
     zipAfterPublish: false
 
