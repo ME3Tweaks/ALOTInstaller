@@ -1,100 +1,96 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <Platforms>x64</Platforms>
-    <Company>ME3Tweaks</Company>
-    <Version>4.0.651.0</Version>
-    <Authors>ME3Tweaks</Authors>
-    <Product>ALOT Installer</Product>
-    <Description>Texture installer for the original Mass Effect Trilogy</Description>
-    <Copyright>ME3Tweaks 2017 - 2020</Copyright>
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <Configurations>WPFDebug;WPFRelease</Configurations>
-    <ApplicationIcon>ALOTInstallerIcon.ico</ApplicationIcon>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="Images\alot_me1_bg.jpg" />
-    <None Remove="Images\alot_me1_bg_alt.jpg" />
-    <None Remove="Images\alot_me2_bg.jpg" />
-    <None Remove="Images\alot_me2_bg_alt.jpg" />
-    <None Remove="Images\alot_me3_bg.jpg" />
-    <None Remove="Images\alot_me3_bg_alt.jpg" />
-    <None Remove="Images\logo_me1.png" />
-    <None Remove="Images\logo_me2.png" />
-    <None Remove="Images\logo_me3.png" />
-    <None Remove="Images\logo_mem.png" />
-    <None Remove="Images\meuitm_me1_bg.jpg" />
-    <None Remove="Images\origin\me1update.png" />
-    <None Remove="Images\origin\me2update.png" />
-    <None Remove="InstallerUI\installtips.xml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="MahApps.Metro.IconPacks.Ionicons" Version="4.4.0" />
-    <PackageReference Include="Microsoft.AppCenter" Version="3.4.1" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="3.4.1" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="3.4.1" />
-    <PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
-    <PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
-    <PackageReference Include="Notifications.Wpf.Core" Version="1.3.1" />
-    <PackageReference Include="PropertyChanged.Fody" Version="3.2.9" />
-    <PackageReference Include="Serilog" Version="2.10.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
-  </ItemGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<Platforms>x64</Platforms>
+		<Product>ALOT Installer</Product>
+		<Description>Texture installer for the original Mass Effect Trilogy</Description>
+		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+		<Configurations>WPFDebug;WPFRelease</Configurations>
+		<ApplicationIcon>ALOTInstallerIcon.ico</ApplicationIcon>
+	</PropertyGroup>
+	<Import Project="..\SharedAssemblyInfo.proj" />
+	<ItemGroup>
+		<None Remove="Images\alot_me1_bg.jpg" />
+		<None Remove="Images\alot_me1_bg_alt.jpg" />
+		<None Remove="Images\alot_me2_bg.jpg" />
+		<None Remove="Images\alot_me2_bg_alt.jpg" />
+		<None Remove="Images\alot_me3_bg.jpg" />
+		<None Remove="Images\alot_me3_bg_alt.jpg" />
+		<None Remove="Images\logo_me1.png" />
+		<None Remove="Images\logo_me2.png" />
+		<None Remove="Images\logo_me3.png" />
+		<None Remove="Images\logo_mem.png" />
+		<None Remove="Images\meuitm_me1_bg.jpg" />
+		<None Remove="Images\origin\me1update.png" />
+		<None Remove="Images\origin\me2update.png" />
+		<None Remove="InstallerUI\installtips.xml" />
+	</ItemGroup>
 
 	<ItemGroup>
-    <Content Include="InstallerUI\installtips.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+		<PackageReference Include="CommandLineParser" Version="2.8.0" />
+		<PackageReference Include="MahApps.Metro.IconPacks.Ionicons" Version="4.4.0" />
+		<PackageReference Include="Microsoft.AppCenter" Version="3.4.1" />
+		<PackageReference Include="Microsoft.AppCenter.Analytics" Version="3.4.1" />
+		<PackageReference Include="Microsoft.AppCenter.Crashes" Version="3.4.1" />
+		<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
+		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
+		<PackageReference Include="Notifications.Wpf.Core" Version="1.3.1" />
+		<PackageReference Include="PropertyChanged.Fody" Version="3.2.9" />
+		<PackageReference Include="Serilog" Version="2.10.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)'=='WPFDebug'">
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
-	  <XamlDebuggingInformation>True</XamlDebuggingInformation>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='WPFRelease'">
-    <DebugType>embedded</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>WINDOWS</DefineConstants>
-  </PropertyGroup>
+	<ItemGroup>
+		<Content Include="InstallerUI\installtips.xml">
+			<SubType>Designer</SubType>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />
-    <ProjectReference Include="..\MahApps.Metro\src\MahApps.Metro\MahApps.Metro.csproj" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='WPFDebug'">
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
+		<XamlDebuggingInformation>True</XamlDebuggingInformation>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='WPFRelease'">
+		<DebugType>embedded</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+		<DefineConstants>WINDOWS</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Resource Include="Images\logo_me1.png" />
-    <Resource Include="Images\logo_me2.png" />
-    <Resource Include="Images\logo_me3.png" />
-    <Resource Include="Images\logo_mem.png" />
-    <Resource Include="Images\alot_me1_bg.jpg" />
-    <Resource Include="Images\alot_me1_bg_alt.jpg" />
-    <Resource Include="Images\alot_me2_bg.jpg" />
-    <Resource Include="Images\alot_me2_bg_alt.jpg" />
-    <Resource Include="Images\alot_me3_bg.jpg" />
-    <Resource Include="Images\alot_me3_bg_alt.jpg" />
-    <Resource Include="Images\meuitm_me1_bg.jpg" />
-    <Resource Include="Images\origin\me1update.png" />
-    <Resource Include="Images\origin\me2update.png" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />
+		<ProjectReference Include="..\MahApps.Metro\src\MahApps.Metro\MahApps.Metro.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Dialogs\ModConfigurationDialog.xaml.cs">
-      <DependentUpon>ModConfigurationDialog.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="Images\logo_me1.png" />
+		<Resource Include="Images\logo_me2.png" />
+		<Resource Include="Images\logo_me3.png" />
+		<Resource Include="Images\logo_mem.png" />
+		<Resource Include="Images\alot_me1_bg.jpg" />
+		<Resource Include="Images\alot_me1_bg_alt.jpg" />
+		<Resource Include="Images\alot_me2_bg.jpg" />
+		<Resource Include="Images\alot_me2_bg_alt.jpg" />
+		<Resource Include="Images\alot_me3_bg.jpg" />
+		<Resource Include="Images\alot_me3_bg_alt.jpg" />
+		<Resource Include="Images\meuitm_me1_bg.jpg" />
+		<Resource Include="Images\origin\me1update.png" />
+		<Resource Include="Images\origin\me2update.png" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="Dialogs\ModConfigurationDialog.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Dialogs\ModConfigurationDialog.xaml.cs">
+			<DependentUpon>ModConfigurationDialog.xaml</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Dialogs\ModConfigurationDialog.xaml">
+			<SubType>Designer</SubType>
+		</Page>
+	</ItemGroup>
 </Project>

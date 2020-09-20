@@ -19,6 +19,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MahApps.Metro", "MahApps.Me
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ME3ExplorerCore", "ME3ExplorerLib\ME3ExplorerCore\ME3ExplorerCore.csproj", "{4CBBBCE7-7E1B-4C45-9071-AF7F9C2704D9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{705CAF8D-FCC2-4DC4-B4B3-9591BEECB65E}"
+	ProjectSection(SolutionItems) = preProject
+		SharedAssemblyInfo.proj = SharedAssemblyInfo.proj
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		LinuxDebug|x64 = LinuxDebug|x64
