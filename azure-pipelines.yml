@@ -42,6 +42,22 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
+    projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
+    arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true -v detailed'
+    zipAfterPublish: false
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
+    includeRootFolder: false
+    archiveType: '7z'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
+    replaceExistingArchive: true
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
     projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
     arguments: '-c LinuxRelease --output "Output/Linux" --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
     zipAfterPublish: false
@@ -70,21 +86,6 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
     replaceExistingArchive: true
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
-    arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
-    zipAfterPublish: false
-
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
-    includeRootFolder: false
-    archiveType: '7z'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
-    replaceExistingArchive: true
 
 - task: PublishBuildArtifacts@1
   inputs:
