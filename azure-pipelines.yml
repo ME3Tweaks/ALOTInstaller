@@ -31,27 +31,44 @@ steps:
   inputs:
     rootFolderOrFile: 'Output/Linux/ALOTInstallerConsole'
     includeRootFolder: false
-    archiveType: '7z'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/AIWPF/ALOTInstallerWPF_4.0.$(Build.BuildId).7z'
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_4.0.$(Build.BuildId).zip'
     replaceExistingArchive: true
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/AIWPF/'
-    ArtifactName: 'ALOTInstallerWPF_4.0.$(Build.BuildId)'
-    publishLocation: 'Container'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
     projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
-    arguments: '-c WinRelease --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+    arguments: '-c WinRelease --output "Output/Windows/ALOTInstallerConsole" --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: 'Output/Windows/ALOTInstallerConsole'
+    includeRootFolder: false
+    archiveType: '7z'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_4.0.$(Build.BuildId).7z'
+    replaceExistingArchive: true
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
     projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
-    arguments: '-c WPFRelease --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
+    arguments: '-c WPFRelease --output "Output/Windows/ALOTInstallerWPF" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
 
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
+    includeRootFolder: false
+    archiveType: '7z'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_4.0.$(Build.BuildId).7z'
+    replaceExistingArchive: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'ALOTInstaller_Build$(Build.BuildId)'
+    publishLocation: 'Container'
+    
 #- task: VSTest@2
 #  inputs:
 #    platform: '$(buildPlatform)'
