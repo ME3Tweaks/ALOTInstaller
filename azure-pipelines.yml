@@ -25,8 +25,21 @@ steps:
   inputs:
     command: 'build'
     projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
-    arguments: '-c LinuxRelease --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+    arguments: '-c LinuxRelease --output "Output/Linux/ALOTInstallerConsole" --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
 
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: 'Output/Linux/ALOTInstallerConsole'
+    includeRootFolder: false
+    archiveType: '7z'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/AIWPF/ALOTInstallerWPF_4.0.$(Build.BuildId).7z'
+    replaceExistingArchive: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/AIWPF/'
+    ArtifactName: 'ALOTInstallerWPF_4.0.$(Build.BuildId)'
+    publishLocation: 'Container'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
