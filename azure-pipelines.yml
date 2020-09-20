@@ -64,7 +64,7 @@ steps:
     rootFolderOrFile: 'Output/Windows/ALOTInstallerConsole'
     includeRootFolder: false
     archiveType: '7z'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(version).7z'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(ver).7z'
     replaceExistingArchive: true
 
 - task: DotNetCoreCLI@2
@@ -80,13 +80,13 @@ steps:
     rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
     includeRootFolder: false
     archiveType: '7z'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(version).7z'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(ver).7z'
     replaceExistingArchive: true
 
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'ALOTInstaller_Build_$(version)'
+    ArtifactName: 'ALOTInstaller_Build_$(ver)'
     publishLocation: 'Container'
     
 #- task: VSTest@2
