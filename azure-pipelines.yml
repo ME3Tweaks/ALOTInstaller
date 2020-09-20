@@ -34,9 +34,9 @@ steps:
 
 - task: NuGetToolInstaller@1
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
+#- task: NuGetCommand@2
+#  inputs:
+#    restoreSolution: '$(solution)'
 
 - task: DotNetCoreCLI@2
   inputs:
@@ -45,6 +45,12 @@ steps:
     projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true -v detailed'
     zipAfterPublish: false
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      Get-ChildItem -Path MahApps.Metro/src/Mahapps.Metro -Recurse
 
 - task: ArchiveFiles@2
   inputs:
