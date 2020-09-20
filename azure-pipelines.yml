@@ -24,8 +24,10 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
-    projects: '**/ALOTInstallerConsole.csproj'
+    publishWebProjects: false
+    projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
     arguments: '-c LinuxRelease --output "Output/Linux/ALOTInstallerConsole" --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+    zipAfterPublish: false
 
 - task: ArchiveFiles@2
   inputs:
@@ -38,8 +40,10 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
+    publishWebProjects: false
     projects: '**/ALOTInstallerConsole.csproj'
     arguments: '-c WinRelease --output "Output/Windows/ALOTInstallerConsole" --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+    zipAfterPublish: false
 
 - task: ArchiveFiles@2
   inputs:
@@ -52,8 +56,10 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
+    publishWebProjects: false
     projects: '**/ALOTInstallerWPF.csproj'
     arguments: '-c WPFRelease --output "Output/Windows/ALOTInstallerWPF" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
+    zipAfterPublish: false
 
 - task: ArchiveFiles@2
   inputs:
