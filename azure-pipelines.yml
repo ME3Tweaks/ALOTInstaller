@@ -27,6 +27,7 @@ steps:
       $xml.Project.PropertyGroup.Version = $ver.ToString()
       $xml.Save("SharedAssemblyInfo.proj")
       Write-Host "Version: $($ver)"
+      echo "##vso[task.setvariable variable=VER]$($ver)"
 
 
 - task: NuGetToolInstaller@1
@@ -48,7 +49,7 @@ steps:
     rootFolderOrFile: 'Output/Linux/ALOTInstallerConsole'
     includeRootFolder: false
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(version).zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(VER).zip'
     replaceExistingArchive: true
 
 - task: DotNetCoreCLI@2
@@ -64,7 +65,7 @@ steps:
     rootFolderOrFile: 'Output/Windows/ALOTInstallerConsole'
     includeRootFolder: false
     archiveType: '7z'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(ver).7z'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
     replaceExistingArchive: true
 
 - task: DotNetCoreCLI@2
@@ -80,13 +81,13 @@ steps:
     rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
     includeRootFolder: false
     archiveType: '7z'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(ver).7z'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
     replaceExistingArchive: true
 
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'ALOTInstaller_Build_$(ver)'
+    ArtifactName: '$(VER) Builds'
     publishLocation: 'Container'
     
 #- task: VSTest@2
