@@ -32,7 +32,7 @@ steps:
     rootFolderOrFile: 'Output/Linux/ALOTInstallerConsole'
     includeRootFolder: false
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_4.0.$(Build.BuildId).zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_4.0.$(Build.BuildId).zip'
     replaceExistingArchive: true
 
 - task: DotNetCoreCLI@2
