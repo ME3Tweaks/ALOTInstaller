@@ -36,9 +36,6 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.AppCenter" Version="3.4.2" />
-		<PackageReference Include="Microsoft.AppCenter.Analytics" Version="3.4.2" />
-		<PackageReference Include="Microsoft.AppCenter.Crashes" Version="3.4.2" />
 		<PackageReference Include="PropertyChanged.Fody" Version="3.2.9" />
 		<PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
 	</ItemGroup>
