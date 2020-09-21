@@ -69,7 +69,7 @@
                 </TabControl.Resources>
                 <TabControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type objects:ModeHeader}">
-                        <TextBlock Text="{Binding ModeText}" ToolTip="{Binding ModeDescription}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
+                        <TextBlock Text="{Binding ModeText}" ToolTip="{Binding ModeDescription}" TextWrapping="Wrap"/>
                     </DataTemplate>
                 </TabControl.ItemTemplate>
                 <TabControl.ContentTemplate>

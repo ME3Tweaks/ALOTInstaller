@@ -172,7 +172,7 @@ namespace ALOTInstallerCore.Helpers
                 XElement rootElement = XElement.Parse(manifestText);
 
                 #region Master Manifest
-                string version = (string)rootElement.Attribute("version") ?? "";
+                string masterVersion = (string)rootElement.Attribute("version") ?? "";
                 MasterManifest.MusicPackMirrors =
                     (from mpm in rootElement.Descendants("musicpackmirror")
                      select new MusicPackMirror()
@@ -280,7 +280,7 @@ namespace ALOTInstallerCore.Helpers
                         mp.ModeDescription = manifestElement.Attribute("description")?.Value;
                         string manifestVersion = manifestElement.Attribute("version")?.Value;
                         Log.Information($"[AICORE] {mode} manifest version: {manifestVersion}");
-                        mp.ManifestVersion = version;
+                        mp.ManifestVersion = manifestVersion;
                         MasterManifest.ManifestModePackageMappping[mode] = mp;
                     }
                 }

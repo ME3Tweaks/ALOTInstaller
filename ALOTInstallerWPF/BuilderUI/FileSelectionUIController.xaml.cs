@@ -412,10 +412,10 @@ namespace ALOTInstallerWPF.BuilderUI
                     return
                         "Install whatever you want. Has no file requirements, however files will not be specifically parsed like in other modes";
                 case ManifestMode.MEUITM:
-                    return $"Install MEUITM using MEUITM mode defaults. Can also install user files\n\nManifest version: {manifestVersion}";
+                    return $"Install MEUITM using MEUITM mode defaults. Can also install user files.\nManifest version: {manifestVersion}";
                 case ManifestMode.ALOT:
                     return
-                        $"Install ALOT and MEUITM (if applicable) with ALOT defaults. Can also install user files. This is the default mode\n\nManifest version: {manifestVersion}";
+                        $"Install ALOT and MEUITM (if applicable) with ALOT defaults. Can also install user files. This is the default mode.\nManifest version: {manifestVersion}";
                 default:
                     return null;
             }
