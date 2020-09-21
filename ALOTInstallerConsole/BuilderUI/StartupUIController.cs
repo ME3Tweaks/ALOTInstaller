@@ -25,14 +25,6 @@ namespace ALOTInstallerConsole.BuilderUI
         #endregion
         public override void BeginFlow()
         {
-            //List<string> items = new List<string>();
-            //for (int i = 0; i < 50; i++)
-            //{
-            //    items.Add("TEST I AM A LINE SHOW ME PLS LINE " + i);
-            //}
-            var syncContext = TaskScheduler.FromCurrentSynchronizationContext();
-
-            //ScrollDialog.Prompt("Scroll dialog", "This is top message", "This is bottom message", items, Colors.Menu, "OK");
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += (a, b) =>
             {

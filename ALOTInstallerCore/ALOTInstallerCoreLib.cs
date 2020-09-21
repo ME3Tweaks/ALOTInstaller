@@ -37,8 +37,6 @@ namespace ALOTInstallerCore
                 Log.Information("[AICORE] Telemetry callback being invoked (if any is set)");
                 startTelemetryCallback?.Invoke();
             }
-
-
         }
 
         /// <summary>

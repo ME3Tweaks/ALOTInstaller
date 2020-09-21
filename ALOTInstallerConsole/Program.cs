@@ -2,11 +2,17 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Xml.Linq;
+using ALOTInstallerConsole.Telemetry;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Serilog;
 using Terminal.Gui;
 
@@ -22,7 +28,7 @@ namespace ALOTInstallerConsole
             {
                 Application.Init();
                 //Initialize ALOT Installer library
-                ALOTInstallerCoreLib.Startup(setWrapperLogger, action => { });
+                ALOTInstallerCoreLib.Startup(setWrapperLogger, action => { }, startTelemetry, stopTelemetry);
 
                 var startupUI = new BuilderUI.StartupUIController();
                 Program.SwapToNewView(startupUI);
@@ -50,17 +56,64 @@ namespace ALOTInstallerConsole
             Application.Run(controller);
         }
 
-        //static void debug()
-        //{
-        //    var xml = File.ReadAllText(@"C:\users\mgamerz\desktop\t.txt");
-        //    XDocument x = XDocument.Parse(xml);
-        //    foreach (var v in x.Root.Elements("supportedhash"))
-        //    {
-        //        if (v.Attribute("game").Value == "me3")
-        //        {
-        //            Debug.WriteLine($"[@\"{v.Value}\"] = @\"{v.Attribute("name").Value}\",");
-        //        }
-        //    }
-        //}
+        private static void startTelemetry()
+        {
+            initAppCenter();
+            AppCenter.SetEnabledAsync(true);
+        }
+
+        private static void stopTelemetry()
+        {
+            AppCenter.SetEnabledAsync(false);
+        }
+
+        private static bool telemetryStarted = false;
+
+        private static void initAppCenter()
+        {
+
+#if DEBUG
+            if (APIKeys.HasAppCenterKey && !telemetryStarted)
+            {
+                Crashes.GetErrorAttachments = (ErrorReport report) =>
+                {
+                    var attachments = new List<ErrorAttachmentLog>();
+                    // Attach some text.
+                    string errorMessage = "ALOT Installer Console has crashed! This is the exception that caused the crash:\n" + report.StackTrace;
+                    Log.Fatal(errorMessage);
+                    Log.Error("Note that this exception may appear to occur in a follow up boot due to how appcenter works");
+                    string log = LogCollector.CollectLatestLog(false);
+                    if (log.Length < 1024 * 1024 * 7)
+                    {
+                        attachments.Add(ErrorAttachmentLog.AttachmentWithText(log, "crashlog.txt"));
+                    }
+                    else
+                    {
+                        //Compress log
+                        var compressedLog = SevenZipHelper.LZMA.CompressToLZMAFile(Encoding.UTF8.GetBytes(log));
+                        attachments.Add(ErrorAttachmentLog.AttachmentWithBinary(compressedLog, "crashlog.txt.lzma", "application/x-lzma"));
+                    }
+
+                    // Attach binary data.
+                    //var fakeImage = System.Text.Encoding.Default.GetBytes("Fake image");
+                    //ErrorAttachmentLog binaryLog = ErrorAttachmentLog.AttachmentWithBinary(fakeImage, "ic_launcher.jpeg", "image/jpeg");
+
+                    return attachments;
+                };
+                AppCenter.Start(APIKeys.AppCenterKey, typeof(Analytics), typeof(Crashes));
+            }
+#else
+            if (!APIKeys.HasAppCenterKey)
+            {
+                Debug.WriteLine(" >>> This build is missing an API key for AppCenter!");
+            }
+            else
+            {
+                Debug.WriteLine("This build has an API key for AppCenter");
+            }
+#endif
+            telemetryStarted = true;
+
+        }
     }
 }
