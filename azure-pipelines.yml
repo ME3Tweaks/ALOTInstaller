@@ -52,82 +52,82 @@ steps:
       #(Get-Content .\ME3Explorer\Properties\AssemblyInfo.cs).replace("0`"","$(Build.BuildId)`"") | out-file -FilePath .\ME3Explorer\Properties\AssemblyInfo.cs
       
 
+- task: NuGetToolInstaller@1
 
-# - task: NuGetToolInstaller@1
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
+    arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
+    zipAfterPublish: false
 
-# #- task: NuGetCommand@2
-# #  inputs:
-# #    restoreSolution: '$(solution)'
+# A second build is required cause of some "fun" things in Mahapp's xamlcombiner
+# The first build will NOT work for AI WPF
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
+    arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true -v detailed'
+    zipAfterPublish: false
 
-# - task: DotNetCoreCLI@2
-#   inputs:
-#     command: 'publish'
-#     publishWebProjects: false
-#     projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
-#     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
-#     zipAfterPublish: false
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
+    includeRootFolder: false
+    archiveType: '7z'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
+    replaceExistingArchive: true
 
-# - task: DotNetCoreCLI@2
-#   inputs:
-#     command: 'publish'
-#     publishWebProjects: false
-#     projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
-#     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true -v detailed'
-#     zipAfterPublish: false
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
+    arguments: '-c LinuxRelease --output "Output/Linux" --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+    zipAfterPublish: false
 
-# - task: PowerShell@2
-#   inputs:
-#     targetType: 'inline'
-#     script: |
-#       Get-ChildItem -Path MahApps.Metro/src/Mahapps.Metro -Recurse
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: 'Output/Linux/ALOTInstallerConsole'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(VER).zip'
+    replaceExistingArchive: true
 
-# - task: ArchiveFiles@2
-#   inputs:
-#     rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
-#     includeRootFolder: false
-#     archiveType: '7z'
-#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
-#     replaceExistingArchive: true
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
+    arguments: '-c WinRelease --output "Output/Windows" --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+    zipAfterPublish: false
 
-# - task: DotNetCoreCLI@2
-#   inputs:
-#     command: 'publish'
-#     publishWebProjects: false
-#     projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
-#     arguments: '-c LinuxRelease --output "Output/Linux" --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
-#     zipAfterPublish: false
-
-# - task: ArchiveFiles@2
-#   inputs:
-#     rootFolderOrFile: 'Output/Linux/ALOTInstallerConsole'
-#     includeRootFolder: false
-#     archiveType: 'zip'
-#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(VER).zip'
-#     replaceExistingArchive: true
-
-# - task: DotNetCoreCLI@2
-#   inputs:
-#     command: 'publish'
-#     publishWebProjects: false
-#     projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
-#     arguments: '-c WinRelease --output "Output/Windows" --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
-#     zipAfterPublish: false
-
-# - task: ArchiveFiles@2
-#   inputs:
-#     rootFolderOrFile: 'Output/Windows/ALOTInstallerConsole'
-#     includeRootFolder: false
-#     archiveType: '7z'
-#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
-#     replaceExistingArchive: true
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: 'Output/Windows/ALOTInstallerConsole'
+    includeRootFolder: false
+    archiveType: '7z'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
+    replaceExistingArchive: true
 
 
-# - task: PublishBuildArtifacts@1
-#   inputs:
-#     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-#     ArtifactName: '$(VER) Builds'
-#     publishLocation: 'Container'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: '$(VER) Builds'
+    publishLocation: 'Container'
     
+# Notify ME3Tweaks that a build has occured
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Webrequest using powershell since invokerestapi doesn't work on anything but server jobs
+      Invoke-WebRequest -Uri $(me3tweaksBuildEndpoint)
+    errorActionPreference: 'continue'
+
 - task: ado-discord-webhook@1
   inputs:
     channelId: '$(discord_channel_id)'
