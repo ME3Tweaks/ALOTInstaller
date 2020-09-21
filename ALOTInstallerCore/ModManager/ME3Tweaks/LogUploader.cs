@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using ALOTInstallerCore.Helpers;
+using ME3ExplorerCore.Compression;
 using Serilog;
 
 namespace ALOTInstallerCore.ModManager.ME3Tweaks
@@ -51,7 +52,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             //var logtext = logUploadText.ToString();
             //if (logtext != null)
             //{
-            var lzmalog = SevenZipHelper.LZMA.CompressToLZMAFile(Encoding.UTF8.GetBytes(logtext));
+            var lzmalog = LZMA.CompressToLZMAFile(Encoding.UTF8.GetBytes(logtext));
             var lzmamd5 = Utilities.CalculateMD5(new MemoryStream(lzmalog));
             try
             {

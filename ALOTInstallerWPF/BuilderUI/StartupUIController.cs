@@ -20,6 +20,7 @@ using ControlzEx.Theming;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using MassEffectModManagerCore.modmanager.asi;
+using ME3ExplorerCore.Compression;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
@@ -46,7 +47,6 @@ namespace ALOTInstallerWPF.BuilderUI
 
         private static void initAppCenter()
         {
-
 #if DEBUG
             if (APIKeys.HasAppCenterKey && !telemetryStarted)
             {
@@ -65,7 +65,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     else
                     {
                         //Compress log
-                        var compressedLog = SevenZipHelper.LZMA.CompressToLZMAFile(Encoding.UTF8.GetBytes(log));
+                        var compressedLog = LZMA.CompressToLZMAFile(Encoding.UTF8.GetBytes(log));
                         attachments.Add(ErrorAttachmentLog.AttachmentWithBinary(compressedLog, "crashlog.txt.lzma", "application/x-lzma"));
                     }
 
@@ -88,7 +88,6 @@ namespace ALOTInstallerWPF.BuilderUI
             }
 #endif
             telemetryStarted = true;
-
         }
 
         public static async void BeginFlow(MetroWindow window)
@@ -259,7 +258,7 @@ namespace ALOTInstallerWPF.BuilderUI
 
 
                 pd.SetMessage("Preparing interface");
-                Thread.Sleep(500); // This will allow this message to show up for moment so user can see it.
+                Thread.Sleep(250); // This will allow this message to show up for moment so user can see it.
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     if (Application.Current.MainWindow is MainWindow mw)

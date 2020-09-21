@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
+using ME3ExplorerCore.Compression;
 using Octokit;
 using Serilog;
 
@@ -166,7 +167,7 @@ namespace ALOTInstallerCore
                         
                         // Handle unzip code here.
                         statusMessageUpdate?.Invoke("Extracting MassEffectModderNoGui");
-                        var res = SevenZipHelper.LZMA.ExtractSevenZipArchive(downloadPath, Locations.AppDataFolder(), true);
+                        var res = LZMA.ExtractSevenZipArchive(downloadPath, Locations.AppDataFolder(), true);
                     }
                     else
                     {

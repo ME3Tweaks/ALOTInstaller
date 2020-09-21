@@ -7,6 +7,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using AuthenticodeExaminer;
+using ME3ExplorerCore.Compression;
 using Octokit;
 using Serilog;
 
@@ -206,7 +207,7 @@ namespace ALOTInstallerCore
             var outDir = Path.Combine(Locations.TempDirectory(), Path.GetFileNameWithoutExtension(assetFilename));
             var archiveFile = Path.Combine(Locations.TempDirectory(), assetFilename);
             ms.WriteToFile(archiveFile);
-            if (SevenZipHelper.LZMA.ExtractSevenZipArchive(archiveFile, outDir))
+            if (LZMA.ExtractSevenZipArchive(archiveFile, outDir))
             {
                 // Extraction complete
 #if WINDOWS

@@ -9,6 +9,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Compression;
 using Serilog;
 
 namespace ALOTInstallerCore.ModManager.Services
@@ -59,7 +60,7 @@ namespace ALOTInstallerCore.ModManager.Services
             //var compressedSize = stream.Length - stream.Position;
 
             var compressedBuffer = stream.ReadToBuffer(stream.Length - stream.Position);
-            var decompressedBuffer = SevenZipHelper.LZMA.Decompress(compressedBuffer, (uint)decompressedSize);
+            var decompressedBuffer = LZMA.Decompress(compressedBuffer, (uint)decompressedSize);
             if (decompressedBuffer.Length != decompressedSize)
             {
                 throw new Exception(@"Vanilla database failed to decompress");
