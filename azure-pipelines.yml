@@ -46,11 +46,11 @@ steps:
       # Author-------------------------------------------
       $author = git log -1 --pretty=format:'%an'
       Write-Host "##vso[task.setvariable variable=author]$author"
-      # API Keys and versioning--------------------------
-      #$apikeysprivatefile = "namespace ME3Explorer`n{`n    public static partial class APIKeys`n    {`n        public static string Private_AppCenter {get;} = `"$(AppCenterKey)`";`n    }`n}"
-      #Set-Content -Path "$(Build.Repository.LocalPath)\ME3Explorer\APIKeysPrivate.cs" -Value $apikeysprivatefile
-      #(Get-Content .\ME3Explorer\Properties\AssemblyInfo.cs).replace("0`"","$(Build.BuildId)`"") | out-file -FilePath .\ME3Explorer\Properties\AssemblyInfo.cs
-      
+      # API Keys--------------------------
+      $apikeysprivatefilewpf = "namespace ALOTInstallerWPF.Telemetry`n{`n    public static partial class APIKeys`n    {`n        public static string Private_AppCenter {get;} = `"$(AppCenterKeyAlpha)`";`n    }`n}"
+      Set-Content -Path "$(Build.Repository.LocalPath)\ALOTInstallerWPF\Telemetry\APIKeysPrivate.cs" -Value $apikeysprivatefilewpf
+      $apikeysprivatefileconsole = "namespace ALOTInstallerConsole.Telemetry`n{`n    public static partial class APIKeys`n    {`n        public static string Private_AppCenter {get;} = `"$(AppCenterKeyAlpha)`";`n    }`n}"
+      Set-Content -Path "$(Build.Repository.LocalPath)\ALOTInstallerConsole\Telemetry\APIKeysPrivate.cs" -Value $apikeysprivatefileconsole
 
 - task: NuGetToolInstaller@1
 
@@ -151,6 +151,10 @@ steps:
         {
           "name": "Author",
           "value": "$(author)"
+        },
+        {
+          "name": "Branch",
+          "value": "$(Build.SourceBranchName)"
         },
         {
           "name": "Version",
