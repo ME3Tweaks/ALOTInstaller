@@ -46,13 +46,13 @@ steps:
     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
     zipAfterPublish: false
 
-# - task: DotNetCoreCLI@2
-#   inputs:
-#     command: 'publish'
-#     publishWebProjects: false
-#     projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
-#     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true -v detailed'
-#     zipAfterPublish: false
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
+    arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true -v detailed'
+    zipAfterPublish: false
 
 - task: PowerShell@2
   inputs:
