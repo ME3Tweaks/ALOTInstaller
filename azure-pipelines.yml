@@ -20,6 +20,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
+      # Set version of application
       $xml = [xml](Get-Content .\SharedAssemblyInfo.proj)
       $verstr= $xml.Project.PropertyGroup.Version
       $ver = New-Object System.Version($verstr)
@@ -31,12 +32,27 @@ steps:
       Write-Host "Version: $($ver)"
       echo "##vso[task.setvariable variable=VER]$($ver)"
 
+      # Date--------------------------------------------
+      $date=$(Get-Date -Format s);
+      Write-Host "##vso[task.setvariable variable=time]$date"
+
+      # Commit Message (Multiliner)-----------------------
+      $commitMessageFull = git log -1 --pretty=%B
+      $numlines = $($commitMessageFull | measure).Count
+      if ($numlines > 0) { 
+        $commitMessageFull=[system.String]::Join(" ", $commitMessageFull)
+      }
+      Write-Host "##vso[task.setvariable variable=commitMessageFull]$commitMessageFull"
+      # Author-------------------------------------------
+      $author = git log -1 --pretty=format:'%an'
+      Write-Host "##vso[task.setvariable variable=author]$author"
+      # API Keys and versioning--------------------------
+      #$apikeysprivatefile = "namespace ME3Explorer`n{`n    public static partial class APIKeys`n    {`n        public static string Private_AppCenter {get;} = `"$(AppCenterKey)`";`n    }`n}"
+      #Set-Content -Path "$(Build.Repository.LocalPath)\ME3Explorer\APIKeysPrivate.cs" -Value $apikeysprivatefile
+      #(Get-Content .\ME3Explorer\Properties\AssemblyInfo.cs).replace("0`"","$(Build.BuildId)`"") | out-file -FilePath .\ME3Explorer\Properties\AssemblyInfo.cs
+      
 
 - task: NuGetToolInstaller@1
-
-#- task: NuGetCommand@2
-#  inputs:
-#    restoreSolution: '$(solution)'
 
 - task: DotNetCoreCLI@2
   inputs:
@@ -46,19 +62,15 @@ steps:
     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
     zipAfterPublish: false
 
-# - task: DotNetCoreCLI@2
-#   inputs:
-#     command: 'publish'
-#     publishWebProjects: false
-#     projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
-#     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true -v detailed'
-#     zipAfterPublish: false
-
-- task: PowerShell@2
+# A second build is required cause of some "fun" things in Mahapp's xamlcombiner
+# The first build will NOT work for AI WPF
+- task: DotNetCoreCLI@2
   inputs:
-    targetType: 'inline'
-    script: |
-      Get-ChildItem -Path MahApps.Metro/src/Mahapps.Metro -Recurse
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
+    arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true -v detailed'
+    zipAfterPublish: false
 
 - task: ArchiveFiles@2
   inputs:
@@ -107,6 +119,47 @@ steps:
     ArtifactName: '$(VER) Builds'
     publishLocation: 'Container'
     
+# Notify ME3Tweaks that a build has occured
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Webrequest using powershell since invokerestapi doesn't work on anything but server jobs
+      Invoke-WebRequest -Uri $(me3tweaksBuildEndpoint)
+    errorActionPreference: 'continue'
+
+- task: ado-discord-webhook@1
+  inputs:
+    channelId: '$(discord_channel_id)'
+    webhookKey: '$(discord_webhook_key)'
+    name: 'Azure DevOps CI'
+    avatar: 'https://i.imgur.com/mUtPj2S.png'
+    messageType: 'embeds'
+    embeds: |
+      [{
+        "title": "ALOT Installer Build Complete",
+        "description": "A new set of nightly builds of ALOT Installer have been built. Click this link, then expand the dropdown and download the archive for your platform/interface. Nightly builds may be unstable and have bugs.",
+        "thumbnail": {
+          "url": "https://i.imgur.com/mUtPj2S.png",
+          "height": 64,
+          "width": 64
+        },
+        "fields": [{
+          "name": "Triggering commit",
+          "value": "$(commitMessageFull)"
+        },
+        {
+          "name": "Author",
+          "value": "$(author)"
+        },
+        {
+          "name": "Version",
+          "value": "$(VER)"
+        }],
+        "url": "https://dev.azure.com/ME3Tweaks/ALOT%20Installer/_build/results?buildId=$(Build.BuildId)&view=artifacts",
+        "timestamp": "$(time)"
+      }]
+      
 #- task: VSTest@2
 #  inputs:
 #    platform: '$(buildPlatform)'
