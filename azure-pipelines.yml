@@ -20,6 +20,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
+      # Set version of application
       $xml = [xml](Get-Content .\SharedAssemblyInfo.proj)
       $verstr= $xml.Project.PropertyGroup.Version
       $ver = New-Object System.Version($verstr)
@@ -30,6 +31,26 @@ steps:
       $xml.Save("SharedAssemblyInfo.proj")
       Write-Host "Version: $($ver)"
       echo "##vso[task.setvariable variable=VER]$($ver)"
+
+      # Date--------------------------------------------
+      $date=$(Get-Date -Format s);
+      Write-Host "##vso[task.setvariable variable=time]$date"
+
+      # Commit Message (Multiliner)-----------------------
+      $commitMessageFull = git log -1 --pretty=%B
+      $numlines = $($commitMessageFull | measure).Count
+      if ($numlines > 0) { 
+        $commitMessageFull=[system.String]::Join(" ", $commitMessageFull)
+      }
+      Write-Host "##vso[task.setvariable variable=commitMessageFull]$commitMessageFull"
+      # Author-------------------------------------------
+      $author = git log -1 --pretty=format:'%an'
+      Write-Host "##vso[task.setvariable variable=author]$author"
+      # API Keys and versioning--------------------------
+      #$apikeysprivatefile = "namespace ME3Explorer`n{`n    public static partial class APIKeys`n    {`n        public static string Private_AppCenter {get;} = `"$(AppCenterKey)`";`n    }`n}"
+      #Set-Content -Path "$(Build.Repository.LocalPath)\ME3Explorer\APIKeysPrivate.cs" -Value $apikeysprivatefile
+      #(Get-Content .\ME3Explorer\Properties\AssemblyInfo.cs).replace("0`"","$(Build.BuildId)`"") | out-file -FilePath .\ME3Explorer\Properties\AssemblyInfo.cs
+      
 
 
 # - task: NuGetToolInstaller@1
