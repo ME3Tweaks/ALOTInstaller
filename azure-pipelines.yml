@@ -32,80 +32,80 @@ steps:
       echo "##vso[task.setvariable variable=VER]$($ver)"
 
 
-- task: NuGetToolInstaller@1
+# - task: NuGetToolInstaller@1
 
-#- task: NuGetCommand@2
-#  inputs:
-#    restoreSolution: '$(solution)'
+# #- task: NuGetCommand@2
+# #  inputs:
+# #    restoreSolution: '$(solution)'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
-    arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
-    zipAfterPublish: false
+# - task: DotNetCoreCLI@2
+#   inputs:
+#     command: 'publish'
+#     publishWebProjects: false
+#     projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
+#     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
+#     zipAfterPublish: false
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
-    arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true -v detailed'
-    zipAfterPublish: false
+# - task: DotNetCoreCLI@2
+#   inputs:
+#     command: 'publish'
+#     publishWebProjects: false
+#     projects: 'ALOTInstallerWPF/ALOTInstallerWPF.csproj'
+#     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true -v detailed'
+#     zipAfterPublish: false
 
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: |
-      Get-ChildItem -Path MahApps.Metro/src/Mahapps.Metro -Recurse
+# - task: PowerShell@2
+#   inputs:
+#     targetType: 'inline'
+#     script: |
+#       Get-ChildItem -Path MahApps.Metro/src/Mahapps.Metro -Recurse
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
-    includeRootFolder: false
-    archiveType: '7z'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
-    replaceExistingArchive: true
+# - task: ArchiveFiles@2
+#   inputs:
+#     rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
+#     includeRootFolder: false
+#     archiveType: '7z'
+#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
+#     replaceExistingArchive: true
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
-    arguments: '-c LinuxRelease --output "Output/Linux" --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
-    zipAfterPublish: false
+# - task: DotNetCoreCLI@2
+#   inputs:
+#     command: 'publish'
+#     publishWebProjects: false
+#     projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
+#     arguments: '-c LinuxRelease --output "Output/Linux" --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+#     zipAfterPublish: false
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: 'Output/Linux/ALOTInstallerConsole'
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(VER).zip'
-    replaceExistingArchive: true
+# - task: ArchiveFiles@2
+#   inputs:
+#     rootFolderOrFile: 'Output/Linux/ALOTInstallerConsole'
+#     includeRootFolder: false
+#     archiveType: 'zip'
+#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(VER).zip'
+#     replaceExistingArchive: true
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
-    arguments: '-c WinRelease --output "Output/Windows" --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
-    zipAfterPublish: false
+# - task: DotNetCoreCLI@2
+#   inputs:
+#     command: 'publish'
+#     publishWebProjects: false
+#     projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
+#     arguments: '-c WinRelease --output "Output/Windows" --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
+#     zipAfterPublish: false
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: 'Output/Windows/ALOTInstallerConsole'
-    includeRootFolder: false
-    archiveType: '7z'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
-    replaceExistingArchive: true
+# - task: ArchiveFiles@2
+#   inputs:
+#     rootFolderOrFile: 'Output/Windows/ALOTInstallerConsole'
+#     includeRootFolder: false
+#     archiveType: '7z'
+#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
+#     replaceExistingArchive: true
 
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: '$(VER) Builds'
-    publishLocation: 'Container'
+# - task: PublishBuildArtifacts@1
+#   inputs:
+#     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+#     ArtifactName: '$(VER) Builds'
+#     publishLocation: 'Container'
     
 - task: ado-discord-webhook@1
   inputs:
