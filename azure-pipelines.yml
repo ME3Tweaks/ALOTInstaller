@@ -113,6 +113,12 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
     replaceExistingArchive: true
 
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
+    artifact: 'ALOT Installer WPF (Windows) $(VER)'
+    publishLocation: 'pipeline'
+
 #Publish AIWPF Win
 - task: PublishBuildArtifacts@1
   inputs:
