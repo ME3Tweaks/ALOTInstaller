@@ -112,18 +112,21 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
     replaceExistingArchive: true
 
+#Publish AIConsole Win
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z)'
     ArtifactName: 'ALOT Installer Console (Windows) $(VER)'
     publishLocation: 'Container'
-    - task: PublishBuildArtifacts@1
-  
+
+#Publish AIConsole Linux
+- task: PublishBuildArtifacts@1  
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(VER).zip'
     ArtifactName: '$ALOT Installer Console (Linux) $(VER)'
     publishLocation: 'Container'
 
+#Publish AIWPF )Win
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
