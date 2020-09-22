@@ -80,6 +80,14 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
     replaceExistingArchive: true
 
+
+#Publish AIWPF Win
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
+    ArtifactName: '$ALOT Installer WPF (Windows) $(VER)'
+    publishLocation: 'Container'
+    
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
@@ -126,12 +134,6 @@ steps:
     ArtifactName: '$ALOT Installer Console (Linux) $(VER)'
     publishLocation: 'Container'
 
-#Publish AIWPF )Win
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
-    ArtifactName: '$ALOT Installer WPF (Windows) $(VER)'
-    publishLocation: 'Container'
     
 # Notify ME3Tweaks that a build has occured
 - task: PowerShell@2
