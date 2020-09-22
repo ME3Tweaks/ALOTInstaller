@@ -80,13 +80,6 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
     replaceExistingArchive: true
 
-
-#Publish AIWPF Win
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
-    ArtifactName: '$ALOT Installer WPF (Windows) $(VER)'
-    publishLocation: 'Container'
     
 - task: DotNetCoreCLI@2
   inputs:
@@ -120,10 +113,17 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
     replaceExistingArchive: true
 
+#Publish AIWPF Win
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
+    ArtifactName: '$ALOT Installer WPF (Windows) $(VER)'
+    publishLocation: 'Container'
+
 #Publish AIConsole Win
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
     ArtifactName: 'ALOT Installer Console (Windows) $(VER)'
     publishLocation: 'Container'
 
