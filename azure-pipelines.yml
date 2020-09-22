@@ -72,13 +72,13 @@ steps:
     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
     zipAfterPublish: false
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
-    includeRootFolder: false
-    archiveType: '7z'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
-    replaceExistingArchive: true
+# - task: ArchiveFiles@2
+#   inputs:
+#     rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
+#     includeRootFolder: false
+#     archiveType: '7z'
+#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
+#     replaceExistingArchive: true
 
     
 - task: DotNetCoreCLI@2
@@ -89,13 +89,13 @@ steps:
     arguments: '-c LinuxRelease --output "Output/Linux" --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
     zipAfterPublish: false
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: 'Output/Linux/ALOTInstallerConsole'
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(VER).zip'
-    replaceExistingArchive: true
+# - task: ArchiveFiles@2
+#   inputs:
+#     rootFolderOrFile: 'Output/Linux/ALOTInstallerConsole'
+#     includeRootFolder: false
+#     archiveType: 'zip'
+#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(VER).zip'
+#     replaceExistingArchive: true
 
 - task: DotNetCoreCLI@2
   inputs:
@@ -105,40 +105,34 @@ steps:
     arguments: '-c WinRelease --output "Output/Windows" --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
     zipAfterPublish: false
 
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: 'Output/Windows/ALOTInstallerConsole'
-    includeRootFolder: false
-    archiveType: '7z'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
-    replaceExistingArchive: true
+# - task: ArchiveFiles@2
+#   inputs:
+#     rootFolderOrFile: 'Output/Windows/ALOTInstallerConsole'
+#     includeRootFolder: false
+#     archiveType: '7z'
+#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
+#     replaceExistingArchive: true
 
+#WinUI
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
+    targetPath: 'Output/Windows/ALOTInstallerWPF.exe'
     artifact: 'ALOT Installer WPF (Windows) $(VER)'
     publishLocation: 'pipeline'
 
-#Publish AIWPF Win
-- task: PublishBuildArtifacts@1
+#WinConsole
+- task: PublishPipelineArtifact@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
-    ArtifactName: '$ALOT Installer WPF (Windows) $(VER)'
-    publishLocation: 'Container'
+    targetPath: 'Output/Windows/ALOTInstallerConsole.exe'
+    artifact: 'ALOT Installer Console (Windows) $(VER)'
+    publishLocation: 'pipeline'
 
-#Publish AIConsole Win
-- task: PublishBuildArtifacts@1
+#Linux
+- task: PublishPipelineArtifact@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
-    ArtifactName: 'ALOT Installer Console (Windows) $(VER)'
-    publishLocation: 'Container'
-
-#Publish AIConsole Linux
-- task: PublishBuildArtifacts@1  
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(VER).zip'
-    ArtifactName: '$ALOT Installer Console (Linux) $(VER)'
-    publishLocation: 'Container'
+    targetPath: 'Output/Linux/ALOTInstallerConsole'
+    artifact: 'ALOT Installer Console (Linux) $(VER)'
+    publishLocation: 'pipeline'
 
     
 # Notify ME3Tweaks that a build has occured
