@@ -116,21 +116,21 @@ steps:
 #WinUI
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: 'Output/Windows/ALOTInstallerWPF.exe'
+    targetPath: 'Output/Windows/ALOTInstallerWPF/ALOTInstallerWPF.exe'
     artifact: 'ALOT Installer WPF (Windows) $(VER)'
     publishLocation: 'pipeline'
 
 #WinConsole
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: 'Output/Windows/ALOTInstallerConsole.exe'
+    targetPath: 'Output/Windows/ALOTInstallerConsole/ALOTInstallerConsole.exe'
     artifact: 'ALOT Installer Console (Windows) $(VER)'
     publishLocation: 'pipeline'
 
 #Linux
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: 'Output/Linux/ALOTInstallerConsole'
+    targetPath: 'Output/Linux/ALOTInstallerConsole/ALOTInstallerConsole'
     artifact: 'ALOT Installer Console (Linux) $(VER)'
     publishLocation: 'pipeline'
 
