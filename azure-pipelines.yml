@@ -112,11 +112,22 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
     replaceExistingArchive: true
 
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z)'
+    ArtifactName: 'ALOT Installer Console (Windows) $(VER)'
+    publishLocation: 'Container'
+    - task: PublishBuildArtifacts@1
+  
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(VER).zip'
+    ArtifactName: '$ALOT Installer Console (Linux) $(VER)'
+    publishLocation: 'Container'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: '$(VER) Builds'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
+    ArtifactName: '$ALOT Installer WPF (Windows) $(VER)'
     publishLocation: 'Container'
     
 # Notify ME3Tweaks that a build has occured
