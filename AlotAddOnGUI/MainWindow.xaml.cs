@@ -828,12 +828,10 @@ namespace AlotAddOnGUI
                         {
                             continue; //latest release has no assets
                         }
-                        if (latestReleaseWithAsset != null)
-                        {
-                            latestReleaseWithAsset = r;
-                        }
+                        
                         int releaseNameInt = Convert.ToInt32(r.TagName);
-                        if (releaseNameInt > fileVersion)
+                        if (releaseNameInt > fileVersion 
+                            && releaseNameInt <= 421) // End of V3 supported MEM versions
                         {
                             if (USING_BETA)
                             {
@@ -889,18 +887,13 @@ namespace AlotAddOnGUI
                         }
                         else
                         {
-                            Log.Information("Latest release that is available and has been approved for ALOT Installer is v" + releaseNameInt + " - no update available for us");
+                            Log.Information("Latest release that is available and has been approved for ALOT Installer is v" + releaseNameInt + " - no update available for us. ALOT Installer v3 cannot use MassEffectModderNoGui versions above v421.");
                             break;
                         }
                     }
 
                     //No local version, no latest, but we have asset available somehwere
-                    if (fileVersion == 0 && latest == null && latestReleaseWithAsset != null)
-                    {
-                        Log.Information("MEM No Gui does not exist locally, and no applicable version can be found, pulling latest from github");
-                        latest = latestReleaseWithAsset;
-                    }
-                    else if (fileVersion == 0 && latestReleaseWithAsset == null)
+                    if (fileVersion == 0 && latestReleaseWithAsset == null)
                     {
                         //No local version, and we have no server version
                         Log.Error("Cannot pull a copy of MassEffectModderNoGui from server, could not find one with assets. ALOT Installer will have severely limited functionality.");
