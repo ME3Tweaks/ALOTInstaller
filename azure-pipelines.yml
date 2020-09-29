@@ -72,15 +72,13 @@ steps:
     arguments: '-c WPFRelease --output "Output/Windows" --runtime win-x64 /p:PublishSingleFile=true /p:PublishReadyToRun=true'
     zipAfterPublish: false
 
-# - task: ArchiveFiles@2
-#   inputs:
-#     rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF'
-#     includeRootFolder: false
-#     archiveType: '7z'
-#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerWPF_$(VER).7z'
-#     replaceExistingArchive: true
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Change name since .NET Core SDK still has not been fixed to support easily changing targetname via csproj
+      Rename-Item "Output/Windows/ALOTInstallerWPF/ALOTInstallerWPF.exe" -NewName "Output/Windows/ALOTInstallerWPF/ALOTInstaller.exe"
 
-    
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
@@ -88,14 +86,6 @@ steps:
     projects: 'ALOTInstallerConsole/ALOTInstallerConsole.csproj'
     arguments: '-c LinuxRelease --output "Output/Linux" --runtime linux-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
     zipAfterPublish: false
-
-# - task: ArchiveFiles@2
-#   inputs:
-#     rootFolderOrFile: 'Output/Linux/ALOTInstallerConsole'
-#     includeRootFolder: false
-#     archiveType: 'zip'
-#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Linux_$(VER).zip'
-#     replaceExistingArchive: true
 
 - task: DotNetCoreCLI@2
   inputs:
@@ -105,18 +95,11 @@ steps:
     arguments: '-c WinRelease --output "Output/Windows" --runtime win-x64 /p:PublishTrimmed=true /p:PublishSingleFile=true'
     zipAfterPublish: false
 
-# - task: ArchiveFiles@2
-#   inputs:
-#     rootFolderOrFile: 'Output/Windows/ALOTInstallerConsole'
-#     includeRootFolder: false
-#     archiveType: '7z'
-#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOTInstallerConsole_Win_$(VER).7z'
-#     replaceExistingArchive: true
 
 #WinUI
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: 'Output/Windows/ALOTInstallerWPF/ALOTInstallerWPF.exe'
+    targetPath: 'Output/Windows/ALOTInstallerWPF/ALOTInstaller.exe'
     artifact: 'ALOT Installer WPF (Windows) $(VER)'
     publishLocation: 'pipeline'
 
