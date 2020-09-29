@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Xml.Linq;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
@@ -21,6 +22,9 @@ namespace ALOTInstallerConsole
             try
             {
                 Application.Init();
+                var sc = new SynchronizationContext();
+                SynchronizationContext.SetSynchronizationContext(sc);
+
                 //Initialize ALOT Installer library
                 ALOTInstallerCoreLib.Startup(setWrapperLogger, action => { });
 

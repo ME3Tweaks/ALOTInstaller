@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
@@ -544,6 +545,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     CompressPackages = compressPackagesCb.Checked,
                     Limit2K = use2KLodsCb.Checked,
                     ImportNewlyUnpackedFiles = reimportUnpackedFiles.Checked,
+                    UiThreadScheduler = TaskScheduler.FromCurrentSynchronizationContext(),
 #if DEBUG
                     DebugNoInstall = debugNoInstallCb.Checked
 #endif
