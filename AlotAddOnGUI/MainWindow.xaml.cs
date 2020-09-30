@@ -828,11 +828,17 @@ namespace AlotAddOnGUI
                         {
                             continue; //latest release has no assets
                         }
-                        
+
                         int releaseNameInt = Convert.ToInt32(r.TagName);
-                        if (releaseNameInt > fileVersion 
-                            && releaseNameInt <= 421) // End of V3 supported MEM versions
+                        if (releaseNameInt > fileVersion)
                         {
+                            if (releaseNameInt > 421)
+                            {
+                                // V3 doesn't support versions > 421
+                                Log.Information($"ALOTInstaller V3 doesn't support MEMNoGui versions above 421. {releaseNameInt} is not an applicable release for this product");
+                                continue;
+                            }
+
                             if (USING_BETA)
                             {
                                 latest = r;
