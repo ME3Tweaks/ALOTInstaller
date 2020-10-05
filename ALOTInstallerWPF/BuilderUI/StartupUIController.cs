@@ -195,14 +195,6 @@ namespace ALOTInstallerWPF.BuilderUI
                 pd.SetIndeterminate();
                 pd.SetTitle("Starting up");
 
-                pd.SetMessage("Loading installer framework");
-                ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
-
-                BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
-
-                pd.SetMessage("Loading installer manifests");
-                var alotManifestModePackage = ManifestHandler.LoadMasterManifest(x => pd.SetMessage(x));
-
                 void downloadProgressChanged(long bytes, long total)
                 {
                     //Log.Information("Download: "+bytes);
@@ -215,14 +207,25 @@ namespace ALOTInstallerWPF.BuilderUI
                     // ?? What do we do here.
                 }
 
+
+                pd.SetMessage("Checking for MassEffectModderNoGui updates");
+                MEMUpdater.UpdateMEM(downloadProgressChanged, errorUpdating, setStatus);
+
+                pd.SetMessage("Loading installer framework");
+                ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
+
+                BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
+
+                pd.SetMessage("Loading installer manifests");
+                var alotManifestModePackage = ManifestHandler.LoadMasterManifest(x => pd.SetMessage(x));
+
+                
                 void setStatus(string message)
                 {
                     pd.SetIndeterminate();
                     pd.SetMessage(message);
                 }
 
-                pd.SetMessage("Checking for MassEffectModderNoGui updates");
-                MEMUpdater.UpdateMEM(downloadProgressChanged, errorUpdating, setStatus);
                 b.Result = alotManifestModePackage;
 
                 if (ManifestHandler.MasterManifest != null)

@@ -66,15 +66,18 @@ namespace ALOTInstallerCore.Helpers
         /// <returns></returns>
         public static short GetMemVersion()
         {
-            short version = 0;
-            // If the current version doesn't support the --version --ipc, we just assume it is 0.
-            MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
+            if (File.Exists(Locations.MEMPath()))
             {
-                if (command == "VERSION")
+                // If the current version doesn't support the --version --ipc, we just assume it is 0.
+                MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
                 {
-                    MassEffectModderNoGuiVersion = short.Parse(param);
-                }
-            });
+                    if (command == "VERSION")
+                    {
+                        MassEffectModderNoGuiVersion = short.Parse(param);
+                    }
+                });
+            }
+
             return MassEffectModderNoGuiVersion;
         }
 

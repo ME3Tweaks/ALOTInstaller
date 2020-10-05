@@ -168,6 +168,10 @@ namespace ALOTInstallerCore
                         // Handle unzip code here.
                         statusMessageUpdate?.Invoke("Extracting MassEffectModderNoGui");
                         var res = LZMA.ExtractSevenZipArchive(downloadPath, Locations.AppDataFolder(), true);
+                        if (!res)
+                        {
+                            Log.Error("[AICORE] ERROR EXTRACTING MASSEFFECMODDERNOGUI!!");
+                        }
                     }
                     else
                     {
