@@ -66,7 +66,7 @@ namespace ALOTInstallerCore.Helpers
         /// <returns></returns>
         public static short GetMemVersion()
         {
-            if (File.Exists(Locations.MEMPath()))
+            if (File.Exists(Locations.MEMPath()) && new FileInfo(Locations.MEMPath()).Length > 0)
             {
                 // If the current version doesn't support the --version --ipc, we just assume it is 0.
                 MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
