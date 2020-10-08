@@ -1,6 +1,7 @@
 # Build all three versions of ALOT Installer
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
+name: 'ALOT Installer Build + Publish'
 trigger:
 - ALOT-v4
 
