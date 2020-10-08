@@ -155,7 +155,7 @@ steps:
     BRIDGEPW: $(ME3TweaksBridgePW)
   inputs:
     filePath: 'Azure/ME3TweaksBridge.ps1'
-    arguments: "-Uri $env:BRIDGEENDPOINT -Username $env:BRIDGEUSERNAME -Password $env:BRIDGEPW -Version $VER -AppName ALOTInstallerWPF -InputFile `"$(Build.ArtifactStagingDirectory)/ALOT Installer WPF (Windows) $(VER).7z`""
+    arguments: "-Uri $env:BRIDGEENDPOINT -Username $env:BRIDGEUSERNAME -Password $env:BRIDGEPW -Version $VER -AppName ALOTInstallerWPF -InputFile \"$(Build.ArtifactStagingDirectory)/ALOT Installer WPF (Windows) $(VER).7z\""
     errorActionPreference: 'continue'
 
 # - task: ado-discord-webhook@1
