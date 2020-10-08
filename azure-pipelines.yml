@@ -17,6 +17,7 @@ steps:
  
 # Change artifact name when the version major/minor changes
 - task: PowerShell@2
+  displayName: 'Setup public variables'
   inputs:
     targetType: 'inline'
     script: |
@@ -46,6 +47,13 @@ steps:
       # Author-------------------------------------------
       $author = git log -1 --pretty=format:'%an'
       Write-Host "##vso[task.setvariable variable=author]$author"
+
+- task: PowerShell@2
+  displayName: 'Setup private variables'
+  condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'merge'))
+  inputs:
+    targetType: 'inline'
+    script: |
       # API Keys--------------------------
       $apikeysprivatefilewpf = "namespace ALOTInstallerWPF.Telemetry`n{`n    public static partial class APIKeys`n    {`n        public static string Private_AppCenter {get;} = `"$(AppCenterKeyAlpha)`";`n    }`n}"
       Set-Content -Path "$(Build.Repository.LocalPath)\ALOTInstallerWPF\Telemetry\APIKeysPrivate.cs" -Value $apikeysprivatefilewpf
@@ -55,6 +63,7 @@ steps:
 - task: NuGetToolInstaller@1
 
 - task: DotNetCoreCLI@2
+  displayName: 'Build ALOTInstallerWPF'
   inputs:
     command: 'publish'
     publishWebProjects: false
@@ -65,6 +74,7 @@ steps:
 # A second build is required cause of some "fun" things in Mahapp's xamlcombiner
 # The first build will NOT work for AI WPF
 - task: DotNetCoreCLI@2
+  displayName: 'Build ALOTInstallerConsole (Pass 2)'
   inputs:
     command: 'publish'
     publishWebProjects: false
@@ -73,6 +83,7 @@ steps:
     zipAfterPublish: false
 
 - task: PowerShell@2
+  displayName: 'Rename ALOTInstallerWPF to ALOTInstaller'
   inputs:
     targetType: 'inline'
     script: |
@@ -82,6 +93,7 @@ steps:
       Rename-Item "$(Build.SourcesDirectory)/Output/Windows/ALOTInstallerWPF/ALOTInstallerWPF.exe" -NewName "$(Build.SourcesDirectory)/Output/Windows/ALOTInstallerWPF/ALOTInstaller.exe"
 
 - task: DotNetCoreCLI@2
+  displayName: 'Build ALOTInstallerConsole (Linux)'
   inputs:
     command: 'publish'
     publishWebProjects: false
@@ -90,6 +102,7 @@ steps:
     zipAfterPublish: false
 
 - task: DotNetCoreCLI@2
+  displayName: 'Build ALOTInstallerConsole (Windows)'
   inputs:
     command: 'publish'
     publishWebProjects: false
@@ -100,6 +113,7 @@ steps:
 
 #WinUI
 - task: PublishPipelineArtifact@1
+  displayName: 'Publish ALOT Installer WPF'
   inputs:
     targetPath: 'Output/Windows/ALOTInstallerWPF/ALOTInstaller.exe'
     artifact: 'ALOT Installer WPF (Windows) $(VER)'
@@ -107,6 +121,7 @@ steps:
 
 #WinConsole
 - task: PublishPipelineArtifact@1
+  displayName: 'Publish ALOTInstallerConsole (Linux)'
   inputs:
     targetPath: 'Output/Windows/ALOTInstallerConsole/ALOTInstallerConsole.exe'
     artifact: 'ALOT Installer Console (Windows) $(VER)'
@@ -114,22 +129,37 @@ steps:
 
 #Linux
 - task: PublishPipelineArtifact@1
+  displayName: 'Publish ALOTInstallerConsole (Windows)'
   inputs:
     targetPath: 'Output/Linux/ALOTInstallerConsole/ALOTInstallerConsole'
     artifact: 'ALOT Installer Console (Linux) $(VER)'
     publishLocation: 'pipeline'
 
-    
-# Notify ME3Tweaks that a build has occured
-- task: PowerShell@2
+- task: ArchiveFiles@2
+  condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'merge'))
+  displayName: 'Compress WPF for Bridge transfer'
   inputs:
-    targetType: 'inline'
-    script: |
-      # Webrequest using powershell since invokerestapi doesn't work on anything but server jobs
-      Invoke-WebRequest -Uri $(me3tweaksBuildEndpoint)
+    rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF/ALOTInstaller.exe'
+    includeRootFolder: false
+    archiveType: '7z'
+    sevenZipCompression: 'ultra'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOT Installer WPF (Windows) $(VER).7z'
+    replaceExistingArchive: true
+
+- task: PowerShell@2
+  condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'merge'))
+  displayName: 'Post WPF build to ME3Tweaks via Bridge'
+  env:
+    BRIDGEENDPOINT: $(ME3TweaksALOTBridgeEndpoint)
+    BRIDGEUSERNAME: $(ME3TweaksBridgeUsername)
+    BRIDGEPW: $(ME3TweaksBridgePW)
+  inputs:
+    filePath: 'Azure/ME3TweaksBridge.ps1'
+    arguments: "-Uri $env:BRIDGEENDPOINT -Username $env:BRIDGEUSERNAME -Password $env:BRIDGEPW -Version $VER -AppName ALOTInstallerWPF -InputFile '$(Build.ArtifactStagingDirectory)/ALOT Installer WPF (Windows) $(VER).7z'"
     errorActionPreference: 'continue'
 
 - task: ado-discord-webhook@1
+  condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'merge'))
   inputs:
     channelId: '$(discord_channel_id)'
     webhookKey: '$(discord_webhook_key)'
