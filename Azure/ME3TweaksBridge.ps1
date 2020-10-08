@@ -9,7 +9,6 @@ param (
 )
 
 # Authentication
-$Password
 [securestring]$secStringPassword = ConvertTo-SecureString $Password -AsPlainText -Force
 [pscredential]$cred = New-Object System.Management.Automation.PSCredential ($Username, $secStringPassword)
 $secStringPassword = $null
