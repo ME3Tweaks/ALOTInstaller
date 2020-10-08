@@ -26,5 +26,5 @@ $headers = @{
 
 
 $Response = $null # For retesting
-$Response = Invoke-WebRequest -Uri $Endpoint -Credential $cred -Headers $headers -Method Post -InFile $InputFile
+$Response = Invoke-WebRequest -Uri $Endpoint -Credential $cred -Headers $headers -Method Post -InFile $InputFile -ContentType 'application/x-7z-compressed'
 exit $(if ($Response.StatusCode -eq 200) {0} Else {$Response.StatusCode}) 
