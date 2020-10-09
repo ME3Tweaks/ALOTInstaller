@@ -280,7 +280,7 @@ namespace MassEffectModManagerCore.modmanager.asi
                 {
                     if (v.Hash == asi.Hash && !forceSource.HasValue && !hasExistingVersionOfModInstalled) //If we are forcing a source, we should always install. Delete duplicates past the first one
                     {
-                        Log.Information(@"[AICORE] {v.AssociatedManifestItem.Name} is already installed. We will not remove the existing correct installed ASI for this install request");
+                        Log.Information($@"[AICORE] {v.AssociatedManifestItem.Name} is already installed. We will not remove the existing correct installed ASI for this install request");
                         hasExistingVersionOfModInstalled = true;
                         continue; //Don't delete this one. We are already installed. There is no reason to install it again.
                     }
@@ -326,37 +326,44 @@ namespace MassEffectModManagerCore.modmanager.asi
             {
                 WebRequest request = WebRequest.Create(asi.DownloadLink);
                 Log.Information(@"[AICORE] Fetching remote ASI from server");
-
-                using WebResponse response = request.GetResponse();
-                var memoryStream = new MemoryStream();
-                response.GetResponseStream().CopyTo(memoryStream);
-                //MD5 check on file for security
-                md5 = Utilities.CalculateMD5(memoryStream);
-                if (md5 != asi.Hash)
+                try
                 {
-                    //ERROR!
-                    Log.Error(@"[AICORE] Downloaded ASI did not match the manifest! It has the wrong hash.");
-                    return false;
+                    using WebResponse response = request.GetResponse();
+                    var memoryStream = new MemoryStream();
+                    response.GetResponseStream().CopyTo(memoryStream);
+                    //MD5 check on file for security
+                    md5 = Utilities.CalculateMD5(memoryStream);
+                    if (md5 != asi.Hash)
+                    {
+                        //ERROR!
+                        Log.Error(@"[AICORE] Downloaded ASI did not match the manifest! It has the wrong hash.");
+                        return false;
+                    }
+
+                    Log.Information(@"[AICORE] Fetched remote ASI from server. Installing ASI to " + finalPath);
+                    memoryStream.WriteToFile(finalPath);
+                    Log.Information(@"[AICORE] ASI successfully installed.");
+                    CoreAnalytics.TrackEvent?.Invoke(@"Installed ASI", new Dictionary<string, string>()
+                    {
+                        {@"Filename", Path.GetFileNameWithoutExtension(finalPath)}
+                    });
+
+                    //Cache ASI
+                    if (!Directory.Exists(CachedASIsFolder))
+                    {
+                        Log.Information(@"[AICORE] Creating cached ASIs folder");
+                        Directory.CreateDirectory(CachedASIsFolder);
+                    }
+
+                    Log.Information(@"[AICORE] Caching ASI to local ASI library: " + cachedPath);
+                    memoryStream.WriteToFile(cachedPath);
+                    return true;
                 }
-
-                Log.Information(@"[AICORE] Fetched remote ASI from server. Installing ASI to " + finalPath);
-                memoryStream.WriteToFile(finalPath);
-                Log.Information(@"[AICORE] ASI successfully installed.");
-                CoreAnalytics.TrackEvent?.Invoke(@"Installed ASI", new Dictionary<string, string>()
+                catch (Exception e)
                 {
-                    {@"Filename", Path.GetFileNameWithoutExtension(finalPath)}
-                });
+                    Log.Error($@"[AICORE] Error downloading ASI from {asi.DownloadLink}: {e.Message}");
 
-                //Cache ASI
-                if (!Directory.Exists(CachedASIsFolder))
-                {
-                    Log.Information(@"[AICORE] Creating cached ASIs folder");
-                    Directory.CreateDirectory(CachedASIsFolder);
                 }
-
-                Log.Information(@"[AICORE] Caching ASI to local ASI library: " + cachedPath);
-                memoryStream.WriteToFile(cachedPath);
-                return true;
             }
 
             // We could not install the ASI
