@@ -159,41 +159,41 @@ steps:
     arguments: "-Endpoint $env:BRIDGEENDPOINT -Username $env:BRIDGEUSERNAME -Password $env:BRIDGEPW -Version $(VER) -AppName ALOTInstallerWPF -InputFile \"$(Build.ArtifactStagingDirectory)/ALOT Installer WPF (Windows) $(VER).7z\""
     errorActionPreference: 'continue'
 
-# - task: ado-discord-webhook@1
-#   displayName: 'ALOT Discord notification'
-#   condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'merge'))
-#   inputs:
-#     channelId: '$(discord_channel_id)'
-#     webhookKey: '$(discord_webhook_key)'
-#     name: 'Azure DevOps CI'
-#     avatar: 'https://i.imgur.com/mUtPj2S.png'
-#     messageType: 'embeds'
-#     embeds: |
-#       [{
-#         "title": "ALOT Installer Build Complete",
-#         "description": "A new set of nightly builds of ALOT Installer have been built. Click this link, then expand the dropdown and download the archive for your platform/interface. Nightly builds may be unstable and have bugs.",
-#         "thumbnail": {
-#           "url": "https://i.imgur.com/mUtPj2S.png",
-#           "height": 64,
-#           "width": 64
-#         },
-#         "fields": [{
-#           "name": "Triggering commit",
-#           "value": "$(commitMessageFull)"
-#         },
-#         {
-#           "name": "Author",
-#           "value": "$(author)"
-#         },
-#         {
-#           "name": "Branch",
-#           "value": "$(Build.SourceBranchName)"
-#         },
-#         {
-#           "name": "Version",
-#           "value": "$(VER)"
-#         }],
-#         "url": "https://dev.azure.com/ME3Tweaks/ALOT%20Installer/_build/results?buildId=$(Build.BuildId)&view=artifacts",
-#         "timestamp": "$(time)"
-#       }]
+- task: ado-discord-webhook@1
+  displayName: 'ALOT Discord notification'
+  condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'merge'))
+  inputs:
+    channelId: '$(discord_channel_id)'
+    webhookKey: '$(discord_webhook_key)'
+    name: 'Azure DevOps CI'
+    avatar: 'https://i.imgur.com/mUtPj2S.png'
+    messageType: 'embeds'
+    embeds: |
+      [{
+        "title": "ALOT Installer Build Complete",
+        "description": "A new set of nightly builds of ALOT Installer have been built. Click this link, then expand the dropdown and download the archive for your platform/interface. Nightly builds may be unstable and have bugs.",
+        "thumbnail": {
+          "url": "https://i.imgur.com/mUtPj2S.png",
+          "height": 64,
+          "width": 64
+        },
+        "fields": [{
+          "name": "Triggering commit",
+          "value": "$(commitMessageFull)"
+        },
+        {
+          "name": "Author",
+          "value": "$(author)"
+        },
+        {
+          "name": "Branch",
+          "value": "$(Build.SourceBranchName)"
+        },
+        {
+          "name": "Version",
+          "value": "$(VER)"
+        }],
+        "url": "https://dev.azure.com/ME3Tweaks/ALOT%20Installer/_build/results?buildId=$(Build.BuildId)&view=artifacts",
+        "timestamp": "$(time)"
+      }]
       
