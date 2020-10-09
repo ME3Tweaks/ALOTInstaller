@@ -419,7 +419,7 @@ namespace ALOTInstallerCore.Helpers
                                                                           AllowNoInstall = q.Attribute("allownoinstall")?.Value == "true",
                                                                           DefaultSelectedIndex = TryConvert.ToInt32(q.Attribute("defaultselectedindex")?.Value, 0),
                                                                           Optional = TryConvert.ToBool(q.Attribute("optional")?.Value, true),
-                                                                          InArchivePath = q.Attribute("inarchivepath").Value,
+                                                                          SourceName = q.Attribute("inarchivepath").Value,
                                                                           GameDestinationPath = q.Attribute("gamedestinationpath").Value,
                                                                           DeleteShaders = TryConvert.ToBool(q.Attribute("deleteshaders")?.Value, false),
                                                                           MEUITMSoftShadows = TryConvert.ToBool(q.Attribute("meuitmsoftshadows")?.Value, true),
@@ -432,7 +432,7 @@ namespace ALOTInstallerCore.Helpers
                                                                           AllowNoInstall = q.Attribute("allownoinstall")?.Value == "true",
                                                                           DefaultSelectedIndex = TryConvert.ToInt32(q.Attribute("defaultselectedindex")?.Value, 0),
                                                                           Optional = TryConvert.ToBool(q.Attribute("optional")?.Value, true),
-                                                                          InArchivePath = q.Attribute("inarchivepath").Value,
+                                                                          SourceName = q.Attribute("inarchivepath").Value,
                                                                           GameDestinationPath = q.Attribute("gamedestinationpath").Value,
                                                                       }
                                                                       ).ToList(),

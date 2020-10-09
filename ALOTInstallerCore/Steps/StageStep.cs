@@ -131,8 +131,19 @@ namespace ALOTInstallerCore.Steps
                     // Determine extensions
                     if (instFile.HasAnyPackageFiles())
                     {
-                        var extensions = instFile.PackageFiles.Select(x => Path.GetExtension(x.SourceName)).Distinct()
-                            .ToList();
+                        var extensions = instFile.PackageFiles.Select(x => Path.GetExtension(x.SourceName)).ToList();
+                        if (instFile is ManifestFile mFile)
+                        {
+                            // Add copy files to calculation
+                            extensions.AddRange(mFile.CopyFiles.Where(x => x.IsSelectedForInstallation()).Select(x => Path.GetExtension(x.SourceName)));
+
+                            // Add choice files to calculation
+                            extensions.AddRange(mFile.ChoiceFiles.Where(x => x.IsSelectedForInstallation()).Select(x => Path.GetExtension(x.GetChosenFile().SourceName)));
+
+                            // Add zip files to calculation
+                            extensions.AddRange(mFile.ZipFiles.Where(x => x.IsSelectedForInstallation()).Select(x => Path.GetExtension(x.SourceName)));
+                        }
+                        extensions = extensions.Distinct().ToList();
                         // If any package files list TPFSource disable this space optimization
                         if (extensions.Count == 1 && instFile.PackageFiles.All(x => x.TPFSource == null))
                         {
@@ -755,8 +766,8 @@ namespace ALOTInstallerCore.Steps
                     {
                         if (zip.IsSelectedForInstallation())
                         {
-                            string zipfile = Path.Combine(sourceDirectory, zip.InArchivePath);
-                            string stagedPath = Path.Combine(finalDest, $"{mf.BuildID:D3}_{stagedID}_{Path.GetFileName(zip.InArchivePath)}");
+                            string zipfile = Path.Combine(sourceDirectory, zip.SourceName);
+                            string stagedPath = Path.Combine(finalDest, $"{mf.BuildID:D3}_{stagedID}_{Path.GetFileName(zip.SourceName)}");
                             File.Move(zipfile, stagedPath);
                             zip.StagedPath = stagedPath;
                             stagedID++;
@@ -768,8 +779,8 @@ namespace ALOTInstallerCore.Steps
                     {
                         if (copy.IsSelectedForInstallation())
                         {
-                            string singleFile = Path.Combine(sourceDirectory, copy.InArchivePath);
-                            string stagedPath = Path.Combine(finalDest, $"{mf.BuildID:D3}_{stagedID}_{Path.GetFileName(copy.InArchivePath)}");
+                            string singleFile = Path.Combine(sourceDirectory, copy.SourceName);
+                            string stagedPath = Path.Combine(finalDest, $"{mf.BuildID:D3}_{stagedID}_{Path.GetFileName(copy.SourceName)}");
                             File.Move(singleFile, stagedPath);
                             copy.StagedPath = stagedPath;
                             //copy.ID = stagedID; //still useful?

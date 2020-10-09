@@ -101,5 +101,10 @@ namespace ALOTInstallerCore.Objects.Manifest
                     ApplicableGames &= ~ApplicableGame.ME1;
             }
         }
+
+        public override string ToString()
+        {
+            return $"PackageFile {SourceName}, ChoiceTitle(if any): {ChoiceTitle}, IsTransient: {Transient}";
+        }
     }
 }

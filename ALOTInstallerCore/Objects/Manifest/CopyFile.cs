@@ -19,7 +19,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         }
 
         public string StagedPath { get; set; }
-        public string InArchivePath { get; set; }
+        public string SourceName { get; set; }
         public string GameDestinationPath { get; set; }
     }
 }
