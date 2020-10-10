@@ -56,10 +56,9 @@ namespace ALOTInstallerConsole.InstallerUI
                 Width = 12,
                 Height = 1,
                 TextAlignment = TextAlignment.Centered,
-                Clicked = continueClicked
             };
+            continueButton.Clicked += continueClicked;
             Add(continueButton);
-
         }
 
         private void continueClicked()

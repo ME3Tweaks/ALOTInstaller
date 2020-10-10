@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
@@ -11,7 +9,6 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
-using ME3ExplorerCore.Unreal.Classes;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
@@ -59,46 +56,49 @@ namespace ALOTInstallerConsole.BuilderUI
 
                 if (gameHasListedBackupDir)
                 {
-                    Add(new Button("Unlink backup")
+                    var button = new Button("Unlink backup")
                     {
                         Height = 1,
                         X = 1,
                         Y = y,
-                        Clicked = () => UnlinkBackup(e)
-                    });
+                    };
+                    button.Clicked += () => UnlinkBackup(e);
+                    Add(button);
                 }
                 else
                 {
-                    Add(new Button("Link to existing backup")
+                    var button = new Button("Link to existing backup")
                     {
                         Height = 1,
                         X = 1,
                         Y = y,
-                        Clicked = () => CreateBackup(e, true)
-                    });
+                    };
+                    button.Clicked += () => CreateBackup(e, true);
                 }
 
                 if (gameBackupPath != null)
                 {
                     // Has backup
-                    Add(new Button("Restore")
+                    var button = new Button("Restore")
                     {
                         Height = 1,
                         X = 70,
                         Y = y,
-                        Clicked = () => RestoreBackup(e)
-                    });
+                    };
+                    button.Clicked += () => RestoreBackup(e);
+                    Add(button);
                 }
                 else if (Locations.GetTarget(e) != null)
                 {
                     // No backup but game is installed
-                    Add(new Button("Create backup")
+                    var button = new Button("Create backup")
                     {
                         Height = 1,
                         X = 64,
                         Y = y,
-                        Clicked = () => CreateBackup(e, false)
-                    });
+                    };
+                    button.Clicked += () => CreateBackup(e, false);
+                    Add(button);
                 }
                 else
                 {
@@ -114,14 +114,13 @@ namespace ALOTInstallerConsole.BuilderUI
                 y++;
             }
 
-
             Button close = new Button("Close")
             {
                 X = Pos.Right(this) - 12,
                 Y = Pos.Bottom(this) - 3,
                 Height = 1,
-                Clicked = Close_Clicked
             };
+            close.Clicked += Close_Clicked;
             Add(close);
         }
 

@@ -25,22 +25,18 @@ namespace ALOTInstallerConsole
             string logfile = null;
             bool cont = false;
             ListChooserDialog lcd = null;
-            Button continueButton = new Button("Continue")
+            Button continueButton = new Button("Continue");
+            continueButton.Clicked += () =>
             {
-                Clicked = () =>
-                {
-                    logfile = lcd.SelectedItem;
-                    cont = true;
-                    Application.RequestStop(); //Close dialog
-                }
+                logfile = lcd.SelectedItem;
+                cont = true;
+                Application.RequestStop(); //Close dialog
             };
-            Button abortButton = new Button("Abort upload")
+            Button abortButton = new Button("Abort upload");
+            abortButton.Clicked += () =>
             {
-                Clicked = () =>
-                {
-                    cont = false;
-                    Application.RequestStop(); //Close dialog
-                }
+                cont = false;
+                Application.RequestStop(); //Close dialog
             };
 
             lcd = new ListChooserDialog("Select log file", "Select which log file to upload", "", logFiles.Select(x => Path.GetFileName(x)).ToList(), continueButton);

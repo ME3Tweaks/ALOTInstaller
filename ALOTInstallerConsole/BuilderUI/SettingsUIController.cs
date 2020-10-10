@@ -50,14 +50,15 @@ namespace ALOTInstallerConsole.BuilderUI
                 ReadOnly = true
             };
             gamePathsFv.Add(me1PathField);
-            gamePathsFv.Add(new Button("Change")
+            var button = new Button("Change")
             {
                 X = 53,
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = () => changeGamePath(Enums.MEGame.ME1)
-            });
+            };
+            button.Clicked += () => changeGamePath(Enums.MEGame.ME1);
+            gamePathsFv.Add(button);
             y++;
 
             // ME2 Path
@@ -78,14 +79,15 @@ namespace ALOTInstallerConsole.BuilderUI
                 ReadOnly = true
             };
             gamePathsFv.Add(me2PathField);
-            gamePathsFv.Add(new Button("Change")
+            button = new Button("Change")
             {
                 X = 53,
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = () => changeGamePath(Enums.MEGame.ME2)
-            });
+            };
+            button.Clicked += () => changeGamePath(Enums.MEGame.ME2);
+            gamePathsFv.Add(button); ;
             y++;
 
             // ME3 Path
@@ -107,14 +109,16 @@ namespace ALOTInstallerConsole.BuilderUI
                 ReadOnly = true
             };
             gamePathsFv.Add(me3PathField);
-            gamePathsFv.Add(new Button("Change")
+            button = new Button("Change")
             {
                 X = 53,
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = () => changeGamePath(Enums.MEGame.ME3)
-            });
+            };
+
+            button.Clicked += () => changeGamePath(Enums.MEGame.ME3);
+            gamePathsFv.Add(button);
 
             Add(gamePathsFv);
 
@@ -245,14 +249,15 @@ namespace ALOTInstallerConsole.BuilderUI
                 ReadOnly = true
             };
             fileLocationsFv.Add(textureLibraryLocation);
-            fileLocationsFv.Add(new Button("Change")
+            button = new Button("Change")
             {
                 X = 53,
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = ChangeTextureLibraryLocation
-            });
+            };
+            button.Clicked += ChangeTextureLibraryLocation;
+            fileLocationsFv.Add(button);
             y++;
 
             // Build Location
@@ -273,14 +278,17 @@ namespace ALOTInstallerConsole.BuilderUI
                 ReadOnly = true
             };
             fileLocationsFv.Add(buildLocation);
-            fileLocationsFv.Add(new Button("Change")
+
+            button = new Button("Change")
             {
                 X = 53,
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = ChangeBuildLocation
-            });
+            };
+            button.Clicked += ChangeBuildLocation;
+            fileLocationsFv.Add(button);
+
             Add(fileLocationsFv);
             y++;
             y++;
@@ -290,8 +298,8 @@ namespace ALOTInstallerConsole.BuilderUI
                 X = Pos.Right(this) - 12,
                 Y = Pos.Bottom(this) - 3,
                 Height = 1,
-                Clicked = Close_Clicked
             };
+            close.Clicked += Close_Clicked;
             Add(close);
         }
 

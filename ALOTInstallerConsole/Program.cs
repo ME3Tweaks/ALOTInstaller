@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.Objects;
-using ALOTInstallerCore.Objects.Manifest;
 using Serilog;
 using Terminal.Gui;
 
@@ -63,7 +56,6 @@ namespace ALOTInstallerConsole
             Application.Run(_currentController);
         }
 
-
         private static UIController _nextUIController;
 
         private static UIController _currentController;
@@ -77,18 +69,5 @@ namespace ALOTInstallerConsole
             _currentController?.SignalStopping();
             Application.RequestStop();
         }
-
-        //static void debug()
-        //{
-        //    var xml = File.ReadAllText(@"C:\users\mgamerz\desktop\t.txt");
-        //    XDocument x = XDocument.Parse(xml);
-        //    foreach (var v in x.Root.Elements("supportedhash"))
-        //    {
-        //        if (v.Attribute("game").Value == "me3")
-        //        {
-        //            Debug.WriteLine($"[@\"{v.Value}\"] = @\"{v.Attribute("name").Value}\",");
-        //        }
-        //    }
-        //}
     }
 }

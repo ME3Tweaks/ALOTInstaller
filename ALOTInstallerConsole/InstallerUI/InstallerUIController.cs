@@ -61,9 +61,9 @@ namespace ALOTInstallerConsole.InstallerUI
                 Y = positionY + 3,
                 Width = 12,
                 Height = 1,
-                Clicked = returnToFileSelection,
                 Visible = false
             };
+            continueButton.Clicked += returnToFileSelection;
 
             Add(topLabel, middleLabel, bottomLabel, continueButton);
         }

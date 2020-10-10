@@ -94,8 +94,8 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = Dim.Fill(),
                 X = 0,
                 Y = 0,
-                SelectedItemChanged = SelectedListViewFileChanged
             };
+            ManifestFilesListView.SelectedItemChanged += SelectedListViewFileChanged;
 
             // LEFT SIDE
             leftsideListContainer = new FrameView()
@@ -138,8 +138,8 @@ namespace ALOTInstallerConsole.BuilderUI
                 Y = Pos.Bottom(this) - 2,
                 Height = 1,
                 Width = 12,
-                Clicked = Settings_Clicked
             };
+            settingsButton.Clicked += Settings_Clicked;
             Add(settingsButton);
 
             CheckBox me1FilterCheckbox = new CheckBox("Show ME1 files")
@@ -149,8 +149,8 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = 1,
                 Width = 15,
                 Checked = true,
-                Toggled = x => changeFilter(Enums.MEGame.ME1, !x)
             };
+            me1FilterCheckbox.Toggled += x => changeFilter(Enums.MEGame.ME1, !x);
             Add(me1FilterCheckbox);
 
             CheckBox me2FilterCheckbox = new CheckBox("Show ME2 files")
@@ -160,8 +160,9 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = 1,
                 Width = 15,
                 Checked = true,
-                Toggled = x => changeFilter(Enums.MEGame.ME2, !x)
             };
+            me2FilterCheckbox.Toggled += x => changeFilter(Enums.MEGame.ME2, !x);
+
             Add(me2FilterCheckbox);
 
             CheckBox me3FilterCheckbox = new CheckBox("Show ME3 files")
@@ -171,8 +172,9 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = 1,
                 Width = 15,
                 Checked = true,
-                Toggled = x => changeFilter(Enums.MEGame.ME3, !x)
             };
+            me3FilterCheckbox.Toggled += x => changeFilter(Enums.MEGame.ME3, !x);
+
             Add(me3FilterCheckbox);
 
             //if (ManifestHandler.MasterManifest != null)
@@ -192,8 +194,8 @@ namespace ALOTInstallerConsole.BuilderUI
                 X = Pos.Right(this) - 27,
                 Y = Pos.Bottom(this) - 2,
                 Height = 1,
-                Clicked = Diagnostics_Click
             };
+            diagButton.Clicked += Diagnostics_Click;
             Add(diagButton);
 
             Button installButton = new Button("Install")
@@ -202,8 +204,8 @@ namespace ALOTInstallerConsole.BuilderUI
                 Y = Pos.Bottom(this) - 2,
                 Height = 1,
                 Width = 11,
-                Clicked = InstallButton_Click
             };
+            installButton.Clicked += InstallButton_Click;
             Add(installButton);
 
             TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode, true));
@@ -379,18 +381,14 @@ namespace ALOTInstallerConsole.BuilderUI
         {
             #region Button handlers
             bool buildAndInstall = false;
-            var buildAndInstallButton = new Button("Install")
+            var buildAndInstallButton = new Button("Install");
+            buildAndInstallButton.Clicked += () =>
             {
-                Clicked = () =>
-                {
-                    Application.RequestStop();
-                    buildAndInstall = true;
-                }
+                Application.RequestStop();
+                buildAndInstall = true;
             };
-            var cancelButton = new Button("Cancel")
-            {
-                Clicked = () => Application.RequestStop()
-            };
+            var cancelButton = new Button("Cancel");
+            cancelButton.Clicked += () => Application.RequestStop();
             #endregion
 
             var availableInstallOptions = InstallOptionsStep.CalculateInstallOptions(target, ManifestHandler.CurrentMode, dataSource.ShownFiles);
@@ -702,21 +700,25 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private int UpdateDisplayInstallerFile(InstallerFile ifx, ref int i)
         {
-            if (ifx.Ready && (ifx is UserFile || ifx is ManifestFile mf && mf.Recommendation != RecommendationType.Required))
-
-                selectedFileInfoFrameView.Add(new CheckBox("Don't install file")
+            if (ifx.Ready && (ifx is UserFile ||
+                              ifx is ManifestFile mf && mf.Recommendation != RecommendationType.Required))
+            {
+                var cb = new CheckBox("Don't install file")
                 {
                     Width = "Don't install file".Length + 4,
                     Height = 1,
                     X = 0,
                     Y = Pos.Bottom(selectedFileInfoFrameView) - 4,
                     Checked = ifx.Disabled,
-                    Toggled = (old) =>
-                    {
-                        ifx.Disabled = !old;
-                        ManifestFilesListView.SetNeedsDisplay();
-                    }
-                });
+                };
+                cb.Toggled += old =>
+                {
+                    ifx.Disabled = !old;
+                    ManifestFilesListView.SetNeedsDisplay();
+                };
+                selectedFileInfoFrameView.Add(cb);
+            }
+
             return i;
         }
 
@@ -794,14 +796,16 @@ namespace ALOTInstallerConsole.BuilderUI
             }
 
             var textForWebbutton = mf.Ready ? "Open mod web page" : "Download";
-            selectedFileInfoFrameView.Add(new Button(textForWebbutton)
+            var button = new Button(textForWebbutton)
             {
                 Width = textForWebbutton.Length + 4,
                 Height = 1,
                 X = Pos.Right(selectedFileInfoFrameView) - selectedFileInfoFrameView.X - textForWebbutton.Length - 6,
                 Y = Pos.Bottom(selectedFileInfoFrameView) - 4,
-                Clicked = DownloadClicked
-            });
+            };
+            button.Clicked += DownloadClicked;
+            selectedFileInfoFrameView.Add(button);
+
 
             return y;
         }
