@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
@@ -29,7 +30,7 @@ namespace ALOTInstallerConsole
                 ALOTInstallerCoreLib.Startup(setWrapperLogger, action => { });
 
                 var startupUI = new BuilderUI.StartupUIController();
-                Program.SwapToNewView(startupUI);
+                ViewLoop(startupUI);
             }
             catch (Exception e)
             {
@@ -39,6 +40,32 @@ namespace ALOTInstallerConsole
             }
         }
 
+
+        private static void ViewLoop(UIController initialController)
+        {
+            _nextUIController = initialController;
+            while (true)
+            {
+                SetNextView();
+            }
+        }
+
+        /// <summary>
+        /// Swaps the current top level UIController (if any) with another one.
+        /// </summary>
+        /// <param name="controller"></param>
+        public static void SetNextView()
+        {
+            _nextUIController.SetupUI();
+            _nextUIController.BeginFlow();
+            _currentController = _nextUIController;
+            _nextUIController = null;
+            Application.Run(_currentController);
+        }
+
+
+        private static UIController _nextUIController;
+
         private static UIController _currentController;
         /// <summary>
         /// Swaps the current top level UIController (if any) with another one.
@@ -46,12 +73,9 @@ namespace ALOTInstallerConsole
         /// <param name="controller"></param>
         public static void SwapToNewView(UIController controller)
         {
+            _nextUIController = controller;
             _currentController?.SignalStopping();
             Application.RequestStop();
-            controller.SetupUI();
-            controller.BeginFlow();
-            _currentController = controller;
-            Application.Run(controller);
         }
 
         //static void debug()
