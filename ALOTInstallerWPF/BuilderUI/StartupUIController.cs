@@ -275,22 +275,13 @@ namespace ALOTInstallerWPF.BuilderUI
                     }
                 });
             };
-            bw.RunWorkerCompleted += (a, b) =>
+            bw.RunWorkerCompleted += async (a, b) =>
                     {
-                        pd.CloseAsync();
-                        //if (b.Error == null)
-                        //{
-                        //    FileSelectionUIController bui = new FileSelectionUIController();
-                        //    if (ManifestHandler.MasterManifest != null)
-                        //    {
-                        //        ManifestHandler.CurrentMode = ManifestMode.ALOT;
-                        //    }
-                        //    Program.SwapToNewView(bui);
-                        //}
-                        //else
-                        //{
-                        //    startupStatusLabel.Text = "Error preparing application: " + b.Error.Message;
-                        //}
+                        await pd.CloseAsync();
+#if !DEBUG
+                        await window.ShowMessageAsync("This is a preview version of ALOT Installer V4",
+                            "This is a preview version of ALOT Installer V4. Changes this program makes to you texture library will make those files incompatible with ALOT Installer V3. Please direct all feedback to the #v4-feedback channel on the ALOT Discord. Thanks!");
+#endif
                     };
             bw.RunWorkerAsync();
 
