@@ -246,7 +246,7 @@ namespace ALOTInstallerCore
         private static void applyUpdate(string newExecutable, Action<string> setDialogText = null)
         {
             string args = @"--update-boot";
-            Log.Information(@"[AICORE] Booting new version of the installer to perform first time extraction: {newExecutable} {args}");
+            Log.Information($@"[AICORE] Booting new version of the installer to perform first time extraction: {newExecutable} {args}");
 
             Process process = new Process();
             // Stop the process from opening a new window
@@ -261,7 +261,7 @@ namespace ALOTInstallerCore
             setDialogText?.Invoke($"Restarting {Utilities.GetAppPrefixedName()} Installer");
             Thread.Sleep(2000);
             args = $"--update-dest-path \"{System.Reflection.Assembly.GetExecutingAssembly().Location}\"";
-            Log.Information(@"[AICORE] Running proxy update: {newExecutable} {args}");
+            Log.Information($@"[AICORE] Running proxy update: {newExecutable} {args}");
 
             process = new Process();
             // Stop the process from opening a new window

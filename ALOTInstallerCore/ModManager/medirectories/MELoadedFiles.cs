@@ -137,7 +137,14 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
                 //is mod
                 string autoLoadPath = Path.Combine(dlcDirectory, "AutoLoad.ini");
                 var dlcAutoload = DuplicatingIni.LoadIni(autoLoadPath);
-                return Convert.ToInt32(dlcAutoload["ME1DLCMOUNT"]["ModMount"]); //TODO: Handle errors if this value is not valid.
+                if (int.TryParse(dlcAutoload["ME1DLCMOUNT"]["ModMount"]?.Value, out var mount))
+                {
+                    return mount;
+                }
+                else
+                {
+                    return 0;
+                }
             }
             return MountFile.GetMountPriority(GetMountDLCFromDLCDir(dlcDirectory, game));
         }
