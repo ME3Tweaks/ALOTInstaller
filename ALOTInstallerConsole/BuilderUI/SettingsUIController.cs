@@ -148,14 +148,15 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             gameConfigPathsFv.Add(me1ConfigPathField);
 #if !WINDOWS
-            gameConfigPathsFv.Add(new Button("Change")
+            button = new Button("Change")
             {
                 X = 53,
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = () => changeConfigPath(Enums.MEGame.ME1)
-            });
+            };
+            button.Clicked += () => changeConfigPath(Enums.MEGame.ME1);
+            gameConfigPathsFv.Add(button);
 #endif
             y++;
 
@@ -179,15 +180,15 @@ namespace ALOTInstallerConsole.BuilderUI
 
             gameConfigPathsFv.Add(me2ConfigPathField);
 #if !WINDOWS
-
-            gameConfigPathsFv.Add(new Button("Change")
+            button = new Button("Change")
             {
                 X = 53,
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = () => changeConfigPath(Enums.MEGame.ME2)
-            });
+            };
+            button.Clicked += () => changeConfigPath(Enums.MEGame.ME2);
+            gameConfigPathsFv.Add(button);
 #endif
             y++;
 
@@ -211,14 +212,15 @@ namespace ALOTInstallerConsole.BuilderUI
             };
             gameConfigPathsFv.Add(me3ConfigPathField);
 #if !WINDOWS
-            gameConfigPathsFv.Add(new Button("Change")
+            button = new Button("Change")
             {
                 X = 53,
                 Y = y,
                 Width = 10,
                 Height = 1,
-                Clicked = () => changeConfigPath(Enums.MEGame.ME3)
-            });
+            };
+            button.Clicked += () => changeConfigPath(Enums.MEGame.ME3);
+            gameConfigPathsFv.Add(button);
 #endif
 
             Add(gameConfigPathsFv);
