@@ -294,7 +294,7 @@ namespace ALOTInstallerCore.Steps
                             Log.Information("[AICORE] Processing file " + param);
                             break;
                         default:
-                            var failureIPCTriggered = pm.CurrentStage.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && !x.Warning);
+                            var failureIPCTriggered = pm?.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && !x.Warning);
                             if (failureIPCTriggered != null)
                             {
                                 // We have encountered a known failure IPC
@@ -302,7 +302,7 @@ namespace ALOTInstallerCore.Steps
                                 break;
                             }
 
-                            var warningIPCTriggered = pm.CurrentStage.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && x.Warning);
+                            var warningIPCTriggered = pm?.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && x.Warning);
                             if (warningIPCTriggered != null)
                             {
                                 // We have encountered a known warning IPC

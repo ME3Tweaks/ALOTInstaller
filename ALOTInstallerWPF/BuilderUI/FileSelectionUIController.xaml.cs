@@ -162,10 +162,12 @@ namespace ALOTInstallerWPF.BuilderUI
         public string AppTopText { get; set; } =
             "Add files to install by dragging and dropping their files onto the interface. Make sure you do not extract or rename any files you download, or the installer will not recognize them.";
         public ObservableCollectionExtended<InstallerFile> CurrentModeFiles { get; } = new ObservableCollectionExtended<InstallerFile>();
-        public ICollectionView DisplayedFilesView => CollectionViewSource.GetDefaultView(CurrentModeFiles);
+        public ICollectionView DisplayedFilesView { get; }
 
         public FileSelectionUIController()
         {
+            DisplayedFilesView = CollectionViewSource.GetDefaultView(CurrentModeFiles);
+
             DataContext = this;
             FSUIC = this;
             LoadCommands();
