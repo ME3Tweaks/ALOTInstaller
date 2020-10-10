@@ -170,6 +170,9 @@ namespace ALOTInstallerWPF.BuilderUI
             FSUIC = this;
             LoadCommands();
             InitializeComponent();
+            ShowME1Files = Locations.ME1Target != null;
+            ShowME2Files = Locations.ME2Target != null;
+            ShowME3Files = Locations.ME3Target != null;
 
             AvailableModes.AddRange(ManifestHandler.MasterManifest.ManifestModePackageMappping.Select(x => new ModeHeader(x.Key, getModeDirections(x.Key), getModeDescription(x.Key))));
             OnManifestModeChanged(ManifestHandler.CurrentMode);
