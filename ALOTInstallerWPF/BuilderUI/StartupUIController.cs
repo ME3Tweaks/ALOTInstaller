@@ -47,7 +47,7 @@ namespace ALOTInstallerWPF.BuilderUI
 
         private static void initAppCenter()
         {
-#if DEBUG
+#if !DEBUG
             if (APIKeys.HasAppCenterKey && !telemetryStarted)
             {
                 Microsoft.AppCenter.Crashes.Crashes.GetErrorAttachments = (ErrorReport report) =>
