@@ -842,13 +842,13 @@ namespace ALOTInstallerCore.Steps
                         return;
                     }
 
-                    //if (pf.CopyDirectly)
-                    //{
-                    //    var destinationF = Path.Combine(stagingDest, pf.DestinationName);
-                    //    File.Copy(matchingFile, destinationF, true);
-                    //    pf.Processed = true;
-                    //    continue;
-                    //}
+                    if (pf.CopyDirectly)
+                    {
+                        var destinationF = Path.Combine(compilingStagingDest, pf.DestinationName ?? Path.GetFileName(matchingFile));
+                        File.Copy(matchingFile, destinationF, true);
+                        pf.Processed = true;
+                        return;
+                    }
 
                     if (pf.DestinationName != null)
                     {

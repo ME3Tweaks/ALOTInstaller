@@ -240,223 +240,230 @@ namespace ALOTInstallerCore.Steps
 
             #region Main installation phase
 
+
+            SetMiddleTextCallback?.Invoke("Setting up texture installer");
+            SetBottomTextCallback?.Invoke("");
+            SetTopTextVisibilityCallback?.Invoke(true);
+            SetMiddleTextVisibilityCallback?.Invoke(true);
+            SetBottomTextVisibilityCallback?.Invoke(true);
+            bool doneReached = false;
+            StageFailure failure = null;
+            void handleIPC(string command, string param)
             {
-                SetMiddleTextCallback?.Invoke("Setting up texture installer");
-                SetMiddleTextVisibilityCallback?.Invoke(true);
-                bool doneReached = false;
-                StageFailure failure = null;
-                void handleIPC(string command, string param)
+                switch (command)
                 {
-                    switch (command)
-                    {
-                        case "STAGE_ADD": // Add a new stage 
-                            {
-                                Log.Information("[AICORE] Adding stage to install stages queue: " + param);
-                                pm.AddStage(param, package.InstallTarget.Game);
-                                break;
-                            }
-                        case "STAGE_WEIGHT": //Reweight a stage based on how long we think it will take
-                            string[] parameters = param.Split(' ');
-                            if (parameters.Length > 1)
-                            {
-                                try
-                                {
-                                    double scale = TryConvert.ToDouble(parameters[1], 1);
-                                    Log.Information("[AICORE] Reweighting stage " + parameters[0] + " by " + parameters[1]);
-                                    pm.ScaleStageWeight(parameters[0], scale);
-                                }
-                                catch (Exception e)
-                                {
-                                    Log.Warning("[AICORE] STAGE_WEIGHT parameter invalid: " + e.Message);
-                                }
-                            }
-                            else
-                            {
-                                Log.Error("[AICORE] STAGE_WEIGHT IPC requires 2 parameters, STAGE and WEIGHT");
-                            }
-
-                            pm.DebugPrintWeights();
-                            break;
-                        case "STAGE_CONTEXT": //Change to new stage
-                            doneReached = pm.CompleteAndMoveToStage(param);
-                            updateStageOfStage();
-                            updateCurrentStage();
-                            break;
-                        case "MOD_OVERRIDE":
-                            Log.Information($"[AICORE] {param} overrides some textures in the install set");
-                            break;
-                        case "TASK_PROGRESS": //Report progress of a stage
-                            pm.SubmitProgress(int.Parse(param));
-                            updateCurrentStage();
-                            updateStageOfStage();
-                            break;
-                        case "PROCESSING_FILE": //Report a file is being processed
-                            Log.Information("[AICORE] Processing file " + param);
-                            break;
-                        default:
-                            var failureIPCTriggered = pm?.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && !x.Warning);
-                            if (failureIPCTriggered != null)
-                            {
-                                // We have encountered a known failure IPC
-                                failure = failureIPCTriggered;
-                                break;
-                            }
-
-                            var warningIPCTriggered = pm?.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && x.Warning);
-                            if (warningIPCTriggered != null)
-                            {
-                                // We have encountered a known warning IPC
-                                Log.Warning($"[AICORE] {warningIPCTriggered.FailureTopText}: {param}");
-                                break;
-                            }
-                            Debug.WriteLine($"Unhandled IPC: {command} {param}");
-                            break;
-                    }
-                }
-
-                var computerInfo = new ComputerInfo();
-                var cacheAmountPercent = getCacheSizeToUse(computerInfo);
-
-                int currentMemProcessId = 0;
-                int lastExitCode = int.MinValue;
-                string args = $"--install-mods --gameid {package.InstallTarget.Game.ToGameNum()} --input \"{memInputPath}\" --alot-mode --verify";
-
-                if (package.CompressPackages)
-                {
-                    Log.Information("[AICORE] We will recompress game files in this pass");
-                    args += " --repack-mode";
-                }
-
-                if (cacheAmountPercent != null){
-                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
-                    args += $" --cache-amount {cacheAmountPercent}";
-                }
-
-                args += " --ipc";
-
-                // Uncomment the next 2 lines and then comment out the IPC call to simulate OK install
-                if (package.DebugNoInstall)
-                {
-                    lastExitCode = 0;
-                    doneReached = true;
-                }
-                else
-                {
-
-                    MEMIPCHandler.RunMEMIPCUntilExit(args,
-                        x => currentMemProcessId = x,
-                        handleIPC,
-                        x => Log.Error($"[AICORE] StdError: {x}"),
-                        x =>
+                    case "STAGE_ADD": // Add a new stage 
                         {
-                            currentMemProcessId = 0;
-                            lastExitCode = x;
-                        });
+                            Log.Information("[AICORE] Adding stage to install stages queue: " + param);
+                            pm.AddStage(param, package.InstallTarget.Game);
+                            break;
+                        }
+                    case "STAGE_WEIGHT": //Reweight a stage based on how long we think it will take
+                        string[] parameters = param.Split(' ');
+                        if (parameters.Length > 1)
+                        {
+                            try
+                            {
+                                double scale = TryConvert.ToDouble(parameters[1], 1);
+                                Log.Information("[AICORE] Reweighting stage " + parameters[0] + " by " + parameters[1]);
+                                pm.ScaleStageWeight(parameters[0], scale);
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Warning("[AICORE] STAGE_WEIGHT parameter invalid: " + e.Message);
+                            }
+                        }
+                        else
+                        {
+                            Log.Error("[AICORE] STAGE_WEIGHT IPC requires 2 parameters, STAGE and WEIGHT");
+                        }
+
+                        pm.DebugPrintWeights();
+                        break;
+                    case "STAGE_CONTEXT": //Change to new stage
+                        doneReached = pm.CompleteAndMoveToStage(param);
+                        updateStageOfStage();
+                        updateCurrentStage();
+                        break;
+                    case "MOD_OVERRIDE":
+                        Log.Information($"[AICORE] {param} overrides some textures in the install set");
+                        break;
+                    case "TASK_PROGRESS": //Report progress of a stage
+                        pm.SubmitProgress(int.Parse(param));
+                        updateCurrentStage();
+                        updateStageOfStage();
+                        break;
+                    case "PROCESSING_FILE": //Report a file is being processed
+                        Log.Information("[AICORE] Processing file " + param);
+                        break;
+                    default:
+                        var failureIPCTriggered = pm?.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && !x.Warning);
+                        if (failureIPCTriggered != null)
+                        {
+                            // We have encountered a known failure IPC
+                            failure = failureIPCTriggered;
+                            break;
+                        }
+
+                        var warningIPCTriggered = pm?.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && x.Warning);
+                        if (warningIPCTriggered != null)
+                        {
+                            // We have encountered a known warning IPC
+                            Log.Warning($"[AICORE] {warningIPCTriggered.FailureTopText}: {param}");
+                            break;
+                        }
+                        Debug.WriteLine($"Unhandled IPC: {command} {param}");
+                        break;
                 }
-
-                if (lastExitCode != 0)
-                {
-                    Log.Error($@"[AICORE] MEM exited with non zero exit code: {lastExitCode}");
-                    // Get Stage Failure
-                    if (failure == null)
-                    {
-                        // Crashed (or unhandled new exit IPC)
-                        failure = pm.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == null);
-                    }
-
-                    doWorkEventArgs.Result = failure?.FailureResultCode ?? InstallResult.InstallFailed_UnknownError;
-                    return;
-                }
-
-                if (!doneReached)
-                {
-                    Log.Error(@"[AICORE] MEM exited without reaching STAGE_DONE!");
-                    doWorkEventArgs.Result = InstallResult.InstallFailed_MEMExitedBeforeStageDone;
-                    return;
-                }
-
-                #endregion
-
-                #region Post-main install modifications
-
-                SetMiddleTextCallback?.Invoke("Finishing installation");
-
-                if (!installZipCopyFiles())
-                {
-                    doWorkEventArgs.Result = InstallResult.InstallFailed_ZipCopyFilesError;
-                    return;
-                }
-
-                if (package.InstallTarget.Game == Enums.MEGame.ME1)
-                {
-                    // Apply ME1 LAA
-                    if (!applyME1LAA())
-                    {
-                        doWorkEventArgs.Result = InstallResult.InstallFailed_ME1LAAApplyFailed;
-                        return;
-                    }
-                }
-
-                if (!stampVersionInformation())
-                {
-                    doWorkEventArgs.Result = InstallResult.InstallFailed_FailedToApplyTextureInfo;
-                    return;
-                }
-
-                //At this point we are now OK, errors will result in warnings only.
-                bool hasWarning = false;
-
-                hasWarning |= !applyLODs();
-                TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), package.ImportNewlyUnpackedFiles,
-                    (file, done, todo) => SetBottomTextCallback?.Invoke($"Optimizing {file} for future installs {(int)(done * 100f / todo)}%"));
-
-                SetBottomTextCallback?.Invoke("Installing binkw32 ASI loader");
-
-                hasWarning |= !package.InstallTarget.InstallBinkBypass();
-                if (package.InstallTarget.Game == Enums.MEGame.ME3)
-                {
-                    // Install ASIs.
-                    // Need ASI manager code from Mod Manager once it is ready
-                    if (package.InstallTarget.Supported)
-                    {
-                        SetBottomTextCallback?.Invoke("Installing troubleshooting files");
-                        ASIManager.LoadManifest();
-                        ASIManager.InstallASIToTargetByGroupID(9, package.InstallTarget); //AutoTOC
-                        ASIManager.InstallASIToTargetByGroupID(8, package.InstallTarget); //ME3Logger Truncating
-                    }
-                }
-
-                #endregion
-
-                try
-                {
-                    Utilities.DeleteFilesAndFoldersRecursively(memInputPath);
-                }
-                catch (Exception e)
-                {
-                    Log.Error($"[AICORE] Unable to delete installation packages at {memInputPath}: {e.Message}");
-                }
-
-                showOnlineStorefrontNoUpdateScreen();
-
-                SetTopTextCallback?.Invoke($"Installation of {installString}");
-                if (hasWarning)
-                {
-                    SetMiddleTextCallback?.Invoke("completed with warnings");
-                    SetBottomTextCallback?.Invoke("See installer log for more info");
-                    SetBottomTextVisibilityCallback?.Invoke(true);
-
-                }
-                else
-                {
-                    SetMiddleTextCallback?.Invoke("was successful");
-                    SetBottomTextVisibilityCallback?.Invoke(false);
-                }
-                SetTopTextVisibilityCallback?.Invoke(true);
-                SetMiddleTextVisibilityCallback?.Invoke(true);
-
-                doWorkEventArgs.Result = hasWarning ? InstallResult.InstallOKWithWarning : InstallResult.InstallOK;
             }
+
+            var computerInfo = new ComputerInfo();
+            var cacheAmountPercent = getCacheSizeToUse(computerInfo);
+
+            int currentMemProcessId = 0;
+            int lastExitCode = int.MinValue;
+            string args = $"--install-mods --gameid {package.InstallTarget.Game.ToGameNum()} --input \"{memInputPath}\" --alot-mode --verify";
+
+            if (package.CompressPackages)
+            {
+                Log.Information("[AICORE] We will recompress game files in this pass");
+                args += " --repack-mode";
+            }
+
+            if (cacheAmountPercent != null)
+            {
+                Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
+                args += $" --cache-amount {cacheAmountPercent}";
+            }
+
+            args += " --ipc";
+
+            // Uncomment the next 2 lines and then comment out the IPC call to simulate OK install
+            if (package.DebugNoInstall)
+            {
+                lastExitCode = 0;
+                doneReached = true;
+            }
+            else
+            {
+
+                MEMIPCHandler.RunMEMIPCUntilExit(args,
+                    x => currentMemProcessId = x,
+                    handleIPC,
+                    x => Log.Error($"[AICORE] StdError: {x}"),
+                    x =>
+                    {
+                        currentMemProcessId = 0;
+                        lastExitCode = x;
+                    });
+            }
+
+            if (lastExitCode != 0)
+            {
+                Log.Error($@"[AICORE] MEM exited with non zero exit code: {lastExitCode}");
+                // Get Stage Failure
+                if (failure == null)
+                {
+                    // Crashed (or unhandled new exit IPC)
+                    failure = pm.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == null);
+                }
+
+                doWorkEventArgs.Result = failure?.FailureResultCode ?? InstallResult.InstallFailed_UnknownError;
+                return;
+            }
+
+            if (!doneReached)
+            {
+                Log.Error(@"[AICORE] MEM exited without reaching STAGE_DONE!");
+                doWorkEventArgs.Result = InstallResult.InstallFailed_MEMExitedBeforeStageDone;
+                return;
+            }
+
+            #endregion
+
+            #region Post-main install modifications
+
+            SetMiddleTextCallback?.Invoke("Finishing installation");
+
+            if (!installZipCopyFiles())
+            {
+                doWorkEventArgs.Result = InstallResult.InstallFailed_ZipCopyFilesError;
+                return;
+            }
+
+            if (package.InstallTarget.Game == Enums.MEGame.ME1)
+            {
+                // Apply ME1 LAA
+                if (!applyME1LAA())
+                {
+                    doWorkEventArgs.Result = InstallResult.InstallFailed_ME1LAAApplyFailed;
+                    return;
+                }
+            }
+
+            if (!stampVersionInformation())
+            {
+                doWorkEventArgs.Result = InstallResult.InstallFailed_FailedToApplyTextureInfo;
+                return;
+            }
+
+            //At this point we are now OK, errors will result in warnings only.
+            bool hasWarning = false;
+
+            hasWarning |= !applyLODs();
+            TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), package.ImportNewlyUnpackedFiles,
+                (file, done, todo) => SetBottomTextCallback?.Invoke($"Optimizing {file} for future installs {(int)(done * 100f / todo)}%"));
+
+            SetBottomTextCallback?.Invoke("Installing binkw32 ASI loader");
+
+            hasWarning |= !package.InstallTarget.InstallBinkBypass();
+            if (package.InstallTarget.Game == Enums.MEGame.ME3)
+            {
+                // Install ASIs.
+                // Need ASI manager code from Mod Manager once it is ready
+                if (package.InstallTarget.Supported)
+                {
+                    SetBottomTextCallback?.Invoke("Installing troubleshooting files");
+                    ASIManager.LoadManifest();
+                    ASIManager.InstallASIToTargetByGroupID(9, package.InstallTarget); //AutoTOC
+                    ASIManager.InstallASIToTargetByGroupID(8, package.InstallTarget); //ME3Logger Truncating
+                }
+            }
+
+            #endregion
+
+            #region Cleanup
+            try
+            {
+                Utilities.DeleteFilesAndFoldersRecursively(memInputPath);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"[AICORE] Unable to delete installation packages at {memInputPath}: {e.Message}");
+            }
+            #endregion
+
+            #region Show Ending UI
+            showOnlineStorefrontNoUpdateScreen();
+
+            SetTopTextCallback?.Invoke($"Installation of {installString}");
+            if (hasWarning)
+            {
+                SetMiddleTextCallback?.Invoke("completed with warnings");
+                SetBottomTextCallback?.Invoke("See installer log for more info");
+                SetBottomTextVisibilityCallback?.Invoke(true);
+
+            }
+            else
+            {
+                SetMiddleTextCallback?.Invoke("was successful");
+                SetBottomTextVisibilityCallback?.Invoke(false);
+            }
+            SetTopTextVisibilityCallback?.Invoke(true);
+            SetMiddleTextVisibilityCallback?.Invoke(true);
+            #endregion
+         
+            doWorkEventArgs.Result = hasWarning ? InstallResult.InstallOKWithWarning : InstallResult.InstallOK;
         }
 
         private bool checkForExistingMarkers()
@@ -505,12 +512,16 @@ namespace ALOTInstallerCore.Steps
             return !badFiles.Any();
         }
 
-        private int? getCacheSizeToUse(ComputerInfo ci){
+        private int? getCacheSizeToUse(ComputerInfo ci)
+        {
             var totalMem = ci.TotalPhysicalMemory;
             var availableMem = ci.AvailablePhysicalMemory - (1024 * 1024 * 1330); //Available memory - 1.3GiB
-            if (totalMem > 0 && availableMem > 0 && availableMem < totalMem){
-                return (int?) (availableMem * 100 / totalMem);
-            } else {
+            if (totalMem > 0 && availableMem > 0 && availableMem < totalMem)
+            {
+                return (int?)(availableMem * 100 / totalMem);
+            }
+            else
+            {
                 return null;
             }
         }

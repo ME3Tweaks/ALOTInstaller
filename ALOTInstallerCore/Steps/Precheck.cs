@@ -125,9 +125,10 @@ namespace ALOTInstallerCore.Steps
                 }
             }
 
+            var installInfo = pc.target.GetInstalledALOTInfo();
             if (!pc.package.DebugNoInstall)
             {
-                if (pc.target.GetInstalledALOTInfo() != null)
+                if (installInfo != null)
                 {
                     var replacedAddedRemovedFiles = pc.checkForReplacedAddedRemovedFiles();
                     if (replacedAddedRemovedFiles.Any())
@@ -143,6 +144,18 @@ namespace ALOTInstallerCore.Steps
                         return "The texture map from the previous installation has become desynchronized from the current game state. This means that files/mods were added, removed, or replaced/modified since the last texture installation took place. The game must be restored to vanilla so a new texture map can be created.";
                     }
                 }
+            }
+
+            if (installInfo == null && package.InstallTarget.Game >= Enums.MEGame.ME2)
+            {
+                var tfcFiles = Directory.GetFiles(MEDirectories.BioGamePath(package.InstallTarget), "TexturesMEM*.tfc", SearchOption.AllDirectories).ToList();
+                if (tfcFiles.Any())
+                {
+                    Log.Error("[AICORE] Cannot install textures: Found leftover MEM TFC files that will conflict with installer, game must be fully deleted to remove all leftover files");
+                    // We found leftover TextureMEMXX.tfc files - there's no install so these should not exist!
+                    return "Leftover files were found from a previous texture installation. These may be leftover from a failed install, or the game was repaired instead of being restored with the restore feature. The game directory must be fully deleted to remove leftover files; repairing/uninstalling the game will NOT remove these files.";
+                }
+
             }
 
             return null; //OK
