@@ -468,6 +468,7 @@ namespace ALOTInstallerCore.Steps
 
         private bool checkForExistingMarkers()
         {
+            if (package.InstallTarget.GetInstalledALOTInfo() != null) return true; //Marker exists. We shouldn't check if there's existing markers
             SetMiddleTextVisibilityCallback?.Invoke(false);
             string args = $"--check-for-markers --gameid {package.InstallTarget.Game.ToGameNum()} --ipc";
             if (Settings.DebugLogs)
