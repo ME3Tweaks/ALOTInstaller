@@ -53,7 +53,7 @@ namespace ALOTInstallerCore.Helpers
                         Usable = false
                     };
                 }
-                
+
                 var target = Locations.GetTarget(game.ApplicableGameToMEGame());
                 if (target == null)
                 {
@@ -88,11 +88,14 @@ namespace ALOTInstallerCore.Helpers
             try
             {
                 using var modFile = File.OpenRead(file);
-                var len = modFile.ReadInt32();
+                var len = modFile.ReadInt32(); //first 4 bytes
                 var version = modFile.ReadStringASCIINull();
-
-                if (version.Length < 5) // legacy .mod
-                    modFile.SeekBegin();
+                modFile.SeekBegin();
+                if (version.Length >= 5) // "modern" .mod
+                {
+                    //Re-read the version length
+                    version = modFile.ReadUnrealString();
+                }
                 var numEntries = modFile.ReadUInt32();
                 string desc = modFile.ReadUnrealString();
                 var script = modFile.ReadUnrealString().Split("\n").Select(x => x.Trim()).ToList();

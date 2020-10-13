@@ -10,9 +10,11 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:helpers="clr-namespace:ALOTInstallerCore.Helpers;assembly=ALOTInstallerCore"
              mc:Ignorable="d" 
+             DataContext="{Binding RelativeSource={RelativeSource Self}}"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:NullVisibilityConverter x:Key="NullVisibilityConverter"/>
         <converters:EFIDisplayModeToVisibilityConverter x:Key="EFIDisplayModeToVisibilityConverter"/>
     </UserControl.Resources>
     <StackPanel HorizontalAlignment="Center" UseLayoutRounding="True" Margin="10">
@@ -121,13 +123,18 @@
             <TextBlock Text="Select which game this file applies to" FontSize="16" FontWeight="Light" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"/>
             <TextBlock Text="{Binding CurrentUserFileName}" FontSize="12" TextAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="5" Command="{Binding GameSelectionCommand}" CommandParameter="ME1">
+                <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="5" Command="{Binding GameSelectionCommand}" CommandParameter="ME1"
+                        Visibility="{Binding Path=(helpers:Locations.ME1Target), Converter={StaticResource NullVisibilityConverter}}">
                         <Image Source="/Images/logo_me1.png" Height="40" RenderOptions.BitmapScalingMode="HighQuality" Margin="3"/>
                     </Button>
-                    <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="5" Command="{Binding GameSelectionCommand}" CommandParameter="ME2">
+                    <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="5" Command="{Binding GameSelectionCommand}" CommandParameter="ME2"
+                            Visibility="{Binding Path=(helpers:Locations.ME2Target), Converter={StaticResource NullVisibilityConverter}}">
+
                     <Image Source="/Images/logo_me2.png" Height="40" RenderOptions.BitmapScalingMode="HighQuality" Margin="3"/>
                     </Button>
-                <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="5" Command="{Binding GameSelectionCommand}" CommandParameter="ME3">
+                <Button Style="{StaticResource MahApps.Styles.Button.Square.Accent}" Margin="5" Command="{Binding GameSelectionCommand}" CommandParameter="ME3"
+                        Visibility="{Binding Path=(helpers:Locations.ME3Target), Converter={StaticResource NullVisibilityConverter}}">
+
                     <Image Source="/Images/logo_me3.png" Height="40" RenderOptions.BitmapScalingMode="HighQuality" Margin="3"/>
                     </Button>
                 <Button Height="58" Content="Don't add file" Command="{Binding GameSelectionCommand}" CommandParameter="None"/>
