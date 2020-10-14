@@ -233,6 +233,7 @@ namespace ALOTInstallerWPF.Flyouts
                         Application.Current.Dispatcher.Invoke(() =>
                         {
                             FileSelectionUIController.FSUIC.CurrentModeFiles.Add(instF);
+                            FileSelectionUIController.FSUIC.InstallerFilesListBox.ScrollIntoView(instF);
                         });
                     });
             };

@@ -380,7 +380,7 @@ namespace ALOTInstallerCore
         //        }
 
 
-        
+
 
 
         private static FileAttributes RemoveAttribute(FileAttributes attributes, FileAttributes attributesToRemove)
@@ -388,7 +388,7 @@ namespace ALOTInstallerCore
             return attributes & ~attributesToRemove;
         }
 
-        
+
 
 
         public static int RunProcess(string exe, string args, bool waitForProcess = false, bool allowReattemptAsAdmin = false, bool requireAdmin = false, bool noWindow = true)
@@ -889,7 +889,7 @@ namespace ALOTInstallerCore
 #if (!WINDOWS && DEBUG)
         // running process will be 'dotnet' in this mode
         public static string GetHostingProcessname() => "ALOTInstallerConsole";
-#else 
+#else
         public static string GetHostingProcessname() => Path.GetFileNameWithoutExtension(Process.GetCurrentProcess().MainModule.ModuleName);
 #endif
         public static void WriteDebugLog(string debugMsg)
@@ -915,5 +915,12 @@ namespace ALOTInstallerCore
 
             return "ALOT"; //Default
         }
+
+        /// <summary>
+        /// Gets the version information for the ALOT Installer Core Library.
+        /// </summary>
+        /// <returns></returns>
+        public static Version GetLibraryVersion() => Assembly.GetExecutingAssembly().GetName().Version;
+
     }
 }

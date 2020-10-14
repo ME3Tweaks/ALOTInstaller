@@ -204,7 +204,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             var gameID = selectedDiagnosticTarget.Game.ToString().Substring(2);
 
             addDiagLine(gameID, Severity.GAMEID);
-            addDiagLine($@"{Utilities.GetHostingProcessname()} Game Diagnostic"); //somehow get wrapper name
+            addDiagLine($@"{Utilities.GetHostingProcessname()} {Utilities.GetAppVersion()} Game Diagnostic"); //somehow get wrapper name
             addDiagLine($@"Diagnostic for {selectedDiagnosticTarget.Game.ToGameName()}");
             addDiagLine($@"Diagnostic generated on {DateTime.Now.ToShortDateString()}");
 

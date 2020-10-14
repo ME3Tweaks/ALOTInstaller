@@ -29,6 +29,7 @@ namespace ALOTInstallerCore
             setCallingLoggerCallback?.Invoke(LogCollector.CreateLogger());
             Log.Information("============================SESSION START============================");
             Log.Information("[AICORE] ALOTInstallerCore library is booting");
+            Log.Information($"[AICORE] Library version: {Utilities.GetLibraryVersion()}");
             Log.Information("[AICORE] Loading settings");
 
             Settings.Load();
