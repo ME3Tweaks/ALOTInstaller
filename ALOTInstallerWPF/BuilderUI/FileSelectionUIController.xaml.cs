@@ -333,7 +333,7 @@ namespace ALOTInstallerWPF.BuilderUI
 
         private bool CanInstallTextures()
         {
-            return CurrentModeFiles.Any(x => x.Ready && !x.Disabled);
+            return (Locations.ME1Target != null || Locations.ME2Target != null || Locations.ME3Target != null) && CurrentModeFiles.Any(x => x.Ready && !x.Disabled); //a game must be installed
         }
 
         private async void BeginInstallTextures()

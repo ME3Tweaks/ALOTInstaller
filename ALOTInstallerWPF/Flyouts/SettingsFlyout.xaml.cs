@@ -38,6 +38,7 @@ namespace ALOTInstallerWPF.Flyouts
         public string ME2TextureInstallInfo { get; private set; }
         public string ME3TextureInstallInfo { get; private set; }
         public bool ShowGameMissingText { get; set; }
+        public bool AnyGameInstalled { get; set; }
 
         public ObservableCollectionExtended<ManifestTutorial> AllTutorials { get; } =
             new ObservableCollectionExtended<ManifestTutorial>();
@@ -518,7 +519,7 @@ namespace ALOTInstallerWPF.Flyouts
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ME2Available)));
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ME3Available)));
             ShowGameMissingText = anyMissingInstall;
-
+            AnyGameInstalled = me1Target != null || me2Target != null || me3Target != null;
         }
 
         private async void BetaMode_Toggled(object sender, RoutedEventArgs e)
