@@ -30,7 +30,8 @@ namespace ALOTInstallerCore
         /// <param name="progressIndeterminateCallback"></param>
         /// <param name="showMessageCallback"></param>
         /// <param name="notifyBetaAvailable"></param>
-        public static async void PerformGithubAppUpdateCheck(string owner, string repo, string assetPrefix, string updateFilenameInArchive,
+        public static async void PerformGithubAppUpdateCheck(string owner, string repo, string assetPrefix,
+            string updateFilenameInArchive,
             Func<string, string, string, string, bool> showUpdatePromptCallback,
             Action<string, string, bool> showUpdateProgressDialogCallback, // title, message, cancancel
             Action<string> setUpdateDialogTextCallback,
@@ -105,7 +106,8 @@ namespace ALOTInstallerCore
                                 string uiVersionInfo = "";
                                 if (latest.Prerelease)
                                 {
-                                    uiVersionInfo += " This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
+                                    uiVersionInfo +=
+ " This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
                                 }
                                 int daysAgo = (DateTime.Now - latest.PublishedAt.Value).Days;
                                 string ageStr = "";
@@ -125,18 +127,21 @@ namespace ALOTInstallerCore
                                 uiVersionInfo += $"\nReleased {ageStr}";
                                 string title = $"{Utilities.GetAppPrefixedName()} Installer {releaseName} is available";
 
-                                upgrade = showUpdatePromptCallback != null && showUpdatePromptCallback.Invoke(title, $"You are currently using version {currentAppVersionInfo}.{uiVersionInfo}\nChangelog:\n\n{latest.Body}", "Update", "Later");
+                                upgrade =
+ showUpdatePromptCallback != null && showUpdatePromptCallback.Invoke(title, $"You are currently using version {currentAppVersionInfo}.{uiVersionInfo}\nChangelog:\n\n{latest.Body}", "Update", "Later");
                             }
                             if (upgrade)
                             {
                                 Log.Information("[AICORE] Downloading update for application");
                                 //there's an update
-                                string message = $"Downloading update for {Utilities.GetAppPrefixedName()} Installer...";
+                                string message =
+ $"Downloading update for {Utilities.GetAppPrefixedName()} Installer...";
                                 if (!canCancel)
                                 {
                                     if (!Settings.BetaMode)
                                     {
-                                        message = $"This copy of {Utilities.GetAppPrefixedName()} Installer is outdated and must be updated.";
+                                        message =
+ $"This copy of {Utilities.GetAppPrefixedName()} Installer is outdated and must be updated.";
                                     }
                                 }
 
@@ -152,7 +157,8 @@ namespace ALOTInstallerCore
 
 
                                 var asset = latest.Assets.First(x => x.Name.StartsWith(assetPrefix));
-                                var downloadResult = await OnlineContent.DownloadToMemory(asset.BrowserDownloadUrl, progressCallback,
+                                var downloadResult =
+ await OnlineContent.DownloadToMemory(asset.BrowserDownloadUrl, progressCallback,
                                     logDownload: true, cancellationTokenSource: cancellationTokenSource);
                                 if (downloadResult.result == null & downloadResult.errorMessage == null)
                                 {
@@ -177,7 +183,8 @@ namespace ALOTInstallerCore
 
                                 progressIndeterminateCallback?.Invoke();
                                 showUpdateProgressDialogCallback?.Invoke($"Updating {Utilities.GetAppPrefixedName()} Installer", "Preparing to apply update", false);
-                                var updateFailedResult = extractUpdate(downloadResult.result, Path.GetFileName(asset.Name), updateFilenameInArchive, setUpdateDialogTextCallback);
+                                var updateFailedResult =
+ extractUpdate(downloadResult.result, Path.GetFileName(asset.Name), updateFilenameInArchive, setUpdateDialogTextCallback);
                                 if (updateFailedResult != null)
                                 {
                                     // The download is wrong size
@@ -212,6 +219,8 @@ namespace ALOTInstallerCore
 #endif
         }
 
+#if APPUPDATESUPPORT
+
         private static bool attemptPatchUpdate(Release latestRelease, Action<long, long> progressCallback)
         {
             var hashLine = latestRelease.Body.Split('\n').FirstOrDefault(x => x.StartsWith("hash: "));
@@ -227,7 +236,8 @@ namespace ALOTInstallerCore
                 }
 
                 // Mapping of MD5 patches to destination. Value is a list of mirrors we can use, preferring github first. AI only uses Github
-                Dictionary<string, List<(string downloadhash, string downloadLink, string timetamp)>> patchMappingSourceMd5ToLinks = new Dictionary<string, List<(string downloadhash, string downloadLink, string timetamp)>>();
+                Dictionary<string, List<(string downloadhash, string downloadLink, string timetamp)>> patchMappingSourceMd5ToLinks
+ = new Dictionary<string, List<(string downloadhash, string downloadLink, string timetamp)>>();
 
                 var localExecutableHash = Utilities.CalculateMD5(Utilities.GetExecutablePath());
 
@@ -291,7 +301,6 @@ namespace ALOTInstallerCore
                     $"Release {latestRelease.TagName} is missing hash in body, cannot use patch update strategy");
                 return false; //no hash
             }
-
             return false;
         }
 
@@ -303,6 +312,7 @@ namespace ALOTInstallerCore
         /// <returns>The destination update file, or null if it failed</returns>
         private static string BuildUpdateFromPatch(MemoryStream patchStream, string expectedFinalHash, string fileTimestamp)
         {
+
             // patch stream is LZMA'd
             try
             {
@@ -350,7 +360,8 @@ namespace ALOTInstallerCore
         }
 
 
-        private static string extractUpdate(MemoryStream ms, string assetFilename, string updateFileName, Action<string> setDialogText = null)
+        private static string extractUpdate(MemoryStream ms, string assetFilename, string updateFileName, Action<string> setDialogText
+ = null)
         {
             var outDir = Path.Combine(Locations.TempDirectory(), Path.GetFileNameWithoutExtension(assetFilename));
             var archiveFile = Path.Combine(Locations.TempDirectory(), assetFilename);
@@ -358,7 +369,8 @@ namespace ALOTInstallerCore
             if (LZMA.ExtractSevenZipArchive(archiveFile, outDir))
             {
                 // Extraction complete
-                var fileToValidate = Directory.GetFiles(outDir, updateFileName, SearchOption.AllDirectories).FirstOrDefault();
+                var fileToValidate =
+ Directory.GetFiles(outDir, updateFileName, SearchOption.AllDirectories).FirstOrDefault();
                 if (fileToValidate != null)
                 {
                     return ValidateUpdate(fileToValidate, setDialogText);
@@ -429,5 +441,7 @@ namespace ALOTInstallerCore
             // If this throws exception and the app dies... oh well, I guess?
             Environment.Exit(0);
         }
+    }
+#endif
     }
 }
