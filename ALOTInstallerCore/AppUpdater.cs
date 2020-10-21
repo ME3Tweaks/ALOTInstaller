@@ -441,7 +441,6 @@ namespace ALOTInstallerCore
             // If this throws exception and the app dies... oh well, I guess?
             Environment.Exit(0);
         }
-    }
 #endif
     }
 }
