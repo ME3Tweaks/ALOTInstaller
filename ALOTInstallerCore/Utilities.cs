@@ -881,6 +881,12 @@ namespace ALOTInstallerCore
         /// </summary>
         /// <returns></returns>
         public static FileVersionInfo GetAppVersion() => Process.GetCurrentProcess().MainModule.FileVersionInfo;
+        
+        /// <summary>
+        /// Gets the executable path that is hosting this library.
+        /// </summary>
+        /// <returns></returns>
+        public static string GetExecutablePath() => Process.GetCurrentProcess().MainModule.FileName;
 
         /// <summary>
         /// Returns the hosting processes' name, without extension

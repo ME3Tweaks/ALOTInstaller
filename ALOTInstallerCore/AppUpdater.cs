@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -141,6 +142,15 @@ namespace ALOTInstallerCore
 
                                 showUpdateProgressDialogCallback?.Invoke($"Updating {Utilities.GetAppPrefixedName()} Installer", message, canCancel);
                                 // First here should be OK since we checked it above...
+
+                                // PATCH UPDATE
+                                if (attemptPatchUpdate(latest, progressCallback))
+                                {
+                                    // Patch update succeeded. The code below is the default update
+                                    return;
+                                }
+
+
                                 var asset = latest.Assets.First(x => x.Name.StartsWith(assetPrefix));
                                 var downloadResult = await OnlineContent.DownloadToMemory(asset.BrowserDownloadUrl, progressCallback,
                                     logDownload: true, cancellationTokenSource: cancellationTokenSource);
@@ -202,6 +212,144 @@ namespace ALOTInstallerCore
 #endif
         }
 
+        private static bool attemptPatchUpdate(Release latestRelease, Action<long, long> progressCallback)
+        {
+            var hashLine = latestRelease.Body.Split('\n').FirstOrDefault(x => x.StartsWith("hash: "));
+
+            if (hashLine != null)
+            {
+                var destMd5 = hashLine.Substring(5).Trim();
+                if (destMd5.Length != 32)
+                {
+                    Log.Warning(
+                        $"Release {latestRelease.TagName} has invalid hash length in body, cannot use patch update strategy");
+                    return false; //no hash
+                }
+
+                // Mapping of MD5 patches to destination. Value is a list of mirrors we can use, preferring github first. AI only uses Github
+                Dictionary<string, List<(string downloadhash, string downloadLink, string timetamp)>> patchMappingSourceMd5ToLinks = new Dictionary<string, List<(string downloadhash, string downloadLink, string timetamp)>>();
+
+                var localExecutableHash = Utilities.CalculateMD5(Utilities.GetExecutablePath());
+
+                // Find applicable patch
+                foreach (var asset in latestRelease.Assets.Where(x => x.Name.StartsWith("gh_upd-")))
+                {
+                    var updateinfo = asset.Name.Split(@"-");
+                    if (updateinfo.Length >= 4)
+                    {
+                        var sourceHash = updateinfo[1];
+                        var destHash = updateinfo[2];
+                        var downloadHash = updateinfo[3];
+                        var timestamp = updateinfo.Length > 4 ? updateinfo[4] : @"0";
+
+                        if (localExecutableHash == sourceHash && destHash == destMd5)
+                        {
+
+                            if (!patchMappingSourceMd5ToLinks.TryGetValue(sourceHash, out var patchMappingList))
+                            {
+                                // ^ Don't bother adding items that will never be useful ^
+                                patchMappingList =
+                                    new List<(string downloadhash, string downloadLink, string timetamp)>();
+                                patchMappingSourceMd5ToLinks[sourceHash] = patchMappingList;
+                            }
+
+                            // Insert at front.
+                            patchMappingList.Insert(0, (downloadHash, asset.BrowserDownloadUrl, timestamp));
+                        }
+                    }
+                }
+
+                if (patchMappingSourceMd5ToLinks.TryGetValue(localExecutableHash, out var downloadInfoMirrors))
+                {
+                    foreach (var downloadInfo in downloadInfoMirrors)
+                    {
+                        Log.Information($@"Downloading patch file {downloadInfo.downloadLink}");
+                        var patchUpdate = OnlineContent.DownloadToMemory(downloadInfo.downloadLink, progressCallback,
+                            downloadInfo.downloadhash).Result;
+                        if (patchUpdate.errorMessage != null)
+                        {
+                            Log.Warning($@"Patch update download failed: {patchUpdate.errorMessage}");
+                            return false;
+                        }
+                        Log.Information(@"Download OK: Building new executable");
+                        var newExecutable = BuildUpdateFromPatch(patchUpdate.result, destMd5, downloadInfo.timetamp);
+                        if (newExecutable != null)
+                        {
+                            var validationResult = ValidateUpdate(newExecutable);
+                            return validationResult == null;
+                        }
+                    }
+                }
+                else
+                {
+                    Log.Warning($"No patch is applicable to bridge our current hash {localExecutableHash} to the destination hash {destMd5}");
+                }
+            }
+            else
+            {
+                Log.Warning(
+                    $"Release {latestRelease.TagName} is missing hash in body, cannot use patch update strategy");
+                return false; //no hash
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Builds the new update from a patch update
+        /// </summary>
+        /// <param name="patchStream"></param>
+        /// <param name="expectedFinalHash"></param>
+        /// <returns>The destination update file, or null if it failed</returns>
+        private static string BuildUpdateFromPatch(MemoryStream patchStream, string expectedFinalHash, string fileTimestamp)
+        {
+            // patch stream is LZMA'd
+            try
+            {
+                patchStream = new MemoryStream(LZMA.DecompressLZMAFile(patchStream.ToArray()));
+                using var currentBuildStream = File.OpenRead(Utilities.GetExecutablePath());
+                //using var currentBuildStream = File.OpenRead(@"C:\Users\Mgamerz\source\repos\ME3Tweaks\MassEffectModManager\MassEffectModManagerCore\Deployment\Staging\ME3TweaksModManager\ME3TweaksModManager.exe");
+
+                MemoryStream outStream = new MemoryStream();
+                JPatch.ApplyJPatch(currentBuildStream, patchStream, outStream);
+                var calculatedHash = Utilities.CalculateMD5(outStream);
+                if (calculatedHash == expectedFinalHash)
+                {
+                    Log.Information(@"Patch application successful: Writing new executable to disk");
+                    var outDirectory = Directory.CreateDirectory(Path.Combine(Locations.TempDirectory(), @"update"))
+                        .FullName;
+                    var updateFile = Path.Combine(outDirectory, $"{Utilities.GetHostingProcessname()}.exe");
+                    outStream.WriteToFile(updateFile);
+
+                    if (long.TryParse(fileTimestamp, out var buildDateLong) && buildDateLong > 0)
+                    {
+                        Log.Information(@"Updating timestamp on new executable to the original value");
+                        try
+                        {
+                            File.SetLastWriteTimeUtc(updateFile, new DateTime(buildDateLong));
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error($@"Could not set executable date: {ex.Message}");
+                        }
+                    }
+                    Log.Information(@"New executable patching complete");
+                    return updateFile;
+                }
+                else
+                {
+                    Log.Error($@"Patch application failed. The resulting hash was wrong. Expected {expectedFinalHash}, got {calculatedHash}");
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error($@"Error applying patch update: {e.Message}");
+            }
+            
+            return null;
+        }
+
+
         private static string extractUpdate(MemoryStream ms, string assetFilename, string updateFileName, Action<string> setDialogText = null)
         {
             var outDir = Path.Combine(Locations.TempDirectory(), Path.GetFileNameWithoutExtension(assetFilename));
@@ -210,37 +358,39 @@ namespace ALOTInstallerCore
             if (LZMA.ExtractSevenZipArchive(archiveFile, outDir))
             {
                 // Extraction complete
-#if WINDOWS
-                setDialogText?.Invoke("Verifying update");
-#endif
                 var fileToValidate = Directory.GetFiles(outDir, updateFileName, SearchOption.AllDirectories).FirstOrDefault();
                 if (fileToValidate != null)
                 {
-#if WINDOWS
-                    // Signature check
-                    var authenticodeInspector = new FileInspector(fileToValidate);
-                    var validationResult = authenticodeInspector.Validate();
-                    if (validationResult != SignatureCheckResult.Valid)
-                    {
-                        Log.Error($@"[AICORE] The update file does not have a valid signature: {validationResult}. Update will be aborted.");
-                        return "The update file has an invalid signature. See the application log for more details.";
-                    }
-#endif
-
-                    // Validated
-                    setDialogText?.Invoke("Applying update");
-                    applyUpdate(fileToValidate, setDialogText);
-                    return null;
+                    return ValidateUpdate(fileToValidate, setDialogText);
                 }
                 else
                 {
                     // Could not find update in archive!
                     return $"Could not find {updateFileName} in the downloaded archive.";
                 }
-
             }
 
             return "The update archive failed to extract.";
+        }
+
+        private static string ValidateUpdate(string fileToValidate, Action<string> setDialogText = null)
+        {
+#if WINDOWS
+            setDialogText?.Invoke("Verifying update");
+            // Signature check
+            var authenticodeInspector = new FileInspector(fileToValidate);
+            var validationResult = authenticodeInspector.Validate();
+            if (validationResult != SignatureCheckResult.Valid)
+            {
+                Log.Error($@"[AICORE] The update file does not have a valid signature: {validationResult}. Update will be aborted.");
+                return "The update file has an invalid signature. See the application log for more details.";
+            }
+#endif
+
+            // Validated
+            setDialogText?.Invoke("Applying update");
+            applyUpdate(fileToValidate, setDialogText);
+            return null;
         }
 
         private static void applyUpdate(string newExecutable, Action<string> setDialogText = null)
@@ -258,6 +408,7 @@ namespace ALOTInstallerCore
             process.StartInfo.Arguments = args;
             process.Start();
             process.WaitForExit();
+
             setDialogText?.Invoke($"Restarting {Utilities.GetAppPrefixedName()} Installer");
             Thread.Sleep(2000);
             args = $"--update-dest-path \"{System.Reflection.Assembly.GetExecutingAssembly().Location}\"";
