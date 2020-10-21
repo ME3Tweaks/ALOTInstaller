@@ -56,7 +56,7 @@ namespace ALOTInstallerCore
         /// Gets the folder of the current program that is running this library.
         /// </summary>
         /// <returns></returns>
-        internal static string GetExecutingAssemblyFolder() => Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        internal static string GetExecutingAssemblyFolder() => Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
 
         private static Stream GetResourceStream(string assemblyResource)
         {
@@ -877,10 +877,10 @@ namespace ALOTInstallerCore
         }
 
         /// <summary>
-        /// Returns the application version information
+        /// Returns the running application version information
         /// </summary>
         /// <returns></returns>
-        public static Version GetAppVersion() => Assembly.GetEntryAssembly().GetName().Version;
+        public static FileVersionInfo GetAppVersion() => Process.GetCurrentProcess().MainModule.FileVersionInfo;
 
         /// <summary>
         /// Returns the hosting processes' name, without extension

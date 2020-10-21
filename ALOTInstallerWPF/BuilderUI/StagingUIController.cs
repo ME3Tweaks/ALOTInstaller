@@ -170,16 +170,17 @@ namespace ALOTInstallerWPF.BuilderUI
             return continueStaging;
         }
 
-        private async void errorStaging(string message)
+        private void errorStaging(string message)
         {
-            if (Application.Current.MainWindow is MainWindow mw)
+            Application.Current.Invoke(async () =>
             {
-                Application.Current.Invoke(async () =>
+                if (Application.Current.MainWindow is MainWindow mw)
                 {
                     await mw.ShowMessageAsync("Error occurred while staging textures", message);
-                });
-            }
+                }
+            });
         }
+
 
         private async void performPreinstallCheck()
         {
@@ -205,17 +206,17 @@ namespace ALOTInstallerWPF.BuilderUI
                     }
                     else if (b.Result != null)
                     {
-                        // Precheck failed
-                        await mw.ShowMessageAsync("Error occurred performing install precheck", b.Result as string);
+                    // Precheck failed
+                    await mw.ShowMessageAsync("Error occurred performing install precheck", b.Result as string);
                         fsuic.IsStaging = false;
                     }
                     else
                     {
-                        // Precheck passed
-                        if (iop.FilesToInstall != null)
+                    // Precheck passed
+                    if (iop.FilesToInstall != null)
                         {
-                            // BEGIN INSTALLATION!
-                            var iuic = new InstallerUIController(iop)
+                        // BEGIN INSTALLATION!
+                        var iuic = new InstallerUIController(iop)
                             {
                                 InstallerTextTop = "Preparing texture installer",
                             };
