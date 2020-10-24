@@ -43,7 +43,7 @@ namespace ALOTInstallerCore
         {
 #if APPUPDATESUPPORT
             Log.Information("[AICORE] Checking for application updates from gitub");
-            var currentAppVersionInfo = Process.GetCurrentProcess().MainModule.FileVersionInfo.ToVersion();
+            var currentAppVersionInfo = Utilities.GetAppVersion();
             var client = new GitHubClient(new ProductHeaderValue($"{Utilities.GetAppPrefixedName()}Installer"));
             try
             {

@@ -262,7 +262,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 {
                     if (Application.Current.MainWindow is MainWindow mw)
                     {
-                        mw.Title = $"{Utilities.GetAppPrefixedName()} Installer {Utilities.GetAppVersion().FileVersion}";
+                        mw.Title = $"{Utilities.GetAppPrefixedName()} Installer {Utilities.GetAppVersion()}";
                         mw.ContentGrid.Children.Add(new FileSelectionUIController());
                         mw.SettingsFlyoutControl.Content = mw.SettingsFlyoutContent = new SettingsFlyout();
                         mw.DiagnosticsFlyoutControl.Content = new DiagnosticsFlyout();
