@@ -663,32 +663,8 @@ namespace ALOTInstallerCore.Helpers
                     continue;
                 }
 
-                if (Directory.GetParent(file).FullName.StartsWith(Settings.BuildLocation,
-                    StringComparison.InvariantCultureIgnoreCase))
-                {
-                    importResults.Add(new ImportResult()
-                    {
-                        ImportName = Path.GetFileName(file),
-                        Result = "Cannot add files to installer from staging directory",
-                        Accepted = false
-                    });
-                    continue;
-                }
 
-                if (Directory.GetParent(file).FullName.StartsWith(Path.GetTempPath(),
-                    StringComparison.InvariantCultureIgnoreCase))
-                {
-                    importResults.Add(new ImportResult()
-                    {
-                        ImportName = Path.GetFileName(file),
-                        Result = "Cannot add files to installer from temp directory - if this is a manifest file, drop the archive directly, if this is a user file, extract it first",
-                        Accepted = false
-                    });
-                    continue;
-                }
-
-
-                // Okay to import or add from location
+                // Okay to import or add from location - official only for now
                 bool importInManifestMode = !userFileMode.HasValue || !userFileMode.Value;
                 bool importInUserMode = !userFileMode.HasValue || userFileMode.Value;
                 bool handled = false;
@@ -725,6 +701,7 @@ namespace ALOTInstallerCore.Helpers
                                 Result = successful ? "Manifest file imported" : failedReason,
                                 Accepted = successful
                             });
+                            continue;
                         }
                         else
                         {
@@ -735,7 +712,7 @@ namespace ALOTInstallerCore.Helpers
                                 Result = "Already imported",
                                 Accepted = true
                             });
-                            ;
+                            continue;
                         }
                     }
                     else if (!importInUserMode)
@@ -747,87 +724,136 @@ namespace ALOTInstallerCore.Helpers
                             Result = "Not a manifest file",
                             Accepted = false
                         });
+                        continue;
                     }
                 } // END MANIFEST FILE PARSING
 
-                if (!handled && importInUserMode)
+                // Check other locations as the file won't be moved/copied.
+                if (Directory.GetParent(file).FullName.StartsWith(Settings.BuildLocation,
+                    StringComparison.InvariantCultureIgnoreCase))
                 {
-                    // User file
-                    var fi = new FileInfo(file);
-                    //var matchingManifestFile = TextureLibrary.manifestFiles.FirstOrDefault(x => x.FileSize == fi.Length);
-                    //if (matchingManifestFile != null && ManifestHandler.CurrentMode != ManifestMode.Free)
-                    //{
-                    //    // Did user rename file?
-
-                    //}
-
-                    var preinstallMods = ManifestHandler.GetAllPreinstallMods();
-                    PreinstallMod matchingPIM = preinstallMods.FirstOrDefault(x => x.FileSize == fi.Length
-                        && (x.Filename.Equals(Path.GetFileName(file),
-                                StringComparison.InvariantCultureIgnoreCase) ||
-                            x.TorrentFilename.Equals(Path.GetFileName(file),
-                                StringComparison.InvariantCultureIgnoreCase)));
-                    if (matchingPIM != null)
+                    importResults.Add(new ImportResult()
                     {
-                        // It's a preinstall mod user added.
-                        // Add the (cloned) original ManifestFile to this mode
-                        var newObj = new PreinstallMod(matchingPIM)
-                        {
-                            ForcedSourcePath = file
-                        };
-                        newObj.UpdateReadyStatus();
-                        ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].ManifestFiles.Add(newObj);
+                        ImportName = Path.GetFileName(file),
+                        Result = "Cannot add files to installer from staging directory",
+                        Accepted = false
+                    });
+                    continue;
+                }
+
+                if (Directory.GetParent(file).FullName.StartsWith(Path.GetTempPath(),
+                    StringComparison.InvariantCultureIgnoreCase))
+                {
+                    importResults.Add(new ImportResult()
+                    {
+                        ImportName = Path.GetFileName(file),
+                        Result = "Cannot add files to installer from temp directory - if this is a manifest file, drop the archive directly, if this is a user file, extract it first",
+                        Accepted = false
+                    });
+                    continue;
+                }
+
+                bool shouldContinue = true;
+                foreach (var v in Locations.GetAllAvailableTargets())
+                {
+                    if (Directory.GetParent(file).FullName.StartsWith(v.TargetPath,
+                        StringComparison.InvariantCultureIgnoreCase))
+                    {
                         importResults.Add(new ImportResult()
                         {
-                            Result = "Added for install",
-                            ImportName = matchingPIM.FriendlyName,
-                            Accepted = true
+                            ImportName = Path.GetFileName(file),
+                            Result = "Cannot add files to installer from within a game directory",
+                            Accepted = false
                         });
-                        addedFileToModeCallback?.Invoke(newObj);
+                        shouldContinue = false;
+                        break;
+                    }
+                }
+
+                if (!shouldContinue) continue; //Skip to next file
+
+
+                //if (!handled && importInUserMode)
+                //{
+                // User file
+                var fi = new FileInfo(file);
+                //var matchingManifestFile = TextureLibrary.manifestFiles.FirstOrDefault(x => x.FileSize == fi.Length);
+                //if (matchingManifestFile != null && ManifestHandler.CurrentMode != ManifestMode.Free)
+                //{
+                //    // Did user rename file?
+
+                //}
+
+                var preinstallMods = ManifestHandler.GetAllPreinstallMods();
+                PreinstallMod matchingPIM = preinstallMods.FirstOrDefault(x => x.FileSize == fi.Length
+                    && (x.Filename.Equals(Path.GetFileName(file),
+                            StringComparison.InvariantCultureIgnoreCase) ||
+                        x.TorrentFilename.Equals(Path.GetFileName(file),
+                            StringComparison.InvariantCultureIgnoreCase)));
+                if (matchingPIM != null)
+                {
+                    // It's a preinstall mod user added.
+                    // Add the (cloned) original ManifestFile to this mode
+                    var newObj = new PreinstallMod(matchingPIM)
+                    {
+                        ForcedSourcePath = file
+                    };
+                    newObj.UpdateReadyStatus();
+                    ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].ManifestFiles.Add(newObj);
+                    importResults.Add(new ImportResult()
+                    {
+                        Result = "Added for install",
+                        ImportName = matchingPIM.FriendlyName,
+                        Accepted = true
+                    });
+                    addedFileToModeCallback?.Invoke(newObj);
+                    continue;
+                }
+                else
+                {
+                    // Standard user file
+
+                    var usable = TextureLibrary.IsUserFileUsable(file, out var notUsableReason);
+                    if (!usable)
+                    {
+                        // File is not usable
+                        importResults.Add(new ImportResult()
+                        {
+                            Result = "Not usable",
+                            Reason = notUsableReason,
+                            ImportName = Path.GetFileName(file),
+                            Accepted = false
+                        });
+                        continue;
                     }
                     else
                     {
-                        // Standard user file
+                        // File is usable
 
-                        var usable = TextureLibrary.IsUserFileUsable(file, out var notUsableReason);
-                        if (!usable)
+                        var failedToAddReason = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].AttemptAddUserFile(file, selectGameCallback, out var addedUserFile);
+                        importResults.Add(new ImportResult()
                         {
-                            // File is not usable
-                            importResults.Add(new ImportResult()
-                            {
-                                Result = "Not usable",
-                                Reason = notUsableReason,
-                                ImportName = Path.GetFileName(file),
-                                Accepted = false
-                            });
-                        }
-                        else
+                            Result = failedToAddReason ?? "Added for install",
+                            ImportName = Path.GetFileName(file),
+                            Accepted = failedToAddReason == null
+                        });
+                        if (addedUserFile != null)
                         {
-                            // File is usable
-
-                            var failedToAddReason = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].AttemptAddUserFile(file, selectGameCallback, out var addedUserFile);
-                            importResults.Add(new ImportResult()
-                            {
-                                Result = failedToAddReason ?? "Added for install",
-                                ImportName = Path.GetFileName(file),
-                                Accepted = failedToAddReason == null
-                            });
-                            if (addedUserFile != null)
-                            {
-                                addedFileToModeCallback?.Invoke(addedUserFile);
-                            }
-                            //}
-                            //else
-                            //{
-                            //    importResults.Add(new ImportResult()
-                            //    {
-                            //        Result = "Skipped",
-                            //        ImportName = Path.GetFileName(file)
-                            //    });
-                            //}
+                            addedFileToModeCallback?.Invoke(addedUserFile);
                         }
+                        continue;
+                        //}
+                        //else
+                        //{
+                        //    importResults.Add(new ImportResult()
+                        //    {
+                        //        Result = "Skipped",
+                        //        ImportName = Path.GetFileName(file)
+                        //    });
+                        //}
                     }
                 }
+                //}
             }
             return importResults;
         }

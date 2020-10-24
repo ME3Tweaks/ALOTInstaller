@@ -93,15 +93,15 @@
                         <DockPanel Margin="0,3" Width="390">
                             <TextBlock DockPanel.Dock="Top" Text="{Binding ImportName}" FontSize="14"/>
                             <iconPacks:PackIconIonicons Kind="CheckmarkCircleMD" Margin="0,1,3,0"  DockPanel.Dock="Left" Height="14" 
-                                                        VerticalAlignment="Center" ToolTip="{Binding ToolTip}"
+                                                        VerticalAlignment="Center" ToolTip="{Binding Reason}"
                                                         Foreground="LawnGreen"
                                                         Visibility="{Binding Accepted, Converter={StaticResource BoolToVisibilityConverter}}"/>
                             <iconPacks:PackIconIonicons Kind="WarningMD" Margin="0,1,3,0"  DockPanel.Dock="Left" Height="14" 
-                                                        VerticalAlignment="Center" ToolTip="{Binding ToolTip}"
+                                                        VerticalAlignment="Center" ToolTip="{Binding Reason}"
                                                         Foreground="Yellow"
                                                         Visibility="{Binding Accepted, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}"/>
 
-                            <TextBlock HorizontalAlignment="Left" Text="{Binding Result}" TextWrapping="Wrap" ToolTip="{Binding ToolTip}">
+                            <TextBlock HorizontalAlignment="Left" Text="{Binding Result}" TextWrapping="Wrap" ToolTip="{Binding Reason}">
                                     <TextBlock.Style>
                                         <Style TargetType="TextBlock">
                                             <Style.Triggers>
