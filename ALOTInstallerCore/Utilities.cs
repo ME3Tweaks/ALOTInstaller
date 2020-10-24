@@ -883,6 +883,12 @@ namespace ALOTInstallerCore
         public static Version GetAppVersion() => Assembly.GetEntryAssembly().GetName().Version;
 
         /// <summary>
+        /// Gets the version information for the ALOT Installer Core Library.
+        /// </summary>
+        /// <returns></returns>
+        public static Version GetLibraryVersion() => Assembly.GetExecutingAssembly().GetName().Version;
+
+        /// <summary>
         /// Returns the hosting processes' name, without extension
         /// </summary>
         /// <returns></returns>
@@ -915,12 +921,5 @@ namespace ALOTInstallerCore
 
             return "ALOT"; //Default
         }
-
-        /// <summary>
-        /// Gets the version information for the ALOT Installer Core Library.
-        /// </summary>
-        /// <returns></returns>
-        public static Version GetLibraryVersion() => Assembly.GetExecutingAssembly().GetName().Version;
-
     }
 }
