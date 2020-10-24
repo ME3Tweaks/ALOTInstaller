@@ -318,7 +318,6 @@ namespace ALOTInstallerCore
         /// <returns>The destination update file, or null if it failed</returns>
         private static string BuildUpdateFromPatch(MemoryStream patchStream, string expectedFinalHash, string fileTimestamp)
         {
-
             // patch stream is LZMA'd
             try
             {

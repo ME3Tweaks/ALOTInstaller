@@ -651,147 +651,180 @@ namespace ALOTInstallerCore.Helpers
             object syncObj = new object();
             foreach (var file in files)
             {
-                if (!Directory.GetParent(file).FullName.Equals(Settings.TextureLibraryLocation,
+                if (Directory.GetParent(file).FullName.StartsWith(Settings.TextureLibraryLocation,
                     StringComparison.InvariantCultureIgnoreCase))
                 {
-                    // Okay to import or add from location
-                    bool importInManifestMode = !userFileMode.HasValue || !userFileMode.Value;
-                    bool importInUserMode = !userFileMode.HasValue || userFileMode.Value;
-                    bool handled = false;
-                    if (importInManifestMode)
+                    importResults.Add(new ImportResult()
                     {
-                        bool successful = false;
-                        string failedReason = null;
-                        var attemptingImport = TextureLibrary.AttemptImportManifestFile(file, manifestFiles,
-                            (successfullyImported, failureReason) =>
-                            {
-                                successful = successfullyImported;
-                                failedReason = failureReason;
-                                lock (syncObj)
-                                {
-                                    Monitor.Pulse(syncObj);
-                                }
-                            },
-                            importingProgressCallback);
+                        ImportName = Path.GetFileName(file),
+                        Result = "Cannot add files to installer from texture library directory",
+                        Accepted = false
+                    });
+                    continue;
+                }
 
-                        if (attemptingImport != null)
-                        {
-                            if (!attemptingImport.Ready)
-                            {
-                                // Wait till import completes
-                                lock (syncObj)
-                                {
-                                    Monitor.Wait(syncObj);
-                                }
+                if (Directory.GetParent(file).FullName.StartsWith(Settings.BuildLocation,
+                    StringComparison.InvariantCultureIgnoreCase))
+                {
+                    importResults.Add(new ImportResult()
+                    {
+                        ImportName = Path.GetFileName(file),
+                        Result = "Cannot add files to installer from staging directory",
+                        Accepted = false
+                    });
+                    continue;
+                }
 
-                                handled = successful;
-                                importResults.Add(new ImportResult()
-                                {
-                                    ImportName = attemptingImport.FriendlyName,
-                                    Result = successful ? "Imported" : failedReason,
-                                    Accepted = successful
-                                });
-                            }
-                            else
-                            {
-                                handled = true;
-                                importResults.Add(new ImportResult()
-                                {
-                                    ImportName = attemptingImport.FriendlyName,
-                                    Result = "Already imported",
-                                    Accepted = true
-                                });
-                                ;
-                            }
-                        }
-                        else if (!importInUserMode)
+                if (Directory.GetParent(file).FullName.StartsWith(Path.GetTempPath(),
+                    StringComparison.InvariantCultureIgnoreCase))
+                {
+                    importResults.Add(new ImportResult()
+                    {
+                        ImportName = Path.GetFileName(file),
+                        Result = "Cannot add files to installer from temp directory - if this is a manifest file, drop the archive directly, if this is a user file, extract it first",
+                        Accepted = false
+                    });
+                    continue;
+                }
+
+
+                // Okay to import or add from location
+                bool importInManifestMode = !userFileMode.HasValue || !userFileMode.Value;
+                bool importInUserMode = !userFileMode.HasValue || userFileMode.Value;
+                bool handled = false;
+                if (importInManifestMode)
+                {
+                    bool successful = false;
+                    string failedReason = null;
+                    var attemptingImport = TextureLibrary.AttemptImportManifestFile(file, manifestFiles,
+                        (successfullyImported, failureReason) =>
                         {
-                            // Will not process as user file.
+                            successful = successfullyImported;
+                            failedReason = failureReason;
+                            lock (syncObj)
+                            {
+                                Monitor.Pulse(syncObj);
+                            }
+                        },
+                        importingProgressCallback);
+
+                    if (attemptingImport != null)
+                    {
+                        if (!attemptingImport.Ready)
+                        {
+                            // Wait till import completes
+                            lock (syncObj)
+                            {
+                                Monitor.Wait(syncObj);
+                            }
+
+                            handled = successful;
                             importResults.Add(new ImportResult()
                             {
-                                ImportName = Path.GetFileName(file),
-                                Result = "Not a manifest file",
-                                Accepted = false
+                                ImportName = attemptingImport.FriendlyName,
+                                Result = successful ? "Manifest file imported" : failedReason,
+                                Accepted = successful
                             });
-                        }
-                    } // END MANIFEST FILE PARSING
-
-                    if (!handled && importInUserMode)
-                    {
-                        // User file
-                        var fi = new FileInfo(file);
-                        //var matchingManifestFile = TextureLibrary.manifestFiles.FirstOrDefault(x => x.FileSize == fi.Length);
-                        //if (matchingManifestFile != null && ManifestHandler.CurrentMode != ManifestMode.Free)
-                        //{
-                        //    // Did user rename file?
-
-                        //}
-
-                        var preinstallMods = ManifestHandler.GetAllPreinstallMods();
-                        PreinstallMod matchingPIM = preinstallMods.FirstOrDefault(x => x.FileSize == fi.Length
-                            && (x.Filename.Equals(Path.GetFileName(file),
-                                    StringComparison.InvariantCultureIgnoreCase) ||
-                                x.TorrentFilename.Equals(Path.GetFileName(file),
-                                    StringComparison.InvariantCultureIgnoreCase)));
-                        if (matchingPIM != null)
-                        {
-                            // It's a preinstall mod user added.
-                            // Add the (cloned) original ManifestFile to this mode
-                            var newObj = new PreinstallMod(matchingPIM)
-                            {
-                                ForcedSourcePath = file
-                            };
-                            newObj.UpdateReadyStatus();
-                            ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].ManifestFiles.Add(newObj);
-                            importResults.Add(new ImportResult()
-                            {
-                                Result = "Added for install",
-                                ImportName = matchingPIM.FriendlyName,
-                                Accepted = true
-                            });
-                            addedFileToModeCallback?.Invoke(newObj);
                         }
                         else
                         {
-                            // Standard user file
-
-                            var usable = TextureLibrary.IsUserFileUsable(file, out var notUsableReason);
-                            if (!usable)
+                            handled = true;
+                            importResults.Add(new ImportResult()
                             {
-                                // File is not usable
-                                importResults.Add(new ImportResult()
-                                {
-                                    Result = "Not usable",
-                                    Reason = notUsableReason,
-                                    ImportName = Path.GetFileName(file),
-                                    Accepted = false
-                                });
-                            }
-                            else
-                            {
-                                // File is usable
+                                ImportName = attemptingImport.FriendlyName,
+                                Result = "Already imported",
+                                Accepted = true
+                            });
+                            ;
+                        }
+                    }
+                    else if (!importInUserMode)
+                    {
+                        // Will not process as user file.
+                        importResults.Add(new ImportResult()
+                        {
+                            ImportName = Path.GetFileName(file),
+                            Result = "Not a manifest file",
+                            Accepted = false
+                        });
+                    }
+                } // END MANIFEST FILE PARSING
 
-                                var failedToAddReason = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].AttemptAddUserFile(file, selectGameCallback, out var addedUserFile);
-                                importResults.Add(new ImportResult()
-                                {
-                                    Result = failedToAddReason ?? "Added for install",
-                                    ImportName = Path.GetFileName(file),
-                                    Accepted = failedToAddReason == null
-                                });
-                                if (addedUserFile != null)
-                                {
-                                    addedFileToModeCallback?.Invoke(addedUserFile);
-                                }
-                                //}
-                                //else
-                                //{
-                                //    importResults.Add(new ImportResult()
-                                //    {
-                                //        Result = "Skipped",
-                                //        ImportName = Path.GetFileName(file)
-                                //    });
-                                //}
+                if (!handled && importInUserMode)
+                {
+                    // User file
+                    var fi = new FileInfo(file);
+                    //var matchingManifestFile = TextureLibrary.manifestFiles.FirstOrDefault(x => x.FileSize == fi.Length);
+                    //if (matchingManifestFile != null && ManifestHandler.CurrentMode != ManifestMode.Free)
+                    //{
+                    //    // Did user rename file?
+
+                    //}
+
+                    var preinstallMods = ManifestHandler.GetAllPreinstallMods();
+                    PreinstallMod matchingPIM = preinstallMods.FirstOrDefault(x => x.FileSize == fi.Length
+                        && (x.Filename.Equals(Path.GetFileName(file),
+                                StringComparison.InvariantCultureIgnoreCase) ||
+                            x.TorrentFilename.Equals(Path.GetFileName(file),
+                                StringComparison.InvariantCultureIgnoreCase)));
+                    if (matchingPIM != null)
+                    {
+                        // It's a preinstall mod user added.
+                        // Add the (cloned) original ManifestFile to this mode
+                        var newObj = new PreinstallMod(matchingPIM)
+                        {
+                            ForcedSourcePath = file
+                        };
+                        newObj.UpdateReadyStatus();
+                        ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].ManifestFiles.Add(newObj);
+                        importResults.Add(new ImportResult()
+                        {
+                            Result = "Added for install",
+                            ImportName = matchingPIM.FriendlyName,
+                            Accepted = true
+                        });
+                        addedFileToModeCallback?.Invoke(newObj);
+                    }
+                    else
+                    {
+                        // Standard user file
+
+                        var usable = TextureLibrary.IsUserFileUsable(file, out var notUsableReason);
+                        if (!usable)
+                        {
+                            // File is not usable
+                            importResults.Add(new ImportResult()
+                            {
+                                Result = "Not usable",
+                                Reason = notUsableReason,
+                                ImportName = Path.GetFileName(file),
+                                Accepted = false
+                            });
+                        }
+                        else
+                        {
+                            // File is usable
+
+                            var failedToAddReason = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].AttemptAddUserFile(file, selectGameCallback, out var addedUserFile);
+                            importResults.Add(new ImportResult()
+                            {
+                                Result = failedToAddReason ?? "Added for install",
+                                ImportName = Path.GetFileName(file),
+                                Accepted = failedToAddReason == null
+                            });
+                            if (addedUserFile != null)
+                            {
+                                addedFileToModeCallback?.Invoke(addedUserFile);
                             }
+                            //}
+                            //else
+                            //{
+                            //    importResults.Add(new ImportResult()
+                            //    {
+                            //        Result = "Skipped",
+                            //        ImportName = Path.GetFileName(file)
+                            //    });
+                            //}
                         }
                     }
                 }
