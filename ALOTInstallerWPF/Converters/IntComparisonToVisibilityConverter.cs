@@ -14,6 +14,7 @@ namespace ALOTInstallerWPF.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            // Use parameter styling: OP_NUM_OP2_NUM2...
             if (value is int currentValue && parameter is string str)
             {
                 var split = str.Split('_');

@@ -843,7 +843,7 @@ namespace ALOTInstallerCore.Steps
             {
                 SetBottomTextCallback?.Invoke("Updating texture installation marker");
                 TextureModInstallationInfo tmii = TextureModInstallationInfo.CalculateMarker(package.InstallTarget.GetInstalledALOTInfo(), package.FilesToInstall);
-                tmii.ALOT_INSTALLER_VERSION_USED = (short)Assembly.GetEntryAssembly().GetName().Version.Build;
+                tmii.ALOT_INSTALLER_VERSION_USED = (short)Utilities.GetLibraryVersion().Build;
                 int version = 0;
                 // If the current version doesn't support the --version --ipc, we just assume it is 0.
                 tmii.MEM_VERSION_USED = MEMIPCHandler.GetMemVersion();

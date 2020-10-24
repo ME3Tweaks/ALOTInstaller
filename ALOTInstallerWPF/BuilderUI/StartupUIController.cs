@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -10,16 +9,13 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Services;
-using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Helpers;
-using ALOTInstallerWPF.Objects;
 using ALOTInstallerWPF.Telemetry;
 using ControlzEx.Theming;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
-using MassEffectModManagerCore.modmanager.asi;
 using ME3ExplorerCore.Compression;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
@@ -117,7 +113,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 {
                     ct.Cancel();
                 };
-                AppUpdater.PerformGithubAppUpdateCheck("Mgamerz", "ALOTInstallerTest", "ALOTInstallerWPF", "ALOTInstallerWPF.exe",
+                AppUpdater.PerformGithubAppUpdateCheck("ME3Tweaks", "ALOTInstaller", "ALOTInstallerWPF", "ALOTInstaller.exe",
                     (title, text, updateButtonText, declineButtonText) =>
                     {
                         bool response = false;
@@ -266,7 +262,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 {
                     if (Application.Current.MainWindow is MainWindow mw)
                     {
-                        mw.Title = $"{Utilities.GetAppPrefixedName()} Installer {Utilities.GetAppVersion()}";
+                        mw.Title = $"{Utilities.GetAppPrefixedName()} Installer {Utilities.GetAppVersion().FileVersion}";
                         mw.ContentGrid.Children.Add(new FileSelectionUIController());
                         mw.SettingsFlyoutControl.Content = mw.SettingsFlyoutContent = new SettingsFlyout();
                         mw.DiagnosticsFlyoutControl.Content = new DiagnosticsFlyout();

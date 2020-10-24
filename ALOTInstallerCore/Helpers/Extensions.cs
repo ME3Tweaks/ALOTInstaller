@@ -29,9 +29,13 @@ namespace ALOTInstallerCore.Helpers
                 {
                     Log.Error(prefix + line);
                 }
-                foreach (var line in exception.StackTrace.Split("\n"))
+
+                if (exception.StackTrace != null)
                 {
-                    Log.Error(prefix + line);
+                    foreach (var line in exception.StackTrace.Split("\n"))
+                    {
+                        Log.Error(prefix + line);
+                    }
                 }
 
                 exception = exception.InnerException;
@@ -95,7 +99,7 @@ namespace ALOTInstallerCore.Helpers
             return stringBuilder.ToString();
         }
 
-
+        public static Version ToVersion(this FileVersionInfo fvi) => new Version(fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart, fvi.FilePrivatePart);
 
         private static readonly char[] InvalidPathingChars;
 
