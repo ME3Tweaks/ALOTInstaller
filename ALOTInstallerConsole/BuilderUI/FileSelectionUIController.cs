@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
@@ -569,7 +570,49 @@ namespace ALOTInstallerConsole.BuilderUI
 
                 MessageDialog md = new MessageDialog("Performing installation precheck [1/2]");
                 NamedBackgroundWorker prestageCheckWorker = new NamedBackgroundWorker("PrecheckWorker-Prestaging");
-                prestageCheckWorker.DoWork += (a, b) => { b.Result = Precheck.PerformPreStagingCheck(optionsPackage); };
+                prestageCheckWorker.DoWork += (a, b) =>
+                {
+                    b.Result = Precheck.PerformPreStagingCheck(optionsPackage,
+                        message => Application.MainLoop.Invoke(() => md.Message = message),
+                        (title, message, acceptText, declineText) =>
+                        {
+                            object syncObj = new object();
+                            var options = new[] { (ustring)acceptText, (ustring)declineText }.ToList();
+                            int selectedIndex = 1; //abort 
+                            Application.MainLoop.Invoke(() =>
+                            {
+                                selectedIndex = MessageBox.Query(title, message, options.ToArray());
+
+                                lock (syncObj)
+                                {
+                                    Monitor.Pulse(syncObj);
+                                }
+                            });
+                            lock (syncObj)
+                            {
+                                Monitor.Wait(syncObj);
+                            }
+
+                            return selectedIndex == 0;
+                        },
+                        (title, message) =>
+                        {
+                            object syncObj = new object();
+                            Application.MainLoop.Invoke(() =>
+                            {
+                                MessageBox.Query(title, message, "OK");
+                                lock (syncObj)
+                                {
+                                    Monitor.Pulse(syncObj);
+                                }
+                            });
+                            lock (syncObj)
+                            {
+                                Monitor.Wait(syncObj);
+                            }
+                        }
+                    );
+                };
                 prestageCheckWorker.RunWorkerCompleted += (sender, b) =>
                 {
                     if (md.IsCurrentTop)

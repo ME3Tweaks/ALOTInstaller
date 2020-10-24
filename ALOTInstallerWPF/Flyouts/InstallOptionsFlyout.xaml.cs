@@ -240,16 +240,63 @@ namespace ALOTInstallerWPF.Flyouts
                     #endregion
 
                     #region GAME PRECHECK
-                    var precheckFailedMessage = Precheck.PerformPreStagingCheck(iop);
+
+                    var precheckFailedMessage = Precheck.PerformPreStagingCheck(iop,
+                        pimt => SpinnerText = pimt,
+                        (string title, string message, string affirmativeText, string negativeText) =>
+                        {
+                            MessageDialogResult? option = null;
+                            object syncObj = new object();
+                            Application.Current.Dispatcher.Invoke(async () =>
+                            {
+                                option = await mw.ShowMessageAsync(title, message,
+                                    MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                                    {
+                                        AffirmativeButtonText = affirmativeText,
+                                        NegativeButtonText = negativeText,
+                                        DefaultButtonFocus = MessageDialogResult.Affirmative
+                                    }, 70);
+                                lock (syncObj)
+                                {
+                                    Monitor.Pulse(syncObj);
+                                }
+
+                            });
+                            lock (syncObj)
+                            {
+                                Monitor.Wait(syncObj);
+                            }
+
+                            return option.HasValue && option.Value == MessageDialogResult.Affirmative;
+
+                        },
+                        (string title, string message) =>
+                        {
+                            object syncObj = new object();
+                            Application.Current.Dispatcher.Invoke(async () =>
+                            {
+                                await mw.ShowMessageAsync(title, message);
+                                lock (syncObj)
+                                {
+                                    Monitor.Pulse(syncObj);
+                                }
+                            });
+                            lock (syncObj)
+                            {
+                                Monitor.Wait(syncObj);
+                            }
+                        });
+
                     if (precheckFailedMessage != null)
                     {
                         Application.Current.Dispatcher.Invoke(async () =>
                         {
-                            await mw.ShowMessageAsync("Cannot install textures", precheckFailedMessage);
+                            await mw.ShowMessageAsync("Prestaging check failed", precheckFailedMessage);
                         });
                         b.Result = false;
                         return;
                     }
+
                     #endregion
 
                     #region BACKUP PRECHECK
@@ -295,8 +342,8 @@ namespace ALOTInstallerWPF.Flyouts
                 {
                     if (b.Error == null && b.Result is bool ok && ok)
                     {
-                        // BEGIN STAGING
-                        StagingUIController suic = new StagingUIController();
+                            // BEGIN STAGING
+                            StagingUIController suic = new StagingUIController();
                         suic.StartStaging(iop, FileSelectionUIController.FSUIC);
                     }
                     CloseFlyout();

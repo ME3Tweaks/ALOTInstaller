@@ -880,7 +880,7 @@ namespace ALOTInstallerCore
         /// Returns the running application version information
         /// </summary>
         /// <returns></returns>
-        public static FileVersionInfo GetAppVersion() => Process.GetCurrentProcess().MainModule.FileVersionInfo;
+        public static Version GetAppVersion() => Process.GetCurrentProcess().MainModule.FileVersionInfo.ToVersion();
         
         /// <summary>
         /// Gets the executable path that is hosting this library.

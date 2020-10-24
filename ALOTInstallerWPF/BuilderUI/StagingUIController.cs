@@ -206,17 +206,17 @@ namespace ALOTInstallerWPF.BuilderUI
                     }
                     else if (b.Result != null)
                     {
-                    // Precheck failed
-                    await mw.ShowMessageAsync("Error occurred performing install precheck", b.Result as string);
+                        // Precheck failed
+                        await mw.ShowMessageAsync("Installation precheck failed", b.Result as string);
                         fsuic.IsStaging = false;
                     }
                     else
                     {
-                    // Precheck passed
-                    if (iop.FilesToInstall != null)
+                        // Precheck passed
+                        if (iop.FilesToInstall != null)
                         {
-                        // BEGIN INSTALLATION!
-                        var iuic = new InstallerUIController(iop)
+                            // BEGIN INSTALLATION!
+                            var iuic = new InstallerUIController(iop)
                             {
                                 InstallerTextTop = "Preparing texture installer",
                             };

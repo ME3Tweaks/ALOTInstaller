@@ -113,7 +113,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 {
                     ct.Cancel();
                 };
-                AppUpdater.PerformGithubAppUpdateCheck("Mgamerz", "ALOTInstallerTest", "ALOTInstallerWPF", "ALOTInstallerWPF.exe",
+                AppUpdater.PerformGithubAppUpdateCheck("ME3Tweaks", "ALOTInstaller", "ALOTInstallerWPF", "ALOTInstaller.exe",
                     (title, text, updateButtonText, declineButtonText) =>
                     {
                         bool response = false;

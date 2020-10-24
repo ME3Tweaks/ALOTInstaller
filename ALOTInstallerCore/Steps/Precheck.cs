@@ -76,12 +76,18 @@ namespace ALOTInstallerCore.Steps
         }
 
         /// <summary>
-        /// Performs an installation precheck that should occur after the user has selected files, but before the staging step. This method is synchronous and should probably be run on a background thread as it may take a few seconds.
+        /// Performs an installation precheck that should occur after the user has selected files, but before the staging step.
+        /// This method is synchronous and should probably be run on a background thread as it may take a few seconds.
+        /// A null result means OK. An empty string result means failure, but do not show an error message. A non empty string should be
+        /// displayed to the user.
         /// </summary>
         /// <param name="target"></param>
         /// <param name="mode"></param>
         /// <param name="filesToInstall"></param>
-        public static string PerformPreStagingCheck(InstallOptionsPackage package)
+        public static string PerformPreStagingCheck(InstallOptionsPackage package,
+            Action<string> SetPreinstallCheckText,
+            Func<string, string, string, string, bool> ShowConfirmationDialog,
+            Action<string, string> ShowNormalDialog)
         {
             var pc = new Precheck()
             {
@@ -91,6 +97,44 @@ namespace ALOTInstallerCore.Steps
                 package = package
             };
 
+#if WINDOWS
+            // Check for PhysX legacy. Require it to be installed at this point in time
+            if (package.InstallTarget.Game == Enums.MEGame.ME1)
+            {
+                if (!LegacyPhysXInstaller.IsLegacyPhysXInstalled())
+                {
+                    Log.Information("[AICORE] Precheck: Legacy PhysX is not detected. Prompting for install");
+                    if (ShowConfirmationDialog("Legacy PhysX is not installed",
+                        "Legacy PhysX must be installed to correct issues with Mass Effect's use of PhysX. Select Install to begin installation.",
+                        "Install", "Decline"))
+                    {
+                        void setProgressCallback(long done, long total)
+                        {
+                            SetPreinstallCheckText($"Downloading Legacy PhysX {Math.Round(done * 100.0 / total)}%");
+                        }
+
+                        var physxInstallResult = LegacyPhysXInstaller.InstallLegacyPhysX(setProgressCallback,
+                            SetPreinstallCheckText,
+                            ShowConfirmationDialog,
+                            ShowNormalDialog, null).Result;
+                        if (physxInstallResult != null)
+                        {
+                            return physxInstallResult;
+                        }
+                    }
+                    else
+                    {
+                        return
+                            "Legacy PhysX is not installed. Legacy PhysX must be installed to fix issues with Mass Effect when the game is texture modded."; //Technically it's exe modded but still
+                    }
+                }
+                else
+                {
+                    Log.Information("[AICORE] Precheck: Legacy PhysX is installed");
+                }
+            }
+#endif
+            SetPreinstallCheckText("Performing precheck");
             if (!pc.checkOneOptionSelected(out var noOptionsSelectedReason))
             {
                 return noOptionsSelectedReason;

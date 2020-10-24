@@ -61,6 +61,12 @@ namespace ALOTInstallerCore
                     {
                         Version onlineReleaseVersion = new Version(onlineRelease.TagName);
 
+                        if (onlineReleaseVersion < currentAppVersionInfo)
+                        {
+                            Log.Information(@"The version of ALOT Installer that we have is higher than the latest release from github, no updates available.");
+                            break;
+                        }
+
                         // Check if applicable
                         if (onlineRelease.Assets.Any(x => !x.Name.StartsWith(assetPrefix)))
                         {
