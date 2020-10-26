@@ -425,7 +425,7 @@ namespace ALOTInstallerConsole.BuilderUI
             Dictionary<InstallOptionsStep.InstallOption, CheckBox> installOptionMapping = new Dictionary<InstallOptionsStep.InstallOption, CheckBox>();
             foreach (var v in availableInstallOptions)
             {
-                CheckBox cb = new CheckBox(getUIString(v, dataSource.ShownFiles))
+                CheckBox cb = new CheckBox(getUIString(v, dataSource.ShownFiles, target))
                 {
                     X = 1,
                     Y = y++,
@@ -653,17 +653,17 @@ namespace ALOTInstallerConsole.BuilderUI
         /// <returns></returns>
         private bool getInstallOptionValue(InstallOptionsStep.InstallOption key, Dictionary<InstallOptionsStep.InstallOption, CheckBox> installOptionMapping)
         {
-            return installOptionMapping.ContainsKey(key) ? installOptionMapping[key].Checked : false;
+            return installOptionMapping.ContainsKey(key) && installOptionMapping[key].Checked;
         }
 
-        private ustring getUIString(KeyValuePair<InstallOptionsStep.InstallOption, (InstallOptionsStep.OptionState state, string reasonForState)> option, List<InstallerFile> installerFiles)
+        private ustring getUIString(KeyValuePair<InstallOptionsStep.InstallOption, (InstallOptionsStep.OptionState state, string reasonForState)> option, List<InstallerFile> installerFiles, GameTarget installTarget)
         {
 
             var forcedOption = option.Value.state == InstallOptionsStep.OptionState.ForceCheckedVisible || option.Value.state == InstallOptionsStep.OptionState.DisabledVisible;
             string suffix = forcedOption ? "*" : "";
 
-            if (option.Key == InstallOptionsStep.InstallOption.ALOT) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0)?.FriendlyName ?? "ALOT") + suffix;
-            if (option.Key == InstallOptionsStep.InstallOption.ALOTUpdate) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0)?.FriendlyName ?? "ALOT update") + suffix;
+            if (option.Key == InstallOptionsStep.InstallOption.ALOT) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0 && x.ApplicableGames.HasFlag(installTarget.Game.ToApplicableGame()))?.FriendlyName ?? "ALOT") + suffix;
+            if (option.Key == InstallOptionsStep.InstallOption.ALOTUpdate) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0 && x.ApplicableGames.HasFlag(installTarget.Game.ToApplicableGame()))?.FriendlyName ?? "ALOT update") + suffix;
             if (option.Key == InstallOptionsStep.InstallOption.Addon) return "ALOT Addon" + suffix;
             if (option.Key == InstallOptionsStep.InstallOption.MEUITM) return "MEUITM" + suffix;
             if (option.Key == InstallOptionsStep.InstallOption.UserFiles) return "User files" + suffix;
