@@ -94,7 +94,7 @@ namespace ALOTInstallerWPF.Flyouts
                 var ii = target.GetInstalledALOTInfo();
                 if (ii != null)
                 {
-                    InstallOptionsTopText = prefix + ii.ToString();
+                    InstallOptionsTopText = prefix + ii;
                 }
                 b.Result = InstallOptionsStep.CalculateInstallOptions(target, ManifestHandler.CurrentMode, files);
             };
@@ -126,8 +126,10 @@ namespace ALOTInstallerWPF.Flyouts
 
         private string getUIString(InstallOptionsStep.InstallOption option, List<InstallerFile> installerFiles)
         {
-            if (option == InstallOptionsStep.InstallOption.ALOT) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0)?.FriendlyName ?? "ALOT");
-            if (option == InstallOptionsStep.InstallOption.ALOTUpdate) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0)?.FriendlyName ?? "ALOT update");
+            if (option == InstallOptionsStep.InstallOption.ALOT) 
+                return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && 
+                                                           x.AlotVersionInfo.ALOTUPDATEVER == 0 && x.ApplicableGames.HasFlag(InstallTarget.Game.ToApplicableGame()))?.FriendlyName ?? "ALOT");
+            if (option == InstallOptionsStep.InstallOption.ALOTUpdate) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0 && x.ApplicableGames.HasFlag(InstallTarget.Game.ToApplicableGame()))?.FriendlyName ?? "ALOT update");
             if (option == InstallOptionsStep.InstallOption.Addon) return "ALOT Addon";
             if (option == InstallOptionsStep.InstallOption.MEUITM) return "MEUITM";
             if (option == InstallOptionsStep.InstallOption.UserFiles) return "User files";
