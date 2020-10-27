@@ -191,13 +191,12 @@ namespace ALOTInstallerCore
         {
             foreach (var a in r.Assets)
             {
-                // Todo: Make Windows if
+#if WINDOWS
                 if (a.Name.StartsWith("MassEffectModderNoGui-v")) return a;
-
-#if LINUX
-
+#elif LINUX
+                if (a.Name.StartsWith("MassEffectModderNoGui-Linux-v")) return a;
 #elif MACOS
-
+                if (a.Name.StartsWith("MassEffectModderNoGui-macOS-v")) return a;
 #endif
             }
 
