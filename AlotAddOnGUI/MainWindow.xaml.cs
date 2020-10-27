@@ -1083,11 +1083,20 @@ namespace AlotAddOnGUI
                     await kp.Key.CloseAsync();
 
                     Log.Information("Update Extracted - rebooting to update mode");
-                    string exe = EXE_DIRECTORY + "Update\\" + System.AppDomain.CurrentDomain.FriendlyName;
-                    string currentDirNoSlash = EXE_DIRECTORY.Substring(0, EXE_DIRECTORY.Length - 1);
-                    args = "--update-dest \"" + currentDirNoSlash + "\"";
-                    Utilities.runProcess(exe, args, true);
-                    Environment.Exit(0);
+                    var exeDir = Path.Combine(EXE_DIRECTORY, "Update");
+                    var exe = Directory.GetFiles(exeDir, "ALOTInstaller.exe", SearchOption.AllDirectories).FirstOrDefault();
+                    if (exe != null)
+                    {
+                        string currentDirNoSlash = EXE_DIRECTORY.Substring(0, EXE_DIRECTORY.Length - 1);
+                        args = "--update-dest \"" + currentDirNoSlash + "\"";
+                        Utilities.runProcess(exe, args, true);
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        Log.Error("Failed to launch update program, ALOTInstaller.exe could not be found in the extracted folder!");
+                        await this.ShowMessageAsync("Could not find update in download", "The update failed due the a target update file not existing in the archive. This is a bug in ALOT Installer, please report it to the developers.");
+                    }
                 }
                 else
                 {
