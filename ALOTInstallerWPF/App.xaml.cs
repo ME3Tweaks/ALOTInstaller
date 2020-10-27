@@ -64,6 +64,12 @@ namespace ALOTInstallerWPF
                         copyAndRebootUpdate(parsedCommandLineArgs.Value.UpdateRebootDest);
                         return;
                     }
+
+                    if (parsedCommandLineArgs.Value.UpdateRebootDestDir != null)
+                    {
+                        copyAndRebootUpdateV3(parsedCommandLineArgs.Value.UpdateRebootDestDir);
+                        return;
+                    }
                 }
                 else
                 {
@@ -75,6 +81,54 @@ namespace ALOTInstallerWPF
 
         }
 
+        /// <summary>
+        /// Upgrade from V3 update and swap
+        /// </summary>
+        /// <param name="updateRebootDestDir"></param>
+        private void copyAndRebootUpdateV3(string updateRebootDestDir)
+        {
+            Thread.Sleep(2000); //SLEEP WHILE WE WAIT FOR PARENT PROCESS TO STOP.
+            Log.Information("In update mode. Update destination: " + updateRebootDestDir);
+            int i = 0;
+            var targetFile = Path.Combine(updateRebootDestDir, "ALOTInstaller.exe");
+            while (i < 5)
+            {
+                i++;
+                try
+                {
+                    Log.Information("Applying update");
+                    if (File.Exists(targetFile)) File.Delete(targetFile);
+                    File.Copy(System.Reflection.Assembly.GetExecutingAssembly().Location, targetFile);
+                    ProcessStartInfo psi = new ProcessStartInfo(targetFile)
+                    {
+                        WorkingDirectory = updateRebootDestDir
+                    };
+                    Process.Start(psi);
+                    Environment.Exit(0);
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Error applying update: " + e.Message);
+                    if (i < 5)
+                    {
+                        Thread.Sleep(1000);
+                        Log.Information("Attempt #" + (i + 1));
+                    }
+                    else
+                    {
+                        Log.Fatal("Unable to apply update after 5 attempts. We are giving up.");
+                        MessageBox.Show("Update was unable to apply. See the logs directory for more information. If this continues to happen please come to the ALOT discord or download a new copy from GitHub.");
+                        Environment.Exit(1);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// V4 update reboot and swap
+        /// </summary>
+        /// <param name="valueUpdateRebootDest"></param>
         private void copyAndRebootUpdate(string valueUpdateRebootDest)
         {
             Thread.Sleep(2000); //SLEEP WHILE WE WAIT FOR PARENT PROCESS TO STOP.
@@ -117,6 +171,10 @@ namespace ALOTInstallerWPF
 
         class Options
         {
+            [Option("update-dest",
+                HelpText = "Legacy update flag for upgrading from ALOT Installer V3. This is the directory that this executable should be copied to, and booted from.")]
+            public string UpdateRebootDestDir { get; private set; }
+
             [Option("update-dest-path",
                 HelpText = "Copies this program's executable to the specified location, runs the new executable, and then exits this process.")]
             public string UpdateRebootDest { get; private set; }
