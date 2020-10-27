@@ -432,7 +432,7 @@ namespace AlotAddOnGUI
 
         private async void PerformUpdateCheck(bool dotNetSatisfiedForUpdate)
         {
-            Log.Information("Checking for application updates from gitub");
+            Log.Information("Checking for application updates from github");
             AddonFilesLabel.Text = "Checking for application updates";
             var versInfo = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
             var client = new GitHubClient(new ProductHeaderValue("ALOTInstaller"));
@@ -452,7 +452,7 @@ namespace AlotAddOnGUI
                     foreach (Release r in releases)
                     {
                         // Check if applicable
-                        var applicableAsset = r.Assets.FirstOrDefault(x => x.Name.StartsWith("ALOTInstallerWPF") || !x.Name.StartsWith("ALOTInstaller_3"));
+                        var applicableAsset = r.Assets.FirstOrDefault(x => x.Name.StartsWith("ALOTInstallerWPF") || x.Name.StartsWith("ALOTInstaller_3"));
                         if (applicableAsset == null) continue; //No applicable asset
 
                         Version releaseVersion = new Version(r.TagName);
