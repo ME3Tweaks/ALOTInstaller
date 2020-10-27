@@ -444,12 +444,17 @@ namespace AlotAddOnGUI
                 {
                     Log.Information("Fetched application releases from github");
 
-                    //The release we want to check is always the latest, so [0]
+                    //The release we want to check is always the latest
                     Release latest = null;
                     Version latestVer = new Version("0.0.0.0");
                     bool newHiddenBetaBuildAvailable = false;
+                    ReleaseAsset latestAsset = null;
                     foreach (Release r in releases)
                     {
+                        // Check if applicable
+                        var applicableAsset = r.Assets.FirstOrDefault(x => x.Name.StartsWith("ALOTInstallerWPF") || !x.Name.StartsWith("ALOTInstaller_3"));
+                        if (applicableAsset == null) continue; //No applicable asset
+
                         Version releaseVersion = new Version(r.TagName);
                         if (!USING_BETA && r.Prerelease && versInfo.Build < releaseVersion.Build)
                         {
@@ -464,6 +469,7 @@ namespace AlotAddOnGUI
                         {
                             latest = r;
                             latestVer = releaseVersion;
+                            latestAsset = applicableAsset;
                         }
                     }
 
@@ -471,7 +477,7 @@ namespace AlotAddOnGUI
                     {
                         Log.Information("Latest available: " + latest.TagName);
                         Version releaseName = new Version(latest.TagName);
-                        if (versInfo < releaseName && latest.Assets.Count > 0)
+                        if (versInfo < releaseName)
                         {
                             if (!dotNetSatisfiedForUpdate)
                             {
@@ -487,7 +493,6 @@ namespace AlotAddOnGUI
                                     return;
                                 }
                             }
-
 
                             bool upgrade = false;
                             bool canCancel = true;
@@ -578,7 +583,7 @@ namespace AlotAddOnGUI
                                     }
                                 };
                                 downloadClient.DownloadFileCompleted += UnzipSelfUpdate;
-                                string downloadPath = temppath + "ALOTInstaller_Update" + Path.GetExtension(latest.Assets[0].BrowserDownloadUrl);
+                                string downloadPath = temppath + "ALOTInstaller_Update" + Path.GetExtension(latestAsset.BrowserDownloadUrl);
                                 //DEBUG ONLY
                                 Uri downloadUri = new Uri(latest.Assets[0].BrowserDownloadUrl);
                                 downloadClient.DownloadFileAsync(downloadUri, downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
