@@ -121,6 +121,18 @@ namespace ALOTInstallerWPF
                 HelpText = "Copies this program's executable to the specified location, runs the new executable, and then exits this process.")]
             public string UpdateRebootDest { get; private set; }
 
+            [Option("me1path",
+                HelpText = "Sets the path for Mass Effect on app boot. It must point to the game root directory.")]
+            public bool PassthroughME1Path { get; private set; }
+
+            [Option("me2path",
+                HelpText = "Sets the path for Mass Effect 2 on app boot. It must point to the game root directory.")]
+            public bool PassthroughME2Path { get; private set; }
+
+            [Option("me3path",
+                HelpText = "Sets the path for Mass Effect 3 on app boot. It must point to the game root directory.")]
+            public bool PassthroughME3Path { get; private set; }
+
             [Option("update-boot",
                 HelpText = "Indicates that the process should run in update mode for a single file .net core executable. The process will exit upon starting because the platform extraction process will have completed.")]
             public bool UpdateBoot { get; private set; }
