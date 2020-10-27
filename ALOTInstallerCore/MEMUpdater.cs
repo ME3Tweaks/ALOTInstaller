@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using ALOTInstallerCore.Helpers;
@@ -164,13 +165,32 @@ namespace ALOTInstallerCore
                             downloadProgressChanged?.Invoke(bytesReceived, totalBytes);
 
                         });
-                        
+
                         // Handle unzip code here.
                         statusMessageUpdate?.Invoke("Extracting MassEffectModderNoGui");
-                        var res = LZMA.ExtractSevenZipArchive(downloadPath, Locations.AppDataFolder(), true);
-                        if (!res)
+                        if (Path.GetExtension(downloadPath) == ".7z")
                         {
-                            Log.Error("[AICORE] ERROR EXTRACTING MASSEFFECMODDERNOGUI!!");
+                            var res = LZMA.ExtractSevenZipArchive(downloadPath, Locations.AppDataFolder(), true);
+                            if (!res)
+                            {
+                                Log.Error("[AICORE] ERROR EXTRACTING 7z MASSEFFECMODDERNOGUI!!");
+                            }
+                        }
+                        else if (Path.GetExtension(downloadPath) == ".zip")
+                        {
+                            var zf = ZipFile.OpenRead(downloadPath);
+                            var zipEntry = zf.Entries.FirstOrDefault(x =>
+                                Path.GetFileNameWithoutExtension(x.FullName) == "MassEffectModderNoGui");
+                            if (zipEntry != null)
+                            {
+                                if (File.Exists(Locations.MEMPath())) File.Delete(Locations.MEMPath());
+                                using var fs = File.OpenWrite(Locations.MEMPath());
+                                zipEntry.Open().CopyTo(fs);
+                            }
+                            else
+                            {
+                                Log.Error(@"[AICORE] MassEffectModderNoGui file was not found in the archive!");
+                            }
                         }
                     }
                     else
