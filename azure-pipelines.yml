@@ -1,9 +1,19 @@
 # Build all three versions of ALOT Installer
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
-name: 'ALOT Installer Build + Publish'
 trigger:
-- ALOT-v4
+  branches:
+    include:
+      - ALOT-v4
+  paths:
+    include:
+      - ALOTInstaller*/*
+      - Libraries/*
+      - Azure/*
+      - SharedAssemblyInfo.proj
+    exclude:
+       - manifest.xml
+       - manifest-beta.xml
 
 pool:
   vmImage: 'windows-latest'
@@ -30,6 +40,7 @@ steps:
       $xml.Project.PropertyGroup.Version = $ver.ToString()
       $xml.Project.PropertyGroup.AssemblyVersion = $ver.ToString()
       $xml.Project.PropertyGroup.FileVersion = $ver.ToString()
+      $xml.Project.PropertyGroup.Copyright = "2017-$(Get-Date -Format yyyy) ME3Tweaks"
       $xml.Save("SharedAssemblyInfo.proj")
       Write-Host "Version: $($ver)"
       echo "##vso[task.setvariable variable=VER]$($ver)"
