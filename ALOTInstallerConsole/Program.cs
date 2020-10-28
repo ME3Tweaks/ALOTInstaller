@@ -28,7 +28,10 @@ namespace ALOTInstallerConsole
             catch (Exception e)
             {
                 // Unhandled exception!
-                Console.BufferHeight = bufferHeight; //Restore
+                try
+                {
+                    Console.BufferHeight = bufferHeight; //Restore
+                } catch { } //Can't restore console height on platform.
                 Console.Error.WriteLine(e.FlattenWithTrace());
             }
         }
