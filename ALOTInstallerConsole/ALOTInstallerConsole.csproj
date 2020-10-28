@@ -23,7 +23,7 @@
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='LinuxDebug'">
 		<DefineConstants>TRACE;DEBUG;LINUX</DefineConstants>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net5.0</TargetFramework>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='LinuxRelease'">
 		<DefineConstants>LINUX</DefineConstants>
