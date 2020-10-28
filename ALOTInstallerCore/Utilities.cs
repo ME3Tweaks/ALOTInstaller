@@ -56,7 +56,7 @@ namespace ALOTInstallerCore
         /// Gets the folder of the current program that is running this library.
         /// </summary>
         /// <returns></returns>
-        internal static string GetExecutingAssemblyFolder() => Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+        internal static string GetExecutingAssemblyFolder() => Path.GetDirectoryName(GetExecutablePath());
 
         private static Stream GetResourceStream(string assemblyResource)
         {

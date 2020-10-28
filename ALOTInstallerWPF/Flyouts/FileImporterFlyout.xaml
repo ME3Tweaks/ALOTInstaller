@@ -62,7 +62,7 @@
 
 
         <!-- Importing -->
-        <StackPanel Width="300" HorizontalAlignment="Center" VerticalAlignment="Center"
+        <StackPanel Width="400" HorizontalAlignment="Center" VerticalAlignment="Center"
                         Visibility="{Binding CurrentDisplayMode, 
                             Converter={StaticResource EFIDisplayModeToVisibilityConverter},
                             ConverterParameter='ImportingView'}">
