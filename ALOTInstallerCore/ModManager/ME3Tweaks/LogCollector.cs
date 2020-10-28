@@ -50,6 +50,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         public static string LogDir => Directory.CreateDirectory(Path.Combine(Locations.AppDataFolder(), "Logs")).FullName;
 
         /// <summary>
+        /// Log session divider. Should always be the very first line of a new session
+        /// </summary>
+        public static string SessionStartString { get; } = "============================SESSION START============================";
+
+        /// <summary>
         /// Pulls the specified log file, with support for restarting the logger
         /// </summary>
         /// <param name="logfile"></param>

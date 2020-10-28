@@ -9,6 +9,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using ALOTInstallerCore;
+using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager.ME3Tweaks;
 using CommandLine;
 using Serilog;
 
@@ -31,9 +34,6 @@ namespace ALOTInstallerWPF
         public App() : base()
         {
             handleCommandLine();
-
-
-
             ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(UIElement),
                 new FrameworkPropertyMetadata(15000));
             ToolTipService.ShowOnDisabledProperty.OverrideMetadata(
@@ -61,12 +61,16 @@ namespace ALOTInstallerWPF
 
                     if (parsedCommandLineArgs.Value.UpdateRebootDest != null)
                     {
+                        Log.Logger = LogCollector.CreateLogger();
+                        Log.Information(LogCollector.SessionStartString);
                         copyAndRebootUpdate(parsedCommandLineArgs.Value.UpdateRebootDest);
                         return;
                     }
 
                     if (parsedCommandLineArgs.Value.UpdateRebootDestDir != null)
                     {
+                        Log.Logger = LogCollector.CreateLogger();
+                        Log.Information(LogCollector.SessionStartString);
                         copyAndRebootUpdateV3(parsedCommandLineArgs.Value.UpdateRebootDestDir);
                         return;
                     }
@@ -98,7 +102,7 @@ namespace ALOTInstallerWPF
                 {
                     Log.Information("Applying update");
                     if (File.Exists(targetFile)) File.Delete(targetFile);
-                    File.Copy(System.Reflection.Assembly.GetExecutingAssembly().Location, targetFile);
+                    File.Copy(Utilities.GetExecutablePath(), targetFile);
                     ProcessStartInfo psi = new ProcessStartInfo(targetFile)
                     {
                         WorkingDirectory = updateRebootDestDir
@@ -118,7 +122,7 @@ namespace ALOTInstallerWPF
                     else
                     {
                         Log.Fatal("Unable to apply update after 5 attempts. We are giving up.");
-                        MessageBox.Show("Update was unable to apply. See the logs directory for more information. If this continues to happen please come to the ALOT discord or download a new copy from GitHub.");
+                        MessageBox.Show($"Update was unable to apply. The last error message was {e.Message}.\nSee the logs directory in {LogCollector.LogDir} for more information.\n\nUpdate file: {Utilities.GetExecutablePath()}\nDestination file: {targetFile}\n\nIf this continues to happen please come to the ALOT discord or download a new release from GitHub.");
                         Environment.Exit(1);
                     }
                 }
@@ -128,24 +132,23 @@ namespace ALOTInstallerWPF
         /// <summary>
         /// V4 update reboot and swap
         /// </summary>
-        /// <param name="valueUpdateRebootDest"></param>
-        private void copyAndRebootUpdate(string valueUpdateRebootDest)
+        /// <param name="updateRebootDest"></param>
+        private void copyAndRebootUpdate(string updateRebootDest)
         {
             Thread.Sleep(2000); //SLEEP WHILE WE WAIT FOR PARENT PROCESS TO STOP.
-            Log.Information("In update mode. Update destination: " + valueUpdateRebootDest);
+            Log.Information("In update mode. Update destination: " + updateRebootDest);
             int i = 0;
             while (i < 5)
             {
-
                 i++;
                 try
                 {
                     Log.Information("Applying update");
-                    if (File.Exists(valueUpdateRebootDest)) File.Delete(valueUpdateRebootDest);
-                    File.Copy(System.Reflection.Assembly.GetExecutingAssembly().Location, valueUpdateRebootDest);
-                    ProcessStartInfo psi = new ProcessStartInfo(valueUpdateRebootDest)
+                    if (File.Exists(updateRebootDest)) File.Delete(updateRebootDest);
+                    File.Copy(Utilities.GetExecutablePath(), updateRebootDest);
+                    ProcessStartInfo psi = new ProcessStartInfo(updateRebootDest)
                     {
-                        WorkingDirectory = Directory.GetParent(valueUpdateRebootDest).FullName
+                        WorkingDirectory = Directory.GetParent(updateRebootDest).FullName
                     };
                     Process.Start(psi);
                     Environment.Exit(0);
@@ -162,7 +165,7 @@ namespace ALOTInstallerWPF
                     else
                     {
                         Log.Fatal("Unable to apply update after 5 attempts. We are giving up.");
-                        MessageBox.Show("Update was unable to apply. See the logs directory for more information. If this continues to happen please come to the ALOT discord or download a new copy from GitHub.");
+                        MessageBox.Show($"Update was unable to apply. The last error message was {e.Message}.\nSee the logs directory in {LogCollector.LogDir} for more information.\n\nUpdate file: {Utilities.GetExecutablePath()}\nDestination file: {updateRebootDest}\n\nIf this continues to happen please come to the ALOT discord or download a new release from GitHub.");
                         Environment.Exit(1);
                     }
                 }
