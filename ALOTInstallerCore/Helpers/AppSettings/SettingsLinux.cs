@@ -25,8 +25,8 @@ namespace ALOTInstallerCore.Helpers.AppSettings
             {
                 settingsIni = DuplicatingIni.LoadIni(SettingsPath);
             }
-            TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, @"Downloaded_Mods");
-            BuildLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, @"Staging");
+            TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller", "Downloaded_Mods"), true);
+            BuildLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller","Staging"), true);
             MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
             Telemetry = LoadSettingBool(SettingsKeys.SettingKeys.Telemetry, true);
             BetaMode = LoadSettingBool(SettingsKeys.SettingKeys.BetaMode, false);
@@ -85,7 +85,7 @@ namespace ALOTInstallerCore.Helpers.AppSettings
             return res;
         }
 
-        private static string LoadDirectorySetting(SettingsKeys.SettingKeys key, string defaultSubfolder)
+        private static string LoadDirectorySetting(SettingsKeys.SettingKeys key, string defaultSubfolder, bool isDefaultFullPath)
         {
             var dir = settingsIni["Settings"][SettingsKeys.SettingsKeyMapping[key]]?.Value;
             if (dir != null && Directory.Exists(dir))
@@ -93,6 +93,7 @@ namespace ALOTInstallerCore.Helpers.AppSettings
                 return dir;
             }
             var path = Path.Combine(Utilities.GetExecutingAssemblyFolder(), defaultSubfolder);
+            if (isDefaultFullPath) path = defaultSubfolder;
             Directory.CreateDirectory(path);
             return path;
         }
