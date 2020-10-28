@@ -35,11 +35,11 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
             }
         }
 
-        internal static string CookedPath(string basepath) => Path.Combine(basepath, @"BioGame\CookedPCConsole");
+        internal static string CookedPath(string basepath) => Path.Combine(basepath, @"BIOGame\CookedPCConsole");
         public static string biogamePath => gamePath != null ? gamePath.Contains("biogame", StringComparison.OrdinalIgnoreCase) ? gamePath : Path.Combine(gamePath, @"BIOGame\") : null;
         public static string tocFile => gamePath != null ? Path.Combine(gamePath, @"BIOGame\PCConsoleTOC.bin") : null;
         public static string cookedPath => gamePath != null ? Path.Combine(gamePath, @"BIOGame\CookedPCConsole\") : "Not Found";
-        public static string CookedPath(GameTarget target) => Path.Combine(target.TargetPath, @"BioGame\CookedPCConsole");
+        public static string CookedPath(GameTarget target) => Path.Combine(target.TargetPath, @"BIOGame\CookedPCConsole");
 
         /// <summary>
         /// Gets the path to the testpatch DLC file for the specified game target

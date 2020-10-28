@@ -27,7 +27,7 @@ namespace ALOTInstallerCore
             CoreAnalytics.StopTelemetryCallback = stopTelemetryCallback;
             LogCollector.SetWrapperLogger = setCallingLoggerCallback;
             setCallingLoggerCallback?.Invoke(LogCollector.CreateLogger());
-            Log.Information("============================SESSION START============================");
+            Log.Information(LogCollector.SessionStartString);
             Log.Information("[AICORE] ALOTInstallerCore library is booting");
             Log.Information($"[AICORE] Library version: {Utilities.GetLibraryVersion()}");
             Log.Information("[AICORE] Loading settings");

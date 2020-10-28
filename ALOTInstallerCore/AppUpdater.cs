@@ -42,7 +42,7 @@ namespace ALOTInstallerCore
             CancellationTokenSource cancellationTokenSource)
         {
 #if APPUPDATESUPPORT
-            Log.Information("[AICORE] Checking for application updates from gitub");
+            Log.Information("[AICORE] Checking for application updates from github");
             var currentAppVersionInfo = Utilities.GetAppVersion();
             var client = new GitHubClient(new ProductHeaderValue($"{Utilities.GetAppPrefixedName()}Installer"));
             try

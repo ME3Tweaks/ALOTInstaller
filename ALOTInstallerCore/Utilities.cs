@@ -23,6 +23,7 @@ using Microsoft.Win32;
 using NickStrupat;
 using System.Management;
 using ALOTInstallerCore.Helpers.AppSettings;
+using ME3ExplorerCore.Gammtek.Extensions.Reflection;
 
 namespace ALOTInstallerCore
 {
@@ -56,7 +57,7 @@ namespace ALOTInstallerCore
         /// Gets the folder of the current program that is running this library.
         /// </summary>
         /// <returns></returns>
-        internal static string GetExecutingAssemblyFolder() => Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+        internal static string GetExecutingAssemblyFolder() => Path.GetDirectoryName(GetExecutablePath());
 
         private static Stream GetResourceStream(string assemblyResource)
         {
@@ -880,7 +881,7 @@ namespace ALOTInstallerCore
         /// Returns the running application version information
         /// </summary>
         /// <returns></returns>
-        public static Version GetAppVersion() => Process.GetCurrentProcess().MainModule.FileVersionInfo.ToVersion();
+        public static Version GetAppVersion() => System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
         
         /// <summary>
         /// Gets the executable path that is hosting this library.
