@@ -125,8 +125,6 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         /// <returns></returns>
         public static string PerformDiagnostic(GameTarget selectedDiagnosticTarget, bool textureCheck,
             Action<string> updateStatusCallback = null, Action<int> updateProgressCallback = null, Action progressIndeterminateCallback = null)
-        //,
-        //Action<TaskbarItemProgressState> updateTaskbarState = null)
         {
             //updateTaskbarState?.Invoke(TaskbarItemProgressState.Indeterminate);
 
@@ -137,6 +135,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             //    /_/  \
             //    \_\/\ \
             //      \_\/
+
+            Log.Information($@"[AICORE] Beginning diagnostics for {selectedDiagnosticTarget.Game.ToGameName()}");
+            Log.Information($@"[AICORE] Full textures check: {textureCheck}");
 
             #region Diagnostic setup and diag header
 
@@ -167,9 +168,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         diagStringBuilder.Append($@"[WARN]{message}");
                         break;
                     case Severity.ERROR:
+                        Log.Error($@"[AICORE] {message}");
                         diagStringBuilder.Append($@"[ERROR]{message}");
                         break;
                     case Severity.FATAL:
+                        Log.Fatal($@"[AICORE] {message}");
                         diagStringBuilder.Append($@"[FATAL]{message}");
                         break;
                     case Severity.DIAGSECTION:
@@ -233,6 +236,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #region Game Information
 
                 updateStatusCallback?.Invoke("Collecting game information");
+                Log.Information($@"[AICORE] Collecting game information");
+
                 addDiagLine(@"Basic game information", Severity.DIAGSECTION);
                 addDiagLine($@"Game is installed at {gamePath}");
 
@@ -273,10 +278,14 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 string exePath = MEDirectories.ExecutablePath(selectedDiagnosticTarget);
                 if (File.Exists(exePath))
                 {
-
+#if WINDOWS
+                    Log.Information(@"[AICORE] Getting game version");
                     var versInfo = FileVersionInfo.GetVersionInfo(exePath);
                     addDiagLine(
                         $@"Version: {versInfo.FileMajorPart}.{versInfo.FileMinorPart}.{versInfo.FileBuildPart}.{versInfo.FilePrivatePart}");
+#else
+                    addDiagLine($@"Version information cannot be read on non-windows platforms");
+#endif
                     if (selectedDiagnosticTarget.Game == Enums.MEGame.ME1)
                     {
                         //bool me1LAAEnabled = Utilities.GetME1LAAEnabled();
@@ -302,6 +311,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
 
 #if WINDOWS
+                    Log.Information(@"[AICORE] Checking executable signatures");
+
                     //Executable signatures
                     var info = new FileInspector(exePath);
                     var certOK = info.Validate();
@@ -333,6 +344,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 #endif
 
                     //BINK
+                    Log.Information(@"[AICORE] Checking if Bink ASI loader is installed");
+
                     if (selectedDiagnosticTarget.IsBinkBypassInstalled())
                     {
                         addDiagLine(@"binkw32 ASI bypass is installed");
@@ -358,7 +371,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #endregion
 
                 #region System Information
-
+                Log.Information(@"[AICORE] Collecting system information");
                 updateStatusCallback?.Invoke("Collecting system information");
 
                 addDiagLine(@"System information", Severity.DIAGSECTION);
@@ -462,6 +475,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #endregion
 
                 #region Texture mod information
+                Log.Information(@"[AICORE] Getting texture mod installation info");
 
                 updateStatusCallback?.Invoke(@"Getting texture mod installation info");
 
@@ -502,7 +516,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
 
                 #region Basegame file changes
-
+                Log.Information(@"[AICORE] Getting basegame file modifications");
                 addDiagLine(@"Basegame changes", Severity.DIAGSECTION);
 
                 updateStatusCallback?.Invoke(@"Collecting basegame file modifications");
@@ -567,6 +581,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         Severity.ERROR);
                 }
 
+                Log.Information(@"[AICORE] Checking for blacklisted mods");
                 updateStatusCallback?.Invoke(@"Checking for blacklisted mods");
                 args = $@"--detect-bad-mods --gameid {gameID} --ipc";
                 var blacklistedMods = new List<string>();
@@ -614,6 +629,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #region Installed DLCs
 
                 //Get DLCs
+                Log.Information(@"[AICORE] Getting DLC information");
+
                 updateStatusCallback?.Invoke("Collecting DLC information");
 
                 var installedDLCs = MEDirectories.GetMetaMappedInstalledDLC(selectedDiagnosticTarget);
@@ -661,6 +678,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             : Severity.DLC);
                 }
 
+                Log.Information(@"[AICORE] Calculating supercedances");
+
                 var supercedanceList = MEDirectories.GetFileSupercedances(selectedDiagnosticTarget)
                     .Where(x => x.Value.Count > 1).ToList();
                 if (supercedanceList.Any())
@@ -695,6 +714,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 if (selectedDiagnosticTarget.Game > Enums.MEGame.ME1)
                 {
+                    Log.Information(@"[AICORE] Getting list of TFCs");
                     updateStatusCallback?.Invoke("Collecting TFC file information");
 
                     addDiagLine(@"Texture File Cache (TFC) files", Severity.DIAGSECTION);
@@ -726,6 +746,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 if (selectedDiagnosticTarget.TextureModded)
                 {
                     // Is this correct on linux?
+                    Log.Information(@"[AICORE] Checking texture map is in sync with game state");
+
                     bool textureMapFileExists =
                         File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
                                     $@"\MassEffectModder\me{gameID}map.bin");
@@ -828,116 +850,13 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 #endregion
 
-                #region Textures check... unknown?
-
-                //what the hell is this?
-                //if (textureCheck)
-                //{
-                //    //if (MEMI_FOUND)
-                //    //{
-                //    args = $"--check-game-data-after --gameid {gameID} --ipc"; //Check texture map is still valid
-                //    //}
-                //    //else // full texture check without mods installed. might allow this
-                //    //{
-                //    //    args = "--check-for-markers --gameid " + DIAGNOSTICS_GAME + " --ipc"; //Check if any ALOT markers exist (all packages will be opened for reading)
-                //    //}
-                //    exitcode = null;
-                //    runMassEffectModderNoGuiIPC(mempath, args, memFinishedLock, i => exitcode = i, (string command, string param) =>
-                //    {
-
-                //    });
-                //    lock (memFinishedLock)
-                //    {
-                //        Monitor.Wait(memFinishedLock);
-                //    }
-                //    if (MEMI_FOUND)
-                //    {
-                //        addDiagLine("===Replaced files scan (after textures were installed)");
-                //        addDiagLine("This check will detect if files were replaced after textures were installed in an unsupported manner.");
-                //        addDiagLine("");
-                //    }
-                //    else
-                //    {
-                //        addDiagLine("===Preinstallation file scan");
-                //        addDiagLine("This check will make sure all files can be opened for reading and that files that were previously modified by ALOT are not installed.");
-                //        addDiagLine("");
-                //    }
-
-                //    if (BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count > 0)
-                //    {
-
-                //        if (MEMI_FOUND)
-                //        {
-                //            addDiagLine("[ERROR]Diagnostic reports some files appear to have been added or replaced after ALOT was installed, or could not be read:");
-                //        }
-                //        else
-                //        {
-                //            addDiagLine("[ERROR]The following files did not pass the modification marker check, or could not be read:");
-                //        }
-
-                //        int numSoFar = 0;
-                //        foreach (String str in BACKGROUND_MEM_PROCESS_PARSED_ERRORS)
-                //        {
-                //            addDiagLine("[ERROR] - " + str);
-                //            numSoFar++;
-                //            if (numSoFar == 10 && BACKGROUND_MEM_PROCESS_PARSED_ERRORS.Count() > 10)
-                //            {
-                //                addDiagLine("[SUB]");
-                //            }
-                //        }
-
-                //        if (numSoFar > 10)
-                //        {
-                //            addDiagLine("[/SUB]");
-                //        }
-
-                //        if (MEMI_FOUND)
-                //        {
-                //            addDiagLine("[ERROR]Files added or replaced after ALOT has been installed is not supported due to the way the Unreal Engine 3 works.");
-                //        }
-                //        else
-                //        {
-                //            addDiagLine("[ERROR]Files that were previously modified by ALOT are most times broken or leftover from a previous ALOT failed installation that did not complete and set the ALOT installation marker.");
-                //            addDiagLine("[ERROR]Delete your game installation and reinstall the game, or restore from your backup in the ALOT settings.");
-                //        }
-
-                //        if (BACKGROUND_MEM_PROCESS.ExitCode == null || BACKGROUND_MEM_PROCESS.ExitCode != 0)
-                //        {
-                //            pairLog = true;
-                //            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during --check-game-data-after. Some data was returned. The return code was: " + BACKGROUND_MEM_PROCESS.ExitCode);
-                //        }
-                //    }
-                //    else
-                //    {
-                //        if (BACKGROUND_MEM_PROCESS.ExitCode != null && BACKGROUND_MEM_PROCESS.ExitCode == 0)
-                //        {
-                //            if (MEMI_FOUND)
-                //            {
-                //                addDiagLine("Diagnostic did not find any files that were added or replaced after ALOT installation or have issues reading files.");
-                //            }
-                //            else
-                //            {
-                //                addDiagLine("Diagnostic did not find any files from previous installations of ALOT or have issues reading files.");
-                //            }
-                //        }
-                //        else
-                //        {
-                //            pairLog = true;
-                //            addDiagLine("[ERROR]MEMNoGui returned non zero exit code, or null (crash) during --check-game-data-after: " + BACKGROUND_MEM_PROCESS.ExitCode);
-                //        }
-                //    }
-
-                //    diagnosticsWorker.ReportProgress(0, new ThreadCommand(RESET_REPLACEFILE_TEXT));
-                //    diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_DataAfter));
-                //}
-
-                #endregion
-
                 #region Textures - full check
 
                 //FULL CHECK
                 if (textureCheck)
                 {
+                    Log.Information(@"[AICORE] Performing full textures check. This will take some time");
+
                     var param = 0;
                     updateStatusCallback?.Invoke("Running full textures check 0%");
                     addDiagLine(@"Full Textures Check", Severity.DIAGSECTION);
@@ -948,7 +867,6 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     string lastMissingTFC = null;
                     updateProgressCallback?.Invoke(0);
 
-                    //updateTaskbarState?.Invoke(TaskbarItemProgressState.Normal);
                     void handleIPC(string command, string param)
                     {
                         switch (command)
@@ -1074,6 +992,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 #region Texture LODs
 
+                Log.Information(@"[AICORE] Collecting LOD info");
                 updateStatusCallback?.Invoke(@"Collecting LOD settings");
                 var lods = MEMIPCHandler.GetLODs(selectedDiagnosticTarget.Game);
                 if (lods != null)
@@ -1088,6 +1007,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #endregion
 
                 #region ASI mods
+                Log.Information(@"[AICORE] Collecting ASI information");
 
                 updateStatusCallback?.Invoke("Collecting ASI information");
 
@@ -1125,6 +1045,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 //TOC SIZE CHECK
                 if (selectedDiagnosticTarget.Game == Enums.MEGame.ME3)
                 {
+                    Log.Information(@"[AICORE] Checking ME3 TOC files");
+
                     updateStatusCallback?.Invoke(@"Collecting TOC file information");
 
                     addDiagLine(@"File Table of Contents (TOC) size check", Severity.DIAGSECTION);
@@ -1184,11 +1106,12 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 //ME1: LOGS
                 if (selectedDiagnosticTarget.Game == Enums.MEGame.ME1)
                 {
+                    Log.Information(@"[AICORE] Collecting ME1 app logs");
+
                     updateStatusCallback?.Invoke("Collecting ME1 app logs");
 
                     //GET LOGS
-                    string logsdir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal),
-                        @"BioWare\Mass Effect\Logs");
+                    string logsdir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"BioWare", @"Mass Effect", @"Logs");
                     if (Directory.Exists(logsdir))
                     {
                         DirectoryInfo info = new DirectoryInfo(logsdir);
@@ -1244,6 +1167,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
 #if WINDOWS
                 //EVENT LOGS
+                Log.Information(@"[AICORE] Checking Windows event logs for crash events");
+
                 updateStatusCallback?.Invoke("Collecting relevant event logs");
                 StringBuilder crashLogs = new StringBuilder();
                 var sevenDaysAgo = DateTime.Now.AddDays(-3);
@@ -1283,6 +1208,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 if (selectedDiagnosticTarget.Game == Enums.MEGame.ME3)
                 {
+                    Log.Information(@"[AICORE] Collecting ME3logger session log");
+
                     updateStatusCallback?.Invoke("Collecting ME3 session log");
                     string me3logfilepath =
                         Path.Combine(

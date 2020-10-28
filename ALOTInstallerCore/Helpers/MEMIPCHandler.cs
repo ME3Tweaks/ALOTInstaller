@@ -171,6 +171,10 @@ namespace ALOTInstallerCore.Helpers
                         ipcCallback?.Invoke(command, parm);
                         break;
                     default:
+                        if (Settings.DebugLogs)
+                        {
+                            Log.Debug($@"[AICORE] Mem Output: {command} {parm}");
+                        }
                         ipcCallback?.Invoke(command, parm);
                         break;
                 }

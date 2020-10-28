@@ -281,11 +281,11 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
             switch (selectedDiagnosticTarget.Game)
             {
                 case Enums.MEGame.ME1:
-                    return Path.Combine(selectedDiagnosticTarget.TargetPath, @"BioGame\CookedPC\testVolumeLight_VFX.upk");
+                    return Path.Combine(selectedDiagnosticTarget.TargetPath, @"BioGame", "CookedPC", "testVolumeLight_VFX.upk");
                 case Enums.MEGame.ME2:
-                    return Path.Combine(selectedDiagnosticTarget.TargetPath, @"BioGame\CookedPC\BIOC_Materials.pcc");
+                    return Path.Combine(selectedDiagnosticTarget.TargetPath, @"BioGame", "CookedPC", "BIOC_Materials.pcc");
                 case Enums.MEGame.ME3:
-                    return Path.Combine(selectedDiagnosticTarget.TargetPath, @"BIOGame\CookedPCConsole\adv_combat_tutorial_xbox_D_Int.afc");
+                    return Path.Combine(selectedDiagnosticTarget.TargetPath, @"BIOGame", "CookedPCConsole", "adv_combat_tutorial_xbox_D_Int.afc");
                 default:
                     return null;
             }
@@ -301,11 +301,11 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
             switch (game)
             {
                 case Enums.MEGame.ME1:
-                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"BioWare\Mass Effect\Config\BIOEngine.ini");
+                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"BioWare", "Mass Effect", "Config", "BIOEngine.ini");
                 case Enums.MEGame.ME2:
-                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"BioWare\Mass Effect 2\BioGame\Config\GamerSettings.ini");
+                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"BioWare", "Mass Effect 2", "BioGame", "Config", "GamerSettings.ini");
                 case Enums.MEGame.ME3:
-                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"BioWare\Mass Effect 3\BIOGame\Config\GamerSettings.ini");
+                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"BioWare", "Mass Effect 3", "BIOGame", "Config", "GamerSettings.ini");
                 default:
                     return null;
             }
