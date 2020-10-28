@@ -6,6 +6,8 @@ trigger:
     include:
       - ALOT-v4
   paths:
+    include:
+     - '*'
     exclude:
        - manifest.xml
        - manifest-beta.xml
