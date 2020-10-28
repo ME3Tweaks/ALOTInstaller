@@ -12,9 +12,10 @@ using Serilog;
 namespace ALOTInstallerCore
 {
     // WINDOWS SPECIFIC ITEMS IN UTILITIES
+#if WINDOWS
     public static partial class Utilities
     {
-#if WINDOWS
+
         public const int WIN32_EXCEPTION_ELEVATED_CODE = -98763;
         [DllImport("kernel32.dll")]
         static extern uint GetLastError();
@@ -102,6 +103,7 @@ namespace ALOTInstallerCore
                 Log.Information("[AICORE] Antivirus info: " + virusCheckerName + " with state " + bytes[1].ToString("X2") + " " + bytes[2].ToString("X2") + " " + bytes[3].ToString("X2"));
             }
         }
+}
 #endif
-    }
+
 }

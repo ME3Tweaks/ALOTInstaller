@@ -184,8 +184,13 @@ namespace ALOTInstallerCore
                             if (zipEntry != null)
                             {
                                 if (File.Exists(Locations.MEMPath())) File.Delete(Locations.MEMPath());
-                                using var fs = File.OpenWrite(Locations.MEMPath());
-                                zipEntry.Open().CopyTo(fs);
+                                using (var fs = File.OpenWrite(Locations.MEMPath()))
+                                {
+                                    zipEntry.Open().CopyTo(fs);
+                                }
+#if LINUX
+                                Utilities.MakeFileExecutable(Locations.MEMPath());
+#endif
                             }
                             else
                             {
