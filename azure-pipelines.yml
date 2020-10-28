@@ -7,9 +7,10 @@ trigger:
       - ALOT-v4
   paths:
     include:
-      - ALOTInstaller*/*
-      - Libraries/*
-      - Azure/*
+      - ALOTInstaller*/**
+      - Libraries/**
+      - Azure/**
+      - azure-pipelines.yml
       - SharedAssemblyInfo.proj
     exclude:
        - manifest.xml
