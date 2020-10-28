@@ -3,8 +3,8 @@
  encoding="utf-8"?>
 <alotinstallermanifest>
     <!-- MEM Update Information -->
-    <highestapprovedmemversion>421</highestapprovedmemversion>
-    <soaktestingmemversion soakstartdate="2020-08-01">421</soaktestingmemversion>
+    <highestapprovedmemversion>425</highestapprovedmemversion>
+    <soaktestingmemversion soakstartdate="2020-08-01">425</soaktestingmemversion>
     <!-- YYYY-MM-DD-->
 
     <!-- Stages, weights, UI messages -->

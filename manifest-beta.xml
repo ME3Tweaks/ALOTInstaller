@@ -3,8 +3,8 @@
  encoding="utf-8"?>
 <alotinstallermanifest>
     <!-- MEM Update Information -->
-    <highestapprovedmemversion>421</highestapprovedmemversion>
-    <soaktestingmemversion soakstartdate="2020-08-01">421</soaktestingmemversion>
+    <highestapprovedmemversion>425</highestapprovedmemversion>
+    <soaktestingmemversion soakstartdate="2020-08-01">425</soaktestingmemversion>
     <!-- YYYY-MM-DD-->
 
     <!-- Stages, weights, UI messages -->
@@ -3095,7 +3095,7 @@
                     me3="false" />
         </preinstallmod>
         <preinstallmod mode="ALOT"
-            friendlyname="A Lot of Videos for ME2 (1080p)"
+            friendlyname="A Lot of Videos for ME2 2.0 (1080p)"
             author="Audemus"
             recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 2"
             recommendation="Recommended"
@@ -3103,10 +3103,10 @@
             uipriority="2">
                <file
                     downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files"
-                    filename="ALOV for ME2 1.1 (1080p)-245-1-1-1580074467.7z"
-                    torrentfilename="ALotofVideosforME2-1080p_1.1.7z"
-                    md5="700e3f16a21ac277f5285b5a7d751a1c"
-                    size="5533430325" />
+                    filename="ALOVforME2-1080p_2.0.7z"
+                    torrentfilename="ALOVforME2-1080p_2.0-NOTORRENTYET.7z"
+                    md5="1327c98bff782e54ce5621230cf2df26"
+                    size="5763135923" />
                <extractionredirect
                     archiverootpath="BASEGAME\Movies"
                     relativedestinationdirectory="BIOGame\Movies" />
@@ -3136,7 +3136,7 @@
                     me3="false" />
         </preinstallmod>
         <preinstallmod mode="ALOT"
-            friendlyname="A Lot of Videos for ME2 (4K)"
+            friendlyname="A Lot of Videos for ME2 2.0 (4K)"
             author="Audemus"
             recommendationreason="Optional due to large filesize and CPU requirements"
             recommendation="Optional"
@@ -3144,10 +3144,10 @@
             uipriority="2">
                <file
                     downloadlink="https://www.nexusmods.com/masseffect2/mods/245/?tab=files"
-                    filename="ALotofVideosforME2-4K_1.1.7z"
-                    torrentfilename="ALotofVideosforME2-4K_1.1.7z"
-                    md5="c4ac2e9d1e947205a4a2b970f358b9b7"
-                    size="14780810833" />
+                    filename="ALOVforME2-4K_2.0.7z"
+                    torrentfilename="ALOVforME2-4K_2.0-NOTORRENTYET.7z"
+                    md5="d40905f6111a061ae058b9bdf7f348ac"
+                    size="15314602179" />
                <extractionredirect
                     archiverootpath="BASEGAME\Movies"
                     relativedestinationdirectory="BIOGame\Movies" />
