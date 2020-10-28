@@ -89,8 +89,8 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
             }
         }
 
-        public static string BioGamePath(GameTarget target) => Path.Combine(target.TargetPath, "BioGame"); //all games use same biogame path.
-        public static string BioGamePath(string gameRoot) => Path.Combine(gameRoot, "BioGame"); //all games use same biogame path.
+        public static string BioGamePath(GameTarget target) => Path.Combine(target.TargetPath, target.Game == Enums.MEGame.ME3 ? "BIOGame" : "BioGame"); //all games use same biogame path.
+
 
         public static Dictionary<string, string> OfficialDLCNames(Enums.MEGame game)
         {
@@ -169,6 +169,7 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
                 case Enums.MEGame.ME1:
                     return Path.Combine(target.TargetPath, "DLC");
                 case Enums.MEGame.ME2:
+                    return Path.Combine(target.TargetPath, "BioGame", "DLC");
                 case Enums.MEGame.ME3:
                     return Path.Combine(target.TargetPath, "BIOGame", "DLC");
                 default:
@@ -270,7 +271,8 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
         internal static string DLCPath(string gameRoot, Enums.MEGame game)
         {
             if (game == Enums.MEGame.ME1) return Path.Combine(gameRoot, @"DLC");
-            if (game == Enums.MEGame.ME2 || game == Enums.MEGame.ME3) return Path.Combine(gameRoot, "BioGame", @"DLC");
+            if (game == Enums.MEGame.ME3) return Path.Combine(gameRoot, "BioGame", @"DLC");
+            if (game == Enums.MEGame.ME3) return Path.Combine(gameRoot, "BIOGame", @"DLC");
             return null;
         }
 
@@ -301,7 +303,7 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
                 case Enums.MEGame.ME1:
                     return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"BioWare\Mass Effect\Config\BIOEngine.ini");
                 case Enums.MEGame.ME2:
-                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"BioWare\Mass Effect 2\BIOGame\Config\GamerSettings.ini");
+                    return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"BioWare\Mass Effect 2\BioGame\Config\GamerSettings.ini");
                 case Enums.MEGame.ME3:
                     return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), @"BioWare\Mass Effect 3\BIOGame\Config\GamerSettings.ini");
                 default:
