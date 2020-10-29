@@ -23,20 +23,20 @@ namespace ALOTInstallerWPF.Controllers
                 if (!App.CheckedForMEMUpdates)
                 {
                     var pd = await mw.ShowProgressAsync("Checking for updates to Mass Effect Modder", "Please wait");
-                    Task.Run(() =>
-                    {
-                        return MEMGUIUpdater.UpdateMEMGUI(title => pd.SetTitle(title),
-                            message => pd.SetMessage(message),
-                            (done, total) => pd.SetProgress(total != 0 ? (done * 1.0 / total) : 0));
-                    }).ContinueWith(result =>
-                    {
-                        Application.Current.Invoke(async () =>
-                        {
-                            await pd.CloseAsync();
-                            LaunchMEMGUINoUpdate();
-                        });
-                        App.CheckedForMEMUpdates = true;
-                    });
+                    await Task.Run(() =>
+                     {
+                         return MEMGUIUpdater.UpdateMEMGUI(title => pd.SetTitle(title),
+                             message => pd.SetMessage(message),
+                             (done, total) => pd.SetProgress(total != 0 ? (done * 1.0 / total) : 0));
+                     }).ContinueWith(result =>
+                     {
+                         Application.Current.Invoke(async () =>
+                         {
+                             await pd.CloseAsync();
+                             LaunchMEMGUINoUpdate();
+                         });
+                         App.CheckedForMEMUpdates = true;
+                     });
                 }
                 else
                 {

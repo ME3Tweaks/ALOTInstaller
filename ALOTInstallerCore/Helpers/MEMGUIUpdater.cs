@@ -62,7 +62,7 @@ namespace ALOTInstallerCore.Helpers
                         }
                     }
 
-                    if (latest == null && fileVersion > 0)
+                    if (latest == null || fileVersion >= latestReleaseNum)
                     {
                         return false; // No update
                     }
