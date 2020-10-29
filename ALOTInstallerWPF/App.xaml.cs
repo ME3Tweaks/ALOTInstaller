@@ -24,6 +24,7 @@ namespace ALOTInstallerWPF
     public partial class App : Application
     {
         public static bool BetaAvailable { get; set; }
+        public static bool CheckedForMEMUpdates { get; set; }
 
 
 #if DEBUG

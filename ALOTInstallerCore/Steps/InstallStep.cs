@@ -752,12 +752,7 @@ namespace ALOTInstallerCore.Steps
                                     SetBottomTextCallback?.Invoke($"Installing {zf.ChoiceTitle}");
                                     string installationPath = Path.Combine(package.InstallTarget.TargetPath, zf.GameDestinationPath);
                                     int extractcode = -1;
-                                    Directory.CreateDirectory(installationPath);
-                                    MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{zf.StagedPath}\" --output \"{installationPath}\" --ipc",
-                                        null,
-                                        null,
-                                        x => Log.Error($"[AICORE] StdError on {zf.StagedPath}: {x}"),
-                                        x => extractcode = x);
+                                    extractcode = MEMIPCHandler.ExtractArchiveToDirectory(zf.StagedPath, installationPath);
                                     if (extractcode == 0)
                                     {
                                         Log.Information($"[AICORE] Installed zipfile: {zf.ChoiceTitle} {zf.StagedPath} to {installationPath}");

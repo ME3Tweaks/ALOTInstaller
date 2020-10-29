@@ -619,6 +619,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     {
                         // Close the dialog
                         Application.RequestStop();
+                        while (Application.MainLoop.EventsPending()) Application.MainLoop.MainIteration();
                     }
 
                     if (b.Error != null)

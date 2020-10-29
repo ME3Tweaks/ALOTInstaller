@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
@@ -31,7 +32,8 @@ namespace ALOTInstallerConsole
                 try
                 {
                     Console.BufferHeight = bufferHeight; //Restore
-                } catch { } //Can't restore console height on platform.
+                }
+                catch { } //Can't restore console height on platform.
                 Console.Error.WriteLine(e.FlattenWithTrace());
             }
         }
@@ -68,9 +70,14 @@ namespace ALOTInstallerConsole
         /// <param name="controller"></param>
         public static void SwapToNewView(UIController controller)
         {
-            _nextUIController = controller;
-            _currentController?.SignalStopping();
-            Application.RequestStop();
+            Application.MainLoop.Invoke(() =>
+            {
+                _nextUIController = controller;
+                _currentController?.SignalStopping();
+                Application.RequestStop();
+                Debug.WriteLine($"Stopped a view. The new one is now {Application.Top}");
+            });
         }
+
     }
 }

@@ -71,7 +71,7 @@ namespace ALOTInstallerWPF.Flyouts
         public GenericCommand LogsDiagnosticsCommand { get; set; }
         public GenericCommand OpenLODSwitcherCommand { get; set; }
         public RelayCommand OpenTutorialLinkCommand { get; set; }
-
+        public GenericCommand LaunchMEMGuiCommand { get; set; }
         private void LoadCommands()
         {
             SetLibraryLocationCommand = new GenericCommand(ChangeLibraryLocation);
@@ -83,9 +83,9 @@ namespace ALOTInstallerWPF.Flyouts
             CleanupLibraryCommand = new GenericCommand(CleanupLibrary);
             CleanupBuildLocationCommand = new GenericCommand(CleanupBuildLocation);
             LogsDiagnosticsCommand = new GenericCommand(OpenDiagnosticsFlyout);
-            OpenLODSwitcherCommand =
-                new GenericCommand(OpenLODSwitcher, () => Locations.GetAllAvailableTargets().Any());
+            OpenLODSwitcherCommand = new GenericCommand(OpenLODSwitcher, () => Locations.GetAllAvailableTargets().Any());
             OpenTutorialLinkCommand = new RelayCommand(OpenTutorialLink);
+            LaunchMEMGuiCommand = new GenericCommand(LaunchMEM);
 #if DEBUG
             DebugShowInstallerFlyoutCommand = new GenericCommand(() =>
             {
@@ -116,6 +116,11 @@ namespace ALOTInstallerWPF.Flyouts
                 }
             });
 #endif
+        }
+
+        private void LaunchMEM()
+        {
+            MEMGUILaunchController.LaunchMEMGUI();
         }
 
         private void OpenTutorialLink(object obj)

@@ -293,14 +293,18 @@ namespace ALOTInstallerCore.Helpers
             return Directory.CreateDirectory(Path.Combine(AppDataFolder(), "ObjectInfo")).FullName;
         }
 
-        internal static string GetCachedExecutablesDirectory()
+        public static string GetCachedExecutablesDirectory()
         {
             return Directory.CreateDirectory(Path.Combine(AppDataFolder(), "CachedExecutables")).FullName;
         }
 
-        public static string GetCachedExecutable(string executableName)
+        public static string GetCachedExecutable(string executableName, bool appendWindows = false)
         {
-            return Path.Combine(GetCachedExecutablesDirectory(), executableName);
+            var result = Path.Combine(GetCachedExecutablesDirectory(), executableName);
+#if WINDOWS
+            if (appendWindows) result += ".exe";
+#endif
+            return result;
         }
     }
 }

@@ -81,6 +81,18 @@ namespace ALOTInstallerCore.Helpers
             return MassEffectModderNoGuiVersion;
         }
 
+        public static int ExtractArchiveToDirectory(string inputArchive, string outputFolder)
+        {
+            int extractcode = -1;
+            Directory.CreateDirectory(outputFolder);
+            MEMIPCHandler.RunMEMIPCUntilExit($"--unpack-archive --input \"{inputArchive}\" --output \"{outputFolder}\" --ipc",
+                null,
+                null,
+                x => Log.Error($"[AICORE] StdError extracting {inputArchive}: {x}"),
+                x => extractcode = x);
+            return extractcode;
+        }
+
         /// <summary>
         /// Verifies a game against the MEM MD5 database
         /// </summary>
