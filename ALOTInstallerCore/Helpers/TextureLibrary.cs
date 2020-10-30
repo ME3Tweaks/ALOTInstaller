@@ -104,36 +104,44 @@ namespace ALOTInstallerCore.Helpers
             if (e.Name != null)
             {
                 Debug.WriteLine($"Change {e.ChangeType} for {e.Name}");
-                var matchingManifestFile = manifestFiles.Find(x =>
-                    Path.GetFileName(x.GetUsedFilepath()).Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
-                if (matchingManifestFile?.UpdateReadyStatus() ?? false)
+                try
                 {
-                    readyStatusChanged?.Invoke(matchingManifestFile);
-                }
-
-                if (e.ChangeType == WatcherChangeTypes.Renamed && e is RenamedEventArgs rea)
-                {
-                    // Trigger on old name too.
-                    matchingManifestFile = manifestFiles.Find(x =>
-                        Path.GetFileName(x.GetUsedFilepath())
-                            .Equals(rea.OldName, StringComparison.InvariantCultureIgnoreCase));
-                    if (matchingManifestFile?.UpdateReadyStatus() ?? false)
-                    {
-                        readyStatusChanged?.Invoke(matchingManifestFile);
-                        return;
-                    }
-                }
-
-                if (e.ChangeType == WatcherChangeTypes.Deleted)
-                {
-                    // Edge case: Unpacked file is moved out of library. This makes GetUsedPath() fail as file does not exist, but file was just moved.
-                    matchingManifestFile = manifestFiles.Find(x =>
-                        x.UnpackedSingleFilename != null &&
-                        x.UnpackedSingleFilename.Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
+                    var matchingManifestFile = manifestFiles.Find(x =>
+                        Path.GetFileName(x.GetUsedFilepath()).Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
                     if (matchingManifestFile?.UpdateReadyStatus() ?? false)
                     {
                         readyStatusChanged?.Invoke(matchingManifestFile);
                     }
+
+                    if (e.ChangeType == WatcherChangeTypes.Renamed && e is RenamedEventArgs rea)
+                    {
+                        // Trigger on old name too.
+                        matchingManifestFile = manifestFiles.Find(x =>
+                            Path.GetFileName(x.GetUsedFilepath())
+                                .Equals(rea.OldName, StringComparison.InvariantCultureIgnoreCase));
+                        if (matchingManifestFile?.UpdateReadyStatus() ?? false)
+                        {
+                            readyStatusChanged?.Invoke(matchingManifestFile);
+                            return;
+                        }
+                    }
+
+                    if (e.ChangeType == WatcherChangeTypes.Deleted)
+                    {
+                        // Edge case: Unpacked file is moved out of library. This makes GetUsedPath() fail as file does not exist, but file was just moved.
+                        matchingManifestFile = manifestFiles.Find(x =>
+                            x.UnpackedSingleFilename != null &&
+                            x.UnpackedSingleFilename.Equals(e.Name, StringComparison.InvariantCultureIgnoreCase));
+                        if (matchingManifestFile?.UpdateReadyStatus() ?? false)
+                        {
+                            readyStatusChanged?.Invoke(matchingManifestFile);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Apparently this can occur if files are moved in bulk in or out. Not really sure why or how
+                    Log.Error($@"[AICORE] Error updating status of manifest file {e.Name} due to file change: {ex.Message}");
                 }
             }
         }

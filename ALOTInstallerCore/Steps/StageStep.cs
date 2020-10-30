@@ -142,6 +142,12 @@ namespace ALOTInstallerCore.Steps
 
                             // Add zip files to calculation
                             extensions.AddRange(mFile.ZipFiles.Where(x => x.IsSelectedForInstallation()).Select(x => Path.GetExtension(x.SourceName)));
+
+                            if (mFile.UnpackedSingleFilename != null)
+                            {
+                                // Must add this or we might filter out on extraction.
+                                extensions.Add(Path.GetExtension(mFile.UnpackedSingleFilename));
+                            }
                         }
                         extensions = extensions.Distinct().ToList();
                         // If any package files list TPFSource disable this space optimization
@@ -263,9 +269,9 @@ namespace ALOTInstallerCore.Steps
             foreach (var v in _installOptions.FilesToInstall)
             {
 #if DEBUG
-                //if (v.Author.Contains("Ottemis"))
+                //if (v.FriendlyName.Contains("Illusive"))
                 //{
-                block.Post(v);
+                    block.Post(v);
                 //}
 #else 
                 // Helps make sure I don't publish broken code
@@ -407,6 +413,13 @@ namespace ALOTInstallerCore.Steps
                     //// See if any files need decompiled (TPF)
                     var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
                     var tpfsToDecomp = installerFile.PackageFiles.Where(x => x.TPFSource != null && x.ApplicableGames.HasFlag(targetGame)).Select(x => x.TPFSource).Distinct().ToList();
+                    if (!tpfsToDecomp.Any() && mf.UnpackedSingleFilename != null && installerFile.PackageFiles.All(x => !x.MoveDirectly && x.ApplicableGames.HasFlag(targetGame)) &&  Path.GetExtension(mf.UnpackedSingleFilename) == ".tpf")
+                    {
+                        // Our files will always be in this
+                        Log.Information(@"[AICORE] No listed TPFs to decomp but we have a single file unpacked TPF, decompiling it");
+                        tpfsToDecomp.Add(mf.UnpackedSingleFilename);
+                    }
+
                     foreach (var v in tpfsToDecomp)
                     {
                         var matchingTpfFile = subfilesToExtract.Find(x => Path.GetFileName(x) == v);

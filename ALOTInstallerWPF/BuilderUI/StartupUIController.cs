@@ -108,8 +108,6 @@ namespace ALOTInstallerWPF.BuilderUI
                     });
                 }
 
-                startupCleanup();
-
                 pd.SetMessage("Checking for application updates");
                 CancellationTokenSource ct = new CancellationTokenSource();
                 pd.Canceled += (sender, args) =>
@@ -287,25 +285,6 @@ namespace ALOTInstallerWPF.BuilderUI
 
 
             return;
-        }
-
-        private static void startupCleanup()
-        {
-            //V3 upgrade cleanup
-            // Clean out existing update folder
-            var subUpdateFolder = Path.Combine(Directory.GetParent(Utilities.GetExecutablePath()).FullName, "Update");
-            if (Directory.Exists(subUpdateFolder))
-            {
-                Log.Information(@"[AIWPF] Deleting existing temp directory");
-                try
-                {
-                    Utilities.DeleteFilesAndFoldersRecursively(Locations.TempDirectory());
-                }
-                catch (Exception e)
-                {
-                    Log.Error($@"[AIWPF] Failed to remove Update directory: {e.Message}");
-                }
-            }
         }
 
         private static void RunOnUIThread(Action obj)

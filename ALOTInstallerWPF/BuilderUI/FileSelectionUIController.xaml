@@ -184,7 +184,10 @@
                                            FontSize="11" 
                                            DockPanel.Dock="Top"
                                            Margin="0,1,2,0"
-                                           HorizontalAlignment="Right"/>
+                                           HorizontalAlignment="Right"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="300"
+                                           TextAlignment="Right"/>
                             <StackPanel
                                     VerticalAlignment="Center">
                                 <StackPanel Orientation="Horizontal" 

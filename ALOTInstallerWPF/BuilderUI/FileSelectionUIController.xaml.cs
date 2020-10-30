@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,7 +20,6 @@ using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
-using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Notifications.Wpf.Core;
 using Serilog;
@@ -501,13 +498,14 @@ namespace ALOTInstallerWPF.BuilderUI
                 {
                     Log.Information("Opening URL: " + e.Uri.ToString());
                     Utilities.OpenWebPage(e.Uri.ToString());
-                    var message = $"Download the file titled '{mf.Tooltipname}'";
-
+                    var message = $"Download the file titled '{mf.Tooltipname}'.\n\nDo not extract the file. Drag the download onto ALOT Installer to import it or use Import Assistant.";
+                    var messageType = NotificationType.Information;
                     if (mf.ExtraInstructions != null)
                     {
                         message += $"\n\n{mf.ExtraInstructions}";
+                        messageType = NotificationType.Warning;
                     }
-                    Toaster.ShowNotification("Directions", message, -1, NotificationType.Information);
+                    Toaster.ShowNotification("Directions", message, -1, messageType);
                 }
                 catch (Exception other)
                 {

@@ -63,7 +63,7 @@ namespace ALOTInstallerCore
 
                         if (onlineReleaseVersion < currentAppVersionInfo)
                         {
-                            Log.Information(@"The version of ALOT Installer that we have is higher than the latest release from github, no updates available.");
+                            Log.Information(@"[AICORE] The version of ALOT Installer that we have is higher than the latest release from github, no updates available.");
                             break;
                         }
 
