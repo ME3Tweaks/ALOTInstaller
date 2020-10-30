@@ -28,6 +28,7 @@ using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
 using MahApps.Metro.IconPacks;
+using Microsoft.WindowsAPICodePack.Taskbar;
 using Serilog;
 
 namespace ALOTInstallerWPF.InstallerUI
@@ -227,6 +228,8 @@ namespace ALOTInstallerWPF.InstallerUI
                 SetBottomTextVisibilityCallback = x =>
                     InstallerTextBottomVisibility = x ? Visibility.Visible : Visibility.Collapsed,
                 ShowStorefrontDontClickUpdateCallback = showStorefrontNoUpdateUI,
+                SetOverallProgressCallback = x=> TaskbarHelper.SetProgress(x),
+                SetProgressStyle = x => TaskbarHelper.SetProgressState(progressStyleToProgressState(x))
             };
             installerWorker.WorkerReportsProgress = true;
             installerWorker.DoWork += ss.InstallTextures;
@@ -288,6 +291,21 @@ namespace ALOTInstallerWPF.InstallerUI
             }
 
             #endregion
+        }
+
+        private TaskbarProgressBarState progressStyleToProgressState(InstallStep.ProgressStyle progressStyle)
+        {
+            switch (progressStyle)
+            {
+                case InstallStep.ProgressStyle.None:
+                    return TaskbarProgressBarState.NoProgress;
+                case InstallStep.ProgressStyle.Indeterminate:
+                    return TaskbarProgressBarState.Indeterminate;
+                case InstallStep.ProgressStyle.Determinate:
+                    return TaskbarProgressBarState.Normal;
+                default:
+                    return TaskbarProgressBarState.NoProgress;
+            }
         }
 
         private void showStorefrontNoUpdateUI(Enums.MEGame obj)

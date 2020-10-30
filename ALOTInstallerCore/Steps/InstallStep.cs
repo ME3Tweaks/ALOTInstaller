@@ -74,7 +74,27 @@ namespace ALOTInstallerCore.Steps
         /// <summary>
         /// Callback for setting the 'overall' progress value, from 0 to 100. Can be used to display things like progressbars. Only works for the main long install step
         /// </summary>
-        //public Action<int> SetOverallProgressCallback { get; set; }
+        public Action<int> SetOverallProgressCallback { get; set; }
+        /// <summary>
+        /// Sets the progress style. This is used for things like taskbar progress
+        /// </summary>
+        public Action<ProgressStyle> SetProgressStyle { get; set; }
+
+        public enum ProgressStyle
+        {
+            /// <summary>
+            /// There should be no shown types of progress
+            /// </summary>
+            None,
+            /// <summary>
+            /// There is an indeterminate task
+            /// </summary>
+            Indeterminate,
+            /// <summary>
+            /// There is known progress values
+            /// </summary>
+            Determinate
+        }
 
         public InstallStep(InstallOptionsPackage package)
         {
@@ -85,6 +105,7 @@ namespace ALOTInstallerCore.Steps
 
         void updateStageOfStage()
         {
+            SetOverallProgressCallback?.Invoke(pm.GetOverallProgress()); // Notifies of integer progress for taskbar, etc
             SetMiddleTextCallback?.Invoke($"Stage {pm.CurrentStage?.StageUIIndex} of {pm.Stages.Count} ({pm.GetOverallProgress()}%)");
         }
 
@@ -336,6 +357,13 @@ namespace ALOTInstallerCore.Steps
                 args += $" --cache-amount {cacheAmountPercent}";
             }
 
+            var skipMarkersFlagFile = Path.Combine(Utilities.GetExecutingAssemblyFolder(), "_skipmarkers");
+            if (File.Exists(skipMarkersFlagFile))
+            {
+                Log.Information(@"Found _skipmarkers file. We will skip installing markers. This install will not support further texture modding");
+                args += " --skip-markers";
+            }
+
             args += " --ipc";
 
             // Uncomment the next 2 lines and then comment out the IPC call to simulate OK install
@@ -462,7 +490,8 @@ namespace ALOTInstallerCore.Steps
             SetTopTextVisibilityCallback?.Invoke(true);
             SetMiddleTextVisibilityCallback?.Invoke(true);
             #endregion
-         
+
+            SetProgressStyle?.Invoke(ProgressStyle.None);
             doWorkEventArgs.Result = hasWarning ? InstallResult.InstallOKWithWarning : InstallResult.InstallOK;
         }
 

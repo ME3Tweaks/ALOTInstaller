@@ -262,10 +262,15 @@ namespace ALOTInstallerCore.Steps
 
             foreach (var v in _installOptions.FilesToInstall)
             {
+#if DEBUG
                 //if (v.Author.Contains("Ottemis"))
                 //{
-                    block.Post(v);
+                block.Post(v);
                 //}
+#else 
+                // Helps make sure I don't publish broken code
+                block.Post(v);
+#endif
             }
             block.Complete();
             block.Completion.Wait();

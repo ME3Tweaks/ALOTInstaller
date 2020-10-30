@@ -139,9 +139,6 @@
                 </Expander.Header>
                 <StackPanel>
                     <!--<Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowFirstTime" Content="Show Intro Dialog" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Shows the initial instructions screen"/>-->
-
-                    <!--<CheckBox Margin="5" x:Name="Checkbox_RepackME2GameFiles" Content="Repack ME2 files" Click="Checkbox_RepackME2Files_Click" ToolTip="Repacking game files for ME2 makes installation take longer, but will save some disk space.&#10;This option only has an effect during the initial installation of ALOT. Subsequent installations are not affected." />
-                    <CheckBox Margin="5" x:Name="Checkbox_RepackME3GameFiles" Content="Repack ME3 files" Click="Checkbox_RepackME3Files_Click" ToolTip="Repacking game files for ME3 makes installation take longer, but will save some disk space.&#10;This option only has an effect during the initial installation of ALOT. Subsequent installations are not affected." />-->
                     <mah:ToggleSwitch IsOn="{Binding Path=(appSettings:Settings.MoveFilesWhenImporting)}"  OnContent="Import via Move" OffContent="Import via Copy" Margin="20,0,0,0" ToolTip="Files that are importing will be moved instead of copied.&#10;This only is used if files are on same drive - if files are on different drives then they are always copied." />
                     <!--<CheckBox Margin="5" x:Name="Checkbox_DebugLogging" Content="Debug logging" Click="Checkbox_DebugLogging_Click" ToolTip="Turns on debug logging. Makes log significantly bigger with more logs - only turn on if requested by developers."  />-->
                     <mah:ToggleSwitch OffContent="Stable mode"  OnContent="Beta mode" Toggled="BetaMode_Toggled" Margin="20,0,0,0" 
@@ -150,6 +147,9 @@
                     <mah:ToggleSwitch OffContent="Telemetry disabled"  OnContent="Telemetry enabled" Toggled="Telemetry_Toggled" Margin="20,0,0,0" 
                                       ToolTip="Toggles telemetry data, which allows the developers to automatically receive basic information&#10;about your sessions and crash information, which is used to improve the product"
                                       IsOn="{Binding Path=(appSettings:Settings.Telemetry)}"/>
+                    <mah:ToggleSwitch Content="Debug logging" Margin="20,0,0,0" 
+                                      ToolTip="Toggles debug logging. You should only turn this on if a developer asks as it will produce a large amount of log entries on disk"
+                                      IsOn="{Binding Path=(appSettings:Settings.DebugLogs)}"/>
 
 <!--<mah:ToggleSwitch Content="Show advanced file info" ToolTip="Shows advanced file information" IsOn="{Binding Path=(modmanager:Settings.ShowAdvancedFileInfo)}" Margin="20,0,0,0"/>-->
                 </StackPanel>
