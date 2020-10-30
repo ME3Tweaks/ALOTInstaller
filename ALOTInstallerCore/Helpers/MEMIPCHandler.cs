@@ -61,14 +61,15 @@ namespace ALOTInstallerCore.Helpers
         }
 
         /// <summary>
-        /// Returns the version number for MEM, or 0 if it couldn't be retreived
+        /// Returns the version number for MEM, or -1 if it couldn't be retrieved. The result is cached into the variable MassEffectModderNoGuiVerison
         /// </summary>
         /// <returns></returns>
-        public static short GetMemVersion()
+        public static short GetMemVersion(bool invalidateCache = false)
         {
-            if (File.Exists(Locations.MEMPath()) && new FileInfo(Locations.MEMPath()).Length > 0)
+            if (invalidateCache) MassEffectModderNoGuiVersion = -1;
+            if (MassEffectModderNoGuiVersion <= 0 && File.Exists(Locations.MEMPath()) && new FileInfo(Locations.MEMPath()).Length > 0)
             {
-                // If the current version doesn't support the --version --ipc, we just assume it is 0.
+                // If the current version doesn't support the --version --ipc, we just assume it is -1.
                 MEMIPCHandler.RunMEMIPCUntilExit("--version --ipc", ipcCallback: (command, param) =>
                 {
                     if (command == "VERSION")

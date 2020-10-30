@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
@@ -37,6 +38,20 @@ namespace ALOTInstallerCore
             {
                 Log.Information("[AICORE] Telemetry callback being invoked (if any is set)");
                 startTelemetryCallback?.Invoke();
+            }
+
+            // Cleanup lib temp
+            if (Directory.Exists(Locations.TempDirectory()))
+            {
+                Log.Information(@"[AICORE] Deleting existing temp directory");
+                try
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(Locations.TempDirectory());
+                }
+                catch (Exception e)
+                {
+                    Log.Error($@"[AICORE] Failed to cleanup Temp directory in appdata: {e.Message}");
+                }
             }
         }
 

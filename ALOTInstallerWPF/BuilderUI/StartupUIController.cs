@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -106,6 +107,8 @@ namespace ALOTInstallerWPF.BuilderUI
                         ThemeManager.Current.ChangeTheme(App.Current, "Dark.Red");
                     });
                 }
+
+                startupCleanup();
 
                 pd.SetMessage("Checking for application updates");
                 CancellationTokenSource ct = new CancellationTokenSource();
@@ -216,7 +219,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 pd.SetMessage("Loading installer manifests");
                 var alotManifestModePackage = ManifestHandler.LoadMasterManifest(x => pd.SetMessage(x));
 
-                
+
                 void setStatus(string message)
                 {
                     pd.SetIndeterminate();
@@ -284,6 +287,25 @@ namespace ALOTInstallerWPF.BuilderUI
 
 
             return;
+        }
+
+        private static void startupCleanup()
+        {
+            //V3 upgrade cleanup
+            // Clean out existing update folder
+            var subUpdateFolder = Path.Combine(Directory.GetParent(Utilities.GetExecutablePath()).FullName, "Update");
+            if (Directory.Exists(subUpdateFolder))
+            {
+                Log.Information(@"[AIWPF] Deleting existing temp directory");
+                try
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(Locations.TempDirectory());
+                }
+                catch (Exception e)
+                {
+                    Log.Error($@"[AIWPF] Failed to remove Update directory: {e.Message}");
+                }
+            }
         }
 
         private static void RunOnUIThread(Action obj)

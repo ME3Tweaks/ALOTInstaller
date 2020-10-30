@@ -43,6 +43,7 @@ namespace ALOTInstallerWPF
                 new FrameworkPropertyMetadata(true));
         }
 
+
         private void handleCommandLine()
         {
             #region Command line

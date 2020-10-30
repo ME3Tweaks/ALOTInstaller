@@ -191,6 +191,7 @@ namespace ALOTInstallerCore
 #if LINUX
                                 Utilities.MakeFileExecutable(Locations.MEMPath());
 #endif
+                                Log.Information($"[AICORE] Updated MassEffectModderNoGui to version {MEMIPCHandler.GetMemVersion(true)}");
                             }
                             else
                             {

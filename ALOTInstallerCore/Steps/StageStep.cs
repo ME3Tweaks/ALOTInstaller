@@ -88,7 +88,7 @@ namespace ALOTInstallerCore.Steps
         /// </summary>
         /// <param name="instFile"></param>
         /// <param name="substagingDir"></param>
-        private bool? ExtractArchive(InstallerFile instFile, string substagingDir)
+        private bool? ExtractArchive(InstallerFile instFile, string substagingDir, ApplicableGame targetGame)
         {
             string filepath = instFile.GetUsedFilepath();
 
@@ -145,7 +145,7 @@ namespace ALOTInstallerCore.Steps
                         }
                         extensions = extensions.Distinct().ToList();
                         // If any package files list TPFSource disable this space optimization
-                        if (extensions.Count == 1 && instFile.PackageFiles.All(x => x.TPFSource == null))
+                        if (extensions.Count == 1 && instFile.PackageFiles.Where(x => x.ApplicableGames.HasFlag(targetGame)).All(x => x.TPFSource == null))
                         {
                             // We have only one extension type! We can filter what we extract with MEM
                             args += $" --filter-with-ext {extensions.First().Substring(1)}"; //remove the '.'
@@ -205,6 +205,7 @@ namespace ALOTInstallerCore.Steps
                 // Abort!
                 Log.Error("[AICORE] There are no files to install! Is this a bug?");
                 e.Result = false;
+                CoreCrashes.TrackError?.Invoke(new Exception("There were no install files to process in the stage step"));
                 return;
             }
 
@@ -256,12 +257,15 @@ namespace ALOTInstallerCore.Steps
 
 
             var block = new ActionBlock<InstallerFile>(
-                job => PrepareSingleFile(job, stagingDir, addonStagingPath, finalBuiltPackagesDestination),
+                job => PrepareSingleFile(job, stagingDir, addonStagingPath, finalBuiltPackagesDestination, _installOptions.InstallTarget.Game.ToApplicableGame()),
                 new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 2 }); // How to maximize this?
 
             foreach (var v in _installOptions.FilesToInstall)
             {
-                block.Post(v);
+                //if (v.Author.Contains("Ottemis"))
+                //{
+                    block.Post(v);
+                //}
             }
             block.Complete();
             block.Completion.Wait();
@@ -291,7 +295,7 @@ namespace ALOTInstallerCore.Steps
             e.Result = true;
         }
 
-        private bool? PrepareSingleFile(InstallerFile installerFile, string stagingDir, string addonStagingPath, string finalBuiltPackagesDestination)
+        private bool? PrepareSingleFile(InstallerFile installerFile, string stagingDir, string addonStagingPath, string finalBuiltPackagesDestination, ApplicableGame targetGame)
         {
             if (_abortStaging) return null;
             Log.Information($"[AICORE] Processing staging for {installerFile.FriendlyName}");
@@ -305,7 +309,7 @@ namespace ALOTInstallerCore.Steps
                 var outputDir = Path.Combine(stagingDir, Path.GetFileNameWithoutExtension(installerFile.GetUsedFilepath()));
                 mf.StagedName = installerFile.GetUsedFilepath();
                 // Extract Archive
-                var archiveExtractedN = installerFile.PackageFiles.Any() ? ExtractArchive(installerFile, outputDir) : false;
+                var archiveExtractedN = installerFile.PackageFiles.Any(x => x.ApplicableGames.HasFlag(targetGame)) ? ExtractArchive(installerFile, outputDir, targetGame) : false;
                 if (archiveExtractedN == null)
                 {
                     // There was an error
@@ -359,7 +363,7 @@ namespace ALOTInstallerCore.Steps
                 bool decompiled = false;
 
                 // Check if listed file is a decompilable format and not archive format 
-                if (!archiveExtracted && installerFile.PackageFiles.Any(x => !x.MoveDirectly) && FiletypeRequiresDecompilation(installerFile.GetUsedFilepath()))
+                if (!archiveExtracted && installerFile.PackageFiles.Any(x => !x.MoveDirectly && x.ApplicableGames.HasFlag(targetGame)) && FiletypeRequiresDecompilation(installerFile.GetUsedFilepath()))
                 {
                     // Decompile file instead 
                     if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mod" && installerFile.StageModFiles)
@@ -374,6 +378,19 @@ namespace ALOTInstallerCore.Steps
                         ExtractTextureContainer(_installOptions.InstallTarget.Game,
                             installerFile.GetUsedFilepath(),
                             outputDir, installerFile);
+
+                        // Check if this file has CopyDirectly set
+                        // If it does it will try to look in the extraction dir for it
+                        // So we just copy it here and sets it processed so it doesn't try to stage
+                        var copyDirectlyPackageFile = installerFile.PackageFiles.FirstOrDefault(x => x.SourceName == (mf.UnpackedSingleFilename ?? mf.Filename) && x.CopyDirectly && x.ApplicableGames.HasFlag(targetGame));
+                        if (copyDirectlyPackageFile != null)
+                        {
+                            var modDest = Path.Combine(stagingDir, Path.GetFileName(installerFile.GetUsedFilepath()));
+                            Log.Information($"[AICORE] Copying an installer file to staging (due to a subitem having CopyFile=true): {installerFile.GetUsedFilepath()} -> {modDest}");
+                            File.Copy(installerFile.GetUsedFilepath(), modDest);
+                            copyDirectlyPackageFile.Processed = true;
+                        }
+
                         decompiled = true;
                     }
                 }
@@ -384,13 +401,14 @@ namespace ALOTInstallerCore.Steps
 
                     //// See if any files need decompiled (TPF)
                     var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
-                    var tpfsToDecomp = installerFile.PackageFiles.Where(x => x.TPFSource != null).Select(x => x.TPFSource).Distinct().ToList();
+                    var tpfsToDecomp = installerFile.PackageFiles.Where(x => x.TPFSource != null && x.ApplicableGames.HasFlag(targetGame)).Select(x => x.TPFSource).Distinct().ToList();
                     foreach (var v in tpfsToDecomp)
                     {
                         var matchingTpfFile = subfilesToExtract.Find(x => Path.GetFileName(x) == v);
                         if (matchingTpfFile == null)
                         {
                             Log.Error($"Could not find TPF source! Missing TPF: {v}");
+                            CoreCrashes.TrackError?.Invoke(new Exception($"Could not find a TPF source for an item in {installerFile.FriendlyName}! Missing TPF: {v}"));
                             continue;
                         }
 
@@ -418,7 +436,7 @@ namespace ALOTInstallerCore.Steps
                         }
 
 
-                        var matchingPackageFiles = installerFile.PackageFiles.Where(x => Path.GetFileName(x.SourceName) == Path.GetFileName(sf)).ToList();
+                        var matchingPackageFiles = installerFile.PackageFiles.Where(x => Path.GetFileName(x.SourceName) == Path.GetFileName(sf) && x.ApplicableGames.HasFlag(targetGame)).ToList();
                         foreach (var mpf in matchingPackageFiles)
                         {
                             if (mpf.MoveDirectly)
@@ -430,7 +448,26 @@ namespace ALOTInstallerCore.Steps
                                     if (len != unpackedSize)
                                     {
                                         installerFile.StatusText = "Extraction produced incorrect file";
-                                        Log.Error($"ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
+                                        Log.Error($"ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (MOVEDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
+                                        _abortStaging = true;
+                                        return false;
+                                    }
+                                }
+
+                                // This file will be handled by stagePackageFile(); Do not try to operate on it
+                                // We could move it here but let's just keep code in one place
+                            }
+
+                            if (mpf.CopyDirectly)
+                            {
+                                if (unpackedSize != 0)
+                                {
+                                    // Ensure file extracted correct size
+                                    var len = new FileInfo(sf).Length;
+                                    if (len != unpackedSize)
+                                    {
+                                        installerFile.StatusText = "Extraction produced incorrect file";
+                                        Log.Error($"ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (COPYDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
                                         _abortStaging = true;
                                         return false;
                                     }
@@ -487,7 +524,7 @@ namespace ALOTInstallerCore.Steps
 
                     stage = false;
                 }
-                else if (archiveExtracted && installerFile.PackageFiles.All(x => x.MoveDirectly))
+                else if (archiveExtracted && installerFile.PackageFiles.All(x => x.MoveDirectly && x.ApplicableGames.HasFlag(targetGame)))
                 {
                     // Subfiles move to dest
                 }
@@ -503,6 +540,7 @@ namespace ALOTInstallerCore.Steps
                 else
                 {
                     Log.Error($"[AICORE] STAGING NOT HANDLED FOR {installerFile.FriendlyName}");
+                    CoreCrashes.TrackError?.Invoke(new Exception($"STAGING NOT HANDLED FOR {installerFile.FriendlyName}"));
                 }
 
                 if (stage)
@@ -518,7 +556,7 @@ namespace ALOTInstallerCore.Steps
                 Directory.CreateDirectory(userFileBuildMemPath);
 
                 // Extract Archive
-                var archiveExtractedN = ExtractArchive(installerFile, userFileExtractionPath);
+                var archiveExtractedN = ExtractArchive(installerFile, userFileExtractionPath, targetGame);
                 if (archiveExtractedN == null)
                 {
                     ErrorStagingCallback?.Invoke($"Unable to extract {installerFile.GetUsedFilepath()}");
@@ -540,6 +578,10 @@ namespace ALOTInstallerCore.Steps
                         x =>
                         {
                             // Do something here. Not sure what
+                            Log.Error($@"[AICORE] Error occurred staging {installerFile.FriendlyName}: {x.Message}");
+                            error = true;
+                            installerFile.StatusText = $"Failed to stage file(s): {x.Message}";
+                            _abortStaging = true;
                         }
                     );
                 }
@@ -591,7 +633,7 @@ namespace ALOTInstallerCore.Steps
             installerFile.IsProcessing = false;
             if (installerFile is PreinstallMod)
             {
-                installerFile.StatusText = installerFile.PackageFiles.Any() ? "Textures staged, mod component install during install step" : "Mod will install during install step";
+                installerFile.StatusText = installerFile.PackageFiles.Any(x => x.ApplicableGames.HasFlag(targetGame)) ? "Textures staged, mod component install during install step" : "Mod will install during install step";
             }
             else if (!error)
             {
@@ -737,11 +779,11 @@ namespace ALOTInstallerCore.Steps
             if (installerFile is ManifestFile mf)
             {
                 var filesInSource = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.AllDirectories);
-                int? numPackageFiles = mf.PackageFiles.Count + mf.ChoiceFiles?.Count + mf.ZipFiles?.Count + mf.CopyFiles?.Count;
+                int? numPackageFiles = mf.PackageFiles.Count(x => x.ApplicableGames.HasFlag(targetGame.ToApplicableGame())) + mf.ChoiceFiles?.Count + mf.ZipFiles?.Count + mf.CopyFiles?.Count;
                 if (numPackageFiles > 0)
                 {
                     int numPackageFilesStaged = 0;
-                    foreach (var pf in mf.PackageFiles)
+                    foreach (var pf in mf.PackageFiles.Where(x => x.ApplicableGames.HasFlag(targetGame.ToApplicableGame())))
                     {
                         stagePackageFile(mf, pf, compilingStagingDest, finalDest, filesInSource, ref numPackageFilesStaged, numPackageFiles.Value);
                     }
@@ -789,9 +831,9 @@ namespace ALOTInstallerCore.Steps
                         }
                     }
 
-                    if (mf.PackageFiles.Any(x => !x.Processed && x.ApplicableGames.HasFlag(targetGame.ToApplicableGame())))
+                    if (mf.PackageFiles.Where(x => x.ApplicableGames.HasFlag(targetGame.ToApplicableGame())).Any(x => !x.Processed))
                     {
-                        Log.Warning("[AICORE] Not all package files were marked as processed!");
+                        Log.Warning($"[AICORE] Not all package files were marked as processed for file {mf.FriendlyName}!");
                     }
                 }
                 installerFile.StatusText = "Cleaning temporary files";
@@ -861,16 +903,17 @@ namespace ALOTInstallerCore.Steps
                         installerFile.StatusText = $"Staging files {numPackageFilesStaged}/{numPackageFiles}";
                         pf.Processed = true;
                     }
-                    else if (pf.DestinationName == null)
+                    else /*if (pf.DestinationName == null)*/
                     {
                         Log.Error(
                             $"[AICORE] Package file destinationname value is null. This is an error in the manifest file, please contact the developers. File: {installerFile.FriendlyName}, PackageFile: {pf.SourceName}");
+                        CoreCrashes.TrackError?.Invoke(new Exception($"{installerFile.FriendlyName} has a package file with a null source name! This must be fixed."));
                     }
                 }
                 else
                 {
-                    Log.Error("[AICORE] File specified by manifest doesn't exist after extraction: " +
-                              pf.SourceName);
+                    Log.Error($"[AICORE] File specified by manifest doesn't exist after extraction for file {installerFile.FriendlyName}: {pf.SourceName}");
+                    CoreCrashes.TrackError?.Invoke(new Exception($"{installerFile.FriendlyName} has a package file that didn't exist after preparing and could not stage: {pf.SourceName}"));
                 }
             }
         }

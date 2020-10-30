@@ -70,7 +70,7 @@ namespace ALOTInstallerCore.Steps
             if (targetDi.AvailableFreeSpace < requiredDiskSpace * 1.1)
             {
                 // Less than 10% buffer
-                return $"There is not enough space on the disk the game resides on to install textures. Note that the required space is only an estimate and includes required temporary space.\n\nDrive: {targetDi.Name}\nRequired space: {FileSizeFormatter.FormatSize(requiredDiskSpace)}\nAvailable space: {FileSizeFormatter.FormatSize(targetDi.AvailableFreeSpace)}";
+                return $"There is not enough space on the disk the game resides on to install textures. Note that the required space is only an estimate and includes required temporary space.\n\nDrive: {targetDi.Name}\nRequired space: {FileSizeFormatter.FormatSize(requiredDiskSpace)}\nAvailable space: {FileSizeFormatter.FormatSize(targetDi.AvailableFreeSpace)}\n\nYou can set storage locations in the application settings.";
             }
             return null;
         }
@@ -281,9 +281,16 @@ namespace ALOTInstallerCore.Steps
             if (nonReadyRecommendedFiles.Any())
             {
                 // At least one recommended file for this game is not ready
-                var result = missingRecommandedItemsDialogCallback?.Invoke("Not all addon files available for install",
-                    $"Not all addon files for {package.InstallerMode} mode are currently ready for install in the texture library. Without these files, the game will be missing significant amounts of upgraded textures. You should have these files imported into your texture library before you continue installation.",
+                var result = missingRecommandedItemsDialogCallback?.Invoke($"{(nonReadyRecommendedFiles.Count == 1 ? "1 file is" : $"{nonReadyRecommendedFiles.Count} files are")} not ready for installation",
+                    $"Not all recommended files for {package.InstallerMode} mode are currently ready for install in the texture library. Without these files, the game will be missing significant amounts of upgraded textures and you will have a degraded experience. You should download and import these files into your texture library before you continue installation.",
                     "Install anyways (NOT RECOMMENDED)?", nonReadyRecommendedFiles.Select(x => x.FriendlyName).ToList());
+                if (result.HasValue)
+                {
+                    CoreAnalytics.TrackEvent(@"Was shown prompt that not all addon files are ready", new Dictionary<string, string>()
+                    {
+                        {"Continued anyways", result.Value.ToString()}
+                    });
+                }
                 return result.HasValue && result.Value;
             }
 
