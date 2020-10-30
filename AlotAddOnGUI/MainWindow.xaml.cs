@@ -452,7 +452,7 @@ namespace AlotAddOnGUI
                     foreach (Release r in releases)
                     {
                         // Check if applicable
-                        var applicableAsset = r.Assets.FirstOrDefault(x => x.Name.StartsWith("ALOTInstallerWPF") || x.Name.StartsWith("ALOTInstaller_3"));
+                        var applicableAsset = r.Assets.FirstOrDefault(x => x.Name.StartsWith("ALOTInstallerWPF_") || x.Name.StartsWith("ALOTInstaller_3"));
                         if (applicableAsset == null) continue; //No applicable asset
 
                         Version releaseVersion = new Version(r.TagName);
@@ -585,7 +585,9 @@ namespace AlotAddOnGUI
                                 downloadClient.DownloadFileCompleted += UnzipSelfUpdate;
                                 string downloadPath = temppath + "ALOTInstaller_Update" + Path.GetExtension(latestAsset.BrowserDownloadUrl);
                                 //DEBUG ONLY
-                                Uri downloadUri = new Uri(latest.Assets[0].BrowserDownloadUrl);
+                                var applicableAsset = latest.Assets.FirstOrDefault(x => x.Name.StartsWith("ALOTInstallerWPF_") || x.Name.StartsWith("ALOTInstaller_3"));
+
+                                Uri downloadUri = new Uri(applicableAsset.BrowserDownloadUrl);
                                 downloadClient.DownloadFileAsync(downloadUri, downloadPath, new KeyValuePair<ProgressDialogController, string>(updateprogresscontroller, downloadPath));
                             }
                             else
