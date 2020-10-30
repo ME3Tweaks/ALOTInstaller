@@ -59,6 +59,11 @@ namespace ALOTInstallerCore
         /// <returns></returns>
         internal static string GetExecutingAssemblyFolder() => Path.GetDirectoryName(GetExecutablePath());
 
+        /// <summary>
+        /// Gets a resource from ALOTInstallerCore
+        /// </summary>
+        /// <param name="assemblyResource"></param>
+        /// <returns></returns>
         private static Stream GetResourceStream(string assemblyResource)
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();

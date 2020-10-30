@@ -216,7 +216,14 @@ namespace ALOTInstallerCore.Helpers
         public static readonly string CachedASIsFolder = Directory.CreateDirectory(Path.Combine(AppDataFolder(), @"CachedASIs")).FullName;
 
         public static ObservableCollectionExtended<GameTarget> GameTargets { get; } = new ObservableCollectionExtended<GameTarget>();
-        public static string ResourcesDir => Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName;
+
+#if WINDOWS
+        /// <summary>
+        /// Accesses the internal 'Resources' directory. This should only
+        /// </summary>
+        
+        public static string ResourcesDir => Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName; //The internal 'resources' directory. Does not exist when running from Linux as it's fully single file
+#endif
 
         /// <summary>
         /// Sets the game path that MEM and ALOTInstallerCore will use for the game specified by the target.
@@ -225,7 +232,6 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="target"></param>
         public static bool SetTarget(GameTarget target)
         {
-
             var successful = MEMIPCHandler.SetGamePath(target.Game, target.TargetPath);
             switch (target.Game)
             {
