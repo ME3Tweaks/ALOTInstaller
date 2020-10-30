@@ -10,6 +10,7 @@ using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.Helpers;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.WindowsAPICodePack.Taskbar;
 
 namespace ALOTInstallerWPF.Controllers
 {
@@ -96,14 +97,14 @@ namespace ALOTInstallerWPF.Controllers
                             pd.SetProgress(done * 1d / total);
                             if (total != 0)
                             {
-                                TaskbarHelper.SetProgressState(TaskbarItemProgressState.Normal);
+                                TaskbarHelper.SetProgressState(TaskbarProgressBarState.Normal);
                                 TaskbarHelper.SetProgress(done * 1.0 / total);
                             }
                         }),
                     SetProgressIndeterminateCallback = indeterminate => Application.Current.Dispatcher.Invoke(() =>
                     {
                         if (indeterminate) pd.SetIndeterminate();
-                        TaskbarHelper.SetProgressState(indeterminate ? TaskbarItemProgressState.Indeterminate : TaskbarItemProgressState.Normal);
+                        TaskbarHelper.SetProgressState(indeterminate ? TaskbarProgressBarState.Indeterminate : TaskbarProgressBarState.Normal);
                     }),
                     SelectDestinationDirectoryCallback = (title, message) =>
                     {
@@ -130,7 +131,7 @@ namespace ALOTInstallerWPF.Controllers
             };
             nbw.RunWorkerCompleted += async (a, b) =>
             {
-                TaskbarHelper.SetProgressState(TaskbarItemProgressState.None);
+                TaskbarHelper.SetProgressState(TaskbarProgressBarState.NoProgress);
 
                 updateGameStatuses?.Invoke();
                 if (pd.IsOpen) await pd.CloseAsync();

@@ -15,6 +15,7 @@ using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.WindowsAPICodePack.Taskbar;
 
 namespace ALOTInstallerWPF.Controllers
 {
@@ -111,7 +112,7 @@ namespace ALOTInstallerWPF.Controllers
                             pd.SetProgress(progressVal * 1f / progressMax);
                             if (progressMax != 0)
                             {
-                                TaskbarHelper.SetProgressState(TaskbarItemProgressState.Normal);
+                                TaskbarHelper.SetProgressState(TaskbarProgressBarState.Normal);
                                 TaskbarHelper.SetProgress(progressVal * 1.0 / progressMax);
                             }
                         });
@@ -122,7 +123,7 @@ namespace ALOTInstallerWPF.Controllers
                         {
                             pd.SetIndeterminate();
                         }
-                        TaskbarHelper.SetProgressState(indeterminate ? TaskbarItemProgressState.Indeterminate : TaskbarItemProgressState.Normal);
+                        TaskbarHelper.SetProgressState(indeterminate ? TaskbarProgressBarState.Indeterminate : TaskbarProgressBarState.Normal);
                         // ?? setting progress will unset it
                     },
                     UpdateStatusCallback = newstatus => pd.SetMessage(newstatus),
@@ -178,7 +179,7 @@ namespace ALOTInstallerWPF.Controllers
             };
             nbw.RunWorkerCompleted += async (a, b) =>
             {
-                TaskbarHelper.SetProgressState(TaskbarItemProgressState.None);
+                TaskbarHelper.SetProgressState(TaskbarProgressBarState.NoProgress);
                 if (pd.IsOpen)
                 {
                     await pd.CloseAsync();
