@@ -8,3 +8,6 @@
 [submodule "gui.cs"]
 	path = gui.cs
 	url = https://github.com/Mgamerz/gui.cs.git
+[submodule "Notifications.Wpf.Core"]
+	path = Notifications.Wpf.Core
+	url = https://github.com/Mgamerz/Notifications.Wpf.Core.git
