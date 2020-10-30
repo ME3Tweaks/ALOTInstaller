@@ -1212,7 +1212,10 @@
                     downloadlink="https://www.nexusmods.com/masseffect3/mods/578/?tab=files"
                     filename="el_JacobComplexionTweak.7z-578-1-0.7z"
                     size="12101697"
-                    md5="7432e4bf056a689d648c9e0f71271fd3" />
+                    md5="7432e4bf056a689d648c9e0f71271fd3"
+                    unpackedsinglefilename="el_JacobComplexionTweak.tpf"
+                    unpackedsize="11939415"
+                    unpackedmd5="36271df9d602c274db6d7460f321920e" />
             <packagefile
                     me2="true"
                     sourcename="el_JacobComplexionTweak.tpf"
