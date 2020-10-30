@@ -882,159 +882,206 @@
 					choicetitle="MEUITM Splash Screen" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-		    alotversion="12"
-		    friendlyname="ALOT for ME1 12.0"
-		    author="CreeperLava"
-		    uipriority="0"
-		    recommendationreason="Main ALOT file, required"
-		    recommendation="Required"
-		    installpriority="1">
-		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
-			    tooltipname="ALOT for ME1 12.0"
-			    torrentfilename="ALOT for ME1.zip"
-			    filename="ALOT for ME1.zip"
-			    size="4453410804"
-			    md5="8d36eac617658994d20091f8c53d754a"
-			    unpackedsinglefilename="ALOT_ME1_v12.mem"
-			    unpackedsize="4264869546"
-			    unpackedmd5="6a435382ff9cd76ac3c2687d76dd7c0f" />
-		    <packagefile
-			    me1="true"
-			    sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v12.mem"
-			    movedirectly="true" />
+			alotversion="11"
+			friendlyname="ALOT for ME1 11.0"
+			author="CreeperLava"
+			uipriority="0"
+			recommendationreason="Main ALOT file, required"
+			recommendation="Required"
+			installpriority="1">
+			<file
+			downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+			tooltipname="ALOT for ME1 11.0"
+			torrentfilename="ALOT for ME1.zip"
+			filename="ALOT for ME1 11.0-83-2020-11-1591229529.zip"
+			size="4293992409"
+			md5="8066a931b6e0ff7c4f007984c3a76e50"
+			unpackedsinglefilename="ALOT_ME1_v11.mem"
+			unpackedsize="4203662462"
+			unpackedmd5="7d50bee890c3545e12a70cba8350e2be" />
+			<packagefile
+			me1="true"
+			sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v11.mem"
+			movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-		    alotversion="12"
-		    friendlyname="ALOT for ME2 12.0"
-		    author="CreeperLava"
-		    uipriority="0"
-		    recommendationreason="Main ALOT file, required"
-		    recommendation="Required"
-		    installpriority="1">
-		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
-			    tooltipname="ALOT for ME2 12.0"
-			    torrentfilename="ALOT for ME2.zip"
-			    filename="ALOT for ME2.zip"
-			    size="6230258877"
-			    md5="cd7e532e2a53d00beec259adc7870a58"
-			    unpackedsinglefilename="ALOT_ME2_v12.mem"
-			    unpackedsize="6041717579"
-			    unpackedmd5="c9333cbddbcf2c814a33abda7b62d87f" />
-		    <packagefile
-			    me2="true"
-			    sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v12.mem"
-			    movedirectly="true" />
+			alotversion="11"
+			friendlyname="ALOT for ME2 11.0"
+			author="CreeperLava"
+			uipriority="0"
+			recommendationreason="Main ALOT file, required"
+			recommendation="Required"
+			installpriority="1">
+			<file
+					downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+					tooltipname="ALOT for ME2 11.0"
+					torrentfilename="ALOT for ME2.zip"
+					filename="ALOT for ME2 11.0-68-2020-11-1591228690.zip"
+					size="6478711287"
+					md5="972a69975cc2e474e3781290a43ecd82"
+					unpackedsinglefilename="ALOT_ME2_v11.mem"
+					unpackedsize="6388381224"
+					unpackedmd5="42d42abcf3d8702140218cfc4574dc35" />
+			<packagefile
+					me2="true"
+					sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v11.mem"
+					movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-		    alotversion="12"
-		    friendlyname="ALOT for ME3 12.0"
-		    author="CreeperLava"
-		    uipriority="0"
-		    recommendationreason="Main ALOT file, required"
-		    recommendation="Required"
-		    installpriority="1">
-		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
-			    tooltipname="ALOT for ME3 12.0"
-			    torrentfilename="ALOT for ME3.zip"
-			    filename="ALOT for ME3.zip"
-			    size="9370770330"
-			    md5="f599e1ff3becc05246edf9640e0c9e22"
-			    unpackedsinglefilename="ALOT_ME3_v12.mem"
-			    unpackedsize="9182229032"
-			    unpackedmd5="cca92a9e91f941e7625d53675d828d47" />
-		    <packagefile
-			    me3="true"
-			    sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v12.mem"
-			    movedirectly="true" />
-		</manifestfile>
-
-		<manifestfile mode="ALOT"
-		    friendlyname="Improved Static Lighting for ME1"
-		    author="CreeperLava"
-		    installpriority="3"
-		    recommendationreason="Significantly improves the static shadows in level environments"
-		    recommendation="Recommended">
-		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
-			    tooltipname="Improved Static Lighting for ME1"
-			    torrentfilename="LightMaps_ME1.zip"
-			    filename="Improved Static Lighting for ME1-83-2020-10-0-1573101555.zip"
-			    size="6610942066"
-			    md5="2234159c710d77ffd2e8a91fefe975ee"
-			    unpackedsinglefilename="LightMaps_ME1.mem"
-			    unpackedsize="6610941782"
-			    unpackedmd5="c7cc9fae7381de825b7943ef9b1a6f89" />
-		    <packagefile
-			    me1="true"
-			    sourcename="LightMaps_ME1.mem"
-			    movedirectly="true" />
+			alotversion="11"
+			friendlyname="ALOT for ME3 11.0"
+			author="CreeperLava"
+			uipriority="0"
+			recommendationreason="Main ALOT file, required"
+			recommendation="Required"
+			installpriority="1">
+			<file
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+					tooltipname="ALOT for ME3 11.0"
+					torrentfilename="ALOT for ME3.zip"
+					filename="ALOT for ME3 11.0-363-2020-11-1591212660.zip"
+					size="9153130765"
+					md5="cc72e1dd98ef96089533245618557a1a"
+					unpackedsinglefilename="ALOT_ME3_v11.mem"
+					unpackedsize="9062800702"
+					unpackedmd5="ca1632d7f1f6d9fd22ad410641c8aae7" />
+			<packagefile
+					me3="true"
+					sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v11.mem"
+					movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-		    friendlyname="Improved Static Lighting for ME2"
-		    author="CreeperLava"
-		    installpriority="3"
-		    recommendationreason="Significantly improves the static shadows in level environments"
-		    recommendation="Recommended">
-		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
-			    tooltipname="Improved Static Lighting for ME2"
-			    torrentfilename="LightMaps_ME2.zip"
-			    filename="Improved Static Lighting for ME2-68-2020-10-0-1573098585.zip"
-			    size="665769837"
-			    md5="d78abde1cef08b7ce64c70eaa4c46b71"
-			    unpackedsinglefilename="LightMaps_ME2.mem"
-			    unpackedsize="665769669"
-			    unpackedmd5="cf3fe16cede255158312adbfafa277d2" />
-		    <packagefile
-			    me2="true"
-			    sourcename="LightMaps_ME2.mem"
-			    movedirectly="true" />
+			alotversion="11"
+			alotupdateversion="1"
+			uipriority="0"
+			recommendationreason="Required for up to date install"
+			recommendation="Required"
+			friendlyname="ALOT for ME1 11.1 - Update"
+			tooltipname="ALOT for ME1 11.1 - Update"
+			author="CreeperLava"
+			installpriority="2">
+			<file
+					downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+					filename="ALOT for ME1 11.0 - Update-83-2020-11-1-1591653251.zip"
+					size="68399573"
+					md5="118987417fc41fc6e2f68d316aa57395"
+					unpackedsinglefilename="ALOT_ME1_UPDATE_v11.mem"
+					unpackedsize="68399393"
+					unpackedmd5="b01584a1a1744e3775d0c4ce002a2b20"
+					/>
+			<packagefile
+					me1="true"
+					sourcename="ALOT_ME1_UPDATE_v11.mem"
+					movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-		    friendlyname="Improved Static Lighting for ME3 - FULL"
-		    author="CreeperLava"
-		    installpriority="3"
-		    recommendationreason="Significantly improves the static shadows in level environments. Denoised and higher resolution. Uses more memory, but won't lower the framerate. May cause crashes when combined with the Project Variety and EGM mods."
-		    recommendation="Recommended">
-		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
-			    tooltipname="Improved Static Lighting for ME3 - FULL"
-			    torrentfilename="LightMaps_ME3_Full_v2.zip"
-			    filename=""
-			    size="10764271596"
-			    md5="7da97b9c26cfc4547be42ddffe72bec1"
-			    unpackedsinglefilename="LightMaps_ME3_Full_v2.mem"
-			    unpackedsize="10764271296"
-			    unpackedmd5="5f0ae60159f1c492badd186c2c02f89e" />
-		    <packagefile
-			    me3="true"
-			    sourcename="LightMaps_ME3.mem"
-			    movedirectly="true" />
+			alotversion="11"
+			alotupdateversion="1"
+			uipriority="0"
+			recommendationreason="Required for up to date install"
+			recommendation="Required"
+			friendlyname="ALOT for ME2 11.1 - Update"
+			tooltipname="ALOT for ME2 11.1 - Update"
+			author="CreeperLava"
+			installpriority="2">
+			<file
+					downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+					filename="ALOT for ME2 11.1 - Update-68-2020-11-1-1592240377.zip"
+					size="234813"
+					md5="6fdb227c271d5a3acbc8a5997641a345"
+					unpackedsinglefilename="ALOT_ME2_UPDATE_v11.mem"
+					unpackedsize="234633"
+					unpackedmd5="eafa043cb7a5aa7ec3a2ed2dff9abd47" />
+			<packagefile
+					me2="true"
+					sourcename="ALOT_ME2_UPDATE_v11.mem"
+					movedirectly="true" />
 		</manifestfile>
-
 		<manifestfile mode="ALOT"
-		    friendlyname="Improved Static Lighting for ME3 - LITE"
-		    author="CreeperLava"
-		    installpriority="3"
-		    recommendationreason="Significantly improves the static shadows in level environments. Only denoised, uses less memory than the full version at the cost of quality. Install this if you experience crashes with other mods installed."
-		    recommendation="Recommended">
-		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
-			    tooltipname="Improved Static Lighting for ME3 - LITE"
-			    torrentfilename="LightMaps_ME3_Lite_v2.zip"
-			    filename=""
-			    size="4631906376"
-			    md5="7361b5ad1b94491ca949acba0ce1b5c5"
-			    unpackedsinglefilename="LightMaps_ME3_Lite_v2.mem"
-			    unpackedsize="4631906076"
-			    unpackedmd5="552c9ebfe650471790e6309035c695ed" />
-		    <packagefile
-			    me3="true"
-			    sourcename="LightMaps_ME3.mem"
-			    movedirectly="true" />
+			alotversion="11"
+			alotupdateversion="3"
+			uipriority="0"
+			recommendationreason="Required for up to date install"
+			recommendation="Required"
+			friendlyname="ALOT for ME3 11.3 - Update"
+			tooltipname="ALOT for ME3 11.3 - Update"
+			author="CreeperLava"
+			installpriority="2">
+			<file
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+					filename="ALOT for ME3 11.3 - Update-363-2020-11-3-1593591936.zip"
+					size="23588808"
+					md5="7b0cf8367c334f62df013a5e5aaa886c"
+					unpackedsinglefilename="ALOT_ME3_UPDATE_v11.mem"
+					unpackedsize="23588628"
+					unpackedmd5="564041c8507f472ee550ed993704d09c" />
+			<packagefile
+					me3="true"
+					sourcename="ALOT_ME3_UPDATE_v11.mem"
+					movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
+			friendlyname="Improved Static Lighting for ME1"
+			author="CreeperLava"
+			installpriority="3"
+			recommendationreason="Signficantly improves the static shadows in level environments"
+			recommendation="Recommended">
+			<file
+					downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+					tooltipname="Improved Static Lighting for ME1"
+					torrentfilename="LightMaps_ME1.zip"
+					filename="Improved Static Lighting for ME1-83-2020-10-0-1573101555.zip"
+					size="6610942066"
+					md5="2234159c710d77ffd2e8a91fefe975ee"
+					unpackedsinglefilename="LightMaps_ME1.mem"
+					unpackedsize="6610941782"
+					unpackedmd5="c7cc9fae7381de825b7943ef9b1a6f89" />
+			<packagefile
+					me1="true"
+					sourcename="LightMaps_ME1.mem"
+					movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
+			friendlyname="Improved Static Lighting for ME2"
+			author="CreeperLava"
+			installpriority="3"
+			recommendationreason="Signficantly improves the static shadows in level environments"
+			recommendation="Recommended">
+			<file
+					downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+					tooltipname="Improved Static Lighting for ME2"
+					torrentfilename="LightMaps_ME2.zip"
+					filename="Improved Static Lighting for ME2-68-2020-10-0-1573098585.zip"
+					size="665769837"
+					md5="d78abde1cef08b7ce64c70eaa4c46b71"
+					unpackedsinglefilename="LightMaps_ME2.mem"
+					unpackedsize="665769669"
+					unpackedmd5="cf3fe16cede255158312adbfafa277d2" />
+			<packagefile
+					me2="true"
+					sourcename="LightMaps_ME2.mem"
+					movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
+			friendlyname="Improved Static Lighting for ME3"
+			author="CreeperLava"
+			installpriority="3"
+			recommendationreason="Signficantly improves the static shadows in level environments"
+			recommendation="Recommended">
+			<file
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+					tooltipname="Improved Static Lighting for ME3"
+					torrentfilename="LightMaps_ME3.zip"
+					filename="Improved Static Lighting for ME3-363-2019-10-0-1573144588.zip"
+					size="9082233367"
+					md5="33fe926fd3c82d00b886e74b6b87527f"
+					unpackedsinglefilename="LightMaps_ME3.mem"
+					unpackedsize="9082233083"
+					unpackedmd5="75530cbe6aa10224a15053b138228c4f" />
+			<packagefile
+					me3="true"
+					sourcename="LightMaps_ME3.mem"
+					movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
 			friendlyname="Allers Complexion Tweak"
