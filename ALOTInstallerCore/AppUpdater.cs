@@ -425,7 +425,7 @@ namespace ALOTInstallerCore
 
             setDialogText?.Invoke($"Restarting {Utilities.GetAppPrefixedName()} Installer");
             Thread.Sleep(2000);
-            args = $"--update-dest-path \"{System.Reflection.Assembly.GetExecutingAssembly().Location}\"";
+            args = $"--update-dest-path \"{Utilities.GetExecutablePath()}\"";
             Log.Information($@"[AICORE] Running proxy update: {newExecutable} {args}");
 
             process = new Process();
