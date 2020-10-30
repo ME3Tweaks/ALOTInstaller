@@ -34,7 +34,7 @@
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='WPFRelease'">
-		<DefineConstants>TRACE;DEBUG;WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
+		<DefineConstants>WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
 		<DebugType>embedded</DebugType>
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>

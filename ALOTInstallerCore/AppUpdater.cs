@@ -112,8 +112,7 @@ namespace ALOTInstallerCore
                                 string uiVersionInfo = "";
                                 if (latest.Prerelease)
                                 {
-                                    uiVersionInfo +=
- " This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
+                                    uiVersionInfo += " This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
                                 }
                                 int daysAgo = (DateTime.Now - latest.PublishedAt.Value).Days;
                                 string ageStr = "";
@@ -133,21 +132,18 @@ namespace ALOTInstallerCore
                                 uiVersionInfo += $"\nReleased {ageStr}";
                                 string title = $"{Utilities.GetAppPrefixedName()} Installer {releaseName} is available";
 
-                                upgrade =
- showUpdatePromptCallback != null && showUpdatePromptCallback.Invoke(title, $"You are currently using version {currentAppVersionInfo}.{uiVersionInfo}\nChangelog:\n\n{latest.Body}", "Update", "Later");
+                                upgrade = showUpdatePromptCallback != null && showUpdatePromptCallback.Invoke(title, $"You are currently using version {currentAppVersionInfo}.{uiVersionInfo}\nChangelog:\n\n{latest.Body}", "Update", "Later");
                             }
                             if (upgrade)
                             {
                                 Log.Information("[AICORE] Downloading update for application");
                                 //there's an update
-                                string message =
- $"Downloading update for {Utilities.GetAppPrefixedName()} Installer...";
+                                string message = $"Downloading update for {Utilities.GetAppPrefixedName()} Installer...";
                                 if (!canCancel)
                                 {
                                     if (!Settings.BetaMode)
                                     {
-                                        message =
- $"This copy of {Utilities.GetAppPrefixedName()} Installer is outdated and must be updated.";
+                                        message = $"This copy of {Utilities.GetAppPrefixedName()} Installer is outdated and must be updated.";
                                     }
                                 }
 
@@ -163,8 +159,7 @@ namespace ALOTInstallerCore
 
 
                                 var asset = latest.Assets.First(x => x.Name.StartsWith(assetPrefix));
-                                var downloadResult =
- await OnlineContent.DownloadToMemory(asset.BrowserDownloadUrl, progressCallback,
+                                var downloadResult = await OnlineContent.DownloadToMemory(asset.BrowserDownloadUrl, progressCallback,
                                     logDownload: true, cancellationTokenSource: cancellationTokenSource);
                                 if (downloadResult.result == null & downloadResult.errorMessage == null)
                                 {
@@ -189,8 +184,7 @@ namespace ALOTInstallerCore
 
                                 progressIndeterminateCallback?.Invoke();
                                 showUpdateProgressDialogCallback?.Invoke($"Updating {Utilities.GetAppPrefixedName()} Installer", "Preparing to apply update", false);
-                                var updateFailedResult =
- extractUpdate(downloadResult.result, Path.GetFileName(asset.Name), updateFilenameInArchive, setUpdateDialogTextCallback);
+                                var updateFailedResult = extractUpdate(downloadResult.result, Path.GetFileName(asset.Name), updateFilenameInArchive, setUpdateDialogTextCallback);
                                 if (updateFailedResult != null)
                                 {
                                     // The download is wrong size
@@ -248,7 +242,7 @@ namespace ALOTInstallerCore
                 var localExecutableHash = Utilities.CalculateMD5(Utilities.GetExecutablePath());
 
                 // Find applicable patch
-                foreach (var asset in latestRelease.Assets.Where(x => x.Name.StartsWith("gh_upd-")))
+                foreach (var asset in latestRelease.Assets.Where(x => x.Name.StartsWith("upd-")))
                 {
                     var updateinfo = asset.Name.Split(@"-");
                     if (updateinfo.Length >= 4)
@@ -360,7 +354,7 @@ namespace ALOTInstallerCore
             {
                 Log.Error($@"Error applying patch update: {e.Message}");
             }
-            
+
             return null;
         }
 
