@@ -68,7 +68,7 @@ namespace ALOTInstallerCore
                         }
 
                         // Check if applicable
-                        if (onlineRelease.Assets.Any(x => !x.Name.StartsWith(assetPrefix)))
+                        if (onlineRelease.Assets.All(x => !x.Name.StartsWith(assetPrefix)))
                         {
                             continue; //This release is not applicable to us
                         }
@@ -112,7 +112,7 @@ namespace ALOTInstallerCore
                                 string uiVersionInfo = "";
                                 if (latest.Prerelease)
                                 {
-                                    uiVersionInfo += " This is a beta build. You are receiving this update because you have opted into Beta Mode in settings.";
+                                    uiVersionInfo += " This update is a beta build. You are receiving this update because you have opted into Beta Mode in the settings.";
                                 }
                                 int daysAgo = (DateTime.Now - latest.PublishedAt.Value).Days;
                                 string ageStr = "";
@@ -122,17 +122,20 @@ namespace ALOTInstallerCore
                                 }
                                 else if (daysAgo == 0)
                                 {
-                                    ageStr = "today";
+                                    ageStr = "Today";
                                 }
                                 else
                                 {
                                     ageStr = $"{daysAgo} days ago";
                                 }
 
-                                uiVersionInfo += $"\nReleased {ageStr}";
+                                uiVersionInfo += $"\nReleased: {ageStr}";
                                 string title = $"{Utilities.GetAppPrefixedName()} Installer {releaseName} is available";
 
-                                upgrade = showUpdatePromptCallback != null && showUpdatePromptCallback.Invoke(title, $"You are currently using version {currentAppVersionInfo}.{uiVersionInfo}\nChangelog:\n\n{latest.Body}", "Update", "Later");
+                                var message = latest.Body;
+                                var msgLines = latest.Body.Split('\n');
+                                message = string.Join('\n', msgLines.Where(x => !x.StartsWith("hash: "))).Trim();
+                                upgrade = showUpdatePromptCallback != null && showUpdatePromptCallback.Invoke(title, $"You are currently using version {currentAppVersionInfo}.{uiVersionInfo}\n\n{message}", "Update", "Later");
                             }
                             if (upgrade)
                             {

@@ -19,7 +19,23 @@ namespace ALOTInstallerCore.Helpers
     /// </summary>
     public static class Locations
     {
-        public static string AppDataFolder() => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create), Utilities.GetHostingProcessname())).FullName;
+        private static string _appDataFolderName;
+
+        /// <summary>
+        /// The name of the folder for the appdata. Set this value as soon as the hosting app loads to ensure a consistent appdata folder
+        /// </summary>
+        public static string AppDataFolderName
+        {
+            get => _appDataFolderName ?? Utilities.GetHostingProcessname();
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    _appDataFolderName = value;
+                }
+            }
+        }
+        public static string AppDataFolder() => Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create), AppDataFolderName)).FullName;
         public static string TempDirectory() => Directory.CreateDirectory(Path.Combine(AppDataFolder(), "Temp")).FullName;
         public static string GetCachedManifestPath() => Path.Combine(AppDataFolder(), "manifest.xml");
 

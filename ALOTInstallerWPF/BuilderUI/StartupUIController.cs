@@ -127,7 +127,8 @@ namespace ALOTInstallerWPF.BuilderUI
                                     AffirmativeButtonText = updateButtonText,
                                     NegativeButtonText = declineButtonText,
                                     DefaultButtonFocus = MessageDialogResult.Affirmative
-                                });
+                                },
+                                    75);
                                 response = result == MessageDialogResult.Affirmative;
                                 lock (syncObj)
                                 {

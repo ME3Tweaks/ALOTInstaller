@@ -34,6 +34,7 @@ namespace ALOTInstallerWPF
 #endif
         public App() : base()
         {
+            Locations.AppDataFolderName = "ALOTInstallerWPF"; // Do not change this!
             handleCommandLine();
             ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(UIElement),
                 new FrameworkPropertyMetadata(15000));

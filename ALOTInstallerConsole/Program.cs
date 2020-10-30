@@ -13,6 +13,7 @@ namespace ALOTInstallerConsole
         private static void setWrapperLogger(ILogger logger) => Log.Logger = logger;
         static void Main(string[] args)
         {
+            Locations.AppDataFolderName = "ALOTInstallerConsole"; // Do not change this!
             var bufferHeight = Console.BufferHeight;
             try
             {
