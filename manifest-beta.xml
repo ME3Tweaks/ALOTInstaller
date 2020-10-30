@@ -890,7 +890,7 @@
 		    recommendation="Required"
 		    installpriority="1">
 		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+			    downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
 			    tooltipname="ALOT for ME1 12.0"
 			    torrentfilename="ALOT for ME1.zip"
 			    filename="ALOT for ME1.zip"
@@ -913,7 +913,7 @@
 		    recommendation="Required"
 		    installpriority="1">
 		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+			    downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
 			    tooltipname="ALOT for ME2 12.0"
 			    torrentfilename="ALOT for ME2.zip"
 			    filename="ALOT for ME2.zip"
@@ -936,7 +936,7 @@
 		    recommendation="Required"
 		    installpriority="1">
 		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+			    downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
 			    tooltipname="ALOT for ME3 12.0"
 			    torrentfilename="ALOT for ME3.zip"
 			    filename="ALOT for ME3.zip"
@@ -1000,7 +1000,7 @@
 		    recommendationreason="Significantly improves the static shadows in level environments. Denoised and higher resolution. Uses more memory, but won't lower the framerate. May cause crashes when combined with the Project Variety and EGM mods."
 		    recommendation="Recommended">
 		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+			    downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
 			    tooltipname="Improved Static Lighting for ME3 - FULL"
 			    torrentfilename="LightMaps_ME3_Full_v2.zip"
 			    filename=""
@@ -1022,7 +1022,7 @@
 		    recommendationreason="Significantly improves the static shadows in level environments. Only denoised, uses less memory than the full version at the cost of quality. Install this if you experience crashes with other mods installed."
 		    recommendation="Recommended">
 		    <file
-			    downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+			    downloadlink="not yet implemented"
 			    tooltipname="Improved Static Lighting for ME3 - LITE"
 			    torrentfilename="LightMaps_ME3_Lite_v2.zip"
 			    filename=""
