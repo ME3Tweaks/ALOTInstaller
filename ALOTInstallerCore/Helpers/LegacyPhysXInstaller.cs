@@ -8,10 +8,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
-using ALOTInstallerCore.PlatformSpecific.Windows;
 using ME3ExplorerCore.Helpers;
 using Microsoft.Win32;
 using Serilog;
+#if WINDOWS
+using ALOTInstallerCore.PlatformSpecific.Windows;
+#endif
 
 namespace ALOTInstallerCore.Helpers
 {
@@ -19,19 +21,17 @@ namespace ALOTInstallerCore.Helpers
     {
         public static bool IsPhysxKeyWritable()
         {
-#if !WINDOWS
-            return true;
-#endif
+#if WINDOWS
             var ageiaKey = @"SOFTWARE\WOW6432Node\AGEIA Technologies";
             return RegistryHandler.TestKeyWritable(Registry.LocalMachine, ageiaKey);
+#else
+            return true;
+#endif
         }
 
         public static bool IsLegacyPhysXInstalled()
         {
-#if !WINDOWS
-            // Linux users should know what they're doing
-            return true;
-#else
+#if WINDOWS
             // Guidance from mirh https://github.com/ME3Tweaks/ALOTInstaller/issues/23
             var intVal = RegistryHandler.GetRegistryInt(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\AGEIA Technologies\PhysX_A32_Engines", "2.7.2");
             if (intVal.HasValue && intVal.Value != -1)
@@ -43,6 +43,9 @@ namespace ALOTInstallerCore.Helpers
             }
 
             return false; //Registry check failed
+#else
+            // Linux users should know what they're doing
+            return true;
 #endif
         }
 
@@ -109,8 +112,6 @@ namespace ALOTInstallerCore.Helpers
                                 File.Delete(msiPath);
                             } catch { } //Don't care about the exception.
                         }
-
-                        return null;
                     }
                     else
                     {

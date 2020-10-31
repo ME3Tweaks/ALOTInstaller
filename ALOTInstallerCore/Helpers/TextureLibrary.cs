@@ -696,11 +696,13 @@ namespace ALOTInstallerCore.Helpers
                     {
                         if (!attemptingImport.Ready)
                         {
+                            Debug.WriteLine($@"Ingesting manifest file {file}");
                             // Wait till import completes
                             lock (syncObj)
                             {
                                 Monitor.Wait(syncObj);
                             }
+                            Debug.WriteLine($@"Ingested manifest file {file}");
 
                             handled = successful;
                             importResults.Add(new ImportResult()
@@ -838,7 +840,10 @@ namespace ALOTInstallerCore.Helpers
                     {
                         // File is usable
 
+                        Debug.WriteLine($@"Ingesting user file {file}");
                         var failedToAddReason = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].AttemptAddUserFile(file, selectGameCallback, out var addedUserFile);
+                        Debug.WriteLine($@"Ingested user file {file}");
+
                         importResults.Add(new ImportResult()
                         {
                             Result = failedToAddReason ?? "Added for install",

@@ -3,16 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects;
@@ -209,6 +202,7 @@ namespace ALOTInstallerWPF.Flyouts
                         ProgressValue = done;
                         ProgressIndeterminate = false;
                         ImportStatusText = $"Importing {file}";
+                        CurrentDisplayMode = EFIDisplayMode.ImportingView;
                     },
                 x =>
                 {
@@ -282,6 +276,7 @@ namespace ALOTInstallerWPF.Flyouts
                         ProgressMax = total;
                         ProgressValue = done;
                         ImportStatusText = $"Importing {file}";
+                        CurrentDisplayMode = EFIDisplayMode.ImportingView;
                     },
                     filesDone => importedManifestFiles = filesDone
                     );
