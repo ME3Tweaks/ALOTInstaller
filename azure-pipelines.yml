@@ -22,7 +22,12 @@ variables:
 steps:
 - checkout: self
   submodules: true 
- 
+
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '3.x'
+
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
