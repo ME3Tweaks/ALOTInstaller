@@ -101,11 +101,11 @@ namespace ALOTInstallerCore.Steps
             // Check for PhysX legacy. Require it to be installed at this point in time
             if (package.InstallTarget.Game == Enums.MEGame.ME1)
             {
-                if (!LegacyPhysXInstaller.IsLegacyPhysXInstalled())
+                if (!LegacyPhysXInstaller.IsPhysxKeyWritable() && !LegacyPhysXInstaller.IsLegacyPhysXInstalled())
                 {
                     Log.Information("[AICORE] Precheck: Legacy PhysX is not detected. Prompting for install");
                     if (ShowConfirmationDialog("Legacy PhysX is not installed",
-                        "Legacy PhysX must be installed to correct issues with Mass Effect's use of PhysX. Select Install to begin installation.",
+                        "Legacy PhysX must be installed to correct issues with poor programming practices in Mass Effect that can cause other older games (such as Mirror's Edge) to not work, due to how PhyX was designed back in 2007.\n\nSelect Install to begin installation.",
                         "Install", "Decline"))
                     {
                         void setProgressCallback(long done, long total)

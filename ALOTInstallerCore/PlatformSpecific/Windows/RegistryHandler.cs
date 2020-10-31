@@ -1,10 +1,34 @@
 ﻿#if WINDOWS
+using System;
+using System.Security.AccessControl;
 using Microsoft.Win32;
 
 namespace ALOTInstallerCore.PlatformSpecific.Windows
 {
     public static class RegistryHandler
     {
+        /// <summary>
+        /// Tests if a registry key is writable by writing a randomly named value into it and then attempting to delete it.
+        /// </summary>
+        /// <param name="subkey"></param>
+        /// <param name="subpath"></param>
+        /// <returns></returns>
+        public static bool TestKeyWritable(RegistryKey subkey, string subpath)
+        {
+            var guid = Guid.NewGuid().ToString();
+            try
+            {
+                subkey = subkey.OpenSubKey(subpath, true);
+                subkey.SetValue(guid, "testwrite");
+                subkey.DeleteValue(guid);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
         internal static void WriteRegistryKey(RegistryKey subkey, string subpath, string value, string data)
         {
 
@@ -98,6 +122,17 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         {
 
             return (string)Registry.GetValue(key, valueName, null);
+        }
+
+        /// <summary>
+        /// Gets a DWORD value from the registry from the specified key and value name.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="valueName"></param>
+        /// <returns></returns>
+        public static int? GetRegistryInt(string key, string valueName)
+        {
+            return (int?) Registry.GetValue(key, valueName, -1);
         }
 
         /// <summary>

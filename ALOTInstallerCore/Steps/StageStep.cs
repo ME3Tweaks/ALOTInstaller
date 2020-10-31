@@ -269,10 +269,10 @@ namespace ALOTInstallerCore.Steps
             foreach (var v in _installOptions.FilesToInstall)
             {
 #if DEBUG
-                //if (v.FriendlyName.Contains("Illusive"))
-                //{
+                if (!v.FriendlyName.Contains("ALOT"))
+                {
                     block.Post(v);
-                //}
+                }
 #else 
                 // Helps make sure I don't publish broken code
                 block.Post(v);
@@ -280,14 +280,7 @@ namespace ALOTInstallerCore.Steps
             }
             block.Complete();
             block.Completion.Wait();
-
-            //BlockingCollection<InstallerFile> stagingQueue = new BlockingCollection<InstallerFile>(, 2);
-
-            //foreach (var installerFile in _installOptions.FilesToInstall)
-            //{
-            //    PrepareSingleFile(installerFile, stagingDir, addonStagingPath, finalBuiltPackagesDestination);
-            //}
-
+            
             if (_abortStaging)
             {
                 // Error callback goes here
