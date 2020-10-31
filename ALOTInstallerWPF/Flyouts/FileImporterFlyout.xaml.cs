@@ -22,6 +22,7 @@ using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.WindowsAPICodePack.Taskbar;
 
 namespace ALOTInstallerWPF.Flyouts
 {
@@ -198,6 +199,12 @@ namespace ALOTInstallerWPF.Flyouts
                     x => ImportStatusText = x,
                     (file, done, total) =>
                     {
+                        if (ProgressMax > 0)
+                        {
+                            // Do it this way as we may have > 2GiB
+                            TaskbarHelper.SetProgress(done * 1.0f / total);
+                            TaskbarHelper.SetProgressState(TaskbarProgressBarState.Normal);
+                        }
                         ProgressMax = total;
                         ProgressValue = done;
                         ProgressIndeterminate = false;
@@ -240,6 +247,7 @@ namespace ALOTInstallerWPF.Flyouts
 
             nbw.RunWorkerCompleted += (sender, args) =>
             {
+                TaskbarHelper.SetProgressState(TaskbarProgressBarState.NoProgress);
                 if (args.Error == null)
                 {
                     if (args.Result is List<ImportResult> results)
@@ -265,6 +273,12 @@ namespace ALOTInstallerWPF.Flyouts
                 TextureLibrary.ImportFromFolder(folderPath, ManifestHandler.GetAllManifestFiles(),
                     (file, done, total) =>
                     {
+                        if (ProgressMax > 0)
+                        {
+                            // Do it this way as we may have > 2GiB
+                            TaskbarHelper.SetProgress(done * 1.0f / total);
+                            TaskbarHelper.SetProgressState(TaskbarProgressBarState.Normal);
+                        }
                         ProgressMax = total;
                         ProgressValue = done;
                         ImportStatusText = $"Importing {file}";
@@ -275,6 +289,7 @@ namespace ALOTInstallerWPF.Flyouts
             };
             nbw.RunWorkerCompleted += (sender, args) =>
             {
+                TaskbarHelper.SetProgressState(TaskbarProgressBarState.NoProgress);
                 if (args.Error == null)
                 {
                     if (args.Result is List<ManifestFile> importedFiles)
