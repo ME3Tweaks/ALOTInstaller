@@ -14,11 +14,6 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// List of redirections of files from extracted path => game path
         /// </summary>
         public List<ExtractionRedirect> ExtractionRedirects { get; set; }
-        /// <summary>
-        /// A mutual exclusive group option. If multiple files are ready at install time with same option group,
-        /// a dialog must be shown so the user can pick which one to use. Doing more than one will waste disk space and time
-        /// </summary>
-        public string OptionGroup { get; set; }
         public override string Category => "ALOV";
 
         public class ExtractionRedirect

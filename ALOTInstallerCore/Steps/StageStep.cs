@@ -269,10 +269,10 @@ namespace ALOTInstallerCore.Steps
             foreach (var v in _installOptions.FilesToInstall)
             {
 #if DEBUG
-                if (!v.FriendlyName.Contains("ALOT"))
-                {
+                //if (!v.FriendlyName.Contains("ALOT"))
+                //{
                     block.Post(v);
-                }
+                //}
 #else 
                 // Helps make sure I don't publish broken code
                 block.Post(v);
@@ -742,15 +742,19 @@ namespace ALOTInstallerCore.Steps
             Dictionary<string, List<InstallerFile>> mutualExclusiveMods = new Dictionary<string, List<InstallerFile>>();
             foreach (var v in _installOptions.FilesToInstall)
             {
-                if (v is PreinstallMod pm)
+                if (v is ManifestFile mf)
                 {
-                    if (pm.OptionGroup != null)
+                    if (mf.OptionGroup != null)
                     {
-                        if (!mutualExclusiveMods.TryGetValue(pm.OptionGroup, out var _))
+                        if (!mutualExclusiveMods.TryGetValue(mf.OptionGroup, out var _))
                         {
-                            mutualExclusiveMods[pm.OptionGroup] = new List<InstallerFile>();
+                            mutualExclusiveMods[mf.OptionGroup] = new List<InstallerFile>();
                         }
-                        mutualExclusiveMods[pm.OptionGroup].Add(pm);
+                        mutualExclusiveMods[mf.OptionGroup].Add(mf);
+                    }
+                    else
+                    {
+                        files.Add(v); //No mutual exclusivity
                     }
                 }
                 else

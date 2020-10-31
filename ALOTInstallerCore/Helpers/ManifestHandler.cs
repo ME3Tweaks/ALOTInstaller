@@ -375,7 +375,7 @@ namespace ALOTInstallerCore.Helpers
                                                                   UIPriority = TryConvert.ToInt32(e.Attribute("uipriority")?.Value, 5),
                                                                   Tooltipname = e.Element("file").Attribute("tooltipname")?.Value ?? e.Attribute("friendlyname").Value,
                                                                   DownloadLink = (string)e.Element("file").Attribute("downloadlink"),
-
+                                                                  OptionGroup = e.Attribute("optiongroup")?.Value,
                                                                   PackageFiles = e.Elements("packagefile")
                                                                       .Select(r => new PackageFile
                                                                       {

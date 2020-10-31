@@ -360,7 +360,7 @@ namespace ALOTInstallerCore.Steps
             var skipMarkersFlagFile = Path.Combine(Utilities.GetExecutingAssemblyFolder(), "_skipmarkers");
             if (File.Exists(skipMarkersFlagFile))
             {
-                Log.Information(@"Found _skipmarkers file. We will skip installing markers. This install will not support further texture modding");
+                Log.Information(@"[AICORE] Found _skipmarkers file. We will skip installing markers. This install will not support further texture modding");
                 args += " --skip-markers";
             }
 
