@@ -1,120 +1,21 @@
-        <preinstallmod mode="ALOT"
-            friendlyname="A Lot of Videos for ME3 2.0 - Basegame (1080p)"
-            author="Mellin"
-            recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3. This file covers the basegame, no DLC or mods."
-            recommendation="Recommended"
-            version="2.0"
-            optiongroup="ME3ALOV"
-            uipriority="2">
+        <manifestfile mode="ALOT"
+            friendlyname="Improved Static Lighting for ME3 - LITE"
+            author="CreeperLava"
+            installpriority="3"
+            recommendationreason="Significantly improves the static shadows in level environments. Only denoised, uses less memory than the full version at the cost of quality. Install this if you experience crashes with other mods installed."
+            recommendation="Recommended">
             <file
-                    downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
-                    filename="ALOVforME3-1080p-Basegame_2.0+.7z"
-                    torrentfilename="ALOVforME3-1080p-Basegame_2.0+-NOTORRENTYET.7z"
-                    md5="e772e68c20d2183ae2ed610afb35483a"
-                    size="6850185398" />
-            <extractionredirect
-                    archiverootpath="DLC_MOD_ALOV"
-                    relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV"
-                    loggingname="ALOV for ME3 1080p 2.0 - Basegame"
-                    isdlc="true" />
-            <games
-                    me1="false"
-                    me2="false"
-                    me3="true" />
-        </preinstallmod>
-        <preinstallmod mode="ALOT"
-            friendlyname="A Lot of Videos for ME3 2.0 - Official DLC (1080p)"
-            author="Mellin"
-            recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3. This file covers the official BioWare DLCs."
-            recommendation="Recommended"
-            version="2.0"
-            optiongroup="ME3ALOV"
-            uipriority="2">
-            <file
-                    downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
-                    filename="ALOVforME3-1080p-DLCs_2.0+.7z"
-                    torrentfilename="ALOVforME3-1080p-DLCs_2.0+-NOTORRENTYET.7z"
-                    md5="6a64b86b405d40cbf30696e5b387d293"
-                    size="6026554668" />
-            <!-- main DLC mod folder. Must exist for extraction redirects to work -->
-            <extractionredirect
-                    archiverootpath="DLC_MOD_ALOV_DLC"
-                    relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC"
-                    loggingname="ALOV for ME3 1080p 2.0 - DLC"
-                    isdlc="true" />
-            <!-- Official DLC components-->
-            <extractionredirect
-                    archiverootpath="Alternates\LEVIATHAN"
-                    relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC\Movies"
-                    optionalrequireddlc="DLC_EXP_Pack001"
-                    loggingname="Leviathan" />
-            <extractionredirect
-                    archiverootpath="Alternates\OMEGA"
-                    relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC\Movies"
-                    optionalrequireddlc="DLC_EXP_Pack002"
-                    loggingname="Omega" />
-            <extractionredirect
-                    archiverootpath="Alternates\FROM_ASHES"
-                    relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC\Movies"
-                    optionalrequireddlc="DLC_HEN_PR"
-                    loggingname="From Ashes" />
-            <extractionredirect
-                    archiverootpath="Alternates\CITADEL"
-                    relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC\Movies"
-                    optionalrequireddlc="DLC_EXP_Pack003"
-                    loggingname="Citadel" />
-            <extractionredirect
-                    archiverootpath="Alternates\EXTENDEDCUT"
-                    relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC\Movies"
-                    optionalrequireddlc="DLC_CON_END"
-                    loggingname="Extended Cut" />
-            <games
-                    me1="false"
-                    me2="false"
-                    me3="true" />
-        </preinstallmod>
-        <preinstallmod mode="ALOT"
-            friendlyname="A Lot of Videos for ME3 2.0 - Third Party Mods (1080p)"
-            author="Mellin"
-            recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3. This file covers third party mods where permission was granted and they are not using 1080p videos already."
-            recommendation="Recommended"
-            version="2.0"
-            optiongroup="ME3ALOV"
-            uipriority="2">
-            <file
-                    downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
-                    filename="ALOVforME3-1080p-ThirdPartyMods_2.0.0.0.7z"
-                    torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.0.0.0-NOTORRENTYET.7z"
-                    md5="420d04e20369fee4544c9e8d86b3cc80"
-                    size="3111552868" />
-            <!-- main DLC mod folder. Must exist for extraction redirects to work -->
-            <extractionredirect
-                    archiverootpath="DLC_MOD_ALOV_Patches"
-                    relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches"
-                    loggingname="ALOV for ME3 1080p 2.0 - Third Party"
-                    isdlc="true" />
-            <!-- Third Party DLC components. Generated with M3-->
-            <extractionredirect archiverootpath="Patches_Alternates\CEM_F" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_EXP_CEMF" loggingname="Citadel Epilogue Mod Full" />
-            <extractionredirect archiverootpath="Patches_Alternates\JAM_A" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JAM" loggingname="(JAM) JohnP's Alternate MEHEM" />
-            <extractionredirect archiverootpath="Patches_Alternates\JAM_B" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequiredfiles="\BIOGame\DLC\DLC_CON_JAM\Movies\End02_Cit_Flower4.bik" optionalrequiredfilessizes="6118444" loggingname="(JAM) version B" />
-            <extractionredirect archiverootpath="Patches_Alternates\LIME_WWP" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequiredfiles="\BIOGame\DLC\DLC_CON_LIME\Movies\End03_D_MRDes_Good.bik" optionalrequiredfilessizes="69242856" loggingname="LIME WWP" />
-            <extractionredirect archiverootpath="Patches_Alternates\LIME_WWP_FLOW" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequiredfiles="\BIOGame\DLC\DLC_CON_LIME\Movies\End03_D_NormandyChaseExt.bik" optionalrequiredfilessizes="43174424" loggingname="LIME WWP + FLOW" />
-            <extractionredirect archiverootpath="Patches_Alternates\OP_RE" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_MOD_OpRemaster" loggingname="ME3 Opening Remaster" />
-            <extractionredirect archiverootpath="Patches_Alternates\PEOM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_PEOM" loggingname="Priority Earth Overhaul Mod" />
-            <extractionredirect archiverootpath="Patches_Alternates\PEOM_to_EGM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_PEOM;DLC_MOD_EGM" loggingname="PEOM and EGM" />
-            <extractionredirect archiverootpath="Patches_Alternates\TALI" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_TaliMaster" loggingname="Tali Remastered" />
-            <extractionredirect archiverootpath="Patches_Alternates\TALI_ME2" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequiredfiles="\BIOGame\DLC\DLC_CON_TaliMaster\Movies\End03_Flashback_Tali.bik" optionalrequiredfilessizes="4536000" loggingname="Tali Remastered ME2 Like" />
-            <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JtoC" loggingname="JAM and CEM Core 1" />
-            <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM_and_MEHEM_to_CEM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JtoC" loggingname="JAM and CEM Core 2" />
-            <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM_and_MEHEM_to_CEM_Full" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JtoC;DLC_EXP_CEMF" loggingname="(JAM and CEM) CEM Full" />
-            <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM_and_MEHEM_to_CEM_Lite" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_JtoC;DLC_EXP_CEML" loggingname="(JAM and CEM) CEM Lite" />
-            <extractionredirect archiverootpath="Patches_Alternates\LIME_to_CEM_Full" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LtoC;DLC_EXP_CEMF" loggingname="(LIME and CEM) CEM Full" />
-            <extractionredirect archiverootpath="Patches_Alternates\LIME_to_CEM_Lite" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_LtoC;DLC_EXP_CEML" loggingname="(LIME and CEM) CEM Lite" />
-            <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM_and_MEHEM_to_CEM" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_MtoC" loggingname="MEHEM and CEM Core" />
-            <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM_and_MEHEM_to_CEM_Full" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_MtoC;DLC_EXP_CEMF" loggingname="(MEHEM and CEM) CEM Full" />
-            <extractionredirect archiverootpath="Patches_Alternates\JAM_to_CEM_and_MEHEM_to_CEM_Lite" relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies" optionalrequireddlc="DLC_CON_MtoC;DLC_EXP_CEML" loggingname="(MEHEM and CEM) CEM Lite" />
-            <games
-                    me1="false"
-                    me2="false"
-                    me3="true" />
-        </preinstallmod>
+                downloadlink="not yet implemented"
+                tooltipname="Improved Static Lighting for ME3 - LITE"
+                torrentfilename="LightMaps_ME3_Lite_v2.zip"
+                filename=""
+                size="4631906376"
+                md5="7361b5ad1b94491ca949acba0ce1b5c5"
+                unpackedsinglefilename="LightMaps_ME3_Lite_v2.mem"
+                unpackedsize="4631906076"
+                unpackedmd5="552c9ebfe650471790e6309035c695ed" />
+            <packagefile
+                me3="true"
+                sourcename="LightMaps_ME3.mem"
+                movedirectly="true" />
+        </manifestfile>
