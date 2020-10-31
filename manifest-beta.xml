@@ -3193,8 +3193,8 @@
 		<preinstallmod mode="ALOT"
 			friendlyname="A Lot of Videos for ME3 2.0 - Third Party Mods (1080p)"
 			author="Mellin"
-			recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3. This file covers third party mods where permission was granted and they are not using 1080p videos already."
-			recommendation="Recommended"
+			recommendationreason="Upgrades third party mod's videos where permission was granted, and they are not using 1080p videos already."
+			recommendation="Optional"
 			version="2.0"
 			optiongroup="ME3ALOV"
 			uipriority="2">
