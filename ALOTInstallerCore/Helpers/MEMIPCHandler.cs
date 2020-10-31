@@ -195,7 +195,7 @@ namespace ALOTInstallerCore.Helpers
 
             // No validation. Make sure exit code is checked in the calling process.
             var cmd = Cli.Wrap(Locations.MEMPath()).WithArguments(arguments).WithValidation(CommandResultValidation.None);
-            Debug.WriteLine($"Launching process: {Locations.MEMPath()} {arguments}");
+            Log.Information($"Invoking MEM with IPC: {Locations.MEMPath()} {arguments}");
 #if WINDOWS
             await foreach (var cmdEvent in cmd.ListenAsync(Encoding.Unicode, cancellationToken))
 #elif LINUX
