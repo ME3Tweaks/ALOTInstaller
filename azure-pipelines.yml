@@ -23,6 +23,12 @@ steps:
 - checkout: self
   submodules: true 
  
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '5.0'
+    includePreviewVersions: true
+
 # Change artifact name when the version major/minor changes
 - task: PowerShell@2
   displayName: 'Setup public variables'
