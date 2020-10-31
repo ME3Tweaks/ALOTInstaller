@@ -3121,7 +3121,7 @@
 			recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3. This file covers the basegame, no DLC or mods."
 			recommendation="Recommended"
 			version="2.0"
-			optiongroup="ME3ALOV"
+			optiongroup="ME3ALOV_BASE"
 			uipriority="2">
 			<file
 					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
@@ -3145,7 +3145,7 @@
 			recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3. This file covers the official BioWare DLCs."
 			recommendation="Recommended"
 			version="2.0"
-			optiongroup="ME3ALOV"
+			optiongroup="ME3ALOV_DLC"
 			uipriority="2">
 			<file
 					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
@@ -3196,7 +3196,7 @@
 			recommendationreason="Upgrades third party mod's videos where permission was granted, and they are not using 1080p videos already."
 			recommendation="Optional"
 			version="2.0"
-			optiongroup="ME3ALOV"
+			optiongroup="ME3ALOV_THIRDPARTY"
 			uipriority="2">
 			<file
 					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
@@ -3241,7 +3241,7 @@
 			recommendationreason="Optional due to large filesize and CPU requirements"
 			recommendation="Optional"
 			version="2.0"
-			optiongroup="ME3ALOV"
+			optiongroup="ME3ALOV_BASE"
 			uipriority="2">
 			<file
 					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
@@ -3265,7 +3265,7 @@
 			recommendationreason="Optional due to large filesize and CPU requirements"
 			recommendation="Optional"
 			version="2.0"
-			optiongroup="ME3ALOV"
+			optiongroup="ME3ALOV_DLC"
 			uipriority="2">
 			<file
 					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
@@ -3316,7 +3316,7 @@
 			recommendationreason="Optional due to large filesize and CPU requirements"
 			recommendation="Optional"
 			version="2.0"
-			optiongroup="ME3ALOV"
+			optiongroup="ME3ALOV_THIRDPARTY"
 			uipriority="2">
 			<file
 				downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
