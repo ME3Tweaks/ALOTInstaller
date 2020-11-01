@@ -23,7 +23,7 @@ namespace ALOTInstallerWPF.Flyouts
         public OriginNoUpdateFlyout(ALOTInstallerCore.Objects.Enums.MEGame game)
         {
             DataContext = this;
-            ImagePath = $"/Images/origin/{game.ToString().ToLower()}update.png";
+            ImagePath = $"pack://application:,,,/ALOTInstallerWPF;component/Images/origin/{game.ToString().ToLower()}update.png"; //IF ASSEMBLY CHANGES THIS MUST BE UPDATED!!
             CloseFlyoutCommand = new GenericCommand(closeFlyout);
             InitializeComponent();
         }
