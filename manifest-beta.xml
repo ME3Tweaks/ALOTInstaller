@@ -1028,11 +1028,11 @@
 			    tooltipname="Improved Static Lighting for ME3 - LITE"
 			    torrentfilename="Improved Static Lighting for ME3 - Lite.zip"
 			    filename="Improved Static Lighting for ME3 - Lite.zip"
-			    size="4631906376"
-			    md5="7361b5ad1b94491ca949acba0ce1b5c5"
+			    size="4517800344"
+			    md5="d99e0e3e7c8c6f8c65f98435638a72c6"
 			    unpackedsinglefilename="LightMaps_ME3_Lite_v2.mem"
-			    unpackedsize="4631906076"
-			    unpackedmd5="552c9ebfe650471790e6309035c695ed" />
+			    unpackedsize="4517800644"
+			    unpackedmd5="e21cafc243511f5486923103566dadcf" />
 		    <packagefile
 			    me3="true"
 			    sourcename="LightMaps_ME3_Lite_v2.mem"
