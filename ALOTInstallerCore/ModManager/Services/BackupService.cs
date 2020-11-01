@@ -210,7 +210,7 @@ namespace ALOTInstallerCore.ModManager.Services
             {
                 if (v.Game == game || game == Enums.MEGame.Unknown)
                 {
-                    v.RefreshBackupStatus(allTargets == null || allTargets.Any(x => x.Game == Enums.MEGame.ME1), forceCmmVanilla);
+                    v.RefreshBackupStatus(allTargets == null || allTargets.Any(x => x.Game == game), forceCmmVanilla);
                 }
             }
         }
