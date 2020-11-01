@@ -1012,7 +1012,7 @@
 			    unpackedmd5="5f0ae60159f1c492badd186c2c02f89e" />
 		    <packagefile
 			    me3="true"
-			    sourcename="LightMaps_ME3.mem"
+			    sourcename="LightMaps_ME3_Full_v2.mem"
 			    movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
