@@ -270,10 +270,10 @@ namespace ALOTInstallerCore.Steps
             foreach (var v in _installOptions.FilesToInstall)
             {
 #if DEBUG
-                //if (!v.FriendlyName.Contains("ALOT"))
-                //{
+                if (v.FriendlyName.Contains("Jacob"))
+                {
                     block.Post(v);
-                //}
+                }
 #else 
                 // Helps make sure I don't publish broken code
                 block.Post(v);
@@ -281,7 +281,7 @@ namespace ALOTInstallerCore.Steps
             }
             block.Complete();
             block.Completion.Wait();
-            
+
             if (_abortStaging)
             {
                 // Error callback goes here
@@ -303,7 +303,8 @@ namespace ALOTInstallerCore.Steps
         private bool? PrepareSingleFile(InstallerFile installerFile, string stagingDir, string addonStagingPath, string finalBuiltPackagesDestination, ApplicableGame targetGame)
         {
             if (_abortStaging) return null;
-            Log.Information($"[AICORE] Processing staging for {installerFile.FriendlyName}");
+            var prefix = installerFile.FriendlyName;
+            Log.Information($"[AICORE] [{prefix}] Processing staging for {installerFile.FriendlyName}");
             NotifyFileBeingProcessed?.Invoke(installerFile);
             installerFile.IsProcessing = true;
             installerFile.IsWaiting = false;
@@ -374,7 +375,7 @@ namespace ALOTInstallerCore.Steps
                     if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mod" && installerFile.StageModFiles)
                     {
                         var modDest = Path.Combine(stagingDir, Path.GetFileName(installerFile.GetUsedFilepath()));
-                        Log.Information($"[AICORE] Copying .mod file to staging (due to StageModFiles=true): {installerFile.GetUsedFilepath()} -> {modDest}");
+                        Log.Information($"[AICORE] [{prefix}] Copying .mod file to staging (due to StageModFiles=true): {installerFile.GetUsedFilepath()} -> {modDest}");
                         File.Copy(installerFile.GetUsedFilepath(), modDest);
                     }
                     else
@@ -391,7 +392,7 @@ namespace ALOTInstallerCore.Steps
                         if (copyDirectlyPackageFile != null)
                         {
                             var modDest = Path.Combine(stagingDir, Path.GetFileName(installerFile.GetUsedFilepath()));
-                            Log.Information($"[AICORE] Copying an installer file to staging (due to a subitem having CopyFile=true): {installerFile.GetUsedFilepath()} -> {modDest}");
+                            Log.Information($"[AICORE] [{prefix}] Copying an installer file to staging (due to a subitem having CopyFile=true): {installerFile.GetUsedFilepath()} -> {modDest}");
                             File.Copy(installerFile.GetUsedFilepath(), modDest);
                             copyDirectlyPackageFile.Processed = true;
                         }
@@ -407,10 +408,10 @@ namespace ALOTInstallerCore.Steps
                     //// See if any files need decompiled (TPF)
                     var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
                     var tpfsToDecomp = installerFile.PackageFiles.Where(x => x.TPFSource != null && x.ApplicableGames.HasFlag(targetGame)).Select(x => x.TPFSource).Distinct().ToList();
-                    if (!tpfsToDecomp.Any() && mf.UnpackedSingleFilename != null && installerFile.PackageFiles.All(x => !x.MoveDirectly && x.ApplicableGames.HasFlag(targetGame)) &&  Path.GetExtension(mf.UnpackedSingleFilename) == ".tpf")
+                    if (!tpfsToDecomp.Any() && mf.UnpackedSingleFilename != null && installerFile.PackageFiles.All(x => !x.MoveDirectly && x.ApplicableGames.HasFlag(targetGame)) && Path.GetExtension(mf.UnpackedSingleFilename) == ".tpf")
                     {
                         // Our files will always be in this
-                        Log.Information(@"[AICORE] No listed TPFs to decomp but we have a single file unpacked TPF, decompiling it");
+                        Log.Information($@"[AICORE] [{prefix}] No listed TPFs to decomp but we have a single file unpacked TPF, decompiling it");
                         tpfsToDecomp.Add(mf.UnpackedSingleFilename);
                     }
 
@@ -419,7 +420,7 @@ namespace ALOTInstallerCore.Steps
                         var matchingTpfFile = subfilesToExtract.Find(x => Path.GetFileName(x) == v);
                         if (matchingTpfFile == null)
                         {
-                            Log.Error($"Could not find TPF source! Missing TPF: {v}");
+                            Log.Error($"[AICORE] [{prefix}] Could not find TPF source! Missing TPF: {v}");
                             CoreCrashes.TrackError?.Invoke(new Exception($"Could not find a TPF source for an item in {installerFile.FriendlyName}! Missing TPF: {v}"));
                             continue;
                         }
@@ -442,7 +443,7 @@ namespace ALOTInstallerCore.Steps
                         if (Path.GetExtension(sf) == ".mod" && installerFile.StageModFiles)
                         {
                             var modDest = Path.Combine(addonStagingPath, Path.GetFileName(sf));
-                            Log.Information($"[AICORE] Moving .mod file to staging (due to StageModFiles=true): {sf} -> {modDest}");
+                            Log.Information($"[AICORE] [{prefix}] Moving .mod file to staging (due to StageModFiles=true): {sf} -> {modDest}");
                             File.Move(sf, modDest);
                             continue;
                         }
@@ -460,7 +461,7 @@ namespace ALOTInstallerCore.Steps
                                     if (len != unpackedSize)
                                     {
                                         installerFile.StatusText = "Extraction produced incorrect file";
-                                        Log.Error($"ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (MOVEDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
+                                        Log.Error($"[AICORE] [{prefix}] ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (MOVEDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
                                         _abortStaging = true;
                                         return false;
                                     }
@@ -479,7 +480,7 @@ namespace ALOTInstallerCore.Steps
                                     if (len != unpackedSize)
                                     {
                                         installerFile.StatusText = "Extraction produced incorrect file";
-                                        Log.Error($"ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (COPYDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
+                                        Log.Error($"[AICORE] [{prefix}] ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (COPYDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
                                         _abortStaging = true;
                                         return false;
                                     }
@@ -504,7 +505,7 @@ namespace ALOTInstallerCore.Steps
                             else
                             {
                                 // File skipped
-                                Log.Information($"[AICORE] File skipped for processing: {sf}");
+                                Log.Information($"[AICORE] [{prefix}] File skipped for processing: {sf}");
                             }
                         }
                     }
@@ -519,13 +520,13 @@ namespace ALOTInstallerCore.Steps
                     if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory == new DriveInfo(finalBuiltPackagesDestination).RootDirectory)
                     {
                         // Move
-                        Log.Information($"[AICORE] Moving unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                        Log.Information($"[AICORE] [{prefix}] Moving unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
                         File.Move(installerFile.GetUsedFilepath(), destF);
                     }
                     else
                     {
                         //Copy
-                        Log.Information($"[AICORE] Copying unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                        Log.Information($"[AICORE] [{prefix}] Copying unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
                         CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
                             (x, y) =>
                             {
@@ -536,7 +537,7 @@ namespace ALOTInstallerCore.Steps
 
                     stage = false;
                 }
-                else if (archiveExtracted && installerFile.PackageFiles.All(x => x.MoveDirectly && x.ApplicableGames.HasFlag(targetGame)))
+                else if (archiveExtracted && installerFile.PackageFiles.Where(x => x.ApplicableGames.HasFlag(targetGame)).All(x => x.MoveDirectly))
                 {
                     // Subfiles move to dest
                 }
@@ -551,7 +552,7 @@ namespace ALOTInstallerCore.Steps
                 }
                 else
                 {
-                    Log.Error($"[AICORE] STAGING NOT HANDLED FOR {installerFile.FriendlyName}");
+                    Log.Error($"[AICORE] [{prefix}] STAGING NOT HANDLED!");
                     CoreCrashes.TrackError?.Invoke(new Exception($"STAGING NOT HANDLED FOR {installerFile.FriendlyName}"));
                 }
 
@@ -590,7 +591,7 @@ namespace ALOTInstallerCore.Steps
                         x =>
                         {
                             // Do something here. Not sure what
-                            Log.Error($@"[AICORE] Error occurred staging {installerFile.FriendlyName}: {x.Message}");
+                            Log.Error($@"[AICORE] [{prefix}] Error occurred performing staging: {x.Message}");
                             error = true;
                             installerFile.StatusText = $"Failed to stage file(s): {x.Message}";
                             _abortStaging = true;
@@ -609,14 +610,14 @@ namespace ALOTInstallerCore.Steps
                         {
                             // Can be staged directly
                             var destF = Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{Path.GetFileName(sf)}");
-                            Log.Information($"[AICORE] Moving prebuild .mem archive subfile to installation packages folder: {sf} -> {destF}");
+                            Log.Information($"[AICORE] [{prefix}] Moving prebuild .mem archive subfile to installation packages folder: {sf} -> {destF}");
                             File.Move(sf, destF);
                             stagedID++;
                         }
                         else if (userSubfileShouldBeStaged(_installOptions.InstallTarget.Game, sf))
                         {
                             var modDest = Path.Combine(userFileBuildMemPath, Path.GetFileName(sf));
-                            Log.Information($"[AICORE] Moving archive subfile to user staging: {sf} -> {modDest}");
+                            Log.Information($"[AICORE] [{prefix}] Moving archive subfile to user staging: {sf} -> {modDest}");
                             File.Move(sf, modDest);
                         }
                     }
@@ -629,6 +630,7 @@ namespace ALOTInstallerCore.Steps
                         var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{uf.FriendlyName}.mem"), _installOptions.InstallTarget.Game);
                         if (resultcode != 0)
                         {
+                            Log.Error($@"[AICORE] [{prefix}] User file failed to build");
                             error = true;
                             installerFile.Disabled = true;
                             installerFile.StatusText = $"Failed to build, exit code {resultcode}. File has been disabled";
@@ -651,7 +653,7 @@ namespace ALOTInstallerCore.Steps
             {
                 installerFile.StatusText = "Staged for installation";
             }
-
+            Log.Information($@"[AICORE] [{prefix}] Staging completed");
             return true;
         }
 
@@ -792,6 +794,7 @@ namespace ALOTInstallerCore.Steps
         /// <param name="finalDest">Where compiled (.mem) files for installation will be placed</param>
         private void StageForBuilding(InstallerFile installerFile, string sourceDirectory, string compilingStagingDest, string finalDest, MEGame targetGame)
         {
+            var prefix = installerFile.FriendlyName;
             if (installerFile is ManifestFile mf)
             {
                 var filesInSource = Directory.GetFiles(sourceDirectory, "*.*", SearchOption.AllDirectories);
@@ -810,12 +813,12 @@ namespace ALOTInstallerCore.Steps
                         var chosenOption = cf.GetChosenFile();
                         if (chosenOption != null)
                         {
-                            Log.Information($"[AICORE] Option chosen on {mf.FriendlyName}, using choicefile {cf.ChoiceTitle}: {cf.GetChosenFile()}");
+                            Log.Information($"[AICORE] [{prefix}] Using choicefile option {cf.ChoiceTitle}: {cf.GetChosenFile()}");
                             stagePackageFile(mf, cf.GetChosenFile(), compilingStagingDest, finalDest, filesInSource, ref numPackageFilesStaged, numPackageFiles.Value);
                         }
                         else
                         {
-                            Log.Information($"[AICORE] Not installing {cf.ChoiceTitle}");
+                            Log.Information($"[AICORE] [{prefix}] Not installing {cf.ChoiceTitle}");
                         }
                     }
 
@@ -827,6 +830,7 @@ namespace ALOTInstallerCore.Steps
                         {
                             string zipfile = Path.Combine(sourceDirectory, zip.SourceName);
                             string stagedPath = Path.Combine(finalDest, $"{mf.BuildID:D3}_{stagedID}_{Path.GetFileName(zip.SourceName)}");
+                            Log.Information($@"[AICORE] [{prefix}] Installing ZipFile item: {zipfile} -> {stagedPath}");
                             File.Move(zipfile, stagedPath);
                             zip.StagedPath = stagedPath;
                             stagedID++;
@@ -840,6 +844,8 @@ namespace ALOTInstallerCore.Steps
                         {
                             string singleFile = Path.Combine(sourceDirectory, copy.SourceName);
                             string stagedPath = Path.Combine(finalDest, $"{mf.BuildID:D3}_{stagedID}_{Path.GetFileName(copy.SourceName)}");
+                            Log.Information($@"[AICORE] [{prefix}] Installing CopyFile item: {singleFile} -> {stagedPath}");
+
                             File.Move(singleFile, stagedPath);
                             copy.StagedPath = stagedPath;
                             //copy.ID = stagedID; //still useful?
@@ -849,13 +855,14 @@ namespace ALOTInstallerCore.Steps
 
                     if (mf.PackageFiles.Where(x => x.ApplicableGames.HasFlag(targetGame.ToApplicableGame())).Any(x => !x.Processed))
                     {
-                        Log.Warning($"[AICORE] Not all package files were marked as processed for file {mf.FriendlyName}!");
+                        Log.Warning($"[AICORE] [{prefix}] Not all package files were marked as processed!");
                     }
                 }
                 installerFile.StatusText = "Cleaning temporary files";
+                Log.Information($"[AICORE] [{prefix}] Cleaning up {sourceDirectory}");
                 Utilities.DeleteFilesAndFoldersRecursively(sourceDirectory);
                 installerFile.StatusText = "Staged for building";
-
+                Log.Information($"[AICORE] [{prefix}] Staged for build complete");
             }
         }
 
@@ -874,6 +881,7 @@ namespace ALOTInstallerCore.Steps
             // Stage package files
             if (!pf.Processed && pf.ApplicableGames.HasFlag(_installOptions.InstallTarget.Game.ToApplicableGame()))
             {
+                var prefix = installerFile.FriendlyName;
                 var matchingFile = filesInSource.FirstOrDefault(x => Path.GetFileName(x).Equals(Path.GetFileName(pf.SourceName), StringComparison.InvariantCultureIgnoreCase));
                 if (matchingFile != null)
                 {
@@ -883,7 +891,7 @@ namespace ALOTInstallerCore.Steps
                     {
                         // Directly move .mem file to output
                         var destinationF = Path.Combine(finalDest, $"{installerFile.BuildID:D3}_{Path.GetFileName(pf.SourceName)}");
-                        Log.Information($"[AICORE] Moving .mem file to builtdir: {pf.SourceName} -> {destinationF}");
+                        Log.Information($"[AICORE] [{prefix}] Moving .mem file to builtdir: {pf.SourceName} -> {destinationF}");
                         if (File.Exists(destinationF)) File.Delete(destinationF);
                         File.Move(matchingFile, destinationF);
                         pf.Processed = true;
@@ -894,8 +902,8 @@ namespace ALOTInstallerCore.Steps
                     {
                         // not mem file. Move to staging
                         var destinationF = Path.Combine(compilingStagingDest, pf.DestinationName ?? pf.SourceName);
-                        Log.Information($"[AICORE] Moving package file to staging: {pf.SourceName} -> {pf.DestinationName ?? pf.SourceName}");
                         if (File.Exists(destinationF)) File.Delete(destinationF);
+                        Log.Information($"[AICORE] [{prefix}] Moving file to staging via MoveDirectly flag on package file: {pf.SourceName} -> {destinationF}");
                         File.Move(matchingFile, destinationF);
                         pf.Processed = true;
                         return;
@@ -904,6 +912,7 @@ namespace ALOTInstallerCore.Steps
                     if (pf.CopyDirectly)
                     {
                         var destinationF = Path.Combine(compilingStagingDest, pf.DestinationName ?? Path.GetFileName(matchingFile));
+                        Log.Information($"[AICORE] [{prefix}] Copying file to staging via CopyDirectly flag on package file: {pf.SourceName} -> {destinationF}");
                         File.Copy(matchingFile, destinationF, true);
                         pf.Processed = true;
                         return;
@@ -912,7 +921,7 @@ namespace ALOTInstallerCore.Steps
                     if (pf.DestinationName != null)
                     {
                         // Found file to stage
-                        Log.Information($"[AICORE] Copying package file: {pf.SourceName} -> {pf.DestinationName}");
+                        Log.Information($"[AICORE] [{prefix}] Copying package file: {pf.SourceName} -> {pf.DestinationName}");
                         string destinationF = Path.Combine(compilingStagingDest, pf.DestinationName);
                         File.Copy(matchingFile, destinationF, true);
                         numPackageFilesStaged++;
@@ -922,13 +931,13 @@ namespace ALOTInstallerCore.Steps
                     else /*if (pf.DestinationName == null)*/
                     {
                         Log.Error(
-                            $"[AICORE] Package file destinationname value is null. This is an error in the manifest file, please contact the developers. File: {installerFile.FriendlyName}, PackageFile: {pf.SourceName}");
+                            $"[AICORE] [{prefix}] Package file destinationname value is null. This is an error in the manifest file, please contact the developers. File: {installerFile.FriendlyName}, PackageFile: {pf.SourceName}");
                         CoreCrashes.TrackError?.Invoke(new Exception($"{installerFile.FriendlyName} has a package file with a null source name! This must be fixed."));
                     }
                 }
                 else
                 {
-                    Log.Error($"[AICORE] File specified by manifest doesn't exist after extraction for file {installerFile.FriendlyName}: {pf.SourceName}");
+                    Log.Error($"[AICORE] [{prefix}] File specified by manifest doesn't exist after extraction for file: {pf.SourceName}. This is an error in the manifest.");
                     CoreCrashes.TrackError?.Invoke(new Exception($"{installerFile.FriendlyName} has a package file that didn't exist after preparing and could not stage: {pf.SourceName}"));
                 }
             }
