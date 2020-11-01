@@ -154,7 +154,7 @@ namespace ALOTInstallerCore
                                 // First here should be OK since we checked it above...
 
                                 // PATCH UPDATE
-                                if (attemptPatchUpdate(latest, progressCallback))
+                                if (attemptPatchUpdate(latest, progressCallback, progressIndeterminateCallback, setUpdateDialogTextCallback, cancellationTokenSource))
                                 {
                                     // Patch update succeeded. The code below is the default update
                                     return;
@@ -224,7 +224,7 @@ namespace ALOTInstallerCore
 
 #if APPUPDATESUPPORT
 
-        private static bool attemptPatchUpdate(Release latestRelease, Action<long, long> progressCallback)
+        private static bool attemptPatchUpdate(Release latestRelease, Action<long, long> progressCallback, Action progressIndeterminateCallback, Action<string> setUpdateDialogTextCallback, CancellationTokenSource cancellationTokenSource)
         {
             var hashLine = latestRelease.Body.Split('\n').FirstOrDefault(x => x.StartsWith("hash: "));
 
@@ -278,17 +278,19 @@ namespace ALOTInstallerCore
                     {
                         Log.Information($@"Downloading patch file {downloadInfo.downloadLink}");
                         var patchUpdate = OnlineContent.DownloadToMemory(downloadInfo.downloadLink, progressCallback,
-                            downloadInfo.downloadhash).Result;
+                            downloadInfo.downloadhash, cancellationTokenSource: cancellationTokenSource).Result;
                         if (patchUpdate.errorMessage != null)
                         {
                             Log.Warning($@"Patch update download failed: {patchUpdate.errorMessage}");
                             return false;
                         }
                         Log.Information(@"Download OK: Building new executable");
+                        setUpdateDialogTextCallback?.Invoke("Building new executable");
+                        progressIndeterminateCallback?.Invoke();
                         var newExecutable = BuildUpdateFromPatch(patchUpdate.result, destMd5, downloadInfo.timetamp);
                         if (newExecutable != null)
                         {
-                            var validationResult = ValidateUpdate(newExecutable);
+                            var validationResult = ValidateUpdate(newExecutable, setUpdateDialogTextCallback);
                             return validationResult == null;
                         }
                     }
@@ -371,8 +373,7 @@ namespace ALOTInstallerCore
             if (LZMA.ExtractSevenZipArchive(archiveFile, outDir))
             {
                 // Extraction complete
-                var fileToValidate =
- Directory.GetFiles(outDir, updateFileName, SearchOption.AllDirectories).FirstOrDefault();
+                var fileToValidate = Directory.GetFiles(outDir, updateFileName, SearchOption.AllDirectories).FirstOrDefault();
                 if (fileToValidate != null)
                 {
                     return ValidateUpdate(fileToValidate, setDialogText);

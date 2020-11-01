@@ -76,6 +76,7 @@ namespace ALOTInstallerCore
             {
                 Settings.LastContentCheck = DateTime.Now;
             }
+            PeriodicRefresh.StartPeriodicRefresh();
         }
     }
 }

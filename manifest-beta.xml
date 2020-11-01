@@ -993,7 +993,7 @@
 			    sourcename="LightMaps_ME2.mem"
 			    movedirectly="true" />
 		</manifestfile>
-    <manifestfile mode="ALOT"
+   		<manifestfile mode="ALOT"
                   friendlyname="Improved Static Lighting for ME3 - FULL"
                   author="CreeperLava"
                   installpriority="3"
@@ -1015,6 +1015,30 @@
 			    sourcename="LightMaps_ME3_Full_v2.mem"
 			    movedirectly="true" />
 		</manifestfile>
+		
+		<manifestfile mode="ALOT"
+		    friendlyname="Improved Static Lighting for ME3 - LITE"
+		    author="CreeperLava"
+		    installpriority="3"
+		    recommendationreason="Significantly improves the static shadows in level environments. Only denoised, uses less memory than the full version at the cost of quality. Install this if you experience crashes with other mods installed."
+		    recommendation="Optional"
+	            optiongroup="ME3StaticLighting">
+		    <file
+			    downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+			    tooltipname="Improved Static Lighting for ME3 - LITE"
+			    torrentfilename="Improved Static Lighting for ME3 - Lite.zip"
+			    filename="Improved Static Lighting for ME3 - Lite.zip"
+			    size="4631906376"
+			    md5="7361b5ad1b94491ca949acba0ce1b5c5"
+			    unpackedsinglefilename="LightMaps_ME3_Lite_v2.mem"
+			    unpackedsize="4631906076"
+			    unpackedmd5="552c9ebfe650471790e6309035c695ed" />
+		    <packagefile
+			    me3="true"
+			    sourcename="LightMaps_ME3_Lite_v2.mem"
+			    movedirectly="true" />
+		</manifestfile>
+		
 		<manifestfile mode="ALOT"
 			friendlyname="Allers Complexion Tweak"
 			author="Ellise"
