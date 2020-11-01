@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.GameINI;
@@ -269,6 +270,8 @@ namespace ALOTInstallerCore.Steps
             SetBottomTextVisibilityCallback?.Invoke(true);
             bool doneReached = false;
             StageFailure failure = null;
+            string lastProcessedFile = null;
+            StringBuilder memCrashBuilder = new StringBuilder();
             void handleIPC(string command, string param)
             {
                 switch (command)
@@ -316,6 +319,7 @@ namespace ALOTInstallerCore.Steps
                         break;
                     case "PROCESSING_FILE": //Report a file is being processed
                         Log.Information("[AICORE] Processing file " + param);
+                        lastProcessedFile = param;
                         break;
                     default:
                         var failureIPCTriggered = pm?.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && !x.Warning);
@@ -383,7 +387,7 @@ namespace ALOTInstallerCore.Steps
                     {
                         currentMemProcessId = 0;
                         lastExitCode = x;
-                    });
+                    }, crashMsg => memCrashBuilder.AppendLine(crashMsg));
             }
 
             if (lastExitCode != 0)
@@ -394,6 +398,16 @@ namespace ALOTInstallerCore.Steps
                 {
                     // Crashed (or unhandled new exit IPC)
                     failure = pm.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == null);
+                }
+
+                if (memCrashBuilder.Length > 0)
+                {
+                    CoreCrashes.TrackError3?.Invoke(new Exception("MassEffectModderNoGui crashed during install step"),
+                        new Dictionary<string, string>()
+                        {
+                            {"Died on file", lastProcessedFile},
+                            {"Stage context", pm.CurrentStage.StageName}
+                        }, new[] { CoreCrashes.ErrorAttachmentLog.AttachmentWithText(memCrashBuilder.ToString(), "MemException.txt") });
                 }
 
                 doWorkEventArgs.Result = failure?.FailureResultCode ?? InstallResult.InstallFailed_UnknownError;
