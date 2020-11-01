@@ -453,8 +453,7 @@ namespace ALOTInstallerCore.Steps
             bool hasWarning = false;
 
             hasWarning |= !applyLODs();
-            TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), package.ImportNewlyUnpackedFiles,
-                (file, done, todo) => SetBottomTextCallback?.Invoke($"Optimizing {file} for future installs {(int)(done * 100f / todo)}%"));
+            
 
             SetBottomTextCallback?.Invoke("Installing binkw32 ASI loader");
 
@@ -483,6 +482,13 @@ namespace ALOTInstallerCore.Steps
             {
                 Log.Error($"[AICORE] Unable to delete installation packages at {memInputPath}: {e.Message}");
             }
+
+            if (package.ImportNewlyUnpackedFiles)
+            {
+                TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), package.ImportNewlyUnpackedFiles,
+                    (file, done, todo) => SetBottomTextCallback?.Invoke($"Optimizing {file} for future installs {(int)(done * 100f / todo)}%"));
+            }
+
             #endregion
 
             #region Show Ending UI

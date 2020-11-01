@@ -66,8 +66,8 @@ namespace ALOTInstallerWPF.Flyouts
 
         public InstallOptionsFlyout(GameTarget target, List<UserFile> userFiles)
         {
-            DataContext = this;
             InstallTarget = target;
+            if (target.Game == Enums.MEGame.ME1) CompressPackages = false;
             TitleText = $"Select install options for {target.Game.ToGameName()}";
             ModeText = $"Installer mode: {ManifestHandler.CurrentMode} Mode";
             OnUse4KLODsChanged(); //Set the default text.
