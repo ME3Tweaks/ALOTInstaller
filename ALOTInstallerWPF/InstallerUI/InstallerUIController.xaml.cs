@@ -228,7 +228,7 @@ namespace ALOTInstallerWPF.InstallerUI
                 SetBottomTextVisibilityCallback = x =>
                     InstallerTextBottomVisibility = x ? Visibility.Visible : Visibility.Collapsed,
                 ShowStorefrontDontClickUpdateCallback = showStorefrontNoUpdateUI,
-                SetOverallProgressCallback = x=> TaskbarHelper.SetProgress(x),
+                SetOverallProgressCallback = x=> TaskbarHelper.SetProgress(x / 100.0f),
                 SetProgressStyle = x => TaskbarHelper.SetProgressState(progressStyleToProgressState(x))
             };
             installerWorker.WorkerReportsProgress = true;

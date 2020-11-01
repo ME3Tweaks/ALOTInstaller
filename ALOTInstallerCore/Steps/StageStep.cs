@@ -271,7 +271,7 @@ namespace ALOTInstallerCore.Steps
             {
 #if DEBUG
                 //if (v.FriendlyName.Contains("Jacob"))
-                //{
+               // {
                     block.Post(v);
                 //}
 #else 
