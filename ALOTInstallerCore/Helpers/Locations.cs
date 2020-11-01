@@ -10,6 +10,7 @@ using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using Microsoft.Win32;
+using PropertyChanged;
 using Serilog;
 
 namespace ALOTInstallerCore.Helpers
@@ -69,6 +70,20 @@ namespace ALOTInstallerCore.Helpers
         public static GameTarget ME1Target { get; set; }
         public static GameTarget ME2Target { get; set; }
         public static GameTarget ME3Target { get; set; }
+
+        /// <summary>
+        /// UI display string of the ME1 target path. Do not trust this value as a true path, use the target instead.
+        /// </summary>
+        [DependsOn(nameof(ME1Target))] public static string ME1GamePath => ME1Target?.TargetPath ?? "Not installed";
+        /// <summary>
+        /// UI display string of the ME2 target path. Do not trust this value as a true path, use the target instead.
+        /// </summary>
+        [DependsOn(nameof(ME2Target))] public static string ME2GamePath => ME2Target?.TargetPath ?? "Not installed";
+        /// <summary>
+        /// UI display string of the ME3 target path. Do not trust this value as a true path, use the target instead.
+        /// </summary>
+        [DependsOn(nameof(ME3Target))] public static string ME3GamePath => ME3Target?.TargetPath ?? "Not installed";
+        
         public static string ConfigPathME1 { get; set; }
         public static string ConfigPathME2 { get; set; }
         public static string ConfigPathME3 { get; set; }
@@ -221,7 +236,7 @@ namespace ALOTInstallerCore.Helpers
         /// <summary>
         /// Accesses the internal 'Resources' directory. This should only
         /// </summary>
-        
+
         public static string ResourcesDir => Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName; //The internal 'resources' directory. Does not exist when running from Linux as it's fully single file
 #endif
 

@@ -25,9 +25,9 @@
                     <Label FontSize="16" Margin="5,0,0,0" Padding="0,0,0,0" Content="Texture Mod Installation Status"/>
                 </Expander.Header>
                 <StackPanel Orientation="Vertical">
-                    <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME1TextureInstallInfo, FallbackValue='ME1: Textures installed, no ALOT, no MEUITM'}"/>
-                    <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME2TextureInstallInfo, FallbackValue='ME2: Game not installed'}"/>
-                    <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME3TextureInstallInfo, FallbackValue='ME3: ALOT 11.3'}"/>
+                    <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME1TextureInstallInfo, FallbackValue='ME1: Textures installed, no ALOT, no MEUITM'}" ToolTip="{Binding Path=(modmanager:Locations.ME1GamePath)}"/>
+                    <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME2TextureInstallInfo, FallbackValue='ME2: Game not installed'}" ToolTip="{Binding Path=(modmanager:Locations.ME2GamePath)}"/>
+                    <TextBlock Margin="20,0,0,0" Padding="0,0,0,5" Text="{Binding ME3TextureInstallInfo, FallbackValue='ME3: ALOT 11.3'}" ToolTip="{Binding Path=(modmanager:Locations.ME3GamePath)}"/>
                     <Button Content="LOD Switcher" 
                             Margin="20,0,0,0"
                             ToolTip="Allows you to change Texture Level of Detail (LOD) settings for each game"
