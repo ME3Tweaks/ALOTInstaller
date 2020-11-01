@@ -22,6 +22,7 @@ namespace ALOTInstallerCore.Helpers
                 periodicTimer.Elapsed -= periodicRefresh;
                 periodicTimer.Close();
             }
+
             periodicTimer = new Timer(60000)
             {
                 AutoReset = true
