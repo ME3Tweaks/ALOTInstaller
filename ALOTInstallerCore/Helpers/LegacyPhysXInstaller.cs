@@ -33,13 +33,15 @@ namespace ALOTInstallerCore.Helpers
         {
 #if WINDOWS
             // Guidance from mirh https://github.com/ME3Tweaks/ALOTInstaller/issues/23
-            var intVal = RegistryHandler.GetRegistryInt(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\AGEIA Technologies\PhysX_A32_Engines", "2.7.2");
-            if (intVal.HasValue && intVal.Value != -1)
+            var me1LegacyPhysxEngineVal = RegistryHandler.GetRegistryInt(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\AGEIA Technologies\PhysX_A32_Engines", "2.7.2");
+            if (me1LegacyPhysxEngineVal.HasValue && me1LegacyPhysxEngineVal.Value != -1)
             {
-                var legacyPhysXEngineFolder = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), @"NVIDIA Corporation\PhysX\Engine\v2.7.2");
-                var legacyPhysx = Path.Combine(legacyPhysXEngineFolder, "PhysXCore.dll");
-                return Directory.Exists(legacyPhysXEngineFolder) && File.Exists(legacyPhysx);
+                var legacyPhysXEngineFolder = RegistryHandler.GetRegistryString(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\AGEIA Technologies", "PhysXCore Path");
+                if (legacyPhysXEngineFolder != null)
+                {
+                    var legacyPhysx = Path.Combine(legacyPhysXEngineFolder, "PhysXCore.dll");
+                    return Directory.Exists(legacyPhysXEngineFolder) && File.Exists(legacyPhysx);
+                }
             }
 
             return false; //Registry check failed
@@ -110,9 +112,11 @@ namespace ALOTInstallerCore.Helpers
                             try
                             {
                                 File.Delete(msiPath);
-                            } catch { } //Don't care about the exception.
+                            }
+                            catch { } //Don't care about the exception.
                         }
                     }
+
                     else
                     {
                         Log.Error(@"[AICORE] User declined the license agreement for Legacy PhysX");
