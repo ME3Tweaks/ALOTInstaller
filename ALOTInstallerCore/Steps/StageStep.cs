@@ -99,6 +99,7 @@ namespace ALOTInstallerCore.Steps
             if (extension == ".png") return false; //no need to extract this file
             if (extension == ".tga") return false; //no need to extract this file
             if (extension == ".bik") return false; //no need to extract this file
+            if (extension == ".mod") return false; //no need to extract this file
 
             Directory.CreateDirectory(substagingDir);
 
