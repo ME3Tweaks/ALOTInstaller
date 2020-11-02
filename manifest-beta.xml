@@ -3168,8 +3168,8 @@
 					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
 					filename="ALOVforME3-1080p-Basegame_2.0+.7z"
 					torrentfilename="ALOVforME3-1080p-Basegame_2.0+-NOTORRENTYET.7z"
-					md5="2a4aae8641213ccb33dd2b63f030f3ba"
-					size="6850185189" />
+					md5="d2997e24f4cf537582ec1e823336f389"
+					size="6026545647" />
 			<extractionredirect
 					archiverootpath="DLC_MOD_ALOV"
 					relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV"
@@ -3192,7 +3192,7 @@
 					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
 					filename="ALOVforME3-1080p-DLCs_2.0+.7z"
 					torrentfilename="ALOVforME3-1080p-DLCs_2.0+-NOTORRENTYET.7z"
-					md5="1d7a8f8065d82cbab653f64bf84f65e8 "
+					md5="1f1e51b7d65b6f6b601fa0cd92b92063"
 					size="6026554367" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect
@@ -3243,8 +3243,8 @@
 					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
 					filename="ALOVforME3-1080p-ThirdPartyMods_2.0.0.0.7z"
 					torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.0.0.0-NOTORRENTYET.7z"
-					md5="31bafb1be1cc2caa838874094f9ffef2"
-					size="3111552952" />
+					md5="360aff945b24f4f45e920013b0956db6"
+					size="3111552728" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect
 					archiverootpath="DLC_MOD_ALOV_Patches"
@@ -3288,8 +3288,8 @@
 					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
 					filename="ALOVforME3-4K-Basegame_2.0+.7z"
 					torrentfilename="ALOVforME3-4K-Basegame_2.0+-NOTORRENTYET.7z"
-					md5="7fd00ad7918ebb18fd45d5cc9725b8eb"
-					size="17659866773" />
+					md5="1b22ee35d8452f94b44cd102328ca383"
+					size="17659858129" />
 			<extractionredirect
 					archiverootpath="DLC_MOD_ALOV"
 					relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV"
@@ -3312,8 +3312,8 @@
 					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
 					filename="ALOVforME3-4K-DLCs_2.0+.7z"
 					torrentfilename="ALOVforME3-4K-DLCs_2.0+-NOTORRENTYET.7z"
-					md5="3fdf0ce2657ea74015aecd110aea8a27"
-					size="16188204145" />
+					md5="d024b6f36d3d8d727c0bdb06031f2236 "
+					size="16188195425" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect
 					archiverootpath="DLC_MOD_ALOV_DLC"
@@ -3363,8 +3363,8 @@
 				downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
 				filename="ALOVforME3-4K-ThirdPartyMods_2.0.0.0.7z"
 				torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.0.0.0-NOTORRENTYET.7z"
-				md5="1fae9b7e571da80d216e7b7debef8995"
-				size="12835788760" />
+				md5="bf25228dcb6f793b1ca603dc70cf5cbe"
+				size="12835788528" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect
 				archiverootpath="DLC_MOD_ALOV_Patches"
