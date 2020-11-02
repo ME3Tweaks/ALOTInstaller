@@ -252,7 +252,7 @@
 	<manifest
 	 mode="ALOT"
 	 description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-	 version="7.0.0"/>
+	 version="7.0.2"/>
 	<!-- DEFINE MANIFEST FILES -->
 	<manifestfiles>
 		<manifestfile mode="MEUITM"
@@ -265,12 +265,13 @@
 			recommendation="Required"
 			comparisonslink="https://www.nexusmods.com/masseffect/mods/1?tab=images">
 			<file
-					downloadlink="https://www.nexusmods.com/masseffect/mods/1"
+					downloadlink="https://www.nexusmods.com/masseffect/mods/1/?tab=files"
 					tooltipname="MEUITM Anniversary Edition"
 					torrentfilename="MEUITM.zip"
 					filename="MEUITM Anniversary Edition Direct Download-1-2-1574046168.zip"
 					size="3304906568"
-					md5="4befad0f104c665358ec6f5f67a9dd5a" />
+					md5="4befad0f104c665358ec6f5f67a9dd5a" 
+					extract/>
 			<packagefile
 					me1="true"
 					sourcename="MEUITM\mods\Anderson.mem"
@@ -579,7 +580,7 @@
 			recommendation="Recommended"
 			comparisonslink="https://www.nexusmods.com/masseffect/mods/1?tab=images">
 			<file
-					downloadlink="https://www.nexusmods.com/masseffect/mods/1"
+					downloadlink="https://www.nexusmods.com/masseffect/mods/1/?tab=files"
 					tooltipname="MEUITM Anniversary Edition"
 					torrentfilename="MEUITM.zip"
 					filename="MEUITM Anniversary Edition Direct Download-1-2-1574046168.zip"
@@ -1152,7 +1153,8 @@
 					size="10154183"
 					unpackedsinglefilename="el_Ashley Complexion Tweak.mem"
 					unpackedsize="10148747"
-					unpackedmd5="731e784bbeadb8b49e137af3adde1358" />
+					unpackedmd5="731e784bbeadb8b49e137af3adde1358"
+					extrainstructions="Ensure you download the .MEM version - the first download in the list is not the correct one!" />
 			<packagefile
 					me3="true"
 					sourcename="el_Ashley Complexion Tweak.mem"
@@ -1211,7 +1213,7 @@
 					movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-			friendlyname="FemShep Complexion Tweak"
+			friendlyname="Default Femshep Retexture"
 			author="Ellise"
 			recommendationreason="Very good face textures for default FemShep (not custom), but a little different from vanilla and thus up to personal preference"
 			recommendation="Optional"
@@ -1581,6 +1583,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/134/?tab=files"
 					filename="ME3 HR Armor Sets Pack-134-1-1.rar"
+					tooltipname="HR Armor Sets Pack for ME3"
 					md5="eb0e06bc0133533adcd5d42ee12dbf5b"
 					size="199493402"
 					unpackedsinglefilename="ME3_SetArmor_Pack_Ottemis.tpf"
@@ -2252,6 +2255,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/13/?tab=files"
 					filename="ME3 HR Ashley Alternate Armor for Texmod-13-1.rar"
+					tooltipname="ME3 HR Ashley Alternate Armor"
 					md5="da6939281b5faf7702dc021abd7bf61d"
 					size="36815144"
 					unpackedsinglefilename="ME3_Ashley_Combat_Blue_Ottemis.tpf"
@@ -2287,6 +2291,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/15/?tab=files"
 					filename="ME3 HR Ashley Alt From Ashes Armor for Texmod-15-1-0.rar"
+					tooltipname="ME3 HR Ashley Alternate From Ashes Armor"
 					md5="1ca4dcbf0100e07ee4fe91628e412b91"
 					size="24737378"
 					unpackedsinglefilename="ME3_Ashley_From_Ashes_Ottemis.tpf"
@@ -2314,6 +2319,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/95/?tab=files"
 					filename="ME3 HR Ashley CE Armor for Texmod-95-1-0.rar"
+					tooltipname="ME3 HR Ashley CE Armor"
 					md5="a1c4ec876a40959046747a8de9c041af"
 					size="26716539"
 					unpackedsinglefilename="ME3_Ashley_CE_Red_Ottemis.tpf"
@@ -2349,6 +2355,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/4/?tab=files"
 					filename="ME3 HR Ashley Default for Texmod-4-1-1.rar"
+					tooltipname="ME3 HR Ashley Default"
 					md5="767ff17a47e4afd45510406f75054448"
 					size="28999538"
 					unpackedsinglefilename="ME3_Ashley_default_Ottemis.tpf"
@@ -2597,8 +2604,8 @@
 			recommendation="Recommended">
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/301/?tab=files"
-					tooltipname="HR Fourth Casual Black"
 					filename="HR Fourth Casual Black-301-1-0.rar"
+					tooltipname="HR Fourth Casual Black"
 					md5="49288ba2d85905c4d05ac96cacae968f"
 					size="13134921"
 					unpackedsinglefilename="ME3_Casual04_Black_FM_Ottemis.tpf"
@@ -2682,6 +2689,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/276/?tab=files"
 					filename="HR Kai Leng-276-1-0.rar"
+					tooltipname="HR Kai Leng"
 					md5="331fe235edc45f9b3b60386522dc35b5"
 					size="29162477"
 					unpackedsinglefilename="ME3_Kai_Leng_Ottemis.tpf"
@@ -2729,6 +2737,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/17/?tab=files"
 					filename="ME3 HR Kaidan Alt From Ashes Armor in Original Black for Texmod-17-1.rar"
+					tooltipname="ME3 HR Kaidan Alt From Ashes Armor in Original Black"
 					md5="bd116def607eda7c5361d9df94c2fc5b"
 					size="18962567"
 					unpackedsinglefilename="ME3_FromAshes-Black_Kaidan_Ottemis.tpf"
@@ -2752,6 +2761,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/294/?tab=files"
 					filename="HR Kaidan CE Armor-294-1-0.rar"
+					tooltipname="HR Kaidan CE Armor"
 					md5="512333d498ef618fd2daf703d40f6636"
 					size="54077086"
 					unpackedsinglefilename="ME3_Kaidan_CE_Ottemis.tpf"
@@ -2795,6 +2805,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/290/?tab=files"
 					filename="HR Kaidan Default Armor-290-1-0.rar"
+					tooltipname="HR Kaidan Default Armor"
 					md5="091834842d6b9711f353baa1679ba7a0"
 					size="55198707"
 					unpackedsinglefilename="ME3_Kaidan_default_Ottemis.tpf"
@@ -2909,6 +2920,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/45/?tab=files"
 					filename="ME3 HR N7 Hoody for Texmod-45-1.rar"
+					tooltipname="ME3 HR N7 Hoody"
 					md5="697e95d4672c3bbd7b4da7301f5f81e1"
 					size="37304754"
 					unpackedsinglefilename="ME3_Hoodie_N7_Greypocket_Ottemis.tpf"
@@ -2948,6 +2960,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/161/?tab=files"
 					filename="ME3 HR Science Uniforms for Texmod-161-1-1.rar"
+					tooltipname="ME3 HR Science Uniforms"
 					md5="357399b12a0d602d6ed8b6ac85cd8c45"
 					size="98028226"
 					unpackedsinglefilename="ME3_Science_Outfits_Ottemis.tpf"
@@ -2983,6 +2996,7 @@
 			<file
 					downloadlink="http://www.nexusmods.com/masseffect3/mods/7/?tab=files"
 					filename="ME3 HR Vega Alt From Ashes Armor in Original Blue for Texmod-7-1-0.rar"
+					tooltipname="ME3 HR Vega Alt From Ashes Armor in Original Blue"
 					md5="3d08a52123e1fb4e007a69b397b5d7a1"
 					size="20815649"
 					unpackedsinglefilename="ME3_FromAshes-Blue_Vega_Ottemis.tpf"
