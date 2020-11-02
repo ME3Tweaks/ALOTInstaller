@@ -1219,6 +1219,7 @@
 			<file
 					downloadlink="https://www.nexusmods.com/masseffect3/mods/562/?tab=files"
 					filename="el_DefaultFemshepRetexture.7z-562-1-0.7z"
+					tooltipname="el_DefaultFemshepRetexture"
 					md5="5e9ebeaf71f30bb64d508e2c4a89ab33"
 					size="15121152"
 					unpackedsinglefilename="el_DefaultFemshepRetexture.tpf"
@@ -1238,6 +1239,7 @@
 			<file
 					downloadlink="https://www.nexusmods.com/masseffect3/mods/574/?tab=files"
 					filename="el_SheplooComplexionTweak_1.7z-574-1-0.7z"
+					tooltip="Sheploo Complexion Tweak_1.0"
 					size="16186448"
 					md5="8c131425b32d06984ad4f5b57a6fc19e"
 					unpackedsinglefilename="el_SheplooComplexionTweak_1.tpf"
@@ -1257,6 +1259,7 @@
 			<file
 					downloadlink="https://www.nexusmods.com/masseffect3/mods/576/?tab=files"
 					filename="James Complexion Tweak_1.0-576-1-0.7z"
+					tooltip="James Complexion Tweak_1.0"
 					size="9620693"
 					md5="efab600ba1c6b6c3dcae3aaa4492ef4e"
 					unpackedsinglefilename="el_JamesComplexionTweak_1.tpf"
@@ -1276,6 +1279,7 @@
 			<file
 					downloadlink="https://www.nexusmods.com/masseffect3/mods/579/?tab=files"
 					filename="Zaeed Complexion Tweak 1.0-579-1-0.7z"
+					tooltip="Zaeed Complexion Tweak 1.0"
 					size="13561527"
 					md5="e1ff127784ed88d5a1ef6ad2edaaa11a"
 					unpackedsinglefilename="el_ZaeedComplexionTweak_1.tpf"
@@ -1294,6 +1298,7 @@
 			installpriority="10">
 			<file
 					downloadlink="https://www.mediafire.com/file/v151vbhh7d28kgb/%5BME3%5D+femShep+High+Quality+textures.7z"
+					tooltipname="[ME3] femShep High Quality textures"
 					filename="[ME3] femShep High Quality textures.7z"
 					size="18877523"
 					md5="03d31b6a684a8d498997b03a43e8e53f" />
