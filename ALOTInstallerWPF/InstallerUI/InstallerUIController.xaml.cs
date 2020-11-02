@@ -310,13 +310,16 @@ namespace ALOTInstallerWPF.InstallerUI
 
         private void showStorefrontNoUpdateUI(Enums.MEGame obj)
         {
-            Application.Current.Invoke(() =>
+            if (obj != Enums.MEGame.ME3)
             {
-                if (Application.Current.MainWindow is MainWindow mw)
+                Application.Current.Invoke(() =>
                 {
-                    mw.OpenOriginFlyout(obj);
-                }
-            });
+                    if (Application.Current.MainWindow is MainWindow mw)
+                    {
+                        mw.OpenOriginFlyout(obj);
+                    }
+                });
+            }
         }
 
         public DispatcherTimer TipTimer { get; set; }

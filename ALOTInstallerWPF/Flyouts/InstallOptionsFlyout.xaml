@@ -42,7 +42,7 @@
                     <mah:ToggleSwitch OffContent="2K Texture LODs" OnContent="4K Texture LODs" IsOn="{Binding Use4KLODs}" ToolTip="Texture quality settings. These can be changed after installation in the settings panel"/>
                     <TextBlock Text="{Binding CurrentLodsDescText}" TextWrapping="Wrap"/>
                     <mah:ToggleSwitch OffContent="Don't compress files" OnContent="Compress game files" IsOn="{Binding CompressPackages}" ToolTip="Compressing packages will make installation take slightly longer but will save significant disk space in the end" Visibility="{Binding InstallTarget.Game, Converter={StaticResource GameToVisibilityConverter}, ConverterParameter='Not_ME1'}"/>
-                    <mah:ToggleSwitch OffContent="Don't optimize texture library" OnContent="Optimize texture library" IsOn="{Binding OptimizeTextureLibrary}" ToolTip="Unpacked files will be moved into the texture library, replacing the packed versions. This will speed up future installations by skipping the extraction step"/>
+                    <mah:ToggleSwitch OffContent="Don't optimize texture library" OnContent="Optimize texture library" IsOn="{Binding OptimizeTextureLibrary}" ToolTip="Unpacked files will be moved into the texture library, replacing the packed versions. This will speed up future installations by skipping the extraction step" Visibility="{Binding ShowOptimizeOption, Converter={StaticResource BoolToVisibilityConverter}}"/>
                     <mah:ToggleSwitch OffContent="DEBUG: Skip texture install" OnContent="DEBUG: Perform texture install" IsOn="{Binding DebugPerformMainInstallation}" Visibility="{Binding Path=(alotInstallerWpf:App.DebugModeVisibility)}"/>
 
                 </StackPanel>

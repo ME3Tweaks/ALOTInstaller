@@ -23,6 +23,7 @@ using Microsoft.Win32;
 using NickStrupat;
 using System.Management;
 using ALOTInstallerCore.Helpers.AppSettings;
+using ALOTInstallerCore.Objects.Manifest;
 using ME3ExplorerCore.Gammtek.Extensions.Reflection;
 
 namespace ALOTInstallerCore
@@ -397,17 +398,17 @@ namespace ALOTInstallerCore
 
 
 
-        public static int RunProcess(string exe, string args, bool waitForProcess = false, bool allowReattemptAsAdmin = false, bool requireAdmin = false, bool noWindow = true)
+        public static int RunProcess(string exe, string args, bool waitForProcess = false, bool allowReattemptAsAdmin = false, bool requireAdmin = false, bool noWindow = true, bool useShellExecute = true)
         {
-            return RunProcess(exe, null, args, waitForProcess: waitForProcess, allowReattemptAsAdmin: allowReattemptAsAdmin, requireAdmin: requireAdmin, noWindow: noWindow);
+            return RunProcess(exe, null, args, waitForProcess: waitForProcess, allowReattemptAsAdmin: allowReattemptAsAdmin, requireAdmin: requireAdmin, noWindow: noWindow, useShellExecute: useShellExecute);
         }
 
-        public static int RunProcess(string exe, List<string> args, bool waitForProcess = false, bool allowReattemptAsAdmin = false, bool requireAdmin = false, bool noWindow = true)
+        public static int RunProcess(string exe, List<string> args, bool waitForProcess = false, bool allowReattemptAsAdmin = false, bool requireAdmin = false, bool noWindow = true, bool useShellExecute = true)
         {
-            return RunProcess(exe, args, null, waitForProcess: waitForProcess, allowReattemptAsAdmin: allowReattemptAsAdmin, requireAdmin: requireAdmin, noWindow: noWindow);
+            return RunProcess(exe, args, null, waitForProcess: waitForProcess, allowReattemptAsAdmin: allowReattemptAsAdmin, requireAdmin: requireAdmin, noWindow: noWindow, useShellExecute: useShellExecute);
         }
 
-        private static int RunProcess(string exe, List<string> argsL, string argsS, bool waitForProcess, bool allowReattemptAsAdmin, bool requireAdmin, bool noWindow)
+        private static int RunProcess(string exe, List<string> argsL, string argsS, bool waitForProcess, bool allowReattemptAsAdmin, bool requireAdmin, bool noWindow, bool useShellExecute)
         {
             var argsStr = argsS;
             if (argsStr == null && argsL != null)
@@ -434,8 +435,13 @@ namespace ALOTInstallerCore
                 using (Process p = new Process())
                 {
                     p.StartInfo.FileName = exe;
-                    p.StartInfo.UseShellExecute = true;
-                    p.StartInfo.CreateNoWindow = noWindow;
+                    p.StartInfo.UseShellExecute = useShellExecute;
+                    p.StartInfo.WorkingDirectory = Path.GetDirectoryName(exe);
+                    p.StartInfo.CreateNoWindow = true;
+                    if (noWindow)
+                    {
+                        p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                    }
                     p.StartInfo.Arguments = argsStr;
                     p.StartInfo.Verb = "runas";
                     p.Start();
@@ -456,8 +462,13 @@ namespace ALOTInstallerCore
                     using (Process p = new Process())
                     {
                         p.StartInfo.FileName = exe;
-                        p.StartInfo.UseShellExecute = true;
+                        p.StartInfo.UseShellExecute = useShellExecute;
+                        p.StartInfo.WorkingDirectory = Path.GetDirectoryName(exe);
                         p.StartInfo.CreateNoWindow = noWindow;
+                        if (noWindow)
+                        {
+                            p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                        }
                         p.StartInfo.Arguments = argsStr;
                         p.Start();
                         if (waitForProcess)
@@ -479,8 +490,13 @@ namespace ALOTInstallerCore
                         using (Process p = new Process())
                         {
                             p.StartInfo.FileName = exe;
-                            p.StartInfo.UseShellExecute = true;
+                            p.StartInfo.UseShellExecute = useShellExecute;
+                            p.StartInfo.WorkingDirectory = Path.GetDirectoryName(exe);
                             p.StartInfo.CreateNoWindow = noWindow;
+                            if (noWindow)
+                            {
+                                p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                            }
                             p.StartInfo.Arguments = argsStr;
                             p.StartInfo.Verb = "runas";
                             p.Start();
@@ -928,7 +944,14 @@ namespace ALOTInstallerCore
             var installerIndex = hostingName.IndexOf("Installer", StringComparison.InvariantCultureIgnoreCase);
             if (installerIndex > 0)
             {
-                return hostingName.Substring(0, installerIndex);
+                var prefix = hostingName.Substring(0, installerIndex);
+                if (Enum.TryParse<ManifestMode>(prefix, out _))
+                {
+                    // Not a supported app prefix.
+                    return "ALOT";
+                }
+
+                return prefix;
             }
 
             return "ALOT"; //Default

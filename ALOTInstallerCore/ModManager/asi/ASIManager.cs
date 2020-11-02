@@ -343,10 +343,6 @@ namespace MassEffectModManagerCore.modmanager.asi
                     Log.Information(@"[AICORE] Fetched remote ASI from server. Installing ASI to " + finalPath);
                     memoryStream.WriteToFile(finalPath);
                     Log.Information(@"[AICORE] ASI successfully installed.");
-                    CoreAnalytics.TrackEvent?.Invoke(@"Installed ASI", new Dictionary<string, string>()
-                    {
-                        {@"Filename", Path.GetFileNameWithoutExtension(finalPath)}
-                    });
 
                     //Cache ASI
                     if (!Directory.Exists(CachedASIsFolder))
@@ -389,7 +385,7 @@ namespace MassEffectModManagerCore.modmanager.asi
         /// <param name="gameTarget"></param>
         public static bool InstallASIToTargetByGroupID(int updateGroup, GameTarget gameTarget)
         {
-            Log.Error($@"[AICORE] Installing ASI update group {updateGroup} to target {gameTarget.TargetPath}");
+            Log.Information($@"[AICORE] Installing ASI update group {updateGroup} to target {gameTarget.TargetPath}");
             var group = GetASIModsByGame(gameTarget.Game).FirstOrDefault(x => x.UpdateGroupId == updateGroup);
             if (group == null)
             {

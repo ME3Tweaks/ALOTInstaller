@@ -72,6 +72,12 @@ namespace ALOTInstallerWPF.Flyouts
             ModeText = $"Installer mode: {ManifestHandler.CurrentMode} Mode";
             OnUse4KLODsChanged(); //Set the default text.
             LoadCommands();
+
+            if (!ShowOptimizeOption)
+            {
+                OptimizeTextureLibrary = false;
+            }
+
             InitializeComponent();
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("InstallOptionsWorker");
             var files = ManifestHandler.GetManifestFilesForMode(ManifestHandler.CurrentMode);
@@ -123,6 +129,7 @@ namespace ALOTInstallerWPF.Flyouts
         }
 
         public GameTarget InstallTarget { get; set; }
+        public bool ShowOptimizeOption => ManifestHandler.CurrentMode == ManifestMode.ALOT; //This needs changed if MEUITM gains optimizable files!
 
         private string getUIString(InstallOptionsStep.InstallOption option, List<InstallerFile> installerFiles)
         {

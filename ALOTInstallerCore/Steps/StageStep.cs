@@ -271,8 +271,8 @@ namespace ALOTInstallerCore.Steps
             {
 #if DEBUG
                 //if (v.FriendlyName.Contains("Jacob"))
-               // {
-                    block.Post(v);
+                // {
+                block.Post(v);
                 //}
 #else 
                 // Helps make sure I don't publish broken code
@@ -579,24 +579,62 @@ namespace ALOTInstallerCore.Steps
 
 
                 var archiveExtracted = archiveExtractedN.Value;
-                // File is a direct copy if it's not extracted by extract archive
+                // File is a direct copy if it's not extracted by extract archive. Put it in staging.
                 if (!archiveExtracted)
                 {
-                    CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), Path.Combine(userFileBuildMemPath, Path.GetFileName(installerFile.GetUsedFilepath())),
-                        (x, y) =>
+                    if (Path.GetExtension(uf.GetUsedFilepath()) == ".mem")
+                    {
+                        var destF = Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_USER_{Path.GetFileName(uf.GetUsedFilepath())}");
+                        Log.Information($@"[AICORE] [{prefix}] Copying precompiled mem directly to the mem input path: {uf.GetUsedFilepath()} -> {destF}");
+                        CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
+                            (x, y) =>
+                            {
+                                installerFile.StatusText = $"Staging for install {(int)(x * 100f / y)}%";
+                            },
+                            x =>
+                            {
+                                // Do something here. Not sure what
+                                Log.Error($@"[AICORE] [{prefix}] Error occurred performing staging: {x.Message}");
+                                error = true;
+                                installerFile.StatusText = $"Failed to stage file(s): {x.Message}";
+                                _abortStaging = true;
+                            }
+                        );
+                    }
+                    else
+                    {
+                        // Must be built
+
+                        // Copy to the staging dir
+                        var destF = Path.Combine(userFileBuildMemPath, Path.GetFileName(uf.GetUsedFilepath()));
+                        Log.Information($@"[AICORE] [{prefix}] Copying user file into mem build for user file -> {destF}");
+                        CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
+                            (x, y) =>
+                            {
+                                installerFile.StatusText = $"Staging for build {(int)(x * 100f / y)}%";
+                            },
+                            x =>
+                            {
+                                // Do something here. Not sure what
+                                Log.Error($@"[AICORE] [{prefix}] Error occurred performing staging: {x.Message}");
+                                error = true;
+                                installerFile.StatusText = $"Failed to stage file(s): {x.Message}";
+                                _abortStaging = true;
+                            }
+                        );
+
+
+                        // don't add progress indicator here. We don't need more than the text
+                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_USER_{uf.FriendlyName}.mem"), _installOptions.InstallTarget.Game, installerFile: uf);
+                        if (resultcode != 0)
                         {
-                            //UpdateStatusCallback?.Invoke($"Staging {Path.GetFileName(installerFile.GetUsedFilepath())} {(int)(x * 100f / y)}%"),
-                            installerFile.StatusText = $"Staging for install {(int)(x * 100f / y)}%";
-                        },
-                        x =>
-                        {
-                            // Do something here. Not sure what
-                            Log.Error($@"[AICORE] [{prefix}] Error occurred performing staging: {x.Message}");
+                            Log.Error($@"[AICORE] [{prefix}] User file failed to build");
                             error = true;
-                            installerFile.StatusText = $"Failed to stage file(s): {x.Message}";
+                            installerFile.Disabled = true;
+                            installerFile.StatusText = $"Failed to build, exit code {resultcode}. File has been disabled";
                             _abortStaging = true;
                         }
-                    );
+                    }
                 }
                 else
                 {
@@ -609,13 +647,14 @@ namespace ALOTInstallerCore.Steps
                         if (Path.GetExtension(sf) == ".mem")
                         {
                             // Can be staged directly
-                            var destF = Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{Path.GetFileName(sf)}");
-                            Log.Information($"[AICORE] [{prefix}] Moving prebuild .mem archive subfile to installation packages folder: {sf} -> {destF}");
+                            var destF = Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_USER_{Path.GetFileName(sf)}");
+                            Log.Information($"[AICORE] [{prefix}] Moving prebuilt .mem archive subfile to installation packages folder: {sf} -> {destF}");
                             File.Move(sf, destF);
                             stagedID++;
                         }
                         else if (userSubfileShouldBeStaged(_installOptions.InstallTarget.Game, sf))
                         {
+                            // Move to build
                             var modDest = Path.Combine(userFileBuildMemPath, Path.GetFileName(sf));
                             Log.Information($"[AICORE] [{prefix}] Moving archive subfile to user staging: {sf} -> {modDest}");
                             File.Move(sf, modDest);
@@ -625,9 +664,8 @@ namespace ALOTInstallerCore.Steps
                     if (Directory.GetFiles(userFileBuildMemPath).Any())
                     {
                         // Requires build
-                        installerFile.StatusText = "Building user file installation package";
                         // don't add progress indicator here. We don't need more than the text
-                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_{uf.FriendlyName}.mem"), _installOptions.InstallTarget.Game);
+                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_USER_{uf.FriendlyName}.mem"), _installOptions.InstallTarget.Game);
                         if (resultcode != 0)
                         {
                             Log.Error($@"[AICORE] [{prefix}] User file failed to build");
@@ -637,9 +675,9 @@ namespace ALOTInstallerCore.Steps
                             _abortStaging = true;
                         }
                     }
-
-                    Utilities.DeleteFilesAndFoldersRecursively(userFileExtractionPath);
                 }
+                Utilities.DeleteFilesAndFoldersRecursively(userFileBuildMemPath);
+                Utilities.DeleteFilesAndFoldersRecursively(userFileExtractionPath);
             }
 
             Interlocked.Increment(ref _numTasksCompleted);
@@ -949,15 +987,23 @@ namespace ALOTInstallerCore.Steps
         /// <param name="sourceDir"></param>
         /// <param name="outputFile"></param>
         /// <param name="targetGame"></param>
-        private int BuildMEMPackageFile(string uiname, string sourceDir, string outputFile, MEGame targetGame, Action<int, int> progressCallback = null)
+        private int BuildMEMPackageFile(string uiname, string sourceDir, string outputFile, MEGame targetGame, Action<int, int> progressCallback = null, InstallerFile installerFile = null)
         {
             void handleIPC(string command, string param)
             {
                 switch (command)
                 {
                     case "TASK_PROGRESS":
-                        UpdateOverallStatusCallback?.Invoke($"Building install package for {uiname}");
-                        progressCallback?.Invoke(TryConvert.ToInt32(param, 0), 100);
+                        if (installerFile != null)
+                        {
+                            // Local progress
+                            installerFile.StatusText = $"Building MEM installation package {param}%";
+                        }
+                        else
+                        {
+                            progressCallback?.Invoke(TryConvert.ToInt32(param, 0), 100);
+                            UpdateOverallStatusCallback?.Invoke($"Building install package for {uiname}");
+                        }
                         break;
                     case "PROCESSING_FILE":
                         Log.Information($"[AICORE] MEMCompiler PROCESSING_FILE {param}");

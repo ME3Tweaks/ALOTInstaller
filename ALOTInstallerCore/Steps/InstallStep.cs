@@ -262,6 +262,13 @@ namespace ALOTInstallerCore.Steps
 
             #region Main installation phase
 
+            Log.Information("[AICORE] -----------MEM INSTALLATION BEGIN-----------");
+            Log.Information("[AICORE] The following files are going to be installed:");
+            var filesThatWillInstall = Directory.GetFiles(memInputPath, "*.mem");
+            foreach(var f in filesThatWillInstall)
+            {
+                Log.Information(Path.GetFileName(f));
+            }
 
             SetMiddleTextCallback?.Invoke("Setting up texture installer");
             SetBottomTextCallback?.Invoke("");

@@ -24,6 +24,21 @@ namespace ALOTInstallerCore.Steps
 
         public static string PerformPreInstallCheck(InstallOptionsPackage package)
         {
+            // Make sure there are packages to install
+            var installationPackagesDir = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
+            if (!Directory.Exists(installationPackagesDir))
+            {
+                CoreCrashes.TrackError(new Exception("The InstallationPackages directory doesn't exist after build!"));
+                return "The final InstallationPackages directory does not exist. This is likely a bug in the installer. Please report this to to the developers on the ALOT Discord.";
+            }
+
+            var filesThatWillInstall = Directory.GetFiles(installationPackagesDir, "*.mem");
+            if (!filesThatWillInstall.Any())
+            {
+                CoreCrashes.TrackError(new Exception("There were no files in the InstallationPackages directory!"));
+                return "There are no files that will be installed, as the InstallationPackages directory is empty. This is likely a bug in the installer. Please report this to the developers on the ALOT Discord.";
+            }
+
             // Get required disk space
             long requiredDiskSpace = Utilities.GetSizeOfDirectory(new DirectoryInfo(Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString())));
             foreach (var v in package.FilesToInstall.OfType<PreinstallMod>())
@@ -105,8 +120,8 @@ namespace ALOTInstallerCore.Steps
                 {
                     Log.Information("[AICORE] Precheck: Legacy PhysX is not detected. Prompting for install");
                     if (ShowConfirmationDialog("Legacy PhysX is not installed",
-                        "Legacy PhysX must be installed to correct issues with poor programming practices in Mass Effect that can cause other older games (such as Mirror's Edge) to not work, due to how PhyX was designed back in 2007.\n\nSelect Install to begin installation.",
-                        "Install", "Decline"))
+                        "Legacy PhysX must be installed to correct issues with poor programming practices in Mass Effect that can cause other older games (such as Mirror's Edge) to not work, due to how PhyX was designed back in 2007.\n\nALOT Installer will install Legacy PhysX and implement changes that prevent Mass Effect from interfering with other games. The next page has important information about this fix.",
+                        "Continue", "Abort install"))
                     {
                         void setProgressCallback(long done, long total)
                         {
