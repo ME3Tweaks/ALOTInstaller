@@ -252,7 +252,7 @@
 	<manifest
 	 mode="ALOT"
 	 description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-	 version="7.0.2"/>
+	 version="7.0.3"/>
 	<!-- DEFINE MANIFEST FILES -->
 	<manifestfiles>
 		<manifestfile mode="MEUITM"
@@ -1029,7 +1029,7 @@
 			    tooltipname="Improved Static Lighting for ME3 - LITE"
 			    torrentfilename="Improved Static Lighting for ME3 - Lite.zip"
 			    filename="Improved Static Lighting for ME3 - Lite.zip"
-			    size="4517800344"
+			    size="4517800644"
 			    md5="d99e0e3e7c8c6f8c65f98435638a72c6"
 			    unpackedsinglefilename="LightMaps_ME3_Lite_v2.mem"
 			    unpackedsize="4517800644"

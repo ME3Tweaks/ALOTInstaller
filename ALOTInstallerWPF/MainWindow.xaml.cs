@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ALOTInstallerCore;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Flyouts;
@@ -65,6 +66,7 @@ namespace ALOTInstallerWPF
         public MainWindow()
         {
             DataContext = this;
+            Title = $"ALOT Installer {Utilities.GetAppVersion()}";
             InitializeComponent();
         }
 
