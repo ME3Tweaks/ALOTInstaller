@@ -258,26 +258,26 @@ namespace ALOTInstallerCore.Steps
 
             #endregion
 
-            #region Fix broken mods like Bonus Powers Pack
 
-            if (!applyNeverStreamFixes())
-            {
-                doWorkEventArgs.Result = InstallResult.InstallFailed_TextureExportFixFailed;
-                return;
-            }
-
-            #endregion
-
-            #region Apply Post-mars post-hackett fix (ME3 only)
-
-            applyCitadelTransitionFix();
-
-            #endregion
-
-            #region Main installation phase
-            
             if (mainInstallStageWillCommence)
             {
+                #region Fix broken mods like Bonus Powers Pack
+
+                if (!applyNeverStreamFixes())
+                {
+                    doWorkEventArgs.Result = InstallResult.InstallFailed_TextureExportFixFailed;
+                    return;
+                }
+
+                #endregion
+
+                #region Apply Post-mars post-hackett fix (ME3 only)
+
+                applyCitadelTransitionFix();
+
+                #endregion
+
+                #region Main installation phase
 
                 Log.Information("[AICORE] -----------MEM INSTALLATION BEGIN-----------");
                 Log.Information("[AICORE] The following files are going to be installed:");
@@ -301,11 +301,11 @@ namespace ALOTInstallerCore.Steps
                     switch (command)
                     {
                         case "STAGE_ADD": // Add a new stage 
-                            {
-                                Log.Information("[AICORE] Adding stage to install stages queue: " + param);
-                                pm.AddStage(param, package.InstallTarget.Game);
-                                break;
-                            }
+                        {
+                            Log.Information("[AICORE] Adding stage to install stages queue: " + param);
+                            pm.AddStage(param, package.InstallTarget.Game);
+                            break;
+                        }
                         case "STAGE_WEIGHT": //Reweight a stage based on how long we think it will take
                             string[] parameters = param.Split(' ');
                             if (parameters.Length > 1)
@@ -382,7 +382,7 @@ namespace ALOTInstallerCore.Steps
 
                 if (cacheAmountPercent != null)
                 {
-                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
+                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long) ((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
                     args += $" --cache-amount {cacheAmountPercent}";
                 }
 
@@ -432,7 +432,7 @@ namespace ALOTInstallerCore.Steps
                             {
                                 {"Died on file", lastProcessedFile},
                                 {"Stage context", pm.CurrentStage.StageName}
-                            }, new[] { CoreCrashes.ErrorAttachmentLog.AttachmentWithText(memCrashBuilder.ToString(), "MemException.txt") });
+                            }, new[] {CoreCrashes.ErrorAttachmentLog.AttachmentWithText(memCrashBuilder.ToString(), "MemException.txt")});
                     }
 
                     doWorkEventArgs.Result = failure?.FailureResultCode ?? InstallResult.InstallFailed_UnknownError;
@@ -445,9 +445,13 @@ namespace ALOTInstallerCore.Steps
                     doWorkEventArgs.Result = InstallResult.InstallFailed_MEMExitedBeforeStageDone;
                     return;
                 }
+                #endregion
             }
-
-            #endregion
+            else
+            {
+                SetMiddleTextVisibilityCallback?.Invoke(true);
+                SetMiddleTextCallback?.Invoke("Finishing installation");
+            }
 
             #region Post-main install modifications
 
@@ -472,6 +476,7 @@ namespace ALOTInstallerCore.Steps
                 }
             }
 
+            // stamp version info
             if (mainInstallStageWillCommence && !stampVersionInformation())
             {
                 doWorkEventArgs.Result = InstallResult.InstallFailed_FailedToApplyTextureInfo;
@@ -480,8 +485,10 @@ namespace ALOTInstallerCore.Steps
 
             //At this point we are now OK, errors will result in warnings only.
             bool hasWarning = false;
-
-            hasWarning |= !applyLODs();
+            if (mainInstallStageWillCommence)
+            {
+                hasWarning |= !applyLODs();
+            }
 
 
             SetBottomTextCallback?.Invoke("Installing binkw32 ASI loader");
@@ -1075,7 +1082,7 @@ namespace ALOTInstallerCore.Steps
                             }
 
                             //Check if any required file is missing
-                            if (requiredFiles.Any(x => !File.Exists(Path.Combine(dlcDirectory, x))))
+                            if (requiredFiles.Any(x => !File.Exists(Path.Combine(package.InstallTarget.TargetPath, x))))
                             {
                                 Log.Information($"[AICORE] {extractionRedirect.LoggingName}: Extraction rule is not applicable to this setup. At least one file for this rule was not found: {extractionRedirect.OptionalRequiredFiles}");
                                 continue;
@@ -1089,7 +1096,7 @@ namespace ALOTInstallerCore.Steps
                                 {
                                     string file = requiredFiles[i];
                                     long size = requiredFilesSizes[i];
-                                    string finalPath = Path.Combine(dlcDirectory, file);
+                                    string finalPath = Path.Combine(package.InstallTarget.TargetPath, file);
                                     var info = new FileInfo(finalPath);
                                     if (info.Length != size)
                                     {

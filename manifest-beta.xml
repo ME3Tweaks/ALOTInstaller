@@ -3088,26 +3088,26 @@
 					size="5763135923" />
 			<extractionredirect
 					archiverootpath="BASEGAME\Movies"
-					relativedestinationdirectory="BIOGame\Movies" />
+					relativedestinationdirectory="BioGame\Movies" />
 			<extractionredirect
 					archiverootpath="ARRIVAL\Movies"
-					relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part02\Movies"
+					relativedestinationdirectory="BioGame\DLC\DLC_EXP_Part02\Movies"
 					optionalrequireddlc="DLC_EXP_Part02" />
 			<extractionredirect
 					archiverootpath="FIREWALKER\Movies"
-					relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Hammer01\Movies"
+					relativedestinationdirectory="BioGame\DLC\DLC_UNC_Hammer01\Movies"
 					optionalrequireddlc="DLC_UNC_Hammer01" />
 			<extractionredirect
 					archiverootpath="KASUMI\Movies"
-					relativedestinationdirectory="BIOGame\DLC\DLC_HEN_MT\Movies"
+					relativedestinationdirectory="BioGame\DLC\DLC_HEN_MT\Movies"
 					optionalrequireddlc="DLC_HEN_MT" />
 			<extractionredirect
 					archiverootpath="LOTSB\Movies"
-					relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part01\Movies"
+					relativedestinationdirectory="BioGame\DLC\DLC_EXP_Part01\Movies"
 					optionalrequireddlc="DLC_EXP_Part01" />
 			<extractionredirect
 					archiverootpath="OVERLORD\Movies"
-					relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies"
+					relativedestinationdirectory="BioGame\DLC\DLC_UNC_Pack01\Movies"
 					optionalrequireddlc="DLC_UNC_Pack01" />
 			<games
 					me1="false"
@@ -3130,26 +3130,26 @@
 					size="15314602179" />
 			<extractionredirect
 					archiverootpath="BASEGAME\Movies"
-					relativedestinationdirectory="BIOGame\Movies" />
+					relativedestinationdirectory="BioGame\Movies" />
 			<extractionredirect
 					archiverootpath="ARRIVAL\Movies"
-					relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part02\Movies"
+					relativedestinationdirectory="BioGame\DLC\DLC_EXP_Part02\Movies"
 					optionalrequireddlc="DLC_EXP_Part02" />
 			<extractionredirect
 					archiverootpath="FIREWALKER\Movies"
-					relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Hammer01\Movies"
+					relativedestinationdirectory="BioGame\DLC\DLC_UNC_Hammer01\Movies"
 					optionalrequireddlc="DLC_UNC_Hammer01" />
 			<extractionredirect
 					archiverootpath="KASUMI\Movies"
-					relativedestinationdirectory="BIOGame\DLC\DLC_HEN_MT\Movies"
+					relativedestinationdirectory="BioGame\DLC\DLC_HEN_MT\Movies"
 					optionalrequireddlc="DLC_HEN_MT" />
 			<extractionredirect
 					archiverootpath="LOTSB\Movies"
-					relativedestinationdirectory="BIOGame\DLC\DLC_EXP_Part01\Movies"
+					relativedestinationdirectory="BioGame\DLC\DLC_EXP_Part01\Movies"
 					optionalrequireddlc="DLC_EXP_Part01" />
 			<extractionredirect
 					archiverootpath="OVERLORD\Movies"
-					relativedestinationdirectory="BIOGame\DLC\DLC_UNC_Pack01\Movies"
+					relativedestinationdirectory="BioGame\DLC\DLC_UNC_Pack01\Movies"
 					optionalrequireddlc="DLC_UNC_Pack01" />
 			<games
 					me1="false"
