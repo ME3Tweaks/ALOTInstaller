@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerWPF.Converters
 {
@@ -13,7 +14,7 @@ namespace ALOTInstallerWPF.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Enums.MEGame testGame && parameter is string gameStr)
+            if (value is MEGame testGame && parameter is string gameStr)
             {
                 bool inverted = false;
                 if (gameStr.IndexOf('_') > 0)
@@ -22,7 +23,7 @@ namespace ALOTInstallerWPF.Converters
                     inverted = splitparms.Any(x => x == "Not");
                     gameStr = splitparms.Last();
                 }
-                if (Enum.TryParse(gameStr, out Enums.MEGame parameterGame))
+                if (Enum.TryParse(gameStr, out MEGame parameterGame))
                 {
                     if (inverted ^ parameterGame == testGame) return Visibility.Visible;
                 }

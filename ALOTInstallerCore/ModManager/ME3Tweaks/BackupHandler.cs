@@ -11,6 +11,7 @@ using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using Serilog;
 using ALOTInstallerCore.Helpers.AppSettings;
+using ME3ExplorerCore.Packages;
 #if WINDOWS
 using Microsoft.Win32;
 using ALOTInstallerCore.PlatformSpecific.Windows;
@@ -30,7 +31,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         public class GameBackup : INotifyPropertyChanged
         {
             public string GameName => Game.ToGameName();
-            public Enums.MEGame Game { get; }
+            public MEGame Game { get; }
             public ObservableCollectionExtended<GameTarget> AvailableTargetsToBackup { get; } = new ObservableCollectionExtended<GameTarget>();
 
             /// <summary>
@@ -48,7 +49,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             /// <summary>
             /// Called when the user must select a game executable (for backup). Return null to indicate the user aborted the prompt.
             /// </summary>
-            public Func<Enums.MEGame, GameTarget> SelectGameExecutableCallback { get; set; }
+            public Func<MEGame, GameTarget> SelectGameExecutableCallback { get; set; }
 
             /// <summary>
             /// Called when the user must select a backup folder destination. Return null to indicate user aborted the prompt.
@@ -72,7 +73,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             /// </summary>
             public Action<bool> SetProgressIndeterminateCallback { get; set; }
 
-            public GameBackup(Enums.MEGame game, IEnumerable<GameTarget> availableBackupSources)
+            public GameBackup(MEGame game, IEnumerable<GameTarget> availableBackupSources)
             {
                 this.Game = game;
                 this.AvailableTargetsToBackup.AddRange(availableBackupSources);
@@ -526,7 +527,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
         public class GameRestore : INotifyPropertyChanged
         {
-            private Enums.MEGame Game;
+            private MEGame Game;
 
             public event PropertyChangedEventHandler PropertyChanged;
 
@@ -559,7 +560,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             /// </summary>
             public Action<bool> SetProgressIndeterminateCallback { get; set; }
 
-            public GameRestore(Enums.MEGame game)
+            public GameRestore(MEGame game)
             {
                 this.Game = game;
             }
@@ -852,16 +853,16 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         private const string BACKUP_REGISTRY_KEY = @"Software\ALOTAddon"; //Shared. Do not change
                                                                           //#endif
 
-        private static void WriteBackupLocation(Enums.MEGame game, string backupPath)
+        private static void WriteBackupLocation(MEGame game, string backupPath)
         {
 #if WINDOWS
             switch (game)
             {
-                case Enums.MEGame.ME1:
-                case Enums.MEGame.ME2:
+                case MEGame.ME1:
+                case MEGame.ME2:
                     RegistryHandler.WriteRegistryKey(Registry.CurrentUser, BACKUP_REGISTRY_KEY, game + @"VanillaBackupLocation", backupPath);
                     break;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     RegistryHandler.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY_ME3CMM, @"VanillaCopyLocation", backupPath);
                     break;
             }
@@ -870,7 +871,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 #endif
         }
 
-        public static void UnlinkBackup(Enums.MEGame meGame)
+        public static void UnlinkBackup(MEGame meGame)
         {
             Log.Information($"[AICORE] Unlinking backup for {meGame}");
             var gbPath = BackupService.GetGameBackupPath(meGame, out _, forceReturnPath: true);
@@ -887,12 +888,12 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
             switch (meGame)
             {
-                case Enums.MEGame.ME1:
-                case Enums.MEGame.ME2:
+                case MEGame.ME1:
+                case MEGame.ME2:
                     RegistryHandler.DeleteRegistryKey(Registry.CurrentUser, BACKUP_REGISTRY_KEY,
                         meGame + @"VanillaBackupLocation");
                     break;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     RegistryHandler.DeleteRegistryKey(Registry.CurrentUser, REGISTRY_KEY_ME3CMM,
                         @"VanillaCopyLocation");
                     break;

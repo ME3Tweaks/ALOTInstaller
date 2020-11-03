@@ -25,6 +25,7 @@ using System.Management;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects.Manifest;
 using ME3ExplorerCore.Gammtek.Extensions.Reflection;
+using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerCore
 {
@@ -202,13 +203,13 @@ namespace ALOTInstallerCore
         /// <param name="game">What game this exe is for</param>
         /// <param name="exe">Executable path</param>
         /// <returns></returns>
-        public static string GetGamePathFromExe(Enums.MEGame game, string exe)
+        public static string GetGamePathFromExe(MEGame game, string exe)
         {
             try
             {
                 string result = Path.GetDirectoryName(Path.GetDirectoryName(exe)); //binaries, <GAME>
 
-                if (game == Enums.MEGame.ME3)
+                if (game == MEGame.ME3)
                     result = Path.GetDirectoryName(result); //up one more because of win32 directory.
                 return result;
             }
@@ -878,14 +879,14 @@ namespace ALOTInstallerCore
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        public static bool IsGameRunning(Enums.MEGame game)
+        public static bool IsGameRunning(MEGame game)
         {
-            if (game == Enums.MEGame.ME1)
+            if (game == MEGame.ME1)
             {
                 Process[] pname = Process.GetProcessesByName("MassEffect");
                 return pname.Length > 0;
             }
-            if (game == Enums.MEGame.ME2)
+            if (game == MEGame.ME2)
             {
                 Process[] pname = Process.GetProcessesByName("MassEffect2");
                 Process[] pname2 = Process.GetProcessesByName("ME2Game");

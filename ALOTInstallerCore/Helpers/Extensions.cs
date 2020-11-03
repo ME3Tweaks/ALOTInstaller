@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.Helpers
@@ -111,43 +112,43 @@ namespace ALOTInstallerCore.Helpers
             Extensions.InvalidPathingChars = enumerable.ToArray<char>(enumerable.Count);
         }
 
-        public static string GetGameName(this Enums.MEGame game)
+        public static string GetGameName(this MEGame game)
         {
-            if (game == Enums.MEGame.ME1) return "Mass Effect";
-            if (game == Enums.MEGame.ME2) return "Mass Effect 2";
-            if (game == Enums.MEGame.ME3) return "Mass Effect 3";
+            if (game == MEGame.ME1) return "Mass Effect";
+            if (game == MEGame.ME2) return "Mass Effect 2";
+            if (game == MEGame.ME3) return "Mass Effect 3";
             return "Error: Unknown game";
         }
 
-        public static Enums.MEGame ApplicableGameToMEGame(this ApplicableGame game)
+        public static MEGame ApplicableGameToMEGame(this ApplicableGame game)
         {
-            if (game == ApplicableGame.ME1) return Enums.MEGame.ME1;
-            if (game == ApplicableGame.ME2) return Enums.MEGame.ME2;
-            if (game == ApplicableGame.ME3) return Enums.MEGame.ME3;
-            return Enums.MEGame.Unknown;
+            if (game == ApplicableGame.ME1) return MEGame.ME1;
+            if (game == ApplicableGame.ME2) return MEGame.ME2;
+            if (game == ApplicableGame.ME3) return MEGame.ME3;
+            return MEGame.Unknown;
         }
 
-        public static ApplicableGame ToApplicableGame(this Enums.MEGame game)
+        public static ApplicableGame ToApplicableGame(this MEGame game)
         {
-            if (game == Enums.MEGame.ME1) return ApplicableGame.ME1;
-            if (game == Enums.MEGame.ME2) return ApplicableGame.ME2;
-            if (game == Enums.MEGame.ME3) return ApplicableGame.ME3;
+            if (game == MEGame.ME1) return ApplicableGame.ME1;
+            if (game == MEGame.ME2) return ApplicableGame.ME2;
+            if (game == MEGame.ME3) return ApplicableGame.ME3;
             return ApplicableGame.None;
         }
 
-        public static int ToGameNum(this Enums.MEGame game)
+        public static int ToGameNum(this MEGame game)
         {
-            if (game == Enums.MEGame.ME1) return 1;
-            if (game == Enums.MEGame.ME2) return 2;
-            if (game == Enums.MEGame.ME3) return 3;
+            if (game == MEGame.ME1) return 1;
+            if (game == MEGame.ME2) return 2;
+            if (game == MEGame.ME3) return 3;
             return 0;
         }
 
-        public static string ToGameName(this Enums.MEGame game)
+        public static string ToGameName(this MEGame game)
         {
-            if (game == Enums.MEGame.ME1) return "Mass Effect";
-            if (game == Enums.MEGame.ME2) return "Mass Effect 2";
-            if (game == Enums.MEGame.ME3) return "Mass Effect 3";
+            if (game == MEGame.ME1) return "Mass Effect";
+            if (game == MEGame.ME2) return "Mass Effect 2";
+            if (game == MEGame.ME3) return "Mass Effect 3";
             return "UNKNOWN GAME";
         }
 

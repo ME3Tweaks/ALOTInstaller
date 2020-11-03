@@ -19,6 +19,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.Objects;
+using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerWPF.Flyouts
 {
@@ -84,7 +85,7 @@ namespace ALOTInstallerWPF.Flyouts
         public class LODGame : INotifyPropertyChanged
         {
             public string TexturesInstalledString { get; }
-            public Enums.MEGame Game { get; set; }
+            public MEGame Game { get; set; }
             public LodSetting CurrentSetting { get; set; }
             public bool ShowHigherLODs { get; private set; }
             public ObservableCollectionExtended<LodSetting> AvailableSettings { get; set; }
@@ -128,9 +129,9 @@ namespace ALOTInstallerWPF.Flyouts
             {
                 if (obj is string str && Enum.TryParse<LodSetting>(str, out var ls))
                 {
-                    if (Game == Enums.MEGame.ME1)
+                    if (Game == MEGame.ME1)
                     {
-                        var target = Locations.GetTarget(Enums.MEGame.ME1);
+                        var target = Locations.GetTarget(MEGame.ME1);
                         if (target.GetInstalledALOTInfo()?.MEUITMVER > 0)
                         {
                             //detect soft shadows/meuitm

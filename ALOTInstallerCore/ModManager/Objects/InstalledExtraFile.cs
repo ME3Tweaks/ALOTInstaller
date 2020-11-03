@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.ModManager.Objects
@@ -9,7 +10,7 @@ namespace ALOTInstallerCore.ModManager.Objects
 
     public class InstalledExtraFile
     {
-        private Enums.MEGame game;
+        private MEGame game;
         public string DisplayName { get; }
         public enum EFileType
         {
@@ -17,7 +18,7 @@ namespace ALOTInstallerCore.ModManager.Objects
         }
 
         public EFileType FileType { get; }
-        public InstalledExtraFile(string filepath, EFileType type, Enums.MEGame game)
+        public InstalledExtraFile(string filepath, EFileType type, MEGame game)
         {
             this.game = game;
             FilePath = filepath;

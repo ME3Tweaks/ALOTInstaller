@@ -4,6 +4,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps
@@ -298,7 +299,7 @@ namespace ALOTInstallerCore.Steps
                 }
 
                 // MEUITM
-                if (gameTarget.Game == Enums.MEGame.ME1)
+                if (gameTarget.Game == MEGame.ME1)
                 {
                     var meuitmFile = filesForTarget.FirstOrDefault(x =>
                     x.AlotVersionInfo.MEUITMVER > 0);

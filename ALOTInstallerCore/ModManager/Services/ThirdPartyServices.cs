@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerCore.ModManager.Services
 {
@@ -14,7 +15,7 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <param name="dlcName"></param>
         /// <param name="game">Game to look in database for</param>
         /// <returns>Third party mod info about dlc folder, null if not found</returns>
-        public static ThirdPartyModInfo GetThirdPartyModInfo(string dlcName, Enums.MEGame game)
+        public static ThirdPartyModInfo GetThirdPartyModInfo(string dlcName, MEGame game)
         {
             if (ThirdPartyIdentificationService.ModDatabase == null) return null; //Not loaded
             if (ThirdPartyIdentificationService.ModDatabase.TryGetValue(game.ToString(), out var infosForGame))
@@ -71,7 +72,7 @@ namespace ALOTInstallerCore.ModManager.Services
             return me2Values.Where(x => x.Value.modulenumber == modDLCModuleNumber.ToString()).Select(x => x.Value).ToList();
         }
 
-        internal static List<ThirdPartyModInfo> GetThirdPartyModInfosByMountPriority(Enums.MEGame game, int modMountPriority)
+        internal static List<ThirdPartyModInfo> GetThirdPartyModInfosByMountPriority(MEGame game, int modMountPriority)
         {
             if (ThirdPartyIdentificationService.ModDatabase == null) return new List<ThirdPartyModInfo>(); //Not loaded
             var gameValues = ThirdPartyIdentificationService.ModDatabase[game.ToString()];

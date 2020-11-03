@@ -7,13 +7,14 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole
 {
     public static class VerifyVanillaController
     {
-        public static void VerifyVanilla(Enums.MEGame game)
+        public static void VerifyVanilla(MEGame game)
         {
             var target = Locations.GetTarget(game);
             if (target == null) return; //Can't do anything.

@@ -11,6 +11,7 @@ using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects;
 using CliWrap;
 using CliWrap.EventStream;
+using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerCore.Helpers
 {
@@ -103,7 +104,7 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="applicationStdErr"></param>
         /// <param name="applicationExited"></param>
         /// <param name="cancellationToken"></param>
-        public static void VerifyVanilla(Enums.MEGame game, Action<int> applicationStarted = null,
+        public static void VerifyVanilla(MEGame game, Action<int> applicationStarted = null,
             Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null,
             Action<int> applicationExited = null, CancellationToken cancellationToken = default)
         {
@@ -269,7 +270,7 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="targetGame"></param>
         /// <param name="targetPath"></param>
         /// <returns></returns>
-        public static bool SetGamePath(Enums.MEGame targetGame, string targetPath)
+        public static bool SetGamePath(MEGame targetGame, string targetPath)
         {
             int exitcode = 0;
             string args = $"--set-game-data-path --gameid {targetGame.ToGameNum()} --path \"{targetPath}\"";
@@ -287,7 +288,7 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="game"></param>
         /// <param name="setting"></param>
         /// <returns></returns>
-        public static bool SetLODs(Enums.MEGame game, LodSetting setting)
+        public static bool SetLODs(MEGame game, LodSetting setting)
         {
             string args = $"--apply-lods-gfx --gameid {game.ToGameNum()}";
             if (setting.HasFlag(LodSetting.SoftShadows))
@@ -359,7 +360,7 @@ namespace ALOTInstallerCore.Helpers
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        public static Dictionary<string, string> GetLODs(Enums.MEGame game)
+        public static Dictionary<string, string> GetLODs(MEGame game)
         {
             Dictionary<string, string> lods = new Dictionary<string, string>();
             var args = $@"--print-lods --gameid {game.ToGameNum()} --ipc";
@@ -450,7 +451,7 @@ namespace ALOTInstallerCore.Helpers
         }
 
 #if !WINDOWS
-        public static bool SetConfigPath(Enums.MEGame game, string itemValue)
+        public static bool SetConfigPath(MEGame game, string itemValue)
         {
             int exitcode = 0;
             string args = $"--set-game-user-path --gameid {game.ToGameNum()} --path \"{itemValue}\"";

@@ -9,6 +9,7 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.Helpers;
 using MahApps.Metro.Controls.Dialogs;
+using ME3ExplorerCore.Packages;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.WindowsAPICodePack.Taskbar;
 
@@ -16,7 +17,7 @@ namespace ALOTInstallerWPF.Controllers
 {
     class RestoreController
     {
-        public static async void PerformRestore(Enums.MEGame game, bool hasTarget, MainWindow mw, Action updateGameStatuses)
+        public static async void PerformRestore(MEGame game, bool hasTarget, MainWindow mw, Action updateGameStatuses)
         {
             string destinationPath = Locations.GetTarget(game)?.TargetPath;
 

@@ -6,6 +6,7 @@ using System.Text;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.Helpers
@@ -18,7 +19,7 @@ namespace ALOTInstallerCore.Helpers
             var texturesInstalled = target.GetInstalledALOTInfo();
 
             LodSetting mixinSS = LodSetting.Vanilla;
-            if (target.Game == Enums.MEGame.ME1)
+            if (target.Game == MEGame.ME1)
             {
 
                 var branchingPCFCommon = Path.Combine(target.TargetPath, @"Engine", @"Shaders", @"BranchingPCFCommon.usf");
@@ -49,7 +50,7 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="game"></param>
         /// <param name="lods"></param>
         /// <returns></returns>
-        public static LodSetting GetLODSettingFromLODs(Enums.MEGame game, Dictionary<string, string> lods)
+        public static LodSetting GetLODSettingFromLODs(MEGame game, Dictionary<string, string> lods)
         {
             var textureChar1024 = lods.FirstOrDefault(x => x.Key == @"TEXTUREGROUP_Character_1024");
             if (string.IsNullOrWhiteSpace(textureChar1024.Key)) //does this work for ME2/ME3??
@@ -61,11 +62,11 @@ namespace ALOTInstallerCore.Helpers
             try
             {
                 int maxLodSize = 0;
-                int vanillaLODSize = game == Enums.MEGame.ME1 ? 1024 : 0;
+                int vanillaLODSize = game == MEGame.ME1 ? 1024 : 0;
                 if (!string.IsNullOrWhiteSpace(textureChar1024.Value))
                 {
                     //ME2,3 default to blank
-                    maxLodSize = int.Parse(StringStructParser.GetCommaSplitValues(textureChar1024.Value)[game == Enums.MEGame.ME1 ? @"MinLODSize" : @"MaxLODSize"]);
+                    maxLodSize = int.Parse(StringStructParser.GetCommaSplitValues(textureChar1024.Value)[game == MEGame.ME1 ? @"MinLODSize" : @"MaxLODSize"]);
                 }
 
                 if (maxLodSize != vanillaLODSize)

@@ -19,6 +19,7 @@ using ALOTInstallerWPF.InstallerUI;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using ME3ExplorerCore.Packages;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
@@ -31,9 +32,9 @@ namespace ALOTInstallerWPF.Flyouts
     /// </summary>
     public partial class SettingsFlyout : UserControl, INotifyPropertyChanged
     {
-        public bool ME1Available => Locations.GetTarget(Enums.MEGame.ME1) != null;
-        public bool ME2Available => Locations.GetTarget(Enums.MEGame.ME2) != null;
-        public bool ME3Available => Locations.GetTarget(Enums.MEGame.ME3) != null;
+        public bool ME1Available => Locations.GetTarget(MEGame.ME1) != null;
+        public bool ME2Available => Locations.GetTarget(MEGame.ME2) != null;
+        public bool ME3Available => Locations.GetTarget(MEGame.ME3) != null;
         public string ME1TextureInstallInfo { get; private set; }
         public string ME2TextureInstallInfo { get; private set; }
         public string ME3TextureInstallInfo { get; private set; }
@@ -89,7 +90,7 @@ namespace ALOTInstallerWPF.Flyouts
 #if DEBUG
             DebugShowInstallerFlyoutCommand = new GenericCommand(() =>
             {
-                var game = Enums.MEGame.ME3;
+                var game = MEGame.ME3;
                 InstallerUIController iuic = new InstallerUIController(new InstallOptionsPackage()
                 {
                     DebugNoInstall = true,
@@ -112,7 +113,7 @@ namespace ALOTInstallerWPF.Flyouts
             {
                 if (Application.Current.MainWindow is MainWindow mw)
                 {
-                    mw.OpenOriginFlyout(Enums.MEGame.ME1);
+                    mw.OpenOriginFlyout(MEGame.ME1);
                 }
             });
 #endif
@@ -270,7 +271,7 @@ namespace ALOTInstallerWPF.Flyouts
 
         private async void CheckVanilla(object obj)
         {
-            if (obj is string gameStr && Enum.TryParse<Enums.MEGame>(gameStr, out var game) &&
+            if (obj is string gameStr && Enum.TryParse<MEGame>(gameStr, out var game) &&
                 Application.Current.MainWindow is MainWindow mw)
             {
                 var target = Locations.GetTarget(game);
@@ -328,7 +329,7 @@ namespace ALOTInstallerWPF.Flyouts
 
         private bool CanCheckVanilla(object obj)
         {
-            if (obj is string gameStr && Enum.TryParse<Enums.MEGame>(gameStr, out var game))
+            if (obj is string gameStr && Enum.TryParse<MEGame>(gameStr, out var game))
             {
                 return Locations.GetTarget(game) != null;
             }
@@ -414,7 +415,7 @@ namespace ALOTInstallerWPF.Flyouts
             }
         }
 
-        private async void performBackup(Enums.MEGame game, bool linkMode, MetroWindow mw)
+        private async void performBackup(MEGame game, bool linkMode, MetroWindow mw)
         {
             BackupController.PerformBackup(game, linkMode, mw);
 
@@ -453,7 +454,7 @@ namespace ALOTInstallerWPF.Flyouts
             }
         }
 
-        private async void performRestore(Enums.MEGame game, bool hasTarget, MainWindow mw)
+        private async void performRestore(MEGame game, bool hasTarget, MainWindow mw)
         {
             RestoreController.PerformRestore(game, hasTarget, mw, UpdateGameStatuses);
         }

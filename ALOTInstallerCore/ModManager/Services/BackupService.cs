@@ -9,6 +9,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 using Serilog;
 #if WINDOWS
 using ALOTInstallerCore.PlatformSpecific.Windows;
@@ -71,7 +72,7 @@ namespace ALOTInstallerCore.ModManager.Services
         public class GameBackupStatus : INotifyPropertyChanged
         {
             public string GameName => Game.ToGameName();
-            public Enums.MEGame Game { get; internal set; }
+            public MEGame Game { get; internal set; }
             public bool BackedUp { get; internal set; }
             public bool BackupActivity { get; internal set; }
             public string BackupStatus { get; internal set; }
@@ -79,7 +80,7 @@ namespace ALOTInstallerCore.ModManager.Services
             public string LinkActionText { get; internal set; }
             public string BackupActionText { get; internal set; }
 
-            internal GameBackupStatus(Enums.MEGame game)
+            internal GameBackupStatus(MEGame game)
             {
                 Game = game;
             }
@@ -141,9 +142,9 @@ namespace ALOTInstallerCore.ModManager.Services
             object obj = new object(); //Syncobj to ensure the UI thread method has finished invoking
             void runOnUiThread()
             {
-                GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME1));
-                GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME2));
-                GameBackupStatuses.Add(new GameBackupStatus(Enums.MEGame.ME3));
+                GameBackupStatuses.Add(new GameBackupStatus(MEGame.ME1));
+                GameBackupStatuses.Add(new GameBackupStatus(MEGame.ME2));
+                GameBackupStatuses.Add(new GameBackupStatus(MEGame.ME3));
             }
             runCodeOnUIThreadCallback.Invoke(runOnUiThread);
             RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
@@ -152,21 +153,21 @@ namespace ALOTInstallerCore.ModManager.Services
         //private static bool _me1BackedUp;
         //public static bool ME1BackedUp
         //{
-        //    get => GetGameBackupPath(Enums.MEGame.ME1, out var isVanilla, true) != null;
+        //    get => GetGameBackupPath(MEGame.ME1, out var isVanilla, true) != null;
         //    private set => SetProperty(ref _me1BackedUp, value);
         //}
 
         //private static bool _me2BackedUp;
         //public static bool ME2BackedUp
         //{
-        //    get => GetGameBackupPath(Enums.MEGame.ME2, out var isVanilla, true) != null;
+        //    get => GetGameBackupPath(MEGame.ME2, out var isVanilla, true) != null;
         //    private set => SetProperty(ref _me2BackedUp, value);
         //}
 
         //private static bool _me3BackedUp;
         //public static bool ME3BackedUp
         //{
-        //    get => GetGameBackupPath(Enums.MEGame.ME3, out var isVanilla, true) != null;
+        //    get => GetGameBackupPath(MEGame.ME3, out var isVanilla, true) != null;
         //    private set => SetProperty(ref _me3BackedUp, value);
         //}
 
@@ -193,7 +194,7 @@ namespace ALOTInstallerCore.ModManager.Services
 
         //public static bool AnyGameMissingBackup => (!ME1BackedUp && Locations.ME1Target != null) || (!ME2BackedUp && Locations.ME2Target != null) || (!ME3BackedUp && Locations.ME3Target != null);
 
-        public static GameBackupStatus GetBackupStatus(Enums.MEGame game)
+        public static GameBackupStatus GetBackupStatus(MEGame game)
         {
             return GameBackupStatuses.FirstOrDefault(x => x.Game == game);
         }
@@ -204,11 +205,11 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <param name="allTargets">List of targets to determine if the game is installed or not. Passing null will assume the game is installed</param>
         /// <param name="forceCmmVanilla">If the backups will be forced to have the cmmVanilla file to be considered valid</param>
         /// <param name="game">What game to refresh. Set to unknown to refresh all.</param>
-        public static void RefreshBackupStatus(List<GameTarget> allTargets, bool forceCmmVanilla = true, Enums.MEGame game = Enums.MEGame.Unknown)
+        public static void RefreshBackupStatus(List<GameTarget> allTargets, bool forceCmmVanilla = true, MEGame game = MEGame.Unknown)
         {
             foreach (var v in GameBackupStatuses)
             {
-                if (v.Game == game || game == Enums.MEGame.Unknown)
+                if (v.Game == game || game == MEGame.Unknown)
                 {
                     v.RefreshBackupStatus(allTargets == null || allTargets.Any(x => x.Game == game), forceCmmVanilla);
                 }
@@ -262,13 +263,13 @@ namespace ALOTInstallerCore.ModManager.Services
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        //public static string GetBackupStatus(Enums.MEGame game)
+        //public static string GetBackupStatus(MEGame game)
         //{
         //    switch (game)
         //    {
-        //        case Enums.MEGame.ME1: return ME1BackupStatus;
-        //        case Enums.MEGame.ME2: return ME2BackupStatus;
-        //        case Enums.MEGame.ME3: return ME3BackupStatus;
+        //        case MEGame.ME1: return ME1BackupStatus;
+        //        case MEGame.ME2: return ME2BackupStatus;
+        //        case MEGame.ME3: return ME3BackupStatus;
         //    }
 
         //    return null;
@@ -280,36 +281,36 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <param name="game"></param>
         /// <param name="checkingBackup"></param>
         /// <param name="pleaseWait"></param>
-        public static void SetStatus(Enums.MEGame game, string status, string tooltip)
+        public static void SetStatus(MEGame game, string status, string tooltip)
         {
             //switch (game)
             //{
-            //    case Enums.MEGame.ME1:
+            //    case MEGame.ME1:
             //        ME1BackupStatus = status;
             //        ME1BackupStatusTooltip = tooltip;
             //        break;
-            //    case Enums.MEGame.ME2:
+            //    case MEGame.ME2:
             //        ME2BackupStatus = status;
             //        ME2BackupStatusTooltip = tooltip;
             //        break;
-            //    case Enums.MEGame.ME3:
+            //    case MEGame.ME3:
             //        ME3BackupStatus = status;
             //        ME3BackupStatusTooltip = tooltip;
             //        break;
             //}
         }
 
-        //public static void SetActivity(Enums.MEGame game, bool p1)
+        //public static void SetActivity(MEGame game, bool p1)
         //{
         //    switch (game)
         //    {
-        //        case Enums.MEGame.ME1:
+        //        case MEGame.ME1:
         //            ME1BackupActivity = p1;
         //            break;
-        //        case Enums.MEGame.ME2:
+        //        case MEGame.ME2:
         //            ME2BackupActivity = p1;
         //            break;
-        //        case Enums.MEGame.ME3:
+        //        case MEGame.ME3:
         //            ME3BackupActivity = p1;
         //            break;
         //    }
@@ -317,19 +318,19 @@ namespace ALOTInstallerCore.ModManager.Services
 
 
 
-        public static string GetGameBackupPath(Enums.MEGame game, out bool isVanilla, bool forceCmmVanilla = true, bool logReturnedPath = false, bool forceReturnPath = false)
+        public static string GetGameBackupPath(MEGame game, out bool isVanilla, bool forceCmmVanilla = true, bool logReturnedPath = false, bool forceReturnPath = false)
         {
 #if WINDOWS
             string path;
             switch (game)
             {
-                case Enums.MEGame.ME1:
+                case MEGame.ME1:
                     path = RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\ALOTAddon", @"ME1VanillaBackupLocation");
                     break;
-                case Enums.MEGame.ME2:
+                case MEGame.ME2:
                     path = RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\ALOTAddon", @"ME2VanillaBackupLocation");
                     break;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     //Check for backup via registry - Use Mod Manager's game backup key to find backup.
                     path = RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\Mass Effect 3 Mod Manager", @"VanillaCopyLocation");
                     break;
@@ -397,17 +398,17 @@ namespace ALOTInstallerCore.ModManager.Services
             return path;
         }
 
-        //public static void SetBackedUp(Enums.MEGame game, bool b)
+        //public static void SetBackedUp(MEGame game, bool b)
         //{
         //    switch (game)
         //    {
-        //        case Enums.MEGame.ME1:
+        //        case MEGame.ME1:
         //            ME1BackedUp = b;
         //            break;
-        //        case Enums.MEGame.ME2:
+        //        case MEGame.ME2:
         //            ME2BackedUp = b;
         //            break;
-        //        case Enums.MEGame.ME3:
+        //        case MEGame.ME3:
         //            ME3BackedUp = b;
         //            break;
         //    }
@@ -417,27 +418,27 @@ namespace ALOTInstallerCore.ModManager.Services
 
         //public static void SetInstallStatuses(ObservableCollectionExtended<GameTarget> installationTargets)
         //{
-        //    ME1Installed = installationTargets.Any(x => x.Game == Enums.MEGame.ME1);
-        //    ME2Installed = installationTargets.Any(x => x.Game == Enums.MEGame.ME2);
-        //    ME3Installed = installationTargets.Any(x => x.Game == Enums.MEGame.ME3);
+        //    ME1Installed = installationTargets.Any(x => x.Game == MEGame.ME1);
+        //    ME2Installed = installationTargets.Any(x => x.Game == MEGame.ME2);
+        //    ME3Installed = installationTargets.Any(x => x.Game == MEGame.ME3);
         //    StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(AnyGameMissingBackup)));
         //    StaticBackupStateChanged?.Invoke(null, null);
         //}
 
-        public static bool HasGameEverBeenBackedUp(Enums.MEGame game)
+        public static bool HasGameEverBeenBackedUp(MEGame game)
         {
 #if WINDOWS
 
             switch (game)
             {
-                case Enums.MEGame.ME1:
+                case MEGame.ME1:
                     return RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\ALOTAddon",
                         @"ME1VanillaBackupLocation") != null;
-                case Enums.MEGame.ME2:
+                case MEGame.ME2:
                     return RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\ALOTAddon",
                         @"ME2VanillaBackupLocation") != null;
                     break;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     //Check for backup via registry - Use Mod Manager's game backup key to find backup.
                     return RegistryHandler.GetRegistryString(
                         @"HKEY_CURRENT_USER\Software\Mass Effect 3 Mod Manager", @"VanillaCopyLocation") != null;
@@ -450,7 +451,7 @@ namespace ALOTInstallerCore.ModManager.Services
 
         }
 
-        public static void UpdateBackupStatus(Enums.MEGame game, bool forceCmmVanilla)
+        public static void UpdateBackupStatus(MEGame game, bool forceCmmVanilla)
         {
             GameBackupStatuses.FirstOrDefault(x => x.Game == game)?.RefreshBackupStatus(true, forceCmmVanilla);
         }

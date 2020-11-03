@@ -28,6 +28,7 @@ using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
 using MahApps.Metro.IconPacks;
+using ME3ExplorerCore.Packages;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using Serilog;
 
@@ -85,7 +86,7 @@ namespace ALOTInstallerWPF.InstallerUI
         public Visibility InstallerTextTopVisibility { get; private set; } = Visibility.Visible;
         public Visibility InstallerTextMiddleVisibility { get; private set; } = Visibility.Visible;
         public Visibility InstallerTextBottomVisibility { get; private set; } = Visibility.Visible;
-        public static ImageBrush GetInstallerBackgroundImage(Enums.MEGame game, ManifestMode mode)
+        public static ImageBrush GetInstallerBackgroundImage(MEGame game, ManifestMode mode)
         {
             string bgPath = $"/alot_{game.ToString().ToLower()}_bg"; // ALOT / FREE MODE
             if (mode == ManifestMode.MEUITM)
@@ -308,9 +309,9 @@ namespace ALOTInstallerWPF.InstallerUI
             }
         }
 
-        private void showStorefrontNoUpdateUI(Enums.MEGame obj)
+        private void showStorefrontNoUpdateUI(MEGame obj)
         {
-            if (obj != Enums.MEGame.ME3)
+            if (obj != MEGame.ME3)
             {
                 Application.Current.Invoke(() =>
                 {
@@ -402,7 +403,7 @@ namespace ALOTInstallerWPF.InstallerUI
             audioPlayer.BeginAnimation(MediaElement.VolumeProperty, volumeFadeoutAnim);
         }
 
-        private string getMusicPath(Enums.MEGame game)
+        private string getMusicPath(MEGame game)
         {
             return Path.Combine(Locations.MusicDirectory, game.ToString().ToLower() + ".mp3");
         }

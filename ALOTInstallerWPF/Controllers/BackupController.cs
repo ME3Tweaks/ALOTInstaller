@@ -13,6 +13,7 @@ using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.Helpers;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using ME3ExplorerCore.Packages;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.WindowsAPICodePack.Taskbar;
@@ -21,7 +22,7 @@ namespace ALOTInstallerWPF.Controllers
 {
     class BackupController
     {
-        public static async void PerformBackup(Enums.MEGame game, bool linkMode, MetroWindow mw)
+        public static async void PerformBackup(MEGame game, bool linkMode, MetroWindow mw)
         {
             var pd = await mw.ShowProgressAsync($"{(linkMode ? "Linking" : "Creating")} backup of {game.ToGameName()}",
                 "Checking game...");

@@ -21,6 +21,7 @@ using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.InstallerUI;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
+using ME3ExplorerCore.Packages;
 using Octokit;
 
 namespace ALOTInstallerWPF
@@ -142,7 +143,7 @@ namespace ALOTInstallerWPF
             controller.StartInstall(isOpeningDebug);
         }
 
-        public void OpenOriginFlyout(Enums.MEGame game)
+        public void OpenOriginFlyout(MEGame game)
         {
             var content = new OriginNoUpdateFlyout(game);
             OriginFlyout.Content = content;

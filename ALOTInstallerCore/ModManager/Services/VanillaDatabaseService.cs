@@ -10,6 +10,7 @@ using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ME3ExplorerCore.Compression;
+using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.ModManager.Services
@@ -23,22 +24,22 @@ namespace ALOTInstallerCore.ModManager.Services
         public static CaseInsensitiveDictionary<List<(int size, string md5)>> ME2VanillaDatabase = new CaseInsensitiveDictionary<List<(int size, string md5)>>();
         public static CaseInsensitiveDictionary<List<(int size, string md5)>> ME3VanillaDatabase = new CaseInsensitiveDictionary<List<(int size, string md5)>>();
 
-        public static CaseInsensitiveDictionary<List<(int size, string md5)>> LoadDatabaseFor(Enums.MEGame game, bool isMe1PL = false)
+        public static CaseInsensitiveDictionary<List<(int size, string md5)>> LoadDatabaseFor(MEGame game, bool isMe1PL = false)
         {
             string assetPrefix = @"ALOTInstallerCore.ModManager.gamemd5.me";
             switch (game)
             {
-                case Enums.MEGame.ME1:
+                case MEGame.ME1:
                     ME1VanillaDatabase.Clear();
                     var me1stream = Utilities.ExtractInternalFileToStream($@"{assetPrefix}1{(isMe1PL ? @"pl" : @"")}.bin"); //do not localize
                     ParseDatabase(me1stream, ME1VanillaDatabase);
                     return ME1VanillaDatabase;
-                case Enums.MEGame.ME2:
+                case MEGame.ME2:
                     if (ME2VanillaDatabase.Count > 0) return ME2VanillaDatabase;
                     var me2stream = Utilities.ExtractInternalFileToStream($@"{assetPrefix}2.bin");
                     ParseDatabase(me2stream, ME2VanillaDatabase);
                     return ME2VanillaDatabase;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     if (ME3VanillaDatabase.Count > 0) return ME3VanillaDatabase;
                     var me3stream = Utilities.ExtractInternalFileToStream($@"{assetPrefix}3.bin");
                     ParseDatabase(me3stream, ME3VanillaDatabase);
@@ -117,14 +118,14 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <param name="game"></param>
         /// <param name="filename">FILENAME only of file. Do not pass a relative path</param>
         /// <returns></returns>
-        internal static MemoryStream FetchBasegameFile(Enums.MEGame game, string filename)
+        internal static MemoryStream FetchBasegameFile(MEGame game, string filename)
         {
             var backupPath = BackupService.GetGameBackupPath(game, out var isVanilla);
             if (backupPath == null/* && target == null*/) return null; //can't fetch
 
             string cookedPath = MEDirectories.CookedPath(game, backupPath);
 
-            if (game >= Enums.MEGame.ME2)
+            if (game >= MEGame.ME2)
             {
                 //Me2,Me3: Game file will exist in this folder
                 var file = Path.Combine(cookedPath, Path.GetFileName(filename));
@@ -164,9 +165,9 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <param name="dlcfoldername">DLC foldername</param>
         /// <param name="filename">filename</param>
         /// <returns></returns>
-        internal static MemoryStream FetchME1ME2DLCFile(Enums.MEGame game, string dlcfoldername, string filename)
+        internal static MemoryStream FetchME1ME2DLCFile(MEGame game, string dlcfoldername, string filename)
         {
-            if (game == Enums.MEGame.ME3) throw new Exception(@"Cannot call this method with game = ME3");
+            if (game == MEGame.ME3) throw new Exception(@"Cannot call this method with game = ME3");
             var backupPath = BackupService.GetGameBackupPath(game, out var isVanilla);
             if (backupPath == null/* && target == null*/) return null; //can't fetch
 
@@ -195,7 +196,7 @@ namespace ALOTInstallerCore.ModManager.Services
             return IsFileVanilla(target.Game, file, relativePath, target.IsPolishME1, md5check);
         }
 
-        public static bool IsFileVanilla(Enums.MEGame game, string fullpath, string relativepath, bool isME1Polish, bool md5check = false)
+        public static bool IsFileVanilla(MEGame game, string fullpath, string relativepath, bool isME1Polish, bool md5check = false)
         {
             var database = LoadDatabaseFor(game, isME1Polish);
             if (database.TryGetValue(relativepath, out var info))
@@ -223,7 +224,7 @@ namespace ALOTInstallerCore.ModManager.Services
         }
 
         private static readonly string[] BasegameTFCs = { @"CharTextures", @"Movies", @"Textures", @"Lighting" };
-        internal static bool IsBasegameTFCName(string tfcName, Enums.MEGame game)
+        internal static bool IsBasegameTFCName(string tfcName, MEGame game)
         {
             if (BasegameTFCs.Contains(tfcName)) return true;
             //Might be DLC.
@@ -248,16 +249,16 @@ namespace ALOTInstallerCore.ModManager.Services
             CaseInsensitiveDictionary<List<(int size, string md5)>> vanillaDB = null;
             switch (target.Game)
             {
-                case Enums.MEGame.ME1:
-                    if (ME1VanillaDatabase.Count == 0) LoadDatabaseFor(Enums.MEGame.ME1, target.IsPolishME1);
+                case MEGame.ME1:
+                    if (ME1VanillaDatabase.Count == 0) LoadDatabaseFor(MEGame.ME1, target.IsPolishME1);
                     vanillaDB = ME1VanillaDatabase;
                     break;
-                case Enums.MEGame.ME2:
-                    if (ME2VanillaDatabase.Count == 0) LoadDatabaseFor(Enums.MEGame.ME2);
+                case MEGame.ME2:
+                    if (ME2VanillaDatabase.Count == 0) LoadDatabaseFor(MEGame.ME2);
                     vanillaDB = ME2VanillaDatabase;
                     break;
-                case Enums.MEGame.ME3:
-                    if (ME2VanillaDatabase.Count == 0) LoadDatabaseFor(Enums.MEGame.ME3);
+                case MEGame.ME3:
+                    if (ME2VanillaDatabase.Count == 0) LoadDatabaseFor(MEGame.ME3);
                     vanillaDB = ME3VanillaDatabase;
                     break;
                 default:
@@ -373,7 +374,7 @@ namespace ALOTInstallerCore.ModManager.Services
 
         internal static bool ValidateTargetDLCConsistency(GameTarget target, Action<string> inconsistentDLCCallback = null)
         {
-            if (target.Game != Enums.MEGame.ME3) return true; //No consistency check except for ME3
+            if (target.Game != MEGame.ME3) return true; //No consistency check except for ME3
             bool allConsistent = true;
             var unpackedFileExtensions = new List<string>() { @".pcc", @".tlk", @".bin", @".dlc" };
             var dlcDir = MEDirectories.DLCPath(target);
@@ -412,16 +413,16 @@ namespace ALOTInstallerCore.ModManager.Services
             CaseInsensitiveDictionary<List<(int size, string md5)>> vanillaDB = null;
             switch (target.Game)
             {
-                case Enums.MEGame.ME1:
-                    if (ME1VanillaDatabase.Count == 0) LoadDatabaseFor(Enums.MEGame.ME1, target.IsPolishME1);
+                case MEGame.ME1:
+                    if (ME1VanillaDatabase.Count == 0) LoadDatabaseFor(MEGame.ME1, target.IsPolishME1);
                     vanillaDB = ME1VanillaDatabase;
                     break;
-                case Enums.MEGame.ME2:
-                    if (ME2VanillaDatabase.Count == 0) LoadDatabaseFor(Enums.MEGame.ME2);
+                case MEGame.ME2:
+                    if (ME2VanillaDatabase.Count == 0) LoadDatabaseFor(MEGame.ME2);
                     vanillaDB = ME2VanillaDatabase;
                     break;
-                case Enums.MEGame.ME3:
-                    if (ME2VanillaDatabase.Count == 0) LoadDatabaseFor(Enums.MEGame.ME3);
+                case MEGame.ME3:
+                    if (ME2VanillaDatabase.Count == 0) LoadDatabaseFor(MEGame.ME3);
                     vanillaDB = ME3VanillaDatabase;
                     break;
                 default:
@@ -448,13 +449,13 @@ namespace ALOTInstallerCore.ModManager.Services
                 var md5 = Utilities.CalculateMD5(exePath);
                 switch (target.Game)
                 {
-                    case Enums.MEGame.ME1:
+                    case MEGame.ME1:
                         SUPPORTED_HASHES_ME1.TryGetValue(md5, out var me1result);
                         return (md5, me1result);
-                    case Enums.MEGame.ME2:
+                    case MEGame.ME2:
                         SUPPORTED_HASHES_ME2.TryGetValue(md5, out var me2result);
                         return (md5, me2result);
-                    case Enums.MEGame.ME3:
+                    case MEGame.ME3:
                         SUPPORTED_HASHES_ME3.TryGetValue(md5, out var me3result);
                         return (md5, me3result);
                     default:
@@ -501,7 +502,7 @@ namespace ALOTInstallerCore.ModManager.Services
         /// Checks the existing listed backup and tags it with cmm_vanilla if determined to be vanilla. This is because ALOT Installer allows modified backups where as Mod Manager will not
         /// </summary>
         /// <param name="game"></param>
-        internal static void CheckAndTagBackup(Enums.MEGame game)
+        internal static void CheckAndTagBackup(MEGame game)
         {
             Log.Information(@"[AICORE] Validating backup for " + game.GetGameName());
             var targetPath = BackupService.GetGameBackupPath(game, out var isVanillaBU, false);

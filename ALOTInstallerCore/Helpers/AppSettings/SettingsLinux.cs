@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.Helpers.AppSettings
@@ -159,13 +160,13 @@ namespace ALOTInstallerCore.Helpers.AppSettings
             settingsIni["Settings"][SettingsKeys.SettingsKeyMapping[key]].Value = value.ToBinary().ToString();
         }
 
-        public static string GetBackupPath(Enums.MEGame game)
+        public static string GetBackupPath(MEGame game)
         {
             var v = settingsIni["BackupPaths"][SettingsKeys.SettingsKeyMapping[Enum.Parse<SettingsKeys.SettingKeys>($"{game}BackupPath")]]?.Value;
             return string.IsNullOrWhiteSpace(v) ? null : v;
         }
 
-        public static void SaveBackupPath(Enums.MEGame game, string path)
+        public static void SaveBackupPath(MEGame game, string path)
         {
             settingsIni["BackupPaths"][SettingsKeys.SettingsKeyMapping[Enum.Parse<SettingsKeys.SettingKeys>($"{game}BackupPath")]].Value = path;
             File.WriteAllText(SettingsPath, settingsIni.ToString());

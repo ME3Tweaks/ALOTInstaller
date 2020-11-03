@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps.Installer
@@ -32,7 +33,7 @@ namespace ALOTInstallerCore.Steps.Installer
         /// Adds a task to the progress tracker. These tasks must be submitted in the order that the program will execute them in. Tasks add to the weight pool and will allocate a progress slot.
         /// </summary>
         /// <param name="stagename">Name of stage.</param>
-        public void AddStage(string stagename, Enums.MEGame game = Enums.MEGame.Unknown)
+        public void AddStage(string stagename, MEGame game = MEGame.Unknown)
         {
             Stage pw = DefaultStages.FirstOrDefault(x => x.StageName == stagename);
             if (pw != null)

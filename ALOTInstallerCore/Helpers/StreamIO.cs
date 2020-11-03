@@ -26,6 +26,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerCore.Helpers
 {
@@ -409,9 +410,9 @@ namespace ALOTInstallerCore.Helpers
             return length < 0 ? stream.ReadStringUnicodeNull(length * -2) : stream.ReadStringASCIINull(length);
         }
 
-        public static void WriteUnrealString(this Stream stream, string value, Enums.MEGame game)
+        public static void WriteUnrealString(this Stream stream, string value, MEGame game)
         {
-            if (game == Enums.MEGame.ME3)
+            if (game == MEGame.ME3)
             {
                 stream.WriteUnrealStringUnicode(value);
             }

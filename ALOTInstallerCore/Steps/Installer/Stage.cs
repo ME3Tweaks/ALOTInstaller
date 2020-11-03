@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerCore.Steps.Installer
 {
@@ -50,17 +51,17 @@ namespace ALOTInstallerCore.Steps.Installer
         /// Reweights this stage for the specified game.
         /// </summary>
         /// <param name="game"></param>
-        public void reweightStageForGame(Enums.MEGame game)
+        public void reweightStageForGame(MEGame game)
         {
             switch (game)
             {
-                case Enums.MEGame.ME1:
+                case MEGame.ME1:
                     Weight *= ME1Scaling;
                     break;
-                case Enums.MEGame.ME2:
+                case MEGame.ME2:
                     Weight *= ME2Scaling;
                     break;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     Weight *= ME3Scaling;
                     break;
             }

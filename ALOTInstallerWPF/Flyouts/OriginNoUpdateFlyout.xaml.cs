@@ -11,6 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ALOTInstallerWPF.Objects;
+using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerWPF.Flyouts
 {
@@ -20,7 +21,7 @@ namespace ALOTInstallerWPF.Flyouts
     public partial class OriginNoUpdateFlyout : UserControl
     {
         public string ImagePath { get; }
-        public OriginNoUpdateFlyout(ALOTInstallerCore.Objects.Enums.MEGame game)
+        public OriginNoUpdateFlyout(MEGame game)
         {
             DataContext = this;
             ImagePath = $"pack://application:,,,/ALOTInstallerWPF;component/Images/origin/{game.ToString().ToLower()}update.png"; //IF ASSEMBLY CHANGES THIS MUST BE UPDATED!!

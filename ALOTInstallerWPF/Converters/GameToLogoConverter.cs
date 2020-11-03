@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Data;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerWPF.Converters
 {
@@ -13,7 +14,7 @@ namespace ALOTInstallerWPF.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is Enums.MEGame game && game != Enums.MEGame.Unknown)
+            if (value is MEGame game && game != MEGame.Unknown)
             {
                 return $"/Images/logo_{game.ToString().ToLower()}.png";
             }

@@ -7,6 +7,7 @@ using ALOTInstallerCore.Steps;
 using ALOTInstallerCore.Steps.Installer;
 using Terminal.Gui;
 using System.Threading;
+using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerConsole.InstallerUI
 {
@@ -158,7 +159,7 @@ namespace ALOTInstallerConsole.InstallerUI
             }
         }
 
-        private void showStorefrontNoUpdateUI(Enums.MEGame game)
+        private void showStorefrontNoUpdateUI(MEGame game)
         {
             object o = new object();
             Application.MainLoop.Invoke(() =>

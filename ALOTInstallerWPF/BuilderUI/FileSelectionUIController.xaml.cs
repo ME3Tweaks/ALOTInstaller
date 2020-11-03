@@ -21,6 +21,7 @@ using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls.Dialogs;
+using ME3ExplorerCore.Packages;
 using Notifications.Wpf.Core;
 using Serilog;
 using Application = System.Windows.Application;
@@ -338,7 +339,7 @@ namespace ALOTInstallerWPF.BuilderUI
             if (Application.Current.MainWindow is MainWindow mw)
             {
                 //InstallerUIController iuic = new InstallerUIController();
-                //mw.OpenInstallerUI(iuic, InstallerUIController.GetInstallerBackgroundImage(Enums.MEGame.ME1, ManifestHandler.CurrentMode));
+                //mw.OpenInstallerUI(iuic, InstallerUIController.GetInstallerBackgroundImage(MEGame.ME1, ManifestHandler.CurrentMode));
                 //return;
                 var buttons = new List<Button>();
                 var mp = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode];
@@ -354,7 +355,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     return;
                 }
 
-                List<Enums.MEGame> availableGames = new List<Enums.MEGame>();
+                List<MEGame> availableGames = new List<MEGame>();
                 foreach (var game in targets)
                 {
                     {
@@ -470,7 +471,7 @@ namespace ALOTInstallerWPF.BuilderUI
         public bool ProgressIndeterminate { get; set; }
         public long ProgressMax { get; set; }
         public long ProgressValue { get; set; }
-        public Enums.MEGame StagingGame { get; set; }
+        public MEGame StagingGame { get; set; }
 
         /// <summary>
         /// Gets if this is a file or directory. Returns null if path doesn't exist. False if it's a file. True if it's a directory.

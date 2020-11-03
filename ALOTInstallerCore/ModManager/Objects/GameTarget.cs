@@ -9,6 +9,7 @@ using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using MassEffectModManagerCore.modmanager.asi;
+using ME3ExplorerCore.Packages;
 using Serilog;
 using Path = System.IO.Path;
 
@@ -20,7 +21,7 @@ namespace ALOTInstallerCore.ModManager.Objects
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Enums.MEGame Game { get; }
+        public MEGame Game { get; }
         public string TargetPath { get; }
         public bool RegistryActive { get; set; }
         public string GameSource { get; private set; }
@@ -53,7 +54,7 @@ namespace ALOTInstallerCore.ModManager.Objects
         /// </summary>
         public bool IsCustomOption { get; set; } = false;
 
-        public GameTarget(Enums.MEGame game, string targetRootPath, bool currentRegistryActive, bool isCustomOption = false)
+        public GameTarget(MEGame game, string targetRootPath, bool currentRegistryActive, bool isCustomOption = false)
         {
             this.Game = game;
             this.RegistryActive = currentRegistryActive;
@@ -64,7 +65,7 @@ namespace ALOTInstallerCore.ModManager.Objects
 
         public void ReloadGameTarget(bool logSource = true, bool forceLodUpdate = false)
         {
-            if (Game != Enums.MEGame.Unknown && !IsCustomOption)
+            if (Game != MEGame.Unknown && !IsCustomOption)
             {
                 if (Directory.Exists(TargetPath))
                 {
@@ -99,7 +100,7 @@ namespace ALOTInstallerCore.ModManager.Objects
                     }
                     else
                     {
-                        if (GameSource.Contains(@"Origin") && Game == Enums.MEGame.ME3)
+                        if (GameSource.Contains(@"Origin") && Game == MEGame.ME3)
                         {
                             // Check for steam
                             if (Directory.Exists(Path.Combine(TargetPath, @"__overlay")))
@@ -111,7 +112,7 @@ namespace ALOTInstallerCore.ModManager.Objects
                         CLog.Information(@"[AICORE] Source: " + GameSource, logSource);
                     }
 
-                    IsPolishME1 = Game == Enums.MEGame.ME1 && File.Exists(Path.Combine(TargetPath, @"BioGame", @"CookedPC", @"Movies", @"niebieska_pl.bik"));
+                    IsPolishME1 = Game == MEGame.ME1 && File.Exists(Path.Combine(TargetPath, @"BioGame", @"CookedPC", @"Movies", @"niebieska_pl.bik"));
                     if (IsPolishME1)
                     {
                         CLog.Information(@"[AICORE] ME1 Polish Edition detected", logSource);
@@ -137,7 +138,7 @@ namespace ALOTInstallerCore.ModManager.Objects
             if (textureInfo != null)
             {
                 setting |= twoK ? LodSetting.TwoK : LodSetting.FourK;
-                if (Game == Enums.MEGame.ME1)
+                if (Game == MEGame.ME1)
                 {
                     if (textureInfo.MEUITMVER > 0)
                     {
@@ -193,13 +194,13 @@ namespace ALOTInstallerCore.ModManager.Objects
                         int perGameFinal4Bytes = -20;
                         switch (Game)
                         {
-                            case Enums.MEGame.ME1:
+                            case MEGame.ME1:
                                 perGameFinal4Bytes = 0;
                                 break;
-                            case Enums.MEGame.ME2:
+                            case MEGame.ME2:
                                 perGameFinal4Bytes = 4352;
                                 break;
-                            case Enums.MEGame.ME3:
+                            case MEGame.ME3:
                                 perGameFinal4Bytes = 16777472;
                                 break;
                         }
@@ -320,7 +321,7 @@ namespace ALOTInstallerCore.ModManager.Objects
             string[] validationFiles = null;
             switch (Game)
             {
-                case Enums.MEGame.ME1:
+                case MEGame.ME1:
                     validationFiles = new[]
                     {
                             Path.Combine(TargetPath, @"Binaries", @"MassEffect.exe"),
@@ -331,7 +332,7 @@ namespace ALOTInstallerCore.ModManager.Objects
                             Path.Combine(TargetPath, @"BioGame", @"CookedPC", @"Movies", @"MEvisionSEQ3.bik")
                         };
                     break;
-                case Enums.MEGame.ME2:
+                case MEGame.ME2:
                     validationFiles = new[]
                     {
                             Path.Combine(TargetPath, @"Binaries", @"MassEffect2.exe"),
@@ -342,7 +343,7 @@ namespace ALOTInstallerCore.ModManager.Objects
                             Path.Combine(TargetPath, @"BioGame", @"Movies", @"Crit03_CollectArrive_Part2_1.bik")
                         };
                     break;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     validationFiles = new[]
                     {
                             Path.Combine(TargetPath, @"Binaries", @"Win32", @"MassEffect3.exe"),
@@ -587,7 +588,7 @@ namespace ALOTInstallerCore.ModManager.Objects
 
         //            public void PopulateBinkInfo()
         //            {
-        //                if (Game != Enums.MEGame.ME1)
+        //                if (Game != MEGame.ME1)
         //                {
         //                    Binkw32StatusText = Utilities.CheckIfBinkw32ASIIsInstalled(this) ? M3L.GetString(M3L.string_bypassInstalledASIAndDLCModsWillBeAbleToLoad) : M3L.GetString(M3L.string_bypassNotInstalledASIAndDLCModsWillBeUnableToLoad);
         //                }
@@ -601,9 +602,9 @@ namespace ALOTInstallerCore.ModManager.Objects
         private string getBinkPath()
         {
 
-            if (Game == Enums.MEGame.ME1) return Path.Combine(TargetPath, "Binaries", "binkw32.dll");
-            if (Game == Enums.MEGame.ME2) return Path.Combine(TargetPath, "Binaries", "binkw32.dll");
-            if (Game == Enums.MEGame.ME3) return Path.Combine(TargetPath, "Binaries", "Win32", "binkw32.dll");
+            if (Game == MEGame.ME1) return Path.Combine(TargetPath, "Binaries", "binkw32.dll");
+            if (Game == MEGame.ME2) return Path.Combine(TargetPath, "Binaries", "binkw32.dll");
+            if (Game == MEGame.ME3) return Path.Combine(TargetPath, "Binaries", "Win32", "binkw32.dll");
             return null;
 
         }
@@ -613,20 +614,20 @@ namespace ALOTInstallerCore.ModManager.Objects
             var binkPath = getBinkPath();
             Log.Information($"[AICORE] Installing Binkw32 bypass for {Game} to {binkPath}");
 
-            if (Game == Enums.MEGame.ME1)
+            if (Game == MEGame.ME1)
             {
                 var obinkPath = Path.Combine(TargetPath, "Binaries", "binkw23.dll");
                 Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me1.binkw32.dll", binkPath, true);
                 Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me1.binkw23.dll", obinkPath, true);
             }
-            else if (Game == Enums.MEGame.ME2)
+            else if (Game == MEGame.ME2)
             {
                 var obinkPath = Path.Combine(TargetPath, "Binaries", "binkw23.dll");
                 Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me2.binkw32.dll", binkPath, true);
                 Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me2.binkw23.dll", obinkPath, true);
 
             }
-            else if (Game == Enums.MEGame.ME3)
+            else if (Game == MEGame.ME3)
             {
                 var obinkPath = Path.Combine(TargetPath, "Binaries", "Win32", "binkw23.dll");
                 Utilities.ExtractInternalFile("ALOTInstallerCore.ModManager.binkw32.me3.binkw32.dll", binkPath, true);
@@ -650,17 +651,17 @@ namespace ALOTInstallerCore.ModManager.Objects
         {
             string binkPath = null;
             string expectedHash = null;
-            if (Game == Enums.MEGame.ME1)
+            if (Game == MEGame.ME1)
             {
                 binkPath = Path.Combine(TargetPath, "Binaries", "binkw32.dll");
                 expectedHash = ME1ASILoaderHash;
             }
-            else if (Game == Enums.MEGame.ME2)
+            else if (Game == MEGame.ME2)
             {
                 binkPath = Path.Combine(TargetPath, "Binaries", "binkw32.dll");
                 expectedHash = ME2ASILoaderHash;
             }
-            else if (Game == Enums.MEGame.ME3)
+            else if (Game == MEGame.ME3)
             {
                 binkPath = Path.Combine(TargetPath, "Binaries", "Win32", "binkw32.dll");
                 expectedHash = ME3ASILoaderHash;

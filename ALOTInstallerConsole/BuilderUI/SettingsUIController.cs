@@ -6,6 +6,7 @@ using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore;
+using ME3ExplorerCore.Packages;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
@@ -57,7 +58,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = 10,
                 Height = 1,
             };
-            button.Clicked += () => changeGamePath(Enums.MEGame.ME1);
+            button.Clicked += () => changeGamePath(MEGame.ME1);
             gamePathsFv.Add(button);
             y++;
 
@@ -86,7 +87,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = 10,
                 Height = 1,
             };
-            button.Clicked += () => changeGamePath(Enums.MEGame.ME2);
+            button.Clicked += () => changeGamePath(MEGame.ME2);
             gamePathsFv.Add(button); ;
             y++;
 
@@ -117,7 +118,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Height = 1,
             };
 
-            button.Clicked += () => changeGamePath(Enums.MEGame.ME3);
+            button.Clicked += () => changeGamePath(MEGame.ME3);
             gamePathsFv.Add(button);
 
             Add(gamePathsFv);
@@ -155,7 +156,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = 10,
                 Height = 1,
             };
-            button.Clicked += () => changeConfigPath(Enums.MEGame.ME1);
+            button.Clicked += () => changeConfigPath(MEGame.ME1);
             gameConfigPathsFv.Add(button);
 #endif
             y++;
@@ -187,7 +188,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = 10,
                 Height = 1,
             };
-            button.Clicked += () => changeConfigPath(Enums.MEGame.ME2);
+            button.Clicked += () => changeConfigPath(MEGame.ME2);
             gameConfigPathsFv.Add(button);
 #endif
             y++;
@@ -219,7 +220,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = 10,
                 Height = 1,
             };
-            button.Clicked += () => changeConfigPath(Enums.MEGame.ME3);
+            button.Clicked += () => changeConfigPath(MEGame.ME3);
             gameConfigPathsFv.Add(button);
 #endif
 
@@ -338,7 +339,7 @@ namespace ALOTInstallerConsole.BuilderUI
         }
 
 #if !WINDOWS
-        private async void changeConfigPath(Enums.MEGame game)
+        private async void changeConfigPath(MEGame game)
         {
             OpenDialog selector = new OpenDialog($"Select config directory for {game}",
                 "Select the directory where the game configuration files are stored.")
@@ -362,13 +363,13 @@ namespace ALOTInstallerConsole.BuilderUI
                 {
                     switch (game)
                     {
-                        case Enums.MEGame.ME1:
+                        case MEGame.ME1:
                             me1ConfigPathField.Text = selectedPath;
                             break;
-                        case Enums.MEGame.ME2:
+                        case MEGame.ME2:
                             me2ConfigPathField.Text = selectedPath;
                             break;
-                        case Enums.MEGame.ME3:
+                        case MEGame.ME3:
                             me3ConfigPathField.Text = selectedPath;
                             break;
 
@@ -377,7 +378,7 @@ namespace ALOTInstallerConsole.BuilderUI
             }
         }
 #endif
-        private async void changeGamePath(Enums.MEGame game)
+        private async void changeGamePath(MEGame game)
         {
             var gameexename = game.ToGameName().Replace(" ", "");
             OpenDialog selector = new OpenDialog($"Select {gameexename}.exe", $"Select the executable for {game.ToGameName()}, located in the Binaries directory.")
@@ -403,13 +404,13 @@ namespace ALOTInstallerConsole.BuilderUI
                     {
                         switch (game)
                         {
-                            case Enums.MEGame.ME1:
+                            case MEGame.ME1:
                                 me1PathField.Text = targetPath;
                                 break;
-                            case Enums.MEGame.ME2:
+                            case MEGame.ME2:
                                 me2PathField.Text = targetPath;
                                 break;
-                            case Enums.MEGame.ME3:
+                            case MEGame.ME3:
                                 me3PathField.Text = targetPath;
                                 break;
 

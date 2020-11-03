@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerCore.ModManager.Objects
 {
@@ -19,7 +20,7 @@ namespace ALOTInstallerCore.ModManager.Objects
         public string Version { get; private set; }
         public string InstallerInstanceGUID { get; private set; }
         public string InstallerInstanceBuild { get; private set; }
-        private Enums.MEGame game;
+        private MEGame game;
 
         private Func<InstalledDLCMod, bool> deleteConfirmationCallback;
         private Action notifyDeleted;
@@ -29,7 +30,7 @@ namespace ALOTInstallerCore.ModManager.Objects
         /// </summary>
         public bool InstalledByManagedSolution { get; private set; }
 
-        public InstalledDLCMod(string dlcFolderPath, Enums.MEGame game, bool modNamePrefersTPMI)
+        public InstalledDLCMod(string dlcFolderPath, MEGame game, bool modNamePrefersTPMI)
         {
             this.dlcFolderPath = dlcFolderPath;
             this.game = game;

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 #if WINDOWS
 using Microsoft.Win32;
 #endif
@@ -48,7 +49,7 @@ namespace ALOTInstallerCore.ModManager.GameDirectories
         /// <returns>Null if gametarget game is not ME3. Path where SFAR should be if ME3.</returns>
         public static string GetTestPatchPath(GameTarget target)
         {
-            if (target.Game != Enums.MEGame.ME3) return null;
+            if (target.Game != MEGame.ME3) return null;
             return Path.Combine(target.TargetPath, @"BIOGame\Patches\PCConsole\Patch_001.sfar");
         }
         public static string DLCPath => gamePath != null ? Path.Combine(gamePath, @"BIOGame\DLC\") : "Not Found";

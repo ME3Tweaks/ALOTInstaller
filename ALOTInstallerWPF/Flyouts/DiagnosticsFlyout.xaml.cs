@@ -20,6 +20,7 @@ using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
+using ME3ExplorerCore.Packages;
 using Serilog;
 using Path = System.IO.Path;
 
@@ -32,7 +33,7 @@ namespace ALOTInstallerWPF.Flyouts
     {
         #region chosen options
         private bool? IsBothChosen = null;
-        private Enums.MEGame? GameChosen = null;
+        private MEGame? GameChosen = null;
         private LogItem LogChosen;
         private bool FullDiagChosen;
         #endregion
@@ -215,14 +216,14 @@ namespace ALOTInstallerWPF.Flyouts
 
         private void SelectGameForDiag(object obj)
         {
-            if (obj is string str && Enum.TryParse<Enums.MEGame>(str, out var game))
+            if (obj is string str && Enum.TryParse<MEGame>(str, out var game))
             {
                 GameChosen = game;
                 Step = FULLDIAG_STEP;
             }
         }
 
-        private bool CanSelectGame(object obj) => obj is string str && Enum.TryParse<Enums.MEGame>(str, out var game) && Locations.GetTarget(game) != null;
+        private bool CanSelectGame(object obj) => obj is string str && Enum.TryParse<MEGame>(str, out var game) && Locations.GetTarget(game) != null;
 
         private bool CanSelectIssueType(object obj)
         {

@@ -12,6 +12,7 @@ using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps
@@ -22,77 +23,7 @@ namespace ALOTInstallerCore.Steps
     public class Precheck
     {
 
-        public static string PerformPreInstallCheck(InstallOptionsPackage package)
-        {
-            // Make sure there are packages to install
-            var installationPackagesDir = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
-            if (!Directory.Exists(installationPackagesDir))
-            {
-                Log.Error(@"[AICORE] The InstallationPackages directory doesn't exist. Precheck failed");
-                CoreCrashes.TrackError(new Exception("The InstallationPackages directory doesn't exist after build!"));
-                return "The final InstallationPackages directory does not exist. This is likely a bug in the installer. Please report this to to the developers on the ALOT Discord.";
-            }
-
-            var filesThatWillInstall = Directory.GetFiles(installationPackagesDir, "*.mem");
-            if (package.FilesToInstall.All(x => !(x is PreinstallMod)) && !filesThatWillInstall.Any())
-            {
-                // Preinstall mods don't use .mem packages (As of V4 ALOV 2020). As such there won't be any .mem packages
-                Log.Error(@"[AICORE] There were no mem files in the InstallationPackages directory. Precheck failed");
-                CoreCrashes.TrackError(new Exception("There were no mem files in the InstallationPackages directory!"));
-                return "There are no files that will be installed, as the InstallationPackages directory is empty. This is likely a bug in the installer. Please report this to the developers on the ALOT Discord.";
-            }
-
-            // Get required disk space
-            long requiredDiskSpace = Utilities.GetSizeOfDirectory(new DirectoryInfo(Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString())));
-            foreach (var v in package.FilesToInstall.OfType<PreinstallMod>())
-            {
-                var archiveF = v.GetUsedFilepath();
-                requiredDiskSpace += (long)(new FileInfo(archiveF).Length * 1.4); //Assume there is 40% compression 
-            }
-
-            if (!package.CompressPackages)
-            {
-                // Game files will be unpacked.
-                requiredDiskSpace += (long)(Utilities.GetSizeOfDirectory(new DirectoryInfo(package.InstallTarget.TargetPath), new[] { ".pcc", ".upk", ".sfm", ".u" }) * .4);
-            }
-
-            if (package.InstallTarget.Game == Enums.MEGame.ME3)
-            {
-                // Check how much disk space SFAR unpacking will take
-                var installedDLC = VanillaDatabaseService.GetInstalledOfficialDLC(package.InstallTarget);
-                var gameDlcDir = Path.Combine(package.InstallTarget.TargetPath, "BIOGame", "DLC");
-                foreach (var d in installedDLC)
-                {
-                    var sfar = Path.Combine(gameDlcDir, d, "CookedPCCConsole", "Default.sfar");
-                    if (File.Exists(sfar) && new FileInfo(sfar).Length > 32)
-                    {
-                        // Packed
-                        DLCPackage dlc = new DLCPackage(sfar);
-                        long filesizeTotal = 0;
-                        foreach (var v in dlc.Files)
-                        {
-                            filesizeTotal += v.RealUncompressedSize;
-                        }
-
-                        filesizeTotal -= new FileInfo(sfar).Length;
-                        if (filesizeTotal > 0)
-                        {
-                            requiredDiskSpace += filesizeTotal;
-                        }
-                    }
-                }
-
-            }
-
-            var targetDi = new DriveInfo(package.InstallTarget.TargetPath);
-            if (targetDi.AvailableFreeSpace < requiredDiskSpace * 1.1)
-            {
-                // Less than 10% buffer
-                return $"There is not enough space on the disk the game resides on to install textures. Note that the required space is only an estimate and includes required temporary space.\n\nDrive: {targetDi.Name}\nRequired space: {FileSizeFormatter.FormatSize(requiredDiskSpace)}\nAvailable space: {FileSizeFormatter.FormatSize(targetDi.AvailableFreeSpace)}\n\nYou can set storage locations in the application settings.";
-            }
-            return null;
-        }
-
+        
         /// <summary>
         /// Performs an installation precheck that should occur after the user has selected files, but before the staging step.
         /// This method is synchronous and should probably be run on a background thread as it may take a few seconds.
@@ -119,7 +50,7 @@ namespace ALOTInstallerCore.Steps
             // Check for PhysX legacy. Require it to be installed at this point in time
 
             // Obsolete due to PhysXLoader.dll patch
-            //if (package.InstallTarget.Game == Enums.MEGame.ME1)
+            //if (package.InstallTarget.Game == MEGame.ME1)
             //{
             //    if (!LegacyPhysXInstaller.IsPhysxKeyWritable() && !LegacyPhysXInstaller.IsLegacyPhysXInstalled())
             //    {
@@ -174,7 +105,7 @@ namespace ALOTInstallerCore.Steps
                 return $"The following mods were detected as installed and are known to be incompatible with texture mods:\n{string.Join("\n - ", blacklistedMods)}\n\nThese mods cannot be installed if installing textures and should not be used for any reason.";
             }
 
-            if (pc.target.Game == Enums.MEGame.ME3)
+            if (pc.target.Game == MEGame.ME3)
             {
                 // Sanity check for DLC
                 var inconsistentDLCs = pc.checkDLCConsistency();
@@ -210,7 +141,7 @@ namespace ALOTInstallerCore.Steps
                 }
             }
 
-            if (installInfo == null && package.InstallTarget.Game >= Enums.MEGame.ME2)
+            if (installInfo == null && package.InstallTarget.Game >= MEGame.ME2)
             {
                 var tfcFiles = Directory.GetFiles(MEDirectories.BioGamePath(package.InstallTarget), "TexturesMEM*.tfc", SearchOption.AllDirectories).ToList();
                 if (tfcFiles.Any())
@@ -219,6 +150,11 @@ namespace ALOTInstallerCore.Steps
                     // We found leftover TextureMEMXX.tfc files - there's no install so these should not exist!
                     return "Leftover files were found from a previous texture installation. These may be leftover from a failed install, or the game was repaired instead of being restored with the restore feature. The game directory must be fully deleted to remove leftover files; repairing/uninstalling the game will NOT remove these files.";
                 }
+            }
+
+            // Check if running on AMD and a lighting fix is installed
+            if (installInfo == null && package.InstallTarget.Game == MEGame.ME1)
+            {
 
             }
 
@@ -246,7 +182,7 @@ namespace ALOTInstallerCore.Steps
         /// <returns></returns>
         public static bool CheckMEUITM(InstallOptionsPackage package, Func<string, string, string, List<string>, bool> missingRecommandedItemsDialogCallback)
         {
-            if (package.InstallerMode != ManifestMode.ALOT || package.InstallTarget.Game != Enums.MEGame.ME1) return true; // Only work in ALOT mode. Always say this check is OK if not ME1
+            if (package.InstallerMode != ManifestMode.ALOT || package.InstallTarget.Game != MEGame.ME1) return true; // Only work in ALOT mode. Always say this check is OK if not ME1
             var installedInfo = package.InstallTarget.GetInstalledALOTInfo();
             var shouldCheck = installedInfo == null || installedInfo.MEUITMVER == 0; //if MEUITM is ever updated, this should probably be changed.
 
@@ -512,5 +448,77 @@ namespace ALOTInstallerCore.Steps
             // MEUITM mode doesn't have any conditions currently except MEUITM
             return manifestFilesToInstall.Any(x => x.Recommendation == RecommendationType.Required);
         }
+
+        public static string PerformPreInstallCheck(InstallOptionsPackage package)
+        {
+            // Make sure there are packages to install
+            var installationPackagesDir = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
+            if (!Directory.Exists(installationPackagesDir))
+            {
+                Log.Error(@"[AICORE] The InstallationPackages directory doesn't exist. Precheck failed");
+                CoreCrashes.TrackError(new Exception("The InstallationPackages directory doesn't exist after build!"));
+                return "The final InstallationPackages directory does not exist. This is likely a bug in the installer. Please report this to to the developers on the ALOT Discord.";
+            }
+
+            var filesThatWillInstall = Directory.GetFiles(installationPackagesDir, "*.mem");
+            if (package.FilesToInstall.All(x => !(x is PreinstallMod)) && !filesThatWillInstall.Any())
+            {
+                // Preinstall mods don't use .mem packages (As of V4 ALOV 2020). As such there won't be any .mem packages
+                Log.Error(@"[AICORE] There were no mem files in the InstallationPackages directory. Precheck failed");
+                CoreCrashes.TrackError(new Exception("There were no mem files in the InstallationPackages directory!"));
+                return "There are no files that will be installed, as the InstallationPackages directory is empty. This is likely a bug in the installer. Please report this to the developers on the ALOT Discord.";
+            }
+
+            // Get required disk space
+            long requiredDiskSpace = Utilities.GetSizeOfDirectory(new DirectoryInfo(Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString())));
+            foreach (var v in package.FilesToInstall.OfType<PreinstallMod>())
+            {
+                var archiveF = v.GetUsedFilepath();
+                requiredDiskSpace += (long)(new FileInfo(archiveF).Length * 1.4); //Assume there is 40% compression 
+            }
+
+            if (!package.CompressPackages)
+            {
+                // Game files will be unpacked.
+                requiredDiskSpace += (long)(Utilities.GetSizeOfDirectory(new DirectoryInfo(package.InstallTarget.TargetPath), new[] { ".pcc", ".upk", ".sfm", ".u" }) * .4);
+            }
+
+            if (package.InstallTarget.Game == MEGame.ME3)
+            {
+                // Check how much disk space SFAR unpacking will take
+                var installedDLC = VanillaDatabaseService.GetInstalledOfficialDLC(package.InstallTarget);
+                var gameDlcDir = Path.Combine(package.InstallTarget.TargetPath, "BIOGame", "DLC");
+                foreach (var d in installedDLC)
+                {
+                    var sfar = Path.Combine(gameDlcDir, d, "CookedPCCConsole", "Default.sfar");
+                    if (File.Exists(sfar) && new FileInfo(sfar).Length > 32)
+                    {
+                        // Packed
+                        DLCPackage dlc = new DLCPackage(sfar);
+                        long filesizeTotal = 0;
+                        foreach (var v in dlc.Files)
+                        {
+                            filesizeTotal += v.RealUncompressedSize;
+                        }
+
+                        filesizeTotal -= new FileInfo(sfar).Length;
+                        if (filesizeTotal > 0)
+                        {
+                            requiredDiskSpace += filesizeTotal;
+                        }
+                    }
+                }
+
+            }
+
+            var targetDi = new DriveInfo(package.InstallTarget.TargetPath);
+            if (targetDi.AvailableFreeSpace < requiredDiskSpace * 1.1)
+            {
+                // Less than 10% buffer
+                return $"There is not enough space on the disk the game resides on to install textures. Note that the required space is only an estimate and includes required temporary space.\n\nDrive: {targetDi.Name}\nRequired space: {FileSizeFormatter.FormatSize(requiredDiskSpace)}\nAvailable space: {FileSizeFormatter.FormatSize(targetDi.AvailableFreeSpace)}\n\nYou can set storage locations in the application settings.";
+            }
+            return null;
+        }
+
     }
 }

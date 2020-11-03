@@ -13,6 +13,7 @@ using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace MassEffectModManagerCore.modmanager.asi
@@ -125,18 +126,18 @@ namespace MassEffectModManagerCore.modmanager.asi
         /// </summary>
         /// <param name="i"></param>
         /// <returns></returns>
-        private static Enums.MEGame intToGame(int i)
+        private static MEGame intToGame(int i)
         {
             switch (i)
             {
                 case 1:
-                    return Enums.MEGame.ME1;
+                    return MEGame.ME1;
                 case 2:
-                    return Enums.MEGame.ME2;
+                    return MEGame.ME2;
                 case 3:
-                    return Enums.MEGame.ME3;
+                    return MEGame.ME3;
                 default:
-                    return Enums.MEGame.Unknown;
+                    return MEGame.Unknown;
             }
         }
 
@@ -145,18 +146,18 @@ namespace MassEffectModManagerCore.modmanager.asi
         /// </summary>
         /// <param name="asi"></param>
         /// <returns></returns>
-        public static ASIModVersion GetASIVersionByHash(string hash, Enums.MEGame game)
+        public static ASIModVersion GetASIVersionByHash(string hash, MEGame game)
         {
             List<ASIMod> relevantGroups = null;
             switch (game)
             {
-                case Enums.MEGame.ME1:
+                case MEGame.ME1:
                     relevantGroups = MasterME1ASIUpdateGroups;
                     break;
-                case Enums.MEGame.ME2:
+                case MEGame.ME2:
                     relevantGroups = MasterME2ASIUpdateGroups;
                     break;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     relevantGroups = MasterME3ASIUpdateGroups;
                     break;
                 default:
@@ -208,13 +209,13 @@ namespace MassEffectModManagerCore.modmanager.asi
                 {
                     switch (v.Game)
                     {
-                        case Enums.MEGame.ME1:
+                        case MEGame.ME1:
                             MasterME1ASIUpdateGroups.Add(v);
                             break;
-                        case Enums.MEGame.ME2:
+                        case MEGame.ME2:
                             MasterME2ASIUpdateGroups.Add(v);
                             break;
-                        case Enums.MEGame.ME3:
+                        case MEGame.ME3:
                             MasterME3ASIUpdateGroups.Add(v);
                             break;
                     }
@@ -430,15 +431,15 @@ namespace MassEffectModManagerCore.modmanager.asi
         /// </summary>
         /// <param name="game"></param>
         /// <returns></returns>
-        public static List<ASIMod> GetASIModsByGame(Enums.MEGame game)
+        public static List<ASIMod> GetASIModsByGame(MEGame game)
         {
             switch (game)
             {
-                case Enums.MEGame.ME1:
+                case MEGame.ME1:
                     return MasterME1ASIUpdateGroups;
-                case Enums.MEGame.ME2:
+                case MEGame.ME2:
                     return MasterME2ASIUpdateGroups;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     return MasterME3ASIUpdateGroups;
                 default:
                     return null;

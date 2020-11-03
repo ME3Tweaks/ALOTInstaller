@@ -9,6 +9,7 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
@@ -27,7 +28,7 @@ namespace ALOTInstallerConsole.BuilderUI
         {
             int y = 1;
 
-            foreach (var e in Enums.AllGames)
+            foreach (var e in Locations.AllMEGames)
             {
                 var gameBackupPath = BackupService.GetGameBackupPath(e, out _, false, false, false);
                 var gameHasListedBackupDir = BackupService.HasGameEverBeenBackedUp(e); //does game have backup path in registry?
@@ -124,7 +125,7 @@ namespace ALOTInstallerConsole.BuilderUI
             Add(close);
         }
 
-        //private void LinkBackup(Enums.MEGame game)
+        //private void LinkBackup(MEGame game)
         //{
         //    ProgressDialog pd = new ProgressDialog("Backup in progress",
         //                    $"Please wait while {game.ToGameName()} is backed up.", "Preparing to back up game",
@@ -192,7 +193,7 @@ namespace ALOTInstallerConsole.BuilderUI
         //}
 
 
-        private void CreateBackup(Enums.MEGame game, bool linkMode)
+        private void CreateBackup(MEGame game, bool linkMode)
         {
 
             //int response = MessageBox.ErrorQuery($"Warning: Existing game will be deleted",
@@ -335,7 +336,7 @@ namespace ALOTInstallerConsole.BuilderUI
             //}
         }
 
-        private void RestoreBackup(Enums.MEGame game)
+        private void RestoreBackup(MEGame game)
         {
             string gamePath = Locations.GetTarget(game)?.TargetPath;
             bool overwriteGame = false;
@@ -430,7 +431,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
         }
 
-        private void UnlinkBackup(Enums.MEGame meGame)
+        private void UnlinkBackup(MEGame meGame)
         {
             int response = MessageBox.ErrorQuery($"Warning: Removing backup of {meGame.ToGameName()}",
                            $"Unlinking a backup will make modding tools such as {Utilities.GetAppPrefixedName()} Installer and ME3Tweaks Mod Manager no longer attempt to find the listed backup. It will NOT delete the backup files, if they exist. You will need to create a new backup after unlinking it.\n\nUnlink the backup?",

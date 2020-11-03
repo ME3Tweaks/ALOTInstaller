@@ -26,6 +26,7 @@ using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Actions;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerWPF.Flyouts
@@ -67,7 +68,7 @@ namespace ALOTInstallerWPF.Flyouts
         public InstallOptionsFlyout(GameTarget target, List<UserFile> userFiles)
         {
             InstallTarget = target;
-            if (target.Game == Enums.MEGame.ME1) CompressPackages = false;
+            if (target.Game == MEGame.ME1) CompressPackages = false;
             TitleText = $"Select install options for {target.Game.ToGameName()}";
             ModeText = $"Installer mode: {ManifestHandler.CurrentMode} Mode";
             OnUse4KLODsChanged(); //Set the default text.
@@ -90,9 +91,9 @@ namespace ALOTInstallerWPF.Flyouts
                     // Defer to improve performance
                     using (FileSelectionUIController.FSUIC.DisplayedFilesView.DeferRefresh())
                     {
-                        FileSelectionUIController.ShowME1Files = target.Game == Enums.MEGame.ME1;
-                        FileSelectionUIController.ShowME2Files = target.Game == Enums.MEGame.ME2;
-                        FileSelectionUIController.ShowME3Files = target.Game == Enums.MEGame.ME3;
+                        FileSelectionUIController.ShowME1Files = target.Game == MEGame.ME1;
+                        FileSelectionUIController.ShowME2Files = target.Game == MEGame.ME2;
+                        FileSelectionUIController.ShowME3Files = target.Game == MEGame.ME3;
                     }
                 });
                 string prefix = "Existing texture installation info: ";

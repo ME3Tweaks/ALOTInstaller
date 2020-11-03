@@ -13,8 +13,8 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using ME3ExplorerCore.Packages;
 using Serilog;
-using static ALOTInstallerCore.Objects.Enums;
 
 namespace ALOTInstallerCore.Steps
 {

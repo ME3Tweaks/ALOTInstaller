@@ -13,6 +13,7 @@ using ALOTInstallerCore.ModManager.gamefileformats;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 #if WINDOWS
 using AuthenticodeExaminer;
 using Microsoft.Win32;
@@ -286,7 +287,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 #else
                     addDiagLine($@"Version information cannot be read on non-windows platforms");
 #endif
-                    if (selectedDiagnosticTarget.Game == Enums.MEGame.ME1)
+                    if (selectedDiagnosticTarget.Game == MEGame.ME1)
                     {
                         //bool me1LAAEnabled = Utilities.GetME1LAAEnabled();
                         //if (texturesInstalled && !me1LAAEnabled)
@@ -324,7 +325,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     {
                         if (certOK == SignatureCheckResult.BadDigest)
                         {
-                            if (selectedDiagnosticTarget.Game == Enums.MEGame.ME1 && versInfo.ProductName == @"Mass_Effect")
+                            if (selectedDiagnosticTarget.Game == MEGame.ME1 && versInfo.ProductName == @"Mass_Effect")
                             {
                                 //Check if this Mass_Effect
                                 addDiagLine(@"Signature check for this executable was skipped as MEM modified this exe");
@@ -491,7 +492,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     {
                         addDiagLine(@"ALOT Version: " + avi.ALOTVER + @"." + avi.ALOTUPDATEVER + @"." +
                                     avi.ALOTHOTFIXVER);
-                        if (selectedDiagnosticTarget.Game == Enums.MEGame.ME1 && avi.MEUITMVER != 0)
+                        if (selectedDiagnosticTarget.Game == MEGame.ME1 && avi.MEUITMVER != 0)
                         {
                             addDiagLine(@"MEUITM version: " + avi.MEUITMVER);
                         }
@@ -712,7 +713,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 #region Get list of TFCs
 
-                if (selectedDiagnosticTarget.Game > Enums.MEGame.ME1)
+                if (selectedDiagnosticTarget.Game > MEGame.ME1)
                 {
                     Log.Information(@"[AICORE] Getting list of TFCs");
                     updateStatusCallback?.Invoke("Collecting TFC file information");
@@ -1043,7 +1044,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #region ME3: TOC check
 
                 //TOC SIZE CHECK
-                if (selectedDiagnosticTarget.Game == Enums.MEGame.ME3)
+                if (selectedDiagnosticTarget.Game == MEGame.ME3)
                 {
                     Log.Information(@"[AICORE] Checking ME3 TOC files");
 
@@ -1104,7 +1105,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #region Mass Effect (1) log files
 
                 //ME1: LOGS
-                if (selectedDiagnosticTarget.Game == Enums.MEGame.ME1)
+                if (selectedDiagnosticTarget.Game == MEGame.ME1)
                 {
                     Log.Information(@"[AICORE] Collecting ME1 app logs");
 
@@ -1206,7 +1207,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 #region Mass Effect 3 me3logger log
 
-                if (selectedDiagnosticTarget.Game == Enums.MEGame.ME3)
+                if (selectedDiagnosticTarget.Game == MEGame.ME3)
                 {
                     Log.Information(@"[AICORE] Collecting ME3logger session log");
 
@@ -1284,7 +1285,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 {
                     //ME2,3 default to blank
                     maxLodSize = int.Parse(StringStructParser.GetCommaSplitValues(textureChar1024.Value)[
-                        selectedDiagnosticTarget.Game == Enums.MEGame.ME1 ? @"MinLODSize" : @"MaxLODSize"]);
+                        selectedDiagnosticTarget.Game == MEGame.ME1 ? @"MinLODSize" : @"MaxLODSize"]);
                 }
 
                 // Texture mod installed, HQ LODs
@@ -1299,7 +1300,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     @"High quality LOD settings are not set and no high quality texture mod is installed";
                 switch (selectedDiagnosticTarget.Game)
                 {
-                    case Enums.MEGame.ME1:
+                    case MEGame.ME1:
                         if (maxLodSize != 1024) //ME1 Default
                         {
                             //LODS MODIFIED!
@@ -1341,8 +1342,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         }
 
                         break;
-                    case Enums.MEGame.ME2:
-                    case Enums.MEGame.ME3:
+                    case MEGame.ME2:
+                    case MEGame.ME3:
                         if (maxLodSize != 0)
                         {
                             //Not vanilla, alot/meuitm

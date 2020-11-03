@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 
 namespace MassEffectModManagerCore.modmanager.asi
 {
@@ -40,7 +41,7 @@ namespace MassEffectModManagerCore.modmanager.asi
         /// <summary>
         /// The game this ASI is applicable to
         /// </summary>
-        public Enums.MEGame Game { get; set; }
+        public MEGame Game { get; set; }
         /// <summary>
         /// The description of this ASI
         /// </summary>

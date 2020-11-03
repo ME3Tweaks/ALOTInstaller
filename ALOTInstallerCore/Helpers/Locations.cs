@@ -9,6 +9,7 @@ using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Packages;
 using Microsoft.Win32;
 using PropertyChanged;
 using Serilog;
@@ -20,6 +21,10 @@ namespace ALOTInstallerCore.Helpers
     /// </summary>
     public static class Locations
     {
+        // This technically shouldn't be here but I don't really know where else to put it
+        public static readonly MEGame[] AllMEGames = new[] { MEGame.ME1, MEGame.ME2, MEGame.ME3 };
+
+
         private static string _appDataFolderName;
 
         /// <summary>
@@ -121,9 +126,9 @@ namespace ALOTInstallerCore.Helpers
                         string gameKey = @"BioWare\Mass Effect";
                         string entry = "Path";
 
-                        if (game == Enums.MEGame.ME2)
+                        if (game == MEGame.ME2)
                             gameKey += @" 2";
-                        else if (game == Enums.MEGame.ME3)
+                        else if (game == MEGame.ME3)
                         {
                             gameKey += @" 3";
                             entry = "Install Dir";
@@ -139,7 +144,7 @@ namespace ALOTInstallerCore.Helpers
             foreach (var item in gameLocations)
             {
                 var keyName = item.Key.ToString();
-                var game = Enum.Parse<Enums.MEGame>(keyName.Substring(0, 3));
+                var game = Enum.Parse<MEGame>(keyName.Substring(0, 3));
                 var type = keyName.Substring(3);
                 if (type == "GamePath")
                 {
@@ -179,7 +184,7 @@ namespace ALOTInstallerCore.Helpers
         }
 
 
-        public static bool SetConfigPath(Enums.MEGame game, string itemValue, bool setMEM)
+        public static bool SetConfigPath(MEGame game, string itemValue, bool setMEM)
         {
             bool returnValue = true;
 #if !WINDOWS
@@ -192,13 +197,13 @@ namespace ALOTInstallerCore.Helpers
             {
                 switch (game)
                 {
-                    case Enums.MEGame.ME1:
+                    case MEGame.ME1:
                         ConfigPathME1 = itemValue;
                         break;
-                    case Enums.MEGame.ME2:
+                    case MEGame.ME2:
                         ConfigPathME2 = itemValue;
                         break;
-                    case Enums.MEGame.ME3:
+                    case MEGame.ME3:
                         ConfigPathME3 = itemValue;
                         break;
                 }
@@ -208,20 +213,20 @@ namespace ALOTInstallerCore.Helpers
         }
 
 
-        private static bool internalSetTarget(Enums.MEGame game, string path)
+        private static bool internalSetTarget(MEGame game, string path)
         {
             GameTarget gt = new GameTarget(game, path, false);
             var failedValidationReason = gt.ValidateTarget();
             if (failedValidationReason != null) return false;
             switch (game)
             {
-                case Enums.MEGame.ME1:
+                case MEGame.ME1:
                     ME1Target = gt;
                     return true;
-                case Enums.MEGame.ME2:
+                case MEGame.ME2:
                     ME2Target = gt;
                     return true;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     ME3Target = gt;
                     return true;
             }
@@ -254,13 +259,13 @@ namespace ALOTInstallerCore.Helpers
             var successful = MEMIPCHandler.SetGamePath(target.Game, target.TargetPath);
             switch (target.Game)
             {
-                case Enums.MEGame.ME1:
+                case MEGame.ME1:
                     ME1Target = target;
                     break;
-                case Enums.MEGame.ME2:
+                case MEGame.ME2:
                     ME2Target = target;
                     break;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     ME3Target = target;
                     break;
             }
@@ -293,22 +298,22 @@ namespace ALOTInstallerCore.Helpers
             return gameTargets;
         }
 
-        public static GameTarget GetTarget(Enums.MEGame meGame)
+        public static GameTarget GetTarget(MEGame meGame)
         {
             switch (meGame)
             {
-                case Enums.MEGame.ME1:
+                case MEGame.ME1:
                     return ME1Target;
-                case Enums.MEGame.ME2:
+                case MEGame.ME2:
                     return ME2Target;
-                case Enums.MEGame.ME3:
+                case MEGame.ME3:
                     return ME3Target;
                 default:
                     return null;
             }
         }
 
-        public static void ReloadTarget(Enums.MEGame game)
+        public static void ReloadTarget(MEGame game)
         {
             var target = GetTarget(game);
             target?.ReloadGameTarget(true, true);

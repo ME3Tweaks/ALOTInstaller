@@ -20,6 +20,7 @@ using ControlzEx.Theming;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using ME3ExplorerCore.Compression;
+using ME3ExplorerCore.Packages;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
@@ -301,13 +302,13 @@ namespace ALOTInstallerWPF.BuilderUI
 
         private static void handleM3Passthrough()
         {
-            if (PassthroughME1Path != null) handlePassthrough(Enums.MEGame.ME1, PassthroughME1Path);
-            if (PassthroughME2Path != null) handlePassthrough(Enums.MEGame.ME2, PassthroughME2Path);
-            if (PassthroughME3Path != null) handlePassthrough(Enums.MEGame.ME3, PassthroughME3Path);
+            if (PassthroughME1Path != null) handlePassthrough(MEGame.ME1, PassthroughME1Path);
+            if (PassthroughME2Path != null) handlePassthrough(MEGame.ME2, PassthroughME2Path);
+            if (PassthroughME3Path != null) handlePassthrough(MEGame.ME3, PassthroughME3Path);
 
             PassthroughME1Path = PassthroughME2Path = PassthroughME3Path = null;
 
-            void handlePassthrough(Enums.MEGame game, string path)
+            void handlePassthrough(MEGame game, string path)
             {
                 if (path != null && Directory.Exists(path))
                 {

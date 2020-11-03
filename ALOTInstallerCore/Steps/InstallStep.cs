@@ -70,7 +70,7 @@ namespace ALOTInstallerCore.Steps
         /// <summary>
         /// Callback to indicate that there should be a warning about Origin automatically updating the game for users and that they should never do this. Only triggers on Origin versions of games (ME1/2/3 + 3 steam)
         /// </summary>
-        public Action<Enums.MEGame> ShowStorefrontDontClickUpdateCallback { get; set; }
+        public Action<MEGame> ShowStorefrontDontClickUpdateCallback { get; set; }
 
         /// <summary>
         /// Callback for setting the 'overall' progress value, from 0 to 100. Can be used to display things like progressbars. Only works for the main long install step
@@ -458,7 +458,7 @@ namespace ALOTInstallerCore.Steps
             }
 
             // LAA should always be applied
-            if (package.InstallTarget.Game == Enums.MEGame.ME1)
+            if (package.InstallTarget.Game == MEGame.ME1)
             {
                 // Apply ME1 LAA
                 if (!applyME1LAA())
@@ -483,7 +483,7 @@ namespace ALOTInstallerCore.Steps
             SetBottomTextCallback?.Invoke("Installing binkw32 ASI loader");
 
             hasWarning |= !package.InstallTarget.InstallBinkBypass();
-            if (package.InstallTarget.Game == Enums.MEGame.ME3)
+            if (package.InstallTarget.Game == MEGame.ME3)
             {
                 // Install ASIs.
                 // Need ASI manager code from Mod Manager once it is ready
@@ -496,7 +496,7 @@ namespace ALOTInstallerCore.Steps
                 }
             }
 
-            if (package.InstallTarget.Game == Enums.MEGame.ME1)
+            if (package.InstallTarget.Game == MEGame.ME1)
             {
                 try
                 {
@@ -627,7 +627,7 @@ namespace ALOTInstallerCore.Steps
 
         private void applyCitadelTransitionFix()
         {
-            if (package.InstallTarget.Game == Enums.MEGame.ME3)
+            if (package.InstallTarget.Game == MEGame.ME3)
             {
                 SetMiddleTextVisibilityCallback?.Invoke(false);
 
@@ -772,7 +772,7 @@ namespace ALOTInstallerCore.Steps
 
         private bool applyNeverStreamFixes()
         {
-            if (package.InstallTarget.Game >= Enums.MEGame.ME2)
+            if (package.InstallTarget.Game >= MEGame.ME2)
             {
                 SetMiddleTextCallback?.Invoke("Checking mods for known issues");
                 SetMiddleTextVisibilityCallback?.Invoke(true);
@@ -780,7 +780,7 @@ namespace ALOTInstallerCore.Steps
 
                 string dlcPath = Path.Combine(package.InstallTarget.TargetPath, "BIOGame", "DLC");
                 package.InstallTarget.PopulateDLCMods(false);
-                var listOfItemsToFix = package.InstallTarget.Game == Enums.MEGame.ME2 ? ManifestHandler.MasterManifest.ME2DLCRequiringTextureExportFixes : ManifestHandler.MasterManifest.ME3DLCRequiringTextureExportFixes;
+                var listOfItemsToFix = package.InstallTarget.Game == MEGame.ME2 ? ManifestHandler.MasterManifest.ME2DLCRequiringTextureExportFixes : ManifestHandler.MasterManifest.ME3DLCRequiringTextureExportFixes;
                 foreach (var d in package.InstallTarget.UIInstalledDLCMods)
                 {
                     if (listOfItemsToFix.Contains(d.DLCFolderName, StringComparer.InvariantCultureIgnoreCase))
@@ -850,7 +850,7 @@ namespace ALOTInstallerCore.Steps
                                         Log.Error("[AICORE] Extraction of " + zf.ChoiceTitle + " failed with code " + extractcode);
                                     }
 
-                                    if (package.InstallTarget.Game == Enums.MEGame.ME1 && zf.DeleteShaders)
+                                    if (package.InstallTarget.Game == MEGame.ME1 && zf.DeleteShaders)
                                     {
                                         string documents = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
                                         string localusershaderscache = Path.Combine(documents, @"BioWare\Mass Effect\Published\CookedPC\LocalShaderCache-PC-D3D-SM3.upk");
@@ -1037,7 +1037,7 @@ namespace ALOTInstallerCore.Steps
                 SetBottomTextCallback?.Invoke("Installing files");
 
                 //Check requirements for this extraction rule to fire.
-                var dlcDirectory = package.InstallTarget.Game == Enums.MEGame.ME1
+                var dlcDirectory = package.InstallTarget.Game == MEGame.ME1
                     ? Path.Combine(package.InstallTarget.TargetPath, "DLC")
                     : Path.Combine(package.InstallTarget.TargetPath, "BioGame", "DLC");
 

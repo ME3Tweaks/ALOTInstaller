@@ -15,6 +15,7 @@ using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
+using ME3ExplorerCore.Packages;
 using NStack;
 using Serilog;
 using Terminal.Gui;
@@ -74,9 +75,9 @@ namespace ALOTInstallerConsole.BuilderUI
                         Program.SwapToNewView(new BackupRestoreUIController());
                     }),
                     new MenuItem("Run AutoTOC", "(Update ME3 TOC files)",RunAutoToc, ()=>Locations.ME3Target != null),
-                        new MenuItem("Check if ME1 is vanilla", "", ()=>CheckVanilla(Enums.MEGame.ME1), ()=> Locations.ME1Target != null),
-                        new MenuItem("Check if ME2 is vanilla", "", ()=>CheckVanilla(Enums.MEGame.ME2), ()=> Locations.ME2Target != null),
-                        new MenuItem("Check if ME3 is vanilla", "", ()=>CheckVanilla(Enums.MEGame.ME3), ()=> Locations.ME3Target != null),
+                        new MenuItem("Check if ME1 is vanilla", "", ()=>CheckVanilla(MEGame.ME1), ()=> Locations.ME1Target != null),
+                        new MenuItem("Check if ME2 is vanilla", "", ()=>CheckVanilla(MEGame.ME2), ()=> Locations.ME2Target != null),
+                        new MenuItem("Check if ME3 is vanilla", "", ()=>CheckVanilla(MEGame.ME3), ()=> Locations.ME3Target != null),
                         new MenuItem("Texture LOD selector", "(Change texture quality settings)", ()=>LODController.PromptForLODs()),
 
                 }),
@@ -151,7 +152,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = 15,
                 Checked = true,
             };
-            me1FilterCheckbox.Toggled += x => changeFilter(Enums.MEGame.ME1, !x);
+            me1FilterCheckbox.Toggled += x => changeFilter(MEGame.ME1, !x);
             Add(me1FilterCheckbox);
 
             CheckBox me2FilterCheckbox = new CheckBox("Show ME2 files")
@@ -162,7 +163,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = 15,
                 Checked = true,
             };
-            me2FilterCheckbox.Toggled += x => changeFilter(Enums.MEGame.ME2, !x);
+            me2FilterCheckbox.Toggled += x => changeFilter(MEGame.ME2, !x);
 
             Add(me2FilterCheckbox);
 
@@ -174,7 +175,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = 15,
                 Checked = true,
             };
-            me3FilterCheckbox.Toggled += x => changeFilter(Enums.MEGame.ME3, !x);
+            me3FilterCheckbox.Toggled += x => changeFilter(MEGame.ME3, !x);
 
             Add(me3FilterCheckbox);
 
@@ -214,7 +215,7 @@ namespace ALOTInstallerConsole.BuilderUI
             UpdateLeftSideScrollViewSizing();
         }
 
-        private void CheckVanilla(Enums.MEGame game)
+        private void CheckVanilla(MEGame game)
         {
             VerifyVanillaController.VerifyVanilla(game);
         }
@@ -331,7 +332,7 @@ namespace ALOTInstallerConsole.BuilderUI
             }
         }
 
-        private void changeFilter(Enums.MEGame game, bool nowChecked)
+        private void changeFilter(MEGame game, bool nowChecked)
         {
             Debug.WriteLine($"{game} now checked: {nowChecked}");
             if (nowChecked)
@@ -460,10 +461,10 @@ namespace ALOTInstallerConsole.BuilderUI
                 Y = y++,
                 Width = Dim.Fill(),
                 Height = 1,
-                Checked = target.Game != Enums.MEGame.ME1
+                Checked = target.Game != MEGame.ME1
             };
 
-            if (target.Game > Enums.MEGame.ME1)
+            if (target.Game > MEGame.ME1)
             {
                 installOptionsPicker.Add(compressPackagesCb);
             }
@@ -559,7 +560,7 @@ namespace ALOTInstallerConsole.BuilderUI
                                 "Abort install", "Continue with missing files") == 1)) return;
                 }
 
-                if (optionsPackage.InstallTarget.Game == Enums.MEGame.ME1)
+                if (optionsPackage.InstallTarget.Game == MEGame.ME1)
                 {
                     //Check MEUITM
                     if (!Precheck.CheckMEUITM(optionsPackage,
