@@ -100,6 +100,10 @@ namespace ALOTInstallerCore.Objects
         /// </summary>
         public string FriendlyName { get; set; }
         /// <summary>
+        /// Friendly name to display, but shorter. Used in constrained UI spaces. Caller should check if it's null or not.
+        /// </summary>
+        public string ShortFriendlyName { get; set; }
+        /// <summary>
         /// Filename for the backing file. Do not use this variable when dealing with UserFiles
         /// </summary>
         public string Filename { get; set; }

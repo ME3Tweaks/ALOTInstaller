@@ -174,7 +174,7 @@ namespace ALOTInstallerConsole.BuilderUI
         private InstallerFile resolveMutualExclusiveMod(List<InstallerFile> arg)
         {
             object syncObj = new object();
-            var options = arg.Select(x => (ustring)x.FriendlyName).ToList();
+            var options = arg.Select(x => (ustring)(x.ShortFriendlyName ?? x.FriendlyName)).ToList();
             int abortIndex = options.Count;
             options.Add((ustring)"Abort install");
             int selectedIndex = abortIndex;
