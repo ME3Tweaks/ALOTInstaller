@@ -9,7 +9,9 @@ using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
+using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
+using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Helpers;
@@ -28,6 +30,10 @@ namespace ALOTInstallerWPF.BuilderUI
     public class StartupUIController
     {
         private static void SetWrapperLogger(ILogger logger) => Log.Logger = logger;
+        private static bool telemetryStarted = false;
+        internal static string PassthroughME1Path;
+        internal static string PassthroughME2Path;
+        internal static string PassthroughME3Path;
 
         private static void startTelemetry()
         {
@@ -39,8 +45,6 @@ namespace ALOTInstallerWPF.BuilderUI
         {
             AppCenter.SetEnabledAsync(false);
         }
-
-        private static bool telemetryStarted = false;
 
         private static void initAppCenter()
         {
@@ -89,6 +93,12 @@ namespace ALOTInstallerWPF.BuilderUI
 
         public static async void BeginFlow(MetroWindow window)
         {
+            try
+            {
+                // This is in a try catch because this is a critical no-crash zone that is before launch
+                window.Title = $"{Utilities.GetAppPrefixedName()} Installer {Utilities.GetAppVersion()}";
+            }
+            catch { }
             var pd = await window.ShowProgressAsync("Starting up", $"{Utilities.GetAppPrefixedName()} Installer is starting up. Please wait.");
             pd.SetIndeterminate();
             NamedBackgroundWorker bw = new NamedBackgroundWorker("StartupThread");
@@ -210,8 +220,9 @@ namespace ALOTInstallerWPF.BuilderUI
                 MEMUpdater.UpdateMEM(downloadProgressChanged, errorUpdating, setStatus);
 
                 pd.SetMessage("Loading installer framework");
-                ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
+                handleM3Passthrough();
 
+                ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
                 BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
 
                 pd.SetMessage("Loading installer manifests");
@@ -285,6 +296,33 @@ namespace ALOTInstallerWPF.BuilderUI
 
 
             return;
+        }
+
+        private static void handleM3Passthrough()
+        {
+            if (PassthroughME1Path != null) handlePassthrough(Enums.MEGame.ME1, PassthroughME1Path);
+            if (PassthroughME2Path != null) handlePassthrough(Enums.MEGame.ME2, PassthroughME2Path);
+            if (PassthroughME3Path != null) handlePassthrough(Enums.MEGame.ME3, PassthroughME3Path);
+
+            PassthroughME1Path = PassthroughME2Path = PassthroughME3Path = null;
+
+            void handlePassthrough(Enums.MEGame game, string path)
+            {
+                if (path != null && Directory.Exists(path))
+                {
+                    GameTarget gt = new GameTarget(game, path, true, false);
+                    var passThroughValidationResult = gt.ValidateTarget(false);
+                    if (passThroughValidationResult != null)
+                    {
+                        Log.Error($@"[AIWPF] {game} path passthrough failed game target validation: {passThroughValidationResult}");
+                    }
+                    else
+                    {
+                        Log.Information($@"[AIWPF] Valid passthrough for game {game}. Assigning path.");
+                        MEMIPCHandler.SetGamePath(game, path);
+                    }
+                }
+            }
         }
 
         private static void RunOnUIThread(Action obj)

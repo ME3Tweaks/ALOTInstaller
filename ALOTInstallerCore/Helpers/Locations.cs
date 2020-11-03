@@ -145,7 +145,7 @@ namespace ALOTInstallerCore.Helpers
                 {
                     if (item.Value == null)
                     {
-                        Utilities.WriteDebugLog($"Could not find game path for game {game}");
+                        Utilities.WriteDebugLog($"[AICORE] Could not find game path for game {game}");
                     }
                     else
                     {
@@ -154,8 +154,12 @@ namespace ALOTInstallerCore.Helpers
 
                         if (File.Exists(exePath))
                         {
-                            Utilities.WriteDebugLog("Game executable exists - returning this path: " + exePath);
+                            Utilities.WriteDebugLog("[AICORE] Game executable exists - returning this path: " + exePath);
                             internalSetTarget(game, path);
+                        }
+                        else
+                        {
+                            Log.Warning($@"[AICORE] Executable not found: {exePath}. This target is not available.");
                         }
                     }
                 }

@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
+using ALOTInstallerWPF.BuilderUI;
 using CommandLine;
 using Serilog;
 
@@ -76,6 +77,19 @@ namespace ALOTInstallerWPF
                         Log.Information(LogCollector.SessionStartString);
                         copyAndRebootUpdateV3(parsedCommandLineArgs.Value.UpdateRebootDestDir);
                         return;
+                    }
+
+                    if (parsedCommandLineArgs.Value.PassthroughME1Path != null)
+                    {
+                        StartupUIController.PassthroughME1Path = parsedCommandLineArgs.Value.PassthroughME1Path;
+                    }
+                    if (parsedCommandLineArgs.Value.PassthroughME2Path != null)
+                    {
+                        StartupUIController.PassthroughME2Path = parsedCommandLineArgs.Value.PassthroughME2Path;
+                    }
+                    if (parsedCommandLineArgs.Value.PassthroughME3Path != null)
+                    {
+                        StartupUIController.PassthroughME3Path = parsedCommandLineArgs.Value.PassthroughME3Path;
                     }
                 }
                 else
@@ -187,15 +201,15 @@ namespace ALOTInstallerWPF
 
             [Option("me1path",
                 HelpText = "Sets the path for Mass Effect on app boot. It must point to the game root directory.")]
-            public bool PassthroughME1Path { get; private set; }
+            public string PassthroughME1Path { get; private set; }
 
             [Option("me2path",
                 HelpText = "Sets the path for Mass Effect 2 on app boot. It must point to the game root directory.")]
-            public bool PassthroughME2Path { get; private set; }
+            public string PassthroughME2Path { get; private set; }
 
             [Option("me3path",
                 HelpText = "Sets the path for Mass Effect 3 on app boot. It must point to the game root directory.")]
-            public bool PassthroughME3Path { get; private set; }
+            public string PassthroughME3Path { get; private set; }
 
             [Option("update-boot",
                 HelpText = "Indicates that the process should run in update mode for a single file .net core executable. The process will exit upon starting because the platform extraction process will have completed.")]
