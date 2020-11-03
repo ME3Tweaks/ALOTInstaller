@@ -110,14 +110,12 @@ namespace ALOTInstallerCore.Helpers
                     if (File.Exists(Locations.GetCachedManifestPath()))
                     {
                         Log.Information("[AICORE] Reading cached manifest instead.");
-                        //ManifestDownloaded();
+                        //ReadCachedManifest();
                     }
                     else if (!File.Exists(Locations.GetCachedManifestPath())/* && File.Exists(MANIFEST_BUNDLED_LOC)*/)
                     {
                         Log.Information("[AICORE] Reading bundled manifest instead.");
-                        //File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
-                        //UsingBundledManifest = true;
-                        //ManifestDownloaded();
+
                     }
                     else
                     {
@@ -132,29 +130,15 @@ namespace ALOTInstallerCore.Helpers
             {
                 Log.Error("[AICORE] WebException occurred getting manifest from server:");
                 e.WriteToLog();
-                //if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
-                //{
-                //    Log.Information("[AICORE] Reading bundled manifest instead.");
-                //    File.Delete(MANIFEST_LOC);
-                //    File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
-                //    UsingBundledManifest = true;
-                //    ManifestDownloaded();
-                //}
+                ReadCachedManifest();
             }
-            //}
-            //catch (Exception e)
-            //{
-            //    Debug.WriteLine(DateTime.Now);
-            //    Log.Error("[AICORE] Other Exception occurred getting manifest from server/reading manifest: " + e.ToString());
-            //    if (!File.Exists(MANIFEST_LOC) && File.Exists(MANIFEST_BUNDLED_LOC))
-            //    {
-            //        Log.Information("[AICORE] Reading bundled manifest instead.");
-            //        File.Delete(MANIFEST_LOC);
-            //        File.Copy(MANIFEST_BUNDLED_LOC, MANIFEST_LOC);
-            //        UsingBundledManifest = true;
-            //    }
-            //}
             return returnValue;
+        }
+
+        private static void ReadCachedManifest()
+        {
+            // Todo
+
         }
 
         private static bool ParseManifest(bool usingBundled, string manifestText, Action<Exception> ErrorParsingManifest = null)

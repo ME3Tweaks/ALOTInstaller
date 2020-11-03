@@ -16,7 +16,6 @@
 		<None Remove="ModManager\gamemd5\me1pl.bin" />
 		<None Remove="ModManager\gamemd5\me2.bin" />
 		<None Remove="ModManager\gamemd5\me3.bin" />
-		<None Remove="Steps\Installer\Stage.cs~RF6ac8885.TMP" />
 	</ItemGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='WinDebug'">
 		<DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
@@ -83,4 +82,10 @@
 		<ProjectReference Include="..\ComputerInfo\ComputerInfo\ComputerInfo.csproj" />
 		<ProjectReference Include="..\ME3ExplorerLib\ME3ExplorerCore\ME3ExplorerCore.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="BundledManifest\" />
+	</ItemGroup>
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+	  <Exec Command="if $(ConfigurationName) == WPFRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == WinRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == LinuxRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == MacRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)" />
+	</Target>
 </Project>
