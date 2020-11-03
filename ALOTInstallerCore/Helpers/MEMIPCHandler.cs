@@ -313,7 +313,7 @@ namespace ALOTInstallerCore.Helpers
             // We don't care about IPC on this
             MEMIPCHandler.RunMEMIPCUntilExit(args,
                 null,
-                (x, y) => Debug.WriteLine("hi"),
+                null,
                 x => Log.Error($"[AICORE] StdError setting LODs: {x}"),
                 x => exitcode = x); //Change to catch exit code of non zero.        
             if (exitcode != 0)

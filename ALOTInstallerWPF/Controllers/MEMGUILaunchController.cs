@@ -54,12 +54,12 @@ namespace ALOTInstallerWPF.Controllers
                 {
                     try
                     {
-                        ALOTInstallerCore.Utilities.RunProcess(memGuiPath, "");
+                        ALOTInstallerCore.Utilities.RunProcess(memGuiPath, "", noWindow: false);
                     }
                     catch (Exception e)
                     {
                         Log.Error($@"[AIWPF] Unable to launch Mass Effect Modder: {e.Message}");
-                        await mw.ShowMessageAsync("Unable to launch Mass Effect Modder", $"An error occured launching Mass Effect Modder: {e.Message}");
+                        await mw.ShowMessageAsync("Unable to launch Mass Effect Modder", $"An error occurred launching Mass Effect Modder: {e.Message}");
                     }
                 }
             }
