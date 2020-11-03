@@ -3193,7 +3193,7 @@
 					filename="ALOVforME3-1080p-DLCs_2.0+.7z"
 					torrentfilename="ALOVforME3-1080p-DLCs_2.0+-NOTORRENTYET.7z"
 					md5="1f1e51b7d65b6f6b601fa0cd92b92063"
-					size="6026554367" />
+					size="6026545647" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect
 					archiverootpath="DLC_MOD_ALOV_DLC"
