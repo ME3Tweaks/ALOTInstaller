@@ -330,7 +330,7 @@ namespace ALOTInstallerCore.Helpers
                                                                       .Select(d => new PreinstallMod.ExtractionRedirect
                                                                       {
                                                                           ArchiveRootPath = (string)d.Attribute("archiverootpath"),
-                                                                          RelativeDestinationDirectory = (string)d.Attribute("relativedestinationdirectory"),
+                                                                          RelativeDestinationDirectory = ((string)d.Attribute("relativedestinationdirectory")).TrimStart ('/','\\'),
                                                                           OptionalRequiredDLC = (string)d.Attribute("optionalrequireddlc"),
                                                                           OptionalAnyDLC = (string)d.Attribute("optionalanydlc"),
                                                                           OptionalRequiredFiles = (string)d.Attribute("optionalrequiredfiles"),
