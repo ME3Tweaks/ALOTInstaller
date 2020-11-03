@@ -28,14 +28,17 @@ namespace ALOTInstallerCore.Steps
             var installationPackagesDir = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
             if (!Directory.Exists(installationPackagesDir))
             {
+                Log.Error(@"[AICORE] The InstallationPackages directory doesn't exist. Precheck failed");
                 CoreCrashes.TrackError(new Exception("The InstallationPackages directory doesn't exist after build!"));
                 return "The final InstallationPackages directory does not exist. This is likely a bug in the installer. Please report this to to the developers on the ALOT Discord.";
             }
 
             var filesThatWillInstall = Directory.GetFiles(installationPackagesDir, "*.mem");
-            if (!filesThatWillInstall.Any())
+            if (package.FilesToInstall.All(x => x is PreinstallMod) && !filesThatWillInstall.Any())
             {
-                CoreCrashes.TrackError(new Exception("There were no files in the InstallationPackages directory!"));
+                // Preinstall mods don't use .mem packages (As of V4 ALOV 2020). As such there won't be any .mem packages
+                Log.Error(@"[AICORE] There were no mem files in the InstallationPackages directory. Precheck failed");
+                CoreCrashes.TrackError(new Exception("There were no mem files in the InstallationPackages directory!"));
                 return "There are no files that will be installed, as the InstallationPackages directory is empty. This is likely a bug in the installer. Please report this to the developers on the ALOT Discord.";
             }
 
@@ -114,40 +117,42 @@ namespace ALOTInstallerCore.Steps
 
 #if WINDOWS
             // Check for PhysX legacy. Require it to be installed at this point in time
-            if (package.InstallTarget.Game == Enums.MEGame.ME1)
-            {
-                if (!LegacyPhysXInstaller.IsPhysxKeyWritable() && !LegacyPhysXInstaller.IsLegacyPhysXInstalled())
-                {
-                    Log.Information("[AICORE] Precheck: Legacy PhysX is not detected. Prompting for install");
-                    if (ShowConfirmationDialog("Legacy PhysX is not installed",
-                        "Legacy PhysX must be installed to correct issues with poor programming practices in Mass Effect that can cause other older games (such as Mirror's Edge) to not work, due to how PhyX was designed back in 2007.\n\nALOT Installer will install Legacy PhysX and implement changes that prevent Mass Effect from interfering with other games. The next page has important information about this fix.",
-                        "Continue", "Abort install"))
-                    {
-                        void setProgressCallback(long done, long total)
-                        {
-                            SetPreinstallCheckText($"Downloading Legacy PhysX {Math.Round(done * 100.0 / total)}%");
-                        }
 
-                        var physxInstallResult = LegacyPhysXInstaller.InstallLegacyPhysX(setProgressCallback,
-                            SetPreinstallCheckText,
-                            ShowConfirmationDialog,
-                            ShowNormalDialog, null).Result;
-                        if (physxInstallResult != null)
-                        {
-                            return physxInstallResult;
-                        }
-                    }
-                    else
-                    {
-                        return
-                            "Legacy PhysX is not installed. Legacy PhysX must be installed to fix issues with Mass Effect when the game is texture modded."; //Technically it's exe modded but still
-                    }
-                }
-                else
-                {
-                    Log.Information("[AICORE] Precheck: Legacy PhysX is installed");
-                }
-            }
+            // Obsolete due to PhysXLoader.dll patch
+            //if (package.InstallTarget.Game == Enums.MEGame.ME1)
+            //{
+            //    if (!LegacyPhysXInstaller.IsPhysxKeyWritable() && !LegacyPhysXInstaller.IsLegacyPhysXInstalled())
+            //    {
+            //        Log.Information("[AICORE] Precheck: Legacy PhysX is not detected. Prompting for install");
+            //        if (ShowConfirmationDialog("Legacy PhysX is not installed",
+            //            "Legacy PhysX must be installed to correct issues with poor programming practices in Mass Effect that can cause other older games (such as Mirror's Edge) to not work, due to how PhyX was designed back in 2007.\n\nALOT Installer will install Legacy PhysX and implement changes that prevent Mass Effect from interfering with other games. The next page has important information about this fix.",
+            //            "Continue", "Abort install"))
+            //        {
+            //            void setProgressCallback(long done, long total)
+            //            {
+            //                SetPreinstallCheckText($"Downloading Legacy PhysX {Math.Round(done * 100.0 / total)}%");
+            //            }
+
+            //            var physxInstallResult = LegacyPhysXInstaller.InstallLegacyPhysX(setProgressCallback,
+            //                SetPreinstallCheckText,
+            //                ShowConfirmationDialog,
+            //                ShowNormalDialog, null).Result;
+            //            if (physxInstallResult != null)
+            //            {
+            //                return physxInstallResult;
+            //            }
+            //        }
+            //        else
+            //        {
+            //            return
+            //                "Legacy PhysX is not installed. Legacy PhysX must be installed to fix issues with Mass Effect when the game is texture modded."; //Technically it's exe modded but still
+            //        }
+            //    }
+            //    else
+            //    {
+            //        Log.Information("[AICORE] Precheck: Legacy PhysX is installed");
+            //    }
+            //}
 #endif
             SetPreinstallCheckText("Performing precheck");
             if (!pc.checkOneOptionSelected(out var noOptionsSelectedReason))

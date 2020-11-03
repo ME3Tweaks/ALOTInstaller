@@ -237,7 +237,7 @@ namespace ALOTInstallerWPF.BuilderUI
 
                 if (Application.Current.MainWindow is MainWindow mw)
                 {
-                    var options = arg.Select(x => x.FriendlyName).ToList();
+                    var options = arg.Select(x => x.ShortFriendlyName ?? x.FriendlyName).ToList();
                     options.Add("Abort install");
                     var chosenOption = await mw.ShowMessageAsync("Select which file to use",
                         "Only one of the following mods can be installed. Select which one to use.",
