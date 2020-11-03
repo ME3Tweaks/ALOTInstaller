@@ -36,7 +36,7 @@
 		<PackageReference Include="Microsoft.AppCenter.Crashes" Version="3.4.3" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
-		<PackageReference Include="PropertyChanged.Fody" Version="3.2.10" />
+		<PackageReference Include="PropertyChanged.Fody" Version="4.0.0" />
 		<PackageReference Include="Serilog" Version="2.10.0" />
 		<PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
 	</ItemGroup>
@@ -62,7 +62,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />
-		<ProjectReference Include="..\MahApps.Metro\src\MahApps.Metro\MahApps.Metro.csproj" />
+    <ProjectReference Include="..\MahApps.Metro\src\MahApps.Metro\MahApps.Metro.csproj" />
+    <ProjectReference Include="..\ComputerInfo\ComputerInfo\ComputerInfo.csproj" />
 		<ProjectReference Include="..\Notifications.Wpf.Core\Notifications.Wpf.Core\Notifications.Wpf.Core.csproj" />
 	</ItemGroup>
 

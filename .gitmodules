@@ -11,3 +11,6 @@
 [submodule "Notifications.Wpf.Core"]
 	path = Notifications.Wpf.Core
 	url = https://github.com/Mgamerz/Notifications.Wpf.Core.git
+[submodule "ComputerInfo"]
+	path = ComputerInfo
+	url = https://github.com/ME3Tweaks/ComputerInfo.git

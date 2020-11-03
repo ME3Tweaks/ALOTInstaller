@@ -31,7 +31,6 @@
 		<TargetFramework>net5.0</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="ComputerInfo" Version="0.1.0-prerelease" />
 		<PackageReference Include="Fody" Version="6.2.6">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -41,6 +40,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	    <ProjectReference Include="..\ComputerInfo\ComputerInfo\ComputerInfo.csproj" />
 		<ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />
 		<ProjectReference Include="..\gui.cs\Terminal.Gui\Terminal.Gui.csproj" />
 	</ItemGroup>

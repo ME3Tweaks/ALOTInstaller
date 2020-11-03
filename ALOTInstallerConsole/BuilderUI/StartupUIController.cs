@@ -11,6 +11,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects.Manifest;
 using ME3ExplorerCore;
+using NickStrupat;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI
