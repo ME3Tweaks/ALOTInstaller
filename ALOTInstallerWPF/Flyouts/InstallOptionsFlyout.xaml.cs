@@ -134,8 +134,8 @@ namespace ALOTInstallerWPF.Flyouts
 
         private string getUIString(InstallOptionsStep.InstallOption option, List<InstallerFile> installerFiles)
         {
-            if (option == InstallOptionsStep.InstallOption.ALOT) 
-                return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && 
+            if (option == InstallOptionsStep.InstallOption.ALOT)
+                return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 &&
                                                            x.AlotVersionInfo.ALOTUPDATEVER == 0 && x.ApplicableGames.HasFlag(InstallTarget.Game.ToApplicableGame()))?.FriendlyName ?? "ALOT");
             if (option == InstallOptionsStep.InstallOption.ALOTUpdate) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0 && x.ApplicableGames.HasFlag(InstallTarget.Game.ToApplicableGame()))?.FriendlyName ?? "ALOT update");
             if (option == InstallOptionsStep.InstallOption.Addon) return "ALOT Addon";
@@ -178,114 +178,216 @@ namespace ALOTInstallerWPF.Flyouts
                 };
                 NamedBackgroundWorker nbw = new NamedBackgroundWorker("InstallPrecheckWorker");
                 nbw.DoWork += (a, b) =>
-                {
-                    object syncObj = new object();
-                    bool ok = true;
-                    #region MEUITM CHECK (ME1)
-                    ok = Precheck.CheckMEUITM(iop,
-                        (string title, string topMessage, string bottomMessage, List<string> itemsList) =>
-                        {
+                    {
+                        object syncObj = new object();
+                        bool ok = true;
 
-                            bool response = false;
-                            Application.Current.Dispatcher.Invoke(async () =>
+                        #region MEUITM CHECK (ME1)
+
+                        ok = Precheck.CheckMEUITM(iop,
+                            (string title, string topMessage, string bottomMessage, List<string> itemsList) =>
                             {
-                                response = await mw.ShowScrollMessageAsync(title, topMessage, bottomMessage,
-                                    itemsList, MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+
+                                bool response = false;
+                                Application.Current.Dispatcher.Invoke(async () =>
+                                {
+                                    response = await mw.ShowScrollMessageAsync(title, topMessage, bottomMessage,
+                                        itemsList, MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                                        {
+                                            AffirmativeButtonText = "Install without MEUITM",
+                                            NegativeButtonText = "Abort install"
+                                        }) == MessageDialogResult.Affirmative;
+                                    lock (syncObj)
                                     {
-                                        AffirmativeButtonText = "Install without MEUITM",
-                                        NegativeButtonText = "Abort install"
-                                    }) == MessageDialogResult.Affirmative;
+                                        Monitor.Pulse(syncObj);
+                                    }
+                                });
                                 lock (syncObj)
                                 {
-                                    Monitor.Pulse(syncObj);
+                                    Monitor.Wait(syncObj);
                                 }
-                            });
-                            lock (syncObj)
-                            {
-                                Monitor.Wait(syncObj);
-                            }
-                            return response;
-                        });
-                    if (!ok)
-                    {
-                        Log.Information("User aborted install at check: MEUITM missing");
-                        b.Result = false;
-                        return;
-                    }
-                    #endregion
-                    #region ADDON CHECK
-                    // Precheck: All recommended files ready
-                    if (iop.InstallAddons)
-                    {
-                        if (!Precheck.CheckAllRecommendedItems(iop, (title, topMessage, bottomMessage, missingFilesList)
-                            =>
-                        {
-                            bool response = false;
-                            Application.Current.Dispatcher.Invoke(async () =>
-                            {
-                                response = await mw.ShowScrollMessageAsync(title, topMessage, bottomMessage,
-                                    missingFilesList, MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
-                                    {
-                                        AffirmativeButtonText = "Install without files",
-                                        NegativeButtonText = "Abort install"
-                                    }) == MessageDialogResult.Affirmative;
-                                lock (syncObj)
-                                {
-                                    Monitor.Pulse(syncObj);
-                                }
-                            });
-                            lock (syncObj)
-                            {
-                                Monitor.Wait(syncObj);
-                            }
 
-                            return response;
-                        }))
+                                return response;
+                            });
+                        if (!ok)
                         {
-                            Log.Information("User aborted install at check: Not all recommended files are ready");
+                            Log.Information("User aborted install at check: MEUITM missing");
                             b.Result = false;
                             return;
                         }
-                    }
-                    #endregion
 
-                    #region GAME PRECHECK
+                        #endregion
 
-                    var precheckFailedMessage = Precheck.PerformPreStagingCheck(iop,
-                        pimt => SpinnerText = pimt,
-                        (string title, string message, string affirmativeText, string negativeText) =>
+                        #region ADDON CHECK
+
+                        // Precheck: All recommended files ready
+                        if (iop.InstallAddons)
                         {
-                            MessageDialogResult? option = null;
-                            object syncObj = new object();
+                            if (!Precheck.CheckAllRecommendedItems(iop, (title, topMessage, bottomMessage, missingFilesList)
+                                =>
+                            {
+                                bool response = false;
+                                Application.Current.Dispatcher.Invoke(async () =>
+                                {
+                                    response = await mw.ShowScrollMessageAsync(title, topMessage, bottomMessage,
+                                        missingFilesList, MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                                        {
+                                            AffirmativeButtonText = "Install without files",
+                                            NegativeButtonText = "Abort install"
+                                        }) == MessageDialogResult.Affirmative;
+                                    lock (syncObj)
+                                    {
+                                        Monitor.Pulse(syncObj);
+                                    }
+                                });
+                                lock (syncObj)
+                                {
+                                    Monitor.Wait(syncObj);
+                                }
+
+                                return response;
+                            }))
+                            {
+                                Log.Information("User aborted install at check: Not all recommended files are ready");
+                                b.Result = false;
+                                return;
+                            }
+                        }
+
+                        #endregion
+
+                        #region GAME PRECHECK
+
+                        var precheckFailedMessage = Precheck.PerformPreStagingCheck(iop,
+                            pimt => SpinnerText = pimt,
+                            (string title, string message, string affirmativeText, string negativeText) =>
+                            {
+                                MessageDialogResult? option = null;
+                                object syncObj = new object();
+                                Application.Current.Dispatcher.Invoke(async () =>
+                                {
+                                    option = await mw.ShowMessageAsync(title, message,
+                                        MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                                        {
+                                            AffirmativeButtonText = affirmativeText,
+                                            NegativeButtonText = negativeText,
+                                            DefaultButtonFocus = MessageDialogResult.Affirmative
+                                        }, 70);
+                                    lock (syncObj)
+                                    {
+                                        Monitor.Pulse(syncObj);
+                                    }
+
+                                });
+                                lock (syncObj)
+                                {
+                                    Monitor.Wait(syncObj);
+                                }
+
+                                return option.HasValue && option.Value == MessageDialogResult.Affirmative;
+
+                            }, (title, message, choices) =>
+                            {
+                                MessageDialogResult? option = null;
+                                object syncObj = new object();
+                                Application.Current.Dispatcher.Invoke(async () =>
+                                {
+                                    var dialogOptions = new MetroDialogSettings()
+                                    {
+                                        DefaultButtonFocus = MessageDialogResult.Affirmative
+                                    };
+
+                                    MessageDialogStyle dStyle = MessageDialogStyle.Affirmative;
+                                    if (choices.Count >= 1)
+                                    {
+                                        dialogOptions.AffirmativeButtonText = choices[0];
+                                    }
+
+                                    if (choices.Count >= 2)
+                                    {
+                                        dialogOptions.NegativeButtonText = choices[1];
+                                        dStyle = MessageDialogStyle.AffirmativeAndNegative;
+                                    }
+
+                                    if (choices.Count >= 3)
+                                    {
+                                        dialogOptions.FirstAuxiliaryButtonText = choices[2];
+                                        dStyle = MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary;
+                                    }
+
+                                    if (choices.Count == 4)
+                                    {
+                                        dialogOptions.SecondAuxiliaryButtonText = choices[3];
+                                        dStyle = MessageDialogStyle.AffirmativeAndNegativeAndDoubleAuxiliary;
+                                    }
+
+                                    option = await mw.ShowMessageAsync(title, message, dStyle, dialogOptions, 70);
+                                    lock (syncObj)
+                                    {
+                                        Monitor.Pulse(syncObj);
+                                    }
+
+                                });
+                                lock (syncObj)
+                                {
+                                    Monitor.Wait(syncObj);
+                                }
+
+                                // Return to backend in order left to right.
+                                if (option == MessageDialogResult.Affirmative) return 0;
+                                if (option == MessageDialogResult.Negative) return 1;
+                                if (option == MessageDialogResult.FirstAuxiliary) return 2;
+                                if (option == MessageDialogResult.SecondAuxiliary) return 3;
+                                return -1;
+                            },
+                            (string title, string message) =>
+                            {
+                                object syncObj = new object();
+                                Application.Current.Dispatcher.Invoke(async () =>
+                                {
+                                    await mw.ShowMessageAsync(title, message);
+                                    lock (syncObj)
+                                    {
+                                        Monitor.Pulse(syncObj);
+                                    }
+                                });
+                                lock (syncObj)
+                                {
+                                    Monitor.Wait(syncObj);
+                                }
+                            });
+
+                        if (precheckFailedMessage != null)
+                        {
                             Application.Current.Dispatcher.Invoke(async () =>
                             {
-                                option = await mw.ShowMessageAsync(title, message,
+                                await mw.ShowMessageAsync("Prestaging check failed", precheckFailedMessage);
+                            });
+                            b.Result = false;
+                            return;
+                        }
+
+                        #endregion
+
+                        #region BACKUP PRECHECK
+
+                        if (BackupService.GetGameBackupPath(InstallTarget.Game, out _, false) == null)
+                        {
+                            // No backup
+                            Log.Warning($"NO BACKUP OF {InstallTarget.Game} IS AVAILABLE. PROMPTING USER");
+
+                            bool continueWithoutBackup = false;
+                            Application.Current.Dispatcher.Invoke(async () =>
+                            {
+                                var cwbR = await mw.ShowMessageAsync($"No backup of {InstallTarget.Game.ToGameName()}",
+                                    $"No backup for {InstallTarget.Game.ToGameName()} is available. It is very highly recommended you make a backup of your game before installation using {Utilities.GetAppPrefixedName()} Installer, which will make reinstallation much faster and easier. As installation is a very complicated process, things can go wrong, which will require a full restore of the game. You can create a backup quickly and easily in the Settings menu.",
                                     MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
                                     {
-                                        AffirmativeButtonText = affirmativeText,
-                                        NegativeButtonText = negativeText,
-                                        DefaultButtonFocus = MessageDialogResult.Affirmative
-                                    }, 70);
-                                lock (syncObj)
-                                {
-                                    Monitor.Pulse(syncObj);
-                                }
-
-                            });
-                            lock (syncObj)
-                            {
-                                Monitor.Wait(syncObj);
-                            }
-
-                            return option.HasValue && option.Value == MessageDialogResult.Affirmative;
-
-                        },
-                        (string title, string message) =>
-                        {
-                            object syncObj = new object();
-                            Application.Current.Dispatcher.Invoke(async () =>
-                            {
-                                await mw.ShowMessageAsync(title, message);
+                                        AffirmativeButtonText = "Continue without backup",
+                                        NegativeButtonText = "Abort install",
+                                        DefaultButtonFocus = MessageDialogResult.Negative
+                                    }, 60);
+                                continueWithoutBackup = cwbR == MessageDialogResult.Affirmative;
                                 lock (syncObj)
                                 {
                                     Monitor.Pulse(syncObj);
@@ -295,65 +397,23 @@ namespace ALOTInstallerWPF.Flyouts
                             {
                                 Monitor.Wait(syncObj);
                             }
-                        });
 
-                    if (precheckFailedMessage != null)
-                    {
-                        Application.Current.Dispatcher.Invoke(async () =>
-                        {
-                            await mw.ShowMessageAsync("Prestaging check failed", precheckFailedMessage);
-                        });
-                        b.Result = false;
-                        return;
-                    }
-
-                    #endregion
-
-                    #region BACKUP PRECHECK
-
-                    if (BackupService.GetGameBackupPath(InstallTarget.Game, out _, false) == null)
-                    {
-                        // No backup
-                        Log.Warning($"NO BACKUP OF {InstallTarget.Game} IS AVAILABLE. PROMPTING USER");
-
-                        bool continueWithoutBackup = false;
-                        Application.Current.Dispatcher.Invoke(async () =>
-                        {
-                            var cwbR = await mw.ShowMessageAsync($"No backup of {InstallTarget.Game.ToGameName()}",
-                                $"No backup for {InstallTarget.Game.ToGameName()} is available. It is very highly recommended you make a backup of your game before installation using {Utilities.GetAppPrefixedName()} Installer, which will make reinstallation much faster and easier. As installation is a very complicated process, things can go wrong, which will require a full restore of the game. You can create a backup quickly and easily in the Settings menu.",
-                                MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
-                                {
-                                    AffirmativeButtonText = "Continue without backup",
-                                    NegativeButtonText = "Abort install",
-                                    DefaultButtonFocus = MessageDialogResult.Negative
-                                }, 60);
-                            continueWithoutBackup = cwbR == MessageDialogResult.Affirmative;
-                            lock (syncObj)
+                            if (!continueWithoutBackup)
                             {
-                                Monitor.Pulse(syncObj);
+                                Log.Information("User aborting install due to no backup");
+                                b.Result = false;
+                                return;
                             }
-                        });
-                        lock (syncObj)
-                        {
-                            Monitor.Wait(syncObj);
                         }
-
-                        if (!continueWithoutBackup)
-                        {
-                            Log.Information("User aborting install due to no backup");
-                            b.Result = false;
-                            return;
-                        }
-                    }
-                    #endregion
-                    b.Result = true;
-                };
+                        #endregion
+                        b.Result = true;
+                    };
                 nbw.RunWorkerCompleted += async (a, b) =>
                 {
                     if (b.Error == null && b.Result is bool ok && ok)
                     {
-                            // BEGIN STAGING
-                            StagingUIController suic = new StagingUIController();
+                        // BEGIN STAGING
+                        StagingUIController suic = new StagingUIController();
                         suic.StartStaging(iop, FileSelectionUIController.FSUIC);
                     }
                     CloseFlyout();

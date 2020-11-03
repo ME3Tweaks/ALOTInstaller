@@ -2,18 +2,22 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.gamefileformats.sfar;
+using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ME3ExplorerCore.Packages;
+using NickStrupat;
 using Serilog;
+using ME3Directory = ME3ExplorerCore.MEDirectories.ME3Directory;
 
 namespace ALOTInstallerCore.Steps
 {
@@ -22,8 +26,8 @@ namespace ALOTInstallerCore.Steps
     /// </summary>
     public class Precheck
     {
+        private const string SILENT_PATCH_DLL_NAME = "d3dx9_31.dll";
 
-        
         /// <summary>
         /// Performs an installation precheck that should occur after the user has selected files, but before the staging step.
         /// This method is synchronous and should probably be run on a background thread as it may take a few seconds.
@@ -36,6 +40,7 @@ namespace ALOTInstallerCore.Steps
         public static string PerformPreStagingCheck(InstallOptionsPackage package,
             Action<string> SetPreinstallCheckText,
             Func<string, string, string, string, bool> ShowConfirmationDialog,
+            Func<string, string, List<string>, int> ShowMultiChoiceDialog,
             Action<string, string> ShowNormalDialog)
         {
             var pc = new Precheck()
@@ -153,11 +158,174 @@ namespace ALOTInstallerCore.Steps
             }
 
             // Check if running on AMD and a lighting fix is installed
-            if (installInfo == null && package.InstallTarget.Game == MEGame.ME1)
+            if (package.InstallTarget.Game == MEGame.ME1)
             {
+                var cpuVendor = new ComputerInfo().CPUVendor;
+                if (cpuVendor.Contains("AMD"))
+                {
+                    Log.Information("[AICORE] Precheck: Found AMD processor. Checking for lighting fix");
+                    bool hasLightingFix = false;
+                    // 1. Check for DLC_MOD_AMDLightingFix
+                    var installedDLCMods = VanillaDatabaseService.GetInstalledDLCMods(package.InstallTarget);
+                    if (installedDLCMods.Any(x => x == "DLC_MOD_AMDLightingFix"))
+                    {
+                        Log.Information(@"[AICORE] Found DLC_MOD_AMDLightingFix. No need to advertise lighting fix to user");
+                        hasLightingFix = true;
+                    }
 
+                    // 2. Check for SilentPatch dll
+                    if (!hasLightingFix)
+                    {
+                        package.InstallTarget.PopulateExtras();
+                        foreach (var v in package.InstallTarget.ExtraFiles)
+                        {
+                            if (v.DisplayName == "SilentPatch for Mass Effect" && v.FileName == SILENT_PATCH_DLL_NAME)
+                            {
+                                Log.Information(@"[AICORE] Found SilentPatch dll. No need to advertise lighting fix to user");
+                                hasLightingFix = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    // 3. Check for FPS counter (gross!)
+                    if (!hasLightingFix)
+                    {
+                        var dinput = Path.Combine(MEDirectories.ExecutableDirectory(package.InstallTarget), "dinput8.dll");
+                        var fpsCounter = Path.Combine(MEDirectories.ExecutableDirectory(package.InstallTarget), "FPSCounter", "FPSCounter.dll");
+                        if (File.Exists(dinput) && File.Exists(fpsCounter))
+                        {
+                            Log.Warning(@"[AICORE] Found FPSCounter dll. No need to advertise lighting fix to user. That is, if it works ;)");
+                            hasLightingFix = true;
+                        }
+                    }
+
+
+                    if (!hasLightingFix)
+                    {
+                        // Advertise installation to user
+                        Log.Information("[AICORE] Precheck: Lighting fix was not found. Advertising to user");
+
+                        var options = new List<string>();
+                        if (installInfo == null)
+                        {
+                            options.Add("Install DLC fix");
+                        }
+                        options.Add("Install DLL fix");
+                        options.Add("Don't install a fix");
+                        options.Add("Abort install");
+
+                        var message = $"Mass Effect will encounter a 'black blobs' glitch when running on AMD processors newer than 2011, due to the design and age of the game. This glitch occurs on two different levels and significantly impacts gameplay. These issues do not affect Intel processors.\n\nIt is highly recommended that you install a lighting fix before you continue with installation. {Utilities.GetAppPrefixedName()} Installer can install one for you automatically by selecting an option below.\n\n";
+
+                        if (installInfo == null)
+                        {
+                            message += $"[DLC fix] Black Blobs Fix by ME3Tweaks\n   Installs a DLC mod that disables the offending lights. These levels will be a bit darker, but the fix works regardless of the AMD processor being used.\n\n";
+                        }
+                        else
+                        {
+                            message += $"[DLC fix] Black Blobs Fix by ME3Tweaks\n   Cannot be installed as textures are already installed.\n\n";
+                        }
+
+                        message += "[DLL fix] SilentPatch by CookiePLMonster\n   Installs a dll that corrects the lighting, but only works on Ryzen (2017) and newer processors. There are some other minor known issues.\n\nSelect an option to proceed.";
+
+
+                        var chosenOption = ShowMultiChoiceDialog("No lighting fix is installed", message, options);
+                        Debug.WriteLine($"Chose option {chosenOption}");
+                        if (chosenOption == options.Count - 1)
+                        {
+                            // Abort.
+                            Log.Information(@"[AICORE] User aborted install at AMD lighting prompt");
+                            return "";
+                        }
+
+
+                        bool? isUsingAMDLightingFix = null;
+
+                        string sourceFileUrl = null;
+                        string downloadHash = null;
+                        if (chosenOption == options.Count - 2)
+                        {
+                            // Continue anyways.
+                            Log.Warning(@"[AICORE] User chose not to install an AMD lighting fix");
+                        }
+                        else
+                        {
+
+                            if (chosenOption == 0 && installInfo == null)
+                            {
+                                // It's AMD Lighting Fix DLC
+                                sourceFileUrl = "https://github.com/ME3Tweaks/ALOTInstaller/releases/download/4.0.684.1951/DLC_MOD_AMDLightingFix.7z";
+                                downloadHash = "3eec00aac6a7ca6582f8a97c4174654b";
+                                isUsingAMDLightingFix = true;
+                            }
+                            else if (chosenOption == 0 || (chosenOption == 1 && installInfo == null))
+                            {
+                                // It's silentpatch
+                                isUsingAMDLightingFix = false;
+                                downloadHash = "e80785c4039af965602a7df472d267e1"; //Hopefully if this is updated they make a new release and don't update or remove the old one.
+                                sourceFileUrl = "https://github.com/CookiePLMonster/SilentPatchME/releases/download/BUILD-1/SilentPatchME.zip";
+                            }
+                            else
+                            {
+                                // This shouldn't be reachable.
+                                Log.Error($@"[AICORE] AMD lighting fix code fell through! This shouldn't happen. The chosen option was {chosenOption}.");
+                            }
+                        }
+
+                        if (isUsingAMDLightingFix.HasValue)
+                        {
+                            try
+                            {
+                                var downloadResult = OnlineContent.DownloadToMemory(sourceFileUrl, (done, total) =>
+                                {
+                                    if (total != 0)
+                                    {
+                                        SetPreinstallCheckText($"Downloading lighting fix {Math.Round(done * 100.0 / total)}%");
+                                    }
+                                }, downloadHash).Result;
+
+                                if (downloadResult.errorMessage == null)
+                                {
+                                    // Download OK!
+                                    if (isUsingAMDLightingFix.Value)
+                                    {
+                                        // AMD Lighting Fix
+                                        var diskLocation = Path.Combine(Locations.TempDirectory(), $"LightingFix{Path.GetExtension(sourceFileUrl)}");
+                                        downloadResult.result.WriteToFile(diskLocation);
+                                        Log.Information(@"[AICORE] Extracting DLC_MOD_AMDLightingFix to ME1 DLC directory");
+                                        Directory.CreateDirectory(MEDirectories.DLCPath(package.InstallTarget)); //Ensure DLC directory exists.
+                                        MEMIPCHandler.ExtractArchiveToDirectory(diskLocation, MEDirectories.DLCPath(package.InstallTarget));
+                                        File.Delete(diskLocation);
+                                    }
+                                    else
+                                    {
+                                        // SilentPatch
+                                        using ZipArchive z = new ZipArchive(downloadResult.result);
+                                        var dll = z.Entries.FirstOrDefault(x => Path.GetFileName(x.FullName) == SILENT_PATCH_DLL_NAME);
+                                        if (dll != null)
+                                        {
+                                            // It def shouldn't be null since we hash checked this.
+                                            Log.Information($@"[AICORE] Extracting {SILENT_PATCH_DLL_NAME} to ME1 Binaries directory");
+                                            dll.ExtractToFile(Path.Combine(MEDirectories.ExecutableDirectory(package.InstallTarget), SILENT_PATCH_DLL_NAME));
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    Log.Error($@"[AICORE] Error downloading lighting fix: {downloadResult.errorMessage}");
+                                    return $"Downloading the lighting fix failed: {downloadResult.errorMessage}. You may want to install a lighting fix manually.";
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Log.Error($@"[AICORE] Error installing lighting fix: {e.Message}");
+                                CoreCrashes.TrackError(new Exception("Error installing a lighting fix occurred.", e));
+                                return $"Installing the lighting fix failed: {e.Message}. You may want to install a lighting fix manually.";
+                            }
+                        }
+                    }
+                }
             }
-
             return null; //OK
         }
 

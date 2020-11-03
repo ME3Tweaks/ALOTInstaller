@@ -1167,7 +1167,7 @@ namespace ALOTInstallerCore.Steps
                         {
                             //Write a _metacmm.txt file
                             var metacmm = Path.Combine(ingameDestination, "_metacmm.txt");
-                            string contents = $"{extractionRedirect.LoggingName}\n{extractionRedirect.ModVersion}\n{Assembly.GetEntryAssembly().FullName} {System.Reflection.Assembly.GetEntryAssembly().GetName().Version}\n{Guid.NewGuid().ToString()}";
+                            string contents = $"{extractionRedirect.LoggingName}\n{extractionRedirect.ModVersion}\n{Utilities.GetHostingProcessname()} {Utilities.GetAppVersion()}\n{Guid.NewGuid().ToString()}";
                             File.WriteAllText(metacmm, contents);
                         }
                     }

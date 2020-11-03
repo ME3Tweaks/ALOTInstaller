@@ -596,6 +596,25 @@ namespace ALOTInstallerConsole.BuilderUI
 
                             return selectedIndex == 0;
                         },
+                        (title, message, optionStrings) =>
+                        {
+                            object syncObj = new object();
+                            var options = optionStrings.Select(x => (ustring)x).ToList();
+                            int selectedIndex = 1; //abort 
+                            Application.MainLoop.Invoke(() =>
+                            {
+                                selectedIndex = MessageBox.Query(title, message, options.ToArray());
+                                lock (syncObj)
+                                {
+                                    Monitor.Pulse(syncObj);
+                                }
+                            });
+                            lock (syncObj)
+                            {
+                                Monitor.Wait(syncObj);
+                            }
+                            return selectedIndex;
+                        },
                         (title, message) =>
                         {
                             object syncObj = new object();
