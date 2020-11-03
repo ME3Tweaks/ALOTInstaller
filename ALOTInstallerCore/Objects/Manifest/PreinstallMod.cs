@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 
 namespace ALOTInstallerCore.Objects.Manifest
@@ -16,6 +17,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         public List<ExtractionRedirect> ExtractionRedirects { get; set; }
         public override string Category => "ALOV";
 
+        [DebuggerDisplay("ER {LoggingName} {ArchiveRootPath} -> {RelativeDestinationDirectory}")]
         public class ExtractionRedirect
         {
             public string RelativeDestinationDirectory { get; set; }

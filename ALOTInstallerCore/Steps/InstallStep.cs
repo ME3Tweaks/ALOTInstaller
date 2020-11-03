@@ -297,11 +297,11 @@ namespace ALOTInstallerCore.Steps
                     switch (command)
                     {
                         case "STAGE_ADD": // Add a new stage 
-                        {
-                            Log.Information("[AICORE] Adding stage to install stages queue: " + param);
-                            pm.AddStage(param, package.InstallTarget.Game);
-                            break;
-                        }
+                            {
+                                Log.Information("[AICORE] Adding stage to install stages queue: " + param);
+                                pm.AddStage(param, package.InstallTarget.Game);
+                                break;
+                            }
                         case "STAGE_WEIGHT": //Reweight a stage based on how long we think it will take
                             string[] parameters = param.Split(' ');
                             if (parameters.Length > 1)
@@ -378,7 +378,7 @@ namespace ALOTInstallerCore.Steps
 
                 if (cacheAmountPercent != null)
                 {
-                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long) ((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
+                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
                     args += $" --cache-amount {cacheAmountPercent}";
                 }
 
@@ -428,7 +428,7 @@ namespace ALOTInstallerCore.Steps
                             {
                                 {"Died on file", lastProcessedFile},
                                 {"Stage context", pm.CurrentStage.StageName}
-                            }, new[] {CoreCrashes.ErrorAttachmentLog.AttachmentWithText(memCrashBuilder.ToString(), "MemException.txt")});
+                            }, new[] { CoreCrashes.ErrorAttachmentLog.AttachmentWithText(memCrashBuilder.ToString(), "MemException.txt") });
                     }
 
                     doWorkEventArgs.Result = failure?.FailureResultCode ?? InstallResult.InstallFailed_UnknownError;
@@ -1043,31 +1043,33 @@ namespace ALOTInstallerCore.Steps
 
                 try
                 {
+                    int done = 0;
+                    float total = modAddon.ExtractionRedirects.Count;
                     foreach (var extractionRedirect in modAddon.ExtractionRedirects)
                     {
+                        SetBottomTextCallback?.Invoke($"Installing files {done / total}%");
+                        done++;
                         //dlc is required (all in list)
                         if (extractionRedirect.OptionalRequiredDLC != null)
                         {
                             List<string> requiredDlc = extractionRedirect.OptionalRequiredDLC.Split(';').ToList();
-                            List<string> requiredFiles = new List<string>();
-                            List<long> requiredFilesSizes = new List<long>();
-
-
-                            if (extractionRedirect.OptionalRequiredFiles != null)
-                            {
-                                requiredFiles = extractionRedirect.OptionalRequiredFiles.Split(';').ToList();
-                                if (extractionRedirect.OptionalRequiredFilesSizes != null)
-                                {
-                                    //parse required sizes list. This can be null which means we don't check the list of file sizes in the list
-                                    requiredFilesSizes = extractionRedirect.OptionalRequiredFilesSizes.Split(';').Select(x => long.Parse(x)).ToList();
-                                }
-                            }
-
                             //check if any required dlc is missing
                             if (requiredDlc.Any(x => !Directory.Exists(Path.Combine(dlcDirectory, x))))
                             {
                                 Log.Information($"[AICORE] {extractionRedirect.LoggingName}: Extraction rule is not applicable to this setup. Rule requires all of the DLC: {extractionRedirect.OptionalRequiredDLC}");
                                 continue;
+                            }
+                        }
+
+                        if (extractionRedirect.OptionalRequiredFiles != null)
+                        {
+                            List<string> requiredFiles = new List<string>();
+                            List<long> requiredFilesSizes = new List<long>();
+                            requiredFiles = extractionRedirect.OptionalRequiredFiles.Split(';').ToList();
+                            if (extractionRedirect.OptionalRequiredFilesSizes != null)
+                            {
+                                //parse required sizes list. This can be null which means we don't check the list of file sizes in the list
+                                requiredFilesSizes = extractionRedirect.OptionalRequiredFilesSizes.Split(';').Select(x => long.Parse(x)).ToList();
                             }
 
                             //Check if any required file is missing
@@ -1095,12 +1097,14 @@ namespace ALOTInstallerCore.Steps
                                     }
                                 }
 
+
                                 if (doNotInstall)
                                 {
                                     continue;
                                 }
                             }
                         }
+
 
                         //dlc required (any in list)
                         if (extractionRedirect.OptionalAnyDLC != null)
