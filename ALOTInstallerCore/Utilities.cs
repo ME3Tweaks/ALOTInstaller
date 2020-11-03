@@ -942,10 +942,10 @@ namespace ALOTInstallerCore
         {
             var hostingName = Utilities.GetHostingProcessname();
             var installerIndex = hostingName.IndexOf("Installer", StringComparison.InvariantCultureIgnoreCase);
-            if (installerIndex > 0)
+            if (installerIndex > 0 && installerIndex + 9 == hostingName.Length) //"Installer" must be at the end.
             {
                 var prefix = hostingName.Substring(0, installerIndex);
-                if (Enum.TryParse<ManifestMode>(prefix, out _))
+                if (!Enum.TryParse<ManifestMode>(prefix, out _))
                 {
                     // Not a supported app prefix.
                     return "ALOT";
