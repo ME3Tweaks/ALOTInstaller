@@ -155,28 +155,29 @@ steps:
     artifact: 'ALOT Installer Console (Linux) $(VER)'
     publishLocation: 'pipeline'
 
-- task: ArchiveFiles@2
-  condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'merge'))
-  displayName: 'Compress WPF for Bridge transfer'
-  inputs:
-    rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF/ALOTInstaller.exe'
-    includeRootFolder: false
-    archiveType: '7z'
-    sevenZipCompression: 'ultra'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/ALOT Installer WPF (Windows) $(VER).7z'
-    replaceExistingArchive: true
+# Disabled for now because we don't use this in M3 anymore. Was only for testing V4 at start.
+# - task: ArchiveFiles@2
+#   condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'merge'))
+#   displayName: 'Compress WPF for Bridge transfer'
+#   inputs:
+#     rootFolderOrFile: 'Output/Windows/ALOTInstallerWPF/ALOTInstaller.exe'
+#     includeRootFolder: false
+#     archiveType: '7z'
+#     sevenZipCompression: 'ultra'
+#     archiveFile: '$(Build.ArtifactStagingDirectory)/ALOT Installer WPF (Windows) $(VER).7z'
+#     replaceExistingArchive: true
 
-- task: PowerShell@2
-  condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'merge'))
-  displayName: 'Transfer WPF to ME3Tweaks via Bridge'
-  env:
-    BRIDGEENDPOINT: $(ME3TweaksALOTBridgeEndpoint)
-    BRIDGEUSERNAME: $(ME3TweaksBridgeUsername)
-    BRIDGEPW: $(ME3TweaksBridgePW)
-  inputs:
-    filePath: 'Azure/ME3TweaksBridge.ps1'
-    arguments: "-Endpoint $env:BRIDGEENDPOINT -Username $env:BRIDGEUSERNAME -Password $env:BRIDGEPW -Version $(VER) -AppName ALOTInstallerWPF -InputFile \"$(Build.ArtifactStagingDirectory)/ALOT Installer WPF (Windows) $(VER).7z\""
-    errorActionPreference: 'continue'
+# - task: PowerShell@2
+#   condition: and(succeeded(), ne(variables['Build.SourceBranchName'], 'merge'))
+#   displayName: 'Transfer WPF to ME3Tweaks via Bridge'
+#   env:
+#     BRIDGEENDPOINT: $(ME3TweaksALOTBridgeEndpoint)
+#     BRIDGEUSERNAME: $(ME3TweaksBridgeUsername)
+#     BRIDGEPW: $(ME3TweaksBridgePW)
+#   inputs:
+#     filePath: 'Azure/ME3TweaksBridge.ps1'
+#     arguments: "-Endpoint $env:BRIDGEENDPOINT -Username $env:BRIDGEUSERNAME -Password $env:BRIDGEPW -Version $(VER) -AppName ALOTInstallerWPF -InputFile \"$(Build.ArtifactStagingDirectory)/ALOT Installer WPF (Windows) $(VER).7z\""
+#     errorActionPreference: 'continue'
 
 - task: ado-discord-webhook@1
   displayName: 'ALOT Discord notification'
