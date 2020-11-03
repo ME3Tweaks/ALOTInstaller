@@ -36,7 +36,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="PropertyChanged.Fody" Version="4.0.0" />
-		<PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00887" />
 	</ItemGroup>
 
 	<ItemGroup>
