@@ -1239,7 +1239,7 @@
 			<file
 					downloadlink="https://www.nexusmods.com/masseffect3/mods/574/?tab=files"
 					filename="el_SheplooComplexionTweak_1.7z-574-1-0.7z"
-					tooltip="Sheploo Complexion Tweak_1.0"
+					tooltipname="Sheploo Complexion Tweak_1.0"
 					size="16186448"
 					md5="8c131425b32d06984ad4f5b57a6fc19e"
 					unpackedsinglefilename="el_SheplooComplexionTweak_1.tpf"
@@ -1259,7 +1259,7 @@
 			<file
 					downloadlink="https://www.nexusmods.com/masseffect3/mods/576/?tab=files"
 					filename="James Complexion Tweak_1.0-576-1-0.7z"
-					tooltip="James Complexion Tweak_1.0"
+					tooltipname="James Complexion Tweak_1.0"
 					size="9620693"
 					md5="efab600ba1c6b6c3dcae3aaa4492ef4e"
 					unpackedsinglefilename="el_JamesComplexionTweak_1.tpf"
@@ -1279,7 +1279,7 @@
 			<file
 					downloadlink="https://www.nexusmods.com/masseffect3/mods/579/?tab=files"
 					filename="Zaeed Complexion Tweak 1.0-579-1-0.7z"
-					tooltip="Zaeed Complexion Tweak 1.0"
+					tooltipname="Zaeed Complexion Tweak 1.0"
 					size="13561527"
 					md5="e1ff127784ed88d5a1ef6ad2edaaa11a"
 					unpackedsinglefilename="el_ZaeedComplexionTweak_1.tpf"
@@ -3158,6 +3158,7 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 			friendlyname="A Lot of Videos for ME3 2.0 - Basegame (1080p)"
+      shortname="ALOV for ME3 - Basegame (1080p)"
 			author="Mellin"
 			recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3. This file covers the basegame, no DLC or mods."
 			recommendation="Recommended"
@@ -3182,6 +3183,7 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 			friendlyname="A Lot of Videos for ME3 2.0 - Official DLC (1080p)"
+      shortname="ALOV for ME3 - Official DLC (1080p)"
 			author="Mellin"
 			recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3. This file covers the official BioWare DLCs."
 			recommendation="Recommended"
@@ -3233,6 +3235,7 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 			friendlyname="A Lot of Videos for ME3 2.0 - Third Party Mods (1080p)"
+      shortname="ALOV for ME3 - Third Party Mods (1080p)"
 			author="Mellin"
 			recommendationreason="Upgrades third party mod's videos where permission was granted, and they are not using 1080p videos already."
 			recommendation="Optional"
@@ -3278,6 +3281,7 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 			friendlyname="A Lot of Videos for ME3 2.0 - Basegame (4K)"
+      shortname="ALOV for ME3 - Basegame (4K)"
 			author="Mellin"
 			recommendationreason="Optional due to large filesize and CPU requirements"
 			recommendation="Optional"
@@ -3302,6 +3306,7 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 			friendlyname="A Lot of Videos for ME3 2.0 - Official DLC (4K)"
+      shortname="ALOV for ME3 - Official DLC (4K)"
 			author="Mellin"
 			recommendationreason="Optional due to large filesize and CPU requirements"
 			recommendation="Optional"
@@ -3353,6 +3358,7 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 			friendlyname="A Lot of Videos for ME3 2.0 - Third Party Mods (4K)"
+      shortname="ALOV for ME3 - Third Party Mods (4K)"
 			author="Mellin"
 			recommendationreason="Optional due to large filesize and CPU requirements"
 			recommendation="Optional"
