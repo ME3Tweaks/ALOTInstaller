@@ -218,7 +218,7 @@ namespace ALOTInstallerCore.Steps
 
             FinalizedFileSet?.Invoke(_installOptions.FilesToInstall);
             // Show point of no return prompt if textures are not installed
-            if (_installOptions.InstallTarget.GetInstalledALOTInfo() == null && !PointOfNoReturnNotification())
+            if (_installOptions.InstallTarget.GetInstalledALOTInfo() == null && _installOptions.FilesToInstall.Any(x => !(x is PreinstallMod)) && !PointOfNoReturnNotification())
             {
                 Log.Information("[AICORE] User aborted install at point of no return callback");
                 e.Result = false;

@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
+using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
@@ -155,6 +156,13 @@ namespace ALOTInstallerCore.Steps
         public void InstallTextures(object sender, DoWorkEventArgs doWorkEventArgs)
         {
             // Where the compiled .mem and staged other files will be
+            Log.Information(@"[AICORE] Beginning InstallTextures() thread.");
+            #region Presetup variables
+            var filesThatWillInstall = Directory.GetFiles(memInputPath, "*.mem");
+            var mainInstallStageWillCommence = filesThatWillInstall.Any();
+            Log.Information($@"[AICORE] Main texture installation step (+ supporting steps) will commence: {mainInstallStageWillCommence}");
+
+            #endregion
 
             #region setup top text
 
@@ -230,14 +238,11 @@ namespace ALOTInstallerCore.Steps
 
             #region Check for existing markers
 
-            if (!checkForExistingMarkers())
+            if (mainInstallStageWillCommence && !checkForExistingMarkers())
             {
                 doWorkEventArgs.Result = InstallResult.InstallFailed_ExistingMarkersFound;
                 return;
             }
-
-
-
             #endregion
 
             #region Preinstall ALOV mods
@@ -270,9 +275,8 @@ namespace ALOTInstallerCore.Steps
             #endregion
 
             #region Main installation phase
-            var filesThatWillInstall = Directory.GetFiles(memInputPath, "*.mem");
-            var mainInstallStageCommenced = filesThatWillInstall.Any();
-            if (mainInstallStageCommenced)
+            
+            if (mainInstallStageWillCommence)
             {
 
                 Log.Information("[AICORE] -----------MEM INSTALLATION BEGIN-----------");
@@ -448,7 +452,7 @@ namespace ALOTInstallerCore.Steps
             #region Post-main install modifications
 
             SetMiddleTextCallback?.Invoke("Finishing installation");
-            if (mainInstallStageCommenced)
+            if (mainInstallStageWillCommence)
             {
                 if (!installZipCopyFiles())
                 {
@@ -468,7 +472,7 @@ namespace ALOTInstallerCore.Steps
                 }
             }
 
-            if (mainInstallStageCommenced && !stampVersionInformation())
+            if (mainInstallStageWillCommence && !stampVersionInformation())
             {
                 doWorkEventArgs.Result = InstallResult.InstallFailed_FailedToApplyTextureInfo;
                 return;
@@ -1037,9 +1041,7 @@ namespace ALOTInstallerCore.Steps
                 SetBottomTextCallback?.Invoke("Installing files");
 
                 //Check requirements for this extraction rule to fire.
-                var dlcDirectory = package.InstallTarget.Game == MEGame.ME1
-                    ? Path.Combine(package.InstallTarget.TargetPath, "DLC")
-                    : Path.Combine(package.InstallTarget.TargetPath, "BioGame", "DLC");
+                var dlcDirectory = MEDirectories.DLCPath(package.InstallTarget);
 
                 try
                 {
@@ -1047,7 +1049,7 @@ namespace ALOTInstallerCore.Steps
                     float total = modAddon.ExtractionRedirects.Count;
                     foreach (var extractionRedirect in modAddon.ExtractionRedirects)
                     {
-                        SetBottomTextCallback?.Invoke($"Installing files {done / total}%");
+                        SetBottomTextCallback?.Invoke($"Installing files {(int)(done * 100 / total)}%");
                         done++;
                         //dlc is required (all in list)
                         if (extractionRedirect.OptionalRequiredDLC != null)
