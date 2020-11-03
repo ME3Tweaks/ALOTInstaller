@@ -29,7 +29,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommandLineParser" Version="2.8.0" />
+    <PackageReference Include="Microsoft.NETCore.Targets" Version="3.0.0" PrivateAssets="all" />/
+    <PackageReference Include="CommandLineParser" Version="2.8.0" />
 		<PackageReference Include="MahApps.Metro.IconPacks.Ionicons" Version="4.4.0" />
 		<PackageReference Include="Microsoft.AppCenter" Version="3.4.3" />
 		<PackageReference Include="Microsoft.AppCenter.Analytics" Version="3.4.3" />
