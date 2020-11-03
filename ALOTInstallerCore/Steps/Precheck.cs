@@ -34,7 +34,7 @@ namespace ALOTInstallerCore.Steps
             }
 
             var filesThatWillInstall = Directory.GetFiles(installationPackagesDir, "*.mem");
-            if (package.FilesToInstall.All(x => x is PreinstallMod) && !filesThatWillInstall.Any())
+            if (package.FilesToInstall.All(x => !(x is PreinstallMod)) && !filesThatWillInstall.Any())
             {
                 // Preinstall mods don't use .mem packages (As of V4 ALOV 2020). As such there won't be any .mem packages
                 Log.Error(@"[AICORE] There were no mem files in the InstallationPackages directory. Precheck failed");

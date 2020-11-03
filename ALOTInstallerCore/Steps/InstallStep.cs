@@ -199,6 +199,15 @@ namespace ALOTInstallerCore.Steps
                 installString = "texture mods";
             }
 
+            if (package.FilesToInstall.All(x => x is PreinstallMod))
+            {
+                installString = "mod";
+                if (package.FilesToInstall.Count > 1)
+                {
+                    installString += "s";
+                }
+            }
+
             SetInstallString?.Invoke(installString);
             SetTopTextCallback?.Invoke($"Installing {installString} for {package.InstallTarget.Game.ToGameName()}");
 

@@ -228,7 +228,7 @@ namespace ALOTInstallerWPF.InstallerUI
                 SetBottomTextVisibilityCallback = x =>
                     InstallerTextBottomVisibility = x ? Visibility.Visible : Visibility.Collapsed,
                 ShowStorefrontDontClickUpdateCallback = showStorefrontNoUpdateUI,
-                SetOverallProgressCallback = x=> TaskbarHelper.SetProgress(x / 100.0f),
+                SetOverallProgressCallback = x => TaskbarHelper.SetProgress(x / 100.0f),
                 SetProgressStyle = x => TaskbarHelper.SetProgressState(progressStyleToProgressState(x))
             };
             installerWorker.WorkerReportsProgress = true;
@@ -327,13 +327,19 @@ namespace ALOTInstallerWPF.InstallerUI
         private void handleInstallResult(InstallStep.InstallResult ir, string installString)
         {
             TipTimer?.Stop(); //Stop the tip rotation
+            var installedInfo = InstallOptions.InstallTarget.GetInstalledALOTInfo();
+            var installedTextures = InstallOptions.FilesToInstall.Any(x => !(x is PreinstallMod));
+            CurrentTip = ""; //blank it out
             if (ir == InstallStep.InstallResult.InstallOK)
             {
                 BigIconKind = PackIconIoniconsKind.CheckmarkCircleMD;
                 BigIconForeground = Brushes.Green;
                 //InstallerTextTop = $"Installed {installString}";
                 //InstallerTextBottomVisibility = InstallerTextMiddleVisibility = Visibility.Collapsed;
-                CurrentTip = $"Texture installation succeeded. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
+                if (installedTextures)
+                {
+                    CurrentTip = $"Texture installation succeeded. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
+                }
             }
             else if (ir == InstallStep.InstallResult.InstallOKWithWarning)
             {
@@ -341,7 +347,14 @@ namespace ALOTInstallerWPF.InstallerUI
                 BigIconForeground = Brushes.Yellow;
                 InstallerTextTop = $"Installed {installString}";
                 InstallerTextMiddle = "Installation completed with warnings";
-                CurrentTip = $"Texture installation succeeded with warnings. Check the installer log for more information on these warnings. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
+                if (installedTextures)
+                {
+                    CurrentTip = $"Texture installation succeeded with warnings. Check the installer log for more information on these warnings. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
+                }
+                else
+                {
+                    CurrentTip = $"Installation succeeded with warnings. Check the installer log for more information on these warnings.";
+                }
             }
             else
             {
