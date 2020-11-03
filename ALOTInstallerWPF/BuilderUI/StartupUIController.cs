@@ -241,12 +241,21 @@ namespace ALOTInstallerWPF.BuilderUI
 
                 if (ManifestHandler.MasterManifest != null)
                 {
+                    if (ManifestHandler.MasterManifest.Source != ManifestHandler.ManifestSource.Online)
+                    {
+
+                    }
+
                     ManifestHandler.SetCurrentMode(ManifestHandler.GetDefaultMode());
                     pd.SetMessage("Preparing texture library");
                     foreach (var v in ManifestHandler.MasterManifest.ManifestModePackageMappping)
                     {
                         TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(v.Key));
                     }
+                }
+                else
+                {
+                    // This shouldn't happen...
                 }
 
                 pd.SetMessage("Performing startup checks");
@@ -288,6 +297,14 @@ namespace ALOTInstallerWPF.BuilderUI
             };
             bw.RunWorkerCompleted += async (a, b) =>
                     {
+                        if (ManifestHandler.MasterManifest != null)
+                        {
+                            if (ManifestHandler.MasterManifest.Source != ManifestHandler.ManifestSource.Online)
+                            {
+                                window.Title += $" - Using {ManifestHandler.MasterManifest.Source} manifest";
+                            }
+                        }
+
                         await pd.CloseAsync();
 #if !DEBUG
                         await window.ShowMessageAsync("This is a preview version of ALOT Installer V4",

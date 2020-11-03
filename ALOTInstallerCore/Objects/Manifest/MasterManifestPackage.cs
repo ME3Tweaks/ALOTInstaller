@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ALOTInstallerCore.Helpers;
 
 namespace ALOTInstallerCore.Objects.Manifest
 {
@@ -51,9 +52,9 @@ namespace ALOTInstallerCore.Objects.Manifest
         public List<string> ME2DLCRequiringTextureExportFixes = new List<string>();
 
         /// <summary>
-        /// Indicates that the manifest was loaded from disk rather than the live version. May indicate network issue
+        /// Indicates from where the master manifest was loaded.
         /// </summary>
-        public bool UsingBundled { get; internal set; }
+        public ManifestHandler.ManifestSource Source { get; internal set; }
 
         /// <summary>
         /// List of all known manifest files. May contain "duplicate" items as a single file may appear in multiple modes

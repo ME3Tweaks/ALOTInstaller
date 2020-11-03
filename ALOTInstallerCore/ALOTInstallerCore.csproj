@@ -6,6 +6,7 @@
 	</PropertyGroup>
 	<Import Project="..\SharedAssemblyInfo.proj" />
 	<ItemGroup>
+		<None Remove="BundledManifest\bundledmanifest.zip" />
 		<None Remove="ModManager\binkw32\me1\binkw23.dll" />
 		<None Remove="ModManager\binkw32\me1\binkw32.dll" />
 		<None Remove="ModManager\binkw32\me2\binkw23.dll" />
@@ -62,6 +63,7 @@
 		<PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.1" />
 	</ItemGroup>
 	<ItemGroup>
+		<EmbeddedResource Include="BundledManifest\bundledmanifest.zip" />
 		<EmbeddedResource Include="ModManager\binkw32\me1\binkw23.dll" />
 		<EmbeddedResource Include="ModManager\binkw32\me1\binkw32.dll" />
 		<EmbeddedResource Include="ModManager\binkw32\me2\binkw23.dll" />
@@ -82,10 +84,7 @@
 		<ProjectReference Include="..\ComputerInfo\ComputerInfo\ComputerInfo.csproj" />
 		<ProjectReference Include="..\ME3ExplorerLib\ME3ExplorerCore\ME3ExplorerCore.csproj" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="BundledManifest\" />
-	</ItemGroup>
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-	  <Exec Command="if $(ConfigurationName) == WPFRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == WinRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == LinuxRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == MacRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)" />
+	  <Exec Command="if not exist &quot;$(SolutionDir)ALOTInstallerCore\BundledManifest\&quot; mkdir &quot;$(SolutionDir)ALOTInstallerCore\BundledManifest&quot;&#xD;&#xA;if $(ConfigurationName) == WPFRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == WinRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == LinuxRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == MacRelease (powershell Compress-Archive -Path '$(SolutionDir)manifest.xml' -DestinationPath '$(SolutionDir)ALOTInstallerCore\BundledManifest\bundledmanifest.zip' -Force)" />
 	</Target>
 </Project>

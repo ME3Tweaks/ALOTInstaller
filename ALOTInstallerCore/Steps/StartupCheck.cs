@@ -103,7 +103,6 @@ namespace ALOTInstallerCore.Steps
                 }
 
                 bool isAdmin = Utilities.IsAdministrator();
-                //bool me1AGEIAKeyNotWritable = false;
 
                 if (directoriesToGrant.Any())
                 {
@@ -119,10 +118,6 @@ namespace ALOTInstallerCore.Steps
                         args += $"\"{dir}\"";
                     }
 
-                    //if (me1AGEIAKeyNotWritable)
-                    //{
-                    //    args += " -create-hklm-reg-key \"SOFTWARE\\WOW6432Node\\AGEIA Technologies\"";
-                    //}
                     args = $"\"{System.Security.Principal.WindowsIdentity.GetCurrent().Name}\" {args}";
                     var permissionsGranterExe = Path.Combine(Locations.ResourcesDir, "Binaries", "PermissionsGranter.exe");
 
@@ -158,12 +153,7 @@ namespace ALOTInstallerCore.Steps
                             message += "\n" + str;
                         }
 
-                        //if (me1AGEIAKeyNotWritable)
-                        //{
-                        //    message += "\nRegistry: HKLM\\SOFTWARE\\WOW6432Node\\AGEIA Technologies (Fixes an ME1 launch issue)";
-                        //}
                         messageCallback?.Invoke("Write permissions required for modding", message);
-                        //string exe = BINARY_DIRECTORY + "PermissionsGranter.exe";
                         int result = Utilities.RunProcess(permissionsGranterExe, args, true, true, true, true);
                         if (result == 0)
                         {
@@ -183,10 +173,6 @@ namespace ALOTInstallerCore.Steps
                 Log.Error(
                     "[AICORE] Error checking for write privileges. This may be a significant sign that an installed game is not in a good state.");
                 e.WriteToLog("[AICORE] ");
-                //messageCa
-                //await this.ShowMessageAsync("Error checking write privileges",
-                //    "An error occurred while checking write privileges to game folders. This may be a sign that the game is in a bad state.\n\nThe error was:\n" +
-                //    e.Message);
                 return false;
             }
 #endif

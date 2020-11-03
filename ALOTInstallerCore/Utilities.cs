@@ -161,6 +161,8 @@ namespace ALOTInstallerCore
             }
         }
 
+
+
         public static bool IsWindows10OrNewer()
         {
 #if WINDOWS
@@ -570,32 +572,13 @@ namespace ALOTInstallerCore
                 Log.Information("[AICORE] We need admin rights to create this directory");
 
 #if WINDOWS
-                string exe = Locations.GetCachedExecutable("PermissionsGranter.exe");
-                try
-                {
-                    Utilities.ExtractInternalFile("MassEffectModManagerCore.modmanager.me3tweaks.PermissionsGranter.exe", exe, true);
-                }
-                catch (Exception e)
-                {
-                    Log.Error("[AICORE] Error extracting PermissionsGranter.exe: " + e.Message);
-
-                    Log.Information("[AICORE] Retrying with appdata temp directory instead.");
-                    try
-                    {
-                        exe = Path.Combine(Path.GetTempPath(), "PermissionsGranter");
-                        Utilities.ExtractInternalFile("MassEffectModManagerCore.modmanager.me3tweaks.PermissionsGranter.exe", exe, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error("[AICORE] Retry failed! Unable to make this directory writable due to inability to extract PermissionsGranter.exe. Reason: " + ex.Message);
-                        return false;
-                    }
-                }
-
+                // This works because the executable is extracted as part of the published single file package
+                // This method would NOT work on Linux single file as it doesn't extract!
+                var permissionsGranterExe = Path.Combine(Locations.ResourcesDir, "Binaries", "PermissionsGranter.exe");
                 string args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" -create-directory \"" + directoryPath.TrimEnd('\\') + "\"";
                 try
                 {
-                    int result = Utilities.RunProcess(exe, args, waitForProcess: true, requireAdmin: true, noWindow: true);
+                    int result = Utilities.RunProcess(permissionsGranterExe, args, waitForProcess: true, requireAdmin: true, noWindow: true);
                     if (result == 0)
                     {
                         Log.Information("[AICORE] Elevated process returned code 0, restore directory is hopefully writable now.");
@@ -790,13 +773,6 @@ namespace ALOTInstallerCore
         {
             var computerInfo = new ComputerInfo();
             return computerInfo.TotalPhysicalMemory;
-        }
-
-        public static bool isRunningOnAMD()
-        {
-            // TODO: MAKE WORK CROSS PLAT
-            var processorIdentifier = System.Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER");
-            return processorIdentifier != null && processorIdentifier.Contains("AuthenticAMD");
         }
 
         public static bool TestXMLIsValid(string inputXML)

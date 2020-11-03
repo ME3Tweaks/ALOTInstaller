@@ -88,58 +88,13 @@ namespace ALOTInstallerCore.Helpers
         /// UI display string of the ME3 target path. Do not trust this value as a true path, use the target instead.
         /// </summary>
         [DependsOn(nameof(ME3Target))] public static string ME3GamePath => ME3Target?.TargetPath ?? "Not installed";
-        
+
         public static string ConfigPathME1 { get; set; }
         public static string ConfigPathME2 { get; set; }
         public static string ConfigPathME3 { get; set; }
 
         private static void LoadGamePaths()
         {
-
-            /*
-            //Read config file.
-            string path = null;
-            string mempath = null;
-
-            // MIGHT NEED CHANGED ON LINUX
-            // TODO: USE MEM --game-paths
-            string inipath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "MassEffectModder");
-            inipath = Path.Combine(inipath, "MassEffectModder.ini");
-            DuplicatingIni configIni = null;
-            if (File.Exists(inipath))
-            {
-                configIni = DuplicatingIni.LoadIni(inipath);
-            }
-
-            if (configIni != null)
-            {
-                foreach (var game in Enums.AllGames)
-                {
-                    string key = game.ToString();
-                    path = configIni["GameDataPath"][key]?.Value;
-                    if (!internalSetTarget(game, path))
-                    {
-#if WINDOWS
-                        //does not exist in ini (or ini does not exist).
-                        string softwareKey = @"HKEY_LOCAL_MACHINE\SOFTWARE\";
-                        string key64 = @"Wow6432Node\";
-                        string gameKey = @"BioWare\Mass Effect";
-                        string entry = "Path";
-
-                        if (game == MEGame.ME2)
-                            gameKey += @" 2";
-                        else if (game == MEGame.ME3)
-                        {
-                            gameKey += @" 3";
-                            entry = "Install Dir";
-                        }
-
-                        path = RegistryHandler.GetRegistryString(softwareKey + gameKey, entry);
-                        if (path == null)
-                        {
-                            path = RegistryHandler.GetRegistryString(softwareKey + key64 + gameKey, entry);
-                        }*/
-
             var gameLocations = MEMIPCHandler.GetGameLocations();
             foreach (var item in gameLocations)
             {
@@ -179,7 +134,6 @@ namespace ALOTInstallerCore.Helpers
                         Locations.SetConfigPath(game, item.Value, false);
                     }
                 }
-
             }
         }
 

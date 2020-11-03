@@ -246,8 +246,6 @@ namespace ALOTInstallerWPF.Flyouts
                                 Log.Error($"Error deleting file: {e.Message}");
                             }
                         }
-
-                        // Todo: Show status?
                     }
                 }
                 else
