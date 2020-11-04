@@ -84,10 +84,10 @@
 		<ProjectReference Include="..\ComputerInfo\ComputerInfo\ComputerInfo.csproj" />
 		<ProjectReference Include="..\ME3ExplorerLib\ME3ExplorerCore\ME3ExplorerCore.csproj" />
 	</ItemGroup>
-	<Target Name="PreBuild"  Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))'" BeforeTargets="PreBuildEvent">
+	<Target Name="PreBuildWindows"  Condition="'$(OS)' == 'Windows_NT'" BeforeTargets="PreBuildEvent">
 	  <Exec Command="if not exist &quot;$(ProjectDir)BundledManifest&quot; mkdir &quot;$(ProjectDir)BundledManifest&quot;&#xD;&#xA;if $(ConfigurationName) == WPFRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == WinRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == LinuxRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;::if $(ConfigurationName) == MacRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)" />
 	</Target>
-	<Target Name="PreBuild"  Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'" BeforeTargets="PreBuildEvent">
+	<Target Name="PreBuildLinux"  Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'" BeforeTargets="PreBuildEvent">
 	  <Exec Command="mkdir -p &quot;$(ProjectDir)BundledManifest&quot;&#xD;&#xA;if [ $(ConfigurationName) = LinuxRelease ]; then pwsh -Command &quot;Compress-Archive -Path '$(ProjectDir)../manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest/bundledmanifest.zip' -Force&quot;; fi" />
 	</Target>
 </Project>
