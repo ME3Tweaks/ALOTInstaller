@@ -239,7 +239,7 @@ namespace ALOTInstallerCore.Steps
                 f.BuildID = buildID++;
                 f.StatusText = "Pending staging";
                 f.IsWaiting = true;
-                Log.Information($"[AICORE] {f.Filename}, Build ID {f.BuildID}");
+                Log.Information($"[AICORE]    {f.GetType().Name} {f.Filename}, Build ID {f.BuildID}");
             }
 
             _addonID++; //Add one in case the final file was versioned

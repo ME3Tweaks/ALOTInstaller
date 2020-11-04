@@ -72,6 +72,10 @@ namespace ALOTInstallerCore.Steps
         /// Callback to indicate that there should be a warning about Origin automatically updating the game for users and that they should never do this. Only triggers on Origin versions of games (ME1/2/3 + 3 steam)
         /// </summary>
         public Action<MEGame> ShowStorefrontDontClickUpdateCallback { get; set; }
+        /// <summary>
+        /// Callback to indicate when closing the application will break the game. Used to throw dialogs. When set to false, the application can be safely closed.
+        /// </summary>
+        public Action<bool> NotifyClosingWillBreakGame { get; set; }
 
         /// <summary>
         /// Callback for setting the 'overall' progress value, from 0 to 100. Can be used to display things like progressbars. Only works for the main long install step
@@ -245,6 +249,8 @@ namespace ALOTInstallerCore.Steps
             }
             #endregion
 
+            NotifyClosingWillBreakGame?.Invoke(true);
+
             #region Preinstall ALOV mods
 
             if (!package.DebugNoInstall)
@@ -257,7 +263,6 @@ namespace ALOTInstallerCore.Steps
             }
 
             #endregion
-
 
             if (mainInstallStageWillCommence)
             {
@@ -521,6 +526,8 @@ namespace ALOTInstallerCore.Steps
             }
 
             #endregion
+
+            NotifyClosingWillBreakGame?.Invoke(false);
 
             #region Cleanup
             try

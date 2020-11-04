@@ -27,6 +27,7 @@ using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using ME3ExplorerCore.Packages;
 using Microsoft.WindowsAPICodePack.Taskbar;
@@ -230,7 +231,8 @@ namespace ALOTInstallerWPF.InstallerUI
                     InstallerTextBottomVisibility = x ? Visibility.Visible : Visibility.Collapsed,
                 ShowStorefrontDontClickUpdateCallback = showStorefrontNoUpdateUI,
                 SetOverallProgressCallback = x => TaskbarHelper.SetProgress(x / 100.0f),
-                SetProgressStyle = x => TaskbarHelper.SetProgressState(progressStyleToProgressState(x))
+                SetProgressStyle = x => TaskbarHelper.SetProgressState(progressStyleToProgressState(x)),
+                NotifyClosingWillBreakGame = x => notifyClosingWillBreakGame(x),
             };
             installerWorker.WorkerReportsProgress = true;
             installerWorker.DoWork += ss.InstallTextures;
@@ -293,6 +295,53 @@ namespace ALOTInstallerWPF.InstallerUI
 
             #endregion
         }
+
+        private void notifyClosingWillBreakGame(bool closingWillBreakGame)
+        {
+            Application.Current.Invoke(() =>
+            {
+                if (Application.Current.MainWindow is MainWindow mw)
+                {
+                    if (closingWillBreakGame)
+                    {
+                        mw.Closing += ShowClosingWillBreakGamePrompt;
+                    }
+                    else
+                    {
+                        mw.Closing -= ShowClosingWillBreakGamePrompt;
+                    }
+                }
+            });
+        }
+
+        private void ShowClosingWillBreakGamePrompt(object sender, CancelEventArgs e)
+        {
+            Log.Error(@"[AIWPF] User trying to close installer while critical install is in progress. Prompting user to NOT do this.");
+            Application.Current.Invoke(async () =>
+            {
+                if (Application.Current.MainWindow is MainWindow mw)
+                {
+                    var closeResult = await mw.ShowMessageAsync("Closing the installer now will break the game", "The installer is currently in a state where closing it will leave the game in a broken state. Your game will have to be restored to vanilla to install textures further.\n\n" +
+                                                                              "If you're having issues with the installer, please come to the ALOT Discord, which can be found in the settings.\n\n" +
+                                                                              "Close the installer?", MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                                                                              {
+                                                                                  AffirmativeButtonText = "Close installer",
+                                                                                  NegativeButtonText = "Keep installer open",
+                                                                                  DefaultButtonFocus = MessageDialogResult.Negative
+                                                                              }, 75);
+                    if (closeResult == MessageDialogResult.Affirmative)
+                    {
+                        Log.Error(@"[AIWPF] User has chosen to close the installer while critical install is still in progress. Game will likely be in broken state");
+                    }
+                    else
+                    {
+                        Log.Information(@"[AIWPF] User didn't close the installer");
+                        e.Cancel = true;
+                    }
+                }
+            });
+        }
+
 
         private TaskbarProgressBarState progressStyleToProgressState(InstallStep.ProgressStyle progressStyle)
         {
