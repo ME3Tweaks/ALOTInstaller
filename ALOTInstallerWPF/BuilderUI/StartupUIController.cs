@@ -102,7 +102,7 @@ namespace ALOTInstallerWPF.BuilderUI
             }
             catch { }
 
-            if (Path.GetTempPath().StartsWith(Utilities.GetExecutablePath(), StringComparison.InvariantCultureIgnoreCase))
+            if (Utilities.GetExecutablePath().StartsWith(Path.GetTempPath(), StringComparison.InvariantCultureIgnoreCase))
             {
                 // Running from temp! This is not allowed
                 await window.ShowMessageAsync("Cannot run from temp directory", $"{Utilities.GetAppPrefixedName()} Installer cannot be run from the system's Temp directory. If this executable was run from within an archive, it needs to be extracted first.");
