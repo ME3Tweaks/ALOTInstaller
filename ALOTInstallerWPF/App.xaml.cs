@@ -44,6 +44,19 @@ namespace ALOTInstallerWPF
                 new FrameworkPropertyMetadata(true));
         }
 
+        protected override void OnExit(ExitEventArgs e)
+        {
+            try
+            {
+                Log.Information(@"[AIWPF] Application is exiting. Killing any remaining MassEffectModderNoGui processes");
+                MEMIPCHandler.KillAllActiveMEMInstances();
+                Log.Information(@"[AIWPF] Stopping application");
+            }
+            finally
+            {
+                base.OnExit(e);
+            }
+        }
 
         private void handleCommandLine()
         {
@@ -99,9 +112,9 @@ namespace ALOTInstallerWPF
             }
 
             #endregion
-
         }
 
+        #region Updates
         /// <summary>
         /// Upgrade from V3 update and swap
         /// </summary>
@@ -188,6 +201,7 @@ namespace ALOTInstallerWPF
                 }
             }
         }
+        #endregion
 
         class Options
         {
