@@ -522,7 +522,7 @@ namespace ALOTInstallerCore.Helpers
                     var oldFname = movableFile.Key.GetUsedFilepath();
                     var destF = Path.Combine(Settings.TextureLibraryLocation, movableFile.Key.UnpackedSingleFilename);
                     bool cancelDueToError = false;
-                    if (sDi.RootDirectory == dDi.RootDirectory && !forceCopy)
+                    if (sDi.RootDirectory.FullName == dDi.RootDirectory.FullName && !forceCopy)
                     {
                         // Move
                         if (!File.Exists(destF))

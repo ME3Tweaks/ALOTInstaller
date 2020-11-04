@@ -53,8 +53,8 @@ namespace ALOTInstallerCore.Steps
             }
 
             // Attempt to re-import any files not ready that exist on the same drive in staging/textures lib
-            if (new DriveInfo(Settings.TextureLibraryLocation).RootDirectory ==
-                new DriveInfo(Settings.BuildLocation).RootDirectory)
+            if (new DriveInfo(Settings.TextureLibraryLocation).RootDirectory.Name ==
+                new DriveInfo(Settings.BuildLocation).RootDirectory.Name)
             {
                 foreach (var game in Locations.AllMEGames)
                 {
