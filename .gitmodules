@@ -4,7 +4,7 @@
 [submodule "ME3ExplorerLib"]
 	path = ME3ExplorerLib
 	url = https://github.com/ME3Tweaks/ME3Explorer
-	branch = librarysplit
+	branch = Beta
 [submodule "gui.cs"]
 	path = gui.cs
 	url = https://github.com/Mgamerz/gui.cs.git
