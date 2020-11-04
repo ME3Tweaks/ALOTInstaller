@@ -203,7 +203,7 @@ namespace ALOTInstallerCore.Steps
                     }
                     else
                     {
-                        options[InstallOption.ALOT] = (OptionState.DisabledVisible, $"{alotFile.Filename} is required to be imported when installing in ALOT mode when ALOT is not already installed");
+                        options[InstallOption.ALOT] = (OptionState.DisabledVisible, $"{alotFile.FriendlyName} is required to be imported when installing in ALOT mode when ALOT is not already installed");
                     }
                 }
 
@@ -272,7 +272,7 @@ namespace ALOTInstallerCore.Steps
                         }
                         else
                         {
-                            options[InstallOption.ALOTUpdate] = (OptionState.DisabledVisible, $"{alotUpdateFile.Filename} is required to be imported when installing in ALOT mode when ALOT is not already installed");
+                            options[InstallOption.ALOTUpdate] = (OptionState.DisabledVisible, $"{alotUpdateFile.FriendlyName} is required to be imported when installing in ALOT mode when ALOT is not already installed");
                         }
                     }
                 }
