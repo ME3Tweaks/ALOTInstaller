@@ -543,6 +543,11 @@ namespace ALOTInstallerCore.Steps
             #region Show Ending UI
             showOnlineStorefrontNoUpdateScreen();
 
+            if (package.FilesToInstall.Count == 1)
+            {
+                installString = package.FilesToInstall[0].ShortFriendlyName;
+            }
+
             SetTopTextCallback?.Invoke($"Installation of {installString}");
             if (hasWarning)
             {
