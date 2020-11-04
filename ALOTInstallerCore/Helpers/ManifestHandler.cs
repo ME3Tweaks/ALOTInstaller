@@ -39,7 +39,11 @@ namespace ALOTInstallerCore.Helpers
             /// <summary>
             /// The manifest was fetched from an online source
             /// </summary>
-            Online
+            Online,
+            /// <summary>
+            /// The blank Free mode only manifest source. Only loads when the manifest fully fails to parse out, which shouldn't happen.
+            /// </summary>
+            Failover
         }
 
 
@@ -77,13 +81,13 @@ namespace ALOTInstallerCore.Helpers
         /// <param name="setCurrentOperationCallback">Callback to update text indicating what is currently happening</param>
         public static bool LoadMasterManifest(Action<string> setCurrentOperationCallback = null, Action<Exception> ErrorParsingManifest = null)
         {
-            bool returnValue = false;
+            bool manifestParsed = false;
             using WebClient webClient = new WebClient();
             webClient.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
             setCurrentOperationCallback?.Invoke("Downloading latest installer manifest");
+
             try
             {
-                //File.Copy(@"C:\Users\mgame\Downloads\Manifest.xml", MANIFEST_LOC);
                 string url = "https://raw.githubusercontent.com/ME3Tweaks/ALOTInstaller/ALOT-v4/manifest.xml";
                 if (Settings.BetaMode)
                 {
@@ -115,23 +119,30 @@ namespace ALOTInstallerCore.Helpers
                         ex.WriteToLog("[AICORE] ");
                     }
                     setCurrentOperationCallback?.Invoke("Parsing installer manifest");
-                    returnValue = ParseManifest(ManifestSource.Online, fetchedManifest);
+                    manifestParsed = ParseManifest(ManifestSource.Online, fetchedManifest);
+                    if (!manifestParsed) throw new Exception("Online manifest parsing failed, failing over to cached");
                 }
                 else
                 {
                     Log.Error("[AICORE] Response from server was not valid XML! " + fetchedManifest);
                     CoreCrashes.TrackError(new Exception("Invalid XML from server manifest!"));
                     Log.Information("[AICORE] Reading cached manifest instead.");
-                    returnValue = ReadCachedManifest();
+                    manifestParsed = ReadCachedManifest();
                 }
             }
             catch (Exception e)
             {
                 Log.Error("[AICORE] Exception occurred getting manifest from server:");
                 e.WriteToLog();
-                returnValue = ReadCachedManifest();
+                manifestParsed = ReadCachedManifest();
             }
-            return returnValue;
+
+            if (!manifestParsed)
+            {
+                Log.Error(@"[AICORE] Using failover free mode only blank master manifest");
+                MasterManifest = new MasterManifestPackage {Source = ManifestSource.Failover, ManifestModePackageMappping = {[ManifestMode.Free] = new ManifestModePackage()}};
+            }
+            return manifestParsed;
         }
 
         /// <summary>
@@ -159,11 +170,11 @@ namespace ALOTInstallerCore.Helpers
         private static bool ParseManifest(ManifestSource manifestSource, string manifestText, Action<Exception> errorParsingManifest = null)
         {
             Log.Information($"[AICORE] Reading master manifest. Source: {manifestSource}");
-            MasterManifest = new MasterManifestPackage()
+            var masterManifest = new MasterManifestPackage()
             {
                 Source = manifestSource
             };
-            MasterManifest.ManifestModePackageMappping[ManifestMode.Free] = new ManifestModePackage(); //Blank none mode
+            masterManifest.ManifestModePackageMappping[ManifestMode.Free] = new ManifestModePackage(); //Blank none mode
 
             try
             {
@@ -172,7 +183,7 @@ namespace ALOTInstallerCore.Helpers
 
                 #region Master Manifest
                 string masterVersion = (string)rootElement.Attribute("version") ?? "";
-                MasterManifest.MusicPackMirrors =
+                masterManifest.MusicPackMirrors =
                     (from mpm in rootElement.Descendants("musicpackmirror")
                      select new MusicPackMirror()
                      {
@@ -180,7 +191,7 @@ namespace ALOTInstallerCore.Helpers
                          Hash = mpm.Attribute("hash")?.Value
                      }).ToList();
 
-                MasterManifest.Tutorials =
+                masterManifest.Tutorials =
                     (from mpm in rootElement.Descendants("tutorial")
                      select new ManifestTutorial()
                      {
@@ -230,12 +241,12 @@ namespace ALOTInstallerCore.Helpers
 
                 if (rootElement.Element("me3dlctexturefixes") != null)
                 {
-                    MasterManifest.ME3DLCRequiringTextureExportFixes = rootElement.Elements("me3dlctexturefixes").Descendants("dlc").Select(x => x.Attribute("name").Value.ToUpperInvariant()).ToList();
+                    masterManifest.ME3DLCRequiringTextureExportFixes = rootElement.Elements("me3dlctexturefixes").Descendants("dlc").Select(x => x.Attribute("name").Value.ToUpperInvariant()).ToList();
                 }
 
                 if (rootElement.Element("me2dlctexturefixes") != null)
                 {
-                    MasterManifest.ME2DLCRequiringTextureExportFixes = rootElement.Elements("me2dlctexturefixes").Descendants("dlc").Select(x => x.Attribute("name").Value.ToUpperInvariant()).ToList();
+                    masterManifest.ME2DLCRequiringTextureExportFixes = rootElement.Elements("me2dlctexturefixes").Descendants("dlc").Select(x => x.Attribute("name").Value.ToUpperInvariant()).ToList();
                 }
 
                 if (rootElement.Element("stages") != null)
@@ -280,7 +291,7 @@ namespace ALOTInstallerCore.Helpers
                         string manifestVersion = manifestElement.Attribute("version")?.Value;
                         Log.Information($"[AICORE] {mode} manifest version: {manifestVersion}");
                         mp.ManifestVersion = manifestVersion;
-                        MasterManifest.ManifestModePackageMappping[mode] = mp;
+                        masterManifest.ManifestModePackageMappping[mode] = mp;
                     }
                 }
 
@@ -291,7 +302,7 @@ namespace ALOTInstallerCore.Helpers
                 foreach (var manifestElement in manifestFiles)
                 {
                     // Add PREINSTALL MODS
-                    MasterManifest.AllManifestFiles.AddRange((from e in manifestElement.Elements("preinstallmod")
+                    masterManifest.AllManifestFiles.AddRange((from e in manifestElement.Elements("preinstallmod")
                                                               select new PreinstallMod()
                                                               {
                                                                   Mode = TryConvert.ToEnum<ManifestMode>(e.Attribute("mode")?.Value, ManifestMode.Invalid),
@@ -344,7 +355,7 @@ namespace ALOTInstallerCore.Helpers
                                                               }));
 
                     // ADD TEXTURE MODS
-                    MasterManifest.AllManifestFiles.AddRange((from e in manifestElement.Elements("manifestfile")
+                    masterManifest.AllManifestFiles.AddRange((from e in manifestElement.Elements("manifestfile")
                                                               select new ManifestFile()
                                                               {
                                                                   Mode = TryConvert.ToEnum<ManifestMode>(e.Attribute("mode")?.Value, ManifestMode.Invalid),
@@ -444,7 +455,7 @@ namespace ALOTInstallerCore.Helpers
                                                               }));
 
                     // Build list of files for each mode
-                    foreach (var mf in MasterManifest.AllManifestFiles)
+                    foreach (var mf in masterManifest.AllManifestFiles)
                     {
                         foreach (var msf in mf.PackageFiles)
                         {
@@ -455,11 +466,11 @@ namespace ALOTInstallerCore.Helpers
                             // If none, then all
                             mf.ApplicableGames = ApplicableGame.ME1 | ApplicableGame.ME2 | ApplicableGame.ME3;
                         }
-                        MasterManifest.ManifestModePackageMappping[mf.Mode].ManifestFiles.Add(mf);
+                        masterManifest.ManifestModePackageMappping[mf.Mode].ManifestFiles.Add(mf);
                     }
 
                     // Order the mods
-                    foreach (var v in MasterManifest.ManifestModePackageMappping.Values)
+                    foreach (var v in masterManifest.ManifestModePackageMappping.Values)
                     {
                         v.OrderManifestFiles();
                     }
@@ -470,11 +481,14 @@ namespace ALOTInstallerCore.Helpers
             }
             catch (Exception e)
             {
+                CoreCrashes.TrackError(new Exception($"An exception occurred reading the manifest. Source: {manifestSource}", e));
                 Log.Error("[AICORE] Error has occurred parsing the manifest XML!");
                 e.WriteToLog("[AICORE] ");
                 errorParsingManifest?.Invoke(e);
                 return false;
             }
+
+            MasterManifest = masterManifest;
             return true; //Parsing succeeded
         }
 

@@ -299,9 +299,13 @@ namespace ALOTInstallerWPF.BuilderUI
                     {
                         if (ManifestHandler.MasterManifest != null)
                         {
-                            if (ManifestHandler.MasterManifest.Source != ManifestHandler.ManifestSource.Online)
+                            if (ManifestHandler.MasterManifest.Source < ManifestHandler.ManifestSource.Online)
                             {
                                 window.Title += $" - Using {ManifestHandler.MasterManifest.Source} manifest";
+                            }
+                            else if (ManifestHandler.MasterManifest.Source == ManifestHandler.ManifestSource.Failover)
+                            {
+                                window.Title += " - FAILED TO LOAD MANIFEST";
                             }
                         }
 
