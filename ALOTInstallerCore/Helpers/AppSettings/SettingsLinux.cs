@@ -26,8 +26,8 @@ namespace ALOTInstallerCore.Helpers.AppSettings
             {
                 settingsIni = DuplicatingIni.LoadIni(SettingsPath);
             }
-            TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller", "Downloaded_Mods"), true);
-            BuildLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller","Staging"), true);
+            TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller", "Downloaded_Mods"), true, v => TextureLibrarySettingsLocation = v, v => TextureLibraryLocationExistedOnLoad = v);
+            BuildLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller", "Staging"), true, v => StagingSettingsLocation = v, v => StagingLocationExistedOnLoad = v);
             MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
             Telemetry = LoadSettingBool(SettingsKeys.SettingKeys.Telemetry, true);
             BetaMode = LoadSettingBool(SettingsKeys.SettingKeys.BetaMode, false);
@@ -86,13 +86,17 @@ namespace ALOTInstallerCore.Helpers.AppSettings
             return res;
         }
 
-        private static string LoadDirectorySetting(SettingsKeys.SettingKeys key, string defaultSubfolder, bool isDefaultFullPath)
+        private static string LoadDirectorySetting(SettingsKeys.SettingKeys key, string defaultSubfolder, bool isDefaultFullPath, Action<string> readValue, Action<bool> readValueExists)
         {
             var dir = settingsIni["Settings"][SettingsKeys.SettingsKeyMapping[key]]?.Value;
+            readValue(dir);
+
             if (dir != null && Directory.Exists(dir))
             {
+                readValueExists(true);
                 return dir;
             }
+            readValueExists(false);
             var path = Path.Combine(Utilities.GetExecutingAssemblyFolder(), defaultSubfolder);
             if (isDefaultFullPath) path = defaultSubfolder;
             Directory.CreateDirectory(path);

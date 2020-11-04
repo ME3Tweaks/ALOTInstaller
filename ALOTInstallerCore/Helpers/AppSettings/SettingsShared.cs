@@ -48,6 +48,11 @@ namespace ALOTInstallerCore.Helpers.AppSettings
         }
         #endregion
 
+        public static bool TextureLibraryLocationExistedOnLoad;
+        public static string TextureLibrarySettingsLocation;
+        public static bool StagingLocationExistedOnLoad;
+        public static string StagingSettingsLocation;
+
 
         private static string _textureLibraryLocation;
         /// <summary>

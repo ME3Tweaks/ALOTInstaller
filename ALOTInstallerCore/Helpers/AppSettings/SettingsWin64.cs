@@ -16,7 +16,7 @@ namespace ALOTInstallerCore.Helpers.AppSettings
     /// </summary>
     public partial class Settings
     {
-        
+
         private static bool _playMusic = true;
         /// <summary>
         /// Global indicator if music should play during the installer or not.
@@ -29,8 +29,8 @@ namespace ALOTInstallerCore.Helpers.AppSettings
 
         public static void Load()
         {
-            TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, @"Downloaded_Mods");
-            BuildLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, @"Staging");
+            TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, @"Downloaded_Mods", v => TextureLibrarySettingsLocation = v, v => TextureLibraryLocationExistedOnLoad = v);
+            BuildLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, @"Staging", v => StagingSettingsLocation = v, v => StagingLocationExistedOnLoad = v);
             MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
             Telemetry = LoadSettingBool(SettingsKeys.SettingKeys.Telemetry, true);
             PlayMusic = LoadSettingBool(SettingsKeys.SettingKeys.PlayMusic, false);
@@ -146,15 +146,18 @@ namespace ALOTInstallerCore.Helpers.AppSettings
             }
         }
 
-        private static string LoadDirectorySetting(SettingsKeys.SettingKeys key, string defaultSubfolder)
+        private static string LoadDirectorySetting(SettingsKeys.SettingKeys key, string defaultSubfolder, Action<string> readValue, Action<bool> readValueExists)
         {
             string dir = RegistryHandler.GetRegistryString(SettingsKeys.SettingsKeyMapping[key]);
+            readValue(dir);
             if (dir != null && Directory.Exists(dir))
             {
+                readValueExists(true);
                 return dir;
             }
             else
             {
+                readValueExists(false);
                 var path = Path.Combine(Utilities.GetExecutingAssemblyFolder(), defaultSubfolder);
                 Directory.CreateDirectory(path);
                 return path;

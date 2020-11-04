@@ -1,9 +1,11 @@
 ﻿using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -60,6 +62,26 @@ namespace ALOTInstallerCore.Helpers
             get => _memVersion;
             set => SetProperty(ref _memVersion, value);
         }
+
+        // gotta love C#
+        private static ConcurrentDictionary<int, int> ActiveMEMProcessIDs = new ConcurrentDictionary<int, int>();
+
+        /// <summary>
+        /// Kills all known active instances of MEM.
+        /// </summary>
+        public static void KillAllActiveMEMInstances()
+        {
+            foreach (var v in ActiveMEMProcessIDs.Keys.ToList()) // To list as this may try to be concurrently modified. I'm not sure how that works in a concurrent dictionary but removing keys in the loop func will probably do that.
+            {
+                try
+                {
+                    Log.Information($@"[AICORE] Killing MassEffectModderNoGui process {v}");
+                    Process.GetProcessById(v)?.Kill();
+                }
+                catch { } //We don't really care if this fails.
+            }
+        }
+
 
         /// <summary>
         /// Returns the version number for MEM, or -1 if it couldn't be retrieved. The result is cached into the variable MassEffectModderNoGuiVerison
@@ -175,7 +197,8 @@ namespace ALOTInstallerCore.Helpers
                 switch (command)
                 {
                     case "CACHE_USAGE":
-                        if (DateTime.Now > (lastCacheoutput.AddSeconds(10))){
+                        if (DateTime.Now > (lastCacheoutput.AddSeconds(10)))
+                        {
                             Log.Information($"[AICORE] MEM cache usage: {FileSizeFormatter.FormatSize(long.Parse(parm))}");
                             lastCacheoutput = DateTime.Now;
                         }
@@ -197,6 +220,7 @@ namespace ALOTInstallerCore.Helpers
             // No validation. Make sure exit code is checked in the calling process.
             var cmd = Cli.Wrap(Locations.MEMPath()).WithArguments(arguments).WithValidation(CommandResultValidation.None);
             Log.Information($"[AICORE] Invoking MEM with IPC: {Locations.MEMPath()} {arguments}");
+            int localProcessId = -1;
 #if WINDOWS
             await foreach (var cmdEvent in cmd.ListenAsync(Encoding.Unicode, cancellationToken))
 #elif LINUX
@@ -206,14 +230,17 @@ namespace ALOTInstallerCore.Helpers
                 switch (cmdEvent)
                 {
                     case StartedCommandEvent started:
+                        ActiveMEMProcessIDs.TryAdd(started.ProcessId, started.ProcessId);
                         applicationStarted?.Invoke(started.ProcessId);
+                        localProcessId = started.ProcessId;
                         break;
                     case StandardOutputCommandEvent stdOut:
-                    #if DEBUG
-                        if (!stdOut.Text.StartsWith("[IPC]CACHE_USAGE")){
+#if DEBUG
+                        if (!stdOut.Text.StartsWith("[IPC]CACHE_USAGE"))
+                        {
                             Debug.WriteLine(stdOut.Text);
                         }
-                    #endif
+#endif
                         if (stdOut.Text.StartsWith(@"[IPC]"))
                         {
                             var ipc = breakdownIPC(stdOut.Text);
@@ -240,6 +267,7 @@ namespace ALOTInstallerCore.Helpers
                         }
                         break;
                     case ExitedCommandEvent exited:
+                        ActiveMEMProcessIDs.TryRemove(localProcessId, out _);
                         applicationExited?.Invoke(exited.ExitCode);
                         break;
                 }

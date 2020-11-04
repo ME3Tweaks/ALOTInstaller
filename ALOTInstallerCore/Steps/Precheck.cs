@@ -683,7 +683,7 @@ namespace ALOTInstallerCore.Steps
             if (targetDi.AvailableFreeSpace < requiredDiskSpace * 1.1)
             {
                 // Less than 10% buffer
-                return $"There is not enough space on the disk the game resides on to install textures. Note that the required space is only an estimate and includes required temporary space.\n\nDrive: {targetDi.Name}\nRequired space: {FileSizeFormatter.FormatSize(requiredDiskSpace)}\nAvailable space: {FileSizeFormatter.FormatSize(targetDi.AvailableFreeSpace)}\n\nYou can set storage locations in the application settings.";
+                return $"There is not enough space on the disk the game resides on to install textures. Note that the required space is only an estimate and includes required temporary space.\n\nDrive: {targetDi.Name}\nRequired space: {FileSizeFormatter.FormatSize(requiredDiskSpace)}\nAvailable space: {FileSizeFormatter.FormatSize(targetDi.AvailableFreeSpace)}\n\nYou can change storage locations in the application settings.";
             }
             return null;
         }

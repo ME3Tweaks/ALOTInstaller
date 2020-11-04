@@ -114,9 +114,6 @@ namespace ALOTInstallerWPF.BuilderUI
             NamedBackgroundWorker bw = new NamedBackgroundWorker("StartupThread");
             bw.DoWork += (a, b) =>
             {
-
-
-
                 ALOTInstallerCoreLib.Startup(SetWrapperLogger, RunOnUIThread, startTelemetry, stopTelemetry);
                 // Setup telemetry handlers
                 CoreAnalytics.TrackEvent = TelemetryController.TrackEvent;
@@ -272,7 +269,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     {
                         if (Application.Current.MainWindow is MainWindow mw)
                         {
-                            await mw.ShowMessageAsync(title, message);
+                            await mw.ShowMessageAsync(title, message, ContentWidthPercent: 75);
                             lock (o)
                             {
                                 Monitor.Pulse(o);

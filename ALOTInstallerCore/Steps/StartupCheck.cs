@@ -7,6 +7,7 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.Helpers.AppSettings;
 using Microsoft.Win32;
 using Serilog;
 
@@ -22,6 +23,35 @@ namespace ALOTInstallerCore.Steps
         {
             PerformRAMCheck(messageCallback);
             PerformWriteCheck(messageCallback, true);
+
+            var textureLibUnavailable = !Settings.TextureLibraryLocationExistedOnLoad &&
+                                        Settings.TextureLibrarySettingsLocation != null;
+            var stagingDirUnavailable = !Settings.StagingLocationExistedOnLoad &&
+                                        Settings.StagingSettingsLocation != null;
+            if (textureLibUnavailable || stagingDirUnavailable)
+            {
+                string title = "";
+                if (textureLibUnavailable)
+                {
+                    title += "Texture library";
+                }
+
+                if (stagingDirUnavailable)
+                {
+                    if (title.Length > 0) title += ", ";
+                    title += "Texture staging directory";
+                }
+
+                title += " unavailable";
+
+                var message =
+                    $"Paths defined in settings were not available when {Utilities.GetAppPrefixedName()} Installer was booted. The below paths are what will be used for this session instead.\n\n" +
+                    $"Texture library:\n{Settings.TextureLibraryLocation}\n\n" +
+                    $"Texture staging:\n{Settings.BuildLocation}\n\n" +
+                    $"You can update the paths where textures are stored before installation (Texture Library) and textures are built for installation (Staging) in the settings.";
+                messageCallback?.Invoke(title,message);
+            }
+
         }
 
         private static void PerformRAMCheck(Action<string, string> messageCallback)

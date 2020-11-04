@@ -16,7 +16,7 @@ namespace ALOTInstallerCore
         private static bool startedUp;
 
         /// <summary>
-        /// Starts the library initialization. This method must ALWAYS be called before using the library. This will load the settings, setup telemetry, start the logger, load locations, and begin the backup service.
+        /// Starts the library initialization. This method must ALWAYS be called before using the library. This will initialize telemetry, load settings, cleanup the temp directory, and more.
         /// </summary>
         /// <param name="setCallingLoggerCallback">Function to pass this library's logger back</param>
         /// <param name="runOnUiThreadCallback">Callback that contains method that should be wrapped in a UI-thread only runner. Some object initialization can only be performed on the UI thread</param>
@@ -69,8 +69,12 @@ namespace ALOTInstallerCore
             BackupService.InitBackupService(runOnUiThreadCallback);
 
             currentOperationCallback?.Invoke("Loading ME3Tweaks services");
+            Log.Information("[AICORE] Loading ME3Tweaks service: Basegame File Identification Service (BGFIS)");
+
             var willcheckforupdates = OnlineContent.CanFetchContentThrottleCheck();
             BasegameFileIdentificationService.BasegameFileIdentificationServiceDB = OnlineContent.FetchBasegameFileIdentificationServiceManifest();
+            Log.Information("[AICORE] Loading ME3Tweaks service: Third Party Mod Identification Service (TPMI)");
+
             ThirdPartyIdentificationService.ModDatabase = OnlineContent.FetchThirdPartyIdentificationManifest();
             if (willcheckforupdates)
             {
