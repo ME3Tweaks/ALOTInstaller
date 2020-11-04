@@ -450,7 +450,7 @@ namespace ALOTInstallerCore.Helpers
         /// <returns></returns>
         public static bool AttemptImportUnpackedFiles(string directory, List<ManifestFile> manifestFiles,
             bool switchFilesToUnpacked = true, Action<string, long, long> progressCallback = null,
-            bool forceCopy = false, bool unReadyOnly = false)
+            bool forceCopy = false, bool unReadyOnly = false, bool dontCheckFilename = false)
         {
             try
             {
@@ -463,8 +463,7 @@ namespace ALOTInstallerCore.Helpers
                     if (mf.Ready && unReadyOnly) continue;
                     if (mf.UnpackedSingleFilename != null)
                     {
-                        if (Path.GetFileName(mf.StagedName)
-                            .Equals(mf.Filename, StringComparison.InvariantCultureIgnoreCase))
+                        if (dontCheckFilename || Path.GetFileName(mf.StagedName).Equals(mf.Filename, StringComparison.InvariantCultureIgnoreCase))
                         {
                             // The ready file is the normal file but there is unpacked single file support for this
                             // This file was extracted or copied so it's still in library
@@ -489,9 +488,7 @@ namespace ALOTInstallerCore.Helpers
                                 }
                             }
                         }
-                        else if (!File.Exists(mf.StagedName) && Path.GetExtension(mf.StagedName)
-                            .Equals(Path.GetExtension(mf.UnpackedSingleFilename),
-                                StringComparison.InvariantCultureIgnoreCase))
+                        else if (mf.StagedName != null && !File.Exists(mf.StagedName) && Path.GetExtension(mf.StagedName).Equals(Path.GetExtension(mf.UnpackedSingleFilename), StringComparison.InvariantCultureIgnoreCase))
                         {
                             // Ready file is using unpacked file but the unpacked file isn't available so it returned the main one
                             // This needs to be moved back
@@ -540,7 +537,7 @@ namespace ALOTInstallerCore.Helpers
                             x => cancelDueToError = true
                         );
                     }
-
+                    movableFile.Key.UpdateReadyStatus();
                     if (switchFilesToUnpacked && !cancelDueToError && oldFname != movableFile.Key.GetUsedFilepath())
                     {
                         if (!movableFile.Key.IsBackedByUnpacked())

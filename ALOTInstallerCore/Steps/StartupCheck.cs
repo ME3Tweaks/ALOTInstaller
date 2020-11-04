@@ -58,14 +58,14 @@ namespace ALOTInstallerCore.Steps
             {
                 foreach (var game in Locations.AllMEGames)
                 {
-                    var path = Path.Combine(Settings.BuildLocation, "InstallationPackages", game.ToString());
+                    var path = Path.Combine(Settings.BuildLocation, game.ToString(),"InstallationPackages");
                     if (Directory.Exists(path))
                     {
                         Log.Information($@"[AICORE] Attempting reimport of possibly moved files from {path}");
                         TextureLibrary.AttemptImportUnpackedFiles(path,
                             ManifestHandler.GetAllManifestFiles()
                                 .Where(x => x.UnpackedSingleFilename != null && !x.Ready)
-                                .ToList(), true, null, false, unReadyOnly: true);
+                                .ToList(), false, null, false, unReadyOnly: true, dontCheckFilename: true);
                     }
                 }
             }
