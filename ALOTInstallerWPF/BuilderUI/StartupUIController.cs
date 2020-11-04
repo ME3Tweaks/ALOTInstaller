@@ -108,7 +108,7 @@ namespace ALOTInstallerWPF.BuilderUI
                 await window.ShowMessageAsync("Cannot run from temp directory", $"{Utilities.GetAppPrefixedName()} Installer cannot be run from the system's Temp directory. If this executable was run from within an archive, it needs to be extracted first.");
                 Environment.Exit(1);
             }
-            
+
             var pd = await window.ShowProgressAsync("Starting up", $"{Utilities.GetAppPrefixedName()} Installer is starting up. Please wait.");
             pd.SetIndeterminate();
             NamedBackgroundWorker bw = new NamedBackgroundWorker("StartupThread");
@@ -280,7 +280,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     {
                         Monitor.Wait(o);
                     }
-                });
+                }, x => pd.SetMessage(x));
 
 
                 pd.SetMessage("Preparing interface");

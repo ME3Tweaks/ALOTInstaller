@@ -450,7 +450,7 @@ namespace ALOTInstallerCore.Helpers
         /// <returns></returns>
         public static bool AttemptImportUnpackedFiles(string directory, List<ManifestFile> manifestFiles,
             bool switchFilesToUnpacked = true, Action<string, long, long> progressCallback = null,
-            bool forceCopy = false)
+            bool forceCopy = false, bool unReadyOnly = false)
         {
             try
             {
@@ -460,6 +460,7 @@ namespace ALOTInstallerCore.Helpers
                 Dictionary<ManifestFile, string> mfToUnpackedMap = new Dictionary<ManifestFile, string>();
                 foreach (var mf in manifestFiles)
                 {
+                    if (mf.Ready && unReadyOnly) continue;
                     if (mf.UnpackedSingleFilename != null)
                     {
                         if (Path.GetFileName(mf.StagedName)

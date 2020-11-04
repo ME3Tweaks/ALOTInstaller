@@ -62,7 +62,7 @@ namespace ALOTInstallerConsole.BuilderUI
                     },
                     x => x()
                     );
-
+                // TODO: Startup Checks
                 b.Result = alotManifestModePackage;
             };
             bw.RunWorkerCompleted += (a, b) =>

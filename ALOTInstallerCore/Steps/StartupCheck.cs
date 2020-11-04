@@ -16,10 +16,10 @@ namespace ALOTInstallerCore.Steps
     public static class StartupCheck
     {
         /// <summary>
-        /// Performs startup checks
+        /// Performs startup checks. This should be run after the texture library has been initially loaded
         /// </summary>
         /// <param name="messageCallback"></param>
-        public static void PerformStartupCheck(Action<string, string> messageCallback)
+        public static void PerformStartupCheck(Action<string, string> messageCallback, Action<string> setStartupMessageText)
         {
             PerformRAMCheck(messageCallback);
             PerformWriteCheck(messageCallback, true);
@@ -49,9 +49,26 @@ namespace ALOTInstallerCore.Steps
                     $"Texture library:\n{Settings.TextureLibraryLocation}\n\n" +
                     $"Texture staging:\n{Settings.BuildLocation}\n\n" +
                     $"You can update the paths where textures are stored before installation (Texture Library) and textures are built for installation (Staging) in the settings.";
-                messageCallback?.Invoke(title,message);
+                messageCallback?.Invoke(title, message);
             }
 
+            // Attempt to re-import any files not ready that exist on the same drive in staging/textures lib
+            if (new DriveInfo(Settings.TextureLibraryLocation).RootDirectory ==
+                new DriveInfo(Settings.BuildLocation).RootDirectory)
+            {
+                foreach (var game in Locations.AllMEGames)
+                {
+                    var path = Path.Combine(Settings.BuildLocation, "InstallationPackages", game.ToString());
+                    if (Directory.Exists(path))
+                    {
+                        Log.Information($@"[AICORE] Attempting reimport of possibly moved files from {path}");
+                        TextureLibrary.AttemptImportUnpackedFiles(path,
+                            ManifestHandler.GetAllManifestFiles()
+                                .Where(x => x.UnpackedSingleFilename != null && !x.Ready)
+                                .ToList(), true, null, false, unReadyOnly: true);
+                    }
+                }
+            }
         }
 
         private static void PerformRAMCheck(Action<string, string> messageCallback)
