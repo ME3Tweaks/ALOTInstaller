@@ -101,11 +101,22 @@ namespace ALOTInstallerWPF.BuilderUI
                 window.Title = $"{Utilities.GetAppPrefixedName()} Installer {Utilities.GetAppVersion()}";
             }
             catch { }
+
+            if (Path.GetTempPath().StartsWith(Utilities.GetExecutablePath(), StringComparison.InvariantCultureIgnoreCase))
+            {
+                // Running from temp! This is not allowed
+                await window.ShowMessageAsync("Cannot run from temp directory", $"{Utilities.GetAppPrefixedName()} Installer cannot be run from the system's Temp directory. If this executable was run from within an archive, it needs to be extracted first.");
+                Environment.Exit(1);
+            }
+            
             var pd = await window.ShowProgressAsync("Starting up", $"{Utilities.GetAppPrefixedName()} Installer is starting up. Please wait.");
             pd.SetIndeterminate();
             NamedBackgroundWorker bw = new NamedBackgroundWorker("StartupThread");
             bw.DoWork += (a, b) =>
             {
+
+
+
                 ALOTInstallerCoreLib.Startup(SetWrapperLogger, RunOnUIThread, startTelemetry, stopTelemetry);
                 // Setup telemetry handlers
                 CoreAnalytics.TrackEvent = TelemetryController.TrackEvent;
@@ -241,11 +252,6 @@ namespace ALOTInstallerWPF.BuilderUI
 
                 if (ManifestHandler.MasterManifest != null)
                 {
-                    if (ManifestHandler.MasterManifest.Source != ManifestHandler.ManifestSource.Online)
-                    {
-
-                    }
-
                     ManifestHandler.SetCurrentMode(ManifestHandler.GetDefaultMode());
                     pd.SetMessage("Preparing texture library");
                     foreach (var v in ManifestHandler.MasterManifest.ManifestModePackageMappping)
