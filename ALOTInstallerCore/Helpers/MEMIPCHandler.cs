@@ -67,10 +67,16 @@ namespace ALOTInstallerCore.Helpers
         private static ConcurrentDictionary<int, int> ActiveMEMProcessIDs = new ConcurrentDictionary<int, int>();
 
         /// <summary>
+        /// Flag to prevent MEM IPC handler from firing further. This can happen when app is shutting down and install thread is running
+        /// </summary>
+        private static bool SuppressFurtherMEMLaunches;
+
+        /// <summary>
         /// Kills all known active instances of MEM.
         /// </summary>
         public static void KillAllActiveMEMInstances()
         {
+            SuppressFurtherMEMLaunches = true;
             foreach (var v in ActiveMEMProcessIDs.Keys.ToList()) // To list as this may try to be concurrently modified. I'm not sure how that works in a concurrent dictionary but removing keys in the loop func will probably do that.
             {
                 try
@@ -185,11 +191,9 @@ namespace ALOTInstallerCore.Helpers
             }
         }
 
-        private static readonly UTF8Encoding unicode = new UTF8Encoding();
-
-
         private static async void RunMEMIPC(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, Action<string> memCrashLine = null, CancellationToken cancellationToken = default)
         {
+            if (SuppressFurtherMEMLaunches) return;
             bool exceptionOcurred = false;
             DateTime lastCacheoutput = DateTime.Now;
             void internalHandleIPC(string command, string parm)

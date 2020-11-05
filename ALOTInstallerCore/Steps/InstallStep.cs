@@ -157,8 +157,10 @@ namespace ALOTInstallerCore.Steps
             InstallFailed_UnknownError
         }
 
+
         public void InstallTextures(object sender, DoWorkEventArgs doWorkEventArgs)
         {
+
             // Where the compiled .mem and staged other files will be
             Log.Information(@"[AICORE] Beginning InstallTextures() thread.");
             #region Presetup variables
@@ -225,6 +227,11 @@ namespace ALOTInstallerCore.Steps
 
             #endregion
 
+            #region setup bottom text
+            SetBottomTextCallback?.Invoke("Setting up installer");
+            SetBottomTextVisibilityCallback?.Invoke(true);
+            #endregion
+
             #region Attempt clearing read-write flag
 
 #if WINDOWS
@@ -249,7 +256,7 @@ namespace ALOTInstallerCore.Steps
             }
             #endregion
 
-            NotifyClosingWillBreakGame?.Invoke(true);
+            NotifyClosingWillBreakGame?.Invoke(true); //Start of critical section
 
             #region Preinstall ALOV mods
 
@@ -527,7 +534,7 @@ namespace ALOTInstallerCore.Steps
 
             #endregion
 
-            NotifyClosingWillBreakGame?.Invoke(false);
+            NotifyClosingWillBreakGame?.Invoke(false); // End of critical section
 
             #region Cleanup
             try

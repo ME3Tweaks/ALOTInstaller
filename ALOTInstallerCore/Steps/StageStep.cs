@@ -517,16 +517,16 @@ namespace ALOTInstallerCore.Steps
                     // File must just be moved directly it seems
                     var destF = Path.Combine(finalBuiltPackagesDestination, $"{installerFile.BuildID:D3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
 
-                    if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory == new DriveInfo(finalBuiltPackagesDestination).RootDirectory)
+                    if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory.Name == new DriveInfo(finalBuiltPackagesDestination).RootDirectory.Name)
                     {
                         // Move
-                        Log.Information($"[AICORE] [{prefix}] Moving unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                        Log.Information($"[AICORE] [{prefix}] Moving unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
                         File.Move(installerFile.GetUsedFilepath(), destF);
                     }
                     else
                     {
                         //Copy
-                        Log.Information($"[AICORE] [{prefix}] Copying unpacked file to build directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                        Log.Information($"[AICORE] [{prefix}] Copying unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
                         CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
                             (x, y) =>
                             {

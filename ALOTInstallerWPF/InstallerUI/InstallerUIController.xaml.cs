@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -40,6 +41,9 @@ namespace ALOTInstallerWPF.InstallerUI
     /// </summary>
     public partial class InstallerUIController : UserControl, INotifyPropertyChanged
     {
+        // Used to suppress further closing dialogs from showing up, if they somehow do
+        private bool SignaledWindowClose;
+
         private bool musicOn = false;
         public PackIconIoniconsKind MusicIcon { get; private set; }
         public PackIconIoniconsKind BigIconKind { get; private set; }
@@ -298,12 +302,14 @@ namespace ALOTInstallerWPF.InstallerUI
 
         private void notifyClosingWillBreakGame(bool closingWillBreakGame)
         {
-            Application.Current.Invoke(() =>
+            Application.Current?.Invoke(() =>
             {
-                if (Application.Current.MainWindow is MainWindow mw)
+                if (Application.Current?.MainWindow is MainWindow mw)
                 {
                     if (closingWillBreakGame)
                     {
+                        // Ensure we don't add a duplicate by removing any previous one that was added
+                        mw.Closing -= ShowClosingWillBreakGamePrompt;
                         mw.Closing += ShowClosingWillBreakGamePrompt;
                     }
                     else
@@ -314,32 +320,34 @@ namespace ALOTInstallerWPF.InstallerUI
             });
         }
 
-        private void ShowClosingWillBreakGamePrompt(object sender, CancelEventArgs e)
+        private async void ShowClosingWillBreakGamePrompt(object sender, CancelEventArgs e)
         {
+            if (SignaledWindowClose) return; // Nothing to handle here
             Log.Error(@"[AIWPF] User trying to close installer while critical install is in progress. Prompting user to NOT do this.");
-            Application.Current.Invoke(async () =>
+            if (Application.Current.MainWindow is MainWindow mw)
             {
-                if (Application.Current.MainWindow is MainWindow mw)
+                e.Cancel = true; //Cancel the close request. The dialog will re-throw the close
+                var closeResult = await mw.ShowMessageAsync("Closing the installer now will break the game", "The installer is currently in a state where closing it will leave the game in a broken state. Your game will have to be restored to vanilla, either through a restore operation (if you made a backup) or a complete deletion of the game directory and then a reinstall.\n\n" +
+                                                                                                             "If you're having issues with the installer, please come to the ALOT Discord, which can be found in the settings.\n\n" +
+                                                                                                             "Close the installer?", MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                                                                                                             {
+                                                                                                                 AffirmativeButtonText = "Close installer",
+                                                                                                                 NegativeButtonText = "Keep installer open",
+                                                                                                                 DefaultButtonFocus = MessageDialogResult.Negative
+                                                                                                             }, 75);
+                if (closeResult == MessageDialogResult.Affirmative)
                 {
-                    var closeResult = await mw.ShowMessageAsync("Closing the installer now will break the game", "The installer is currently in a state where closing it will leave the game in a broken state. Your game will have to be restored to vanilla to install textures further.\n\n" +
-                                                                              "If you're having issues with the installer, please come to the ALOT Discord, which can be found in the settings.\n\n" +
-                                                                              "Close the installer?", MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
-                                                                              {
-                                                                                  AffirmativeButtonText = "Close installer",
-                                                                                  NegativeButtonText = "Keep installer open",
-                                                                                  DefaultButtonFocus = MessageDialogResult.Negative
-                                                                              }, 75);
-                    if (closeResult == MessageDialogResult.Affirmative)
-                    {
-                        Log.Error(@"[AIWPF] User has chosen to close the installer while critical install is still in progress. Game will likely be in broken state");
-                    }
-                    else
-                    {
-                        Log.Information(@"[AIWPF] User didn't close the installer");
-                        e.Cancel = true;
-                    }
+                    Log.Error(@"[AIWPF] User has chosen to close the installer while critical install is still in progress. Game will likely be in broken state");
+                    SignaledWindowClose = true;
+                    mw.Closing -= ShowClosingWillBreakGamePrompt;
+                    mw.Close(); //Rethrow the close
                 }
-            });
+                else
+                {
+                    Log.Information(@"[AIWPF] User didn't close the installer");
+                    e.Cancel = true;
+                }
+            }
         }
 
 
