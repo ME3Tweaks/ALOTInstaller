@@ -391,6 +391,10 @@ namespace ALOTInstallerWPF.InstallerUI
                 {
                     CurrentTip = $"Texture installation succeeded. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
                 }
+                else if (installedInfo != null)
+                {
+                    CurrentTip = $"This installation has been texture modded. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
+                }
                 else
                 {
                     TipsVisible = false;
