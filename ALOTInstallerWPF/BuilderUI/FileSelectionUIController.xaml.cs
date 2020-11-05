@@ -456,6 +456,7 @@ namespace ALOTInstallerWPF.BuilderUI
             }
 
             TextureLibrary.SetupLibraryWatcher(newFileSet.OfType<ManifestFile>().ToList(), manifestFileReadyStateChanged);
+            UpdateReadyness();
         }
 
         public void OnSelectedHeaderChanged()
@@ -464,6 +465,11 @@ namespace ALOTInstallerWPF.BuilderUI
         }
 
         private void manifestFileReadyStateChanged(ManifestFile changedManifestFile)
+        {
+            UpdateReadyness();
+        }
+
+        private void UpdateReadyness()
         {
             var readyness = ManifestHandler.GetNonOptionalReadyness();
             ProgressValue = readyness.ready;

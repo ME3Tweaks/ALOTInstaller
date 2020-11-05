@@ -521,7 +521,7 @@ namespace ALOTInstallerCore.Helpers
         }
 
         /// <summary>
-        /// Gets the level of readiness of non-optional manifest files. THis can be used to show the user how 'ready' the recommended experience for the current mode is before install
+        /// Gets the level of readiness of non-optional manifest files. This can be used to show the user how 'ready' the recommended experience for the current mode is before install
         /// </summary>
         /// <returns></returns>
         public static (long ready, long recommendedCount) GetNonOptionalReadyness()
