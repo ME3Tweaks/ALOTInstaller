@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -25,6 +26,7 @@ using ME3ExplorerCore.Packages;
 using Notifications.Wpf.Core;
 using Serilog;
 using Application = System.Windows.Application;
+using ZipFile = System.IO.Compression.ZipFile;
 
 namespace ALOTInstallerWPF.BuilderUI
 {
@@ -193,16 +195,13 @@ namespace ALOTInstallerWPF.BuilderUI
 
         }
 
-        private async void startPostStartup()
+        private void startPostStartup()
         {
-
-
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("PostStartup");
             nbw.DoWork += async (sender, args) =>
             {
                 try
                 {
-
                     if (ManifestHandler.MasterManifest == null || ManifestHandler.MasterManifest.MusicPackMirrors.Count == 0)
                     {
                         // Nothing wae can do.
@@ -617,7 +616,12 @@ namespace ALOTInstallerWPF.BuilderUI
                         else
                         {
                             // It's a file
-                            if (TextureLibrary.ImportableFileTypes.Contains(Path.GetExtension(f), StringComparer.InvariantCultureIgnoreCase))
+
+                            if (Path.GetFileName(f) == "InstallerSupportPackage.zip")
+                            {
+                                IngestSupportPackage(f);
+                            }
+                            else if (TextureLibrary.ImportableFileTypes.Contains(Path.GetExtension(f), StringComparer.InvariantCultureIgnoreCase))
                             {
                                 // Not supported.
                                 e.Effects = DragDropEffects.None;
@@ -627,6 +631,34 @@ namespace ALOTInstallerWPF.BuilderUI
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Installs an archive of supporting files that are typically downloaded
+        /// </summary>
+        /// <param name="packagePath"></param>
+        private async void IngestSupportPackage(string packagePath)
+        {
+            Log.Information(@"[AIWPF] Installing support package for the installer");
+            using ZipArchive za = ZipFile.OpenRead(packagePath);
+            za.ExtractToDirectory(Locations.AppDataFolder(), true);
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                await mw.ShowMessageAsync("Support package installed",
+                    "The support package has been installed. The installer should be restarted.");
+            }
+            //// MEM, manifest
+            //za.Entries.FirstOrDefault(x => x.Name == "MassEffectModderNoGui.exe").ExtractToFile(Locations.MEMPath());
+            //za.Entries.FirstOrDefault(x => x.Name == "manifest.xml").ExtractToFile(Locations.GetCachedManifestPath());
+
+            //// Music pack
+            //var me1Mp3Entry = za.Entries.FirstOrDefault(x => x.Name == "me1.mp3");
+            //var me2Mp3Entry = za.Entries.FirstOrDefault(x => x.Name == "me2.mp3");
+            //var me3Mp3Entry = za.Entries.FirstOrDefault(x => x.Name == "me3.mp3");
+            //me1Mp3Entry?.ExtractToFile(Path.Combine(Locations.MusicDirectory, "me1.mp3"));
+            //me2Mp3Entry?.ExtractToFile(Path.Combine(Locations.MusicDirectory, "me2.mp3"));
+            //me3Mp3Entry?.ExtractToFile(Path.Combine(Locations.MusicDirectory, "me3.mp3"));
+
         }
 
         private void attemptImportFolder(string folderPath)

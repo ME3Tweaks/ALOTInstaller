@@ -226,22 +226,9 @@ namespace ALOTInstallerWPF.BuilderUI
 
                 void errorUpdating(Exception e)
                 {
+                    Log.Error($@"[AIWPF] Error updating MEM: {e.Message}");
                     // ?? What do we do here.
                 }
-
-
-                pd.SetMessage("Checking for MassEffectModderNoGui updates");
-                MEMUpdater.UpdateMEM(downloadProgressChanged, errorUpdating, setStatus);
-
-                pd.SetMessage("Loading installer framework");
-                handleM3Passthrough();
-
-                ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
-                BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
-
-                pd.SetMessage("Loading installer manifests");
-                var alotManifestModePackage = ManifestHandler.LoadMasterManifest(x => pd.SetMessage(x));
-
 
                 void setStatus(string message)
                 {
@@ -249,47 +236,67 @@ namespace ALOTInstallerWPF.BuilderUI
                     pd.SetMessage(message);
                 }
 
-                b.Result = alotManifestModePackage;
+                pd.SetMessage("Checking for MassEffectModderNoGui updates");
+                MEMUpdater.UpdateMEM(downloadProgressChanged, errorUpdating, setStatus);
 
-                if (ManifestHandler.MasterManifest != null)
+                try
                 {
-                    ManifestHandler.SetCurrentMode(ManifestHandler.GetDefaultMode());
-                    pd.SetMessage("Preparing texture library");
-                    foreach (var v in ManifestHandler.MasterManifest.ManifestModePackageMappping)
-                    {
-                        TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(v.Key));
-                    }
-                }
-                else
-                {
-                    // This shouldn't happen...
-                }
+                    pd.SetMessage("Loading installer framework");
+                    handleM3Passthrough();
 
-                pd.SetMessage("Performing startup checks");
-                StartupCheck.PerformStartupCheck((title, message) =>
-                {
-                    object o = new object();
-                    Application.Current.Dispatcher.Invoke(async () =>
+                    ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
+                    BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
+
+                    pd.SetMessage("Loading installer manifests");
+                    var alotManifestModePackage = ManifestHandler.LoadMasterManifest(x => pd.SetMessage(x));
+
+                    b.Result = alotManifestModePackage;
+                    if (ManifestHandler.MasterManifest != null)
                     {
-                        if (Application.Current.MainWindow is MainWindow mw)
+                        ManifestHandler.SetCurrentMode(ManifestHandler.GetDefaultMode());
+                        pd.SetMessage("Preparing texture library");
+                        foreach (var v in ManifestHandler.MasterManifest.ManifestModePackageMappping)
                         {
-                            await mw.ShowMessageAsync(title, message, ContentWidthPercent: 75);
-                            lock (o)
-                            {
-                                Monitor.Pulse(o);
-                            }
+                            TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetManifestFilesForMode(v.Key));
                         }
-                    });
-                    lock (o)
-                    {
-                        Monitor.Wait(o);
                     }
-                }, x => pd.SetMessage(x));
+                    else
+                    {
+                        // This shouldn't happen...
+                    }
 
+                    pd.SetMessage("Performing startup checks");
+                    StartupCheck.PerformStartupCheck((title, message) =>
+                    {
+                        object o = new object();
+                        Application.Current.Dispatcher.Invoke(async () =>
+                        {
+                            if (Application.Current.MainWindow is MainWindow mw)
+                            {
+                                await mw.ShowMessageAsync(title, message, ContentWidthPercent: 75);
+                                lock (o)
+                                {
+                                    Monitor.Pulse(o);
+                                }
+                            }
+                        });
+                        lock (o)
+                        {
+                            Monitor.Wait(o);
+                        }
+                    }, x => pd.SetMessage(x));
+                }
+                catch (Exception e)
+                {
+                    Log.Error(@"[AIWPF] There was an error starting up the installer!");
+                    e.WriteToLog("[AIWPF] ");
+                }
 
                 pd.SetMessage("Preparing interface");
+                var hasWorkingMEM = MEMIPCHandler.TestWorkingMEM();
+
                 Thread.Sleep(250); // This will allow this message to show up for moment so user can see it.
-                Application.Current.Dispatcher.Invoke(() =>
+                Application.Current.Dispatcher.Invoke(async () =>
                 {
                     if (Application.Current.MainWindow is MainWindow mw)
                     {
@@ -299,6 +306,12 @@ namespace ALOTInstallerWPF.BuilderUI
                         mw.DiagnosticsFlyoutControl.Content = new DiagnosticsFlyout();
                         mw.FileImporterFlyoutContent = new FileImporterFlyout();
                         mw.LODSwitcherFlyout.Content = mw.LODSwitcherFlyoutContent = new LODSwitcherFlyout();
+                        if (!hasWorkingMEM)
+                        {
+                            await mw.ShowMessageAsync("Required components are not available",
+                                "Some components for installation are not available, likely due to network issues (blocking, no internet, etc). To install these components, download the 'Installer Support Package' from the ALOT page on NexusMods. Drag the downloaded zip file onto this window once you have closed this dialog.",
+                                ContentWidthPercent: 75);
+                        }
                     }
                 });
             };

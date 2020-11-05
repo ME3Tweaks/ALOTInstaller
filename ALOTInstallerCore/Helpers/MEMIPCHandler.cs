@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects;
 using CliWrap;
@@ -88,6 +89,22 @@ namespace ALOTInstallerCore.Helpers
             }
         }
 
+        /// <summary>
+        /// Tests if MEM is working and available
+        /// </summary>
+        /// <returns></returns>
+        public static bool TestWorkingMEM()
+        {
+            try
+            {
+                var version = MEMIPCHandler.GetMemVersion(true);
+                return version > 421;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
 
         /// <summary>
         /// Returns the version number for MEM, or -1 if it couldn't be retrieved. The result is cached into the variable MassEffectModderNoGuiVerison
@@ -194,6 +211,17 @@ namespace ALOTInstallerCore.Helpers
         private static async void RunMEMIPC(string arguments, Action<int> applicationStarted = null, Action<string, string> ipcCallback = null, Action<string> applicationStdErr = null, Action<int> applicationExited = null, Action<string> memCrashLine = null, CancellationToken cancellationToken = default)
         {
             if (SuppressFurtherMEMLaunches) return;
+            if (!File.Exists(Locations.MEMPath()))
+            {
+                Task.Run(() =>
+                {
+                    // this is so the locks still work
+                    Thread.Sleep(500);
+                    applicationExited?.Invoke(-1);
+                });
+                Log.Error(@"[AICORE] Can't run MassEffectModderNoGui: It doesn't exist! You may need to install the support package since it didn't seem to auto download");
+                return; //Can't run if it doesn't exist!
+            }
             bool exceptionOcurred = false;
             DateTime lastCacheoutput = DateTime.Now;
             void internalHandleIPC(string command, string parm)

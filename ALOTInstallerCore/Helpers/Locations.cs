@@ -67,9 +67,13 @@ namespace ALOTInstallerCore.Helpers
             forcedMemPath = forcedPath;
         }
 #if WINDOWS
-        public static string MEMPath() => forcedMemPath ?? Path.Combine(AppDataFolder(), @"MassEffectModderNoGui.exe");
+        public static string MEMPath(bool forceCached = false) => !forceCached ? 
+            forcedMemPath ?? Path.Combine(AppDataFolder(), @"MassEffectModderNoGui.exe") :
+            Path.Combine(AppDataFolder(), @"MassEffectModderNoGui.exe");
 #elif LINUX
-        public static string MEMPath() => forcedMemPath ?? Path.Combine(AppDataFolder(), @"MassEffectModderNoGui");
+        public static string MEMPath(bool forceCached = false) => !forceCached ? 
+            forcedMemPath ?? Path.Combine(AppDataFolder(), @"MassEffectModderNoGui.exe") :
+            Path.Combine(AppDataFolder(), @"MassEffectModderNoGui");
 #endif
 
         public static GameTarget ME1Target { get; set; }
