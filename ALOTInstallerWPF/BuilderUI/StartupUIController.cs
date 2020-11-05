@@ -309,7 +309,7 @@ namespace ALOTInstallerWPF.BuilderUI
                         if (!hasWorkingMEM)
                         {
                             await mw.ShowMessageAsync("Required components are not available",
-                                "Some components for installation are not available, likely due to network issues (blocking, no internet, etc). To install these components, download the 'Installer Support Package' from the ALOT page on NexusMods. Drag the downloaded zip file onto this window once you have closed this dialog.",
+                                "Some components for installation are not available, likely due to network issues (blocking, no internet, etc). To install these components, folow the 'How to install the Installer Support Package' directions on any of the ALOT pages on NexusMods. The installer will not work without these files installed.",
                                 ContentWidthPercent: 75);
                         }
                     }
