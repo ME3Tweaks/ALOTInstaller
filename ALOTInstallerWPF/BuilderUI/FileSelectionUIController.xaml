@@ -276,21 +276,19 @@
                     <MenuItem Header="Open download page" 
                               Command="{Binding Parent.PlacementTarget.Tag.DataContext.OpenModWebpageCommand,
                                             RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" 
-                              Visibility="{Binding PlacementTarget.IsEnabled, RelativeSource={RelativeSource AncestorType=ContextMenu},
-                                            Converter={StaticResource BoolToVisibilityConverter}}"
+                              Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolToVisibilityConverter}}"
                               CommandParameter="{Binding}"/>
                     <MenuItem Header="Open file location" ToolTip="Opens location of file on disk" 
                               Command="{Binding Parent.PlacementTarget.Tag.DataContext.OpenFileOnDiskCommand,
                                             RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}}" 
-                              Visibility="{Binding PlacementTarget.IsEnabled, RelativeSource={RelativeSource AncestorType=ContextMenu},
-                                            Converter={StaticResource BoolToVisibilityConverter}}"
+                              Visibility="{Binding IsEnabled, RelativeSource={RelativeSource Self}, Converter={StaticResource BoolToVisibilityConverter}}"
                               CommandParameter="{Binding}"/>
                     <MenuItem IsCheckable="True" Header="Install this file" 
                               IsChecked="{Binding Disabled, Converter={StaticResource BoolInverterConverter}}" 
                               StaysOpenOnClick="True" 
                               Visibility="{Binding Self, Converter={StaticResource ToggleEnabledVisibilityConverter}}"
                               CommandParameter="{Binding}"
-                              />
+                    />
                     <!--<MenuItem Header="Remove file" Click="ContextMenu_RemoveFile" ToolTip="Removes file from ALOT Installer list. This does not remove the file on disk."/>-->
                 </ContextMenu>
             </ListBox.Resources>

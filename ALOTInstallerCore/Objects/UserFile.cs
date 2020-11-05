@@ -46,7 +46,13 @@ namespace ALOTInstallerCore.Objects
             var fp = GetUsedFilepath();
             Ready = File.Exists(fp);
             Debug.WriteLine($"USER {FriendlyName} ready: {Ready}");
-            return oldReady != Ready;
+            var readyStateChanged = oldReady != Ready;
+            if (readyStateChanged)
+            {
+                if (!Ready) Description = "File no longer available";
+                NotifyStatusUpdate();
+            }
+            return readyStateChanged;
         }
 
         /// <summary>

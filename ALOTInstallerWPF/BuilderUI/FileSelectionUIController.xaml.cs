@@ -281,12 +281,14 @@ namespace ALOTInstallerWPF.BuilderUI
 
         private void LoadCommands()
         {
-            OpenModWebpageCommand = new RelayCommand(OpenModWebpage);
+            OpenModWebpageCommand = new RelayCommand(OpenModWebpage, CanOpenWebpage);
             OpenFileOnDiskCommand = new RelayCommand(OpenFileOnDisk, CanOpenFileOnDisk);
             OpenSettingsCommand = new GenericCommand(OpenSettings, CanOpenSettings);
             InstallTexturesCommand = new GenericCommand(BeginInstallTextures, CanInstallTextures);
             ImportAssistantCommand = new GenericCommand(OpenImportAssistant, () => !IsStaging);
         }
+
+        private bool CanOpenWebpage(object obj) => obj is ManifestFile mf && mf.DownloadLink != null;
 
         private void OpenImportAssistant()
         {
