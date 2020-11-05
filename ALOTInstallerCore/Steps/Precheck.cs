@@ -356,7 +356,7 @@ namespace ALOTInstallerCore.Steps
 
             if (shouldCheck)
             {
-                var meuitmFile = package.FilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.MEUITMVER > 0);
+                var meuitmFile = package.FilesToInstall.FirstOrDefault(x => x.AlotVersionInfo.MEUITMVER > 0 && x.Ready);
                 if (meuitmFile == null)
                 {
                     var result = missingRecommandedItemsDialogCallback?.Invoke("MEUITM not available for installation",
