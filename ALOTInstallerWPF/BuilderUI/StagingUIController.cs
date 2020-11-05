@@ -176,7 +176,7 @@ namespace ALOTInstallerWPF.BuilderUI
             {
                 if (Application.Current.MainWindow is MainWindow mw)
                 {
-                    await mw.ShowMessageAsync("Error occurred while staging textures", message);
+                    await mw.ShowMessageAsync("Error occurred while staging textures", message, ContentWidthPercent: 75);
                 }
             });
         }

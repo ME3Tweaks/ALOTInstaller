@@ -284,7 +284,9 @@ namespace ALOTInstallerCore.Steps
 
             if (_abortStaging)
             {
+                Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
                 // Error callback goes here
+                ErrorStagingCallback?.Invoke(@"There was an error staging files for installation. You can review the application log for more information about why staging failed.");
                 e.Result = false;
                 return;
             }
@@ -293,10 +295,29 @@ namespace ALOTInstallerCore.Steps
             {
                 NotifyAddonBuild?.Invoke();
                 // Addon needs built
-                BuildMEMPackageFile("ALOT Addon", addonStagingPath, Path.Combine(finalBuiltPackagesDestination, $"{_addonID:D3}_ALOTAddon.mem"), _installOptions.InstallTarget.Game, UpdateProgressCallback);
+                var resultcode = BuildMEMPackageFile("ALOT Addon", addonStagingPath, 
+                    Path.Combine(finalBuiltPackagesDestination, $"{_addonID:D3}_ALOTAddon.mem"), _installOptions.InstallTarget.Game, 
+                    out var buildFailedReason,
+                    UpdateProgressCallback);
+                if (resultcode != 0 || buildFailedReason != null)
+                {
+                    Log.Error($@"[AICORE] The ALOT Addon package failed to build");
+                    _abortStaging = true;
+                    ErrorStagingCallback?.Invoke(@"The ALOT Addon package failed to build. You can review the application log for more information about why it failed to build.");
+                }
             }
 
+
+
             Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
+
+            if (_abortStaging)
+            {
+                Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
+                // Error callback goes here
+                e.Result = false;
+                return;
+            }
             e.Result = true;
         }
 
@@ -625,15 +646,16 @@ namespace ALOTInstallerCore.Steps
 
 
                         // don't add progress indicator here. We don't need more than the text
-                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_USER_{uf.FriendlyName}.mem"), _installOptions.InstallTarget.Game, installerFile: uf);
-                        if (resultcode != 0)
+                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_USER_{uf.FriendlyName}.mem"), 
+                            _installOptions.InstallTarget.Game, out var buildFailedReason, installerFile: uf);
+                        if (resultcode != 0 || buildFailedReason != null)
                         {
                             Log.Error($@"[AICORE] [{prefix}] User file failed to build");
                             error = true;
                             installerFile.Disabled = true;
-                            installerFile.StatusText = $"Failed to build, exit code {resultcode}. File has been disabled";
+                            installerFile.StatusText = buildFailedReason ?? $"Failed to build, exit code {resultcode}. File has been disabled";
                             _abortStaging = true;
-                        }
+                        } 
                     }
                 }
                 else
@@ -665,13 +687,15 @@ namespace ALOTInstallerCore.Steps
                     {
                         // Requires build
                         // don't add progress indicator here. We don't need more than the text
-                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_USER_{uf.FriendlyName}.mem"), _installOptions.InstallTarget.Game);
-                        if (resultcode != 0)
+                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, 
+                            Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_USER_{uf.FriendlyName}.mem"), 
+                            _installOptions.InstallTarget.Game, out var buildFailedReason);
+                        if (resultcode != 0 || buildFailedReason != null)
                         {
                             Log.Error($@"[AICORE] [{prefix}] User file failed to build");
                             error = true;
                             installerFile.Disabled = true;
-                            installerFile.StatusText = $"Failed to build, exit code {resultcode}. File has been disabled";
+                            installerFile.StatusText = buildFailedReason ?? $"Failed to build, exit code {resultcode}. File has been disabled";
                             _abortStaging = true;
                         }
                     }
@@ -987,8 +1011,10 @@ namespace ALOTInstallerCore.Steps
         /// <param name="sourceDir"></param>
         /// <param name="outputFile"></param>
         /// <param name="targetGame"></param>
-        private int BuildMEMPackageFile(string uiname, string sourceDir, string outputFile, MEGame targetGame, Action<int, int> progressCallback = null, InstallerFile installerFile = null)
+        private int BuildMEMPackageFile(string uiname, string sourceDir, string outputFile, MEGame targetGame, out string buildFailedReason, Action<int, int> progressCallback = null, InstallerFile installerFile = null)
         {
+            buildFailedReason = null;
+            string localBuildFailedReason = null; // We can't use out params in lambdas
             void handleIPC(string command, string param)
             {
                 switch (command)
@@ -1009,6 +1035,10 @@ namespace ALOTInstallerCore.Steps
                         Log.Information($"[AICORE] MEMCompiler PROCESSING_FILE {param}");
                         // Unpacking file
                         break;
+                    case "ERROR_NO_BUILDABLE_FILES":
+                        Log.Error(@"[AICORE] MEM reports there are no buildable files. This may occur if the targeted textures are not part of the basegame/official dlc set - installing textures from non-mem file to custom textures is not yet supported");
+                        localBuildFailedReason = "Install package not built: no usable files. See log for more info";
+                        break;
                     default:
                         Debug.WriteLine($"Unhandled IPC: {command} {param}");
                         break;
@@ -1022,6 +1052,7 @@ namespace ALOTInstallerCore.Steps
                 handleIPC,
                 x => Log.Error($"[AICORE] StdError building {uiname}: {x}"),
                 x => exitcode = x); //Change to catch exit code of non zero.
+            buildFailedReason = localBuildFailedReason;
             return exitcode;
         }
 
