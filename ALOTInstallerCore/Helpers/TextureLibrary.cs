@@ -73,17 +73,19 @@ namespace ALOTInstallerCore.Helpers
                 };
                 fullRefreshTimer.Elapsed += async (a, b) =>
                 {
-                    Debug.WriteLine("Full ready status refresh");
-                    await Task.Run(() =>
+                    if (ManifestHandler.MasterManifest != null)
                     {
-                        var updatedFiles =
-                            TextureLibrary.ResetAllReadyStatuses(TextureLibrary.manifestFiles.OfType<InstallerFile>()
-                                .ToList());
-                        if (updatedFiles.Any())
+                        Debug.WriteLine("Full ready status refresh");
+                        await Task.Run(() =>
                         {
-                            readyStatusChangedCallback?.Invoke(null);
-                        }
-                    });
+                            var updatedFiles =
+                                TextureLibrary.ResetAllReadyStatuses(ManifestHandler.MasterManifest.GetAllInstallerFiles());
+                            if (updatedFiles.Any())
+                            {
+                                readyStatusChangedCallback?.Invoke(null);
+                            }
+                        });
+                    }
                 };
             }
             else
@@ -810,7 +812,7 @@ namespace ALOTInstallerCore.Helpers
                     ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].ManifestFiles.Add(newObj);
                     importResults.Add(new ImportResult()
                     {
-                        Result = "Added for install",
+                        Result = $"Added for install",
                         ImportName = matchingPIM.FriendlyName,
                         Accepted = true
                     });
@@ -841,15 +843,17 @@ namespace ALOTInstallerCore.Helpers
                         Debug.WriteLine($@"Ingesting user file {file}");
                         var failedToAddReason = ManifestHandler.MasterManifest.ManifestModePackageMappping[ManifestHandler.CurrentMode].AttemptAddUserFile(file, selectGameCallback, out var addedUserFile);
                         Debug.WriteLine($@"Ingested user file {file}");
-
-                        importResults.Add(new ImportResult()
+                        var importResult = new ImportResult()
                         {
                             Result = failedToAddReason ?? "Added for install",
                             ImportName = Path.GetFileName(file),
                             Accepted = failedToAddReason == null
-                        });
+                        };
+
+                        importResults.Add(importResult);
                         if (addedUserFile != null)
                         {
+                            importResult.Result += $" ({addedUserFile.ApplicableGames.ToCommaUIString()})";
                             addedFileToModeCallback?.Invoke(addedUserFile);
                         }
                         continue;

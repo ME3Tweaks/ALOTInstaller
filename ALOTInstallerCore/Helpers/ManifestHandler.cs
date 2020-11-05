@@ -67,6 +67,7 @@ namespace ALOTInstallerCore.Helpers
             CurrentMode = mode;
             if (oldMode != CurrentMode)
             {
+                Log.Information($@"[AICORE] Change to new mode: {CurrentMode}");
                 OnManifestModeChanged?.Invoke(CurrentMode);
             }
         }
@@ -566,6 +567,11 @@ namespace ALOTInstallerCore.Helpers
                 return mode;
             }
             return ManifestMode.Free;
+        }
+
+        public static IEnumerable<InstallerFile> GetAllFilesForMode(ManifestMode newMode)
+        {
+            throw new NotImplementedException();
         }
     }
 }

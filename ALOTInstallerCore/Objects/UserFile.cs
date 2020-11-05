@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using ALOTInstallerCore.Objects.Manifest;
 
 namespace ALOTInstallerCore.Objects
@@ -6,7 +8,7 @@ namespace ALOTInstallerCore.Objects
     /// <summary>
     /// A user file is a file that is not listed in the manifest and is added to the installer by the user
     /// </summary>
-    public class UserFile : InstallerFile
+    public class UserFile : InstallerFile, INotifyPropertyChanged //requires INotifyPropertyChanged so Fody injects into it
     {
 
         public UserFile()
@@ -43,6 +45,7 @@ namespace ALOTInstallerCore.Objects
             var oldReady = Ready;
             var fp = GetUsedFilepath();
             Ready = File.Exists(fp);
+            Debug.WriteLine($"USER {FriendlyName} ready: {Ready}");
             return oldReady != Ready;
         }
 

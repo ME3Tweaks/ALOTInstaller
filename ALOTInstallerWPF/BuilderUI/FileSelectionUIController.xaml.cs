@@ -447,12 +447,10 @@ namespace ALOTInstallerWPF.BuilderUI
         private void OnManifestModeChanged(ManifestMode newMode)
         {
             SelectedHeader = AvailableModes.FirstOrDefault(x => x.Mode == newMode); //Change header. This won't retrigger this since mode should already be set
-            var currentUserFiles = CurrentModeFiles.Where(x => x is UserFile);
-            var newFileSet = ManifestHandler.GetManifestFilesForMode(newMode);
+            var newFileSet = ManifestHandler.GetManifestFilesForMode(newMode, true);
             using (DisplayedFilesView.DeferRefresh())
             {
                 CurrentModeFiles.ReplaceAll(newFileSet);
-                CurrentModeFiles.AddRange(currentUserFiles);
             }
 
             TextureLibrary.SetupLibraryWatcher(newFileSet.OfType<ManifestFile>().ToList(), manifestFileReadyStateChanged);

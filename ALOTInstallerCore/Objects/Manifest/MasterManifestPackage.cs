@@ -66,6 +66,21 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// List of all tutorials that the user can open and browse
         /// </summary>
         public List<ManifestTutorial> Tutorials { get; set; } = new List<ManifestTutorial>();
+
+        /// <summary>
+        /// Gets a list of all installer files - user and manifest. May return duplicates as MEUITM is shared in two modes.
+        /// </summary>
+        /// <returns></returns>
+        public List<InstallerFile> GetAllInstallerFiles()
+        {
+            List<InstallerFile> ifx = new List<InstallerFile>();
+            foreach (var modePackage in ManifestModePackageMappping.Values)
+            {
+                ifx.AddRange(modePackage.UserFiles);
+                ifx.AddRange(modePackage.ManifestFiles);
+            }
+            return ifx;
+        }
     }
 
     public class MusicPackMirror

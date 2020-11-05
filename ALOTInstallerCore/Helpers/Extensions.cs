@@ -136,6 +136,23 @@ namespace ALOTInstallerCore.Helpers
             return ApplicableGame.None;
         }
 
+        public static string ToCommaUIString(this ApplicableGame game)
+        {
+            string res = "";
+            if (game.HasFlag(ApplicableGame.ME1)) res += "ME1";
+            if (game.HasFlag(ApplicableGame.ME2))
+            {
+                if (res.Length > 0) res += ", ";
+                res += "ME2";
+            }
+            if (game.HasFlag(ApplicableGame.ME3))
+            {
+                if (res.Length > 0) res += ", ";
+                res += "ME3";
+            }
+            return res;
+        }
+
         public static int ToGameNum(this MEGame game)
         {
             if (game == MEGame.ME1) return 1;
