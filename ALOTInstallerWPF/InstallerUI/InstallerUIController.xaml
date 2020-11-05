@@ -90,7 +90,8 @@
                     <!--<Button mah:ControlsHelper.ContentCharacterCasing="Normal" x:Name="Button_InstallViewLogs" Visibility="Collapsed" Margin="0,0,5,0" Width="80" HorizontalAlignment="Center"  Content="View Logs" ToolTip="Click to view logs" Click="Button_ViewLog_Click" Style="{StaticResource AccentedSquareButtonStyle}"/>-->
                     <Button mah:ControlsHelper.ContentCharacterCasing="Normal" Visibility="{Binding ContinueButtonVisible, Converter={StaticResource BoolToVisibilityConverter}}" HorizontalAlignment="Center" Width="80" Content="Continue" ToolTip="Click to dismiss dialog" Command="{Binding CloseInstallerCommand}"  Style="{StaticResource MahApps.Styles.Button.Square.Accent}"/>
                 </StackPanel>
-                <TextBlock MaxWidth="700" TextWrapping="Wrap" MinHeight="90" FontSize="16" FontWeight="Medium" Margin="5,40,0,5" HorizontalAlignment="Center"  TextAlignment="Center" Text="{Binding CurrentTip}">
+                <TextBlock MaxWidth="700" TextWrapping="Wrap" MinHeight="90" FontSize="16" FontWeight="Medium" Margin="5,40,0,5" HorizontalAlignment="Center" 
+                           TextAlignment="Center" Text="{Binding CurrentTip}" Visibility="{Binding TipsVisible, Converter={StaticResource BoolToVisibilityConverter}}">
                     <TextBlock.Effect>
                         <DropShadowEffect
                                   ShadowDepth="4"

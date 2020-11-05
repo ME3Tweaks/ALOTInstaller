@@ -111,7 +111,6 @@
                 </Expander.Header>
                 <StackPanel Width="300">
                     <!--<Button Margin="20,0,20,3" FontSize="11" FontWeight="Bold" Click="ShowFirstTime" Content="Show Intro Dialog" Style="{StaticResource AccentedSquareButtonStyle}" ToolTip="Shows the initial instructions screen"/>-->
-
                     <DockPanel Margin="20,3,0,3">
                         <TextBlock Text="Texture library" DockPanel.Dock="Top" FontWeight="Bold"/>
                         <TextBlock Text="Permanent: Where manifest files are stored for each mode (excluding Free Mode)" TextWrapping="Wrap" DockPanel.Dock="Top"/>
@@ -185,13 +184,13 @@
                     <TextBlock Margin="20,0,0,0" Padding="0,0,0,2" Text="Brought to you by" HorizontalAlignment="Left"/>
                     <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Aquadran" ToolTip="Developed MEM. One who made this all possible." HorizontalAlignment="Left"/>
                     <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="CreeperLava" ToolTip="Developed ALOT. Glued all the pieces together." HorizontalAlignment="Left"/>
-                    <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="ME3Tweaks" ToolTip="Complained a bunch and then made this suave UI." HorizontalAlignment="Left"/>
+                    <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mgamerz (ME3Tweaks)" ToolTip="Complained a bunch and then made this suave UI." HorizontalAlignment="Left"/>
                     <TextBlock Margin="20,0,0,0" Padding="0,0,0,2" Text="Other Credits" HorizontalAlignment="Left"/>
 
                     <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Mass Effect Wiki" ToolTip="This program uses content from the Mass Effect wiki at FANDOM and is licensed under the Creative Commons Attribution-Share Alike License." HorizontalAlignment="Left"/>
-                    <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="ME3Tweaks" ToolTip="Powers the log uploading service to Pastebin" HorizontalAlignment="Left"/>
                     <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="Erik JS" ToolTip="Developer of binkw32 ASI plugins for ME2 and ME3" HorizontalAlignment="Left"/>
                     <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="SirCxyrtyx " ToolTip="Developer of the AutoTOC ASI plugin" HorizontalAlignment="Left"/>
+                    <TextBlock Margin="20,0,0,0" Padding="10,0,0,2" Text="mirh" ToolTip="Researched Mass Effect's administrative requirements" HorizontalAlignment="Left"/>
                 </StackPanel>
             </Expander>
         </DockPanel>

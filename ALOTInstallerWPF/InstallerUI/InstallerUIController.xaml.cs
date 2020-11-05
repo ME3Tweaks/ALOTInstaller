@@ -4,17 +4,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using ALOTInstallerCore;
@@ -24,7 +18,6 @@ using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerCore.Steps.Installer;
-using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
@@ -45,6 +38,7 @@ namespace ALOTInstallerWPF.InstallerUI
         private bool SignaledWindowClose;
 
         private bool musicOn = false;
+        public bool TipsVisible { get; set; } = true;
         public PackIconIoniconsKind MusicIcon { get; private set; }
         public PackIconIoniconsKind BigIconKind { get; private set; }
         public bool BigIconVisible { get; private set; }
@@ -387,7 +381,6 @@ namespace ALOTInstallerWPF.InstallerUI
             TipTimer?.Stop(); //Stop the tip rotation
             var installedInfo = InstallOptions.InstallTarget.GetInstalledALOTInfo();
             var installedTextures = InstallOptions.FilesToInstall.Any(x => !(x is PreinstallMod));
-            CurrentTip = ""; //blank it out
             if (ir == InstallStep.InstallResult.InstallOK)
             {
                 BigIconKind = PackIconIoniconsKind.CheckmarkCircleMD;
@@ -397,6 +390,10 @@ namespace ALOTInstallerWPF.InstallerUI
                 if (installedTextures)
                 {
                     CurrentTip = $"Texture installation succeeded. Ensure you do not install package files (files ending in .pcc, .u, .upk, .sfm) outside of {Utilities.GetAppPrefixedName()} Installer to this game, or you will corrupt it.";
+                }
+                else
+                {
+                    TipsVisible = false;
                 }
             }
             else if (ir == InstallStep.InstallResult.InstallOKWithWarning)
