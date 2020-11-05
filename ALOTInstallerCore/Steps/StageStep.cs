@@ -284,7 +284,11 @@ namespace ALOTInstallerCore.Steps
 
             if (_abortStaging)
             {
-                Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
+                if (!QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.nocleanstaging))
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
+                }
+
                 // Error callback goes here
                 ErrorStagingCallback?.Invoke(@"There was an error staging files for installation. You can review the application log for more information about why staging failed.");
                 e.Result = false;
@@ -295,8 +299,8 @@ namespace ALOTInstallerCore.Steps
             {
                 NotifyAddonBuild?.Invoke();
                 // Addon needs built
-                var resultcode = BuildMEMPackageFile("ALOT Addon", addonStagingPath, 
-                    Path.Combine(finalBuiltPackagesDestination, $"{_addonID:D3}_ALOTAddon.mem"), _installOptions.InstallTarget.Game, 
+                var resultcode = BuildMEMPackageFile("ALOT Addon", addonStagingPath,
+                    Path.Combine(finalBuiltPackagesDestination, $"{_addonID:D3}_ALOTAddon.mem"), _installOptions.InstallTarget.Game,
                     out var buildFailedReason,
                     UpdateProgressCallback);
                 if (resultcode != 0 || buildFailedReason != null)
@@ -308,12 +312,13 @@ namespace ALOTInstallerCore.Steps
             }
 
 
-
-            Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
+            if (!QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.nocleanstaging))
+            {
+                Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
+            }
 
             if (_abortStaging)
             {
-                Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
                 // Error callback goes here
                 e.Result = false;
                 return;
@@ -646,7 +651,7 @@ namespace ALOTInstallerCore.Steps
 
 
                         // don't add progress indicator here. We don't need more than the text
-                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_USER_{uf.FriendlyName}.mem"), 
+                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_USER_{uf.FriendlyName}.mem"),
                             _installOptions.InstallTarget.Game, out var buildFailedReason, installerFile: uf);
                         if (resultcode != 0 || buildFailedReason != null)
                         {
@@ -655,7 +660,7 @@ namespace ALOTInstallerCore.Steps
                             installerFile.Disabled = true;
                             installerFile.StatusText = buildFailedReason ?? $"Failed to build, exit code {resultcode}. File has been disabled";
                             _abortStaging = true;
-                        } 
+                        }
                     }
                 }
                 else
@@ -687,8 +692,8 @@ namespace ALOTInstallerCore.Steps
                     {
                         // Requires build
                         // don't add progress indicator here. We don't need more than the text
-                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath, 
-                            Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_USER_{uf.FriendlyName}.mem"), 
+                        var resultcode = BuildMEMPackageFile(uf.FriendlyName, userFileBuildMemPath,
+                            Path.Combine(finalBuiltPackagesDestination, $"{uf.BuildID:D3}_{stagedID}_USER_{uf.FriendlyName}.mem"),
                             _installOptions.InstallTarget.Game, out var buildFailedReason);
                         if (resultcode != 0 || buildFailedReason != null)
                         {
@@ -700,8 +705,12 @@ namespace ALOTInstallerCore.Steps
                         }
                     }
                 }
-                Utilities.DeleteFilesAndFoldersRecursively(userFileBuildMemPath);
-                Utilities.DeleteFilesAndFoldersRecursively(userFileExtractionPath);
+
+                if (!QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.nocleanstaging))
+                {
+                    Utilities.DeleteFilesAndFoldersRecursively(userFileBuildMemPath);
+                    Utilities.DeleteFilesAndFoldersRecursively(userFileExtractionPath);
+                }
             }
 
             Interlocked.Increment(ref _numTasksCompleted);
@@ -920,9 +929,14 @@ namespace ALOTInstallerCore.Steps
                         Log.Warning($"[AICORE] [{prefix}] Not all package files were marked as processed!");
                     }
                 }
-                installerFile.StatusText = "Cleaning temporary files";
-                Log.Information($"[AICORE] [{prefix}] Cleaning up {sourceDirectory}");
-                Utilities.DeleteFilesAndFoldersRecursively(sourceDirectory);
+
+                if (!QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.nocleanstaging))
+                {
+                    installerFile.StatusText = "Cleaning temporary files";
+                    Log.Information($"[AICORE] [{prefix}] Cleaning up {sourceDirectory}");
+                    Utilities.DeleteFilesAndFoldersRecursively(sourceDirectory);
+                }
+
                 installerFile.StatusText = "Staged for building";
                 Log.Information($"[AICORE] [{prefix}] Staged for build complete");
             }
@@ -1046,6 +1060,18 @@ namespace ALOTInstallerCore.Steps
             }
 
             Log.Information($"[AICORE] Building MEM package {uiname} from {sourceDir}, output to {outputFile}");
+
+            if (Settings.DebugLogs)
+            {
+                Log.Debug($@"[AICORE] [{uiname}] Input files to MEM compiler");
+                var files = Directory.GetFiles(sourceDir);
+                foreach (var f in files)
+                {
+                    Log.Debug($@"[AICORE] [{uiname}]      {Path.GetFileName(f)}");
+                }
+            }
+
+
             int exitcode = -1;
             MEMIPCHandler.RunMEMIPCUntilExit($"--convert-to-mem --gameid {targetGame.ToGameNum()} --input \"{sourceDir}\" --output \"{outputFile}\" --ipc",
                 null,

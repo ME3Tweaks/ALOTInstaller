@@ -313,11 +313,11 @@ namespace ALOTInstallerCore.Steps
                     switch (command)
                     {
                         case "STAGE_ADD": // Add a new stage 
-                        {
-                            Log.Information("[AICORE] Adding stage to install stages queue: " + param);
-                            pm.AddStage(param, package.InstallTarget.Game);
-                            break;
-                        }
+                            {
+                                Log.Information("[AICORE] Adding stage to install stages queue: " + param);
+                                pm.AddStage(param, package.InstallTarget.Game);
+                                break;
+                            }
                         case "STAGE_WEIGHT": //Reweight a stage based on how long we think it will take
                             string[] parameters = param.Split(' ');
                             if (parameters.Length > 1)
@@ -394,12 +394,11 @@ namespace ALOTInstallerCore.Steps
 
                 if (cacheAmountPercent != null)
                 {
-                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long) ((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
+                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
                     args += $" --cache-amount {cacheAmountPercent}";
                 }
 
-                var skipMarkersFlagFile = Path.Combine(Utilities.GetExecutingAssemblyFolder(), "_skipmarkers");
-                if (File.Exists(skipMarkersFlagFile))
+                if (QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.skipmarkers))
                 {
                     Log.Information(@"[AICORE] Found _skipmarkers file. We will skip installing markers. This install will not support further texture modding");
                     args += " --skip-markers";
@@ -444,7 +443,7 @@ namespace ALOTInstallerCore.Steps
                             {
                                 {"Died on file", lastProcessedFile},
                                 {"Stage context", pm.CurrentStage.StageName}
-                            }, new[] {CoreCrashes.ErrorAttachmentLog.AttachmentWithText(memCrashBuilder.ToString(), "MemException.txt")});
+                            }, new[] { CoreCrashes.ErrorAttachmentLog.AttachmentWithText(memCrashBuilder.ToString(), "MemException.txt") });
                     }
 
                     doWorkEventArgs.Result = failure?.FailureResultCode ?? InstallResult.InstallFailed_UnknownError;
