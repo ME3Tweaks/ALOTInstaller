@@ -325,7 +325,9 @@ namespace ALOTInstallerWPF.Flyouts
                             Utilities.OpenWebPage(response.result);
                         }
                     }
-                    else
+                    
+
+                    if (!response.uploaded || QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.ForceSavingLogLocally))
                     {
                         // Upload failed.
                         GeneratedLogPath = Path.Combine(LogCollector.LogDir, $"FailedLogUpload_{DateTime.Now.ToString("s").Replace(":", ".")}.txt");

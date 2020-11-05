@@ -19,7 +19,11 @@ namespace ALOTInstallerCore.Helpers
             /// <summary>
             /// Do not cleanup staging (cleans up initially)
             /// </summary>
-            nocleanstaging
+            nocleanstaging,
+            /// <summary>
+            /// Forces log to also save locally after upload
+            /// </summary>
+            ForceSavingLogLocally
         }
 
 
