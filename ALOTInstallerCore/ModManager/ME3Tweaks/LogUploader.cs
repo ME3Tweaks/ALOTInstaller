@@ -16,42 +16,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         /// <param name="logtext"></param>
         /// <param name="endpoint"></param>
         /// <returns></returns>
-        public static string UploadLog(string logtext, string endpoint)
+        public static (bool uploaded, string result) UploadLog(string logtext, string endpoint)
         {
-            //void updateStatusCallback(string status)
-            //{
-            //    CollectionStatusMessage = status;
-            //}
-
-            //void updateProgressCallback(int progress)
-            //{
-            //    nbw.ReportProgress(0, progress / 100.0);
-            //}
-
-            //void updateTaskbarProgressStateCallback(TaskbarItemProgressState state)
-            //{
-            //    nbw.ReportProgress(-1, state);
-            //}
-            //StringBuilder logUploadText = new StringBuilder();
-            //if (SelectedDiagnosticTarget != null && SelectedDiagnosticTarget.Game > Mod.MEGame.Unknown)
-            //{
-            //    Debug.WriteLine(@"Selected game target: " + SelectedDiagnosticTarget.TargetPath);
-            //    logUploadText.Append("[MODE]diagnostics\n"); //do not localize
-            //    logUploadText.Append(LogCollector.PerformDiagnostic(SelectedDiagnosticTarget, TextureCheck, updateStatusCallback, updateProgressCallback, updateTaskbarProgressStateCallback));
-            //    logUploadText.Append("\n"); //do not localize
-            //}
-
-            //if (SelectedLog != null && SelectedLog.Selectable)
-            //{
-            //    Debug.WriteLine(@"Selected log: " + SelectedLog.filepath);
-            //    logUploadText.Append("[MODE]logs\n"); //do not localize
-            //    logUploadText.AppendLine(LogCollector.CollectLogs(SelectedLog.filepath));
-            //    logUploadText.Append("\n"); //do not localize
-            //}
-
-            //var logtext = logUploadText.ToString();
-            //if (logtext != null)
-            //{
             var lzmalog = LZMA.CompressToLZMAFile(Encoding.UTF8.GetBytes(logtext));
             var lzmamd5 = Utilities.CalculateMD5(new MemoryStream(lzmalog));
             try
@@ -79,42 +45,10 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 // ensure the request was a success
                 if (!response.IsSuccessStatusCode)
                 {
-                    return null;
+                    return (false, $"Error uploading log: Response code {response.StatusCode.ToString()}");
                 }
                 var resultStream = response.Content.ReadAsStreamAsync().Result;
                 var responseString = new StreamReader(resultStream).ReadToEnd();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                //var request = WebRequest.CreateHttp(endpoint);
-                //request.Method = "POST";
-                //request.ContentType = "application/x-www-form-urlencoded";
-                //var logB64 = Convert.ToBase64String(lzmalog);
-                //string reqText = $"LogData={logB64}&ToolVersion={Utilities.GetAppVersion()}&ToolName={Utilities.GetHostingProcessname()}&LogDataMD5={lzmamd5}";
-                //File.WriteAllText(@"C:\users\mgamerz\desktop\post.txt", reqText);
-                //request.ContentLength = reqText.Length;
-                //using (StreamWriter stOut = new StreamWriter(request.GetRequestStream()))
-                //{
-                //    stOut.Write(reqText);
-                //    stOut.Close();
-                //}
-
-                //var response = request.GetResponse();
-                //using var reader = new System.IO.StreamReader(response.GetResponseStream(), Encoding.ASCII);
-                //string responseString = reader.ReadToEnd();
 
                 Uri uriResult;
                 bool result = Uri.TryCreate(responseString, UriKind.Absolute, out uriResult)
@@ -125,18 +59,18 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     //diagnosticsWorker.ReportProgress(0, new ThreadCommand(SET_DIAGTASK_ICON_GREEN, Image_Upload));
                     //e.Result = responseString;
                     Log.Information(@"[AICORE] Result from server for log upload: " + responseString);
-                    return responseString;
+                    return (true, responseString);
                 }
                 Log.Error(@"[AICORE] Error uploading log. The server responded with: " + responseString);
-                return $"The server rejected the upload: {responseString}";
+                return (false, $"The server rejected the upload: {responseString}");
             }
             catch (Exception ex)
             {
-                // ex.Message contains rich details, inclulding the URL, verb, response status,
+                // ex.Message contains rich details, including the URL, verb, response status,
                 // and request and response bodies (if available)
                 Log.Error($@"[AICORE] Handled error uploading log:");
                 ex.WriteToLog("[AICORE] ");
-                return $"Error uploading log: {ex.Message}";
+                return (false, $"Error uploading log: {ex.Message}");
             }
         }
     }

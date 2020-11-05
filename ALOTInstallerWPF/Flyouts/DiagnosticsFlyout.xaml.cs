@@ -1,23 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
-using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
 using ME3ExplorerCore.Packages;
@@ -59,6 +51,10 @@ namespace ALOTInstallerWPF.Flyouts
         public bool ProgressIndeterminate { get; set; }
         public long ProgressValue { get; set; }
         /// <summary>
+        /// Name of the generated log. Only populated if upload fails.
+        /// </summary>
+        public string GeneratedLogPath { get; set; }
+        /// <summary>
         /// Result of the diagnostic. This on success will be a link, on failure will be text (not a link)
         /// </summary>
         public string DiagnosticResultText { get; set; }
@@ -96,6 +92,7 @@ namespace ALOTInstallerWPF.Flyouts
         public GenericCommand CopyLinkCommand { get; set; }
         public GenericCommand CloseDiagnosticsPanel { get; set; }
         public GenericCommand ViewLogCommand { get; set; }
+        public GenericCommand OpenLogCommand { get; set; }
         public RelayCommand SetFullTextureCheckCommand { get; set; }
 
         public ObservableCollectionExtended<LogItem> LogFiles { get; } = new ObservableCollectionExtended<LogItem>();
@@ -108,8 +105,14 @@ namespace ALOTInstallerWPF.Flyouts
             BackCommand = new GenericCommand(GoBack, () => Step > 0 && Step != FINAL_STEP);
             CloseDiagnosticsPanel = new GenericCommand(CloseFlyout, () => !DiagnosticInProgress);
             SetFullTextureCheckCommand = new RelayCommand(ContinuePastFullTextureCheckStep);
-            CopyLinkCommand = new GenericCommand(CopyLink);
+            CopyLinkCommand = new GenericCommand(CopyLink, () => GeneratedLogPath == null);
             ViewLogCommand = new GenericCommand(ViewLink, LinkIsValid);
+            OpenLogCommand = new GenericCommand(HighlightGeneratedLog, () => GeneratedLogPath != null);
+        }
+
+        private void HighlightGeneratedLog()
+        {
+            Utilities.OpenAndSelectFileInExplorer(GeneratedLogPath);
         }
 
         private void ViewLink()
@@ -156,6 +159,7 @@ namespace ALOTInstallerWPF.Flyouts
 
         private void ResetDiagnostics()
         {
+            GeneratedLogPath = null;
             UISelectedLogItem = null;
             LogChosen = null;
             DiagnosticResultText = null;
@@ -277,7 +281,7 @@ namespace ALOTInstallerWPF.Flyouts
             }
         }
 
-        private async void StartDiagnostic()
+        private void StartDiagnostic()
         {
             if (Application.Current.MainWindow is MainWindow mw)
             {
@@ -313,14 +317,27 @@ namespace ALOTInstallerWPF.Flyouts
                     DiagnosticStatusText = "Uploading to log viewing service";
                     ProgressIndeterminate = true;
                     var response = LogUploader.UploadLog(logUploadText.ToString(), "https://me3tweaks.com/alot/logupload3");
-
-                    DiagnosticResultText = response;
-                    if (response.StartsWith("http"))
+                    if (response.uploaded)
                     {
-                        Utilities.OpenWebPage(response);
+                        DiagnosticResultText = response.result;
+                        if (response.result.StartsWith("http"))
+                        {
+                            Utilities.OpenWebPage(response.result);
+                        }
                     }
+                    else
+                    {
+                        // Upload failed.
+                        GeneratedLogPath = Path.Combine(LogCollector.LogDir, $"FailedLogUpload_{DateTime.Now.ToString("s").Replace(":", ".")}.txt");
+                        File.WriteAllText(GeneratedLogPath,logUploadText.ToString());
+                    }
+
                     DiagnosticComplete = true;
                     DiagnosticInProgress = false;
+                };
+                nbw.RunWorkerCompleted += (sender, args) =>
+                {
+                    CommandManager.InvalidateRequerySuggested();
                 };
                 DiagnosticInProgress = true;
                 nbw.RunWorkerAsync();
