@@ -205,6 +205,10 @@ namespace ALOTInstallerWPF.BuilderUI
                     {
                         App.BetaAvailable = true;
                     },
+                    () =>
+                    {
+                        pd.SetCancelable(false);
+                    },
                     ct
                 );
 

@@ -39,6 +39,7 @@ namespace ALOTInstallerCore
             Action progressIndeterminateCallback,
             Action<string, string> showMessageCallback,
             Action notifyBetaAvailable,
+            Action downloadCompleted, // When we should hide cancel button
             CancellationTokenSource cancellationTokenSource)
         {
 #if APPUPDATESUPPORT
@@ -154,7 +155,7 @@ namespace ALOTInstallerCore
                                 // First here should be OK since we checked it above...
 
                                 // PATCH UPDATE
-                                if (attemptPatchUpdate(latest, progressCallback, progressIndeterminateCallback, setUpdateDialogTextCallback, cancellationTokenSource))
+                                if (attemptPatchUpdate(latest, progressCallback, progressIndeterminateCallback, setUpdateDialogTextCallback, downloadCompleted, cancellationTokenSource))
                                 {
                                     // Patch update succeeded. The code below is the default update
                                     return;
@@ -184,7 +185,7 @@ namespace ALOTInstallerCore
                                     return;
                                 }
                                 // Download is OK
-
+                                downloadCompleted?.Invoke();
                                 progressIndeterminateCallback?.Invoke();
                                 showUpdateProgressDialogCallback?.Invoke($"Updating {Utilities.GetAppPrefixedName()} Installer", "Preparing to apply update", false);
                                 var updateFailedResult = extractUpdate(downloadResult.result, Path.GetFileName(asset.Name), updateFilenameInArchive, setUpdateDialogTextCallback);
@@ -224,7 +225,10 @@ namespace ALOTInstallerCore
 
 #if APPUPDATESUPPORT
 
-        private static bool attemptPatchUpdate(Release latestRelease, Action<long, long> progressCallback, Action progressIndeterminateCallback, Action<string> setUpdateDialogTextCallback, CancellationTokenSource cancellationTokenSource)
+        private static bool attemptPatchUpdate(Release latestRelease, Action<long, long> progressCallback, Action progressIndeterminateCallback,
+            Action<string> setUpdateDialogTextCallback, 
+            Action downloadCompletedCallback,
+            CancellationTokenSource cancellationTokenSource)
         {
             var hashLine = latestRelease.Body.Split('\n').FirstOrDefault(x => x.StartsWith("hash: "));
 
@@ -284,6 +288,7 @@ namespace ALOTInstallerCore
                             Log.Warning($@"Patch update download failed: {patchUpdate.errorMessage}");
                             return false;
                         }
+                        downloadCompletedCallback?.Invoke();
                         Log.Information(@"Download OK: Building new executable");
                         setUpdateDialogTextCallback?.Invoke("Building new executable");
                         progressIndeterminateCallback?.Invoke();
