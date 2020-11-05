@@ -49,7 +49,8 @@ namespace ALOTInstallerCore.Objects
             var readyStateChanged = oldReady != Ready;
             if (readyStateChanged)
             {
-                if (!Ready) Description = "File no longer available";
+                if (!Ready) StatusText = "File no longer available";
+                if (Ready) StatusText = Description;
                 NotifyStatusUpdate();
             }
             return readyStateChanged;
