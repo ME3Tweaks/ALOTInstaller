@@ -152,7 +152,6 @@ namespace ALOTInstallerWPF.Flyouts
 
         private async void CleanupBuildLocation()
         {
-            // Todo: Attempt reimport before cleanup.
             if (Application.Current.MainWindow is MainWindow mw)
             {
                 if (!Directory.Exists(Settings.BuildLocation))
@@ -166,29 +165,8 @@ namespace ALOTInstallerWPF.Flyouts
                     "Checking if any files in build directory need to be re-imported to library...");
                 nbw.DoWork += (sender, args) =>
                 {
+                    TextureLibrary.AttemptReimportFromStaging();
                     var bdSize = Utilities.GetSizeOfDirectory(Settings.BuildLocation);
-                    foreach (var file in Directory.GetFiles(Settings.BuildLocation, "*.*", SearchOption.AllDirectories))
-                    {
-                        TextureLibrary.AttemptImportManifestFile(file,
-                            ManifestHandler.GetAllManifestFiles(),
-                            (x, y) =>
-                            {
-                                if (x)
-                                {
-                                    Log.Information($"Reimported {y} to texture library");
-                                }
-                            },
-                            (file, done, total) =>
-                            {
-                                Application.Current.Dispatcher.Invoke(() =>
-                                {
-                                    pd.SetMessage($"Reimporting {file} to library");
-                                    pd.Maximum = total;
-                                    pd.SetProgress(done);
-                                });
-                            });
-                    }
-
                     foreach (var d in Directory.GetDirectories(Settings.BuildLocation))
                     {
                         Utilities.DeleteFilesAndFoldersRecursively(d);

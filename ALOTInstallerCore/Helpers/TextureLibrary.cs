@@ -872,6 +872,26 @@ namespace ALOTInstallerCore.Helpers
             }
             return importResults;
         }
+
+        public static void AttemptReimportFromStaging()
+        {
+            if (new DriveInfo(Settings.TextureLibraryLocation).RootDirectory.Name ==
+                new DriveInfo(Settings.BuildLocation).RootDirectory.Name)
+            {
+                foreach (var game in Locations.AllMEGames)
+                {
+                    var path = Path.Combine(Settings.BuildLocation, game.ToString(), "InstallationPackages");
+                    if (Directory.Exists(path))
+                    {
+                        Log.Information($@"[AICORE] Attempting reimport of possibly moved files from {path}");
+                        TextureLibrary.AttemptImportUnpackedFiles(path,
+                            ManifestHandler.GetAllManifestFiles()
+                                .Where(x => x.UnpackedSingleFilename != null && !x.Ready)
+                                .ToList(), false, null, false, unReadyOnly: true, dontCheckFilename: true);
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>
