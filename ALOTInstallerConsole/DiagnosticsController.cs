@@ -111,13 +111,28 @@ namespace ALOTInstallerConsole
                     Application.RequestStop(); //Close dialog
                 }
 
-                if (response.StartsWith("http"))
+                if (response.uploaded)
                 {
-                    Utilities.OpenWebPage(response);
+                    if (response.result.StartsWith("http"))
+                    {
+                        Utilities.OpenWebPage(response.result);
+                    }
+
+                    // TODO: MAKE DIALOG WORK HERE
                 }
                 else
                 {
-                    MessageBox.Query("Error uploading to server", response, "OK");
+#if WINDOWS
+                    if (!response.uploaded || QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.ForceSavingLogLocally))
+                    {
+                        // Upload failed.
+                        var savePath = Path.Combine(LogCollector.LogDir, $"FailedLogUpload_{DateTime.Now.ToString("s").Replace(":", ".")}.txt");
+                        File.WriteAllText(b.Result as string, savePath);
+                        Utilities.OpenAndSelectFileInExplorer(savePath);
+                    }
+#endif
+                    // todo: Support this on linux
+
                 }
             };
             nbw.RunWorkerAsync();
