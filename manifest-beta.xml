@@ -891,15 +891,15 @@
 			recommendation="Required"
 			installpriority="1">
 			<file
-				downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
+				downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
 				tooltipname="ALOT for ME1 12.0"
 				torrentfilename="ALOT for ME1.zip"
-				filename="ALOT for ME1.zip"
-				size="4453410804"
-				md5="8d36eac617658994d20091f8c53d754a"
+				filename="ALOT for ME1 12.0-83-2021-12-0-1604601699.zip"
+				size="4401598618"
+				md5="cbd7dccb5a0909dd5882472dac9f24c9"
 				unpackedsinglefilename="ALOT_ME1_v12.mem"
-				unpackedsize="4264869546"
-				unpackedmd5="6a435382ff9cd76ac3c2687d76dd7c0f" />
+				unpackedsize="4322992433"
+				unpackedmd5="118e7d9784dcc50646c8949e5838be21" />
 			<packagefile
 				me1="true"
 				sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v12.mem"
@@ -914,15 +914,15 @@
 			recommendation="Required"
 			installpriority="1">
 			<file
-				downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
+				downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
 				tooltipname="ALOT for ME2 12.0"
 				torrentfilename="ALOT for ME2.zip"
-				filename="ALOT for ME2.zip"
-				size="6230258877"
-				md5="cd7e532e2a53d00beec259adc7870a58"
+				filename="ALOT for ME2 12.0-68-2021-12-0-1604620707.zip"
+				size="6169019512"
+				md5="22c3f49b421db0794c616a863a38a971"
 				unpackedsinglefilename="ALOT_ME2_v12.mem"
-				unpackedsize="6041717579"
-				unpackedmd5="c9333cbddbcf2c814a33abda7b62d87f" />
+				unpackedsize="6090413327"
+				unpackedmd5="1368aef987826fde34d5025440f6adca" />
 			<packagefile
 				me2="true"
 				sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v12.mem"
@@ -937,15 +937,15 @@
 			recommendation="Required"
 			installpriority="1">
 			<file
-				downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
+				downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
 				tooltipname="ALOT for ME3 12.0"
 				torrentfilename="ALOT for ME3.zip"
-				filename="ALOT for ME3.zip"
-				size="9370770330"
-				md5="f599e1ff3becc05246edf9640e0c9e22"
+				filename="ALOT for ME3 12.0-363-2021-12-0-1604625739.zip"
+				size="9288229132"
+				md5="746e6585f288b2a99219d92c34af5df9"
 				unpackedsinglefilename="ALOT_ME3_v12.mem"
-				unpackedsize="9182229032"
-				unpackedmd5="cca92a9e91f941e7625d53675d828d47" />
+				unpackedsize="9209622947"
+				unpackedmd5="a6ed5bd423c87abca202192e6ca11363" />
 			<packagefile
 				me3="true"
 				sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v12.mem"
@@ -994,7 +994,7 @@
 				movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-			friendlyname="Improved Static Lighting for ME3 - LITE"
+			friendlyname="Improved Static Lighting for ME3 - Lite"
 			author="CreeperLava"
 			installpriority="3"
 			recommendationreason="Significantly improves the static shadows in level environments. Only denoised, uses less memory than the full version at the cost of quality. Install this if you experience crashes with other mods installed."
@@ -1002,7 +1002,7 @@
 			optiongroup="ME3StaticLighting">
 			<file
 				downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
-				tooltipname="Improved Static Lighting for ME3 - LITE"
+				tooltipname="Improved Static Lighting for ME3 - Lite"
 				torrentfilename="Improved Static Lighting for ME3 - Lite.zip"
 				filename="Improved Static Lighting for ME3 - Lite.zip"
 				size="4517800644"
@@ -1016,15 +1016,15 @@
 				movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-				  friendlyname="Improved Static Lighting for ME3 - FULL"
+				  friendlyname="Improved Static Lighting for ME3 - Full"
 				  author="CreeperLava"
 				  installpriority="3"
 				  recommendationreason="Significantly improves the static shadows in level environments. Denoised and higher resolution. Uses more memory, but won't lower the framerate. May cause crashes when combined with the Project Variety and EGM mods."
 				  recommendation="Optional"
 				  optiongroup="ME3StaticLighting">
 			<file
-				downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
-				tooltipname="Improved Static Lighting for ME3 - FULL"
+				downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+				tooltipname="Improved Static Lighting for ME3 - Full"
 				torrentfilename="Improved Static Lighting for ME3 - Full.zip"
 				filename="Improved Static Lighting for ME3 - Full.zip"
 				size="10764271596"
