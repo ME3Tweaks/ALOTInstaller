@@ -12,6 +12,7 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.PlatformSpecific.Windows;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Helpers;
@@ -24,6 +25,7 @@ using ME3ExplorerCore.Packages;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
+using Microsoft.Win32;
 using NickStrupat;
 using Serilog;
 
@@ -114,7 +116,10 @@ namespace ALOTInstallerWPF.BuilderUI
             NamedBackgroundWorker bw = new NamedBackgroundWorker("StartupThread");
             bw.DoWork += (a, b) =>
             {
+                
                 ALOTInstallerCoreLib.Startup(SetWrapperLogger, RunOnUIThread, startTelemetry, stopTelemetry);
+                // Logger is now available
+
                 // Setup telemetry handlers
                 CoreAnalytics.TrackEvent = TelemetryController.TrackEvent;
                 CoreCrashes.TrackError = TelemetryController.TrackError;

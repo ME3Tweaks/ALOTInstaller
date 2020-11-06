@@ -12,6 +12,7 @@ using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using ALOTInstallerCore.PlatformSpecific.Windows;
 using ALOTInstallerCore.Steps.Installer;
 using MassEffectModManagerCore.modmanager.asi;
 using ME3ExplorerCore;
@@ -19,7 +20,9 @@ using ME3ExplorerCore.Packages;
 using ME3ExplorerCore.Unreal;
 using Serilog;
 using NickStrupat;
-
+#if WINDOWS
+using Microsoft.Win32;
+#endif
 
 namespace ALOTInstallerCore.Steps
 {
@@ -485,6 +488,11 @@ namespace ALOTInstallerCore.Steps
                     doWorkEventArgs.Result = InstallResult.InstallFailed_ME1LAAApplyFailed;
                     return;
                 }
+
+                // Remove V3 registry permissions
+#if WINDOWS
+                removeV3RegistryChanges();
+#endif
             }
 
             // stamp version info
@@ -581,6 +589,24 @@ namespace ALOTInstallerCore.Steps
             SetProgressStyle?.Invoke(ProgressStyle.None);
             doWorkEventArgs.Result = hasWarning ? InstallResult.InstallOKWithWarning : InstallResult.InstallOK;
         }
+
+#if WINDOWS
+        private void removeV3RegistryChanges()
+        {
+            try
+            {
+                Log.Information(@"[AICORE] Removing ALOT Installer V3 ME1 run as admin registry changes (if any are still installed), as they are no longer necessary for V4");
+                RegistryHandler.DeleteRegistryValue(Registry.LocalMachine, @"SOFTWARE\\WOW6432Node\\AGEIA Technologies", "enableLocalPhysXCore"); //Should not throw exception
+                RegistryHandler.DeleteRegistryValue(Registry.LocalMachine, @"SOFTWARE\\WOW6432Node\\AGEIA Technologies", "EpicLocalDllHack"); //Should not throw exception
+                // Remove non-inherited ACLs. If we have permissions (which V3 granted), this effectively should return the system to how it was originally.
+                RegistryHandler.RemoveFullControlNonInheritedACLs(Registry.LocalMachine, @"SOFTWARE\\WOW6432Node\\AGEIA Technologies",
+                    () => Log.Information(@"[AICORE] Removed ALOT Installer V3 AGEIA registry permissions that are no longer necessary"),
+                    () => Log.Information(@"[AICORE] Could not remove permissions on AGEIA registry key. It may be that they were already revoked or were never set to begin with. (This is not an error)"));
+            }
+            catch { }
+
+        }
+#endif
 
         private bool checkForExistingMarkers()
         {
