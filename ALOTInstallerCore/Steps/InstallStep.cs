@@ -12,7 +12,6 @@ using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
-using ALOTInstallerCore.PlatformSpecific.Windows;
 using ALOTInstallerCore.Steps.Installer;
 using MassEffectModManagerCore.modmanager.asi;
 using ME3ExplorerCore;
@@ -21,6 +20,7 @@ using ME3ExplorerCore.Unreal;
 using Serilog;
 using NickStrupat;
 #if WINDOWS
+using ALOTInstallerCore.PlatformSpecific.Windows;
 using Microsoft.Win32;
 #endif
 
