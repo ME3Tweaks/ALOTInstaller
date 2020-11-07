@@ -96,6 +96,11 @@ namespace ALOTInstallerCore.Steps
                 return noOptionsSelectedReason;
             }
 
+            if (!pc.checkRequiredExecutableVersion(out var badExeVersion))
+            {
+                return badExeVersion;
+            }
+
             if (!pc.checkRequiredFiles(out var failureReason1))
             {
                 // Require files validation failed
@@ -327,6 +332,42 @@ namespace ALOTInstallerCore.Steps
                 }
             }
             return null; //OK
+        }
+
+        private bool checkRequiredExecutableVersion(out string failureReason)
+        {
+            failureReason = null; // Defaultxxe
+#if !WINDOWS
+            return true;
+#else
+            var exePath = MEDirectories.ExecutablePath(package.InstallTarget);
+            if (File.Exists(exePath))
+            {
+                Version minVersionRequired = null;
+                var diskVersion = FileVersionInfo.GetVersionInfo(exePath);
+                switch (package.InstallTarget.Game)
+                {
+                    case MEGame.ME1:
+                        minVersionRequired = new Version("1.2.20608.0");
+                        break;
+                    case MEGame.ME2:
+                        minVersionRequired = new Version("1.2.1604.0");
+                        break;
+                    case MEGame.ME3:
+                        minVersionRequired = new Version("1.5.5427.124");
+                        break;
+                }
+
+                if (diskVersion.ToVersion() < minVersionRequired)
+                {
+                    Log.Error($@"[AICORE] Executable for {package.InstallTarget.Game} is outdated and must be updated. Minimum version required: {minVersionRequired}, installed vesrion: {diskVersion}");
+                    failureReason = $"Executable for {package.InstallTarget.Game} is outdated and must be updated. Minimum version required: {minVersionRequired}, installed version: {diskVersion}";
+                    return false;
+                }
+            }
+            Log.Information(@"[AICORE] Precheck: Executable version meets minimum requirement");
+            return true;
+#endif
         }
 
         private bool checkOneOptionSelected(out string failurereason)
