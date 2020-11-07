@@ -42,6 +42,8 @@ namespace ALOTInstallerWPF.Flyouts
         public string ModeText { get; } = "Mode Text";
         public string SpinnerText { get; set; } = "Calculating install options";
         public string InstallOptionsTopText { get; set; }
+        public bool ManifestFilesOptionOn => checkboxMapping != null && checkboxMapping.Any(x => x.Key != InstallOptionsStep.InstallOption.UserFiles && x.Value.IsOn);
+        public bool ShowTextureLODsOption => checkboxMapping != null && checkboxMapping.Any(x => x.Key != InstallOptionsStep.InstallOption.ALOVMods && x.Value.IsOn);
         public bool CompressPackages { get; set; } = true;
         public string CurrentLodsDescText { get; set; }
         public bool Use4KLODs { get; set; } = true; //Default to TRUE
@@ -424,8 +426,11 @@ namespace ALOTInstallerWPF.Flyouts
 
         private bool CanInstallTextures()
         {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ManifestFilesOptionOn)));
+            PropertyChanged?.Invoke(this,new PropertyChangedEventArgs(nameof(ShowTextureLODsOption))); //This is kind of a hack. But it works!
             return checkboxMapping.Any(x => x.Value.IsOn);
         }
+
 
         private void AbortInstall()
         {

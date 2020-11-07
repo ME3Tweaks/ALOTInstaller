@@ -230,12 +230,13 @@ namespace ALOTInstallerWPF.InstallerUI
                 ShowStorefrontDontClickUpdateCallback = showStorefrontNoUpdateUI,
                 SetOverallProgressCallback = x => TaskbarHelper.SetProgress(x / 100.0f),
                 SetProgressStyle = x => TaskbarHelper.SetProgressState(progressStyleToProgressState(x)),
-                NotifyClosingWillBreakGame = x => notifyClosingWillBreakGame(x),
+                NotifyClosingWillBreakGame = notifyClosingWillBreakGame,
             };
             installerWorker.WorkerReportsProgress = true;
             installerWorker.DoWork += ss.InstallTextures;
             installerWorker.RunWorkerCompleted += (a, b) =>
             {
+                notifyClosingWillBreakGame(false);
                 ContinueButtonVisible = true;
                 fadeoutMusic();
                 // Installation has completed
