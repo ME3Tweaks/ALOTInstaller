@@ -191,10 +191,16 @@
 			name="Steam, MEM patched">78ac3d9b4aad1989dae74505ea65aa6c</supportedhash>
 		<supportedhash
 			game="me1"
+			name="Steam, V4 MEM patched">5c87b24a141bc6a487a2199dec9739a0</supportedhash>
+		<supportedhash
+			game="me1"
 			name="Steam, BioWare signed">fef464b4b92c19ce76add75de6732ccf</supportedhash>
 		<supportedhash
 			game="me1"
 			name="Origin, MEM patched">2390143503635f3c4cfaed0afe0b8c71</supportedhash>
+		<supportedhash
+			game="me1"
+			name="Origin, V4 MEM patched">bfe090e76ca9f4d585e380662cf4980e</supportedhash>
 		<supportedhash
 			game="me1"
 			name="Origin">ff1f894fa1c2dbf4d4b9f0de85c166e5</supportedhash>
