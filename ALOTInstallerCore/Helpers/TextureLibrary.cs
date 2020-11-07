@@ -462,10 +462,7 @@ namespace ALOTInstallerCore.Helpers
                 Dictionary<ManifestFile, string> mfToUnpackedMap = new Dictionary<ManifestFile, string>();
                 foreach (var mf in manifestFiles)
                 {
-                    if (unReadyOnly)
-                    {
-                        mf.UpdateReadyStatus(); //Make sure have the most up to date data
-                    }
+                    mf.UpdateReadyStatus(); //Make sure have the most up to date data
                     if (mf.Ready && unReadyOnly) continue;
                     if (mf.UnpackedSingleFilename != null)
                     {
@@ -550,7 +547,7 @@ namespace ALOTInstallerCore.Helpers
                         {
                             Log.Error("[AICORE] File copied back did not trigger switch to unpacked version! Something probably went wrong on file copy.");
                         }
-                        else
+                        else if (File.Exists(oldFname))
                         {
                             // Switched to unpacked
                             Log.Information(

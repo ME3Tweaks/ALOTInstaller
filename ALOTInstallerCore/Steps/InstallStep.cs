@@ -559,7 +559,7 @@ namespace ALOTInstallerCore.Steps
                 {
                     // Will only run moves. If these aren't the same it won't be moved into staging, it'd be copied.
                     TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), false,
-                        (file, done, todo) => SetBottomTextCallback?.Invoke($"Restoring texture library files"));
+                        (file, done, todo) => SetBottomTextCallback?.Invoke($"Restoring texture library files"), unReadyOnly: true); //unready only will make sure that we don't try to move back things like mem files from zip archives
                 }
             }
 
@@ -573,7 +573,7 @@ namespace ALOTInstallerCore.Steps
             {
                 Log.Error($"[AICORE] Unable to delete installation packages at {memInputPath}: {e.Message}");
             }
-            
+
             #endregion
 
             #region Show Ending UI
@@ -581,7 +581,7 @@ namespace ALOTInstallerCore.Steps
 
             if (package.FilesToInstall.Count == 1)
             {
-                installString = package.FilesToInstall[0].ShortFriendlyName;
+                installString = package.FilesToInstall[0].ShortFriendlyName ?? package.FilesToInstall[0].FriendlyName;
             }
 
             SetTopTextCallback?.Invoke($"Installation of {installString}");
