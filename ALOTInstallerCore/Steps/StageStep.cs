@@ -231,7 +231,7 @@ namespace ALOTInstallerCore.Steps
             // ORDER THE INSTALL ITEMS HERE AS THIS WILL DETERMINE THE FINAL INSTALLATION ORDER
             sortInstallerSet(_installOptions);
 
-            foreach (var f in _installOptions.FilesToInstall.OrderBy(x=>x is ))
+            foreach (var f in _installOptions.FilesToInstall)
             {
                 f.ResetBuildVars();
                 if (f.AlotVersionInfo.IsNotVersioned)
