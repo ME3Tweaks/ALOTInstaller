@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ALOTInstallerCore.Helpers.AppSettings;
+using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.Objects;
 using CliWrap;
 using CliWrap.EventStream;
@@ -350,6 +351,28 @@ namespace ALOTInstallerCore.Helpers
         /// <returns></returns>
         public static bool SetLODs(MEGame game, LodSetting setting)
         {
+            Log.Information($@"[AICORE] Settings LODs for {game}. Setting: {setting}");
+
+            bool configFileReadOnly = false;
+            if (game == MEGame.ME1)
+            {
+                try
+                {
+                    // Get read only state for config file. It seems sometimes they get set read only.
+                    FileInfo fi = new FileInfo(MEDirectories.LODConfigFile(game));
+                    configFileReadOnly = fi.IsReadOnly;
+                    if (configFileReadOnly)
+                    {
+                        Log.Information(@"[AICORE] Removing read only flag from ME1 bioengine.ini");
+                        fi.IsReadOnly = false; //clear read only. might happen on some binkw32 in archives, maybe
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.Error($@"[AICORE] Error removing readonly flag from ME1 bioengine.ini: {e.Message}");
+                }
+            }
+
             string args = $"--apply-lods-gfx --gameid {game.ToGameNum()}";
             if (setting.HasFlag(LodSetting.SoftShadows))
             {
@@ -377,6 +400,21 @@ namespace ALOTInstallerCore.Helpers
                 null,
                 x => Log.Error($"[AICORE] StdError setting LODs: {x}"),
                 x => exitcode = x); //Change to catch exit code of non zero.        
+
+            if (configFileReadOnly)
+            {
+                try
+                {
+                    Log.Information(@"[AICORE] Re-setting the read only flag on ME1 bioengine.ini");
+                    FileInfo fi = new FileInfo(MEDirectories.LODConfigFile(game));
+                    fi.IsReadOnly = configFileReadOnly;
+                }
+                catch (Exception e)
+                {
+                    Log.Error($@"[AICORE] Error re-setting readonly flag from ME1 bioengine.ini: {e.Message}");
+                }
+            }
+
             if (exitcode != 0)
             {
                 Log.Error($"[AICORE] MassEffectModderNoGui had error setting LODs, exited with code {exitcode}");

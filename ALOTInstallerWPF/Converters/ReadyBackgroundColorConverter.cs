@@ -15,9 +15,9 @@ namespace ALOTInstallerWPF.Converters
         private static readonly SolidColorBrush ReadyBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3549c70a"));
         private static readonly SolidColorBrush WaitingBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#35009dff"));
         private static readonly SolidColorBrush RequiredNotReadyBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#35d91600"));
-        private static readonly SolidColorBrush RecommendedNotReadyBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#35b85000"));
+        private static readonly SolidColorBrush RecommendedNotReadyBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#35730e00"));
         private static readonly SolidColorBrush ProcessingBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#35ffe900"));
-        private static readonly SolidColorBrush OptionalNotReadyBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#350045a6"));
+        private static readonly SolidColorBrush OptionalNotReadyBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#35464b54"));
         private static readonly SolidColorBrush UserNotReadyBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3503e3fc"));
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
