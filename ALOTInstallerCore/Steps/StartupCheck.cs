@@ -30,6 +30,10 @@ namespace ALOTInstallerCore.Steps
                                         Settings.StagingSettingsLocation != null;
             if (textureLibUnavailable || stagingDirUnavailable)
             {
+                Log.Error(@"[AICORE] StartupCheck: Texture library or Staging Directory is reporting itself as unavailable! We will use the defaults.");
+                if (textureLibUnavailable) Log.Error($@"[AICORE] Texture library path is not available: {Settings.TextureLibrarySettingsLocation}");
+                if (stagingDirUnavailable) Log.Error($@"[AICORE] Staging directory is not available: {Settings.StagingSettingsLocation}");
+
                 string title = "";
                 if (textureLibUnavailable)
                 {

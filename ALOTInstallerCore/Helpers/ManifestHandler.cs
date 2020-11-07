@@ -67,7 +67,7 @@ namespace ALOTInstallerCore.Helpers
             CurrentMode = mode;
             if (oldMode != CurrentMode)
             {
-                Log.Information($@"[AICORE] Change to new mode: {CurrentMode}");
+                Log.Information($@"[AICORE] ManifestHandler: Changing to new mode: {CurrentMode}");
                 OnManifestModeChanged?.Invoke(CurrentMode);
             }
         }
