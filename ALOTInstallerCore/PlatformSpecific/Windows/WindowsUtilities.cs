@@ -7,6 +7,9 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Text;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager.GameDirectories;
+using ALOTInstallerCore.ModManager.Objects;
+using Microsoft.Win32;
 using Serilog;
 
 namespace ALOTInstallerCore
@@ -25,6 +28,76 @@ namespace ALOTInstallerCore
             var identity = WindowsIdentity.GetCurrent();
             var principal = new WindowsPrincipal(identity);
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        /// <summary>
+        /// Removes the app compat flags for this specific target. We do not want system wide as it will make game not launch
+        /// if it is not patched to support local physx
+        /// </summary>
+        /// <param name="me1Target"></param>
+        public static void RemoveRunAsAdminXPSP3FromME1(GameTarget me1Target)
+        {
+            var exePath = MEDirectories.ExecutablePath(me1Target);
+            Log.Information($@"[AICORE] Removing app compat flags for ME1 executable at {exePath}. Remove ~, RUNASADMIN, WINXPSP3");
+            try
+            {
+                var compatKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", true);
+                string compatString = (string) compatKey?.GetValue(exePath, null);
+                if (compatString != null) //has compat setting
+                {
+                    string[] compatsettings = compatString.Split(' ');
+                    List<string> newSettings = new List<string>();
+
+                    foreach (string str in compatsettings)
+                    {
+                        switch (str)
+                        {
+                            // Don't add these to the new settings.
+                            case "~": // we will add this back if there's anything to add
+                            case "RUNASADMIN":
+                            case "WINXPSP3":
+                                continue;
+                            default:
+                                newSettings.Add(str);
+                                break;
+                        }
+                    }
+
+                    if (newSettings.Count > 0)
+                    {
+                        string newcompatString = "~";
+                        foreach (var compatitem in newSettings)
+                        {
+                            newcompatString += $" {compatitem}";
+                        }
+
+                        if (newcompatString == compatString)
+                        {
+                            Log.Information($"[AICORE] No compat flags needed updated for ME1");
+                            return; //No changes
+                        }
+                        else
+                        {
+                            compatKey.SetValue(exePath, newcompatString);
+                            Log.Information($"[AICORE] New stripped compatibility string for ME1: {newcompatString}");
+                        }
+                    }
+                    else
+                    {
+                        compatKey.DeleteValue(exePath);
+                        CoreAnalytics.TrackEvent?.Invoke("Removed appcompat settings from ME1", null);
+                        Log.Information("[AICORE] Removed compatibility settings for ME1.");
+                    }
+                }
+                else
+                {
+                    Log.Information($@"[AICORE] No app compat flags found for this executable");
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error($@"[AICORE] Error removing app compat flags: {e.Message}");
+            }
         }
 
         public static bool GrantAccess(string fullPath)
@@ -103,7 +176,7 @@ namespace ALOTInstallerCore
                 Log.Information("[AICORE] Antivirus info: " + virusCheckerName + " with state " + bytes[1].ToString("X2") + " " + bytes[2].ToString("X2") + " " + bytes[3].ToString("X2"));
             }
         }
-}
+    }
 #endif
 
 }
