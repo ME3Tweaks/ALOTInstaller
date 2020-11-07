@@ -567,6 +567,7 @@ namespace ALOTInstallerCore.Steps
 
             try
             {
+                Log.Information($@"[AICORE] Deleting MEM input path {memInputPath}");
                 Utilities.DeleteFilesAndFoldersRecursively(memInputPath);
             }
             catch (Exception e)
@@ -1194,6 +1195,7 @@ namespace ALOTInstallerCore.Steps
                         if (extractionRedirect.IsDLC && Directory.Exists(ingameDestination))
                         {
                             //delete first
+                            Log.Information($@"[AICORE] Deleting in-game destination for extraction redirect {memInputPath}");
                             Utilities.DeleteFilesAndFoldersRecursively(ingameDestination);
                         }
 
@@ -1239,6 +1241,7 @@ namespace ALOTInstallerCore.Steps
 
                 try
                 {
+                    Log.Information($@"[AICORE] Deleting staging folder for {modAddon.FriendlyName}");
                     Utilities.DeleteFilesAndFoldersRecursively(stagingPath);
                 }
                 catch (Exception e)

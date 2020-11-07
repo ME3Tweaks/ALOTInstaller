@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Serilog;
 
 namespace ALOTInstallerCore.Helpers.AppSettings
 {
@@ -31,6 +32,8 @@ namespace ALOTInstallerCore.Helpers.AppSettings
             {
                 Save(propertyName);
             }
+
+            Log.Information($@"[AICORE] Setting changing values: {propertyName} -> {value}");
 
             if (propertyName == nameof(Telemetry))
             {

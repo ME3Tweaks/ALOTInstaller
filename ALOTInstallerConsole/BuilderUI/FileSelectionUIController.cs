@@ -257,6 +257,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
         private void CleanupTextureLibrary()
         {
+            Log.Information(@"[AIConsole] Getting list of unused files in the texture library");
             var unusedFilesInLib = TextureLibrary.GetUnusedFilesInLibrary();
             if (unusedFilesInLib.Any())
             {

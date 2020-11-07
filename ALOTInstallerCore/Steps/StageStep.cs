@@ -183,6 +183,8 @@ namespace ALOTInstallerCore.Steps
             var stagingDir = Path.Combine(Settings.StagingLocation, _installOptions.InstallTarget.Game.ToString());
             if (Directory.Exists(stagingDir))
             {
+                Log.Information($@"[AICORE] Deleting existing staging directory");
+
                 Utilities.DeleteFilesAndFoldersRecursively(stagingDir);
             }
             _installOptions.FilesToInstall = getFilesToStage(_installOptions.FilesToInstall.Where(x => x.Ready && !x.Disabled && (x.ApplicableGames & _installOptions.InstallTarget.Game.ToApplicableGame()) != ApplicableGame.None));
@@ -235,6 +237,7 @@ namespace ALOTInstallerCore.Steps
             var finalBuiltPackagesDestination = Path.Combine(stagingDir, "InstallationPackages");
             if (Directory.Exists(finalBuiltPackagesDestination))
             {
+                Log.Information($@"[AICORE] Deleting existing InstallationPackages directory");
                 Utilities.DeleteFilesAndFoldersRecursively(finalBuiltPackagesDestination);
             }
             Directory.CreateDirectory(finalBuiltPackagesDestination);
@@ -271,6 +274,7 @@ namespace ALOTInstallerCore.Steps
             {
                 if (!QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.nocleanstaging))
                 {
+                    Log.Information($@"[AICORE] Deleting staged files for addon");
                     Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
                 }
 
@@ -299,6 +303,7 @@ namespace ALOTInstallerCore.Steps
 
             if (!QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.nocleanstaging))
             {
+                Log.Information($@"[AICORE] Deleting staged files for addon");
                 Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
             }
 
@@ -740,6 +745,7 @@ namespace ALOTInstallerCore.Steps
 
                 if (!QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.nocleanstaging))
                 {
+                    Log.Information($@"[AICORE] Deleting MEM mem input and staging paths for {installerFile.FriendlyName}");
                     Utilities.DeleteFilesAndFoldersRecursively(userFileBuildMemPath);
                     Utilities.DeleteFilesAndFoldersRecursively(userFileExtractionPath);
                 }
