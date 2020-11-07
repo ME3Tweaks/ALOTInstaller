@@ -365,6 +365,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         {
                             addDiagLine(@"PhysXLoader.dll is patched to force local PhysXCore.dll", Severity.GOOD);
                         }
+#if WINDOWS
                         else if (certOK == SignatureCheckResult.BadDigest)
                         {
                             addDiagLine(@"PhysXLoader.dll is not patched to force local PhysXCore.dll. Game may not boot", Severity.WARN);
@@ -373,6 +374,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         {
                             addDiagLine(@"PhysXLoader.dll is not patched, but executable is still signed", Severity.GOOD);
                         }
+#else
+                        else {
+                            addDiagLine(@"PhysXLoader.dll is not patched to force local PhysXCore.dll", Severity.WARN);
+                        }
+#endif
                         else
                         {
                             addDiagLine(@"PhysXLoader.dll status could not be checked", Severity.WARN);
@@ -390,9 +396,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                 }
 
-                #endregion
+#endregion
 
-                #region System Information
+#region System Information
                 Log.Information(@"[AICORE] Collecting system information");
                 updateStatusCallback?.Invoke("Collecting system information");
 
@@ -494,9 +500,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 }
 #endif
 
-                #endregion
+#endregion
 
-                #region Texture mod information
+#region Texture mod information
                 Log.Information(@"[AICORE] Getting texture mod installation info");
 
                 updateStatusCallback?.Invoke(@"Getting texture mod installation info");
@@ -533,11 +539,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     addDiagLine(@"Latest installation used MEM v" + avi.MEM_VERSION_USED);
                 }
 
-                #endregion
+#endregion
 
 
 
-                #region Basegame file changes
+#region Basegame file changes
                 Log.Information(@"[AICORE] Getting basegame file modifications");
                 addDiagLine(@"Basegame changes", Severity.DIAGSECTION);
 
@@ -590,9 +596,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                 }
 
-                #endregion
+#endregion
 
-                #region Blacklisted mods check
+#region Blacklisted mods check
 
                 void memExceptionOccured(string operation, string line)
                 {
@@ -646,9 +652,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 }
 
 
-                #endregion
+#endregion
 
-                #region Installed DLCs
+#region Installed DLCs
 
                 //Get DLCs
                 Log.Information(@"[AICORE] Getting DLC information");
@@ -730,9 +736,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     addDiagLine(@"[/SUB]");
                 }
 
-                #endregion
+#endregion
 
-                #region Get list of TFCs
+#region Get list of TFCs
 
                 if (selectedDiagnosticTarget.Game > MEGame.ME1)
                 {
@@ -760,9 +766,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                 }
 
-                #endregion
+#endregion
 
-                #region Files added or removed after texture install
+#region Files added or removed after texture install
 
                 args = $@"--check-game-data-mismatch --gameid {gameID} --ipc";
                 if (selectedDiagnosticTarget.TextureModded)
@@ -870,9 +876,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                 }
 
-                #endregion
+#endregion
 
-                #region Textures - full check
+#region Textures - full check
 
                 //FULL CHECK
                 if (textureCheck)
@@ -1008,11 +1014,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 }
 
-                #endregion
+#endregion
 
                 progressIndeterminateCallback?.Invoke();
 
-                #region Texture LODs
+#region Texture LODs
 
                 Log.Information(@"[AICORE] Collecting LOD info");
                 updateStatusCallback?.Invoke(@"Collecting LOD settings");
@@ -1026,9 +1032,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     addDiagLine($"MassEffectModderNoGui exited --print-lods with error. See application log for more info.", Severity.ERROR);
                 }
 
-                #endregion
+#endregion
 
-                #region ASI mods
+#region ASI mods
                 Log.Information(@"[AICORE] Collecting ASI information");
 
                 updateStatusCallback?.Invoke("Collecting ASI information");
@@ -1060,9 +1066,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     addDiagLine(@"ASI directory does not exist. No ASI mods are installed.");
                 }
 
-                #endregion
+#endregion
 
-                #region ME3: TOC check
+#region ME3: TOC check
 
                 //TOC SIZE CHECK
                 if (selectedDiagnosticTarget.Game == MEGame.ME3)
@@ -1121,9 +1127,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                 }
 
-                #endregion
+#endregion
 
-                #region Mass Effect (1) log files
+#region Mass Effect (1) log files
 
                 //ME1: LOGS
                 if (selectedDiagnosticTarget.Game == MEGame.ME1)
@@ -1183,9 +1189,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                 }
 
-                #endregion
+#endregion
 
-                #region Event logs for crashes
+#region Event logs for crashes
 
 #if WINDOWS
                 //EVENT LOGS
@@ -1224,9 +1230,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 }
 #endif
 
-                #endregion
+#endregion
 
-                #region Mass Effect 3 me3logger log
+#region Mass Effect 3 me3logger log
 
                 if (selectedDiagnosticTarget.Game == MEGame.ME3)
                 {
@@ -1256,7 +1262,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                 }
 
-                #endregion
+#endregion
             }
             catch (Exception ex)
             {
