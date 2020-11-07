@@ -226,28 +226,9 @@ namespace ALOTInstallerCore.Steps
             }
 
             Log.Information(@"[AICORE] The following files will be staged for installation (and installed) in the following order:");
-            int buildID = 0;
 
             // ORDER THE INSTALL ITEMS HERE AS THIS WILL DETERMINE THE FINAL INSTALLATION ORDER
-            sortInstallerSet(_installOptions);
-
-            foreach (var f in _installOptions.FilesToInstall)
-            {
-                f.ResetBuildVars();
-                if (f.AlotVersionInfo.IsNotVersioned)
-                {
-                    // First non-versioned file. Versioned files are always able to be overriden so
-                    // first non versioned file will be first addon file (or user file).
-                    _addonID = ++buildID; //Addon will install at this ID
-                }
-                f.BuildID = buildID++;
-                f.StatusText = "Pending staging";
-                f.IsWaiting = true;
-                Log.Information($"[AICORE]    {f.GetType().Name} {f.Filename}, Build ID {f.BuildID}");
-            }
-
-            _addonID++; //Add one in case the final file was versioned
-            Log.Information($"[AICORE] The Addon will stage to build ID {_addonID}, if it needs to be built");
+            sortInstallerFileSet(_installOptions, ref _addonID);
 
             _numTotalTasks = _installOptions.FilesToInstall.Count;
             // Final location where MEM will install packages from. 
@@ -334,11 +315,46 @@ namespace ALOTInstallerCore.Steps
         /// Sorts the installation file set.
         /// </summary>
         /// <param name="installOptions">install options package</param>
-        private void sortInstallerSet(InstallOptionsPackage installOptions)
+        private void sortInstallerFileSet(InstallOptionsPackage installOptions, ref int _addonID)
         {
+            int buildID = 0;
             List<InstallerFile> sortedSet = new List<InstallerFile>();
             sortedSet.AddRange(installOptions.FilesToInstall.OfType<ManifestFile>().OrderBy(x => x.InstallPriority));
-            sortedSet.AddRange(installOptions.FilesToInstall.OfType<UserFile>());
+            foreach (var f in sortedSet)
+            {
+                bool incremented = false;
+                f.ResetBuildVars();
+                if (f.AlotVersionInfo.IsNotVersioned)
+                {
+                    // First non-versioned file. Versioned files are always able to be overriden so
+                    // first non versioned file will be first addon file (or user file).
+                    _addonID = ++buildID; //Addon will install at this ID
+                    incremented = true;
+                }
+
+                if (!incremented)
+                {
+                    buildID++;
+                }
+                f.BuildID = buildID;
+                f.StatusText = "Pending staging";
+                f.IsWaiting = true;
+                Log.Information($"[AICORE]    {f.GetType().Name} {f.Filename}, Build ID {f.BuildID}");
+            }
+
+            _addonID++; //Add one in case the final file was versioned
+            buildID++; // Just make sure we don't override this ID
+            Log.Information($"[AICORE]    The Addon package will stage to build ID {_addonID}, if it needs to be built");
+
+            foreach (var f in installOptions.FilesToInstall.OfType<UserFile>())
+            {
+                f.ResetBuildVars();
+                f.BuildID = buildID++;
+                f.StatusText = "Pending staging";
+                f.IsWaiting = true;
+                Log.Information($"[AICORE]    {f.GetType().Name} {f.Filename}, Build ID {f.BuildID}");
+                sortedSet.Add(f);
+            }
             installOptions.FilesToInstall.ReplaceAll(sortedSet);
         }
 

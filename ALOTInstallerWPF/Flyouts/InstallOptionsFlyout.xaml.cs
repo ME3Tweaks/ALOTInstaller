@@ -359,10 +359,10 @@ namespace ALOTInstallerWPF.Flyouts
 
                         if (precheckFailedMessage != null)
                         {
-                            Application.Current.Dispatcher.Invoke(async () =>
+                            if (precheckFailedMessage.Length > 0)
                             {
-                                await mw.ShowMessageAsync("Prestaging check failed", precheckFailedMessage);
-                            });
+                                Application.Current.Dispatcher.Invoke(async () => { await mw.ShowMessageAsync("Prestaging check failed", precheckFailedMessage); });
+                            }
                             b.Result = false;
                             return;
                         }

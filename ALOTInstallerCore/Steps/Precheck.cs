@@ -179,7 +179,7 @@ namespace ALOTInstallerCore.Steps
                         package.InstallTarget.PopulateExtras();
                         foreach (var v in package.InstallTarget.ExtraFiles)
                         {
-                            if (v.DisplayName == "SilentPatch for Mass Effect" && v.FileName == SILENT_PATCH_DLL_NAME)
+                            if (v.DllProductName == "SilentPatchME" && v.FileName == SILENT_PATCH_DLL_NAME)
                             {
                                 Log.Information(@"[AICORE] Found SilentPatch dll. No need to advertise lighting fix to user");
                                 hasLightingFix = true;
