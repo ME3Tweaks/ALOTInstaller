@@ -55,7 +55,6 @@ namespace ALOTInstallerWPF.Flyouts
             }
 
             InitializeComponent();
-
         }
 
 
@@ -154,7 +153,7 @@ namespace ALOTInstallerWPF.Flyouts
         {
             if (Application.Current.MainWindow is MainWindow mw)
             {
-                if (!Directory.Exists(Settings.BuildLocation))
+                if (!Directory.Exists(Settings.StagingLocation))
                 {
                     await mw.ShowMessageAsync("Error cleaning build directory", "The build directory does not exist.");
                     return;
@@ -166,8 +165,8 @@ namespace ALOTInstallerWPF.Flyouts
                 nbw.DoWork += (sender, args) =>
                 {
                     TextureLibrary.AttemptReimportFromStaging();
-                    var bdSize = Utilities.GetSizeOfDirectory(Settings.BuildLocation);
-                    foreach (var d in Directory.GetDirectories(Settings.BuildLocation))
+                    var bdSize = Utilities.GetSizeOfDirectory(Settings.StagingLocation);
+                    foreach (var d in Directory.GetDirectories(Settings.StagingLocation))
                     {
                         Utilities.DeleteFilesAndFoldersRecursively(d);
                     }
@@ -319,12 +318,18 @@ namespace ALOTInstallerWPF.Flyouts
             {
                 Title = "Select location to build textures installation packages",
                 IsFolderPicker = true,
-                InitialDirectory = Settings.BuildLocation
+                InitialDirectory = Settings.StagingLocation
             };
             if (selector.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                Settings.BuildLocation = selector.FileName;
-                Settings.Save();
+                if (!Settings.TextureLibraryLocation.Equals(selector.FileName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Settings.StagingLocation = selector.FileName;
+                    Settings.Save();
+                } else
+                {
+                    showCannotHaveSamePaths();
+                }
             }
         }
 
@@ -338,10 +343,25 @@ namespace ALOTInstallerWPF.Flyouts
             };
             if (selector.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                Settings.TextureLibraryLocation = selector.FileName;
-                TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetAllManifestFiles().OfType<InstallerFile>()
-                    .ToList());
-                Settings.Save();
+                if (!selector.FileName.Equals(Settings.StagingSettingsLocation, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Settings.TextureLibraryLocation = Utilities.GetExecutablePath(); //This is so the property will be forced to update, in the event it's being set to the default location.
+                    Settings.TextureLibraryLocation = selector.FileName;
+                    TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetAllManifestFiles().OfType<InstallerFile>().ToList());
+                    Settings.Save();
+                }
+                else
+                {
+                    showCannotHaveSamePaths();
+                }
+            }
+        }
+
+        private async void showCannotHaveSamePaths()
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                await mw.ShowMessageAsync("Invalid path selected", "The Texture Library directory and the Staging directory must be two different folders. Choose a different path.");
             }
         }
 

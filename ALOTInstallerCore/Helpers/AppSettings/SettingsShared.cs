@@ -63,14 +63,14 @@ namespace ALOTInstallerCore.Helpers.AppSettings
             get => _textureLibraryLocation;
             set => SetProperty(ref _textureLibraryLocation, value);
         }
-        private static string _buildLocation;
+        private static string _stagingLocation;
         /// <summary>
         /// Location that can be used to build and stage textures in preparation for installation
         /// </summary>
-        public static string BuildLocation
+        public static string StagingLocation
         {
-            get => _buildLocation;
-            set => SetProperty(ref _buildLocation, value);
+            get => _stagingLocation;
+            set => SetProperty(ref _stagingLocation, value);
         }
 
         private static bool _showAdvancedFileInfo;

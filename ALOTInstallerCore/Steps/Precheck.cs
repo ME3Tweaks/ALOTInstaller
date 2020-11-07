@@ -620,7 +620,7 @@ namespace ALOTInstallerCore.Steps
         public static string PerformPreInstallCheck(InstallOptionsPackage package)
         {
             // Make sure there are packages to install
-            var installationPackagesDir = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
+            var installationPackagesDir = Path.Combine(Settings.StagingLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
             if (!Directory.Exists(installationPackagesDir))
             {
                 Log.Error(@"[AICORE] The InstallationPackages directory doesn't exist. Precheck failed");
@@ -638,7 +638,7 @@ namespace ALOTInstallerCore.Steps
             }
 
             // Get required disk space
-            long requiredDiskSpace = Utilities.GetSizeOfDirectory(new DirectoryInfo(Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString())));
+            long requiredDiskSpace = Utilities.GetSizeOfDirectory(new DirectoryInfo(Path.Combine(Settings.StagingLocation, package.InstallTarget.Game.ToString())));
             foreach (var v in package.FilesToInstall.OfType<PreinstallMod>())
             {
                 var archiveF = v.GetUsedFilepath();

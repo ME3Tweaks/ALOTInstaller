@@ -180,7 +180,7 @@ namespace ALOTInstallerCore.Steps
         /// <returns></returns>
         public void PerformStaging(object sender, DoWorkEventArgs e)
         {
-            var stagingDir = Path.Combine(Settings.BuildLocation, _installOptions.InstallTarget.Game.ToString());
+            var stagingDir = Path.Combine(Settings.StagingLocation, _installOptions.InstallTarget.Game.ToString());
             if (Directory.Exists(stagingDir))
             {
                 Utilities.DeleteFilesAndFoldersRecursively(stagingDir);

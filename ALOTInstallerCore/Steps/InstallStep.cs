@@ -109,7 +109,7 @@ namespace ALOTInstallerCore.Steps
         {
             pm = new ProgressHandler();
             this.package = package;
-            memInputPath = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
+            memInputPath = Path.Combine(Settings.StagingLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
         }
 
         void updateStageOfStage()

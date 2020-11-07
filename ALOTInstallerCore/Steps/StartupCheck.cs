@@ -51,10 +51,10 @@ namespace ALOTInstallerCore.Steps
                 var message =
                     $"Paths defined in settings were not available when {Utilities.GetAppPrefixedName()} Installer was booted. The below paths are what will be used for this session instead.\n\n" +
                     $"Texture library:\n{Settings.TextureLibraryLocation}\n\n" +
-                    $"Texture staging:\n{Settings.BuildLocation}\n\n";
+                    $"Texture staging:\n{Settings.StagingLocation}\n\n";
 
-                if (textureLibUnavailable) message += $"Missing texture library path: {Settings.TextureLibraryLocation}\n\n";
-                if (stagingDirUnavailable) message += $"Missing staging directory path: {Settings.StagingSettingsLocation}\n\n";
+                if (textureLibUnavailable) message += $"Missing texture library path:\n{Settings.TextureLibrarySettingsLocation}\n\n";
+                if (stagingDirUnavailable) message += $"Missing staging directory path:\n{Settings.StagingSettingsLocation}\n\n";
 
 
                 message += "You can update the paths where textures are stored before installation (Texture Library) and textures are built for installation (Staging) in the settings.";

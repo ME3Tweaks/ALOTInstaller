@@ -27,7 +27,7 @@ namespace ALOTInstallerCore.Helpers.AppSettings
                 settingsIni = DuplicatingIni.LoadIni(SettingsPath);
             }
             TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller", "Downloaded_Mods"), true, v => TextureLibrarySettingsLocation = v, v => TextureLibraryLocationExistedOnLoad = v);
-            BuildLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller", "Staging"), true, v => StagingSettingsLocation = v, v => StagingLocationExistedOnLoad = v);
+            StagingLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller", "Staging"), true, v => StagingSettingsLocation = v, v => StagingLocationExistedOnLoad = v);
             MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
             Telemetry = LoadSettingBool(SettingsKeys.SettingKeys.Telemetry, true);
             BetaMode = LoadSettingBool(SettingsKeys.SettingKeys.BetaMode, false);
@@ -113,8 +113,8 @@ namespace ALOTInstallerCore.Helpers.AppSettings
         {
             try
             {
-                if (propertyName == nameof(BuildLocation))
-                    SaveSettingString(SettingsKeys.SettingKeys.BuildLocation, BuildLocation);
+                if (propertyName == nameof(StagingLocation))
+                    SaveSettingString(SettingsKeys.SettingKeys.BuildLocation, StagingLocation);
                 if (propertyName == nameof(TextureLibraryLocation))
                     SaveSettingString(SettingsKeys.SettingKeys.TextureLibraryDirectory, TextureLibraryLocation);
                 if (propertyName == nameof(BetaMode))

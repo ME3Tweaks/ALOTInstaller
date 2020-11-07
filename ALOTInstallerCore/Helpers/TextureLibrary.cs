@@ -740,7 +740,7 @@ namespace ALOTInstallerCore.Helpers
                 } // END MANIFEST FILE PARSING
 
                 // Check other locations as the file won't be moved/copied.
-                if (Directory.GetParent(file).FullName.StartsWith(Settings.BuildLocation,
+                if (Directory.GetParent(file).FullName.StartsWith(Settings.StagingLocation,
                     StringComparison.InvariantCultureIgnoreCase))
                 {
                     importResults.Add(new ImportResult()
@@ -877,11 +877,11 @@ namespace ALOTInstallerCore.Helpers
         public static void AttemptReimportFromStaging()
         {
             if (new DriveInfo(Settings.TextureLibraryLocation).RootDirectory.Name ==
-                new DriveInfo(Settings.BuildLocation).RootDirectory.Name)
+                new DriveInfo(Settings.StagingLocation).RootDirectory.Name)
             {
                 foreach (var game in Locations.AllMEGames)
                 {
-                    var path = Path.Combine(Settings.BuildLocation, game.ToString(), "InstallationPackages");
+                    var path = Path.Combine(Settings.StagingLocation, game.ToString(), "InstallationPackages");
                     if (Directory.Exists(path))
                     {
                         Log.Information($@"[AICORE] Attempting reimport of possibly moved files from {path}");

@@ -30,7 +30,7 @@ namespace ALOTInstallerCore.Helpers.AppSettings
         public static void Load()
         {
             TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, @"Downloaded_Mods", v => TextureLibrarySettingsLocation = v, v => TextureLibraryLocationExistedOnLoad = v);
-            BuildLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, @"Staging", v => StagingSettingsLocation = v, v => StagingLocationExistedOnLoad = v);
+            StagingLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, @"Staging", v => StagingSettingsLocation = v, v => StagingLocationExistedOnLoad = v);
             MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
             Telemetry = LoadSettingBool(SettingsKeys.SettingKeys.Telemetry, true);
             PlayMusic = LoadSettingBool(SettingsKeys.SettingKeys.PlayMusic, false);
@@ -171,8 +171,8 @@ namespace ALOTInstallerCore.Helpers.AppSettings
         {
             try
             {
-                if (propertyName == nameof(BuildLocation))
-                    SaveSettingString(SettingsKeys.SettingKeys.BuildLocation, BuildLocation);
+                if (propertyName == nameof(StagingLocation))
+                    SaveSettingString(SettingsKeys.SettingKeys.BuildLocation, StagingLocation);
                 if (propertyName == nameof(TextureLibraryLocation))
                     SaveSettingString(SettingsKeys.SettingKeys.TextureLibraryDirectory, TextureLibraryLocation);
                 if (propertyName == nameof(BetaMode))
