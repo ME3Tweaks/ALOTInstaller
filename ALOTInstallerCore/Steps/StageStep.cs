@@ -227,7 +227,11 @@ namespace ALOTInstallerCore.Steps
 
             Log.Information(@"[AICORE] The following files will be staged for installation:");
             int buildID = 0;
-            foreach (var f in _installOptions.FilesToInstall)
+
+            // ORDER THE INSTALL ITEMS HERE AS THIS WILL DETERMINE THE FINAL INSTALLATION ORDER
+            sortInstallerSet(_installOptions);
+
+            foreach (var f in _installOptions.FilesToInstall.OrderBy(x=>x is ))
             {
                 f.ResetBuildVars();
                 if (f.AlotVersionInfo.IsNotVersioned)
@@ -324,6 +328,18 @@ namespace ALOTInstallerCore.Steps
                 return;
             }
             e.Result = true;
+        }
+
+        /// <summary>
+        /// Sorts the installation file set.
+        /// </summary>
+        /// <param name="installOptions">install options package</param>
+        private void sortInstallerSet(InstallOptionsPackage installOptions)
+        {
+            List<InstallerFile> sortedSet = new List<InstallerFile>();
+            sortedSet.AddRange(installOptions.FilesToInstall.OfType<ManifestFile>().OrderBy(x => x.InstallPriority));
+            sortedSet.AddRange(installOptions.FilesToInstall.OfType<UserFile>());
+            installOptions.FilesToInstall.ReplaceAll(sortedSet);
         }
 
         private bool? PrepareSingleFile(InstallerFile installerFile, string stagingDir, string addonStagingPath, string finalBuiltPackagesDestination, ApplicableGame targetGame)
