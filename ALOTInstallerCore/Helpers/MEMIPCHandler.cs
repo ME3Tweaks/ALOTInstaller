@@ -190,7 +190,7 @@ namespace ALOTInstallerCore.Helpers
 
             void memCrashLogOutput(string str)
             {
-                crashLogBuilder.Append(str);
+                crashLogBuilder.AppendLine(str);
             }
 
             // Run MEM
