@@ -468,8 +468,20 @@ namespace ALOTInstallerCore.Helpers
                     switch (command)
                     {
                         case @"LODLINE":
-                            var lodSplit = param.Split(@"=");
-                            lods[lodSplit[0]] = param.Substring(lodSplit[0].Length + 1);
+                            try
+                            {
+                                var lodSplit = param.Split(@"=");
+                                lods[lodSplit[0]] = param.Substring(lodSplit[0].Length + 1);
+                            }
+                            catch (Exception e)
+                            {
+                                CoreCrashes.TrackError2(new Exception("Error printing MEM LODs over IPC", e), new Dictionary<string, string>()
+                                {
+                                    {"Command",command},
+                                    {"Param", param}
+                                });
+                                lods[param] = $"ERROR SPLITTING STRING: {e.Message}. ";
+                            }
                             break;
                         default:
                             //Debug.WriteLine(@"oof?");
