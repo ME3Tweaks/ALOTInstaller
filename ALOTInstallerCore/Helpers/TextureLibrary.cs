@@ -462,6 +462,10 @@ namespace ALOTInstallerCore.Helpers
                 Dictionary<ManifestFile, string> mfToUnpackedMap = new Dictionary<ManifestFile, string>();
                 foreach (var mf in manifestFiles)
                 {
+                    if (unReadyOnly)
+                    {
+                        mf.UpdateReadyStatus(); //Make sure have the most up to date data
+                    }
                     if (mf.Ready && unReadyOnly) continue;
                     if (mf.UnpackedSingleFilename != null)
                     {

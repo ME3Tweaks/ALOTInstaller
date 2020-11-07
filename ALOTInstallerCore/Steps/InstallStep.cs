@@ -544,6 +544,27 @@ namespace ALOTInstallerCore.Steps
             NotifyClosingWillBreakGame?.Invoke(false); // End of critical section
 
             #region Cleanup
+
+            if (package.ImportNewlyUnpackedFiles)
+            {
+                TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), package.ImportNewlyUnpackedFiles,
+                    (file, done, todo) => SetBottomTextCallback?.Invoke($"Optimizing {file} for future installs {(int)(done * 100f / todo)}%"));
+            }
+            else
+            {
+                // No optimize. But we should move unpacked files back.
+                DriveInfo sDi = new DriveInfo(memInputPath);
+                DriveInfo dDi = new DriveInfo(Settings.TextureLibraryLocation);
+                if (sDi.RootDirectory.Name == dDi.RootDirectory.Name)
+                {
+                    // Will only run moves. If these aren't the same it won't be moved into staging, it'd be copied.
+                    TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), false,
+                        (file, done, todo) => SetBottomTextCallback?.Invoke($"Restoring texture library files"));
+                }
+            }
+
+
+
             try
             {
                 Utilities.DeleteFilesAndFoldersRecursively(memInputPath);
@@ -552,13 +573,7 @@ namespace ALOTInstallerCore.Steps
             {
                 Log.Error($"[AICORE] Unable to delete installation packages at {memInputPath}: {e.Message}");
             }
-
-            if (package.ImportNewlyUnpackedFiles)
-            {
-                TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), package.ImportNewlyUnpackedFiles,
-                    (file, done, todo) => SetBottomTextCallback?.Invoke($"Optimizing {file} for future installs {(int)(done * 100f / todo)}%"));
-            }
-
+            
             #endregion
 
             #region Show Ending UI
