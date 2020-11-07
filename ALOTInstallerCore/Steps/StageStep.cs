@@ -225,7 +225,7 @@ namespace ALOTInstallerCore.Steps
                 return;
             }
 
-            Log.Information(@"[AICORE] The following files will be staged for installation:");
+            Log.Information(@"[AICORE] The following files will be staged for installation (and installed) in the following order:");
             int buildID = 0;
 
             // ORDER THE INSTALL ITEMS HERE AS THIS WILL DETERMINE THE FINAL INSTALLATION ORDER
