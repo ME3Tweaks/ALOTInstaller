@@ -94,7 +94,15 @@ namespace ALOTInstallerWPF
 
             var content = new FlyoutDialogPanel(topText, buttons, selectedOption =>
             {
-                tcs.SetResult(selectedOption);
+                // If user clicks too fast this can cause an exception.
+                try
+                {
+                    tcs.SetResult(selectedOption);
+                }
+                catch
+                {
+                }
+
                 BottomBasicDialog.IsOpen = false;
             });
             BottomBasicDialog.Content = null; //clear
