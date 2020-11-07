@@ -361,7 +361,7 @@ namespace ALOTInstallerCore.Steps
                 if (diskVersion.ToVersion() < minVersionRequired)
                 {
                     Log.Error($@"[AICORE] Executable for {package.InstallTarget.Game} is outdated and must be updated. Minimum version required: {minVersionRequired}, installed vesrion: {diskVersion}");
-                    failureReason = $"Executable for {package.InstallTarget.Game} is outdated and must be updated. Minimum version required: {minVersionRequired}, installed version: {diskVersion}";
+                    failureReason = $"{package.InstallTarget.Game.ToGameName()} is outdated and must be updated. The minimum version required for installation is {minVersionRequired}, while the installed version currently is {diskVersion.ToVersion()}.";
                     return false;
                 }
             }
