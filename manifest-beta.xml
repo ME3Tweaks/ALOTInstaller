@@ -252,7 +252,7 @@
 	<manifest
 	 mode="ALOT"
 	 description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-	 version="7.0.4"/>
+	 version="7.0.6"/>
 	<!-- DEFINE MANIFEST FILES -->
 	<manifestfiles>
 		<manifestfile mode="MEUITM"
@@ -893,7 +893,7 @@
 			<file
 				downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
 				tooltipname="ALOT for ME1 12.0"
-				torrentfilename="ALOT for ME1.zip"
+				torrentfilename="ALOT for ME1 v12.zip"
 				filename="ALOT for ME1 12.0-83-2021-12-0-1604601699.zip"
 				size="4401598618"
 				md5="cbd7dccb5a0909dd5882472dac9f24c9"
@@ -916,7 +916,7 @@
 			<file
 				downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
 				tooltipname="ALOT for ME2 12.0"
-				torrentfilename="ALOT for ME2.zip"
+				torrentfilename="ALOT for ME2 v12.zip"
 				filename="ALOT for ME2 12.0-68-2021-12-0-1604620707.zip"
 				size="6169019512"
 				md5="22c3f49b421db0794c616a863a38a971"
@@ -939,7 +939,7 @@
 			<file
 				downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
 				tooltipname="ALOT for ME3 12.0"
-				torrentfilename="ALOT for ME3.zip"
+				torrentfilename="ALOT for ME3 v12.zip"
 				filename="ALOT for ME3 12.0-363-2021-12-0-1604625739.zip"
 				size="9288229132"
 				md5="746e6585f288b2a99219d92c34af5df9"
@@ -1004,7 +1004,7 @@
 				downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
 				tooltipname="Improved Static Lighting for ME3 - Lite"
 				torrentfilename="Improved Static Lighting for ME3 - Lite.zip"
-				filename="Improved Static Lighting for ME3 - Lite.zip"
+				filename="Improved Static Lighting for ME3 - Lite-363-2021-12-0-1604673604.zip"
 				size="4517800644"
 				md5="d99e0e3e7c8c6f8c65f98435638a72c6"
 				unpackedsinglefilename="LightMaps_ME3_Lite_v2.mem"
@@ -1026,7 +1026,7 @@
 				downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
 				tooltipname="Improved Static Lighting for ME3 - Full"
 				torrentfilename="Improved Static Lighting for ME3 - Full.zip"
-				filename="Improved Static Lighting for ME3 - Full.zip"
+				filename="Improved Static Lighting for ME3 - Full-363-2021-12-0-1604676675.zip"
 				size="10764271596"
 				md5="7da97b9c26cfc4547be42ddffe72bec1"
 				unpackedsinglefilename="LightMaps_ME3_Full_v2.mem"
@@ -3028,7 +3028,7 @@
 			uipriority="2"
 					   >
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME1"
+					downloadlink="https://www.nexusmods.com/masseffect/mods/144"
 					filename="ALOV for ME1 - v2.5 1080p-144-2-5-1604493731.7z"
 					torrentfilename="ALOVforME1-1080p_2.5.7z"
 					md5="f2faef46178a7f5596c127e00aa1eaa0"
@@ -3054,7 +3054,7 @@
 			version="2.5"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME1"
+					downloadlink="https://www.nexusmods.com/masseffect/mods/144"
 					filename="ALOV for ME1 - v2.5 4K-144-2-5-1604494912.7z"
 					torrentfilename="ALOVforME1-4K_2.5.7z"
 					md5="9ffa18409884ebd6cf075f0bad3b12c2"
@@ -3080,7 +3080,7 @@
 			version="2.0"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME2"
+					downloadlink="https://www.nexusmods.com/masseffect2/mods/245/"
 					filename="ALOV for ME2 - v2 (1080p)-245-2-0-1604499663.7z"
 					torrentfilename="ALOVforME2-1080p_2.0.7z"
 					md5="1327c98bff782e54ce5621230cf2df26"
@@ -3122,7 +3122,7 @@
 			version="2.0"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME2"
+					downloadlink="https://www.nexusmods.com/masseffect2/mods/245/"
 					filename="ALOV for ME2 - v2 (4K)-245-2-0-1604505185.7z"
 					torrentfilename="ALOVforME2-4K_2.0.7z"
 					md5="d40905f6111a061ae058b9bdf7f348ac"
@@ -3165,7 +3165,7 @@
 			optiongroup="ME3ALOV_BASE"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/XimxSk6MrenpwN6"
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
 					filename="ALOVforME3-1080p-Basegame_2.0-773-2-0-0-0-1604481916.7z"
 					torrentfilename="ALOVforME3-1080p-Basegame_2.0+.7z"
 					md5="d2997e24f4cf537582ec1e823336f389"
@@ -3190,7 +3190,7 @@
 			optiongroup="ME3ALOV_DLC"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/XimxSk6MrenpwN6"
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
 					filename="ALOVforME3-1080p-DLCs_2.0-773-2-0-0-0-1604490514.7z"
 					torrentfilename="ALOVforME3-1080p-DLCs_2.0+.7z"
 					md5="1f1e51b7d65b6f6b601fa0cd92b92063"
@@ -3242,7 +3242,7 @@
 			optiongroup="ME3ALOV_THIRDPARTY"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/XimxSk6MrenpwN6"
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
 					filename="ALOVforME3-1080p-ThirdPartyMods_2.0.0.0-773-2-0-0-0-1604495208.7z"
 					torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.0.0.0.7z"
 					md5="360aff945b24f4f45e920013b0956db6"
@@ -3288,7 +3288,7 @@
 			optiongroup="ME3ALOV_BASE"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/XimxSk6MrenpwN6"
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
 					filename="ALOVforME3-4K-Basegame_2.0-773-2-0-0-0-1604520548.7z"
 					torrentfilename="ALOVforME3-4K-Basegame_2.0+.7z"
 					md5="1b22ee35d8452f94b44cd102328ca383"
@@ -3313,7 +3313,7 @@
 			optiongroup="ME3ALOV_DLC"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/XimxSk6MrenpwN6"
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
 					filename="ALOVforME3-4K-DLCs_2.0-773-2-0-0-0-1604581194.7z"
 					torrentfilename="ALOVforME3-4K-DLCs_2.0+.7z"
 					md5="d024b6f36d3d8d727c0bdb06031f2236 "
@@ -3365,7 +3365,7 @@
 			optiongroup="ME3ALOV_THIRDPARTY"
 			uipriority="2">
 			<file
-				downloadlink="https://tessatheterror.xyz/index.php/s/XimxSk6MrenpwN6"
+				downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
 				filename="ALOVforME3-4K-ThirdPartyMods_2.0.0.0-773-2-0-0-0-1604598760.7z"
 				torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.0.0.0.7z"
 				md5="bf25228dcb6f793b1ca603dc70cf5cbe"
