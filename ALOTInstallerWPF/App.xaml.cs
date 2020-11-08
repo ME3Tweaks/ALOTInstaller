@@ -9,11 +9,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Xml.Linq;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerWPF.BuilderUI;
 using CommandLine;
+using ME3ExplorerCore.Misc;
 using Serilog;
 
 namespace ALOTInstallerWPF
@@ -35,6 +37,7 @@ namespace ALOTInstallerWPF
 #endif
         public App() : base()
         {
+            debug();
             Locations.AppDataFolderName = "ALOTInstallerWPF"; // Do not change this!
             handleCommandLine();
             ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(UIElement),
@@ -42,6 +45,57 @@ namespace ALOTInstallerWPF
             ToolTipService.ShowOnDisabledProperty.OverrideMetadata(
                 typeof(Control),
                 new FrameworkPropertyMetadata(true));
+        }
+
+        private void debug()
+        {
+            var meuitmBasepath = @"X:\MEUITM2\";
+            var meuitmIni = Path.Combine(meuitmBasepath, "installer.ini");
+            var meuitmModsDir = Path.Combine(meuitmBasepath, "Mods");
+            DuplicatingIni ini = DuplicatingIni.LoadIni(meuitmIni);
+
+            XElement root = new XElement("root");
+            foreach (var v in ini.Sections)
+            {
+                if (v.Header.StartsWith("Mod"))
+                {
+                    XElement cf = new XElement("choicefile");
+                    cf.SetAttributeValue("choicetitle", $"{v.Entries.FirstOrDefault(x=>x.Key == "Label1")?.Value} textures");
+                    cf.SetAttributeValue("defaultselectedindex", "0");
+                    int i = 1;
+                    while (true)
+                    {
+                        var fileX = v.Entries.FirstOrDefault(x => x.Key == $"File{i}")?.Value;
+                        var labelX = v.Entries.FirstOrDefault(x => x.Key == $"Label{i}")?.Value;
+
+                        if (fileX != null && labelX != null)
+                        {
+                            if (labelX == "Dont install")
+                            {
+                                cf.SetAttributeValue("allownoinstall", "true");
+                                i++;
+                                continue;
+                            }
+                            // it's file
+                            XElement pfce = new XElement("packagefile");
+                            pfce.SetAttributeValue("me2", "true");
+                            pfce.SetAttributeValue("movedirectly", "true");
+                            var subPath = Utilities.GetRelativePath(Path.Combine(meuitmModsDir, fileX), meuitmBasepath);
+                            pfce.SetAttributeValue("sourcename", subPath);
+                            pfce.SetAttributeValue("choicetitle", labelX);
+                            cf.Add(pfce);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                        i++;
+                    }
+                    root.Add(cf);
+                }
+            }
+            Debug.WriteLine(root);
+
         }
 
         protected override void OnExit(ExitEventArgs e)

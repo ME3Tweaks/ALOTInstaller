@@ -939,7 +939,7 @@ namespace ALOTInstallerCore.Steps
                         {
                             string zipfile = Path.Combine(sourceDirectory, zip.SourceName);
                             string stagedPath = Path.Combine(finalDest, $"{mf.BuildID:D3}_{stagedID}_{Path.GetFileName(zip.SourceName)}");
-                            Log.Information($@"[AICORE] [{prefix}] Installing ZipFile item: {zipfile} -> {stagedPath}");
+                            Log.Information($@"[AICORE] [{prefix}] Staging ZipFile item: {zipfile} -> {stagedPath}");
                             File.Move(zipfile, stagedPath);
                             zip.StagedPath = stagedPath;
                             stagedID++;
@@ -953,7 +953,7 @@ namespace ALOTInstallerCore.Steps
                         {
                             string singleFile = Path.Combine(sourceDirectory, copy.SourceName);
                             string stagedPath = Path.Combine(finalDest, $"{mf.BuildID:D3}_{stagedID}_{Path.GetFileName(copy.SourceName)}");
-                            Log.Information($@"[AICORE] [{prefix}] Installing CopyFile item: {singleFile} -> {stagedPath}");
+                            Log.Information($@"[AICORE] [{prefix}] Staging CopyFile item: {singleFile} -> {stagedPath}");
 
                             File.Move(singleFile, stagedPath);
                             copy.StagedPath = stagedPath;

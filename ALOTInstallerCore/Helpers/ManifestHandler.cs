@@ -410,7 +410,7 @@ namespace ALOTInstallerCore.Helpers
                                                                           ChoiceTitle = q.Attribute("choicetitle").Value,
                                                                           AllowNoInstall = q.Attribute("allownoinstall")?.Value == "true",
                                                                           DefaultSelectedIndex = TryConvert.ToInt32(q.Attribute("defaultselectedindex")?.Value, 0),
-                                                                          Choices = q.Elements("packagefile").Select(c => new PackageFile
+                                                                          ChoicesHuman = q.Elements("packagefile").Select(c => new PackageFile
                                                                           {
                                                                               ChoiceTitle = c.Attribute("choicetitle").Value,
                                                                               SourceName = c.Attribute("sourcename").Value,
@@ -422,7 +422,7 @@ namespace ALOTInstallerCore.Helpers
                                                                               m_me3 = TryConvert.ToBool(c.Attribute("me3")?.Value, false),
                                                                               TPFSource = c.Attribute("tpfsource")?.Value,
                                                                               Transient = true
-                                                                          }).ToList()
+                                                                          }).OfType<object>().ToList() //Use oftype object as the list supports multiple object types
                                                                       }).ToList(),
                                                                   // Included zip files
                                                                   ZipFiles = e.Elements("zipfile")

@@ -11,21 +11,21 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// <param name="source"></param>
         public ChoiceFile(ChoiceFile source) : base(source)
         {
-            Choices = source.Choices.Select(x => new PackageFile(x)).ToList();
+            ChoicesHuman = source.ChoicesHuman.OfType<PackageFile>().Select(x => new PackageFile(x)).OfType<object>().ToList();
         }
 
-        public ChoiceFile() { }
-
-        public override List<object> ChoicesHuman => Choices.Select(s => (object)s.ChoiceTitle).ToList();
+        public ChoiceFile()
+        {
+            ChoicesHuman = new List<object>();
+        }
 
         //Class Specific
-        public List<PackageFile> Choices { get; set; } // Support null option for none?
         public PackageFile GetChosenFile()
         {
             var uiChoice = ChoicesHuman[SelectedIndex];
             if (!(uiChoice is NullChoiceOption))
             {
-                return Choices[SelectedIndex];
+                return ChoicesHuman[SelectedIndex] as PackageFile;
             }
 
             return null; // No choice was taken
