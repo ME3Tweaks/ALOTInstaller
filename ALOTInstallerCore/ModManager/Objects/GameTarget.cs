@@ -216,7 +216,7 @@ namespace ALOTInstallerCore.ModManager.Objects
                             fs.Position = endPos - 16;
                             int MEUITMVER = fs.ReadInt32();
 
-                            return new TextureModInstallationInfo(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER, installerVersionUsed, memVersionUsed);
+                            return new TextureModInstallationInfo(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER, memVersionUsed, installerVersionUsed);
                         }
                         else
                         {

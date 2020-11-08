@@ -43,7 +43,7 @@ namespace ALOTInstallerCore
             CancellationTokenSource cancellationTokenSource)
         {
 #if APPUPDATESUPPORT
-            Log.Information("[AICORE] Checking for application updates from github");
+            Log.Information($"[AICORE] Checking for application updates from github. Mode: {(Settings.BetaMode ? "Beta" : "Stable")}");
             var currentAppVersionInfo = Utilities.GetAppVersion();
             var client = new GitHubClient(new ProductHeaderValue($"{Utilities.GetAppPrefixedName()}Installer"));
             try
@@ -64,7 +64,7 @@ namespace ALOTInstallerCore
 
                         if (onlineReleaseVersion < currentAppVersionInfo)
                         {
-                            Log.Information(@"[AICORE] The version of ALOT Installer that we have is higher than the latest release from github, no updates available.");
+                            Log.Information($@"[AICORE] The version of ALOT Installer that we have is higher than the latest release from github, no updates available. Latest applicable github release is {onlineReleaseVersion}");
                             break;
                         }
 

@@ -12,6 +12,7 @@ namespace ALOTInstallerCore.ModManager.Objects
     {
         private MEGame game;
         public string DisplayName { get; }
+        public string DllProductName { get; }
         public enum EFileType
         {
             DLL
@@ -32,6 +33,7 @@ namespace ALOTInstallerCore.ModManager.Objects
                     if (!string.IsNullOrWhiteSpace(info.ProductName))
                     {
                         DisplayName += $@" ({info.ProductName.Trim()})";
+                        DllProductName = info.ProductName.Trim();
                     }
                     break;
             }

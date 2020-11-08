@@ -59,12 +59,6 @@
 		<DebugSymbols>true</DebugSymbols>
 		<DefineConstants>WINDOWS</DefineConstants>
 	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)'=='WinRelease'">
-	  <DebugType>embedded</DebugType>
-	  <DebugSymbols>true</DebugSymbols>
-	  <DefineConstants>WINDOWS</DefineConstants>
-	</PropertyGroup>
-
 	<ItemGroup>
 		<ProjectReference Include="..\ALOTInstallerCore\ALOTInstallerCore.csproj" />
     <ProjectReference Include="..\MahApps.Metro\src\MahApps.Metro\MahApps.Metro.csproj" />

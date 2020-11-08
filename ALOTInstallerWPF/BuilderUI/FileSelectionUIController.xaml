@@ -162,10 +162,10 @@
                         <DockPanel Dock="Right">
                             <StackPanel Orientation="Vertical"  Margin="3,3" DockPanel.Dock="Top">
                                 <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Border Padding="3,1" Margin="2,0" BorderThickness="1" BorderBrush="LightGray" Background="{Binding Recommendation, Converter={StaticResource RecommendationColorConverter}}" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    <Border Padding="3,1" Margin="2,0" Background="{Binding Recommendation, Converter={StaticResource RecommendationColorConverter}}" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
                                         <TextBlock TextAlignment="Right" Text="{Binding RecommendationString}" FontStyle="Italic"/>
                                     </Border>
-                                    <Border Padding="3,1" Margin="2,0" Visibility="{Binding Category, Converter={StaticResource NullVisibilityConverter}}" BorderThickness="1" BorderBrush="LightGray" Background="DarkSlateBlue" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    <Border Padding="3,1" Margin="2,0" Visibility="{Binding Category, Converter={StaticResource NullVisibilityConverter}}" Background="DarkSlateBlue" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
                                         <Border.ToolTip>
                                             <ToolTip 
                                                 Content="{Binding Category}"
@@ -174,24 +174,24 @@
                                         </Border.ToolTip>
                                         <TextBlock TextAlignment="Right" Text="{Binding Category}" FontStyle="Italic"/>
                                     </Border>
-                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME1'}" ToolTip="This file applies to Mass Effect" BorderThickness="1" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
+                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME1'}" ToolTip="This file applies to Mass Effect" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
                                         <TextBlock Text="Mass Effect" VerticalAlignment="Center"/>
                                     </Border>
-                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME2'}" ToolTip="This file applies to Mass Effect 2" BorderThickness="1" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
+                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME2'}" ToolTip="This file applies to Mass Effect 2" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
                                         <TextBlock Text="Mass Effect 2" VerticalAlignment="Center"/>
                                     </Border>
-                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME3'}" ToolTip="This file applies to Mass Effect 3" BorderThickness="1" BorderBrush="Chartreuse" Background="#0f4e60" CornerRadius="2" VerticalAlignment="Center">
+                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME3'}" ToolTip="This file applies to Mass Effect 3" Background="#0f4e60" CornerRadius="2" VerticalAlignment="Center">
                                         <TextBlock Text="Mass Effect 3" VerticalAlignment="Center"/>
                                     </Border>
                                 </StackPanel>
                             </StackPanel>
                             <TextBlock Text="{Binding Self, Converter={StaticResource InstallerFileBackingFileConverter}}" 
-                                           FontSize="11" 
+                                           FontSize="10" 
                                            DockPanel.Dock="Top"
                                            Margin="0,1,2,0"
                                            HorizontalAlignment="Right"
                                            TextWrapping="Wrap"
-                                           MaxWidth="300"
+                                           MaxWidth="400"
                                            TextAlignment="Right"/>
                             <StackPanel
                                     VerticalAlignment="Center">
@@ -247,16 +247,16 @@
                         <DockPanel Dock="Right">
                             <StackPanel Orientation="Vertical"  Margin="3,3" DockPanel.Dock="Top">
                                 <StackPanel  Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Border Padding="3,1" Margin="2,0" BorderThickness="1" BorderBrush="LightGray" ToolTip="This file is part of the Addon" Background="DarkSlateBlue" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                    <Border Padding="3,1" Margin="2,0" BorderThickness="1" ToolTip="This file is not listed in the manifest" Background="DarkSlateBlue" CornerRadius="2" VerticalAlignment="Center" HorizontalAlignment="Right">
                                         <TextBlock TextAlignment="Right" Text="User File" FontStyle="Italic"/>
                                     </Border>
-                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME1'}" ToolTip="This file applies to Mass Effect" BorderThickness="1" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
+                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME1'}" ToolTip="This file applies to Mass Effect" BorderBrush="CadetBlue" Background="DarkBlue" CornerRadius="2" VerticalAlignment="Center">
                                         <TextBlock Text="Mass Effect" VerticalAlignment="Center"/>
                                     </Border>
-                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME2'}" ToolTip="This file applies to Mass Effect 2" BorderThickness="1" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
+                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME2'}" ToolTip="This file applies to Mass Effect 2" BorderBrush="Red" Background="#6b006b" CornerRadius="2" VerticalAlignment="Center">
                                         <TextBlock Text="Mass Effect 2" VerticalAlignment="Center"/>
                                     </Border>
-                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME3'}" ToolTip="This file applies to Mass Effect 3" BorderThickness="1" BorderBrush="Chartreuse" Background="#0f4e60" CornerRadius="2" VerticalAlignment="Center">
+                                    <Border Padding="2,1" Margin="2,0" Visibility="{Binding ApplicableGames, Converter={StaticResource ApplicableGamesVisibilityConverter}, ConverterParameter='ME3'}" ToolTip="This file applies to Mass Effect 3" BorderBrush="Chartreuse" Background="#0f4e60" CornerRadius="2" VerticalAlignment="Center">
                                         <TextBlock Text="Mass Effect 3" VerticalAlignment="Center"/>
                                     </Border>
                                 </StackPanel>

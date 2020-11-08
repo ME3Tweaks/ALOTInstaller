@@ -272,7 +272,7 @@ namespace ALOTInstallerConsole.BuilderUI
                 Width = 65,
                 Height = 1
             });
-            buildLocation = new TextField(Settings.BuildLocation)
+            buildLocation = new TextField(Settings.StagingLocation)
             {
                 X = 2,
                 Y = y,
@@ -312,12 +312,12 @@ namespace ALOTInstallerConsole.BuilderUI
             {
                 CanChooseDirectories = true,
                 CanChooseFiles = false,
-                DirectoryPath = Directory.Exists(Settings.BuildLocation) ? Settings.BuildLocation : null
+                DirectoryPath = Directory.Exists(Settings.StagingLocation) ? Settings.StagingLocation : null
             };
             Application.Run(selector);
             if (!selector.Canceled && selector.FilePath != null && Directory.Exists(selector.FilePath.ToString()))
             {
-                buildLocation.Text = Settings.BuildLocation = selector.FilePath.ToString();
+                buildLocation.Text = Settings.StagingLocation = selector.FilePath.ToString();
             }
         }
 

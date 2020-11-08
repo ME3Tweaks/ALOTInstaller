@@ -16,7 +16,15 @@ namespace ALOTInstallerWPF.Converters
         {
             if (value is InstallerFile ifx)
             {
-                return $"{Path.GetFileName(ifx.GetUsedFilepath())} ({FileSizeFormatter.FormatSize(ifx.FileSize)})";
+                try
+                {
+                    return $"{Path.GetFileName(ifx.GetUsedFilepath())} ({FileSizeFormatter.FormatSize(ifx.FileSize)})";
+                }
+                catch
+                {
+                    // If the file is moved and this is invoked it may cause an exception
+                    return ifx.Filename;
+                }
             }
 
             return "ERROR";

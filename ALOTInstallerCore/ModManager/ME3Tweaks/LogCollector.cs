@@ -358,6 +358,35 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             Severity.WARN);
                     }
 
+                    if (selectedDiagnosticTarget.Game == MEGame.ME1)
+                    {
+                        // Check for patched PhysX
+                        if (LegacyPhysXInstaller.IsPhysXLoaderPatchedLocalOnly(selectedDiagnosticTarget))
+                        {
+                            addDiagLine(@"PhysXLoader.dll is patched to force local PhysXCore.dll", Severity.GOOD);
+                        }
+#if WINDOWS
+                        else if (certOK == SignatureCheckResult.BadDigest)
+                        {
+                            addDiagLine(@"PhysXLoader.dll is not patched to force local PhysXCore.dll. Game may not boot", Severity.WARN);
+                        }
+                        else if (certOK == SignatureCheckResult.Valid)
+                        {
+                            addDiagLine(@"PhysXLoader.dll is not patched, but executable is still signed", Severity.GOOD);
+                        }
+                        else
+                        {
+                            addDiagLine(@"PhysXLoader.dll status could not be checked", Severity.WARN);
+                        }
+#else
+                        else
+                        {
+                            addDiagLine(@"PhysXLoader.dll is not patched to force local PhysXCore.dll", Severity.WARN);
+                        }
+#endif
+
+                    }
+
                     selectedDiagnosticTarget.PopulateExtras();
                     if (selectedDiagnosticTarget.ExtraFiles.Any())
                     {

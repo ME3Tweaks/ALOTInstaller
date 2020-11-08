@@ -180,9 +180,11 @@ namespace ALOTInstallerCore.Steps
         /// <returns></returns>
         public void PerformStaging(object sender, DoWorkEventArgs e)
         {
-            var stagingDir = Path.Combine(Settings.BuildLocation, _installOptions.InstallTarget.Game.ToString());
+            var stagingDir = Path.Combine(Settings.StagingLocation, _installOptions.InstallTarget.Game.ToString());
             if (Directory.Exists(stagingDir))
             {
+                Log.Information($@"[AICORE] Deleting existing staging directory");
+
                 Utilities.DeleteFilesAndFoldersRecursively(stagingDir);
             }
             _installOptions.FilesToInstall = getFilesToStage(_installOptions.FilesToInstall.Where(x => x.Ready && !x.Disabled && (x.ApplicableGames & _installOptions.InstallTarget.Game.ToApplicableGame()) != ApplicableGame.None));
@@ -225,31 +227,17 @@ namespace ALOTInstallerCore.Steps
                 return;
             }
 
-            Log.Information(@"[AICORE] The following files will be staged for installation:");
-            int buildID = 0;
-            foreach (var f in _installOptions.FilesToInstall)
-            {
-                f.ResetBuildVars();
-                if (f.AlotVersionInfo.IsNotVersioned)
-                {
-                    // First non-versioned file. Versioned files are always able to be overriden so
-                    // first non versioned file will be first addon file (or user file).
-                    _addonID = ++buildID; //Addon will install at this ID
-                }
-                f.BuildID = buildID++;
-                f.StatusText = "Pending staging";
-                f.IsWaiting = true;
-                Log.Information($"[AICORE]    {f.GetType().Name} {f.Filename}, Build ID {f.BuildID}");
-            }
+            Log.Information(@"[AICORE] The following files will be staged for installation (and installed) in the following order:");
 
-            _addonID++; //Add one in case the final file was versioned
-            Log.Information($"[AICORE] The Addon will stage to build ID {_addonID}, if it needs to be built");
+            // ORDER THE INSTALL ITEMS HERE AS THIS WILL DETERMINE THE FINAL INSTALLATION ORDER
+            sortInstallerFileSet(_installOptions, ref _addonID);
 
             _numTotalTasks = _installOptions.FilesToInstall.Count;
             // Final location where MEM will install packages from. 
             var finalBuiltPackagesDestination = Path.Combine(stagingDir, "InstallationPackages");
             if (Directory.Exists(finalBuiltPackagesDestination))
             {
+                Log.Information($@"[AICORE] Deleting existing InstallationPackages directory");
                 Utilities.DeleteFilesAndFoldersRecursively(finalBuiltPackagesDestination);
             }
             Directory.CreateDirectory(finalBuiltPackagesDestination);
@@ -286,6 +274,7 @@ namespace ALOTInstallerCore.Steps
             {
                 if (!QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.nocleanstaging))
                 {
+                    Log.Information($@"[AICORE] Deleting staged files for addon");
                     Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
                 }
 
@@ -314,6 +303,7 @@ namespace ALOTInstallerCore.Steps
 
             if (!QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.nocleanstaging))
             {
+                Log.Information($@"[AICORE] Deleting staged files for addon");
                 Utilities.DeleteFilesAndFoldersRecursively(addonStagingPath);
             }
 
@@ -324,6 +314,53 @@ namespace ALOTInstallerCore.Steps
                 return;
             }
             e.Result = true;
+        }
+
+        /// <summary>
+        /// Sorts the installation file set.
+        /// </summary>
+        /// <param name="installOptions">install options package</param>
+        private void sortInstallerFileSet(InstallOptionsPackage installOptions, ref int _addonID)
+        {
+            int buildID = 0;
+            List<InstallerFile> sortedSet = new List<InstallerFile>();
+            sortedSet.AddRange(installOptions.FilesToInstall.OfType<ManifestFile>().OrderBy(x => x.InstallPriority));
+            foreach (var f in sortedSet)
+            {
+                bool incremented = false;
+                f.ResetBuildVars();
+                if (f.AlotVersionInfo.IsNotVersioned)
+                {
+                    // First non-versioned file. Versioned files are always able to be overriden so
+                    // first non versioned file will be first addon file (or user file).
+                    _addonID = ++buildID; //Addon will install at this ID
+                    incremented = true;
+                }
+
+                if (!incremented)
+                {
+                    buildID++;
+                }
+                f.BuildID = buildID;
+                f.StatusText = "Pending staging";
+                f.IsWaiting = true;
+                Log.Information($"[AICORE]    {f.GetType().Name} {f.Filename}, Build ID {f.BuildID}");
+            }
+
+            _addonID++; //Add one in case the final file was versioned
+            buildID++; // Just make sure we don't override this ID
+            Log.Information($"[AICORE]    The Addon package will stage to build ID {_addonID}, if it needs to be built");
+
+            foreach (var f in installOptions.FilesToInstall.OfType<UserFile>())
+            {
+                f.ResetBuildVars();
+                f.BuildID = buildID++;
+                f.StatusText = "Pending staging";
+                f.IsWaiting = true;
+                Log.Information($"[AICORE]    {f.GetType().Name} {f.Filename}, Build ID {f.BuildID}");
+                sortedSet.Add(f);
+            }
+            installOptions.FilesToInstall.ReplaceAll(sortedSet);
         }
 
         private bool? PrepareSingleFile(InstallerFile installerFile, string stagingDir, string addonStagingPath, string finalBuiltPackagesDestination, ApplicableGame targetGame)
@@ -708,6 +745,7 @@ namespace ALOTInstallerCore.Steps
 
                 if (!QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.nocleanstaging))
                 {
+                    Log.Information($@"[AICORE] Deleting MEM mem input and staging paths for {installerFile.FriendlyName}");
                     Utilities.DeleteFilesAndFoldersRecursively(userFileBuildMemPath);
                     Utilities.DeleteFilesAndFoldersRecursively(userFileExtractionPath);
                 }

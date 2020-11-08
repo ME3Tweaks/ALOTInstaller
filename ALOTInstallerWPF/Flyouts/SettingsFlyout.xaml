@@ -123,12 +123,12 @@
 
                     <DockPanel Margin="20,3,0,3">
                         <TextBlock Text="Install package staging" DockPanel.Dock="Top" FontWeight="Bold"/>
-                        <TextBlock  TextWrapping="Wrap" Text="Temporary: Where texture files are decompiled and then recompiled into an installable format. Files are deleted after installation finishes" DockPanel.Dock="Top"/>
+                        <TextBlock  TextWrapping="Wrap" Text="Temporary: Where the installer prepares files for install. Should have plenty of free space. Files are deleted after installation finishes" DockPanel.Dock="Top"/>
                         <DockPanel DockPanel.Dock="Bottom" Margin="0,2,0,0">
                             <Button DockPanel.Dock="Right" Command="{Binding SetBuildLocationCommand}" Content="Change" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Change where the imported texture files for modes (excluding Free Mode) are stored"/>
                             <Button  FontSize="11" FontWeight="Bold" Command="{Binding CleanupBuildLocationCommand}" HorizontalAlignment="Left" Content="Cleanup Package Staging" Style="{StaticResource MahApps.Styles.Button.Square.Accent}" ToolTip="Removes old files from the texture library that are no longer in the manifest.&#10;Any files in this folder that you manually added that are not in the manifest will also be deleted."/>
                         </DockPanel>
-                        <TextBox Text="{Binding Path=(appSettings:Settings.BuildLocation)}" ToolTip="{Binding Path=(appSettings:Settings.BuildLocation)}" IsReadOnly="True" IsEnabled="False" />
+                        <TextBox Text="{Binding Path=(appSettings:Settings.StagingLocation)}" ToolTip="{Binding Path=(appSettings:Settings.StagingLocation)}" IsReadOnly="True" IsEnabled="False" />
                     </DockPanel>
                 </StackPanel>
             </Expander>

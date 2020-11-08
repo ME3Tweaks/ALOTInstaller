@@ -209,5 +209,22 @@ namespace ALOTInstallerCore.Helpers
             return "An unknown error has occurred.";
 
         }
+
+        public static bool IsPhysXLoaderPatchedLocalOnly(GameTarget me1Target)
+        {
+            Log.Information(@"[AICORE] Checking if PhysXLoader.dll is patched for local only");
+            var loaderPath = Path.Combine(me1Target.TargetPath, "Binaries", "PhysXLoader.dll");
+            if (File.Exists(loaderPath) && new FileInfo(loaderPath).Length == 68688) //Make sure it's same size so it's not like some other build
+            {
+                using var pls = File.Open(loaderPath, FileMode.Open, FileAccess.Read);
+                pls.Seek(0x1688, SeekOrigin.Begin);
+
+                var jzByte1 = pls.ReadByte();
+                var jzByte2 = pls.ReadByte();
+                return jzByte1 == 0x90 && jzByte2 == 0x90;
+            }
+
+            return false; // File doesn't exist or is wrong size
+        }
     }
 }

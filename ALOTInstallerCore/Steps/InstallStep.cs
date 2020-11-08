@@ -19,7 +19,10 @@ using ME3ExplorerCore.Packages;
 using ME3ExplorerCore.Unreal;
 using Serilog;
 using NickStrupat;
-
+#if WINDOWS
+using ALOTInstallerCore.PlatformSpecific.Windows;
+using Microsoft.Win32;
+#endif
 
 namespace ALOTInstallerCore.Steps
 {
@@ -106,7 +109,7 @@ namespace ALOTInstallerCore.Steps
         {
             pm = new ProgressHandler();
             this.package = package;
-            memInputPath = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
+            memInputPath = Path.Combine(Settings.StagingLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
         }
 
         void updateStageOfStage()
@@ -485,6 +488,13 @@ namespace ALOTInstallerCore.Steps
                     doWorkEventArgs.Result = InstallResult.InstallFailed_ME1LAAApplyFailed;
                     return;
                 }
+
+                // Remove V3 registry permissions
+#if WINDOWS
+                removeV3RegistryChanges();
+                // Remove XPSP3 permissions that seem to get set sometimes
+                Utilities.RemoveRunAsAdminXPSP3FromME1(package.InstallTarget);
+#endif
             }
 
             // stamp version info
@@ -536,19 +546,35 @@ namespace ALOTInstallerCore.Steps
             NotifyClosingWillBreakGame?.Invoke(false); // End of critical section
 
             #region Cleanup
-            try
-            {
-                Utilities.DeleteFilesAndFoldersRecursively(memInputPath);
-            }
-            catch (Exception e)
-            {
-                Log.Error($"[AICORE] Unable to delete installation packages at {memInputPath}: {e.Message}");
-            }
 
             if (package.ImportNewlyUnpackedFiles)
             {
                 TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), package.ImportNewlyUnpackedFiles,
                     (file, done, todo) => SetBottomTextCallback?.Invoke($"Optimizing {file} for future installs {(int)(done * 100f / todo)}%"));
+            }
+            else
+            {
+                // No optimize. But we should move unpacked files back.
+                DriveInfo sDi = new DriveInfo(memInputPath);
+                DriveInfo dDi = new DriveInfo(Settings.TextureLibraryLocation);
+                if (sDi.RootDirectory.Name == dDi.RootDirectory.Name)
+                {
+                    // Will only run moves. If these aren't the same it won't be moved into staging, it'd be copied.
+                    TextureLibrary.AttemptImportUnpackedFiles(memInputPath, package.FilesToInstall.OfType<ManifestFile>().ToList(), false,
+                        (file, done, todo) => SetBottomTextCallback?.Invoke($"Restoring texture library files"), unReadyOnly: true); //unready only will make sure that we don't try to move back things like mem files from zip archives
+                }
+            }
+
+
+
+            try
+            {
+                Log.Information($@"[AICORE] Deleting MEM input path {memInputPath}");
+                Utilities.DeleteFilesAndFoldersRecursively(memInputPath);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"[AICORE] Unable to delete installation packages at {memInputPath}: {e.Message}");
             }
 
             #endregion
@@ -558,7 +584,7 @@ namespace ALOTInstallerCore.Steps
 
             if (package.FilesToInstall.Count == 1)
             {
-                installString = package.FilesToInstall[0].ShortFriendlyName;
+                installString = package.FilesToInstall[0].ShortFriendlyName ?? package.FilesToInstall[0].FriendlyName;
             }
 
             SetTopTextCallback?.Invoke($"Installation of {installString}");
@@ -581,6 +607,24 @@ namespace ALOTInstallerCore.Steps
             SetProgressStyle?.Invoke(ProgressStyle.None);
             doWorkEventArgs.Result = hasWarning ? InstallResult.InstallOKWithWarning : InstallResult.InstallOK;
         }
+
+#if WINDOWS
+        private void removeV3RegistryChanges()
+        {
+            try
+            {
+                Log.Information(@"[AICORE] Removing ALOT Installer V3 ME1 run as admin registry changes (if any are still installed), as they are no longer necessary for V4");
+                RegistryHandler.DeleteRegistryValue(Registry.LocalMachine, @"SOFTWARE\\WOW6432Node\\AGEIA Technologies", "enableLocalPhysXCore"); //Should not throw exception
+                RegistryHandler.DeleteRegistryValue(Registry.LocalMachine, @"SOFTWARE\\WOW6432Node\\AGEIA Technologies", "EpicLocalDllHack"); //Should not throw exception
+                // Remove non-inherited ACLs. If we have permissions (which V3 granted), this effectively should return the system to how it was originally.
+                RegistryHandler.RemoveFullControlNonInheritedACLs(Registry.LocalMachine, @"SOFTWARE\\WOW6432Node\\AGEIA Technologies",
+                    () => Log.Information(@"[AICORE] Removed ALOT Installer V3 AGEIA registry permissions that are no longer necessary"),
+                    () => Log.Information(@"[AICORE] Could not remove permissions on AGEIA registry key. It may be that they were already revoked or were never set to begin with. (This is not an error)"));
+            }
+            catch { }
+
+        }
+#endif
 
         private bool checkForExistingMarkers()
         {
@@ -1153,6 +1197,7 @@ namespace ALOTInstallerCore.Steps
                         if (extractionRedirect.IsDLC && Directory.Exists(ingameDestination))
                         {
                             //delete first
+                            Log.Information($@"[AICORE] Deleting in-game destination for extraction redirect {memInputPath}");
                             Utilities.DeleteFilesAndFoldersRecursively(ingameDestination);
                         }
 
@@ -1198,6 +1243,7 @@ namespace ALOTInstallerCore.Steps
 
                 try
                 {
+                    Log.Information($@"[AICORE] Deleting staging folder for {modAddon.FriendlyName}");
                     Utilities.DeleteFilesAndFoldersRecursively(stagingPath);
                 }
                 catch (Exception e)

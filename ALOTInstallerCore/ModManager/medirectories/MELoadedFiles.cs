@@ -6,6 +6,7 @@ using System.Linq;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.MEDirectories;
 using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerCore.ModManager.GameDirectories

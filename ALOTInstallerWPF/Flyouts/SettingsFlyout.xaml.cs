@@ -55,7 +55,6 @@ namespace ALOTInstallerWPF.Flyouts
             }
 
             InitializeComponent();
-
         }
 
 
@@ -154,32 +153,51 @@ namespace ALOTInstallerWPF.Flyouts
         {
             if (Application.Current.MainWindow is MainWindow mw)
             {
-                if (!Directory.Exists(Settings.BuildLocation))
+                if (!Directory.Exists(Settings.StagingLocation))
                 {
                     await mw.ShowMessageAsync("Error cleaning build directory", "The build directory does not exist.");
                     return;
                 }
+                Log.Information(@"[AIWPF] Preparing to clean staging directory");
 
-                NamedBackgroundWorker nbw = new NamedBackgroundWorker("CleanupBuildLocWorker");
-                var pd = await mw.ShowProgressAsync("Importing leftover files from build directory",
-                    "Checking if any files in build directory need to be re-imported to library...");
-                nbw.DoWork += (sender, args) =>
+                var result = await mw.ShowMessageAsync("Cleaning up build directory", $"The following directory's children will all be deleted:\n{Settings.StagingLocation}\n\nEnsure there is nothing within this directory that should not be deleted - if there is, move it out, or change the staging directory.", MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
                 {
-                    TextureLibrary.AttemptReimportFromStaging();
-                    var bdSize = Utilities.GetSizeOfDirectory(Settings.BuildLocation);
-                    foreach (var d in Directory.GetDirectories(Settings.BuildLocation))
-                    {
-                        Utilities.DeleteFilesAndFoldersRecursively(d);
-                    }
+                    AffirmativeButtonText = "Delete files",
+                    NegativeButtonText = "Don't delete files",
+                    DefaultButtonFocus = MessageDialogResult.Negative
+                });
 
-                    Application.Current.Dispatcher.Invoke(async () =>
+                if (result == MessageDialogResult.Affirmative)
+                {
+                    Log.Information($@"[AIWPF] Deleting children of {Settings.StagingLocation} as user has requested cleaning up staging");
+                    NamedBackgroundWorker nbw = new NamedBackgroundWorker("CleanupBuildLocWorker");
+                    var pd = await mw.ShowProgressAsync("Importing leftover files from build directory",
+                        "Checking if any files in build directory need to be re-imported to library...");
+                    nbw.DoWork += (sender, args) =>
                     {
-                        await pd.CloseAsync();
-                        await mw.ShowMessageAsync("Build directory cleaned",
-                            $"The build directory has been cleaned up. {FileSizeFormatter.FormatSize(bdSize)} of data was deleted.");
-                    });
-                };
-                nbw.RunWorkerAsync();
+                        TextureLibrary.AttemptReimportFromStaging();
+                        var bdSize = Utilities.GetSizeOfDirectory(Settings.StagingLocation);
+                        foreach (var d in Directory.GetDirectories(Settings.StagingLocation))
+                        {
+                            Utilities.DeleteFilesAndFoldersRecursively(d);
+                        }
+                        CoreAnalytics.TrackEvent?.Invoke("Cleaned up staging", new Dictionary<string, string>()
+                        {
+                            {"Amount of data removed", bdSize.ToString()}
+                        });
+                        Application.Current.Dispatcher.Invoke(async () =>
+                        {
+                            await pd.CloseAsync();
+                            await mw.ShowMessageAsync("Build directory cleaned",
+                                $"The build directory has been cleaned up. {FileSizeFormatter.FormatSize(bdSize)} of data was deleted.");
+                        });
+                    };
+                    nbw.RunWorkerAsync();
+                }
+                else
+                {
+                    Log.Information(@"[AIWPF] User aborted cleaning staging");
+                }
             }
         }
 
@@ -187,6 +205,7 @@ namespace ALOTInstallerWPF.Flyouts
         {
             if (Application.Current.MainWindow is MainWindow mw)
             {
+                Log.Information(@"[AIWPF] Getting list of unused files in the texture library");
                 var unusedFilesInLib = TextureLibrary.GetUnusedFilesInLibrary();
                 if (unusedFilesInLib.Any())
                 {
@@ -211,6 +230,7 @@ namespace ALOTInstallerWPF.Flyouts
                     if (result == MessageDialogResult.Affirmative)
                     {
                         // Delete em'
+                        int numFilesDeleted = 0;
                         foreach (var v in unusedFilesInLib)
                         {
                             var fullPath = Path.Combine(Settings.TextureLibraryLocation, v);
@@ -218,12 +238,17 @@ namespace ALOTInstallerWPF.Flyouts
                             try
                             {
                                 File.Delete(fullPath);
+                                numFilesDeleted++;
                             }
                             catch (Exception e)
                             {
                                 Log.Error($"Error deleting file: {e.Message}");
                             }
                         }
+                        CoreAnalytics.TrackEvent?.Invoke("Cleaned up texture library", new Dictionary<string, string>()
+                        {
+                            {"Amount of files removed", numFilesDeleted.ToString()}
+                        });
                     }
                 }
                 else
@@ -319,12 +344,19 @@ namespace ALOTInstallerWPF.Flyouts
             {
                 Title = "Select location to build textures installation packages",
                 IsFolderPicker = true,
-                InitialDirectory = Settings.BuildLocation
+                InitialDirectory = Settings.StagingLocation
             };
             if (selector.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                Settings.BuildLocation = selector.FileName;
-                Settings.Save();
+                if (!Settings.TextureLibraryLocation.Equals(selector.FileName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Settings.StagingLocation = selector.FileName;
+                    Settings.Save();
+                }
+                else
+                {
+                    showCannotHaveSamePaths();
+                }
             }
         }
 
@@ -338,10 +370,25 @@ namespace ALOTInstallerWPF.Flyouts
             };
             if (selector.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                Settings.TextureLibraryLocation = selector.FileName;
-                TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetAllManifestFiles().OfType<InstallerFile>()
-                    .ToList());
-                Settings.Save();
+                if (!selector.FileName.Equals(Settings.StagingSettingsLocation, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    Settings.TextureLibraryLocation = Utilities.GetExecutablePath(); //This is so the property will be forced to update, in the event it's being set to the default location.
+                    Settings.TextureLibraryLocation = selector.FileName;
+                    TextureLibrary.ResetAllReadyStatuses(ManifestHandler.GetAllManifestFiles().OfType<InstallerFile>().ToList());
+                    Settings.Save();
+                }
+                else
+                {
+                    showCannotHaveSamePaths();
+                }
+            }
+        }
+
+        private async void showCannotHaveSamePaths()
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                await mw.ShowMessageAsync("Invalid path selected", "The Texture Library directory and the Staging directory must be two different folders. Choose a different path.");
             }
         }
 

@@ -230,14 +230,16 @@ namespace ALOTInstallerWPF.InstallerUI
                 ShowStorefrontDontClickUpdateCallback = showStorefrontNoUpdateUI,
                 SetOverallProgressCallback = x => TaskbarHelper.SetProgress(x / 100.0f),
                 SetProgressStyle = x => TaskbarHelper.SetProgressState(progressStyleToProgressState(x)),
-                NotifyClosingWillBreakGame = x => notifyClosingWillBreakGame(x),
+                NotifyClosingWillBreakGame = notifyClosingWillBreakGame,
             };
             installerWorker.WorkerReportsProgress = true;
             installerWorker.DoWork += ss.InstallTextures;
             installerWorker.RunWorkerCompleted += (a, b) =>
             {
+                notifyClosingWillBreakGame(false);
                 ContinueButtonVisible = true;
                 fadeoutMusic();
+
                 // Installation has completed
                 if (b.Error == null)
                 {
@@ -378,6 +380,12 @@ namespace ALOTInstallerWPF.InstallerUI
 
         private void handleInstallResult(InstallStep.InstallResult ir, string installString)
         {
+            CoreAnalytics.TrackEvent?.Invoke("Install Step Finished", new Dictionary<string, string>()
+            {
+                {"Result", ir.ToString()},
+                {"Game", InstallOptions.InstallTarget.Game.ToString()},
+                {"LOD setting", InstallOptions.Limit2K ? "2K" : "4K"}
+            });
             TipTimer?.Stop(); //Stop the tip rotation
             var installedInfo = InstallOptions.InstallTarget.GetInstalledALOTInfo();
             var installedTextures = InstallOptions.FilesToInstall.Any(x => !(x is PreinstallMod)); //Debug mode will not have files to install set

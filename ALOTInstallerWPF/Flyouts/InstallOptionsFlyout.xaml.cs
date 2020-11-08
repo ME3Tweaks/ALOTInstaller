@@ -42,6 +42,9 @@ namespace ALOTInstallerWPF.Flyouts
         public string ModeText { get; } = "Mode Text";
         public string SpinnerText { get; set; } = "Calculating install options";
         public string InstallOptionsTopText { get; set; }
+        public bool ShowTextureLODsOption => checkboxMapping != null && checkboxMapping.Any(x => x.Key != InstallOptionsStep.InstallOption.ALOVMods && x.Value.IsOn);
+        public bool ShowOptimizeOption => ManifestHandler.CurrentMode == ManifestMode.ALOT && checkboxMapping != null && checkboxMapping.Any(x => x.Key != InstallOptionsStep.InstallOption.UserFiles && x.Value.IsOn); //This needs changed if MEUITM gains optimizable files!
+
         public bool CompressPackages { get; set; } = true;
         public string CurrentLodsDescText { get; set; }
         public bool Use4KLODs { get; set; } = true; //Default to TRUE
@@ -73,11 +76,7 @@ namespace ALOTInstallerWPF.Flyouts
             ModeText = $"Installer mode: {ManifestHandler.CurrentMode} Mode";
             OnUse4KLODsChanged(); //Set the default text.
             LoadCommands();
-
-            if (!ShowOptimizeOption)
-            {
-                OptimizeTextureLibrary = false;
-            }
+            OptimizeTextureLibrary = ManifestHandler.CurrentMode == ManifestMode.ALOT;
 
             InitializeComponent();
             NamedBackgroundWorker nbw = new NamedBackgroundWorker("InstallOptionsWorker");
@@ -130,7 +129,6 @@ namespace ALOTInstallerWPF.Flyouts
         }
 
         public GameTarget InstallTarget { get; set; }
-        public bool ShowOptimizeOption => ManifestHandler.CurrentMode == ManifestMode.ALOT; //This needs changed if MEUITM gains optimizable files!
 
         private string getUIString(InstallOptionsStep.InstallOption option, List<InstallerFile> installerFiles)
         {
@@ -359,10 +357,10 @@ namespace ALOTInstallerWPF.Flyouts
 
                         if (precheckFailedMessage != null)
                         {
-                            Application.Current.Dispatcher.Invoke(async () =>
+                            if (precheckFailedMessage.Length > 0)
                             {
-                                await mw.ShowMessageAsync("Prestaging check failed", precheckFailedMessage);
-                            });
+                                Application.Current.Dispatcher.Invoke(async () => { await mw.ShowMessageAsync("Prestaging check failed", precheckFailedMessage); });
+                            }
                             b.Result = false;
                             return;
                         }
@@ -424,8 +422,11 @@ namespace ALOTInstallerWPF.Flyouts
 
         private bool CanInstallTextures()
         {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShowOptimizeOption)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ShowTextureLODsOption))); //This is kind of a hack. But it works!
             return checkboxMapping.Any(x => x.Value.IsOn);
         }
+
 
         private void AbortInstall()
         {

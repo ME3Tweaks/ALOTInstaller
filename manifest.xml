@@ -191,10 +191,16 @@
 			name="Steam, MEM patched">78ac3d9b4aad1989dae74505ea65aa6c</supportedhash>
 		<supportedhash
 			game="me1"
+			name="Steam, V4 MEM patched">5c87b24a141bc6a487a2199dec9739a0</supportedhash>
+		<supportedhash
+			game="me1"
 			name="Steam, BioWare signed">fef464b4b92c19ce76add75de6732ccf</supportedhash>
 		<supportedhash
 			game="me1"
 			name="Origin, MEM patched">2390143503635f3c4cfaed0afe0b8c71</supportedhash>
+		<supportedhash
+			game="me1"
+			name="Origin, V4 MEM patched">bfe090e76ca9f4d585e380662cf4980e</supportedhash>
 		<supportedhash
 			game="me1"
 			name="Origin">ff1f894fa1c2dbf4d4b9f0de85c166e5</supportedhash>
@@ -252,7 +258,7 @@
 	<manifest
 	 mode="ALOT"
 	 description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-	 version="7.0.4"/>
+	 version="7.0.6"/>
 	<!-- DEFINE MANIFEST FILES -->
 	<manifestfiles>
 		<manifestfile mode="MEUITM"
@@ -261,7 +267,7 @@
 			friendlyname="MEUITM Anniversary Edition (2018)"
 			author="CDAMJC"
 			installpriority="0"
-			recommendationreason="Enhances large amount of textures in Mass Effect"
+			recommendationreason="Main file, required"
 			recommendation="Required"
 			comparisonslink="https://www.nexusmods.com/masseffect/mods/1?tab=images">
 			<file
@@ -891,15 +897,15 @@
 			recommendation="Required"
 			installpriority="1">
 			<file
-				downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
+				downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
 				tooltipname="ALOT for ME1 12.0"
-				torrentfilename="ALOT for ME1.zip"
-				filename="ALOT for ME1.zip"
-				size="4453410804"
-				md5="8d36eac617658994d20091f8c53d754a"
+				torrentfilename="ALOT for ME1 v12.zip"
+				filename="ALOT for ME1 12.0-83-2021-12-0-1604601699.zip"
+				size="4401598618"
+				md5="cbd7dccb5a0909dd5882472dac9f24c9"
 				unpackedsinglefilename="ALOT_ME1_v12.mem"
-				unpackedsize="4264869546"
-				unpackedmd5="6a435382ff9cd76ac3c2687d76dd7c0f" />
+				unpackedsize="4322992433"
+				unpackedmd5="118e7d9784dcc50646c8949e5838be21" />
 			<packagefile
 				me1="true"
 				sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v12.mem"
@@ -914,15 +920,15 @@
 			recommendation="Required"
 			installpriority="1">
 			<file
-				downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
+				downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
 				tooltipname="ALOT for ME2 12.0"
-				torrentfilename="ALOT for ME2.zip"
-				filename="ALOT for ME2.zip"
-				size="6230258877"
-				md5="cd7e532e2a53d00beec259adc7870a58"
+				torrentfilename="ALOT for ME2 v12.zip"
+				filename="ALOT for ME2 12.0-68-2021-12-0-1604620707.zip"
+				size="6169019512"
+				md5="22c3f49b421db0794c616a863a38a971"
 				unpackedsinglefilename="ALOT_ME2_v12.mem"
-				unpackedsize="6041717579"
-				unpackedmd5="c9333cbddbcf2c814a33abda7b62d87f" />
+				unpackedsize="6090413327"
+				unpackedmd5="1368aef987826fde34d5025440f6adca" />
 			<packagefile
 				me2="true"
 				sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v12.mem"
@@ -937,21 +943,20 @@
 			recommendation="Required"
 			installpriority="1">
 			<file
-				downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
+				downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
 				tooltipname="ALOT for ME3 12.0"
-				torrentfilename="ALOT for ME3.zip"
-				filename="ALOT for ME3.zip"
-				size="9370770330"
-				md5="f599e1ff3becc05246edf9640e0c9e22"
+				torrentfilename="ALOT for ME3 v12.zip"
+				filename="ALOT for ME3 12.0-363-2021-12-0-1604625739.zip"
+				size="9288229132"
+				md5="746e6585f288b2a99219d92c34af5df9"
 				unpackedsinglefilename="ALOT_ME3_v12.mem"
-				unpackedsize="9182229032"
-				unpackedmd5="cca92a9e91f941e7625d53675d828d47" />
+				unpackedsize="9209622947"
+				unpackedmd5="a6ed5bd423c87abca202192e6ca11363" />
 			<packagefile
 				me3="true"
 				sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v12.mem"
 				movedirectly="true" />
 		</manifestfile>
-
 		<manifestfile mode="ALOT"
 			friendlyname="Improved Static Lighting for ME1"
 			author="CreeperLava"
@@ -995,7 +1000,7 @@
 				movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-			friendlyname="Improved Static Lighting for ME3 - LITE"
+			friendlyname="Improved Static Lighting for ME3 - Lite"
 			author="CreeperLava"
 			installpriority="3"
 			recommendationreason="Significantly improves the static shadows in level environments. Only denoised, uses less memory than the full version at the cost of quality. Install this if you experience crashes with other mods installed."
@@ -1003,9 +1008,9 @@
 			optiongroup="ME3StaticLighting">
 			<file
 				downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
-				tooltipname="Improved Static Lighting for ME3 - LITE"
+				tooltipname="Improved Static Lighting for ME3 - Lite"
 				torrentfilename="Improved Static Lighting for ME3 - Lite.zip"
-				filename="Improved Static Lighting for ME3 - Lite.zip"
+				filename="Improved Static Lighting for ME3 - Lite-363-2021-12-0-1604673604.zip"
 				size="4517800644"
 				md5="d99e0e3e7c8c6f8c65f98435638a72c6"
 				unpackedsinglefilename="LightMaps_ME3_Lite_v2.mem"
@@ -1017,17 +1022,17 @@
 				movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-				  friendlyname="Improved Static Lighting for ME3 - FULL"
+				  friendlyname="Improved Static Lighting for ME3 - Full"
 				  author="CreeperLava"
 				  installpriority="3"
 				  recommendationreason="Significantly improves the static shadows in level environments. Denoised and higher resolution. Uses more memory, but won't lower the framerate. May cause crashes when combined with the Project Variety and EGM mods."
 				  recommendation="Optional"
 				  optiongroup="ME3StaticLighting">
-		   <file
-				downloadlink="https://mega.nz/folder/N4kFhSxB#B74sfHVq39iVqzrNCzCc1g"
-				tooltipname="Improved Static Lighting for ME3 - FULL"
+			<file
+				downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+				tooltipname="Improved Static Lighting for ME3 - Full"
 				torrentfilename="Improved Static Lighting for ME3 - Full.zip"
-				filename="Improved Static Lighting for ME3 - Full.zip"
+				filename="Improved Static Lighting for ME3 - Full-363-2021-12-0-1604676675.zip"
 				size="10764271596"
 				md5="7da97b9c26cfc4547be42ddffe72bec1"
 				unpackedsinglefilename="LightMaps_ME3_Full_v2.mem"
@@ -3029,9 +3034,9 @@
 			uipriority="2"
 					   >
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME1"
-					filename="ALOVforME1-1080p_2.5.7z"
-					torrentfilename="ALOVforME1-1080p_2.5-NOTORRENT.7z"
+					downloadlink="https://www.nexusmods.com/masseffect/mods/144"
+					filename="ALOV for ME1 - v2.5 1080p-144-2-5-1604493731.7z"
+					torrentfilename="ALOVforME1-1080p_2.5.7z"
 					md5="f2faef46178a7f5596c127e00aa1eaa0"
 					size="2549439194" />
 			<extractionredirect
@@ -3055,9 +3060,9 @@
 			version="2.5"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME1"
-					filename="ALOVforME1-4K_2.5.7z"
-					torrentfilename="ALOVforME1-4K_2.5-NOTORRENT.7z"
+					downloadlink="https://www.nexusmods.com/masseffect/mods/144"
+					filename="ALOV for ME1 - v2.5 4K-144-2-5-1604494912.7z"
+					torrentfilename="ALOVforME1-4K_2.5.7z"
 					md5="9ffa18409884ebd6cf075f0bad3b12c2"
 					size="4424888819" />
 			<extractionredirect
@@ -3081,9 +3086,9 @@
 			version="2.0"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME2"
-					filename="ALOVforME2-1080p_2.0.7z"
-					torrentfilename="ALOVforME2-1080p_2.0-NOTORRENTYET.7z"
+					downloadlink="https://www.nexusmods.com/masseffect2/mods/245/"
+					filename="ALOV for ME2 - v2 (1080p)-245-2-0-1604769772.7z"
+					torrentfilename="ALOVforME2-1080p_2.0.7z"
 					md5="1327c98bff782e54ce5621230cf2df26"
 					size="5763135923" />
 			<extractionredirect
@@ -3123,9 +3128,9 @@
 			version="2.0"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME2"
-					filename="ALOVforME2-4K_2.0.7z"
-					torrentfilename="ALOVforME2-4K_2.0-NOTORRENTYET.7z"
+					downloadlink="https://www.nexusmods.com/masseffect2/mods/245/"
+					filename="ALOV for ME2 - v2 (4K)-245-2-0-1604505185.7z"
+					torrentfilename="ALOVforME2-4K_2.0.7z"
 					md5="d40905f6111a061ae058b9bdf7f348ac"
 					size="15314602179" />
 			<extractionredirect
@@ -3166,9 +3171,9 @@
 			optiongroup="ME3ALOV_BASE"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
-					filename="ALOVforME3-1080p-Basegame_2.0+.7z"
-					torrentfilename="ALOVforME3-1080p-Basegame_2.0+-NOTORRENTYET.7z"
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
+					filename="ALOVforME3-1080p-Basegame_2.0-773-2-0-0-0-1604481916.7z"
+					torrentfilename="ALOVforME3-1080p-Basegame_2.0+.7z"
 					md5="d2997e24f4cf537582ec1e823336f389"
 					size="6850176539" />
 			<extractionredirect
@@ -3183,7 +3188,7 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 			friendlyname="A Lot of Videos for ME3 2.0 - Official DLC (1080p)"
-	  shortname="ALOV for ME3 - Official DLC (1080p)"
+	  		shortname="ALOV for ME3 - Official DLC (1080p)"
 			author="Mellin"
 			recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3. This file covers the official BioWare DLCs."
 			recommendation="Recommended"
@@ -3191,9 +3196,9 @@
 			optiongroup="ME3ALOV_DLC"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
-					filename="ALOVforME3-1080p-DLCs_2.0+.7z"
-					torrentfilename="ALOVforME3-1080p-DLCs_2.0+-NOTORRENTYET.7z"
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
+					filename="ALOVforME3-1080p-DLCs_2.0-773-2-0-0-0-1604490514.7z"
+					torrentfilename="ALOVforME3-1080p-DLCs_2.0+.7z"
 					md5="1f1e51b7d65b6f6b601fa0cd92b92063"
 					size="6026545647" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
@@ -3235,7 +3240,7 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 			friendlyname="A Lot of Videos for ME3 2.0 - Third Party Mods (1080p)"
-	  shortname="ALOV for ME3 - Third Party Mods (1080p)"
+	  		shortname="ALOV for ME3 - Third Party Mods (1080p)"
 			author="Mellin"
 			recommendationreason="Upgrades third party mod's videos where permission was granted, and they are not using 1080p videos already."
 			recommendation="Optional"
@@ -3243,9 +3248,9 @@
 			optiongroup="ME3ALOV_THIRDPARTY"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
-					filename="ALOVforME3-1080p-ThirdPartyMods_2.0.0.0.7z"
-					torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.0.0.0-NOTORRENTYET.7z"
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
+					filename="ALOVforME3-1080p-ThirdPartyMods_2.0.0.0-773-2-0-0-0-1604495208.7z"
+					torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.0.0.0.7z"
 					md5="360aff945b24f4f45e920013b0956db6"
 					size="3111552728" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
@@ -3281,7 +3286,7 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 			friendlyname="A Lot of Videos for ME3 2.0 - Basegame (4K)"
-	  shortname="ALOV for ME3 - Basegame (4K)"
+	  		shortname="ALOV for ME3 - Basegame (4K)"
 			author="Mellin"
 			recommendationreason="Optional due to large filesize and CPU requirements"
 			recommendation="Optional"
@@ -3289,9 +3294,9 @@
 			optiongroup="ME3ALOV_BASE"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
-					filename="ALOVforME3-4K-Basegame_2.0+.7z"
-					torrentfilename="ALOVforME3-4K-Basegame_2.0+-NOTORRENTYET.7z"
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
+					filename="ALOVforME3-4K-Basegame_2.0-773-2-0-0-0-1604520548.7z"
+					torrentfilename="ALOVforME3-4K-Basegame_2.0+.7z"
 					md5="1b22ee35d8452f94b44cd102328ca383"
 					size="17659858129" />
 			<extractionredirect
@@ -3314,9 +3319,9 @@
 			optiongroup="ME3ALOV_DLC"
 			uipriority="2">
 			<file
-					downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
-					filename="ALOVforME3-4K-DLCs_2.0+.7z"
-					torrentfilename="ALOVforME3-4K-DLCs_2.0+-NOTORRENTYET.7z"
+					downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
+					filename="ALOVforME3-4K-DLCs_2.0-773-2-0-0-0-1604581194.7z"
+					torrentfilename="ALOVforME3-4K-DLCs_2.0+.7z"
 					md5="d024b6f36d3d8d727c0bdb06031f2236 "
 					size="16188195425" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
@@ -3358,7 +3363,7 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 			friendlyname="A Lot of Videos for ME3 2.0 - Third Party Mods (4K)"
-	  shortname="ALOV for ME3 - Third Party Mods (4K)"
+	  		shortname="ALOV for ME3 - Third Party Mods (4K)"
 			author="Mellin"
 			recommendationreason="Optional due to large filesize and CPU requirements"
 			recommendation="Optional"
@@ -3366,9 +3371,9 @@
 			optiongroup="ME3ALOV_THIRDPARTY"
 			uipriority="2">
 			<file
-				downloadlink="https://tessatheterror.xyz/index.php/s/Nk8jJEtEPtJYroE?path=%2FME3"
-				filename="ALOVforME3-4K-ThirdPartyMods_2.0.0.0.7z"
-				torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.0.0.0-NOTORRENTYET.7z"
+				downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
+				filename="ALOVforME3-4K-ThirdPartyMods_2.0.0.0-773-2-0-0-0-1604598760.7z"
+				torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.0.0.0.7z"
 				md5="bf25228dcb6f793b1ca603dc70cf5cbe"
 				size="12835788528" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->

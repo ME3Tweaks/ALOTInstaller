@@ -96,6 +96,11 @@ namespace ALOTInstallerCore.Steps
                 return noOptionsSelectedReason;
             }
 
+            if (!pc.checkRequiredExecutableVersion(out var badExeVersion))
+            {
+                return badExeVersion;
+            }
+
             if (!pc.checkRequiredFiles(out var failureReason1))
             {
                 // Require files validation failed
@@ -179,7 +184,7 @@ namespace ALOTInstallerCore.Steps
                         package.InstallTarget.PopulateExtras();
                         foreach (var v in package.InstallTarget.ExtraFiles)
                         {
-                            if (v.DisplayName == "SilentPatch for Mass Effect" && v.FileName == SILENT_PATCH_DLL_NAME)
+                            if (v.DllProductName == "SilentPatchME" && v.FileName == SILENT_PATCH_DLL_NAME)
                             {
                                 Log.Information(@"[AICORE] Found SilentPatch dll. No need to advertise lighting fix to user");
                                 hasLightingFix = true;
@@ -327,6 +332,42 @@ namespace ALOTInstallerCore.Steps
                 }
             }
             return null; //OK
+        }
+
+        private bool checkRequiredExecutableVersion(out string failureReason)
+        {
+            failureReason = null; // Defaultxxe
+#if !WINDOWS
+            return true;
+#else
+            var exePath = MEDirectories.ExecutablePath(package.InstallTarget);
+            if (File.Exists(exePath))
+            {
+                Version minVersionRequired = null;
+                var diskVersion = FileVersionInfo.GetVersionInfo(exePath);
+                switch (package.InstallTarget.Game)
+                {
+                    case MEGame.ME1:
+                        minVersionRequired = new Version("1.2.20608.0");
+                        break;
+                    case MEGame.ME2:
+                        minVersionRequired = new Version("1.2.1604.0");
+                        break;
+                    case MEGame.ME3:
+                        minVersionRequired = new Version("1.5.5427.124");
+                        break;
+                }
+
+                if (diskVersion.ToVersion() < minVersionRequired)
+                {
+                    Log.Error($@"[AICORE] Executable for {package.InstallTarget.Game} is outdated and must be updated. Minimum version required: {minVersionRequired}, installed vesrion: {diskVersion}");
+                    failureReason = $"{package.InstallTarget.Game.ToGameName()} is outdated and must be updated. The minimum version required for installation is {minVersionRequired}, while the installed version currently is {diskVersion.ToVersion()}.";
+                    return false;
+                }
+            }
+            Log.Information(@"[AICORE] Precheck: Executable version meets minimum requirement");
+            return true;
+#endif
         }
 
         private bool checkOneOptionSelected(out string failurereason)
@@ -620,7 +661,7 @@ namespace ALOTInstallerCore.Steps
         public static string PerformPreInstallCheck(InstallOptionsPackage package)
         {
             // Make sure there are packages to install
-            var installationPackagesDir = Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
+            var installationPackagesDir = Path.Combine(Settings.StagingLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
             if (!Directory.Exists(installationPackagesDir))
             {
                 Log.Error(@"[AICORE] The InstallationPackages directory doesn't exist. Precheck failed");
@@ -638,7 +679,7 @@ namespace ALOTInstallerCore.Steps
             }
 
             // Get required disk space
-            long requiredDiskSpace = Utilities.GetSizeOfDirectory(new DirectoryInfo(Path.Combine(Settings.BuildLocation, package.InstallTarget.Game.ToString())));
+            long requiredDiskSpace = Utilities.GetSizeOfDirectory(new DirectoryInfo(Path.Combine(Settings.StagingLocation, package.InstallTarget.Game.ToString())));
             foreach (var v in package.FilesToInstall.OfType<PreinstallMod>())
             {
                 var archiveF = v.GetUsedFilepath();

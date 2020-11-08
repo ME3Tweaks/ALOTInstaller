@@ -2,6 +2,7 @@
 using System;
 using System.Security.AccessControl;
 using Microsoft.Win32;
+using Serilog;
 
 namespace ALOTInstallerCore.PlatformSpecific.Windows
 {
@@ -132,7 +133,7 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         /// <returns></returns>
         public static int? GetRegistryInt(string key, string valueName)
         {
-            return (int?) Registry.GetValue(key, valueName, -1);
+            return (int?)Registry.GetValue(key, valueName, -1);
         }
 
         /// <summary>
@@ -159,7 +160,7 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         /// <param name="primaryKey"></param>
         /// <param name="subkey"></param>
         /// <param name="valuename"></param>
-        public static void DeleteRegistryKey(RegistryKey primaryKey, string subkey, string valuename)
+        public static void DeleteRegistryValue(RegistryKey primaryKey, string subkey, string valuename)
         {
             using RegistryKey key = primaryKey.OpenSubKey(subkey, true);
             key?.DeleteValue(valuename, false);
@@ -169,6 +170,26 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         {
             string softwareKey = @"HKEY_CURRENT_USER\Software\ALOTAddon";
             return (long?)Registry.GetValue(softwareKey, name, null);
+        }
+
+        /// <summary>
+        /// Removes all non-inherited ACLs from the specified key and path.
+        /// </summary>
+        /// <param name="localMachine"></param>
+        /// <param name="softwareWow6432nodeAgeiaTechnologies"></param>
+        public static void RemoveFullControlNonInheritedACLs(RegistryKey key, string subkey, Action successfullyRevoked = null, Action error = null)
+        {
+            try
+            {
+                using var keyToOperateOn = key.OpenSubKey(subkey, true);
+                var acl = keyToOperateOn.GetAccessControl();
+                string currentUser = $"{Environment.UserDomainName}\\{Environment.UserName}";
+                RegistryAccessRule rar = new RegistryAccessRule(currentUser, RegistryRights.FullControl, AccessControlType.Allow);
+                acl.RemoveAccessRuleAll(rar);
+                keyToOperateOn.SetAccessControl(acl);
+                successfullyRevoked?.Invoke();
+            }
+            catch { error?.Invoke(); }// We don't care. If there's an issue, we can't do anything about it, so don't bother throwing the error.
         }
     }
 }

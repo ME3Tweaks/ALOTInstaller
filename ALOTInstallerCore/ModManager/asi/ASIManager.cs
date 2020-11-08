@@ -26,8 +26,8 @@ namespace MassEffectModManagerCore.modmanager.asi
         public event PropertyChangedEventHandler PropertyChanged;
         public static readonly string CachedASIsFolder = Directory.CreateDirectory(Path.Combine(Locations.AppDataFolder(), @"CachedASIs")).FullName;
 
-        public static readonly string ManifestLocation = Path.Combine(CachedASIsFolder, @"manifest.xml");
-        public static readonly string StagedManifestLocation = Path.Combine(CachedASIsFolder, @"manifest_staged.xml");
+        public static readonly string ManifestLocation = Path.Combine(CachedASIsFolder, @"asimanifest.xml");
+        public static readonly string StagedManifestLocation = Path.Combine(CachedASIsFolder, @"asimanifest_staged.xml");
 
         public static List<ASIMod> MasterME1ASIUpdateGroups = new List<ASIMod>();
         public static List<ASIMod> MasterME2ASIUpdateGroups = new List<ASIMod>();

@@ -890,11 +890,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             {
                 case MEGame.ME1:
                 case MEGame.ME2:
-                    RegistryHandler.DeleteRegistryKey(Registry.CurrentUser, BACKUP_REGISTRY_KEY,
+                    RegistryHandler.DeleteRegistryValue(Registry.CurrentUser, BACKUP_REGISTRY_KEY,
                         meGame + @"VanillaBackupLocation");
                     break;
                 case MEGame.ME3:
-                    RegistryHandler.DeleteRegistryKey(Registry.CurrentUser, REGISTRY_KEY_ME3CMM,
+                    RegistryHandler.DeleteRegistryValue(Registry.CurrentUser, REGISTRY_KEY_ME3CMM,
                         @"VanillaCopyLocation");
                     break;
             }
