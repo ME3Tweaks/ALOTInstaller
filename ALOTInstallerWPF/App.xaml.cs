@@ -37,7 +37,7 @@ namespace ALOTInstallerWPF
 #endif
         public App() : base()
         {
-            debug();
+            //debug();
             Locations.AppDataFolderName = "ALOTInstallerWPF"; // Do not change this!
             handleCommandLine();
             ToolTipService.ShowDurationProperty.OverrideMetadata(typeof(UIElement),
@@ -49,6 +49,7 @@ namespace ALOTInstallerWPF
 
         private void debug()
         {
+#if DEBUG
             var meuitmBasepath = @"X:\MEUITM2\";
             var meuitmIni = Path.Combine(meuitmBasepath, "installer.ini");
             var meuitmModsDir = Path.Combine(meuitmBasepath, "Mods");
@@ -60,7 +61,7 @@ namespace ALOTInstallerWPF
                 if (v.Header.StartsWith("Mod"))
                 {
                     XElement cf = new XElement("choicefile");
-                    cf.SetAttributeValue("choicetitle", $"{v.Entries.FirstOrDefault(x=>x.Key == "Label1")?.Value} textures");
+                    cf.SetAttributeValue("choicetitle", $"{v.Entries.FirstOrDefault(x => x.Key == "Label1")?.Value} textures");
                     cf.SetAttributeValue("defaultselectedindex", "0");
                     int i = 1;
                     while (true)
@@ -95,7 +96,7 @@ namespace ALOTInstallerWPF
                 }
             }
             Debug.WriteLine(root);
-
+#endif
         }
 
         protected override void OnExit(ExitEventArgs e)
