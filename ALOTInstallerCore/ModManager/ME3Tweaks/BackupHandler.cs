@@ -693,26 +693,29 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             //It's a DLC!
                             string dlcname = fileBeingCopied.Substring(dlcSubStringLen);
                             int index = dlcname.IndexOf(Path.DirectorySeparatorChar);
-                            try
+                            if (index > 0) //Files directly in the DLC directory won't have path sep
                             {
-                                dlcname = dlcname.Substring(0, index);
-                                if (officialDLCNames.TryGetValue(dlcname, out var hrName))
+                                try
                                 {
-                                    UpdateStatusCallback?.Invoke($"Restoring {hrName}");
+                                    dlcname = dlcname.Substring(0, index);
+                                    if (officialDLCNames.TryGetValue(dlcname, out var hrName))
+                                    {
+                                        UpdateStatusCallback?.Invoke($"Restoring {hrName}");
+                                    }
+                                    else
+                                    {
+                                        UpdateStatusCallback?.Invoke($"Restoring {dlcname}");
+                                    }
                                 }
-                                else
+                                catch (Exception e)
                                 {
-                                    UpdateStatusCallback?.Invoke($"Restoring {dlcname}");
+                                    CoreCrashes.TrackError2?.Invoke(e, new Dictionary<string, string>()
+                                    {
+                                        {@"Source", @"Restore UI display callback"},
+                                        {@"Value", fileBeingCopied},
+                                        {@"DLC Folder path", dlcFolderpath}
+                                    });
                                 }
-                            }
-                            catch (Exception e)
-                            {
-                                CoreCrashes.TrackError2?.Invoke(e, new Dictionary<string, string>()
-                                        {
-                                            {@"Source", @"Restore UI display callback"},
-                                            {@"Value", fileBeingCopied},
-                                            {@"DLC Folder path", dlcFolderpath}
-                                        });
                             }
                         }
                         else
