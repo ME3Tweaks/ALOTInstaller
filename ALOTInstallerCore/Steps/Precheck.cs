@@ -267,8 +267,8 @@ namespace ALOTInstallerCore.Steps
                             {
                                 // It's silentpatch
                                 isUsingAMDLightingFix = false;
-                                downloadHash = "e80785c4039af965602a7df472d267e1"; //Hopefully if this is updated they make a new release and don't update or remove the old one.
-                                sourceFileUrl = "https://github.com/CookiePLMonster/SilentPatchME/releases/download/BUILD-1/SilentPatchME.zip";
+                                downloadHash = "9b0c924426428be842690afdeab310a7"; //Hopefully if this is updated they make a new release and don't update or remove the old one.
+                                sourceFileUrl = "https://github.com/CookiePLMonster/SilentPatchME/releases/download/BUILD-2/SilentPatchME.zip";
                             }
                             else
                             {

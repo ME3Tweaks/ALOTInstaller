@@ -362,18 +362,28 @@ namespace ALOTInstallerWPF.BuilderUI
                 foreach (var game in targets)
                 {
                     {
-                        var image = new Image()
+                        Image image = null;
+                        try
                         {
-                            Height = 45,
-                            Source = new BitmapImage(new Uri(
-                                $"pack://application:,,,/ALOTInstallerWPF;component/Images/logo_{game.Game.ToString().ToLower()}.png")),
-                        };
-                        RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+                            image = new Image()
+                            {
+                                Height = 45,
+                                Source = new BitmapImage(new Uri(
+                                    $"pack://application:,,,/ALOTInstallerWPF;component/Images/logo_{game.Game.ToString().ToLower()}.png")),
+                            };
+                            RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+                        }
+                        catch (Exception e)
+                        {
+                            // Really weird Windows 2004 issue
+                            Log.Error($"[AIWPF] Error loading image for game selection: {e.Message}");
+                        }
+
                         buttons.Add(new Button()
                         {
                             ToolTip = game.TargetPath,
                             Margin = new Thickness(5),
-                            Content = image,
+                            Content = image != null ? (object)image : (object)game.Game.ToString(),
                             Padding = new Thickness(4),
                             Style = (Style)FindResource("MahApps.Styles.Button.Square.Accent")
                         });
