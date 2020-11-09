@@ -250,8 +250,6 @@ namespace ALOTInstallerWPF.BuilderUI
                     handleM3Passthrough();
 
                     ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
-                    BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
-
                     pd.SetMessage("Loading installer manifests");
                     var alotManifestModePackage = ManifestHandler.LoadMasterManifest(x => pd.SetMessage(x));
 

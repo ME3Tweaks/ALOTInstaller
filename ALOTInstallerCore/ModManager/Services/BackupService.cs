@@ -85,7 +85,7 @@ namespace ALOTInstallerCore.ModManager.Services
                 Game = game;
             }
 
-            internal void RefreshBackupStatus(bool installed, bool forceCmmVanilla)
+            internal void RefreshBackupStatus(bool installed, bool forceCmmVanilla, bool log)
             {
 
                 var bPath = GetGameBackupPath(Game, out var isVanilla, forceCmmVanilla);
@@ -93,6 +93,7 @@ namespace ALOTInstallerCore.ModManager.Services
                 {
                     if (!isVanilla)
                     {
+                        if (log) Log.Information($@"[AICORE] BackupService: {Game} Backup: Not Vanilla, {bPath}");
                         BackupStatus = "Backed up (Not Vanilla)";
                     }
                     else
@@ -100,6 +101,8 @@ namespace ALOTInstallerCore.ModManager.Services
                         BackupStatus = "Backed up";
                     }
                     BackupLocationStatus = $"Backup stored at {bPath}";
+
+                    if (log) Log.Information($@"[AICORE] BackupService: {Game} {BackupStatus}, {BackupLocationStatus}");
                     LinkActionText = "Unlink backup";
                     BackupActionText = "Restore game";
                     return;
@@ -109,6 +112,7 @@ namespace ALOTInstallerCore.ModManager.Services
                 {
                     BackupStatus = "Not backed up";
                     BackupLocationStatus = "Game has not been backed up";
+                    if (log) Log.Information($@"[AICORE] BackupService: {Game} {BackupStatus}, {BackupLocationStatus}");
                     LinkActionText = "Link existing backup";
                     BackupActionText = "Create backup"; //This should be disabled if game is not installed. This will be handled by the wrapper
                     return;
@@ -117,6 +121,8 @@ namespace ALOTInstallerCore.ModManager.Services
                 {
                     BackupStatus = "Backup unavailable";
                     BackupLocationStatus = $"Backup path not accessible: {bPath}";
+                    if (log) Log.Information($@"[AICORE] BackupService: {Game} {BackupStatus}, {BackupLocationStatus}");
+
                     LinkActionText = "Unlink backup";
                     BackupActionText = "Create new backup";
                     return;
@@ -126,6 +132,7 @@ namespace ALOTInstallerCore.ModManager.Services
                 {
                     BackupStatus = "Game not installed";
                     BackupLocationStatus = "Game not installed. Run at least once to ensure game is fully setup";
+                    if (log) Log.Information($@"[AICORE] BackupService: {Game} {BackupStatus}, {BackupLocationStatus}");
                     LinkActionText = "Link existing backup"; //this seems dangerous to the average user
                     BackupActionText = "Can't create backup";
                 }
@@ -147,7 +154,7 @@ namespace ALOTInstallerCore.ModManager.Services
                 GameBackupStatuses.Add(new GameBackupStatus(MEGame.ME3));
             }
             runCodeOnUIThreadCallback.Invoke(runOnUiThread);
-            RefreshBackupStatus(Locations.GetAllAvailableTargets(), false);
+            RefreshBackupStatus(Locations.GetAllAvailableTargets(), false, log: true);
         }
 
         //private static bool _me1BackedUp;
@@ -205,13 +212,13 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <param name="allTargets">List of targets to determine if the game is installed or not. Passing null will assume the game is installed</param>
         /// <param name="forceCmmVanilla">If the backups will be forced to have the cmmVanilla file to be considered valid</param>
         /// <param name="game">What game to refresh. Set to unknown to refresh all.</param>
-        public static void RefreshBackupStatus(List<GameTarget> allTargets, bool forceCmmVanilla = true, MEGame game = MEGame.Unknown)
+        public static void RefreshBackupStatus(List<GameTarget> allTargets, bool forceCmmVanilla = true, MEGame game = MEGame.Unknown, bool log = false)
         {
             foreach (var v in GameBackupStatuses)
             {
                 if (v.Game == game || game == MEGame.Unknown)
                 {
-                    v.RefreshBackupStatus(allTargets == null || allTargets.Any(x => x.Game == game), forceCmmVanilla);
+                    v.RefreshBackupStatus(allTargets == null || allTargets.Any(x => x.Game == game), forceCmmVanilla, log);
                 }
             }
         }

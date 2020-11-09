@@ -80,9 +80,9 @@ namespace ALOTInstallerCore
         public static void PostCriticalStartup(Action<string> currentOperationCallback, Action<Action> runOnUiThreadCallback)
         {
 
+            // Logs call in method
             Locations.LoadTargets();
             Log.Information("[AICORE] Starting backup service");
-
             BackupService.InitBackupService(runOnUiThreadCallback);
 
             currentOperationCallback?.Invoke("Loading ME3Tweaks services");

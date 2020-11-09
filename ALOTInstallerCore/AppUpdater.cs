@@ -237,7 +237,7 @@ namespace ALOTInstallerCore
                 if (destMd5.Length != 32)
                 {
                     Log.Warning(
-                        $"Release {latestRelease.TagName} has invalid hash length in body, cannot use patch update strategy");
+                        $"[AICORE] Release {latestRelease.TagName} has invalid hash length in body, cannot use patch update strategy");
                     return false; //no hash
                 }
 
@@ -279,16 +279,16 @@ namespace ALOTInstallerCore
                 {
                     foreach (var downloadInfo in downloadInfoMirrors)
                     {
-                        Log.Information($@"Downloading patch file {downloadInfo.downloadLink}");
+                        Log.Information($@"[AICORE] Downloading patch file {downloadInfo.downloadLink}");
                         var patchUpdate = OnlineContent.DownloadToMemory(downloadInfo.downloadLink, progressCallback,
                             downloadInfo.downloadhash, cancellationTokenSource: cancellationTokenSource).Result;
                         if (patchUpdate.errorMessage != null)
                         {
-                            Log.Warning($@"Patch update download failed: {patchUpdate.errorMessage}");
+                            Log.Warning($@"[AICORE] Patch update download failed: {patchUpdate.errorMessage}");
                             return false;
                         }
                         downloadCompletedCallback?.Invoke();
-                        Log.Information(@"Download OK: Building new executable");
+                        Log.Information(@"[AICORE] Download OK: Building new executable");
                         setUpdateDialogTextCallback?.Invoke("Building new executable");
                         progressIndeterminateCallback?.Invoke();
                         var newExecutable = BuildUpdateFromPatch(patchUpdate.result, destMd5, downloadInfo.timetamp);
@@ -301,13 +301,12 @@ namespace ALOTInstallerCore
                 }
                 else
                 {
-                    Log.Warning($"No patch is applicable to bridge our current hash {localExecutableHash} to the destination hash {destMd5}");
+                    Log.Warning($"[AICORE] No patch is applicable to bridge our current hash {localExecutableHash} to the destination hash {destMd5}");
                 }
             }
             else
             {
-                Log.Warning(
-                    $"Release {latestRelease.TagName} is missing hash in body, cannot use patch update strategy");
+                Log.Warning($"[AICORE] Release {latestRelease.TagName} is missing hash in body, cannot use patch update strategy");
                 return false; //no hash
             }
             return false;

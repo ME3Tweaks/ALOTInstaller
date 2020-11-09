@@ -34,7 +34,7 @@ namespace ALOTInstallerCore.Helpers
         private static void periodicRefresh(object sender, ElapsedEventArgs e)
         {
             Debug.WriteLine("Periodic refresh");
-            BackupService.RefreshBackupStatus(null, false);
+            BackupService.RefreshBackupStatus(null, false, log: false);
         }
     }
 }
