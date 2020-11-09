@@ -9,6 +9,7 @@
 		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
 		<Configurations>WPFDebug;WPFRelease</Configurations>
 		<ApplicationIcon>ALOTInstallerIcon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
 	</PropertyGroup>
 	<Import Project="..\SharedAssemblyInfo.proj" />
 	<ItemGroup>

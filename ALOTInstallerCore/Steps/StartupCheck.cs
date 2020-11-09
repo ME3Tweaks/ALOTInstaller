@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using Microsoft.Win32;
+using NickStrupat;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps
@@ -21,6 +22,7 @@ namespace ALOTInstallerCore.Steps
         /// <param name="messageCallback"></param>
         public static void PerformStartupCheck(Action<string, string> messageCallback, Action<string> setStartupMessageText)
         {
+            PerformOperatingSystemCheck(messageCallback);
             PerformRAMCheck(messageCallback);
             PerformWriteCheck(messageCallback, true);
 
@@ -63,6 +65,19 @@ namespace ALOTInstallerCore.Steps
 
             // Attempt to re-import any files not ready that exist on the same drive in staging/textures lib
             TextureLibrary.AttemptReimportFromStaging();
+        }
+
+        private static void PerformOperatingSystemCheck(Action<string, string> messageCallback)
+        {
+            // This check is only on Windows to ensure app runs on supported Windows operating systems
+#if WINDOWS
+            var os = Environment.OSVersion.Version;
+            if (os < ALOTInstallerCoreLib.MIN_SUPPORTED_WINDOWS_OS)
+            {
+                Log.Fatal($@"[AICORE] This operating system version is below the minimum supported version: {os}, minimum supported: {ALOTInstallerCoreLib.MIN_SUPPORTED_WINDOWS_OS}");
+                messageCallback?.Invoke("This operating system is not supported", $"{Utilities.GetAppPrefixedName()} Installer is not supported on this operating system. The application may not work. To ensure application compatibility or receive support from the installer's development team, upgrade to a version of Windows that is supported by Microsoft.");
+            }
+#endif
         }
 
         private static void PerformRAMCheck(Action<string, string> messageCallback)

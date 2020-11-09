@@ -4,6 +4,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Services;
+using NickStrupat;
 using Serilog;
 
 namespace ALOTInstallerCore
@@ -14,6 +15,10 @@ namespace ALOTInstallerCore
     public static class ALOTInstallerCoreLib
     {
         private static bool startedUp;
+
+#if WINDOWS
+        public static Version MIN_SUPPORTED_WINDOWS_OS = new Version("6.3.9600"); //Windows 8.1 Update 3
+#endif
 
         /// <summary>
         /// Starts the library initialization. This method must ALWAYS be called before using the library. This will initialize telemetry, load settings, cleanup the temp directory, and more.
@@ -31,8 +36,21 @@ namespace ALOTInstallerCore
             Log.Information(LogCollector.SessionStartString);
             Log.Information("[AICORE] ALOTInstallerCore library is booting");
             Log.Information($"[AICORE] Library version: {Utilities.GetLibraryVersion()}");
-            Log.Information("[AICORE] Loading settings");
 
+            try
+            {
+                ComputerInfo ci = new ComputerInfo();
+                Log.Information(@"[AICORE] System information:");
+                Log.Information($@"[AICORE]     Operating system: {ci.OSFullName}");
+                Log.Information($@"[AICORE]     Processor:        {ci.CPUName}");
+                Log.Information($@"[AICORE]     Memory:           {FileSizeFormatter.FormatSize(ci.TotalPhysicalMemory)}");
+            }
+            catch (Exception e)
+            {
+                Log.Error($@"[AICORE] Error getting startup system info: {e.Message}");
+            }
+
+            Log.Information("[AICORE] Loading settings");
             Settings.Load();
             if (Settings.Telemetry)
             {
