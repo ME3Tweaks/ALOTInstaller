@@ -51,7 +51,7 @@ namespace ALOTInstallerCore.Helpers
 
         internal static void LoadTargets()
         {
-            Log.Information("[AICORE] Loading targets");
+            Log.Information("[AICORE] Loading game targets");
             LoadGamePaths();
         }
         //#if WINDOWS
@@ -175,7 +175,11 @@ namespace ALOTInstallerCore.Helpers
         {
             GameTarget gt = new GameTarget(game, path, false);
             var failedValidationReason = gt.ValidateTarget();
-            if (failedValidationReason != null) return false;
+            if (failedValidationReason != null)
+            {
+                Log.Error($@"[AICORE] Game target {path} failed validation: {failedValidationReason}");
+                return false;
+            }
             switch (game)
             {
                 case MEGame.ME1:

@@ -79,7 +79,6 @@ namespace ALOTInstallerCore
         /// </summary>
         public static void PostCriticalStartup(Action<string> currentOperationCallback, Action<Action> runOnUiThreadCallback)
         {
-            Log.Information("[AICORE] Loading game targets");
 
             Locations.LoadTargets();
             Log.Information("[AICORE] Starting backup service");
