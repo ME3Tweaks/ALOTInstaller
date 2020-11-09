@@ -460,7 +460,7 @@ namespace ALOTInstallerCore.ModManager.Services
 
         public static void UpdateBackupStatus(MEGame game, bool forceCmmVanilla)
         {
-            GameBackupStatuses.FirstOrDefault(x => x.Game == game)?.RefreshBackupStatus(true, forceCmmVanilla);
+            GameBackupStatuses.FirstOrDefault(x => x.Game == game)?.RefreshBackupStatus(true, forceCmmVanilla, false);
         }
     }
 }
