@@ -1,93 +1,93 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFramework>netstandard2.1</TargetFramework>
-		<Platforms>x64</Platforms>
-		<Configurations>WinRelease;WinDebug;WPFDebug;WPFRelease;LinuxDebug;LinuxRelease</Configurations>
-	</PropertyGroup>
-	<Import Project="..\SharedAssemblyInfo.proj" />
-	<ItemGroup>
-		<None Remove="BundledManifest\bundledmanifest.zip" />
-		<None Remove="ModManager\binkw32\me1\binkw23.dll" />
-		<None Remove="ModManager\binkw32\me1\binkw32.dll" />
-		<None Remove="ModManager\binkw32\me2\binkw23.dll" />
-		<None Remove="ModManager\binkw32\me2\binkw32.dll" />
-		<None Remove="ModManager\binkw32\me3\binkw23.dll" />
-		<None Remove="ModManager\binkw32\me3\binkw32.dll" />
-		<None Remove="ModManager\gamemd5\me1.bin" />
-		<None Remove="ModManager\gamemd5\me1pl.bin" />
-		<None Remove="ModManager\gamemd5\me2.bin" />
-		<None Remove="ModManager\gamemd5\me3.bin" />
-	</ItemGroup>
-	<PropertyGroup Condition="'$(Configuration)'=='WinDebug'">
-		<DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
-		<DebugType>embedded</DebugType>
-		<DebugSymbols>true</DebugSymbols>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)'=='WinRelease'">
-		<DefineConstants>WINDOWS</DefineConstants>
-		<DebugType>embedded</DebugType>
-		<DebugSymbols>true</DebugSymbols>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)'=='WPFDebug'">
-		<DefineConstants>TRACE;DEBUG;WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
-		<DebugType>embedded</DebugType>
-		<DebugSymbols>true</DebugSymbols>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)'=='WPFRelease'">
-		<DefineConstants>WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
-		<DebugType>embedded</DebugType>
-		<DebugSymbols>true</DebugSymbols>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)'=='LinuxDebug'">
-		<DefineConstants>LINUX;DEBUG</DefineConstants>
-		<DebugType>embedded</DebugType>
-		<DebugSymbols>true</DebugSymbols>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)'=='LinuxRelease'">
-		<DefineConstants>LINUX</DefineConstants>
-		<DebugType>embedded</DebugType>
-		<DebugSymbols>true</DebugSymbols>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="AuthenticodeExaminer" Version="0.3.0" />
-		<PackageReference Include="CliWrap" Version="3.2.2" />
-		<PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />
-		<PackageReference Include="Octokit" Version="0.48.0" />
-		<PackageReference Include="PropertyChanged.Fody" Version="4.0.0" />
-		<PackageReference Include="Serilog" Version="2.10.0" />
-		<PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
-		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00887" />
-		<PackageReference Include="System.Diagnostics.EventLog" Version="4.7.0" />
-		<PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
-		<PackageReference Include="System.Management" Version="4.7.0" />
-		<PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.1" />
-	</ItemGroup>
-	<ItemGroup>
-		<EmbeddedResource Include="BundledManifest\bundledmanifest.zip" />
-		<EmbeddedResource Include="ModManager\binkw32\me1\binkw23.dll" />
-		<EmbeddedResource Include="ModManager\binkw32\me1\binkw32.dll" />
-		<EmbeddedResource Include="ModManager\binkw32\me2\binkw23.dll" />
-		<EmbeddedResource Include="ModManager\binkw32\me2\binkw32.dll" />
-		<EmbeddedResource Include="ModManager\binkw32\me3\binkw23.dll" />
-		<EmbeddedResource Include="ModManager\binkw32\me3\binkw32.dll" />
-		<EmbeddedResource Include="ModManager\gamemd5\me1.bin" />
-		<EmbeddedResource Include="ModManager\gamemd5\me1pl.bin" />
-		<EmbeddedResource Include="ModManager\gamemd5\me2.bin" />
-		<EmbeddedResource Include="ModManager\gamemd5\me3.bin" />
-	</ItemGroup>
-	<ItemGroup>
-		<Content Include="Binaries\PermissionsGranter.exe" Condition=" '$(OS)' == 'Windows_NT' ">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\ComputerInfo\ComputerInfo\ComputerInfo.csproj" />
-		<ProjectReference Include="..\ME3ExplorerLib\ME3ExplorerCore\ME3ExplorerCore.csproj" />
-	</ItemGroup>
-	<Target Name="PreBuildWindows"  Condition="'$(OS)' == 'Windows_NT'" BeforeTargets="PreBuildEvent">
-	  <Exec Command="if not exist &quot;$(ProjectDir)BundledManifest&quot; mkdir &quot;$(ProjectDir)BundledManifest&quot;&#xD;&#xA;if $(ConfigurationName) == WPFRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == WinRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == LinuxRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;::if $(ConfigurationName) == MacRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)" />
-	</Target>
-	<Target Name="PreBuildLinux"  Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'" BeforeTargets="PreBuildEvent">
-	  <Exec Command="mkdir -p &quot;$(ProjectDir)BundledManifest&quot;&#xD;&#xA;if [ $(ConfigurationName) = LinuxRelease ]; then pwsh -Command &quot;Compress-Archive -Path '$(ProjectDir)../manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest/bundledmanifest.zip' -Force&quot;; fi" />
-	</Target>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Platforms>x64</Platforms>
+    <Configurations>WinRelease;WinDebug;WPFDebug;WPFRelease;LinuxDebug;LinuxRelease</Configurations>
+  </PropertyGroup>
+  <Import Project="..\SharedAssemblyInfo.proj" />
+  <ItemGroup>
+    <None Remove="BundledManifest\bundledmanifest.zip" />
+    <None Remove="ModManager\binkw32\me1\binkw23.dll" />
+    <None Remove="ModManager\binkw32\me1\binkw32.dll" />
+    <None Remove="ModManager\binkw32\me2\binkw23.dll" />
+    <None Remove="ModManager\binkw32\me2\binkw32.dll" />
+    <None Remove="ModManager\binkw32\me3\binkw23.dll" />
+    <None Remove="ModManager\binkw32\me3\binkw32.dll" />
+    <None Remove="ModManager\gamemd5\me1.bin" />
+    <None Remove="ModManager\gamemd5\me1pl.bin" />
+    <None Remove="ModManager\gamemd5\me2.bin" />
+    <None Remove="ModManager\gamemd5\me3.bin" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='WinDebug'">
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='WinRelease'">
+    <DefineConstants>WINDOWS</DefineConstants>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='WPFDebug'">
+    <DefineConstants>TRACE;DEBUG;WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='WPFRelease'">
+    <DefineConstants>WINDOWS;WPF;APPUPDATESUPPORT</DefineConstants>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='LinuxDebug'">
+    <DefineConstants>LINUX;DEBUG</DefineConstants>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='LinuxRelease'">
+    <DefineConstants>LINUX</DefineConstants>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AuthenticodeExaminer" Version="0.3.0" />
+    <PackageReference Include="CliWrap" Version="3.2.2" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />
+    <PackageReference Include="Octokit" Version="0.48.0" />
+    <PackageReference Include="PropertyChanged.Fody" Version="4.0.0" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00887" />
+    <PackageReference Include="System.Diagnostics.EventLog" Version="4.7.0" />
+    <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
+    <PackageReference Include="System.Management" Version="4.7.0" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="BundledManifest\bundledmanifest.zip" />
+    <EmbeddedResource Include="ModManager\binkw32\me1\binkw23.dll" />
+    <EmbeddedResource Include="ModManager\binkw32\me1\binkw32.dll" />
+    <EmbeddedResource Include="ModManager\binkw32\me2\binkw23.dll" />
+    <EmbeddedResource Include="ModManager\binkw32\me2\binkw32.dll" />
+    <EmbeddedResource Include="ModManager\binkw32\me3\binkw23.dll" />
+    <EmbeddedResource Include="ModManager\binkw32\me3\binkw32.dll" />
+    <EmbeddedResource Include="ModManager\gamemd5\me1.bin" />
+    <EmbeddedResource Include="ModManager\gamemd5\me1pl.bin" />
+    <EmbeddedResource Include="ModManager\gamemd5\me2.bin" />
+    <EmbeddedResource Include="ModManager\gamemd5\me3.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Binaries\PermissionsGranter.exe" Condition=" '$(OS)' == 'Windows_NT' ">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ComputerInfo\ComputerInfo\ComputerInfo.csproj" />
+    <ProjectReference Include="..\ME3ExplorerLib\ME3ExplorerCore\ME3ExplorerCore.csproj" />
+  </ItemGroup>
+  <Target Name="PreBuildWindows" Condition="'$(OS)' == 'Windows_NT'" BeforeTargets="PreBuildEvent">
+    <Exec Command="if not exist &quot;$(ProjectDir)BundledManifest&quot; mkdir &quot;$(ProjectDir)BundledManifest&quot;&#xD;&#xA;if $(ConfigurationName) == WPFRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == WinRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == LinuxRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;::if $(ConfigurationName) == MacRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)" />
+  </Target>
+  <Target Name="PreBuildLinux" Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'" BeforeTargets="PreBuildEvent">
+    <Exec Command="mkdir -p &quot;$(ProjectDir)BundledManifest&quot;&#xD;&#xA;if [ $(ConfigurationName) = LinuxRelease ]; then pwsh -Command &quot;Compress-Archive -Path '$(ProjectDir)../manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest/bundledmanifest.zip' -Force&quot;; fi" />
+  </Target>
 </Project>

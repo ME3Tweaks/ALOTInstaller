@@ -242,37 +242,6 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 addDiagLine(@"Basic game information", Severity.DIAGSECTION);
                 addDiagLine($@"Game is installed at {gamePath}");
 
-#if WINDOWS
-                string pathroot = Path.GetPathRoot(gamePath);
-                pathroot = pathroot.Substring(0, 1);
-                if (pathroot == @"\")
-                {
-                    addDiagLine(@"Installation appears to be on a network drive (first character in path is \)", Severity.WARN);
-                }
-                else
-                {
-                    if (Utilities.IsWindows10OrNewer())
-                    {
-                        int backingType = GetPartitionDiskBackingType(pathroot);
-                        string type = @"Unknown type";
-                        switch (backingType)
-                        {
-                            case 3:
-                                type = @"Hard disk drive";
-                                break;
-                            case 4:
-                                type = @"Solid state drive";
-                                break;
-                            default:
-                                type += @": " + backingType;
-                                break;
-                        }
-
-                        addDiagLine(@"Installed on disk type: " + type);
-                    }
-                }
-#endif
-
                 selectedDiagnosticTarget.ReloadGameTarget(false); //reload vars
                 TextureModInstallationInfo avi = selectedDiagnosticTarget.GetInstalledALOTInfo();
 
@@ -282,11 +251,44 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 #if WINDOWS
                     Log.Information(@"[AICORE] Getting game version");
                     var versInfo = FileVersionInfo.GetVersionInfo(exePath);
-                    addDiagLine(
-                        $@"Version: {versInfo.FileMajorPart}.{versInfo.FileMinorPart}.{versInfo.FileBuildPart}.{versInfo.FilePrivatePart}");
+                    addDiagLine($@"Version: {versInfo.ToVersion()}");
 #else
                     addDiagLine($@"Version information cannot be read on non-windows platforms");
 #endif
+
+                    // Disk type
+#if WINDOWS
+                    string pathroot = Path.GetPathRoot(gamePath);
+                    pathroot = pathroot.Substring(0, 1);
+                    if (pathroot == @"\")
+                    {
+                        addDiagLine(@"Installation appears to be on a network drive (first character in path is \)", Severity.WARN);
+                    }
+                    else
+                    {
+                        if (Utilities.IsWindows10OrNewer())
+                        {
+                            int backingType = GetPartitionDiskBackingType(pathroot);
+                            string type = @"Unknown type";
+                            switch (backingType)
+                            {
+                                case 3:
+                                    type = @"Hard disk drive";
+                                    break;
+                                case 4:
+                                    type = @"Solid state drive";
+                                    break;
+                                default:
+                                    type += @": " + backingType;
+                                    break;
+                            }
+
+                            addDiagLine(@"Installed on disk type: " + type);
+                        }
+                    }
+#endif
+
+
                     if (selectedDiagnosticTarget.Game == MEGame.ME1)
                     {
                         //bool me1LAAEnabled = Utilities.GetME1LAAEnabled();
@@ -309,6 +311,24 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         addDiagLine(
                             $@"Game source: Unknown/Unsupported - {selectedDiagnosticTarget.ExecutableHash}",
                             Severity.FATAL);
+                    }
+
+                    if (selectedDiagnosticTarget.Game == MEGame.ME1)
+                    {
+                        Log.Information(@"[AICORE] Getting additional ME1 executable information");
+                        var exeInfo = ME1ExecutableInfo.GetExecutableInfo(MEDirectories.ExecutablePath(selectedDiagnosticTarget), false);
+                        if (avi != null)
+                        {
+                            addDiagLine($"Large Address Aware: {exeInfo.HasLAAApplied}", exeInfo.HasLAAApplied ? Severity.GOOD : Severity.FATAL);
+                            addDiagLine($"No-admin patched: {exeInfo.HasLAAApplied}", exeInfo.HasProductNameChanged ? Severity.GOOD : Severity.WARN);
+                            addDiagLine($"enableLocalPhysXCore patched: {exeInfo.HasPhysXCoreChanged}", exeInfo.HasLAAApplied ? Severity.GOOD : Severity.WARN);
+                        }
+                        else
+                        {
+                            addDiagLine($"Large Address Aware: {exeInfo.HasLAAApplied}");
+                            addDiagLine($"No-admin patched: {exeInfo.HasLAAApplied}");
+                            addDiagLine($"enableLocalPhysXCore patched: {exeInfo.HasLAAApplied}");
+                        }
                     }
 
 #if WINDOWS
@@ -405,34 +425,26 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 updateStatusCallback?.Invoke("Collecting system information");
 
                 addDiagLine(@"System information", Severity.DIAGSECTION);
+                var computerInfo = new ComputerInfo();
+
                 OperatingSystem os = Environment.OSVersion;
                 Version osBuildVersion = os.Version;
 
-#if WINDOWs
-                    //Windows 10 only
-                    string releaseId =
- Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", @"ReleaseId", "").ToString();
-                    string productName =
- Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", @"ProductName", "").ToString();
-                    string verLine = @"Running " + productName;
-                    if (osBuildVersion.Major == 10)
-                    {
-                        verLine += @" " + releaseId;
-                    }
+                string verLine = @"Running " + computerInfo.OSFullName;
 
-                    if (os.Version < App.MIN_SUPPORTED_OS)
-                    {
-                        addDiagLine(@"This operating system is not supported", Severity.FATAL);
-                        addDiagLine(@"Upgrade to a supported operating system if you want support", Severity.FATAL);
-                    }
-
-                    addDiagLine(verLine, os.Version < App.MIN_SUPPORTED_OS ? Severity.ERROR : Severity.INFO);
-                    addDiagLine(@"Version " + osBuildVersion, os.Version < App.MIN_SUPPORTED_OS ? Severity.ERROR : Severity.INFO);
+#if WINDOWS
+                if (os.Version < ALOTInstallerCoreLib.MIN_SUPPORTED_WINDOWS_OS)
+                {
+                    addDiagLine(@"This operating system is not supported", Severity.FATAL);
+                    addDiagLine(@"Upgrade to a supported operating system if you want support", Severity.FATAL);
+                }
+                addDiagLine(verLine, os.Version < ALOTInstallerCoreLib.MIN_SUPPORTED_WINDOWS_OS ? Severity.ERROR : Severity.INFO);
 #endif
+
+                addDiagLine(@"Version " + osBuildVersion, os.Version < ALOTInstallerCoreLib.MIN_SUPPORTED_WINDOWS_OS ? Severity.ERROR : Severity.INFO);
 
                 addDiagLine();
                 addDiagLine(@"System Memory", Severity.BOLD);
-                var computerInfo = new ComputerInfo();
                 long ramInBytes = (long)computerInfo.TotalPhysicalMemory;
                 addDiagLine(@"Total memory available: " + FileSizeFormatter.FormatSize(ramInBytes));
 #if WINDOWS

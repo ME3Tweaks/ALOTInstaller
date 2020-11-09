@@ -446,11 +446,14 @@ namespace ALOTInstallerCore.ModManager.Services
             var exePath = MEDirectories.ExecutablePath(target);
             if (File.Exists(exePath))
             {
-                var md5 = Utilities.CalculateMD5(exePath);
+
+
+                var md5 = target.Game == MEGame.ME1 ? (string)null : Utilities.CalculateMD5(exePath);
                 switch (target.Game)
                 {
                     case MEGame.ME1:
-                        SUPPORTED_HASHES_ME1.TryGetValue(md5, out var me1result);
+                        var me1Info = ME1ExecutableInfo.GetExecutableInfo(exePath, true);
+                        SUPPORTED_HASHES_ME1.TryGetValue(me1Info.OriginalExecutableHash, out var me1result);
                         return (md5, me1result);
                     case MEGame.ME2:
                         SUPPORTED_HASHES_ME2.TryGetValue(md5, out var me2result);
