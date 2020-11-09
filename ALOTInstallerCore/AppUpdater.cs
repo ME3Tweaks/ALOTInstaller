@@ -206,8 +206,7 @@ namespace ALOTInstallerCore
                         {
                             //up to date
                             Log.Information("[AICORE] Application is up to date.");
-
-                            if (betaAvailableButOnStable && Settings.LastBetaAdvert < (DateTimeOffset.UtcNow.AddDays(-3)))
+                            if (betaAvailableButOnStable && Settings.LastBetaAdvert < (DateTime.UtcNow.AddDays(-3)))
                             {
                                 notifyBetaAvailable?.Invoke();
                                 Settings.LastBetaAdvert = DateTime.Now;
