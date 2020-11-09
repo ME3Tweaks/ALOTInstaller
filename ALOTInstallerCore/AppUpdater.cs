@@ -62,7 +62,7 @@ namespace ALOTInstallerCore
                     {
                         Version onlineReleaseVersion = new Version(onlineRelease.TagName);
 
-                        if (onlineReleaseVersion <= currentAppVersionInfo)
+                        if (onlineReleaseVersion <= currentAppVersionInfo && (Settings.BetaMode && onlineRelease.Prerelease) || !onlineRelease.Prerelease)
                         {
                             Log.Information($@"[AICORE] The version of ALOT Installer that we have is higher than the latest release from github, no updates available. Latest applicable github release is {onlineReleaseVersion}");
                             break;
@@ -225,7 +225,7 @@ namespace ALOTInstallerCore
 #if APPUPDATESUPPORT
 
         private static bool attemptPatchUpdate(Release latestRelease, Action<long, long> progressCallback, Action progressIndeterminateCallback,
-            Action<string> setUpdateDialogTextCallback, 
+            Action<string> setUpdateDialogTextCallback,
             Action downloadCompletedCallback,
             CancellationTokenSource cancellationTokenSource)
         {
