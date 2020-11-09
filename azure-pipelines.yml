@@ -191,7 +191,7 @@ steps:
     embeds: |
       [{
         "title": "ALOT Installer Build Complete",
-        "description": "A new set of nightly builds of ALOT Installer have been built. You can run the latest version of the UI application using ME3Tweaks Mod Manager by going to the Tools menu and selecting ALOT Installer V4. Otherwise, download a copy using this link.\n\nNightly builds may be unstable and have bugs.",
+        "description": "A new set of nightly builds of ALOT Installer have been built. These builds are built from the very latest code and may be unstable, use at your own risk. Click this link and download the version you wish to use.\n\nALOTInstallerWPF: Main installer app\nALOTInstallerConsole: Terminal-based installer",
         "thumbnail": {
           "url": "https://i.imgur.com/mUtPj2S.png",
           "height": 64,
