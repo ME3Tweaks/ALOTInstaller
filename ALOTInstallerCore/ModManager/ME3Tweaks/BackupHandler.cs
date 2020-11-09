@@ -883,7 +883,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 var cmmVanilla = Path.Combine(gbPath, "cmm_vanilla");
                 if (File.Exists(cmmVanilla))
                 {
-                    Log.Information("[AICORE] Deleted cmm_vanilla file: " + cmmVanilla);
+                    Log.Information("[AICORE] Deleting cmm_vanilla file: " + cmmVanilla);
                     File.Delete(cmmVanilla);
                 }
             }
