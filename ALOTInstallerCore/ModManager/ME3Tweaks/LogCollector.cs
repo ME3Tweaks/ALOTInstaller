@@ -441,7 +441,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 addDiagLine(verLine, os.Version < ALOTInstallerCoreLib.MIN_SUPPORTED_WINDOWS_OS ? Severity.ERROR : Severity.INFO);
 #endif
 
-                addDiagLine(@"Version " + osBuildVersion, os.Version < ALOTInstallerCoreLib.MIN_SUPPORTED_WINDOWS_OS ? Severity.ERROR : Severity.INFO);
+                addDiagLine(@"Version " + osBuildVersion);
 
                 addDiagLine();
                 addDiagLine(@"System Memory", Severity.BOLD);
