@@ -165,6 +165,7 @@ namespace ALOTInstallerWPF.Flyouts
                     FilesToInstall = fileSet,
                     DebugNoInstall = !DebugPerformMainInstallation,
                     CompressPackages = CompressPackages,
+                    Limit2K = !Use4KLODs,
 
                     InstallALOT = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.ALOT) && checkboxMapping[InstallOptionsStep.InstallOption.ALOT].IsOn,
                     InstallALOTUpdate = checkboxMapping.ContainsKey(InstallOptionsStep.InstallOption.ALOTUpdate) && checkboxMapping[InstallOptionsStep.InstallOption.ALOTUpdate].IsOn,
