@@ -171,7 +171,7 @@
 			<copyfile optional="true" allownoinstall="true" defaultselectedindex="0" inarchivepath="MEUITM\mods\Splash.bmp" gamedestinationpath="BioGame\Splash\Splash.bmp" choicetitle="MEUITM Splash Screen" />
 		</manifestfile>
 		<manifestfile mode="MEUITM" meuitm="true" meuitmver="1" friendlyname="MEUITM2" author="CDAMJC" installpriority="0" recommendationreason="If using any Blur tribute textures, ensure the Blur mesh mods are installed prior to installing MEUITM2." recommendation="Required">
-			<file downloadlink="https://www.nexusmods.com/masseffect/mods/1/?tab=files" tooltipname="MEUITM Anniversary Edition" torrentfilename="MEUITM2.zip" filename="MEUITM2 direct Download-331-1-0-1604673781.zip" size="3573321471" md5="789f055f9051e6e02cfd98cf346b8aa1" />
+			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/331" tooltipname="MEUITM2" torrentfilename="MEUITM2.zip" filename="MEUITM2 direct Download-331-1-0-1604673781.zip" size="3573321471" md5="789f055f9051e6e02cfd98cf346b8aa1" />
 			<choicefile choicetitle="Default Shepard (Sheploo)" defaultselectedindex="0" allownoinstall="true">
 				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Sheploo.mem" choicetitle="Default Shepard (Sheploo)" />
 			</choicefile>
