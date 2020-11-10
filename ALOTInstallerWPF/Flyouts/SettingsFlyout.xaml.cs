@@ -72,6 +72,7 @@ namespace ALOTInstallerWPF.Flyouts
         public GenericCommand OpenLODSwitcherCommand { get; set; }
         public RelayCommand OpenTutorialLinkCommand { get; set; }
         public GenericCommand LaunchMEMGuiCommand { get; set; }
+        public GenericCommand RunAutoTOCCommand { get; set; }
         private void LoadCommands()
         {
             SetLibraryLocationCommand = new GenericCommand(ChangeLibraryLocation);
@@ -86,6 +87,7 @@ namespace ALOTInstallerWPF.Flyouts
             OpenLODSwitcherCommand = new GenericCommand(OpenLODSwitcher, () => Locations.GetAllAvailableTargets().Any());
             OpenTutorialLinkCommand = new RelayCommand(OpenTutorialLink);
             LaunchMEMGuiCommand = new GenericCommand(LaunchMEM);
+            RunAutoTOCCommand = new GenericCommand(RunAutoTOC, () => Locations.ME3Target != null && Locations.ME3Target.Supported);
 #if DEBUG
             DebugShowInstallerFlyoutCommand = new GenericCommand(() =>
             {
@@ -116,6 +118,22 @@ namespace ALOTInstallerWPF.Flyouts
                 }
             });
 #endif
+        }
+
+        private async void RunAutoTOC()
+        {
+            var result = AutoTOC.RunTOCOnGameTarget(Locations.ME3Target);
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                if (result)
+                {
+                    await mw.ShowMessageAsync("AutoTOC completed", "Mass Effect 3's TOC files have been updated.");
+                }
+                else
+                {
+                    await mw.ShowMessageAsync("AutoTOC failed", "AutoTOC failed. Check the log for more information.");
+                }
+            }
         }
 
         private void LaunchMEM()
