@@ -50,7 +50,7 @@
 	<musicpackmirror hash="04eed88382dda6963a489be93823c5ba">https://github.com/ME3Tweaks/ALOTInstaller/releases/download/3.0.586.5600/alotinstaller_music_pack-v4.zip</musicpackmirror>
 	<musicpackmirror hash="04eed88382dda6963a489be93823c5ba">https://me3tweaks.com/alotinstaller/alotinstaller_music_pack-v4.7z</musicpackmirror>
 	<!-- Tutorials and comparisons -->
-	<tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2018)" tooltip="A tutorial with pictures that walks through the installation steps." />
+	<tutorial link="https://imgur.com/a/WBJQD" text="Installation Guide (2020)" tooltip="A tutorial with pictures that walks through the installation steps." />
 	<tutorial link="https://yttrian.github.io/ALOT-Comparisons/" text="Comparison Screenshots" tooltip="Comparison sliders between ALOT and unmodded, by Ian Moore." />
 	<!-- DLC names matching this in ME3 DLC folders will have MEM texture export fix run over it before installation -->
 	<me3dlctexturefixes>
