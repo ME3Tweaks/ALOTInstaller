@@ -493,7 +493,7 @@ namespace ALOTInstallerCore.Steps
 #if WINDOWS
                 removeV3RegistryChanges();
                 // Remove XPSP3 permissions that seem to get set sometimes
-                Utilities.RemoveRunAsAdminXPSP3FromME1(package.InstallTarget);
+                Utilities.RemoveAppCompatForME1Path(package.InstallTarget);
 #endif
             }
 
