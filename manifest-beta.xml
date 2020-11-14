@@ -85,7 +85,7 @@
 		<supportedhash game="me3" name="Origin (Russian)">70dc87862da9010aad1acd7d0c2c857b</supportedhash>
 	</supportedhashes>
 	<!-- DEFINE MANIFEST MODES THAT MANIFEST FILES CAN ATTACH TO -->
-	<manifest mode="MEUITM" description="Installs MEUITM with MEUITM defaults" version="3.0" />
+	<manifest mode="MEUITM" description="Installs MEUITM with MEUITM defaults" version="3.0.1" />
 	<manifest mode="ALOT" description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults" version="7.0.6" />
 	<!-- DEFINE MANIFEST FILES -->
 	<!-- MAKE SURE EACH MODE IS TAGGED -->
@@ -173,120 +173,120 @@
 		<manifestfile mode="MEUITM" meuitm="true" meuitmver="1" friendlyname="MEUITM2" author="CDAMJC" installpriority="0" recommendationreason="If using any Blur tribute textures, ensure the Blur mesh mods are installed prior to installing MEUITM2." recommendation="Required">
 			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/331" tooltipname="MEUITM2" torrentfilename="MEUITM2.zip" filename="MEUITM2 direct Download-331-1-0-1604673781.zip" size="3573321471" md5="789f055f9051e6e02cfd98cf346b8aa1" />
 			<choicefile choicetitle="Default Shepard (Sheploo)" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Sheploo.mem" choicetitle="Default Shepard (Sheploo)" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Sheploo.mem" choicetitle="Default Shepard (Sheploo)" />
 			</choicefile>
 			<choicefile choicetitle="Male Human Faces and Scalps" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Bro Shep.mem" choicetitle="Male Human Faces and Scalps" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Bro Shep.mem" choicetitle="Male Human Faces and Scalps" />
 			</choicefile>
 			<choicefile choicetitle="FemShep textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Femshep CDA Cut.mem" choicetitle="FemShep CDA Cut" />
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Femshep OM.mem" choicetitle="FemShep Original MEUITM Style" />
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Femshep Vanilla Style HD.mem" choicetitle="Femshep Vanilla HD Look" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Femshep CDA Cut.mem" choicetitle="FemShep CDA Cut" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Femshep OM.mem" choicetitle="FemShep Original MEUITM Style" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Femshep Vanilla Style HD.mem" choicetitle="Femshep Vanilla HD Look" />
 			</choicefile>
 			<choicefile choicetitle="Garrus Head" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Garrus.mem" choicetitle="Garrus Head Textures" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Garrus.mem" choicetitle="Garrus Head Textures" />
 			</choicefile>
 			<choicefile choicetitle="Grunt textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Grunt.mem" choicetitle="Grunt Vanilla Style HD" />
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Grunt Blur Tribute.mem" choicetitle="Grunt Blur Studio Tribute" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Grunt.mem" choicetitle="Grunt Vanilla Style HD" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Grunt Blur Tribute.mem" choicetitle="Grunt Blur Studio Tribute" />
 			</choicefile>
 			<choicefile choicetitle="Illusive Man textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Illusive Man.mem" choicetitle="T.I.M. Vanilla Style HD" />
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Illusive Man Blur Studios.mem" choicetitle="T.I.M. Blur Studio Tribute" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Illusive Man.mem" choicetitle="T.I.M. Vanilla Style HD" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Illusive Man Blur Studios.mem" choicetitle="T.I.M. Blur Studio Tribute" />
 			</choicefile>
 			<choicefile choicetitle="Jack textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Jack.mem" choicetitle="Jack Vanilla Style HD" />
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Jack Blur.mem" choicetitle="Jack Blur Studio Tribute" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Jack.mem" choicetitle="Jack Vanilla Style HD" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Jack Blur.mem" choicetitle="Jack Blur Studio Tribute" />
 			</choicefile>
 			<choicefile choicetitle="Mordin textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Mordin.mem" choicetitle="Mordin Vanilla Style HD" />
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 MordinBlurTribute.mem" choicetitle="Mordin Blur Studio Tribute" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Mordin.mem" choicetitle="Mordin Vanilla Style HD" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 MordinBlurTribute.mem" choicetitle="Mordin Blur Studio Tribute" />
 			</choicefile>
 			<choicefile choicetitle="Miranda textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 MirandaBlur.mem" choicetitle="Miranda Blur Studio Tribute" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 MirandaBlur.mem" choicetitle="Miranda Blur Studio Tribute" />
 			</choicefile>
 			<choicefile choicetitle="Samara and Morinth textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 SamaraMorinth.mem" choicetitle="Samara and Morinth" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 SamaraMorinth.mem" choicetitle="Samara and Morinth" />
 			</choicefile>
 			<choicefile choicetitle="Thane textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Thane.mem" choicetitle="Thane Vanilla style HD" />
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 ThaneBlurTribute.mem" choicetitle="ME2 Thane Blur Studio Tribute" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Thane.mem" choicetitle="Thane Vanilla style HD" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 ThaneBlurTribute.mem" choicetitle="ME2 Thane Blur Studio Tribute" />
 			</choicefile>
 			<choicefile choicetitle="Captain Anderson textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Anderson.mem" choicetitle="Captain Anderson" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Anderson.mem" choicetitle="Captain Anderson" />
 			</choicefile>
 			<choicefile choicetitle="Aria textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Aria.mem" choicetitle="Aria" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Aria.mem" choicetitle="Aria" />
 			</choicefile>
 			<choicefile choicetitle="Ash textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Ash.mem" choicetitle="Ash" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Ash.mem" choicetitle="Ash" />
 			</choicefile>
 			<choicefile choicetitle="Avina textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Avina.mem" choicetitle="Avina" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Avina.mem" choicetitle="Avina" />
 			</choicefile>
 			<choicefile choicetitle="Dr. Chakwas Outfit textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Chakwas.mem" choicetitle="Dr. Chakwas Outfit" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Chakwas.mem" choicetitle="Dr. Chakwas Outfit" />
 			</choicefile>
 			<choicefile choicetitle="Joker textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Joker.mem" choicetitle="Joker" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Joker.mem" choicetitle="Joker" />
 			</choicefile>
 			<choicefile choicetitle="Kaidan textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Kaidan.mem" choicetitle="Kaidan" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Kaidan.mem" choicetitle="Kaidan" />
 			</choicefile>
 			<choicefile choicetitle="Liara and LOTSB Liara textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Liara.mem" choicetitle="Liara and LOTSB Liara" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Liara.mem" choicetitle="Liara and LOTSB Liara" />
 			</choicefile>
 			<choicefile choicetitle="Liara Green Outfit textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Liara Green Outfit.mem" choicetitle="Liara Green Outfit" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Liara Green Outfit.mem" choicetitle="Liara Green Outfit" />
 			</choicefile>
 			<choicefile choicetitle="Wrex textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Wrex Battle Hardened.mem" choicetitle="Wrex Battle Hardened" />
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Wrex Vanilla Style HD.mem" choicetitle="Wrex HD Vanilla Look" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Wrex Battle Hardened.mem" choicetitle="Wrex Battle Hardened" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Wrex Vanilla Style HD.mem" choicetitle="Wrex HD Vanilla Look" />
 			</choicefile>
 			<choicefile choicetitle="Asari textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Asari Scaly.mem" choicetitle="Asari Scaly" />
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Asari Smooth.mem" choicetitle="Asari Smooth" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Asari Scaly.mem" choicetitle="Asari Scaly" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Asari Smooth.mem" choicetitle="Asari Smooth" />
 			</choicefile>
 			<choicefile choicetitle="Batarian textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Batarian.mem" choicetitle="Batarians" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Batarian.mem" choicetitle="Batarians" />
 			</choicefile>
 			<choicefile choicetitle="Elcor textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Elcor.mem" choicetitle="Elcor" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Elcor.mem" choicetitle="Elcor" />
 			</choicefile>
 			<choicefile choicetitle="Hanar textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Hanar.mem" choicetitle="Hanar" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Hanar.mem" choicetitle="Hanar" />
 			</choicefile>
 			<choicefile choicetitle="Keeper textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Keepers.mem" choicetitle="Keepers" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Keepers.mem" choicetitle="Keepers" />
 			</choicefile>
 			<choicefile choicetitle="Salarian Head textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Salarian.mem" choicetitle="Salarian Head Textures" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Salarian.mem" choicetitle="Salarian Head Textures" />
 			</choicefile>
 			<choicefile choicetitle="Alliance Uniforms textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Alliance Uniforms.mem" choicetitle="Alliance Uniforms" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Alliance Uniforms.mem" choicetitle="Alliance Uniforms" />
 			</choicefile>
 			<choicefile choicetitle="Council and Udina textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Council Udina Clothes.mem" choicetitle="Council and Udina" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Council Udina Clothes.mem" choicetitle="Council and Udina" />
 			</choicefile>
 			<choicefile choicetitle="Human NPC Clothing textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Human NPC Clothing.mem" choicetitle="Human NPC Clothing" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Human NPC Clothing.mem" choicetitle="Human NPC Clothing" />
 			</choicefile>
 			<choicefile choicetitle="ME1 N7 Armor textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Old N7 NCF.mem" choicetitle="Original look" />
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Old N7 CF.mem" choicetitle="Carbon Fiber" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Old N7 NCF.mem" choicetitle="Original look" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Old N7 CF.mem" choicetitle="Carbon Fiber" />
 			</choicefile>
 			<choicefile choicetitle="Scientist Clothing textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Scientists.mem" choicetitle="Scientist Clothing" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Scientists.mem" choicetitle="Scientist Clothing" />
 			</choicefile>
 			<choicefile choicetitle="Turian NPC Armors Misc. textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Turian NPC armors Lights.mem" choicetitle="Turian NPC Armors Misc." />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Turian NPC armors Lights.mem" choicetitle="Turian NPC Armors Misc." />
 			</choicefile>
 			<choicefile choicetitle="Reporter Camera Bot textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="Mods\ME2 Reporter Bot.mem" choicetitle="Reporter Camera Bot" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Reporter Bot.mem" choicetitle="Reporter Camera Bot" />
 			</choicefile>
-			<zipfile optional="true" allownoinstall="true" defaultselectedindex="1" inarchivepath="MEUITM\Mods\MEUITM2Reshade.zip" gamedestinationpath="Binaries" choicetitle="MEUITM2 Reshade" />
-			<zipfile optional="true" allownoinstall="true" defaultselectedindex="1" inarchivepath="MEUITM\Mods\Blackcrushremoval.zip" gamedestinationpath="Engine\Shaders" choicetitle="Crushed Blacks Fix" />
-			<copyfile optional="true" defaultselectedindex="0" allownoinstall="true" inarchivepath="MEUITM\Mods\MEUITM2.bik" gamedestinationpath="BioGame\Movies\ME_EAsig_720p_v2_raw.bik" choicetitle="MEUITM Intro Video" />
+			<zipfile optional="true" allownoinstall="true" defaultselectedindex="1" inarchivepath="MEUITM2\Mods\MEUITM2Reshade.zip" gamedestinationpath="Binaries" choicetitle="MEUITM2 Reshade" />
+			<zipfile optional="true" allownoinstall="true" defaultselectedindex="1" inarchivepath="MEUITM2\Mods\Blackcrushremoval.zip" gamedestinationpath="Engine\Shaders" choicetitle="Crushed Blacks Fix" />
+			<copyfile optional="true" defaultselectedindex="0" allownoinstall="true" inarchivepath="MEUITM2\Mods\MEUITM2.bik" gamedestinationpath="BioGame\Movies\ME_EAsig_720p_v2_raw.bik" choicetitle="MEUITM Intro Video" />
 			<games
 			me1="false"
 			me2="true"
