@@ -37,6 +37,10 @@ namespace ALOTInstallerCore.Helpers
             /// </summary>
             Cached,
             /// <summary>
+            /// The local directory's _manifest.xml file
+            /// </summary>
+            LocalOverride,
+            /// <summary>
             /// The manifest was fetched from an online source
             /// </summary>
             Online,
@@ -97,9 +101,11 @@ namespace ALOTInstallerCore.Helpers
                 }
 
                 string fetchedManifest = null;
+                ManifestSource ms = ManifestSource.Online;
                 var localOverride = Path.Combine(Utilities.GetExecutingAssemblyFolder(), "_manifest.xml");
                 if (File.Exists(localOverride))
                 {
+                    ms = ManifestSource.LocalOverride;
                     fetchedManifest = File.ReadAllText(localOverride);
                 }
                 else
@@ -120,7 +126,7 @@ namespace ALOTInstallerCore.Helpers
                         ex.WriteToLog("[AICORE] ");
                     }
                     setCurrentOperationCallback?.Invoke("Parsing installer manifest");
-                    manifestParsed = ParseManifest(ManifestSource.Online, fetchedManifest);
+                    manifestParsed = ParseManifest(ms, fetchedManifest);
                     if (!manifestParsed) throw new Exception("Online manifest parsing failed, failing over to cached");
                 }
                 else
