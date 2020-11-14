@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if WINDOWS
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq.Expressions;
@@ -17,7 +18,7 @@ using Serilog;
 namespace ALOTInstallerCore
 {
     // WINDOWS SPECIFIC ITEMS IN UTILITIES
-#if WINDOWS
+
     public static partial class Utilities
     {
 
@@ -124,6 +125,5 @@ namespace ALOTInstallerCore
             }
         }
     }
-#endif
-
 }
+#endif
