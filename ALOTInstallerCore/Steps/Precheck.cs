@@ -112,6 +112,11 @@ namespace ALOTInstallerCore.Steps
             if (blacklistedMods.Any())
             {
                 // Mod(s) that have been blacklisted as incompatible are installed
+                CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
+                {
+                    {@"Reason", "Blacklisted files found" },
+                    {@"Blacklisted files detected", string.Join(',',blacklistedMods)}
+                });
                 return $"The following mods were detected as installed and are known to be incompatible with texture mods:\n{string.Join("\n - ", blacklistedMods)}\n\nThese mods cannot be installed if installing textures and should not be used for any reason.";
             }
 
@@ -121,6 +126,11 @@ namespace ALOTInstallerCore.Steps
                 var inconsistentDLCs = pc.checkDLCConsistency();
                 if (inconsistentDLCs.Any())
                 {
+                    CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
+                    {
+                        {@"Reason", "Inconsistent DLC found" },
+                        {"Supported installation" , pc.target.Supported.ToString()}
+                    });
                     if (pc.target.Supported)
                     {
                         return $"The following DLCs are in an inconsistent state: {string.Join("\n", inconsistentDLCs)}.\n\nThe game must be restored from a vanilla backup or deleted (not repaired) and reinstalled.";
@@ -138,6 +148,10 @@ namespace ALOTInstallerCore.Steps
                     var replacedAddedRemovedFiles = pc.checkForReplacedAddedRemovedFiles();
                     if (replacedAddedRemovedFiles.Any())
                     {
+                        CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
+                        {
+                            {@"Reason", "Texture map inconsistent" },
+                        });
                         Log.Error("[AICORE] The texture map has become desynchronized from the game state on disk:");
                         foreach (var v in replacedAddedRemovedFiles)
                         {
@@ -156,6 +170,10 @@ namespace ALOTInstallerCore.Steps
                 var tfcFiles = Directory.GetFiles(MEDirectories.BioGamePath(package.InstallTarget), "TexturesMEM*.tfc", SearchOption.AllDirectories).ToList();
                 if (tfcFiles.Any())
                 {
+                    CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
+                    {
+                        {@"Reason", "Leftover files found" },
+                    });
                     Log.Error("[AICORE] Cannot install textures: Found leftover MEM TFC files that will conflict with installer, game must be fully deleted to remove all leftover files");
                     // We found leftover TextureMEMXX.tfc files - there's no install so these should not exist!
                     return "Leftover files were found from a previous texture installation. These may be leftover from a failed install, or the game was repaired instead of being restored with the restore feature. The game directory must be fully deleted to remove leftover files; repairing/uninstalling the game will NOT remove these files.";
@@ -593,6 +611,10 @@ namespace ALOTInstallerCore.Steps
                 {
                     Log.Error("[AICORE] ALOT manifest is missing the ALOT main file!");
                     failureReason = "The main ALOT file is missing from the manifest! Contact the developers to get this resolved.";
+                    CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
+                    {
+                        {@"Reason", "ALOT main file missing from manifest" },
+                    });
                     return false;
                 }
 
@@ -601,8 +623,12 @@ namespace ALOTInstallerCore.Steps
                     if (texturesInfo.ALOTVER != alotMainFile.AlotVersionInfo.ALOTVER && alotMainFile.Ready)
                     {
                         // ALOT main versions are different
-                        Log.Warning($"[AICORE] Precheck failed: {alotMainFile.FriendlyName} file cannot be installed on top of an existing version of ALOT that is different: {texturesInfo.ALOTVER}.{texturesInfo.ALOTUPDATEVER}");
+                        Log.Warning($"[AICORE] Staging precheck failed: {alotMainFile.FriendlyName} file cannot be installed on top of an existing version of ALOT that is different: {texturesInfo.ALOTVER}.{texturesInfo.ALOTUPDATEVER}");
                         failureReason = $"[AICORE] The manifest version of ALOT currently is {alotMainFile.AlotVersionInfo.ALOTVER}, but your current installation is {texturesInfo.ALOTVER}.{texturesInfo.ALOTUPDATEVER}. You cannot install new major versions of ALOT on top of each other, you must restore your game and perform a clean installation.";
+                        CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
+                        {
+                            {@"Reason", "ALOT major version difference" },
+                        });
                         return false;
                     }
 
@@ -613,8 +639,12 @@ namespace ALOTInstallerCore.Steps
                     // ALOT not installed
                     if (!alotMainFile.Ready)
                     {
-                        Log.Warning($"Precheck failed: {alotMainFile.FriendlyName} file is not imported in the texture library and ALOT mode rules require it to be for initial texture installation");
+                        Log.Warning($"Staging precheck failed: {alotMainFile.FriendlyName} file is not imported in the texture library and ALOT mode rules require it to be for initial texture installation");
                         failureReason = $"{alotMainFile.FriendlyName} must be imported into the texture library in order to install textures in ALOT mode.";
+                        CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
+                        {
+                            {@"Reason", "ALOT main file missing" },
+                        });
                         return false;
                     }
                 }
@@ -627,8 +657,12 @@ namespace ALOTInstallerCore.Steps
                     if (hasAlot && alotUpdateFile.AlotVersionInfo > texturesInfo && !alotUpdateFile.Ready)
                     {
                         // This file is required but is not ready
-                        Log.Warning("[AICORE] Precheck failed: ALOT update file is not imported but ALOT mode rules require the latest update to be imported for any subsequent installations on top of the existing ALOT install");
+                        Log.Warning("[AICORE] Staging precheck failed: ALOT update file is not imported but ALOT mode rules require the latest update to be imported for any subsequent installations on top of the existing ALOT install");
                         failureReason = $"ALOT updates are required to be installed if available. Your ALOT version does not have the latest update, and the ALOT update file is not imported into the texture library. You must import the {alotUpdateFile.FriendlyName} file before you can install textures in ALOT mode.";
+                        CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
+                        {
+                            {@"Reason", "ALOT update missing" },
+                        });
                         return false;
                     }
 
@@ -636,17 +670,25 @@ namespace ALOTInstallerCore.Steps
                     if (!alotUpdateFile.Ready)
                     {
                         // This file is required but is not ready
-                        Log.Warning("[AICORE] Precheck failed: ALOT update file is not imported but ALOT mode rules require the latest update to be imported for first time installation");
+                        Log.Warning("[AICORE] Staging precheck failed: ALOT update file is not imported but ALOT mode rules require the latest update to be imported for first time installation");
                         failureReason = $"ALOT updates are required to be installed if available. The ALOT update file is not imported into the texture library. You must import the {alotUpdateFile.FriendlyName} file before you can install textures in ALOT mode.";
+                        CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
+                        {
+                            {@"Reason", "ALOT update missing" },
+                        });
                         return false;
                     }
 
                     if (hasAlot && texturesInfo.ALOTVER != alotUpdateFile.AlotVersionInfo.ALOTVER &&
                         alotUpdateFile.Ready)
                     {
-                        Log.Warning("[AICORE] Precheck failed: ALOT update file is not applicable to installed version of ALOT");
+                        Log.Warning("[AICORE] Staging precheck failed: ALOT update file is not applicable to installed version of ALOT");
                         // Update cannot be applied to this installation
                         failureReason = $"The file {alotUpdateFile.FriendlyName} cannot be installed against the currently installed ALOT version ({texturesInfo.ALOTVER}.{texturesInfo.ALOTUPDATEVER}).";
+                        CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
+                        {
+                            {@"Reason", "ALOT Update file is not applicable" },
+                        });
                         return false;
                     }
                 }
@@ -664,7 +706,7 @@ namespace ALOTInstallerCore.Steps
             var installationPackagesDir = Path.Combine(Settings.StagingLocation, package.InstallTarget.Game.ToString(), "InstallationPackages");
             if (!Directory.Exists(installationPackagesDir))
             {
-                Log.Error(@"[AICORE] The InstallationPackages directory doesn't exist. Precheck failed");
+                Log.Error(@"[AICORE] The InstallationPackages directory doesn't exist. Staging precheck failed");
                 CoreCrashes.TrackError(new Exception("The InstallationPackages directory doesn't exist after build!"));
                 return "The final InstallationPackages directory does not exist. This is likely a bug in the installer. Please report this to to the developers on the ALOT Discord.";
             }
@@ -673,7 +715,7 @@ namespace ALOTInstallerCore.Steps
             if (package.FilesToInstall.All(x => !(x is PreinstallMod)) && !filesThatWillInstall.Any())
             {
                 // Preinstall mods don't use .mem packages (As of V4 ALOV 2020). As such there won't be any .mem packages
-                Log.Error(@"[AICORE] There were no mem files in the InstallationPackages directory. Precheck failed");
+                Log.Error(@"[AICORE] There were no mem files in the InstallationPackages directory. Staging precheck failed");
                 CoreCrashes.TrackError(new Exception("There were no mem files in the InstallationPackages directory!"));
                 return "There are no files that will be installed, as the InstallationPackages directory is empty. This is likely a bug in the installer. Please report this to the developers on the ALOT Discord.";
             }
