@@ -1,17 +1,13 @@
-﻿using MahApps.Metro.Controls.Dialogs;
-using Serilog;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects.Manifest;
-using ALOTInstallerWPF;
 using ALOTInstallerWPF.Objects;
+using MahApps.Metro.Controls.Dialogs;
 
-namespace AlotAddOnGUI
+namespace ALOTInstallerWPF.Dialogs
 {
     /// <summary>
     /// Interaction logic for ModConfigurationDialog.xaml
@@ -37,6 +33,8 @@ namespace AlotAddOnGUI
             ConfigurableItems.AddRange(mf.ChoiceFiles);
             ConfigurableItems.AddRange(mf.CopyFiles.Where(s => s.Optional));
             ConfigurableItems.AddRange(mf.ZipFiles.Where(s => s.Optional));
+            DialogContentMargin = new GridLength(10, GridUnitType.Star);
+            DialogContentWidth = new GridLength(90, GridUnitType.Star);
         }
 
         private void LoadCommands()

@@ -59,7 +59,10 @@
                         <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect files" OnContent="Show Mass Effect files" IsEnabled="{Binding ME1Available}" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowME1Files)}" ToolTip="Toggle showing files for Mass Effect"/>
                         <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect 2 files" OnContent="Show Mass Effect 2 files" IsEnabled="{Binding ME2Available}" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowME2Files)}" ToolTip="Toggle showing files for Mass Effect 2"/>
                         <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show Mass Effect 3 files" OnContent="Show Mass Effect 3 files" IsEnabled="{Binding ME3Available}" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowME3Files)}" ToolTip="Toggle showing files for Mass Effect 3"/>
+                        <Separator Margin="20,0,0,0"/>
+                        <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Don't show optional files" OnContent="Show optional files" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowOptionalFiles)}" ToolTip="Toggle showing files that are considered optional to their respective mode"/>
                         <mah:ToggleSwitch Margin="20,0,0,0" FontSize="12" OffContent="Show only ready files" OnContent="Show ready &amp; non ready files" IsOn="{Binding Path=(builderUi:FileSelectionUIController.ShowNonReadyFiles)}" ToolTip="Toggle showing files that are not ready for installation (not imported/disabled)"/>
+
                     </StackPanel>
                 </StackPanel>
             </Expander>

@@ -25,6 +25,7 @@ using MahApps.Metro.Controls.Dialogs;
 using ME3ExplorerCore.Packages;
 using Notifications.Wpf.Core;
 using Serilog;
+using Serilog.Sinks.File;
 using Application = System.Windows.Application;
 using ZipFile = System.IO.Compression.ZipFile;
 
@@ -96,6 +97,23 @@ namespace ALOTInstallerWPF.BuilderUI
             set
             {
                 if (SetProperty(ref _showME3Files, value))
+                {
+                    Application.Current.Dispatcher.InvokeAsync(() =>
+                    {
+                        FSUIC.DisplayedFilesView.Refresh();
+                    });
+                }
+            }
+        }
+
+        private static bool _showOptionaFiles = true;
+
+        public static bool ShowOptionalFiles
+        {
+            get => _showOptionaFiles;
+            set
+            {
+                if (SetProperty(ref _showOptionaFiles, value))
                 {
                     Application.Current.Dispatcher.InvokeAsync(() =>
                     {
@@ -261,6 +279,7 @@ namespace ALOTInstallerWPF.BuilderUI
             {
                 if (ShownSpecificFileSet != null) return ShownSpecificFileSet.Contains(ifx); //Show only files in the specifically set UI list
                 if (!ShowNonReadyFiles && (!ifx.Ready || ifx.Disabled)) return false; // Show only ready to install files
+                if (!ShowOptionalFiles && ifx is ManifestFile mf && mf.Recommendation == RecommendationType.Optional) return false; //Optional file not shown.
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME1) && ShowME1Files) return true;
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME2) && ShowME2Files) return true;
                 if (ifx.ApplicableGames.HasFlag(ApplicableGame.ME3) && ShowME3Files) return true;
