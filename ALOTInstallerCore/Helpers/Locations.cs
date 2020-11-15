@@ -9,6 +9,7 @@ using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.Objects.Manifest;
 using ME3ExplorerCore.Packages;
 using Microsoft.Win32;
 using PropertyChanged;
@@ -314,5 +315,16 @@ namespace ALOTInstallerCore.Helpers
 #endif
             return result;
         }
+
+#if WPF
+        public static string GetInstallModeMusicFilePath(InstallOptionsPackage iop)
+        {
+            if (iop.InstallerMode == ManifestMode.MEUITM)
+            {
+                return Path.Combine(Locations.MusicDirectory, $"meuitm_{iop.InstallTarget.Game.ToString().ToLower()}.mp3");
+            }
+            return Path.Combine(Locations.MusicDirectory, iop.InstallTarget.Game.ToString().ToLower() + ".mp3");
+        }
+#endif
     }
 }

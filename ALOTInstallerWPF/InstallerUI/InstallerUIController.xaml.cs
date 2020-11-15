@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -85,14 +86,29 @@ namespace ALOTInstallerWPF.InstallerUI
         public Visibility InstallerTextTopVisibility { get; private set; } = Visibility.Visible;
         public Visibility InstallerTextMiddleVisibility { get; private set; } = Visibility.Visible;
         public Visibility InstallerTextBottomVisibility { get; private set; } = Visibility.Visible;
-        public static ImageBrush GetInstallerBackgroundImage(MEGame game, ManifestMode mode)
+        public static ImageBrush GetInstallerBackgroundImage(InstallOptionsPackage iop)
         {
-            string bgPath = $"/alot_{game.ToString().ToLower()}_bg"; // ALOT / FREE MODE
-            if (mode == ManifestMode.MEUITM)
+            if (iop.InstallerMode == ManifestMode.MEUITM)
             {
-                bgPath = $"/meuitm_{game.ToString().ToLower()}_bg";
+                var meuitmFile = iop.FilesToInstall.OfType<ManifestFile>().FirstOrDefault(x => x.MEUITMSettings != null);
+                if (meuitmFile != null)
+                {
+                    using var stream = new MemoryStream(meuitmFile.MEUITMSettings.BackgroundImageBytes);
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = stream;
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+                    return new ImageBrush(bitmap)
+                    {
+                        Stretch = Stretch.UniformToFill
+                    };
+                }
             }
-            else if (DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
+
+            string bgPath = $"/alot_{iop.InstallTarget.Game.ToString().ToLower()}_bg"; // ALOT / FREE MODE
+            if (DateTime.Now.Month == 4 && DateTime.Now.Day == 1)
             {
                 bgPath += "_alt";
             }
@@ -114,7 +130,7 @@ namespace ALOTInstallerWPF.InstallerUI
             loadTips();
             CurrentTip = "This may take a while, enjoy some lore while you wait.";
             InitializeComponent();
-            MusicAvailable = File.Exists(getMusicPath(InstallOptions.InstallTarget.Game));
+            MusicAvailable = File.Exists(Locations.GetInstallModeMusicFilePath(InstallOptions));
             musicOn = MusicAvailable && Settings.PlayMusic;
             setMusicIcon();
         }
@@ -286,10 +302,14 @@ namespace ALOTInstallerWPF.InstallerUI
 
             if (InstallOptions.InstallALOT || InstallOptions.InstallALOTUpdate || InstallOptions.InstallMEUITM)
             {
-                audioPlayer.Source = new Uri(getMusicPath(InstallOptions.InstallTarget.Game));
-                if (musicOn)
+                var musPath = Locations.GetInstallModeMusicFilePath(InstallOptions);
+                if (File.Exists(musPath))
                 {
-                    audioPlayer.Play();
+                    audioPlayer.Source = new Uri(musPath);
+                    if (musicOn)
+                    {
+                        audioPlayer.Play();
+                    }
                 }
             }
 
@@ -467,11 +487,6 @@ namespace ALOTInstallerWPF.InstallerUI
             };
             musicButton.BeginAnimation(UIElement.OpacityProperty, musicButtonFadeoutAnim);
             audioPlayer.BeginAnimation(MediaElement.VolumeProperty, volumeFadeoutAnim);
-        }
-
-        private string getMusicPath(MEGame game)
-        {
-            return Path.Combine(Locations.MusicDirectory, game.ToString().ToLower() + ".mp3");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

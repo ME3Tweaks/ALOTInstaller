@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using ALOTInstallerCore;
+using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Flyouts;
@@ -175,6 +176,13 @@ namespace ALOTInstallerWPF
             FileSelectionUIController.FSUIC.IsStaging = false;
             CommonUtil.Run(() =>
             {
+                foreach (var v in ManifestHandler.GetAllManifestFiles())
+                {
+                    if (v.MEUITMSettings != null)
+                    {
+                        v.MEUITMSettings.BackgroundImageBytes = null; //Clean this out of memory
+                    }
+                }
                 InstallingOverlayFlyout.Content = null; //Remove this so it doesn't keep running. GC will remove it
             }, TimeSpan.FromSeconds(3));
         }

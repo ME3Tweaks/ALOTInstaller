@@ -409,6 +409,13 @@ namespace ALOTInstallerCore.Helpers
                                                                           TPFSource = r.Attribute("tpfsource")?.Value
                                                                       }).ToList(),
 
+                                                                  // MEUITM file specific things
+                                                                  MEUITMSettings = e.Elements("meuitmmodesettings").Select(x=> new MEUITMModeSettings()
+                                                                  {
+                                                                      MEUITMModeBackgroundPath = x.Attribute("modebackgroundpicture")?.Value,
+                                                                      MEUITMModeMusicPath = x.Attribute("modemusic")?.Value,
+                                                                  }).FirstOrDefault(),
+
                                                                   // Configurable mod options
                                                                   ChoiceFiles = e.Elements("choicefile")
                                                                       .Select(q => new ChoiceFile

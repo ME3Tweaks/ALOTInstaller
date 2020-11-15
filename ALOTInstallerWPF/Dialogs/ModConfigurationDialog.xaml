@@ -27,7 +27,7 @@
             <ListView Grid.Row="2" Grid.Column="1" ItemsSource="{Binding ConfigurableItems}"  BorderThickness="0" MaxHeight="400">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Columns="2"/>
+                        <UniformGrid Columns="3"/>
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
 

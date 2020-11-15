@@ -33,7 +33,7 @@ namespace ALOTInstallerCore.Helpers.AppSettings
             StagingLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, @"Staging", v => StagingSettingsLocation = v, v => StagingLocationExistedOnLoad = v);
             MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
             Telemetry = LoadSettingBool(SettingsKeys.SettingKeys.Telemetry, true);
-            PlayMusic = LoadSettingBool(SettingsKeys.SettingKeys.PlayMusic, false);
+            PlayMusic = LoadSettingBool(SettingsKeys.SettingKeys.PlayMusic, true);
             BetaMode = LoadSettingBool(SettingsKeys.SettingKeys.BetaMode, false);
             LastContentCheck = LoadSettingDateTime(SettingsKeys.SettingKeys.LastContentCheck, DateTime.MinValue);
             //AutoUpdateLODs = LoadSettingBool(settingsIni, "ModManager", "AutoUpdateLODs", true);

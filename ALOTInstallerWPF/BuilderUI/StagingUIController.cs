@@ -220,7 +220,7 @@ namespace ALOTInstallerWPF.BuilderUI
                             {
                                 InstallerTextTop = "Preparing texture installer",
                             };
-                            mw.OpenInstallerUI(iuic, InstallerUIController.GetInstallerBackgroundImage(iop.InstallTarget.Game, iop.InstallerMode));
+                            mw.OpenInstallerUI(iuic, InstallerUIController.GetInstallerBackgroundImage(iop));
                         }
                     }
                 };

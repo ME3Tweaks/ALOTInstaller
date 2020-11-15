@@ -202,12 +202,28 @@ namespace ALOTInstallerCore.Steps
                 {
                     if (installString == "")
                     {
-                        installString = $"MEUITM v{meuitmFile.AlotVersionInfo.MEUITMVER}";
+                        installString = getMeuitmIDStr(meuitmFile);
                     }
                     else
                     {
-                        installString += $" & MEUITM v{meuitmFile.AlotVersionInfo.MEUITMVER}";
+                        installString += $" & {getMeuitmIDStr(meuitmFile)}";
                     }
+                }
+
+                string getMeuitmIDStr(InstallerFile meuitmF)
+                {
+                    string retStr = "MEUITM";
+                    if (package.InstallTarget.Game > MEGame.ME1)
+                    {
+                        retStr += package.InstallTarget.Game.ToGameNum();
+                    }
+
+                    if (meuitmFile.AlotVersionInfo.MEUITMVER > 1)
+                    {
+                        retStr += $" v{meuitmFile.AlotVersionInfo.MEUITMVER}";
+                    }
+
+                    return retStr;
                 }
             }
 

@@ -336,7 +336,6 @@ namespace ALOTInstallerCore.Steps
                     _addonID = ++buildID; //Addon will install at this ID
                     incremented = true;
                 }
-
                 if (!incremented)
                 {
                     buildID++;
@@ -967,6 +966,20 @@ namespace ALOTInstallerCore.Steps
                         Log.Warning($"[AICORE] [{prefix}] Not all package files were marked as processed!");
                     }
                 }
+
+#if WPF
+                if (mf.MEUITMSettings != null && ManifestHandler.CurrentMode == ManifestMode.MEUITM)
+                {
+                    var bgPath = Path.Combine(sourceDirectory, mf.MEUITMSettings.MEUITMModeBackgroundPath);
+                    Log.Information($@"[AICORE] [{prefix}] Loading MEUITM mode background data from {bgPath}");
+                    mf.MEUITMSettings.BackgroundImageBytes = File.ReadAllBytes(bgPath);
+                    var musPath = Path.Combine(sourceDirectory, mf.MEUITMSettings.MEUITMModeMusicPath);
+                    var musDest = Locations.GetInstallModeMusicFilePath(_installOptions);
+                    Log.Information($@"[AICORE] [{prefix}] Caching MEUITM mode music {musPath} -> {musDest}");
+                    File.Delete(musDest);
+                    File.Move(musPath, musDest);
+                }
+#endif
 
                 if (!QuickFixHelper.IsQuickFixEnabled(QuickFixHelper.QuickFixName.nocleanstaging))
                 {

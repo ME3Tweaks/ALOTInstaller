@@ -89,27 +89,31 @@ namespace ALOTInstallerWPF.Flyouts
             LaunchMEMGuiCommand = new GenericCommand(LaunchMEM);
             RunAutoTOCCommand = new GenericCommand(RunAutoTOC, () => Locations.ME3Target != null && Locations.ME3Target.Supported);
 #if DEBUG
-            DebugShowInstallerFlyoutCommand = new GenericCommand(() =>
-            {
-                var game = MEGame.ME3;
-                InstallerUIController iuic = new InstallerUIController(new InstallOptionsPackage()
-                {
-                    DebugNoInstall = true,
-                    InstallALOT = true,
-                    InstallTarget = Locations.GetTarget(game)
-                })
-                {
-                    InstallerTextTop = "Installing X TOP TEXT",
-                    InstallerTextMiddle = "This is middle text",
-                    InstallerTextBottom = "Bottom Text 15%",
+            //DebugShowInstallerFlyoutCommand = new GenericCommand(() =>
+            //{
+            //    var game = MEGame.ME3;
+            //    InstallerUIController iuic = new InstallerUIController(new InstallOptionsPackage()
+            //    {
+            //        DebugNoInstall = true,
+            //        InstallALOT = true,
+            //        InstallTarget = Locations.GetTarget(game)
+            //    })
+            //    {
+            //        InstallerTextTop = "Installing X TOP TEXT",
+            //        InstallerTextMiddle = "This is middle text",
+            //        InstallerTextBottom = "Bottom Text 15%",
 
-                };
-                if (Application.Current.MainWindow is MainWindow mw)
-                {
-                    mw.OpenInstallerUI(iuic,
-                        InstallerUIController.GetInstallerBackgroundImage(game, ManifestHandler.CurrentMode), true);
-                }
-            });
+            //    };
+            //    if (Application.Current.MainWindow is MainWindow mw)
+            //    {
+            //        mw.OpenInstallerUI(iuic,
+            //            InstallerUIController.GetInstallerBackgroundImage(new InstallOptionsPackage()
+            //            {
+            //                InstallerMode = ManifestMode.ALOT,
+            //                InstallTa
+            //            }, ManifestHandler.CurrentMode), true);
+            //    }
+            //});
             DebugShowOriginFlyoutCommand = new GenericCommand(() =>
             {
                 if (Application.Current.MainWindow is MainWindow mw)
@@ -301,6 +305,7 @@ namespace ALOTInstallerWPF.Flyouts
                     return;
                 }
 
+                Log.Information($@"[AIWPF] Checking {target.Game} against vanilla database");
                 var pd = await mw.ShowProgressAsync($"Verifying {game.ToGameName()}",
                     "Please wait while your game is verified", true);
                 CancellationTokenSource cts = new CancellationTokenSource();
@@ -318,9 +323,10 @@ namespace ALOTInstallerWPF.Flyouts
                                 pd.SetProgress(done);
                             });
                         }
-                        , true, cts.Token);
+                        , true, true, cts.Token);
                 nbw.RunWorkerCompleted += async (a, b) =>
                 {
+                    Log.Information($@"[AIWPF] Vanilla check thread has exited");
                     if (pd.IsOpen)
                     {
                         await pd.CloseAsync();

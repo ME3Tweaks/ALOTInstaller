@@ -93,6 +93,9 @@
 		<!-- MEUITM MODE STUFF-->
 		<manifestfile mode="MEUITM" meuitm="true" meuitmver="2" friendlyname="MEUITM Anniversary Edition (2018)" author="CDAMJC" installpriority="0" recommendationreason="Main file, required" recommendation="Required" comparisonslink="https://www.nexusmods.com/masseffect/mods/1?tab=images">
 			<file downloadlink="https://www.nexusmods.com/masseffect/mods/1/?tab=files" tooltipname="MEUITM Anniversary Edition" torrentfilename="MEUITM.zip" filename="MEUITM Anniversary Edition Direct Download-1-2-1574046168.zip" size="3304906568" md5="4befad0f104c665358ec6f5f67a9dd5a" />
+			<meuitmmodesettings
+				modebackgroundpicture="MEUITM\MEUITMAnniversaryEdition.jpg"
+				modemusic="MEUITM\InstallerMusic.mp3"/>
 			<packagefile me1="true" sourcename="MEUITM\mods\Anderson.mem" movedirectly="true" />
 			<choicefile choicetitle="Asari Face Style">
 				<packagefile me1="true" sourcename="MEUITM\mods\AsariSmooth.mem" movedirectly="true" choicetitle="Smooth" />
@@ -172,6 +175,9 @@
 		</manifestfile>
 		<manifestfile mode="MEUITM" meuitm="true" meuitmver="1" friendlyname="MEUITM2" author="CDAMJC" installpriority="0" recommendationreason="If using any Blur tribute textures, ensure the Blur mesh mods are installed prior to installing MEUITM2." recommendation="Required">
 			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/331" tooltipname="MEUITM2" torrentfilename="MEUITM2.zip" filename="MEUITM2 direct Download-331-1-0-1604673781.zip" size="3573321471" md5="789f055f9051e6e02cfd98cf346b8aa1" />
+			<meuitmmodesettings
+				modebackgroundpicture="MEUITM2\MEUITM2.jpg"
+				modemusic="MEUITM2\MEUITM2Playlist.mp3"/>
 			<choicefile choicetitle="Default Shepard (Sheploo)" defaultselectedindex="0" allownoinstall="true">
 				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Sheploo.mem" choicetitle="Install" />
 			</choicefile>
@@ -203,7 +209,7 @@
 				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 MordinBlurTribute.mem" choicetitle="Mordin Blur Studio Tribute" />
 			</choicefile>
 			<choicefile choicetitle="Miranda Blur Studio textures" defaultselectedindex="0" allownoinstall="true">
-				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 MirandaBlur.mem" choicetitle="Install" />
+				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 Miranda Blur.mem" choicetitle="Install" />
 			</choicefile>
 			<choicefile choicetitle="Samara/Morinth textures" defaultselectedindex="0" allownoinstall="true">
 				<packagefile me2="true" movedirectly="true" sourcename="MEUITM2\Mods\ME2 SamaraMorinth.mem" choicetitle="Install" />

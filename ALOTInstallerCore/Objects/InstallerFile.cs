@@ -71,6 +71,11 @@ namespace ALOTInstallerCore.Objects
         /// List of sub-files that this mod 
         /// </summary>
         public List<PackageFile> PackageFiles = new List<PackageFile>();
+
+        /// <summary>
+        /// Information about how to setup MEUITM mode using this file.
+        /// </summary>
+        public MEUITMModeSettings MEUITMSettings { get; set; }
         /// <summary>
         /// Developer of this file
         /// </summary>
