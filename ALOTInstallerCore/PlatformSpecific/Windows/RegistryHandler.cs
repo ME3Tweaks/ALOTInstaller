@@ -160,10 +160,20 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         /// <param name="primaryKey"></param>
         /// <param name="subkey"></param>
         /// <param name="valuename"></param>
-        public static void DeleteRegistryValue(RegistryKey primaryKey, string subkey, string valuename)
+        public static bool DeleteRegistryValue(RegistryKey primaryKey, string subkey, string valuename)
         {
             using RegistryKey key = primaryKey.OpenSubKey(subkey, true);
-            key?.DeleteValue(valuename, false);
+            try
+            {
+                key?.DeleteValue(valuename, true);
+                Log.Information($@"[AICORE] Deleted registry value {primaryKey.Name}\{subkey} {valuename}");
+                return true;
+            }
+            catch (Exception e)
+            {
+                Log.Information($@"[AICORE] Error deleting registry value {primaryKey.Name}\{subkey} {valuename}: {e.Message}");
+                return false;
+            }
         }
 
         public static long? GetRegistrySettingLong(string name)
