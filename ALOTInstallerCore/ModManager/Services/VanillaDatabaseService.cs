@@ -242,7 +242,7 @@ namespace ALOTInstallerCore.ModManager.Services
         }
 
         public static bool ValidateTargetAgainstVanilla(GameTarget target, Action<string> failedValidationCallback,
-            Action<string> statusUpdate = null, Action<long, long> progressUpdate = null, bool md5Check = false,
+            Action<string> statusUpdate = null, Action<long, long> progressUpdate = null, bool md5Check = false, bool logBadFiles = true,
             CancellationToken cancellationToken = default)
         {
             bool isVanilla = true;
@@ -293,7 +293,7 @@ namespace ALOTInstallerCore.ModManager.Services
                         bool correctSize = fileInfo.Any(x => x.size == localFileInfo.Length);
                         if (!correctSize)
                         {
-                            Log.Error($"[AICORE] File has wrong size: {file} with size {localFileInfo.Length}");
+                            CLog.Error($"[AICORE] File has wrong size: {file} with size {localFileInfo.Length}", logBadFiles);
                             failedValidationCallback?.Invoke(file);
                             isVanilla = false;
                             continue;
