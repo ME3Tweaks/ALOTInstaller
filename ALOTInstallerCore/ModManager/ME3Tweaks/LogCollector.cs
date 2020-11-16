@@ -288,20 +288,6 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
 #endif
 
-
-                    if (selectedDiagnosticTarget.Game == MEGame.ME1)
-                    {
-                        //bool me1LAAEnabled = Utilities.GetME1LAAEnabled();
-                        //if (texturesInstalled && !me1LAAEnabled)
-                        //{
-                        //    addDiagLine("[ERROR] -  Large Address Aware: " + me1LAAEnabled + " - ALOT/MEUITM is installed - this being false will almost certainly cause crashes");
-                        //}
-                        //else
-                        //{
-                        //    addDiagLine("Large Address Aware: " + me1LAAEnabled);
-                        //}
-                    }
-
                     if (selectedDiagnosticTarget.Supported)
                     {
                         addDiagLine($@"Game source: {selectedDiagnosticTarget.GameSource}", Severity.GOOD);
