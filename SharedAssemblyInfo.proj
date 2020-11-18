@@ -5,8 +5,8 @@
     <Copyright>2017-2020 ME3Tweaks</Copyright>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
     <!-- THESE SHOULD ALL BE THE SAME -->
-    <Version>4.0.713.2078</Version>
-    <AssemblyVersion>4.0.713.2078</AssemblyVersion>
-    <FileVersion>4.0.713.2078</FileVersion>
+    <Version>4.0.714.2093</Version>
+    <AssemblyVersion>4.0.714.2093</AssemblyVersion>
+    <FileVersion>4.0.714.2093</FileVersion>
   </PropertyGroup>
 </Project>
