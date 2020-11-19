@@ -133,7 +133,7 @@ namespace ALOTInstallerCore.Steps
                     });
                     if (pc.target.Supported)
                     {
-                        return $"The following DLCs are in an inconsistent state: {string.Join("\n", inconsistentDLCs)}.\n\nThe game must be restored from a vanilla backup or deleted (not repaired) and reinstalled.";
+                        return $"The following DLCs are in an inconsistent state: {string.Join("\n", inconsistentDLCs)}.\n\nThe game must be restored from a vanilla backup or the game directory must be fully deleted from disk (not repaired) and then reinstalled.";
                     }
 
                     return "Detected inconsistent DLCs. Cannot install textures to a game with inconsistent DLCs.";

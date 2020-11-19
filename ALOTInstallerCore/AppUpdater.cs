@@ -45,6 +45,7 @@ namespace ALOTInstallerCore
 #if APPUPDATESUPPORT
             Log.Information($"[AICORE] Checking for application updates from github. Mode: {(Settings.BetaMode ? "Beta" : "Stable")}");
             var currentAppVersionInfo = Utilities.GetAppVersion();
+            currentAppVersionInfo = new Version(4, 0, 713, 2078);
             var client = new GitHubClient(new ProductHeaderValue($"{Utilities.GetAppPrefixedName()}Installer"));
             try
             {
@@ -62,7 +63,7 @@ namespace ALOTInstallerCore
                     {
                         Version onlineReleaseVersion = new Version(onlineRelease.TagName);
 
-                        if (onlineReleaseVersion <= currentAppVersionInfo && (Settings.BetaMode && onlineRelease.Prerelease) || !onlineRelease.Prerelease)
+                        if (onlineReleaseVersion <= currentAppVersionInfo && ((Settings.BetaMode && onlineRelease.Prerelease) || !onlineRelease.Prerelease))
                         {
                             Log.Information($@"[AICORE] The version of ALOT Installer that we have is higher than the latest release from github, no updates available. Latest applicable github release is {onlineReleaseVersion}");
                             break;
