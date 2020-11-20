@@ -1127,25 +1127,6 @@
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-					  friendlyname="Improved Static Lighting for ME2"
-					  author="CreeperLava"
-					  installpriority="3"
-					  recommendationreason="Significantly improves the static shadows in level environments"
-					  recommendation="Recommended">
-			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
-					  tooltipname="Improved Static Lighting for ME2"
-					  torrentfilename="LightMaps_ME2.zip"
-					  filename="Improved Static Lighting for ME2-68-2020-10-0-1573098585.zip"
-					  size="665769837"
-					  md5="d78abde1cef08b7ce64c70eaa4c46b71"
-					  unpackedsinglefilename="LightMaps_ME2.mem"
-					  unpackedsize="665769669"
-					  unpackedmd5="cf3fe16cede255158312adbfafa277d2" />
-			<packagefile me2="true"
-						 sourcename="LightMaps_ME2.mem"
-						 movedirectly="true" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
 					  friendlyname="Improved Static Lighting for ME3 - Lite"
 					  author="CreeperLava"
 					  installpriority="3"
@@ -1163,6 +1144,25 @@
 					  unpackedmd5="e21cafc243511f5486923103566dadcf" />
 			<packagefile me3="true"
 						 sourcename="LightMaps_ME3_Lite_v2.mem"
+						 movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
+					  friendlyname="Improved Static Lighting for ME2"
+					  author="CreeperLava"
+					  installpriority="3"
+					  recommendationreason="Significantly improves the static shadows in level environments"
+					  recommendation="Recommended">
+			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+					  tooltipname="Improved Static Lighting for ME2"
+					  torrentfilename="LightMaps_ME2.zip"
+					  filename="Improved Static Lighting for ME2-68-2020-10-0-1573098585.zip"
+					  size="665769837"
+					  md5="d78abde1cef08b7ce64c70eaa4c46b71"
+					  unpackedsinglefilename="LightMaps_ME2.mem"
+					  unpackedsize="665769669"
+					  unpackedmd5="cf3fe16cede255158312adbfafa277d2" />
+			<packagefile me2="true"
+						 sourcename="LightMaps_ME2.mem"
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
