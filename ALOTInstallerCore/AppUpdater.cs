@@ -45,7 +45,6 @@ namespace ALOTInstallerCore
 #if APPUPDATESUPPORT
             Log.Information($"[AICORE] Checking for application updates from github. Mode: {(Settings.BetaMode ? "Beta" : "Stable")}");
             var currentAppVersionInfo = Utilities.GetAppVersion();
-            currentAppVersionInfo = new Version(4, 0, 713, 2078);
             var client = new GitHubClient(new ProductHeaderValue($"{Utilities.GetAppPrefixedName()}Installer"));
             try
             {
