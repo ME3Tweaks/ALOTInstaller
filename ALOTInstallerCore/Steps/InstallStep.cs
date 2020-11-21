@@ -17,6 +17,7 @@ using MassEffectModManagerCore.modmanager.asi;
 using ME3ExplorerCore;
 using ME3ExplorerCore.Packages;
 using ME3ExplorerCore.Unreal;
+using ME3ExplorerCore.Unreal.BinaryConverters;
 using Serilog;
 using NickStrupat;
 #if WINDOWS
@@ -306,6 +307,11 @@ namespace ALOTInstallerCore.Steps
 
                 applyCitadelTransitionFix();
 
+                #endregion
+
+                #region Remove personalization caching from SFXGame (ME3 only)
+
+                applyME3PersonalizationCachingFixPackage();
                 #endregion
 
                 #region Main installation phase
@@ -714,9 +720,38 @@ namespace ALOTInstallerCore.Steps
             }
         }
 
+        private void applyME3PersonalizationCachingFixPackage()
+        {
+            if (package.InstallTarget.Game == MEGame.ME3 && package.InstallTarget.GetInstalledALOTInfo() == null)
+            {
+                SetMiddleTextVisibilityCallback?.Invoke(false);
+                SetBottomTextCallback?.Invoke("Fixing armor locker caching");
+                Log.Information("[AICORE] Fixing SFXGame SFXHandler_Personalization holding references to loaded assets");
+                CoreLib.InitLib(package.UiThreadScheduler, x => { Log.Error($"Error saving package: {x}"); });
+
+                var sfxGame = Path.Combine(package.InstallTarget.TargetPath, "BIOGame", "CookedPCConsole", "SFXGame.pcc");
+                if (File.Exists(sfxGame))
+                {
+                    using var sfxGameP = MEPackageHandler.OpenMEPackage(sfxGame, forceLoadFromDisk: true);
+                    var onPawnApperanceChanged = sfxGameP.GetUExport(44572); //Yes, apperance
+                    var func = ObjectBinary.From<UFunction>(onPawnApperanceChanged);
+                    func.ScriptBytes = new byte[] { 0x04, 0x0B, 0x53 };
+                    func.ScriptStorageSize = 3;
+                    func.ScriptBytecodeSize = 3;
+                    onPawnApperanceChanged.WriteBinary(func);
+                    sfxGameP.Save();
+                    Log.Information(@"[AICORE] Saved SFXGame.pcc with new bytecode for caching");
+                }
+                else
+                {
+                    Log.Error($@"[AICORE] SFXGame not found! Path: {sfxGame}");
+                }
+            }
+        }
+
         private void applyCitadelTransitionFix()
         {
-            if (package.InstallTarget.Game == MEGame.ME3)
+            if (package.InstallTarget.Game == MEGame.ME3 && package.InstallTarget.GetInstalledALOTInfo() == null)
             {
                 SetMiddleTextVisibilityCallback?.Invoke(false);
 
@@ -737,7 +772,7 @@ namespace ALOTInstallerCore.Steps
                     {
                         if (File.Exists(bioa_cithubPath))
                         {
-                            var bioa_cithub = MEPackageHandler.OpenMEPackage(bioa_cithubPath);
+                            using var bioa_cithub = MEPackageHandler.OpenMEPackage(bioa_cithubPath);
                             var trigStream1 = bioa_cithub.GetUExport(8);
                             var propsT = trigStream1.GetProperties();
                             var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
@@ -808,7 +843,7 @@ namespace ALOTInstallerCore.Steps
                         {
                             if (File.Exists(biod_cithubPath))
                             {
-                                var biod_cithub = MEPackageHandler.OpenMEPackage(biod_cithubPath);
+                                using var biod_cithub = MEPackageHandler.OpenMEPackage(biod_cithubPath);
                                 var trigStream1 = biod_cithub.GetUExport(162);
                                 var streamStates = trigStream1.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
                                 if (streamStates != null && streamStates.Count > 2)
