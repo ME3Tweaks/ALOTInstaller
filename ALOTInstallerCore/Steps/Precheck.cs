@@ -445,18 +445,15 @@ namespace ALOTInstallerCore.Steps
             for (int i = nonReadyRecommendedFiles.Count - 1; i >= 0; i--)
             {
                 var nonReadyFile = nonReadyRecommendedFiles[i];
-                if (nonReadyFile is PreinstallMod pm)
+                if (nonReadyFile.OptionGroup != null)
                 {
-                    if (pm.OptionGroup != null)
+                    // Find other matching file
+                    var otherMatchingItem = package.FilesToInstall.FirstOrDefault(x =>
+                        x is ManifestFile mfx && mfx.OptionGroup == nonReadyFile.OptionGroup && mfx != nonReadyFile);
+                    if (otherMatchingItem != null && otherMatchingItem.Ready)
                     {
-                        // Find other matching file
-                        var otherMatchingItem = package.FilesToInstall.FirstOrDefault(x =>
-                            x is PreinstallMod pmx && pmx.OptionGroup == pm.OptionGroup && pmx != pm);
-                        if (otherMatchingItem != null && otherMatchingItem.Ready)
-                        {
-                            // Another version of this item is ready instead
-                            nonReadyRecommendedFiles.RemoveAt(i);
-                        }
+                        // Another version of this item is ready instead
+                        nonReadyRecommendedFiles.RemoveAt(i);
                     }
                 }
             }
