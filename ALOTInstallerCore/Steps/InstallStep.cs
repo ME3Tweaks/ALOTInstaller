@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Timers;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.GameDirectories;
@@ -161,10 +162,25 @@ namespace ALOTInstallerCore.Steps
             InstallFailed_UnknownError
         }
 
+#if WINDOWS
+        private static Timer _wakeTimer;
 
+        private void destroyWakeTimer()
+        {
+            if (_wakeTimer != null)
+            {
+                _wakeTimer.Stop();
+                _wakeTimer.Elapsed -= keepAwakTimerTick;
+            }
+            NativeMethods.AllowSleep();
+        }
+        private void keepAwakTimerTick(object sender, ElapsedEventArgs e)
+        {
+            NativeMethods.PreventSleep();
+        }
+#endif
         public void InstallTextures(object sender, DoWorkEventArgs doWorkEventArgs)
         {
-
             // Where the compiled .mem and staged other files will be
             Log.Information(@"[AICORE] Beginning InstallTextures() thread.");
             #region Presetup variables
@@ -173,6 +189,14 @@ namespace ALOTInstallerCore.Steps
             Log.Information($@"[AICORE] Main texture installation step (+ supporting steps) will commence: {mainInstallStageWillCommence}");
 
             #endregion
+
+#if WINDOWS
+            destroyWakeTimer();
+            _wakeTimer = new Timer(60 * 1000); //1 minute
+            _wakeTimer.Elapsed += keepAwakTimerTick;
+            _wakeTimer.Start();
+            NativeMethods.PreventSleep();
+#endif
 
             #region setup top text
 
@@ -271,6 +295,7 @@ namespace ALOTInstallerCore.Steps
 
             if (mainInstallStageWillCommence && !checkForExistingMarkers())
             {
+                destroyWakeTimer();
                 doWorkEventArgs.Result = InstallResult.InstallFailed_ExistingMarkersFound;
                 return;
             }
@@ -284,6 +309,7 @@ namespace ALOTInstallerCore.Steps
             {
                 if (!applyModManagerMods())
                 {
+                    destroyWakeTimer();
                     doWorkEventArgs.Result = InstallResult.InstallFailed_TextureExportFixFailed;
                     return;
                 }
@@ -297,6 +323,7 @@ namespace ALOTInstallerCore.Steps
 
                 if (!applyNeverStreamFixes())
                 {
+                    destroyWakeTimer();
                     doWorkEventArgs.Result = InstallResult.InstallFailed_TextureExportFixFailed;
                     return;
                 }
@@ -470,7 +497,7 @@ namespace ALOTInstallerCore.Steps
                                 {"Stage context", pm.CurrentStage.StageName}
                             }, new[] { CoreCrashes.ErrorAttachmentLog.AttachmentWithText(memCrashBuilder.ToString(), "MemException.txt") });
                     }
-
+                    destroyWakeTimer();
                     doWorkEventArgs.Result = failure?.FailureResultCode ?? InstallResult.InstallFailed_UnknownError;
                     return;
                 }
@@ -478,6 +505,7 @@ namespace ALOTInstallerCore.Steps
                 if (!doneReached)
                 {
                     Log.Error(@"[AICORE] MEM exited without reaching STAGE_DONE!");
+                    destroyWakeTimer();
                     doWorkEventArgs.Result = InstallResult.InstallFailed_MEMExitedBeforeStageDone;
                     return;
                 }
@@ -496,6 +524,7 @@ namespace ALOTInstallerCore.Steps
             {
                 if (!installZipCopyFiles())
                 {
+                    destroyWakeTimer();
                     doWorkEventArgs.Result = InstallResult.InstallFailed_ZipCopyFilesError;
                     return;
                 }
@@ -507,6 +536,7 @@ namespace ALOTInstallerCore.Steps
                 // Apply ME1 LAA
                 if (!applyME1LAA())
                 {
+                    destroyWakeTimer();
                     doWorkEventArgs.Result = InstallResult.InstallFailed_ME1LAAApplyFailed;
                     return;
                 }
@@ -522,6 +552,7 @@ namespace ALOTInstallerCore.Steps
             // stamp version info
             if (mainInstallStageWillCommence && !stampVersionInformation())
             {
+                destroyWakeTimer();
                 doWorkEventArgs.Result = InstallResult.InstallFailed_FailedToApplyTextureInfo;
                 return;
             }
@@ -629,6 +660,7 @@ namespace ALOTInstallerCore.Steps
 
             SetProgressStyle?.Invoke(ProgressStyle.None);
             doWorkEventArgs.Result = hasWarning ? InstallResult.InstallOKWithWarning : InstallResult.InstallOK;
+            destroyWakeTimer();
         }
 
 #if WINDOWS

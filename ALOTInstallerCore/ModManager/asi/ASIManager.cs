@@ -296,10 +296,6 @@ namespace MassEffectModManagerCore.modmanager.asi
             }
 
             // Install the ASI
-            if (forceSource == null || forceSource.Value == false)
-            {
-                Debug.WriteLine("Hit me");
-            }
             string md5;
             bool useLocal = forceSource.HasValue && !forceSource.Value; // false (forceLocal)
             if (!useLocal && !forceSource.HasValue)
