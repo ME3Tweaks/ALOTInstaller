@@ -547,6 +547,7 @@ namespace ALOTInstallerCore.Steps
                     ASIManager.LoadManifest();
                     ASIManager.InstallASIToTargetByGroupID(9, package.InstallTarget); //AutoTOC
                     ASIManager.InstallASIToTargetByGroupID(8, package.InstallTarget); //ME3Logger Truncating
+                    ASIManager.InstallASIToTargetByGroupID(22, package.InstallTarget); //Garbage Collection Forcer
                 }
             }
 
