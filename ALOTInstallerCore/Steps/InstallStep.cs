@@ -178,6 +178,8 @@ namespace ALOTInstallerCore.Steps
         {
             NativeMethods.PreventSleep();
         }
+#else
+        private void destroyWakeTimer(){ } // Do nothing not on Windows
 #endif
         public void InstallTextures(object sender, DoWorkEventArgs doWorkEventArgs)
         {
