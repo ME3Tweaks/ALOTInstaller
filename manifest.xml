@@ -144,6 +144,7 @@
 	<me3dlctexturefixes>
 		<dlc name="DLC_CON_BPPack1" />
 		<dlc name="DLC_CON_BPPack2" />
+		<dlc name="DLC_MOD_Wardrobe" />
 	</me3dlctexturefixes>
 	<!-- DLC names matching this in ME2 DLC folders will have MEM texture export fix run over it before installation -->
 	<me2dlctexturefixes />
