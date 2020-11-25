@@ -258,10 +258,10 @@ namespace ALOTInstallerCore.Steps
             foreach (var v in _installOptions.FilesToInstall)
             {
 #if DEBUG
-                //if (v.FriendlyName.Contains("Jacob"))
-                // {
-                block.Post(v);
-                //}
+                if (v.FriendlyName.Contains("Default Fem"))
+                {
+                    block.Post(v);
+                }
 #else 
                 // Helps make sure I don't publish broken code
                 block.Post(v);
@@ -576,27 +576,47 @@ namespace ALOTInstallerCore.Steps
                 // Single file unpacked
                 if (!archiveExtracted && !decompiled && installerFile is ManifestFile mfx && mfx.IsBackedByUnpacked())
                 {
-                    // File must just be moved directly it seems
-                    var destF = Path.Combine(finalBuiltPackagesDestination, $"{installerFile.BuildID:D3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
+                    // File must just be moved directly.
 
-                    if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory.Name == new DriveInfo(finalBuiltPackagesDestination).RootDirectory.Name)
+                    // Check if it's a .mem.
+                    if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mem")
                     {
-                        // Move
-                        Log.Information($"[AICORE] [{prefix}] Moving unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                        File.Move(installerFile.GetUsedFilepath(), destF);
-                    }
-                    else
+                        var destF = Path.Combine(finalBuiltPackagesDestination,
+                            $"{installerFile.BuildID:D3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
+                        if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory.Name ==
+                            new DriveInfo(finalBuiltPackagesDestination).RootDirectory.Name)
+                        {
+                            // Move
+                            Log.Information(
+                                $"[AICORE] [{prefix}] Moving unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                            File.Move(installerFile.GetUsedFilepath(), destF);
+                        }
+                        else
+                        {
+                            //Copy
+                            Log.Information(
+                                $"[AICORE] [{prefix}] Copying unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                            CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
+                                (x, y) =>
+                                {
+                                    installerFile.StatusText = $"Copying file to installation packages {(int) (x * 100f / y)}%";
+                                },
+                                exception => { _abortStaging = true; });
+                        }
+                        stage = false;
+                    } else
                     {
+                        // It's a TPF with MoveDirectly or something. We should copy this as addon staging files are not copied back
                         //Copy
-                        Log.Information($"[AICORE] [{prefix}] Copying unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                        CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
+                        Log.Information(
+                            $"[AICORE] [{prefix}] Copying unpacked file to addon staging directory: {installerFile.GetUsedFilepath()} -> {addonStagingPath}");
+                        CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), addonStagingPath,
                             (x, y) =>
                             {
                                 installerFile.StatusText = $"Copying file to staging {(int)(x * 100f / y)}%";
                             },
                             exception => { _abortStaging = true; });
                     }
-
                     stage = false;
                 }
                 else if (archiveExtracted && installerFile.PackageFiles.Where(x => x.ApplicableGames.HasFlag(targetGame)).All(x => x.MoveDirectly))

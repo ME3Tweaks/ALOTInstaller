@@ -2,7 +2,7 @@
 
 namespace ALOTInstallerCore.Objects.Manifest
 {
-    [DebuggerDisplay("PackageFile {SourceName}, Transient={Transient}, MoveDirectory={MoveDirectly}, CopyDirectly={CopyDirectly}, Processed={Processed}")]
+    [DebuggerDisplay("PackageFile {SourceName}, Transient={Transient}, MoveDirectly={MoveDirectly}, CopyDirectly={CopyDirectly}, Processed={Processed}")]
     /// <summary>
     /// A file that is part of a manifest file, after extraction. These files are extracted from their source file and then staged for building into the addon. 
     /// </summary>
