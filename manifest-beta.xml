@@ -200,7 +200,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.6" />
+					  version="7.0.7" />
 	<!-- DEFINE MANIFEST FILES -->
 	<!-- MAKE SURE EACH MODE IS TAGGED -->
 	<manifestfiles>
