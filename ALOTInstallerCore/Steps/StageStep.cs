@@ -260,7 +260,7 @@ namespace ALOTInstallerCore.Steps
 #if DEBUG
                 //if (v.FriendlyName.Contains("Default Fem"))
                 //{
-                    block.Post(v);
+                block.Post(v);
                 //}
 #else 
                 // Helps make sure I don't publish broken code
@@ -599,23 +599,30 @@ namespace ALOTInstallerCore.Steps
                             CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
                                 (x, y) =>
                                 {
-                                    installerFile.StatusText = $"Copying file to installation packages {(int) (x * 100f / y)}%";
+                                    installerFile.StatusText = $"Copying file to installation packages {(int)(x * 100f / y)}%";
                                 },
                                 exception => { _abortStaging = true; });
                         }
                         stage = false;
-                    } else
+                    }
+                    else if (mfx.PackageFiles.Count == 1 && mfx.PackageFiles[0].MoveDirectly)
                     {
                         // It's a TPF with MoveDirectly or something. We should copy this as addon staging files are not copied back
                         //Copy
+                        var destF = Path.Combine(addonStagingPath, Path.GetFileName(installerFile.GetUsedFilepath()));
                         Log.Information(
-                            $"[AICORE] [{prefix}] Copying unpacked file to addon staging directory: {installerFile.GetUsedFilepath()} -> {addonStagingPath}");
-                        CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), addonStagingPath,
+                            $"[AICORE] [{prefix}] Copying unpacked file to addon staging directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                        CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
                             (x, y) =>
                             {
                                 installerFile.StatusText = $"Copying file to staging {(int)(x * 100f / y)}%";
                             },
                             exception => { _abortStaging = true; });
+                    }
+                    else
+                    {
+                        Log.Error($@"[AICORE] [{prefix}] Staging not handled for non extract, non decompiled, unpacked file!");
+                        CoreCrashes.TrackError?.Invoke(new Exception($"STAGING NOT HANDLED FOR SINGLE FILE UNPACKED FILE {installerFile.FriendlyName}"));
                     }
                     stage = false;
                 }
