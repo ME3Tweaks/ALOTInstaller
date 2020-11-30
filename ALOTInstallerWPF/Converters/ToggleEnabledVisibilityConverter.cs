@@ -16,7 +16,12 @@ namespace ALOTInstallerWPF.Converters
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is ManifestFile mf && mf.Recommendation == RecommendationType.Required) return Visibility.Collapsed;
+            if (value is ManifestFile mf)
+            {
+                if (mf.Recommendation == RecommendationType.Required) return Visibility.Collapsed;
+                if (mf.ForceDisabled) return Visibility.Collapsed; // Cannot enable this file
+            }
+
             if (FileSelectionUIController.FSUIC.IsStaging) return Visibility.Collapsed; //Do not allow toggling files while staging
             return Visibility.Visible;
         }

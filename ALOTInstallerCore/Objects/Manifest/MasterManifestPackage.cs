@@ -67,6 +67,8 @@ namespace ALOTInstallerCore.Objects.Manifest
         /// </summary>
         public List<ManifestTutorial> Tutorials { get; set; } = new List<ManifestTutorial>();
 
+        public List<CompatibilityPrecheck> CompatibilityPrechecks { get; } = new List<CompatibilityPrecheck>();
+
         /// <summary>
         /// Gets a list of all installer files - user and manifest. May return duplicates as MEUITM is shared in two modes.
         /// </summary>

@@ -793,8 +793,6 @@ namespace ALOTInstallerCore.Steps
                 SetMiddleTextVisibilityCallback?.Invoke(false);
                 SetBottomTextCallback?.Invoke("Fixing armor locker caching");
                 Log.Information("[AICORE] Fixing SFXGame SFXHandler_Personalization holding references to loaded assets");
-                CoreLib.InitLib(package.UiThreadScheduler, x => { Log.Error($"Error saving package: {x}"); });
-
                 var sfxGame = Path.Combine(package.InstallTarget.TargetPath, "BIOGame", "CookedPCConsole", "SFXGame.pcc");
                 if (File.Exists(sfxGame))
                 {

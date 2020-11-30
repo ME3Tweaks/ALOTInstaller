@@ -4,8 +4,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
+using ALOTInstallerCore.ModManager.Objects;
 using Serilog;
 
 namespace ALOTInstallerCore.Objects.Manifest
@@ -117,6 +119,7 @@ namespace ALOTInstallerCore.Objects.Manifest
         public List<ChoiceFile> ChoiceFiles { get; set; } = new List<ChoiceFile>();
         public List<ZipFile> ZipFiles { get; set; } = new List<ZipFile>();
         public List<CopyFile> CopyFiles { get; set; } = new List<CopyFile>();
+        public List<CompatibilityPrecheck> CompatibilityChecks { get; } = new List<CompatibilityPrecheck>();
 
         public string FileMD5 { get; internal set; }
         public string UnpackedFileMD5 { get; set; }
@@ -143,7 +146,7 @@ namespace ALOTInstallerCore.Objects.Manifest
                 Recommendation = r;
             }
         }
-       
+
         public override string ToString() => FriendlyName;
 
         public override string Category
@@ -273,6 +276,26 @@ namespace ALOTInstallerCore.Objects.Manifest
         public string ExtraInstructions { get; set; }
 
         /// <summary>
+        /// Shim to pass an XElement for parsing through from Linq. Converts xelement into compatibility rules
+        /// </summary>
+        internal XElement CompatibilityPrechecksShim
+        {
+            set
+            {
+                if (value != null)
+                {
+                    // list of conditions we use to block install based on compatibility
+                    CompatibilityChecks.AddRange(from compat in value.Descendants("dlcprecheck")
+                        select new DLCCompatibilityPrecheck(compat));
+                    CompatibilityChecks.AddRange(from compat in value.Descendants("fileprecheck")
+                        select new FileCompatibilityPrecheck(compat));
+                    CompatibilityChecks.AddRange(from compat in value.Descendants("packageprecheck")
+                        select new PackageCompatibilityPrecheck(compat));
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the backing MD5 for this file
         /// </summary>
         /// <returns></returns>
@@ -280,6 +303,20 @@ namespace ALOTInstallerCore.Objects.Manifest
         {
             if (IsBackedByUnpacked()) return UnpackedFileMD5;
             return FileMD5;
+        }
+
+        public void DisableIfIncompatible(GameTarget gameTarget)
+        {
+            foreach (var compat in CompatibilityChecks)
+            {
+                if (!compat.IsCompatibleConfig(gameTarget))
+                {
+                    ForceDisabled = true;
+                    Disabled = true;
+                    RecommendationReason = compat.IncompatibleMessage;
+                    break;
+                }
+            }
         }
     }
 }

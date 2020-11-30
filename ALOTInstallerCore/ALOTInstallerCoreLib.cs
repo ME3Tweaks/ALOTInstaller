@@ -4,6 +4,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Services;
+using ME3ExplorerCore;
 using NickStrupat;
 using Serilog;
 
@@ -93,10 +94,16 @@ namespace ALOTInstallerCore
             Log.Information("[AICORE] Loading ME3Tweaks service: Third Party Mod Identification Service (TPMI)");
 
             ThirdPartyIdentificationService.ModDatabase = OnlineContent.FetchThirdPartyIdentificationManifest();
+
+            // Load ME3ExplorerCore library
+            Log.Information(@"[AICORE] Loading ME3ExplorerCore library");
+            CoreLib.InitLib(CoreLib.SYNCHRONIZATION_CONTEXT, x => { Log.Error($"Error saving package: {x}"); });
             if (willcheckforupdates)
             {
                 Settings.LastContentCheck = DateTime.Now;
             }
+            
+            Log.Information(@"[AICORE] Starting periodic refresh");
             PeriodicRefresh.StartPeriodicRefresh();
         }
     }

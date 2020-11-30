@@ -284,6 +284,17 @@ namespace ALOTInstallerCore.Helpers
                     ProgressHandler.UseBuiltinDefaultStages();
                 }
 
+                if (rootElement.Element("compatibilityprechecks") != null)
+                {
+                    // list of conditions we use to block install based on compatibility
+                    masterManifest.CompatibilityPrechecks.AddRange(from compat in rootElement.Element("compatibilityprechecks").Descendants("dlcprecheck")
+                        select new DLCCompatibilityPrecheck(compat));
+                    masterManifest.CompatibilityPrechecks.AddRange(from compat in rootElement.Element("compatibilityprechecks").Descendants("fileprecheck")
+                        select new FileCompatibilityPrecheck(compat));
+                    masterManifest.CompatibilityPrechecks.AddRange(from compat in rootElement.Element("compatibilityprechecks").Descendants("packageprecheck")
+                        select new PackageCompatibilityPrecheck(compat));
+                }
+
                 #endregion
 
                 #region Manifest Modes
@@ -466,6 +477,11 @@ namespace ALOTInstallerCore.Helpers
                                                                   RecommendationReason = e.Attribute("recommendationreason")?.Value,
                                                                   ComparisonsLink = e.Attribute("comparisonslink")?.Value,
                                                                   ExtraInstructions = e.Element("file").Attribute("extrainstructions")?.Value,
+
+                                                                  // COMPATIBILITY REQUIREMENTS FOR FILES
+                                                                  // list of conditions we use to block install based on compatibility
+                                                                  // It's a shim so the setter can set the actual objects.
+                                                                  CompatibilityPrechecksShim = e.Element("compatibilityprechecks"),
                                                               }));
 
                     // Build list of files for each mode

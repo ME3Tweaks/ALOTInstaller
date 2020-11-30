@@ -65,6 +65,16 @@ namespace ALOTInstallerCore.Steps
 
             // Attempt to re-import any files not ready that exist on the same drive in staging/textures lib
             TextureLibrary.AttemptReimportFromStaging();
+
+            // Fire off all compatibility checks to force disable files that are not available for use.
+            var allTargets = Locations.GetAllAvailableTargets();
+            foreach (var v in ManifestHandler.GetAllManifestFiles())
+            {
+                foreach (var g in allTargets)
+                {
+                    v.DisableIfIncompatible(g);
+                }
+            }
         }
 
         private static void PerformOperatingSystemCheck(Action<string, string> messageCallback)

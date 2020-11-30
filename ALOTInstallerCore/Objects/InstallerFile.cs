@@ -166,9 +166,18 @@ namespace ALOTInstallerCore.Objects
         public abstract bool StageModFiles { get; set; }
 
         /// <summary>
-        /// If this file is disabled by the user and will not install. Only files that are not required can have this value set
+        /// If this file is disabled by the user and will not install. Only files that are not required can have this value set. The value should not be set to false if ForceDisabled is true.
         /// </summary>
         public bool Disabled
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// If this file was forcibly disabled by the installer for various reasons.
+        /// </summary>
+        public bool ForceDisabled
         {
             get;
             set;
