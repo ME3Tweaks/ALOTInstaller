@@ -399,6 +399,18 @@ namespace ALOTInstallerCore.Steps
                             updateStageOfStage();
                             updateCurrentStage();
                             break;
+                        case "WARN_4K_NORM_FOUND":
+                            var fourKNormArgs = param.Split(' ');
+                            if (fourKNormArgs.Length == 3)
+                            {
+                                Log.Warning($@"Found a 4K norm during scan step, these waste significant amounts of memory for no benefit. File: {fourKNormArgs[2]}.pcc, Export {fourKNormArgs[0]} {fourKNormArgs[1]}");
+                                CoreAnalytics.TrackEvent(@"Found 4K Norm", new Dictionary<string, string>()
+                                {
+                                    {"File", fourKNormArgs[2]},
+                                    {"Export", $"{fourKNormArgs[0]} {fourKNormArgs[1]}"}
+                                });
+                            }
+                            break;
                         case "STAGE_TIMING":
                             if (pm?.CurrentStage != null && pm.Stages.Count > 4)
                             {
@@ -406,7 +418,7 @@ namespace ALOTInstallerCore.Steps
                                 // 4+ stages means it's gonna be a full install
                                 var time = long.Parse(param);
                                 var stageName = pm.CurrentStage.StageName;
-                                
+
                                 CoreAnalytics.TrackEvent(@"Stage Timing", new Dictionary<string, string>()
                                 {
                                     { "Stage Name", stageName},
