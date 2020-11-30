@@ -399,6 +399,21 @@ namespace ALOTInstallerCore.Steps
                             updateStageOfStage();
                             updateCurrentStage();
                             break;
+                        case "STAGE_TIMING":
+                            if (pm?.CurrentStage != null && pm.Stages.Count > 4)
+                            {
+                                // Telemetry for how long each stage takes. This helps tune the percentage meters
+                                // 4+ stages means it's gonna be a full install
+                                var time = long.Parse(param);
+                                var stageName = pm.CurrentStage.StageName;
+                                
+                                CoreAnalytics.TrackEvent(@"Stage Timing", new Dictionary<string, string>()
+                                {
+                                    { "Stage Name", stageName},
+                                    { "Time", time.ToString()}
+                                });
+                            }
+                            break;
                         case "MOD_OVERRIDE":
                             Log.Information($"[AICORE] {param} overrides some textures in the install set");
                             break;
@@ -542,9 +557,8 @@ namespace ALOTInstallerCore.Steps
                     doWorkEventArgs.Result = InstallResult.InstallFailed_ME1LAAApplyFailed;
                     return;
                 }
-
-                // Remove V3 registry permissions
 #if WINDOWS
+                // Remove V3 registry permissions
                 removeV3RegistryChanges();
                 // Remove XPSP3 permissions that seem to get set sometimes
                 Utilities.RemoveAppCompatForME1Path(package.InstallTarget);
@@ -573,14 +587,19 @@ namespace ALOTInstallerCore.Steps
             if (package.InstallTarget.Game == MEGame.ME3)
             {
                 // Install ASIs.
-                // Need ASI manager code from Mod Manager once it is ready
+                Log.Information(@"Installing supporting ASIs");
+                SetBottomTextCallback?.Invoke("Installing troubleshooting files");
+                ASIManager.LoadManifest();
+                ASIManager.InstallASIToTargetByGroupID(22, package.InstallTarget); //Garbage Collection Forcer
                 if (package.InstallTarget.Supported)
                 {
-                    SetBottomTextCallback?.Invoke("Installing troubleshooting files");
-                    ASIManager.LoadManifest();
+
                     ASIManager.InstallASIToTargetByGroupID(9, package.InstallTarget); //AutoTOC
                     ASIManager.InstallASIToTargetByGroupID(8, package.InstallTarget); //ME3Logger Truncating
-                    ASIManager.InstallASIToTargetByGroupID(22, package.InstallTarget); //Garbage Collection Forcer
+                }
+                else
+                {
+                    Log.Warning(@"Troubleshooting files not installed as this installation is not supported");
                 }
             }
 

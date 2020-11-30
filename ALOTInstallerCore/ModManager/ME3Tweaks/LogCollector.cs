@@ -1323,8 +1323,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     @"High quality texture LOD settings appear to be missing, but a high resolution texture mod appears to be installed.\n[ERROR]The game will not use these new high quality assets - config file was probably deleted or texture quality settings were changed in game"; //do not localize
 
                 // No texture mod, no HQ LODs
-                var HQVanillaLine =
-                    @"High quality LOD settings are not set and no high quality texture mod is installed";
+                var HQVanillaLine = @"High quality LOD settings are not set and no high quality texture mod is installed";
                 switch (selectedDiagnosticTarget.Game)
                 {
                     case MEGame.ME1:
@@ -1374,10 +1373,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         if (maxLodSize != 0)
                         {
                             //Not vanilla, alot/meuitm
-                            if (selectedDiagnosticTarget.TextureModded &&
-                                selectedDiagnosticTarget.HasALOTOrMEUITM())
+                            if (selectedDiagnosticTarget.TextureModded && selectedDiagnosticTarget.HasALOTOrMEUITM())
                             {
-                                addDiagLine(HQVanillaLine, Severity.INFO);
+                                //addDiagLine(HQVanillaLine, Severity.INFO);
                                 if (maxLodSize == 4096)
                                 {
                                     addDiagLine(@"LOD quality settings: 4K textures", Severity.INFO);
@@ -1393,22 +1391,18 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                                 //{
                                 if (maxLodSize == 4096)
                                 {
-                                    addDiagLine(@"LOD quality settings: 4K textures (no high res mod installed)",
-                                        Severity.WARN);
+                                    addDiagLine(@"LOD quality settings: 4K textures (no high res mod installed)", Severity.WARN);
                                 }
                                 else if (maxLodSize == 2048)
                                 {
-                                    addDiagLine(@"LOD quality settings: 2K textures (no high res mod installed)",
-                                        Severity.INFO);
+                                    addDiagLine(@"LOD quality settings: 2K textures (no high res mod installed)", Severity.INFO);
                                 }
 
                                 //}
                                 if (!selectedDiagnosticTarget.TextureModded)
                                 {
                                     //no texture mod, but has set LODs
-                                    addDiagLine(
-                                        @"LODs have been explicitly set, but a texture mod is not installed - game may have black textures as empty mips may not be removed",
-                                        Severity.WARN);
+                                    addDiagLine(@"LODs have been explicitly set, but a texture mod is not installed - game may have black textures as empty mips may not be removed", Severity.WARN);
                                 }
                             }
                         }
