@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
 <alotinstallermanifest>
 	<!-- MEM Update Information -->
 	<highestapprovedmemversion>428</highestapprovedmemversion>
@@ -194,6 +193,21 @@
 		<supportedhash game="me3"
 						 name="Origin (Russian)">70dc87862da9010aad1acd7d0c2c857b</supportedhash>
 	</supportedhashes>
+	
+	<!-- Compatibility prechecks (occurs in precheck step) -->
+	<compatibilityprechecks>
+		<!-- This check is disabled until 3.1 is out as it does not work on 3.0 -->
+<!-- 		<packageprecheck
+			mode="ALOT"
+			me3="true"
+			friendlyname="Project Variety ALOT patch"
+			packagerelativefilepath="BIOGame/DLC/DLC_MOD_ProjectVariety/CookedPCConsole/BioD_CitHub.pcc"
+			exportuindex="126"
+			exportmd5="40e4fc7d412bccb4c712c1ce1c3e98b4"
+			failuremessage="Project Variety is installed, but the ALOT patch was not applied when Project Variety was installed. This option must be chosen when installing Project Variety, otherwise the game will crash when combined with ALOT. Install Project Variety again, but with the ALOT patch option chosen."
+			/> -->
+	</compatibilityprechecks>
+	
 	<!-- DEFINE MANIFEST MODES THAT MANIFEST FILES CAN ATTACH TO -->
 	<manifest mode="MEUITM"
 					  description="Installs MEUITM with MEUITM defaults"
@@ -1169,7 +1183,7 @@
 					  friendlyname="Improved Static Lighting for ME3 - Full"
 					  author="CreeperLava"
 					  installpriority="3"
-					  recommendationreason="Significantly improves the static shadows in level environments. Denoised and higher resolution. Uses more memory, but won't lower the framerate. May cause crashes when combined with the Project Variety and EGM mods."
+					  recommendationreason="Significantly improves the static shadows in level environments. Denoised and higher resolution. Uses more memory, but won't lower the framerate. Cannot be used when Project Variety or Expanded Galaxy Mod is installed."
 					  recommendation="Optional"
 					  optiongroup="ME3StaticLighting">
 			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
@@ -1184,6 +1198,20 @@
 			<packagefile me3="true"
 						 sourcename="LightMaps_ME3_Full_v2.mem"
 						 movedirectly="true" />
+			<compatibilityprechecks>
+				<dlcprecheck 
+					me3="true"
+					friendlyname="Project Variety + ISL Full Check"
+					dlcname="DLC_MOD_ProjectVariety"
+					failuremessage="Improved Static Lighting for ME3 - Full cannot be installed while Project Variety is installed. Use the Lite version instead."
+					/>
+				<dlcprecheck 
+					me3="true"
+					friendlyname="Expanded Galaxy Mod + ISL Full Check"
+					dlcname="DLC_MOD_EGM"
+					failuremessage="Improved Static Lighting for ME3 - Full cannot be installed while Expanded Galaxy Mod is installed. Use the Lite version instead."
+					/>
+			</compatibilityprechecks>
 		</manifestfile>
 		<manifestfile mode="ALOT"
 					  friendlyname="Allers Complexion Tweak"
