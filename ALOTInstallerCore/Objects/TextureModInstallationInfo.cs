@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ALOTInstallerCore.Objects.Manifest;
+using ME3ExplorerCore.Gammtek.Extensions.Collections.Generic;
 
 namespace ALOTInstallerCore.Objects
 {
@@ -8,6 +12,9 @@ namespace ALOTInstallerCore.Objects
     /// </summary>
     public class TextureModInstallationInfo
     {
+        public const int TEXTURE_MOD_MARKER_VERSION = 3;
+        public const uint TEXTURE_MOD_MARKER_VERSIONING_MAGIC = 0xDEADBEEF;
+
         /// <summary>
         /// Major version of ALOT, e.g. 11
         /// </summary>
@@ -32,6 +39,10 @@ namespace ALOTInstallerCore.Objects
         /// The version of MEM that was used to perform the installation of the textures
         /// </summary>
         public short MEM_VERSION_USED;
+
+        public List<InstalledTextureMod> InstalledTextureMods { get; } = new List<InstalledTextureMod>();
+        public string InstallerVersionFullName { get; set; }
+        public DateTime InstallationTimestamp { get; set; }
 
         public static readonly TextureModInstallationInfo NoVersion = new TextureModInstallationInfo(0, 0, 0, 0); //not versioned
 
@@ -89,7 +100,7 @@ namespace ALOTInstallerCore.Objects
             this.MEUITMVER = MEUITMVersion;
         }
 
-        public TextureModInstallationInfo(TextureModInstallationInfo alotVersionInfo)
+        public TextureModInstallationInfo(TextureModInstallationInfo textureModInstallationInfo)
         {
         }
 
@@ -98,12 +109,12 @@ namespace ALOTInstallerCore.Objects
             string str = "";
             if (IsNotVersioned)
             {
-                return "Non MEUITM/ALOT textures installed";
+                return @"Texture modded";
             }
 
             if (ALOTVER > 0)
             {
-                str += $"ALOT {ALOTVER}.{ALOTUPDATEVER}";
+                str += $@"ALOT {ALOTVER}.{ALOTUPDATEVER}";
             }
 
             if (MEUITMVER > 0)
@@ -113,7 +124,7 @@ namespace ALOTInstallerCore.Objects
                     str += ", ";
                 }
 
-                str += $"MEUITM v{MEUITMVER}";
+                str += $@"MEUITM v{MEUITMVER}";
             }
 
             return str;
@@ -124,6 +135,16 @@ namespace ALOTInstallerCore.Objects
         /// </summary>
         /// <returns></returns>
         public bool IsNotVersioned => ALOTVER == 0 && ALOTHOTFIXVER == 0 & ALOTUPDATEVER == 0 && MEUITMVER == 0;
+
+        /// <summary>
+        /// MEMI extended version. 0 if this is not v3 or higher
+        /// </summary>
+        public int MarkerExtendedVersion { get; set; }
+
+        /// <summary>
+        /// Position where data belonging to this marker begins.
+        /// </summary>
+        public int MarkerStartPosition { get; set; }
 
         /// <summary>
         /// Calculates an installation marker based on the existing and installed file sets
@@ -154,6 +175,45 @@ namespace ALOTInstallerCore.Objects
         public static bool operator >(TextureModInstallationInfo first, TextureModInstallationInfo second)
         {
             return first.ToVersion().CompareTo(second.ToVersion()) > 0;
+        }
+
+        public class InstalledTextureMod
+        {
+            public enum InstalledTextureModType
+            {
+                USERFILE,
+                MANIFESTFILE
+            }
+
+            public InstalledTextureModType ModType { get; set; }
+            public string ModName { get; set; }
+        }
+
+        public void SetInstalledFiles(List<InstallerFile> installedInstallerFiles)
+        {
+            InstalledTextureMods.ReplaceAll(installedInstallerFiles.Where(x => !(x is PreinstallMod)).Select(x => new TextureModInstallationInfo.InstalledTextureMod()
+            {
+                ModType = x is UserFile ? InstalledTextureMod.InstalledTextureModType.USERFILE : InstalledTextureMod.InstalledTextureModType.MANIFESTFILE,
+                ModName = x.FriendlyName
+            }));
+        }
+
+        public string ToExtendedString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"MEMI Marker Version {MarkerExtendedVersion}");
+            sb.AppendLine($"Installation by {InstallerVersionFullName}");
+            sb.AppendLine($"Installed on {InstallationTimestamp}");
+            sb.AppendLine("Files installed:");
+            foreach (var v in InstalledTextureMods)
+            {
+                sb.AppendLine($@"    [{v.ModType}] {v.ModName}");
+            }
+
+            sb.AppendLine($"MEM version used: {MEM_VERSION_USED}");
+            sb.AppendLine($"Installer core version: {ALOT_INSTALLER_VERSION_USED}");
+            sb.AppendLine($"Versioned texture info: {ToString()}");
+            return sb.ToString();
         }
     }
 }

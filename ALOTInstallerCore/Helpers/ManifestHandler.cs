@@ -597,10 +597,5 @@ namespace ALOTInstallerCore.Helpers
             }
             return ManifestMode.Free;
         }
-
-        public static IEnumerable<InstallerFile> GetAllFilesForMode(ManifestMode newMode)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

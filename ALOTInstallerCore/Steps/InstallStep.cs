@@ -1117,6 +1117,8 @@ namespace ALOTInstallerCore.Steps
                 int version = 0;
                 // If the current version doesn't support the --version --ipc, we just assume it is 0.
                 tmii.MEM_VERSION_USED = MEMIPCHandler.GetMemVersion();
+                tmii.SetInstalledFiles(package.FilesToInstall);
+                tmii.InstallationTimestamp = DateTime.Now;
                 package.InstallTarget.StampTextureModificationInfo(tmii);
                 return true;
             }
