@@ -113,7 +113,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             GAMEID,
             OFFICIALDLC,
             TPMI,
-            SUB
+            SUB,
+            BOLDBLUE
         }
 
         /// <summary>
@@ -184,6 +185,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         break;
                     case Severity.BOLD:
                         diagStringBuilder.Append($@"[BOLD]{message}");
+                        break;
+                    case Severity.BOLDBLUE:
+                        diagStringBuilder.Append($@"[BOLDBLUE]{message}");
                         break;
                     case Severity.DLC:
                         diagStringBuilder.Append($@"[DLC]{message}");
@@ -504,39 +508,106 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 #region Texture mod information
                 Log.Information(@"[AICORE] Getting texture mod installation info");
-
                 updateStatusCallback?.Invoke(@"Getting texture mod installation info");
+                addDiagLine(@"Current texture mod information", Severity.DIAGSECTION);
 
-                addDiagLine(@"Texture mod information", Severity.DIAGSECTION);
-                if (avi == null)
+                var textureHistory = selectedDiagnosticTarget.GetTextureModInstallationHistory();
+                if (!textureHistory.Any())
                 {
                     addDiagLine(
                         @"The texture mod installation marker was not detected. No texture mods appear to be installed");
                 }
                 else
                 {
-                    if (avi.ALOTVER > 0 || avi.MEUITMVER > 0)
+                    var latestInstall = textureHistory[0];
+                    if (latestInstall.ALOTVER > 0 || latestInstall.MEUITMVER > 0)
                     {
-                        addDiagLine(@"ALOT Version: " + avi.ALOTVER + @"." + avi.ALOTUPDATEVER + @"." +
-                                    avi.ALOTHOTFIXVER);
-                        if (selectedDiagnosticTarget.Game == MEGame.ME1 && avi.MEUITMVER != 0)
+                        addDiagLine($@"ALOT version: {latestInstall.ALOTVER}.{latestInstall.ALOTUPDATEVER}.{latestInstall.ALOTHOTFIXVER}");
+                        if (latestInstall.MEUITMVER != 0)
                         {
-                            addDiagLine(@"MEUITM version: " + avi.MEUITMVER);
+                            var meuitmName = selectedDiagnosticTarget.Game == MEGame.ME1 ? "MEUITM" : $"MEUITM{selectedDiagnosticTarget.Game.ToGameNum()}";
+                            addDiagLine($"{meuitmName} version: {latestInstall.MEUITMVER}");
                         }
                     }
                     else
                     {
-                        addDiagLine(
-                            @"This installation has been texture modded, but ALOT and/or MEUITM has not been installed");
+                        addDiagLine(@"This installation has been texture modded, but ALOT and/or MEUITM has not been installed");
                     }
 
-                    if (avi.ALOT_INSTALLER_VERSION_USED > 0)
+                    if (latestInstall.MarkerExtendedVersion >= TextureModInstallationInfo.FIRST_EXTENDED_MARKER_VERSION && !string.IsNullOrWhiteSpace(latestInstall.InstallerVersionFullName))
                     {
-                        addDiagLine(@"Latest installation was from ALOT Installer v" +
-                                    avi.ALOT_INSTALLER_VERSION_USED);
+                        addDiagLine($@"Latest installation was from performed by {latestInstall.InstallerVersionFullName}");
+                    }
+                    else if (latestInstall.ALOT_INSTALLER_VERSION_USED > 0)
+                    {
+                        addDiagLine($@"Latest installation was from installer v{latestInstall.ALOT_INSTALLER_VERSION_USED}");
                     }
 
-                    addDiagLine(@"Latest installation used MEM v" + avi.MEM_VERSION_USED);
+                    addDiagLine($@"Latest installation used MEM v{latestInstall.MEM_VERSION_USED}");
+
+                    addDiagLine(@"Texture mod installation history", Severity.DIAGSECTION);
+                    addDiagLine(@"The history of texture mods installed into this game is as follows (from latest install to first install):");
+
+                    addDiagLine(@"Click to view list", Severity.SUB);
+                    bool isFirst = true;
+                    foreach (var tmii in textureHistory)
+                    {
+                        if (isFirst)
+                            isFirst = false;
+                        else
+                            addDiagLine();
+
+                        if (tmii.MarkerExtendedVersion >= TextureModInstallationInfo.FIRST_EXTENDED_MARKER_VERSION)
+                        {
+                            addDiagLine($"Texture install on {tmii.InstallationTimestamp:yyyy MMMM dd h:mm:ss tt zz}", Severity.BOLDBLUE);
+                        }
+                        else
+                        {
+                            addDiagLine("Texture install", Severity.BOLDBLUE);
+                        }
+                        addDiagLine($@"Marker version {tmii.MarkerExtendedVersion}");
+                        addDiagLine(tmii.ToString());
+                        if (tmii.MarkerExtendedVersion >= 3 && !string.IsNullOrWhiteSpace(tmii.InstallerVersionFullName))
+                        {
+                            addDiagLine($@"Installation was from performed by {tmii.InstallerVersionFullName}");
+                        }
+                        else if (tmii.ALOT_INSTALLER_VERSION_USED > 0)
+                        {
+                            addDiagLine($@"Installation was performed by installer v{tmii.ALOT_INSTALLER_VERSION_USED}");
+                        }
+
+                        addDiagLine($@"Installed used MEM v{tmii.MEM_VERSION_USED}");
+
+                        if (tmii.InstalledTextureMods.Any())
+                        {
+                            addDiagLine(@"Files installed in session:");
+                            foreach (var fi in tmii.InstalledTextureMods)
+                            {
+                                var modStr = @" - ";
+                                if (fi.ModType == TextureModInstallationInfo.InstalledTextureMod.InstalledTextureModType.USERFILE)
+                                {
+                                    modStr += "[USERFILE] ";
+                                }
+                                modStr += fi.ModName;
+                                if (string.IsNullOrWhiteSpace(fi.AuthorName))
+                                {
+                                    modStr += $" by {fi.AuthorName}";
+                                }
+                                
+                                addDiagLine(modStr,  fi.ModType == TextureModInstallationInfo.InstalledTextureMod.InstalledTextureModType.USERFILE ? Severity.WARN : Severity.GOOD);
+                                if (fi.ChosenOptions.Any())
+                                {
+                                    addDiagLine(@"   Chosen options for install:");
+                                    foreach (var c in fi.ChosenOptions)
+                                    {
+                                        addDiagLine($@"      {c}");
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    addDiagLine(@"[/SUB]");
                 }
 
                 #endregion

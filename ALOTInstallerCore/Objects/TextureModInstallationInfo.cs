@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
+using ME3ExplorerCore.Helpers;
 using ALOTInstallerCore.Objects.Manifest;
 using ME3ExplorerCore.Gammtek.Extensions.Collections.Generic;
 
@@ -12,7 +15,8 @@ namespace ALOTInstallerCore.Objects
     /// </summary>
     public class TextureModInstallationInfo
     {
-        public const int TEXTURE_MOD_MARKER_VERSION = 3;
+        public const int LATEST_TEXTURE_MOD_MARKER_VERSION = 4;
+        public const int FIRST_EXTENDED_MARKER_VERSION = 4; // Do not change
         public const uint TEXTURE_MOD_MARKER_VERSIONING_MAGIC = 0xDEADBEEF;
 
         /// <summary>
@@ -57,12 +61,12 @@ namespace ALOTInstallerCore.Objects
         /// <param name="alotInstallerVersionUsed"></param>
         public TextureModInstallationInfo(short ALOTVersion, byte ALOTUpdaterVersion, byte ALOTHotfixVersion, int MEUITMVersion, short memVersionUsed, short alotInstallerVersionUsed)
         {
-            this.ALOTVER = ALOTVersion;
-            this.ALOTUPDATEVER = ALOTUpdaterVersion;
-            this.ALOTHOTFIXVER = ALOTHotfixVersion;
-            this.MEUITMVER = MEUITMVersion;
-            this.MEM_VERSION_USED = memVersionUsed;
-            this.ALOT_INSTALLER_VERSION_USED = alotInstallerVersionUsed;
+            ALOTVER = ALOTVersion;
+            ALOTUPDATEVER = ALOTUpdaterVersion;
+            ALOTHOTFIXVER = ALOTHotfixVersion;
+            MEUITMVER = MEUITMVersion;
+            MEM_VERSION_USED = memVersionUsed;
+            ALOT_INSTALLER_VERSION_USED = alotInstallerVersionUsed;
         }
 
         private TextureModInstallationInfo()
@@ -94,10 +98,10 @@ namespace ALOTInstallerCore.Objects
         /// <param name="MEUITMVersion"></param>
         public TextureModInstallationInfo(short ALOTVersion, byte ALOTUpdateVersion, byte ALOTHotfixVersion, int MEUITMVersion)
         {
-            this.ALOTVER = ALOTVersion;
-            this.ALOTUPDATEVER = ALOTUpdateVersion;
-            this.ALOTHOTFIXVER = ALOTHotfixVersion;
-            this.MEUITMVER = MEUITMVersion;
+            ALOTVER = ALOTVersion;
+            ALOTUPDATEVER = ALOTUpdateVersion;
+            ALOTHOTFIXVER = ALOTHotfixVersion;
+            MEUITMVER = MEUITMVersion;
         }
 
         public TextureModInstallationInfo(TextureModInstallationInfo textureModInstallationInfo)
@@ -119,9 +123,9 @@ namespace ALOTInstallerCore.Objects
 
             if (MEUITMVER > 0)
             {
-                if (str != "")
+                if (str != @"")
                 {
-                    str += ", ";
+                    str += @", ";
                 }
 
                 str += $@"MEUITM v{MEUITMVER}";
@@ -187,15 +191,87 @@ namespace ALOTInstallerCore.Objects
 
             public InstalledTextureModType ModType { get; set; }
             public string ModName { get; set; }
+            public string AuthorName { get; set; }
+            public List<string> ChosenOptions { get; } = new List<string>();
+
+            /// <summary>
+            /// Generates an InstalledTextureMod object from the given installer file. PreinstallMod objects are not supported.
+            /// </summary>
+            /// <param name="ifx"></param>
+            public InstalledTextureMod(InstallerFile ifx)
+            {
+                if (ifx is PreinstallMod) throw new Exception(@"PreinstallMod is not a type of texture mod!");
+                ModType = ifx is UserFile ? ModType = InstalledTextureModType.USERFILE : InstalledTextureModType.MANIFESTFILE;
+                ModName = ifx.FriendlyName;
+                if (ifx is ManifestFile mf)
+                {
+                    AuthorName = ifx.Author;
+                    if (mf.ChoiceFiles.Any())
+                    {
+                        Debug.WriteLine("hi");
+                    }
+
+                    foreach (var cf in mf.ChoiceFiles)
+                    {
+                        var chosenFile = cf.GetChosenFile();
+                        if (chosenFile != null)
+                        {
+                            ChosenOptions.Add($"{cf.ChoiceTitle}: {chosenFile.ChoiceTitle}");
+                        }
+                    }
+                }
+            }
+
+
+            /// <summary>
+            /// Reads installed texture mod info from the stream, based on the marker version
+            /// </summary>
+            /// <param name="inStream"></param>
+            /// <param name="markerVersion"></param>
+            public InstalledTextureMod(Stream inStream, int markerVersion)
+            {
+                // V4 marker version - DEFAULT
+                ModType = (InstalledTextureModType)inStream.ReadByte();
+                ModName = inStream.ReadUnrealString();
+                if (ModType == InstalledTextureModType.MANIFESTFILE)
+                {
+                    AuthorName = inStream.ReadUnrealString();
+                    var numChoices = inStream.ReadInt32();
+                    while (numChoices > 0)
+                    {
+                        ChosenOptions.Add(inStream.ReadUnrealString());
+                        numChoices--;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Writes this object's information to the stream, using the latest texture mod marker format.
+            /// </summary>
+            /// <param name="fs"></param>
+            public void WriteToMarker(Stream fs)
+            {
+                fs.WriteByte((byte)ModType); // user file = 0, manifest file = 1
+                fs.WriteUnrealStringUnicode(ModName);
+                if (ModType == InstalledTextureModType.MANIFESTFILE)
+                {
+                    fs.WriteUnrealStringUnicode(AuthorName);
+                    fs.WriteInt32(ChosenOptions.Count);
+                    foreach (var c in ChosenOptions)
+                    {
+                        fs.WriteUnrealStringUnicode(c);
+                    }
+                }
+            }
         }
 
+        /// <summary>
+        /// Sets the installed texture mods list for this marker based on the list of files that are passed in
+        /// </summary>
+        /// <param name="installedInstallerFiles"></param>
         public void SetInstalledFiles(List<InstallerFile> installedInstallerFiles)
         {
-            InstalledTextureMods.ReplaceAll(installedInstallerFiles.Where(x => !(x is PreinstallMod)).Select(x => new TextureModInstallationInfo.InstalledTextureMod()
-            {
-                ModType = x is UserFile ? InstalledTextureMod.InstalledTextureModType.USERFILE : InstalledTextureMod.InstalledTextureModType.MANIFESTFILE,
-                ModName = x.FriendlyName
-            }));
+            InstalledTextureMods.ReplaceAll(installedInstallerFiles.Where(x => !(x is PreinstallMod)).Select(x => new InstalledTextureMod(x)));
         }
 
         public string ToExtendedString()
@@ -207,7 +283,17 @@ namespace ALOTInstallerCore.Objects
             sb.AppendLine("Files installed:");
             foreach (var v in InstalledTextureMods)
             {
-                sb.AppendLine($@"    [{v.ModType}] {v.ModName}");
+                var str = $@"  [{v.ModType}] {v.ModName}";
+                if (!string.IsNullOrWhiteSpace(v.AuthorName)) str += $" by {v.AuthorName}";
+                sb.AppendLine(str);
+                if (v.ChosenOptions.Any())
+                {
+                    sb.AppendLine(@"  Optional items:");
+                    foreach (var c in v.ChosenOptions)
+                    {
+                        sb.AppendLine($@"    {c}");
+                    }
+                }
             }
 
             sb.AppendLine($"MEM version used: {MEM_VERSION_USED}");

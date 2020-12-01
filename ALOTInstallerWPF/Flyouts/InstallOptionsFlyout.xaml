@@ -29,7 +29,8 @@
             <TextBlock Text="{Binding SpinnerText}" Margin="0,10,0,0" TextAlignment="Center" Foreground="White"/>
         </StackPanel>
         <StackPanel Margin="0,5,0,0" HorizontalAlignment="Center" Visibility="{Binding DeterminingOptionsVisible, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}">
-            <TextBlock Text="{Binding TitleText}" DockPanel.Dock="Top" TextAlignment="Center" FontSize="20"/>
+            <TextBlock Text="{Binding TitleText}" TextAlignment="Center" FontSize="20"/>
+            <TextBlock Text="{Binding InstallTarget.TargetPath, StringFormat='Installing to {0}'}" TextAlignment="Center"/>
             <TextBlock Text="{Binding InstallOptionsTopText}" TextAlignment="Center" FontSize="12"/>
             <TextBlock Text="{Binding ModeText}" TextAlignment="Center" FontSize="12"/>
             <Grid>
@@ -48,7 +49,6 @@
 
                 </StackPanel>
             </Grid>
-            
-</StackPanel>
+        </StackPanel>
     </DockPanel>
 </local:FlyoutController>

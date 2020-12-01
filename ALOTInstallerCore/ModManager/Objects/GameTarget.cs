@@ -238,7 +238,7 @@ namespace ALOTInstallerCore.ModManager.Objects
 
                         if (preMemi4Bytes != perGameFinal4Bytes) //default bytes before 178 MEMI Format (MEMI v1)
                         {
-                            // MEMI v2
+                            // MEMI v3 (and technically also v2 but values will be wrong)
                             fs.Position = endPos - 12;
                             short ALOTVER = fs.ReadInt16();
                             byte ALOTUPDATEVER = (byte)fs.ReadByte();
@@ -251,33 +251,29 @@ namespace ALOTInstallerCore.ModManager.Objects
                             int MEUITMVER = fs.ReadInt32();
 
                             var tmii = new TextureModInstallationInfo(ALOTVER, ALOTUPDATEVER, ALOTHOTFIXVER, MEUITMVER, memVersionUsed, installerVersionUsed);
-                            tmii.MarkerExtendedVersion = 0x02;
+                            tmii.MarkerExtendedVersion = 0x03; // detected memi v3
                             tmii.MarkerStartPosition = (int)markerStartOffset;
 
-                            // MEMI v3 DETECTION
+                            // MEMI v4 DETECTION
                             fs.Position = endPos - 20;
                             if (fs.ReadUInt32() == TextureModInstallationInfo.TEXTURE_MOD_MARKER_VERSIONING_MAGIC)
                             {
-                                // It's MEMI v3 (or higher)
+                                // It's MEMI v4 (or higher)
                                 var memiExtendedEndPos = endPos - 24; // Sanity check should make reading end here
                                 fs.Position = memiExtendedEndPos;
                                 fs.Position = fs.ReadInt32(); // Go to start of MEMI extended marker
                                 tmii.MarkerStartPosition = (int)fs.Position;
                                 tmii.MarkerExtendedVersion = fs.ReadInt32();
-                                // Extensions go here
+                                // Extensions to memi format go here
 
-                                if (tmii.MarkerExtendedVersion == 0x03)
+                                if (tmii.MarkerExtendedVersion == 0x04)
                                 {
                                     tmii.InstallerVersionFullName = fs.ReadUnrealString();
                                     tmii.InstallationTimestamp = DateTime.FromBinary(fs.ReadInt64());
                                     var fileCount = fs.ReadInt32();
                                     for (int i = 0; i < fileCount; i++)
                                     {
-                                        tmii.InstalledTextureMods.Add(new TextureModInstallationInfo.InstalledTextureMod()
-                                        {
-                                            ModType = (TextureModInstallationInfo.InstalledTextureMod.InstalledTextureModType)fs.ReadByte(),
-                                            ModName = fs.ReadUnrealString()
-                                        });
+                                        tmii.InstalledTextureMods.Add(new TextureModInstallationInfo.InstalledTextureMod(fs, tmii.MarkerExtendedVersion));
                                     }
                                 }
 
@@ -549,7 +545,6 @@ namespace ALOTInstallerCore.ModManager.Objects
             {
                 this.FilePath = filePath;
             }
-
         }
 
         public void StampTextureModificationInfo(TextureModInstallationInfo tmii)
@@ -558,26 +553,37 @@ namespace ALOTInstallerCore.ModManager.Objects
             var markerPath = getALOTMarkerFilePath();
             try
             {
-                using (FileStream fs = new FileStream(markerPath, System.IO.FileMode.Open, FileAccess.ReadWrite))
+                using (FileStream fs = new FileStream(markerPath, FileMode.Open, FileAccess.ReadWrite))
                 {
                     // MARKER FILE FORMAT
                     // When writing marker, the end of the file is appended with the following data.
                     // Programs that read this marker must read the file IN REVERSE as the MEMI marker
                     // file is appended to prevent data corruption of an existing game file
 
-                    // MEMI v1 - MEMI Classic (Pre ALOT Installer):
-                    //Byte "MEMI" ASCII
-
-                    // MEMI v2 - MEMI V3 (2017-2020): 
-                    // INT MEUITM VERSION
-                    // SHORT ALOT MAJOR
-                    // BYTE ALOT UPDATE
-                    // BYTE ALOT HOTFIX (NOT USED)
-                    // SHORT MEM VERSION USED
-                    // SHORT INSTALLER VERSION USED
+                    // MEMI v1 - ALOT support
+                    // This version only indicated that a texture mod (alot) had been installed
                     // BYTE "MEMI" ASCII
 
-                    // MEMI v3 - MEMI Extended (2020+):
+                    // MEMI v2 - MEUITM support (2018):
+                    // This version supported versioning of main ALOT and MEUITM. On ME2/3, the MEUITM field would be 0
+                    // INT MEUITM VERSION
+                    // INT ALOT VERSION (major only)
+                    // SHORT MEM VERSION USED
+                    // SHORT INSTALLER VERSION USED
+                    // <MEMI v1>
+
+                    // MEMI v3 - ALOT subversioning support (2018):
+                    // This version split the ALOT int into a short and 2 bytes. The size did not change.
+                    // As a result it is not possible to distinguish v2 and v3, and code should just assume v3.
+                    // INT MEUITM Version
+                    // SHORT ALOT Version
+                    // BYTE ALOT Update Version
+                    // BYTE ALOT Hotfix Version (not used)
+                    // SHORT MEM VERSION USED
+                    // SHORT INSTALLER VERSION USED
+                    // <MEMI v1>
+
+                    // MEMI v4 - Extended (2020+):
                     // INT MEMI EXTENDED VERSION                         <---------------------------------------------
                     // UNREALSTRING Installer Version Info Extended                                                   |
                     // LONG BINARY DATESTAMP OF STAMPING TIME                                                         |
@@ -587,35 +593,37 @@ namespace ALOTInstallerCore.ModManager.Objects
                     //         0 = USER FILE                                                                          |
                     //         1 = MANIFEST FILE                                                                      |
                     //     UNREALSTRING Installed File Name (INT LEN (negative for unicode), STR DATA)                |
+                    //     [IF MANIFESTFILE] UNREALSTRING Author Name                                                 |
                     // INT MEMI Extended Marker Data Start Offset -----------------------------------------------------
                     // INT MEMI Extended Magic (0xDEADBEEF)
-                    // <MEMI v2>
+                    // <MEMI v3>
 
                     fs.SeekEnd();
 
-                    // VERSION 3 - Installer full name, date, List of installed files
+                    // Write MEMI v4 - Installer full name, date, List of installed files
                     var memiExtensionStartPos = fs.Position;
-                    fs.WriteInt32(TextureModInstallationInfo.TEXTURE_MOD_MARKER_VERSION); // THIS MUST BE INCREMENTED EVERY TIME MARKER FORMAT CHANGES!! OR IT WILL BREAK OTHER APPS
+                    fs.WriteInt32(TextureModInstallationInfo.LATEST_TEXTURE_MOD_MARKER_VERSION); // THIS MUST BE INCREMENTED EVERY TIME MARKER FORMAT CHANGES!! OR IT WILL BREAK OTHER APPS
                     fs.WriteUnrealStringUnicode($"{Utilities.GetAppPrefixedName()} Installer {Utilities.GetAppVersion()}");
                     fs.WriteInt64(DateTime.Now.ToBinary()); // DATESTAMP
                     fs.WriteInt32(tmii.InstalledTextureMods.Count); // NUMBER OF FILE ENTRIES TO FOLLOW. Count must be here
                     foreach (var fi in tmii.InstalledTextureMods)
                     {
-                        fs.WriteByte((byte) fi.ModType); // user file = 0, manifest file = 1
-                        fs.WriteUnrealStringUnicode(fi.ModName);
+                        fi.WriteToMarker(fs);
                     }
                     fs.WriteInt32((int)memiExtensionStartPos); // Start of memi extended data
-                    fs.WriteUInt32(TextureModInstallationInfo.TEXTURE_MOD_MARKER_VERSIONING_MAGIC); // Magic that can be used to tell if this has the v3 extended marker offset preceeding it
+                    fs.WriteUInt32(TextureModInstallationInfo.TEXTURE_MOD_MARKER_VERSIONING_MAGIC); // Magic that can be used to tell if this has the v3 extended marker offset preceding it
 
-                    // Write MEMI v2
+                    // Write MEMI v3
                     fs.WriteInt32(tmii.MEUITMVER); //meuitm
                     fs.WriteInt16(tmii.ALOTVER); //major
                     fs.WriteByte(tmii.ALOTUPDATEVER); //minor
                     fs.WriteByte(tmii.ALOTHOTFIXVER); //hotfix
-                    fs.WriteInt16(tmii.ALOT_INSTALLER_VERSION_USED); //Installer Version (Build)
-                    fs.WriteInt16(tmii.MEM_VERSION_USED); //Backend MEM version
+
+                    // MEMI v2 is not used
 
                     // Write MEMI v1
+                    fs.WriteInt16(tmii.ALOT_INSTALLER_VERSION_USED); //Installer Version (Build)
+                    fs.WriteInt16(tmii.MEM_VERSION_USED); //Backend MEM version
                     fs.WriteUInt32(MEMI_TAG);
                 }
 
@@ -653,18 +661,13 @@ namespace ALOTInstallerCore.ModManager.Objects
         internal void StampDebugALOTInfo()
         {
 #if DEBUG
-            TextureModInstallationInfo tmii = new TextureModInstallationInfo(8,1,0,3);
-            tmii.MarkerExtendedVersion = 0x03;
+            TextureModInstallationInfo tmii = new TextureModInstallationInfo(8, 1, 0, 3);
+            tmii.MarkerExtendedVersion = TextureModInstallationInfo.LATEST_TEXTURE_MOD_MARKER_VERSION;
             tmii.InstallationTimestamp = DateTime.Now;
             tmii.InstallerVersionFullName = "Debug Installer 3.2";
             var ran = new Random();
             var fileset = ManifestHandler.GetAllManifestFiles().Where(x => ran.Next(3) == 0);
-
-            tmii.InstalledTextureMods.AddRange(fileset.Select(x=>new TextureModInstallationInfo.InstalledTextureMod()
-            {
-                ModType = TextureModInstallationInfo.InstalledTextureMod.InstalledTextureModType.MANIFESTFILE,
-                ModName = x.FriendlyName
-            }));
+            tmii.InstalledTextureMods.AddRange(fileset.Select(x => new TextureModInstallationInfo.InstalledTextureMod(x)));
             StampTextureModificationInfo(tmii);
 #endif
         }
