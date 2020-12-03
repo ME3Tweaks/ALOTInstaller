@@ -252,6 +252,8 @@ namespace ALOTInstallerWPF.InstallerUI
             installerWorker.DoWork += ss.InstallTextures;
             installerWorker.RunWorkerCompleted += (a, b) =>
             {
+                TaskbarHelper.SetProgress(0);
+                TaskbarHelper.SetProgressState(TaskbarProgressBarState.NoProgress);
                 notifyClosingWillBreakGame(false);
                 ContinueButtonVisible = true;
                 fadeoutMusic();
