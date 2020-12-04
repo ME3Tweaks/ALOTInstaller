@@ -23,6 +23,7 @@ namespace ALOTInstallerCore
     {
 
         public const int WIN32_EXCEPTION_ELEVATED_CODE = -98763;
+
         [DllImport("kernel32.dll")]
         static extern uint GetLastError();
 
@@ -62,6 +63,7 @@ namespace ALOTInstallerCore
                 Log.Error("[AICORE] Error granting write access: " + e.Message);
                 return false;
             }
+
             return true;
         }
 
@@ -92,9 +94,11 @@ namespace ALOTInstallerCore
                         Log.Error("[AICORE] The game is either nested too deep or a mod has been improperly installed causing a filepath to be too long.");
                         ex.WriteToLog("[AICORE] ");
                     }
+
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -104,6 +108,7 @@ namespace ALOTInstallerCore
             {
                 return false;
             }
+
             //Clean up file path so it can be navigated OK
             filePath = System.IO.Path.GetFullPath(filePath);
             System.Diagnostics.Process.Start("explorer.exe", string.Format("/select,\"{0}\"", filePath));
@@ -119,10 +124,52 @@ namespace ALOTInstallerCore
             {
                 var virusCheckerName = virusChecker["displayName"];
                 var productState = virusChecker["productState"];
-                uint productVal = (uint)productState;
+                uint productVal = (uint) productState;
                 var bytes = BitConverter.GetBytes(productVal);
                 Log.Information("[AICORE] Antivirus info: " + virusCheckerName + " with state " + bytes[1].ToString("X2") + " " + bytes[2].ToString("X2") + " " + bytes[3].ToString("X2"));
             }
+        }
+
+
+        [DllImport("kernel32.dll")]
+        static extern bool CreateSymbolicLink(string lpSymlinkFileName, string lpTargetFileName, SymbolicLink dwFlags);
+
+        enum SymbolicLink
+        {
+            File = 0,
+            Directory = 1
+        }
+
+        /// <summary>
+        /// Creates a link from sourceFile (which is where the fake file is), pointing to the target file.
+        /// </summary>
+        /// <param name="sourceFile"></param>
+        /// <param name="targetFile"></param>
+        /// <returns></returns>
+        public static bool WinCreateFileSymbolicLink(string sourceFile, string targetFile)
+        {
+            if (File.Exists(sourceFile))
+            {
+                Log.Error($"Cannot create symlink from disk location that already has file: {sourceFile}");
+            }
+
+            if (!File.Exists(targetFile))
+            {
+                Log.Error($@"Cannot create symlink to file that doesn't exist: {targetFile}");
+            }
+
+            try
+            {
+                // Apparently this only works if you're running as admin or in developer mode
+                // Because of some really bad design decisions at microsoft with UAC
+                return CreateSymbolicLink(sourceFile, targetFile, SymbolicLink.File);
+            }
+            catch (Exception e)
+            {
+                Log.Warning($@"Cannot create symbolic link from {sourceFile} to {targetFile}: {e.Message}");
+            }
+
+            return false;
         }
     }
 }

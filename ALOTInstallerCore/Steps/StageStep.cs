@@ -258,10 +258,10 @@ namespace ALOTInstallerCore.Steps
             foreach (var v in _installOptions.FilesToInstall)
             {
 #if DEBUG
-                //if (v.FriendlyName.Contains("Default Fem"))
-                //{
-                block.Post(v);
-                //}
+                if (!v.FriendlyName.Contains("ALOT"))
+                {
+                    block.Post(v);
+                }
 #else 
                 // Helps make sure I don't publish broken code
                 block.Post(v);
@@ -581,28 +581,35 @@ namespace ALOTInstallerCore.Steps
                     // Check if it's a .mem.
                     if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mem")
                     {
-                        var destF = Path.Combine(finalBuiltPackagesDestination,
-                            $"{installerFile.BuildID:D3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
-                        if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory.Name ==
-                            new DriveInfo(finalBuiltPackagesDestination).RootDirectory.Name)
+                        var destF = Path.Combine(finalBuiltPackagesDestination, $"{installerFile.BuildID:D3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
+
+                        bool linked = false;
+#if WINDOWS
+                        // Try symlinking first. This way we don't have to copy anything
+                        linked = Utilities.WinCreateFileSymbolicLink(destF, installerFile.GetUsedFilepath());
+#endif
+
+                        if (!linked)
                         {
-                            // Move
-                            Log.Information(
-                                $"[AICORE] [{prefix}] Moving unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                            File.Move(installerFile.GetUsedFilepath(), destF);
+                            if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory.Name ==
+                                new DriveInfo(finalBuiltPackagesDestination).RootDirectory.Name)
+                            {
+                                // Move
+                                Log.Information(
+                                    $"[AICORE] [{prefix}] Moving unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                                File.Move(installerFile.GetUsedFilepath(), destF);
+                            }
+                            else
+                            {
+                                //Copy
+                                Log.Information(
+                                    $"[AICORE] [{prefix}] Copying unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                                CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
+                                    (x, y) => { installerFile.StatusText = $"Copying file to installation packages {(int)(x * 100f / y)}%"; },
+                                    exception => { _abortStaging = true; });
+                            }
                         }
-                        else
-                        {
-                            //Copy
-                            Log.Information(
-                                $"[AICORE] [{prefix}] Copying unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                            CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
-                                (x, y) =>
-                                {
-                                    installerFile.StatusText = $"Copying file to installation packages {(int)(x * 100f / y)}%";
-                                },
-                                exception => { _abortStaging = true; });
-                        }
+
                         stage = false;
                     }
                     else if (mfx.PackageFiles.Count == 1 && mfx.PackageFiles[0].MoveDirectly)
@@ -612,12 +619,18 @@ namespace ALOTInstallerCore.Steps
                         var destF = Path.Combine(addonStagingPath, Path.GetFileName(installerFile.GetUsedFilepath()));
                         Log.Information(
                             $"[AICORE] [{prefix}] Copying unpacked file to addon staging directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                        CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
-                            (x, y) =>
-                            {
-                                installerFile.StatusText = $"Copying file to staging {(int)(x * 100f / y)}%";
-                            },
-                            exception => { _abortStaging = true; });
+                        bool linked = false;
+#if WINDOWS
+                        // Try symlinking first. This way we don't have to copy anything
+                        linked = Utilities.WinCreateFileSymbolicLink(destF, installerFile.GetUsedFilepath());
+#endif
+                        if (!linked)
+                        {
+
+                            CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
+                                (x, y) => { installerFile.StatusText = $"Copying file to staging {(int)(x * 100f / y)}%"; },
+                                exception => { _abortStaging = true; });
+                        }
                     }
                     else
                     {
@@ -906,7 +919,7 @@ namespace ALOTInstallerCore.Steps
                 if (pair.Value.Count > 1)
                 {
                     // Has issue
-                    var chosenFile = ResolveMutualExclusiveMods?.Invoke(pair.Value);
+                    var chosenFile = ResolveMutualExclusiveMods?.Invoke(pair.Value.OfType<ManifestFile>().OrderByDescending(x=>x.Recommendation).OfType<InstallerFile>().ToList());
                     if (chosenFile == null) return null;//abort
                     files.Insert(0, chosenFile);
                 }
