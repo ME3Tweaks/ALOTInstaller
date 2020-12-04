@@ -241,9 +241,6 @@ namespace ALOTInstallerWPF.BuilderUI
                     pd.SetMessage(message);
                 }
 
-                pd.SetMessage("Checking for MassEffectModderNoGui updates");
-                MEMUpdater.UpdateMEM(downloadProgressChanged, errorUpdating, setStatus);
-
                 try
                 {
                     pd.SetMessage("Loading installer framework");
@@ -267,6 +264,9 @@ namespace ALOTInstallerWPF.BuilderUI
                     {
                         // This shouldn't happen...
                     }
+
+                    pd.SetMessage("Checking for MassEffectModderNoGui updates");
+                    MEMUpdater.UpdateMEM(downloadProgressChanged, errorUpdating, setStatus);
 
                     pd.SetMessage("Performing startup checks");
                     StartupCheck.PerformStartupCheck((title, message) =>
