@@ -243,10 +243,6 @@ namespace ALOTInstallerWPF.BuilderUI
 
                 try
                 {
-                    pd.SetMessage("Loading installer framework");
-                    handleM3Passthrough();
-
-                    ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
                     pd.SetMessage("Loading installer manifests");
                     var alotManifestModePackage = ManifestHandler.LoadMasterManifest(x => pd.SetMessage(x));
 
@@ -267,6 +263,11 @@ namespace ALOTInstallerWPF.BuilderUI
 
                     pd.SetMessage("Checking for MassEffectModderNoGui updates");
                     MEMUpdater.UpdateMEM(downloadProgressChanged, errorUpdating, setStatus);
+
+                    // Must come after MEM update check to help ensure we have MEM available
+                    pd.SetMessage("Loading installer framework");
+                    handleM3Passthrough();
+                    ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
 
                     pd.SetMessage("Performing startup checks");
                     StartupCheck.PerformStartupCheck((title, message) =>
