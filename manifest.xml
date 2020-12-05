@@ -2,8 +2,8 @@
 <!-- Created with Liquid Technologies Online Tools 1.0 (https://www.liquid-technologies.com) -->
 <alotinstallermanifest>
 	<!-- MEM Update Information -->
-	<highestapprovedmemversion>428</highestapprovedmemversion>
-	<soaktestingmemversion soakstartdate="2020-12-01">429</soaktestingmemversion>
+	<highestapprovedmemversion>429</highestapprovedmemversion>
+	<soaktestingmemversion soakstartdate="2020-12-01">431</soaktestingmemversion>
 	<!-- YYYY-MM-DD-->
 	<!-- Stages, weights, UI messages -->
 	<stages>
