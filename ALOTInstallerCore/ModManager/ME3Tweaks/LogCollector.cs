@@ -589,7 +589,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                                     modStr += "[USERFILE] ";
                                 }
                                 modStr += fi.ModName;
-                                if (string.IsNullOrWhiteSpace(fi.AuthorName))
+                                if (!string.IsNullOrWhiteSpace(fi.AuthorName))
                                 {
                                     modStr += $" by {fi.AuthorName}";
                                 }
