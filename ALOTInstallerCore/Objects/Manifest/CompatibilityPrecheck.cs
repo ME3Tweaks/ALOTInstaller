@@ -25,7 +25,7 @@ namespace ALOTInstallerCore.Objects.Manifest
             Mode = TryConvert.ToEnum(element.Attribute("mode")?.Value,ManifestMode.Invalid);
             if (ApplicableGames == ApplicableGame.None)
             {
-                Log.Error($@"Compatibility precheck {FriendlyName} is incorrectly configured, it applies to no games!");
+                Log.Error($@"[AICORE] Compatibility precheck {FriendlyName} is incorrectly configured, it applies to no games!");
             }
         }
 
@@ -69,20 +69,20 @@ namespace ALOTInstallerCore.Objects.Manifest
                 if (export == null)
                 {
                     // Could not find export! This rule check failed.
-                    Log.Information($@"{FriendlyName} Compatibility check did not pass: {PackageFileRelativePath} did not contain export with UIndex {ExportUIndex}");
+                    Log.Information($@"[AICORE] {FriendlyName} Compatibility check did not pass: {PackageFileRelativePath} did not contain export with UIndex {ExportUIndex}");
                     return false;
                 }
 
                 var checkingExportMD5 = Utilities.CalculateMD5(new MemoryStream(export.Data));
                 if (checkingExportMD5 != ExportMD5)
                 {
-                    Log.Information($@"{FriendlyName} Compatibility check did not pass: {PackageFileRelativePath}'s export {ExportUIndex} hash check failed. Expected hash {ExportMD5}, got {checkingExportMD5}");
+                    Log.Information($@"[AICORE] {FriendlyName} Compatibility check did not pass: {PackageFileRelativePath}'s export {ExportUIndex} hash check failed. Expected hash {ExportMD5}, got {checkingExportMD5}");
                     return false;
                 }
             }
             else if (FailIfPackageNotFound)
             {
-                Log.Information($@"{FriendlyName} Compatibility check did not pass: {PackageFileRelativePath} was not found in target {target.TargetPath}");
+                Log.Information($@"[AICORE] {FriendlyName} Compatibility check did not pass: {PackageFileRelativePath} was not found in target {target.TargetPath}");
                 return false;
             }
 
@@ -120,13 +120,13 @@ namespace ALOTInstallerCore.Objects.Manifest
                 }
                 if (!FailIfHashMatches && !hashMatches)
                 {
-                    Log.Information($@"{FriendlyName} Compatibility check did not pass: {FileRelativePath} has wrong hash. Expected {FileMD5}, got {localMd5}");
+                    Log.Information($@"[AICORE] {FriendlyName} Compatibility check did not pass: {FileRelativePath} has wrong hash. Expected {FileMD5}, got {localMd5}");
                     return false;
                 }
             }
             else if (FailIfFileNotFound)
             {
-                Log.Information($@"{FriendlyName} Compatibility check did not pass: {FileRelativePath} was not found in target {target.TargetPath}");
+                Log.Information($@"[AICORE] {FriendlyName} Compatibility check did not pass: {FileRelativePath} was not found in target {target.TargetPath}");
                 return false;
             }
 
@@ -153,7 +153,7 @@ namespace ALOTInstallerCore.Objects.Manifest
             var compatible = !VanillaDatabaseService.GetInstalledDLCMods(target).Any(x => x.Equals(DLCName, StringComparison.InvariantCultureIgnoreCase));
             if (!compatible)
             {
-                Log.Information($@"{FriendlyName} Compatibility check did not pass: {DLCName} DLC was found in target {target.TargetPath}");
+                Log.Information($@"[AICORE] {FriendlyName} Compatibility check did not pass: {DLCName} DLC was found in target {target.TargetPath}");
             }
             return compatible;
         }

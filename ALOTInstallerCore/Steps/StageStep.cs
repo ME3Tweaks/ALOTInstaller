@@ -258,10 +258,10 @@ namespace ALOTInstallerCore.Steps
             foreach (var v in _installOptions.FilesToInstall)
             {
 #if DEBUG
-                if (!v.FriendlyName.Contains("ALOT"))
-                {
+                //if (!v.FriendlyName.Contains("ALOT"))
+                //{
                     block.Post(v);
-                }
+                //}
 #else 
                 // Helps make sure I don't publish broken code
                 block.Post(v);
