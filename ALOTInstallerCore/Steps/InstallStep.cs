@@ -418,11 +418,14 @@ namespace ALOTInstallerCore.Steps
                                 var fourKNormArgs = param.Split(' ');
                                 if (fourKNormArgs.Length == 3)
                                 {
-                                    Log.Warning($@"Dropping unused preexisting 4K norm in file: {fourKNormArgs[2]}, Export {fourKNormArgs[0]} {fourKNormArgs[1]}");
+                                    // 0 = File
+                                    // 1 = Export #
+                                    // 2 = ObjectName
+                                    Log.Warning($@"[AICORE] Dropping unused preexisting 4K norm in file: {fourKNormArgs[0]}, Export {fourKNormArgs[1]} {fourKNormArgs[2]}");
                                     CoreAnalytics.TrackEvent(@"Dropped 4K Norm", new Dictionary<string, string>()
                                     {
-                                        {"File", fourKNormArgs[2]},
-                                        {"Export", $"{fourKNormArgs[0]} {fourKNormArgs[1]}"}
+                                        {"File", fourKNormArgs[0]},
+                                        {"Export", $"{fourKNormArgs[1]} {fourKNormArgs[2]}"}
                                     });
                                 }
                             }
@@ -615,7 +618,7 @@ namespace ALOTInstallerCore.Steps
             if (package.InstallTarget.Game == MEGame.ME3)
             {
                 // Install ASIs.
-                Log.Information(@"Installing supporting ASIs");
+                Log.Information(@"[AICORE] Installing supporting ASIs");
                 SetBottomTextCallback?.Invoke("Installing troubleshooting files");
                 ASIManager.LoadManifest();
                 ASIManager.InstallASIToTargetByGroupID(22, package.InstallTarget); //Garbage Collection Forcer

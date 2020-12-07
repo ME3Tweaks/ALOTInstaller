@@ -13,6 +13,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 using Serilog;
 
@@ -209,7 +210,7 @@ namespace ALOTInstallerCore.Steps
                 return;
             }
 
-            if (!_installOptions.FilesToInstall.Any())
+            if (!Enumerable.Any(_installOptions.FilesToInstall))
             {
                 // Abort!
                 Log.Error("[AICORE] There are no files to install! Is this a bug?");
@@ -284,7 +285,7 @@ namespace ALOTInstallerCore.Steps
                 return;
             }
 
-            if (Directory.GetFiles(addonStagingPath).Any())
+            if (Enumerable.Any(Directory.GetFiles(addonStagingPath)))
             {
                 NotifyAddonBuild?.Invoke();
                 // Addon needs built
@@ -470,7 +471,7 @@ namespace ALOTInstallerCore.Steps
                     //// See if any files need decompiled (TPF)
                     var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
                     var tpfsToDecomp = installerFile.PackageFiles.Where(x => x.TPFSource != null && x.ApplicableGames.HasFlag(targetGame)).Select(x => x.TPFSource).Distinct().ToList();
-                    if (!tpfsToDecomp.Any() && mf.UnpackedSingleFilename != null && installerFile.PackageFiles.All(x => !x.MoveDirectly && x.ApplicableGames.HasFlag(targetGame)) && Path.GetExtension(mf.UnpackedSingleFilename) == ".tpf")
+                    if (!Enumerable.Any(tpfsToDecomp) && mf.UnpackedSingleFilename != null && installerFile.PackageFiles.All(x => !x.MoveDirectly && x.ApplicableGames.HasFlag(targetGame)) && Path.GetExtension(mf.UnpackedSingleFilename) == ".tpf")
                     {
                         // Our files will always be in this
                         Log.Information($@"[AICORE] [{prefix}] No listed TPFs to decomp but we have a single file unpacked TPF, decompiling it");
@@ -491,7 +492,7 @@ namespace ALOTInstallerCore.Steps
                         decompiled = true;
                     }
 
-                    if (tpfsToDecomp.Any())
+                    if (Enumerable.Any(tpfsToDecomp))
                     {
                         // Recalculate
                         subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
@@ -556,7 +557,7 @@ namespace ALOTInstallerCore.Steps
                             // Could be multi-copy package file, e.g. one to many from source file
                         }
 
-                        if (!matchingPackageFiles.Any())
+                        if (!Enumerable.Any(matchingPackageFiles))
                         {
                             if (FiletypeRequiresDecompilation(sf) && !tpfsToDecomp.Contains(Path.GetFileName(sf)))
                             {
@@ -612,7 +613,7 @@ namespace ALOTInstallerCore.Steps
 
                         stage = false;
                     }
-                    else if (mfx.PackageFiles.Count == 1 && mfx.PackageFiles[0].MoveDirectly)
+                    else if (mfx.PackageFiles.Count(x => x.ApplicableGames.HasFlag(targetGame)) == 1 && mfx.PackageFiles.First(x => x.ApplicableGames.HasFlag(targetGame)).MoveDirectly)
                     {
                         // It's a TPF with MoveDirectly or something. We should copy this as addon staging files are not copied back
                         //Copy
@@ -647,7 +648,7 @@ namespace ALOTInstallerCore.Steps
                 {
                     // Files will be staged
                 }
-                else if (mf is PreinstallMod pm && !pm.PackageFiles.Any())
+                else if (mf is PreinstallMod pm && !Enumerable.Any(pm.PackageFiles))
                 {
                     // Nothing to stage. Will install before textures
                     stage = false;
@@ -764,7 +765,7 @@ namespace ALOTInstallerCore.Steps
                         }
                     }
 
-                    if (Directory.GetFiles(userFileBuildMemPath).Any())
+                    if (Enumerable.Any(Directory.GetFiles(userFileBuildMemPath)))
                     {
                         // Requires build
                         // don't add progress indicator here. We don't need more than the text
@@ -807,7 +808,7 @@ namespace ALOTInstallerCore.Steps
 
         private bool promptModConfiguration()
         {
-            foreach (var m in _installOptions.FilesToInstall.Where(x => x is ManifestFile mf && (mf.CopyFiles.Any() || mf.ChoiceFiles.Any() || mf.ZipFiles.Any())))
+            foreach (var m in _installOptions.FilesToInstall.Where(x => x is ManifestFile mf && (Enumerable.Any(mf.CopyFiles) || Enumerable.Any(mf.ChoiceFiles) || Enumerable.Any(mf.ZipFiles))))
             {
                 var mf = m as ManifestFile;
                 mf.PackageFiles.RemoveAll(x => x.Transient);
