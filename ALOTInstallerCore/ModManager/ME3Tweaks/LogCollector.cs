@@ -593,8 +593,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                                 {
                                     modStr += $" by {fi.AuthorName}";
                                 }
-                                
-                                addDiagLine(modStr,  fi.ModType == TextureModInstallationInfo.InstalledTextureMod.InstalledTextureModType.USERFILE ? Severity.WARN : Severity.GOOD);
+
+                                addDiagLine(modStr, fi.ModType == TextureModInstallationInfo.InstalledTextureMod.InstalledTextureModType.USERFILE ? Severity.WARN : Severity.GOOD);
                                 if (fi.ChosenOptions.Any())
                                 {
                                     addDiagLine(@"   Chosen options for install:");
@@ -1310,25 +1310,29 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     Log.Information(@"[AICORE] Collecting ME3logger session log");
 
                     updateStatusCallback?.Invoke("Collecting ME3 session log");
-                    string me3logfilepath =
-                        Path.Combine(
-                            Directory.GetParent(MEDirectories.ExecutablePath(selectedDiagnosticTarget)).FullName,
-                            @"me3log.txt");
+                    string me3logfilepath = Path.Combine(Directory.GetParent(MEDirectories.ExecutablePath(selectedDiagnosticTarget)).FullName, @"ME3Log.txt");
                     if (File.Exists(me3logfilepath))
                     {
-
                         FileInfo fi = new FileInfo(me3logfilepath);
-                        if (fi.Length < 10000)
+                        addDiagLine(@"Mass Effect 3 last session log", Severity.DIAGSECTION);
+                        addDiagLine(@"Last session log has modification date of " + fi.LastWriteTimeUtc.ToShortDateString());
+                        addDiagLine(@"Note that messages from this log can be highly misleading as they are context dependent!");
+                        addDiagLine();
+                        var log = Utilities.WriteSafeReadAllLines(me3logfilepath); //try catch needed?
+                        int lineNum = 0;
+                        foreach (string line in log)
                         {
-                            addDiagLine(@"Mass Effect 3 last session log", Severity.DIAGSECTION);
-                            addDiagLine(@"Last session log has modification date of " +
-                                        fi.LastWriteTimeUtc.ToShortDateString());
-                            addDiagLine();
-                            var log = Utilities.WriteSafeReadAllLines(me3logfilepath); //try catch needed?
-                            foreach (string line in log)
+                            addDiagLine(line, line.Contains("I/O failure", StringComparison.InvariantCultureIgnoreCase) ? Severity.FATAL : Severity.INFO);
+                            lineNum++;
+                            if (lineNum > 100)
                             {
-                                addDiagLine(line);
+                                break;
                             }
+                        }
+
+                        if (lineNum > 200)
+                        {
+                            addDiagLine("... log truncated ...");
                         }
                     }
                 }
