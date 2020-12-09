@@ -2,7 +2,7 @@
 <alotinstallermanifest>
 	<!-- MEM Update Information -->
 	<highestapprovedmemversion>431</highestapprovedmemversion>
-	<soaktestingmemversion soakstartdate="2020-12-08">432</soaktestingmemversion>
+	<soaktestingmemversion soakstartdate="2020-12-07">432</soaktestingmemversion>
 	<!-- YYYY-MM-DD-->
 	<!-- Stages, weights, UI messages -->
 	<stages>
