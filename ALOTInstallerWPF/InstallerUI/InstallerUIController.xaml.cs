@@ -411,6 +411,8 @@ namespace ALOTInstallerWPF.InstallerUI
             TipTimer?.Stop(); //Stop the tip rotation
             var installedInfo = InstallOptions.InstallTarget.GetInstalledALOTInfo();
             var installedTextures = InstallOptions.FilesToInstall.Any(x => !(x is PreinstallMod)); //Debug mode will not have files to install set
+            
+            bool showBottomText = false;
             if (ir == InstallStep.InstallResult.InstallOK)
             {
                 BigIconKind = PackIconIoniconsKind.CheckmarkCircleMD;
@@ -465,9 +467,10 @@ namespace ALOTInstallerWPF.InstallerUI
                     InstallerTextTop = sf.FailureTopText;
                     InstallerTextMiddle = sf.FailureBottomText;
                     CurrentTip = sf.FailureHeaderText;
+                    showBottomText = sf.ShowBottomText;
                 }
             }
-            InstallerTextBottomVisibility = Visibility.Collapsed;
+            InstallerTextBottomVisibility = showBottomText ? Visibility.Visible : Visibility.Collapsed;
             InstallerTextMiddleVisibility = InstallerTextTopVisibility = Visibility.Visible;
             BigIconVisible = true;
         }

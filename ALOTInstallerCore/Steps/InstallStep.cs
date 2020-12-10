@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Timers;
 using ALOTInstallerCore.Helpers;
@@ -312,7 +313,7 @@ namespace ALOTInstallerCore.Steps
                 if (!applyModManagerMods())
                 {
                     destroyWakeTimer();
-                    doWorkEventArgs.Result = InstallResult.InstallFailed_TextureExportFixFailed;
+                    doWorkEventArgs.Result = InstallResult.InstallFailed_PreinstallModFailed;
                     return;
                 }
             }
@@ -1240,6 +1241,37 @@ namespace ALOTInstallerCore.Steps
                 if (exitcode != 0)
                 {
                     Log.Error($"[AICORE] MassEffectModderNoGui exited with non zero code {exitcode} extracting {modAddon.FriendlyName}");
+
+                    // Delete staged files
+                    Utilities.DeleteFilesAndFoldersRecursively(stagingPath);
+
+                    // Check hash of archive
+                    try
+                    {
+                        using var fStream = File.OpenRead(modAddon.GetUsedFilepath());
+                        var sizeToHash = fStream.Length;
+                        var hash = HashAlgorithmExtensions.ComputeHashAsync(MD5.Create(), fStream,
+                            progress: x =>
+                            {
+                                //UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file {(int) (x * 100f / sizeToHash)}%");
+                                SetBottomTextCallback?.Invoke($"Verifying file {(int)(x * 100f / sizeToHash)}%");
+                            }).Result;
+                        if (hash != modAddon.FileMD5)
+                        {
+                            Log.Error($@"{modAddon.FriendlyName} file is corrupt and must be redownloaded. Filepath: {modAddon.FileMD5}, Expected hash: {modAddon.FileMD5}, Calculated hash: {hash}");
+                            SetBottomTextCallback?.Invoke("File in texture library is corrupt");
+                        }
+                        else
+                        {
+                            Log.Warning($@"Failed to extract {modAddon.FriendlyName}, but file hash is correct. Perhaps file permissions, disk space, other issues are preventing successful extraction?");
+                            SetBottomTextCallback?.Invoke("Failed to extract archive");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($@"Error calculating MD5 of {modAddon.GetUsedFilepath()}: {e.Message}");
+                    }
+
                     return false;
                 }
 

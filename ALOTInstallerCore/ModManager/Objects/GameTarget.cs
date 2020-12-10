@@ -658,7 +658,7 @@ namespace ALOTInstallerCore.ModManager.Objects
 #endif
         }
 
-        internal void StampDebugALOTInfo()
+        public void StampDebugALOTInfo()
         {
 #if DEBUG
             TextureModInstallationInfo tmii = new TextureModInstallationInfo(8, 1, 0, 3);
@@ -666,7 +666,7 @@ namespace ALOTInstallerCore.ModManager.Objects
             tmii.InstallationTimestamp = DateTime.Now;
             tmii.InstallerVersionFullName = "Debug Installer 3.2";
             var ran = new Random();
-            var fileset = ManifestHandler.GetAllManifestFiles().Where(x => ran.Next(3) == 0);
+            var fileset = ManifestHandler.GetAllManifestFiles().Where(x => !(x is PreinstallMod) && ran.Next(3) == 0);
             tmii.InstalledTextureMods.AddRange(fileset.Select(x => new TextureModInstallationInfo.InstalledTextureMod(x)));
             StampTextureModificationInfo(tmii);
 #endif

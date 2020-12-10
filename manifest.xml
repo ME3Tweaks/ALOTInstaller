@@ -110,7 +110,8 @@
 			<failureinfo resultcode="InstallFailed_PreinstallModFailed"
 						 failedtopmessage="Failed to install ALOV mod"
 						 failedbottommessage="Check installer log for more info"
-						 failedheadermessage="A Lot of Videos (ALOV) mod installs before textures are installed. The installer encountered an error during this procedure. Check the installer log for more information." />
+						 failedheadermessage="A Lot of Videos (ALOV) mod installs before textures are installed. The installer encountered an error during this procedure. Check the installer log for more information."
+						 showbottomtext="true" />
 			<failureinfo resultcode="InstallFailed_MEMExitedBeforeStageDone"
 						 failedtopmessage="Unknown error during texture install"
 						 failedbottommessage="Check installer log for more info"

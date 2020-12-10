@@ -275,7 +275,8 @@ namespace ALOTInstallerCore.Helpers
                                  FailureTopText = z.Attribute("failedtopmessage")?.Value,
                                  FailureHeaderText = z.Attribute("failedheadermessage")?.Value,
                                  FailureResultCode = TryConvert.ToEnum<InstallStep.InstallResult>(z.Attribute("resultcode")?.Value, InstallStep.InstallResult.UNSET_VALUE),
-                                 Warning = TryConvert.ToBool(z.Attribute("warning")?.Value, false)
+                                 Warning = TryConvert.ToBool(z.Attribute("warning")?.Value, false),
+                                 ShowBottomText = TryConvert.ToBool(z.Attribute("showbottomtext")?.Value, false)
                              }).ToList()
                          }).ToList();
                 }
