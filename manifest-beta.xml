@@ -3,6 +3,14 @@
 	<!-- MEM Update Information -->
 	<highestapprovedmemversion>428</highestapprovedmemversion>
 	<soaktestingmemversion soakstartdate="2020-08-01">428</soaktestingmemversion>
+
+		<!-- DEFINE MANIFEST MODES THAT MANIFEST FILES CAN ATTACH TO -->
+	<manifest mode="MEUITM"
+					  description="Installs MEUITM with MEUITM defaults"
+					  version="3.0.1" />
+	<manifest mode="ALOT"
+					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
+					  version="7.0.8" />
 	<!-- YYYY-MM-DD-->
 	<!-- Stages, weights, UI messages -->
 	<stages>
@@ -207,14 +215,6 @@
 			failuremessage="Project Variety is installed, but the ALOT patch was not applied when Project Variety was installed. This option must be chosen when installing Project Variety, otherwise the game will crash when combined with ALOT. Install Project Variety again, but with the ALOT patch option chosen."
 			/> -->
 	</compatibilityprechecks>
-	
-	<!-- DEFINE MANIFEST MODES THAT MANIFEST FILES CAN ATTACH TO -->
-	<manifest mode="MEUITM"
-					  description="Installs MEUITM with MEUITM defaults"
-					  version="3.0.1" />
-	<manifest mode="ALOT"
-					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.7" />
 	<!-- DEFINE MANIFEST FILES -->
 	<!-- MAKE SURE EACH MODE IS TAGGED -->
 	<manifestfiles>
