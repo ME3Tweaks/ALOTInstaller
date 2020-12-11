@@ -150,11 +150,24 @@ namespace ALOTInstallerCore.Steps
                                 // Must add this or we might filter out on extraction.
                                 extensions.Add(Path.GetExtension(mFile.UnpackedSingleFilename));
                             }
+
+                            if (mFile.MEUITMSettings != null)
+                            {
+                                if (!string.IsNullOrWhiteSpace(mFile.MEUITMSettings.MEUITMModeMusicPath))
+                                {
+                                    extensions.Add(Path.GetExtension(mFile.MEUITMSettings.MEUITMModeMusicPath));
+                                }
+                                if (!string.IsNullOrWhiteSpace(mFile.MEUITMSettings.MEUITMModeBackgroundPath))
+                                {
+                                    extensions.Add(Path.GetExtension(mFile.MEUITMSettings.MEUITMModeBackgroundPath));
+                                }
+                            }
                         }
                         extensions = extensions.Distinct().ToList();
                         // If any package files list TPFSource disable this space optimization
                         if (extensions.Count == 1 && instFile.PackageFiles.Where(x => x.ApplicableGames.HasFlag(targetGame)).All(x => x.TPFSource == null))
                         {
+                            
                             // We have only one extension type! We can filter what we extract with MEM
                             args += $" --filter-with-ext {extensions.First().Substring(1)}"; //remove the '.'
                         }
