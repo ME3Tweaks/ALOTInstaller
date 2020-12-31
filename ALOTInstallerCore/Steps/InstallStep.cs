@@ -639,7 +639,7 @@ namespace ALOTInstallerCore.Steps
             {
                 try
                 {
-                    hasWarning |= !LegacyPhysXInstaller.PatchPhysXLoaderME1(package.InstallTarget);
+                    hasWarning |= !ME1PhysXTools.PatchPhysXLoaderME1(package.InstallTarget);
                 }
                 catch (Exception e)
                 {

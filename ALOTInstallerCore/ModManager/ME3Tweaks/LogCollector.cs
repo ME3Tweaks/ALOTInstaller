@@ -375,7 +375,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (selectedDiagnosticTarget.Game == MEGame.ME1)
                     {
                         // Check for patched PhysX
-                        if (LegacyPhysXInstaller.IsPhysXLoaderPatchedLocalOnly(selectedDiagnosticTarget))
+                        if (ME1PhysXTools.IsPhysXLoaderPatchedLocalOnly(selectedDiagnosticTarget))
                         {
                             addDiagLine(@"PhysXLoader.dll is patched to force local PhysXCore.dll", Severity.GOOD);
                         }
@@ -534,8 +534,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         addDiagLine($@"ALOT version: {latestInstall.ALOTVER}.{latestInstall.ALOTUPDATEVER}.{latestInstall.ALOTHOTFIXVER}");
                         if (latestInstall.MEUITMVER != 0)
                         {
-                            var meuitmName = selectedDiagnosticTarget.Game == MEGame.ME1 ? "MEUITM" : $"MEUITM{selectedDiagnosticTarget.Game.ToGameNum()}";
-                            addDiagLine($"{meuitmName} version: {latestInstall.MEUITMVER}");
+                            var meuitmName = selectedDiagnosticTarget.Game == MEGame.ME1 ? @"MEUITM" : $@"MEUITM{selectedDiagnosticTarget.Game.ToGameNum()}";
+                            addDiagLine($@"{meuitmName} version: {latestInstall.MEUITMVER}");
                         }
                     }
                     else
