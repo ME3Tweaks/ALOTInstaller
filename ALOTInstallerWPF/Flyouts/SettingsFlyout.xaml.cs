@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
@@ -19,11 +18,13 @@ using ALOTInstallerWPF.InstallerUI;
 using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
 using Path = System.IO.Path;
+using Utilities = ALOTInstallerCore.Utilities;
 
 namespace ALOTInstallerWPF.Flyouts
 {
@@ -84,7 +85,7 @@ namespace ALOTInstallerWPF.Flyouts
             CleanupLibraryCommand = new GenericCommand(CleanupLibrary);
             CleanupBuildLocationCommand = new GenericCommand(CleanupBuildLocation);
             LogsDiagnosticsCommand = new GenericCommand(OpenDiagnosticsFlyout);
-            OpenLODSwitcherCommand = new GenericCommand(OpenLODSwitcher, () => Locations.GetAllAvailableTargets().Any());
+            OpenLODSwitcherCommand = new GenericCommand(OpenLODSwitcher, () => Enumerable.Any(Locations.GetAllAvailableTargets()));
             OpenTutorialLinkCommand = new RelayCommand(OpenTutorialLink);
             LaunchMEMGuiCommand = new GenericCommand(LaunchMEM);
             RunAutoTOCCommand = new GenericCommand(RunAutoTOC, () => Locations.ME3Target != null && Locations.ME3Target.Supported);
@@ -211,7 +212,7 @@ namespace ALOTInstallerWPF.Flyouts
                         {
                             await pd.CloseAsync();
                             await mw.ShowMessageAsync("Build directory cleaned",
-                                $"The build directory has been cleaned up. {FileSizeFormatter.FormatSize(bdSize)} of data was deleted.");
+                                $"The build directory has been cleaned up. {FileSize.FormatSize(bdSize)} of data was deleted.");
                         });
                     };
                     nbw.RunWorkerAsync();
@@ -229,7 +230,7 @@ namespace ALOTInstallerWPF.Flyouts
             {
                 Log.Information(@"[AIWPF] Getting list of unused files in the texture library");
                 var unusedFilesInLib = TextureLibrary.GetUnusedFilesInLibrary();
-                if (unusedFilesInLib.Any())
+                if (Enumerable.Any(unusedFilesInLib))
                 {
                     string message =
                         "The following files located in the texture library are no longer used, or were moved into the texture library manually (and are not used), and can be safely deleted:\n";
@@ -237,7 +238,7 @@ namespace ALOTInstallerWPF.Flyouts
                     foreach (var v in unusedFilesInLib)
                     {
                         sizedItems.Add(
-                            $"{v} ({FileSizeFormatter.FormatSize(new FileInfo(Path.Combine(Settings.TextureLibraryLocation, v)).Length)})");
+                            $"{v} ({FileSize.FormatSize(new FileInfo(Path.Combine(Settings.TextureLibraryLocation, v)).Length)})");
                     }
 
                     var result = await mw.ShowScrollMessageAsync("Irrelevant files found in texture library", message,
@@ -334,7 +335,7 @@ namespace ALOTInstallerWPF.Flyouts
 
                     if (!cts.IsCancellationRequested)
                     {
-                        if (nonVanillaFiles.Any())
+                        if (Enumerable.Any(nonVanillaFiles))
                         {
                             await mw.ShowScrollMessageAsync($"{game.ToGameName()} has modifications",
                                 "The following files appear to have been modified:",

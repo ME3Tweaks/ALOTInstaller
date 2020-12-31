@@ -15,6 +15,7 @@ using ALOTInstallerCore.Objects;
 using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Packages;
 using ALOTInstallerCore.ModManager.asi;
+using ME3ExplorerCore.Helpers;
 #if WINDOWS
 using AuthenticodeExaminer;
 using Microsoft.Win32;
@@ -242,13 +243,13 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 progressIndeterminateCallback?.Invoke();
 
                 #region Game Information
+                Log.Information($@"[AICORE] Collecting basic game information");
 
                 updateStatusCallback?.Invoke("Collecting game information");
-                Log.Information($@"[AICORE] Collecting game information");
-
                 addDiagLine(@"Basic game information", Severity.DIAGSECTION);
                 addDiagLine($@"Game is installed at {gamePath}");
 
+                Log.Information(@"[AICORE] Reloading target for most up to date information");
                 selectedDiagnosticTarget.ReloadGameTarget(false); //reload vars
                 TextureModInstallationInfo avi = selectedDiagnosticTarget.GetInstalledALOTInfo();
 
@@ -312,15 +313,15 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         var exeInfo = ME1ExecutableInfo.GetExecutableInfo(M3Directories.GetExecutablePath(selectedDiagnosticTarget), false);
                         if (avi != null)
                         {
-                            addDiagLine($"Large Address Aware: {exeInfo.HasLAAApplied}", exeInfo.HasLAAApplied ? Severity.GOOD : Severity.FATAL);
-                            addDiagLine($"No-admin patched: {exeInfo.HasLAAApplied}", exeInfo.HasProductNameChanged ? Severity.GOOD : Severity.WARN);
-                            addDiagLine($"enableLocalPhysXCore patched: {exeInfo.HasPhysXCoreChanged}", exeInfo.HasLAAApplied ? Severity.GOOD : Severity.WARN);
+                            addDiagLine($@"Large Address Aware: {exeInfo.HasLAAApplied}", exeInfo.HasLAAApplied ? Severity.GOOD : Severity.FATAL);
+                            addDiagLine($@"No-admin patched: {exeInfo.HasLAAApplied}", exeInfo.HasProductNameChanged ? Severity.GOOD : Severity.WARN);
+                            addDiagLine($@"enableLocalPhysXCore patched: {exeInfo.HasPhysXCoreChanged}", exeInfo.HasLAAApplied ? Severity.GOOD : Severity.WARN);
                         }
                         else
                         {
-                            addDiagLine($"Large Address Aware: {exeInfo.HasLAAApplied}");
-                            addDiagLine($"No-admin patched: {exeInfo.HasLAAApplied}");
-                            addDiagLine($"enableLocalPhysXCore patched: {exeInfo.HasLAAApplied}");
+                            addDiagLine($@"Large Address Aware: {exeInfo.HasLAAApplied}");
+                            addDiagLine($@"No-admin patched: {exeInfo.HasLAAApplied}");
+                            addDiagLine($@"enableLocalPhysXCore patched: {exeInfo.HasLAAApplied}");
                         }
                     }
 
@@ -441,7 +442,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 addDiagLine();
                 addDiagLine(@"System Memory", Severity.BOLD);
                 long ramInBytes = (long)computerInfo.TotalPhysicalMemory;
-                addDiagLine(@"Total memory available: " + FileSizeFormatter.FormatSize(ramInBytes));
+                addDiagLine($@"Total memory available: {FileSize.FormatSize(ramInBytes)}");
 #if WINDOWS
                 addDiagLine(@"Processors", Severity.BOLD);
                 addDiagLine(GetProcessorInformationForDiag());
@@ -482,19 +483,21 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     string displayVal = null;
                     if (returnvalue is long size && size != 0)
                     {
-                        displayVal = FileSizeFormatter.FormatSize(size);
+                        displayVal = FileSize.FormatSize(size);
                     }
                     else
                     {
                         try
                         {
                             UInt32 wmiValue = (UInt32)obj[@"AdapterRam"];
-                            displayVal = FileSizeFormatter.FormatSize(wmiValue);
-                            // May need to uncomment this later. WMI sometimes returns 4GB when actual value is bigger
-                            //if (numBytes.MebiBytes == 4095)
-                            //{
-                            //    displayVal += @" (possibly more, variable is 32-bit unsigned)";
-                            //}
+                            var numBytes = (long)wmiValue;
+
+                            // TODO: UPDATE THIS FOR FILESIZE. NEEDS TESTING
+                            displayVal = FileSize.FormatSize(numBytes);
+                            if (numBytes == uint.MaxValue)
+                            {
+                                displayVal += @" (possibly more, variable is 32-bit unsigned)";
+                            }
                         }
                         catch (Exception)
                         {
@@ -593,13 +596,13 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                                 var modStr = @" - ";
                                 if (fi.ModType == TextureModInstallationInfo.InstalledTextureMod.InstalledTextureModType.USERFILE)
                                 {
-                                    modStr += "[USERFILE] ";
+                                    modStr += @"[USERFILE] ";
                                 }
 
                                 modStr += fi.ModName;
                                 if (!string.IsNullOrWhiteSpace(fi.AuthorName))
                                 {
-                                    modStr += $" by {fi.AuthorName}";
+                                    modStr += $@" by {fi.AuthorName}";
                                 }
 
                                 addDiagLine(modStr, fi.ModType == TextureModInstallationInfo.InstalledTextureMod.InstalledTextureModType.USERFILE ? Severity.WARN : Severity.GOOD);
@@ -619,8 +622,6 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 }
 
                 #endregion
-
-
 
                 #region Basegame file changes
 
@@ -645,28 +646,37 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 {
                     if (!selectedDiagnosticTarget.TextureModded)
                     {
-                        addDiagLine(@"The following basegame files have been modified:");
+                        var modifiedBGFiles = new List<string>();
                         var cookedPath = M3Directories.GetCookedPath(selectedDiagnosticTarget);
                         var markerPath = M3Directories.GetTextureMarkerPath(selectedDiagnosticTarget);
                         foreach (var mf in modifiedFiles)
                         {
                             if (mf.StartsWith(cookedPath, StringComparison.InvariantCultureIgnoreCase))
                             {
-                                if (mf.Equals(markerPath, StringComparison.InvariantCultureIgnoreCase))
-                                    continue; //don't report this file
-
-                                // BGFIS is not in this library... I think? Might make callout for it
-                                //var info = BasegameFileIdentificationService.GetBasegameFileSource(
-                                //    selectedDiagnosticTarget, mf); //todo: Handle this somehow
-                                //if (info != null)
-                                //{
-                                //    addDiagLine($@" - {mf.Substring(cookedPath.Length + 1)} - {info.source}");
-                                //}
-                                //else
-                                //{
-                                addDiagLine($@" - {mf.Substring(cookedPath.Length + 1)}");
-                                //}
+                                if (mf.Equals(markerPath, StringComparison.InvariantCultureIgnoreCase)) continue; //don't report this file
+                                var info = BasegameFileIdentificationService.GetBasegameFileSource(selectedDiagnosticTarget, mf);
+                                if (info != null)
+                                {
+                                    modifiedBGFiles.Add($@" - {mf.Substring(cookedPath.Length + 1)} - {info.source}");
+                                }
+                                else
+                                {
+                                    modifiedBGFiles.Add($@" - {mf.Substring(cookedPath.Length + 1)}");
+                                }
                             }
+                        }
+
+                        if (modifiedBGFiles.Any())
+                        {
+                            addDiagLine(@"The following basegame files have been modified:");
+                            foreach (var mbgf in modifiedBGFiles)
+                            {
+                                addDiagLine(mbgf);
+                            }
+                        }
+                        else
+                        {
+                            addDiagLine(@"No modified basegame files were found");
                         }
                     }
                     else
@@ -696,19 +706,19 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     updateStatusCallback?.Invoke(@"Checking for blacklisted mods");
                     args = $@"--detect-bad-mods --gameid {gameID} --ipc";
                     var blacklistedMods = new List<string>();
-                    MEMIPCHandler.RunMEMIPCUntilExit(args, i => exitcode = i, (string command, string param) =>
+                    MEMIPCHandler.RunMEMIPCUntilExit(args, ipcCallback: (string command, string param) =>
+                    {
+                        switch (command)
                         {
-                            switch (command)
-                            {
-                                case @"ERROR":
-                                    blacklistedMods.Add(param);
-                                    break;
-                                default:
-                                    Debug.WriteLine(@"oof?");
-                                    break;
-                            }
-                        },
-                        applicationExited: x => exitcode = x);
+                            case @"ERROR":
+                                blacklistedMods.Add(param);
+                                break;
+                            default:
+                                Debug.WriteLine(@"oof?");
+                                break;
+                        }
+                    },
+                    applicationExited: x => exitcode = x);
 
                     if (exitcode != 0)
                     {
@@ -734,14 +744,12 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         addDiagLine(@"No blacklisted mods were found installed");
                     }
 
-
                     #endregion
 
                     #region Installed DLCs
-
-                    //Get DLCs
                     Log.Information(@"[AICORE] Getting DLC information");
 
+                    //Get DLCs
                     updateStatusCallback?.Invoke("Collecting DLC information");
 
                     var installedDLCs = M3Directories.GetMetaMappedInstalledDLC(selectedDiagnosticTarget);
@@ -749,11 +757,6 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     addDiagLine(@"Installed DLC", Severity.DIAGSECTION);
                     addDiagLine(@"The following DLC is installed:");
 
-                    bool metadataPresent = false;
-                    bool hasUIMod = false;
-                    bool compatPatchInstalled = false;
-                    bool hasNonUIDLCMod = false;
-                    Dictionary<int, string> priorities = new Dictionary<int, string>();
                     var officialDLC = MEDirectories.OfficialDLC(selectedDiagnosticTarget.Game);
                     foreach (var dlc in installedDLCs)
                     {
@@ -783,16 +786,31 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             }
                         }
 
-                        addDiagLine(dlctext,
-                            officialDLC.Contains(dlc.Key, StringComparer.InvariantCultureIgnoreCase)
-                                ? Severity.OFFICIALDLC
-                                : Severity.DLC);
+                        var isOfficialDLC = officialDLC.Contains(dlc.Key, StringComparer.InvariantCultureIgnoreCase);
+                        addDiagLine(dlctext, isOfficialDLC ? Severity.OFFICIALDLC : Severity.DLC);
+
+                        if (!isOfficialDLC)
+                        {
+                            if (dlc.Value != null && dlc.Value.OptionsSelectedAtInstallTime.Any())
+                            {
+                                // Print options
+                                addDiagLine(@"   > The following options were chosen at install time:");
+                                foreach (var o in dlc.Value.OptionsSelectedAtInstallTime)
+                                {
+                                    addDiagLine(($@"     > {o}"));
+                                }
+                            }
+                        }
+                    }
+
+                    if (installedDLCs.Any())
+                    {
+                        SeeIfIncompatibleDLCIsInstalled(selectedDiagnosticTarget, addDiagLine);
                     }
 
                     Log.Information(@"[AICORE] Calculating supercedances");
 
-                    var supercedanceList = M3Directories.GetFileSupercedances(selectedDiagnosticTarget)
-                        .Where(x => x.Value.Count > 1).ToList();
+                    var supercedanceList = M3Directories.GetFileSupercedances(selectedDiagnosticTarget).Where(x => x.Value.Count > 1).ToList();
                     if (supercedanceList.Any())
                     {
                         addDiagLine();
@@ -839,8 +857,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                                 FileInfo fi = new FileInfo(tfc);
                                 long tfcSize = fi.Length;
                                 string tfcPath = tfc.Substring(bgPath.Length + 1);
-                                addDiagLine(
-                                    $@" - {tfcPath}, {FileSizeFormatter.FormatSize(tfcSize)}"); //do not localize
+                                addDiagLine($@" - {tfcPath}, {FileSize.FormatSize(tfcSize)}"); //do not localize
                             }
                         }
                         else
@@ -852,6 +869,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     #endregion
 
                     #region Files added or removed after texture install
+                    Log.Information(@"[AICORE] Finding files that have been added/replaced/removed after textures were installed");
 
                     args = $@"--check-game-data-mismatch --gameid {gameID} --ipc";
                     if (selectedDiagnosticTarget.TextureModded)
@@ -878,19 +896,18 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                                     switch (command)
                                     {
                                         case @"ERROR_REMOVED_FILE":
-                                        //.Add($" - File removed after textures were installed: {param}");
-                                        removedFiles.Add(param);
+                                            //.Add($" - File removed after textures were installed: {param}");
+                                            removedFiles.Add(param);
                                             break;
                                         case @"ERROR_ADDED_FILE":
-                                        //addedFiles.Add($"File was added after textures were installed" + param + " " + File.GetCreationTimeUtc(Path.Combine(gamePath, param));
-                                        addedFiles.Add(param);
+                                            //addedFiles.Add($"File was added after textures were installed" + param + " " + File.GetCreationTimeUtc(Path.Combine(gamePath, param));
+                                            addedFiles.Add(param);
                                             break;
                                         case @"ERROR_VANILLA_MOD_FILE":
                                             if (!addedFiles.Contains(param))
                                             {
                                                 replacedFiles.Add(param);
                                             }
-
                                             break;
                                         default:
                                             Debug.WriteLine(@"oof?");

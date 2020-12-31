@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Text;
 using System.Windows.Data;
-using System.Windows.Media;
-using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Helpers;
 
 namespace ALOTInstallerWPF.Converters
 {
@@ -18,7 +15,7 @@ namespace ALOTInstallerWPF.Converters
             {
                 try
                 {
-                    return $"{Path.GetFileName(ifx.GetUsedFilepath())} ({FileSizeFormatter.FormatSize(ifx.FileSize)})";
+                    return $"{Path.GetFileName(ifx.GetUsedFilepath())} ({FileSize.FormatSize(ifx.FileSize)})";
                 }
                 catch
                 {

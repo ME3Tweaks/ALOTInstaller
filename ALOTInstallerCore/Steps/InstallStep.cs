@@ -16,6 +16,7 @@ using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps.Installer;
 using MassEffectModManagerCore.modmanager.asi;
 using ME3ExplorerCore;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 using ME3ExplorerCore.Unreal;
 using ME3ExplorerCore.Unreal.BinaryConverters;
@@ -187,7 +188,7 @@ namespace ALOTInstallerCore.Steps
             Log.Information(@"[AICORE] Beginning InstallTextures() thread.");
             #region Presetup variables
             var filesThatWillInstall = Directory.GetFiles(memInputPath, "*.mem");
-            var mainInstallStageWillCommence = filesThatWillInstall.Any();
+            var mainInstallStageWillCommence = Enumerable.Any(filesThatWillInstall);
             Log.Information($@"[AICORE] Main texture installation step (+ supporting steps) will commence: {mainInstallStageWillCommence}");
 
             #endregion
@@ -494,7 +495,7 @@ namespace ALOTInstallerCore.Steps
 
                 if (cacheAmountPercent != null)
                 {
-                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
+                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSize.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
                     args += $" --cache-amount {cacheAmountPercent}";
                 }
 
@@ -777,7 +778,7 @@ namespace ALOTInstallerCore.Steps
                     lastExitCode = x;
                 });
 
-            return !badFiles.Any();
+            return !Enumerable.Any(badFiles);
         }
 
         private int? getCacheSizeToUse(ComputerInfo ci)
@@ -887,7 +888,7 @@ namespace ALOTInstallerCore.Steps
                             streamStates = trigStream2.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
 
                             // Cleanup visible assets
-                            if (streamStates != null && streamStates.Any())
+                            if (streamStates != null && Enumerable.Any(streamStates))
                             {
                                 var visibleChunkNames = streamStates[0].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
                                 if (visibleChunkNames != null)
@@ -1318,7 +1319,7 @@ namespace ALOTInstallerCore.Steps
                             }
 
                             //Check if any required file size is wrong
-                            if (requiredFilesSizes.Any())
+                            if (Enumerable.Any(requiredFilesSizes))
                             {
                                 bool doNotInstall = false;
                                 for (int i = 0; i < requiredFilesSizes.Count; i++)

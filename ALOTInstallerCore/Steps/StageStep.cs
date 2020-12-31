@@ -537,7 +537,7 @@ namespace ALOTInstallerCore.Steps
                                     if (len != unpackedSize)
                                     {
                                         installerFile.StatusText = "Extraction produced incorrect file";
-                                        Log.Error($"[AICORE] [{prefix}] ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (MOVEDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
+                                        Log.Error($"[AICORE] [{prefix}] ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (MOVEDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSize.FormatSize(unpackedSize)}), Found: {len} ({FileSize.FormatSize(len)})");
                                         _abortStaging = true;
                                         return false;
                                     }
@@ -556,7 +556,7 @@ namespace ALOTInstallerCore.Steps
                                     if (len != unpackedSize)
                                     {
                                         installerFile.StatusText = "Extraction produced incorrect file";
-                                        Log.Error($"[AICORE] [{prefix}] ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (COPYDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
+                                        Log.Error($"[AICORE] [{prefix}] ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (COPYDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSize.FormatSize(unpackedSize)}), Found: {len} ({FileSize.FormatSize(len)})");
                                         _abortStaging = true;
                                         return false;
                                     }

@@ -21,6 +21,7 @@ using ControlzEx.Theming;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using ME3ExplorerCore.Compression;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
@@ -28,6 +29,7 @@ using Microsoft.AppCenter.Crashes;
 using Microsoft.Win32;
 using NickStrupat;
 using Serilog;
+using Utilities = ALOTInstallerCore.Utilities;
 
 namespace ALOTInstallerWPF.BuilderUI
 {
@@ -181,7 +183,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     (done, total) =>
                     {
                         pd.SetProgress(done * 1d / total);
-                        pd.SetMessage($"Downloading update {FileSizeFormatter.FormatSize(done)} / {FileSizeFormatter.FormatSize(total)}");
+                        pd.SetMessage($"Downloading update {FileSize.FormatSize(done)} / {FileSize.FormatSize(total)}");
                     },
                     () =>
                     {

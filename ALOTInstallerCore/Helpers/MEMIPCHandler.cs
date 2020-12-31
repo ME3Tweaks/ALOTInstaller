@@ -14,6 +14,7 @@ using ALOTInstallerCore.Helpers.AppSettings;
 using CliWrap;
 using CliWrap.EventStream;
 using ME3ExplorerCore.GameFilesystem;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerCore.Helpers
@@ -231,7 +232,7 @@ namespace ALOTInstallerCore.Helpers
                     case "CACHE_USAGE":
                         if (DateTime.Now > (lastCacheoutput.AddSeconds(10)))
                         {
-                            Log.Information($"[AICORE] MEM cache usage: {FileSizeFormatter.FormatSize(long.Parse(parm))}");
+                            Log.Information($"[AICORE] MEM cache usage: {FileSize.FormatSize(long.Parse(parm))}");
                             lastCacheoutput = DateTime.Now;
                         }
                         break;
