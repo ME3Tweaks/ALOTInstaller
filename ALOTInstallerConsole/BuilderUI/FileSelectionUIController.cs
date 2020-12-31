@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ALOTInstallerConsole.UserControls;
-using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
@@ -15,10 +14,12 @@ using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 using NStack;
 using Serilog;
 using Terminal.Gui;
+using Utilities = ALOTInstallerCore.Utilities;
 
 namespace ALOTInstallerConsole.BuilderUI
 {
@@ -259,12 +260,12 @@ namespace ALOTInstallerConsole.BuilderUI
         {
             Log.Information(@"[AIConsole] Getting list of unused files in the texture library");
             var unusedFilesInLib = TextureLibrary.GetUnusedFilesInLibrary();
-            if (unusedFilesInLib.Any())
+            if (Enumerable.Any(unusedFilesInLib))
             {
                 string message = "The following files located in the texture library are no longer used or were moved into the texture library manually and are unused, and can be safely deleted:\n";
                 foreach (var v in unusedFilesInLib)
                 {
-                    message += $"\n{v} ({FileSizeFormatter.FormatSize(new FileInfo(Path.Combine(Settings.TextureLibraryLocation, v)).Length)})";
+                    message += $"\n{v} ({FileSize.FormatSize(new FileInfo(Path.Combine(Settings.TextureLibraryLocation, v)).Length)})";
 
                 }
                 message += "\n\nDelete these files?";
@@ -704,7 +705,7 @@ namespace ALOTInstallerConsole.BuilderUI
             ManifestHandler.SetCurrentMode(newMode);
             SetLeftsideTitle();
             RefreshShownFiles();
-            if (dataSource.ShownFiles.Any())
+            if (Enumerable.Any(dataSource.ShownFiles))
             {
                 ManifestFilesListView.SelectedItem = 0;
             }
@@ -809,7 +810,7 @@ namespace ALOTInstallerConsole.BuilderUI
             y++;
 
             AddSFIFVLabel($"Filename: {uf.Filename}", ref y);
-            AddSFIFVLabel($"File size: {uf.FileSize} ({FileSizeFormatter.FormatSize(uf.FileSize)})", ref y);
+            AddSFIFVLabel($"File size: {uf.FileSize} ({FileSize.FormatSize(uf.FileSize)})", ref y);
 
 
             return y;
@@ -849,14 +850,14 @@ namespace ALOTInstallerConsole.BuilderUI
             y++;
 
             AddSFIFVLabel($"Filename: {mf.Filename}", ref y);
-            AddSFIFVLabel($"File size: {mf.FileSize} ({FileSizeFormatter.FormatSize(mf.FileSize)})", ref y);
+            AddSFIFVLabel($"File size: {mf.FileSize} ({FileSize.FormatSize(mf.FileSize)})", ref y);
             AddSFIFVLabel($"File MD5: {mf.FileMD5}", ref y);
             if (mf.UnpackedSingleFilename != null && mf.UnpackedFileSize != 0 && mf.UnpackedFileMD5 != null)
             {
                 y++;
                 AddSFIFVLabel($"This file supports unpacked mode", ref y);
                 AddSFIFVLabel($"Unpacked filename: {mf.UnpackedSingleFilename}", ref y);
-                AddSFIFVLabel($"Unpacked size: {mf.UnpackedFileSize} ({FileSizeFormatter.FormatSize(mf.UnpackedFileSize)})", ref y);
+                AddSFIFVLabel($"Unpacked size: {mf.UnpackedFileSize} ({FileSize.FormatSize(mf.UnpackedFileSize)})", ref y);
                 AddSFIFVLabel($"Unpacked file MD5: {mf.UnpackedFileMD5}", ref y);
             }
 
