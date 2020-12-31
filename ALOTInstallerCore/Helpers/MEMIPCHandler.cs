@@ -11,10 +11,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ALOTInstallerCore.Helpers.AppSettings;
-using ALOTInstallerCore.ModManager.GameDirectories;
-using ALOTInstallerCore.Objects;
 using CliWrap;
 using CliWrap.EventStream;
+using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerCore.Helpers
@@ -359,7 +358,7 @@ namespace ALOTInstallerCore.Helpers
                 try
                 {
                     // Get read only state for config file. It seems sometimes they get set read only.
-                    FileInfo fi = new FileInfo(MEDirectories.LODConfigFile(game));
+                    FileInfo fi = new FileInfo(MEDirectories.GetLODConfigFile(game));
                     configFileReadOnly = fi.IsReadOnly;
                     if (configFileReadOnly)
                     {
@@ -406,7 +405,7 @@ namespace ALOTInstallerCore.Helpers
                 try
                 {
                     Log.Information(@"[AICORE] Re-setting the read only flag on ME1 bioengine.ini");
-                    FileInfo fi = new FileInfo(MEDirectories.LODConfigFile(game));
+                    FileInfo fi = new FileInfo(MEDirectories.GetLODConfigFile(game));
                     fi.IsReadOnly = configFileReadOnly;
                 }
                 catch (Exception e)

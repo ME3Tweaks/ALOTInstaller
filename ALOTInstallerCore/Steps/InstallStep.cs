@@ -4,13 +4,12 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Timers;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
-using ALOTInstallerCore.ModManager.GameDirectories;
+using ALOTInstallerCore.ModManager;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
@@ -1278,7 +1277,7 @@ namespace ALOTInstallerCore.Steps
                 SetBottomTextCallback?.Invoke("Installing files");
 
                 //Check requirements for this extraction rule to fire.
-                var dlcDirectory = MEDirectories.DLCPath(package.InstallTarget);
+                var dlcDirectory = M3Directories.GetDLCPath(package.InstallTarget);
 
                 try
                 {

@@ -5,12 +5,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
-using ALOTInstallerCore.Objects;
 using Serilog;
-using ALOTInstallerCore.Helpers.AppSettings;
+using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Packages;
 #if WINDOWS
 using Microsoft.Win32;
@@ -182,7 +180,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     return x;
                 }).ToList();
                 List<string> installedDLC = VanillaDatabaseService.GetInstalledOfficialDLC(targetToBackup);
-                List<string> allOfficialDLC = MEDirectories.OfficialDLC(targetToBackup.Game);
+                List<string> allOfficialDLC = MEDirectories.OfficialDLC(targetToBackup.Game).ToList();
 
                 if (installedDLC.Count() < allOfficialDLC.Count())
                 {
@@ -287,7 +285,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         BackupProgressCallback?.Invoke(ProgressValue, ProgressMax);
                     }
 
-                    string dlcFolderpath = MEDirectories.DLCPath(targetToBackup) + Path.DirectorySeparatorChar;
+                    string dlcFolderpath = M3Directories.GetDLCPath(targetToBackup) + Path.DirectorySeparatorChar;
                     int dlcSubStringLen = dlcFolderpath.Length;
                     var officialDLCNames = MEDirectories.OfficialDLCNames(targetToBackup.Game);
 
@@ -676,7 +674,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         }
                     }
 
-                    string dlcFolderpath = MEDirectories.DLCPath(backupPath, Game) + Path.DirectorySeparatorChar; //\ at end makes sure we are restoring a subdir
+                    string dlcFolderpath = MEDirectories.GetDLCPath(Game, backupPath) + Path.DirectorySeparatorChar; //\ at end makes sure we are restoring a subdir
                     int dlcSubStringLen = dlcFolderpath.Length;
                     //Debug.WriteLine(@"DLC Folder: " + dlcFolderpath);
                     //Debug.Write(@"DLC Folder path len:" + dlcFolderpath);

@@ -1,5 +1,5 @@
-﻿using System.IO;
-using System.Linq;
+﻿using System.Linq;
+using ALOTInstallerCore.Helpers;
 
 namespace ALOTInstallerCore.ModManager.Objects
 {
@@ -8,14 +8,21 @@ namespace ALOTInstallerCore.ModManager.Objects
     /// </summary>
     public class MetaCMM
     {
+        #region Info Prefixes
+        public static readonly string PrefixOptionsSelectedOnInstall = @"[INSTALLOPTIONS]";
+        public static readonly string PrefixIncompatibleDLC = @"[INCOMPATIBLEDLC]";
+        #endregion
+
         public string ModName { get; set; }
         public string Version { get; set; }
         public string InstalledBy { get; set; }
         public string InstallerInstanceGUID { get; set; }
+        public ObservableCollectionExtended<string> IncompatibleDLC { get; } = new ObservableCollectionExtended<string>();
+        public ObservableCollectionExtended<string> OptionsSelectedAtInstallTime { get; } = new ObservableCollectionExtended<string>();
 
         public MetaCMM(string metaFile)
         {
-            var lines = File.ReadAllLines(metaFile).ToList();
+            var lines = Utilities.WriteSafeReadAllLines(metaFile).ToList();
             int i = 0;
             foreach (var line in lines)
             {
@@ -34,14 +41,21 @@ namespace ALOTInstallerCore.ModManager.Objects
                         InstallerInstanceGUID = line;
                         break;
                     default:
-                        // Nothing
+                        // MetaCMM Extended
+                        if (line.StartsWith(PrefixOptionsSelectedOnInstall))
+                        {
+                            var parsedline = line.Substring(PrefixOptionsSelectedOnInstall.Length);
+                            OptionsSelectedAtInstallTime.ReplaceAll(StringStructParser.GetSemicolonSplitList(parsedline));
+                        }
+                        else if (line.StartsWith(PrefixIncompatibleDLC))
+                        {
+                            var parsedline = line.Substring(PrefixIncompatibleDLC.Length);
+                            IncompatibleDLC.ReplaceAll(StringStructParser.GetSemicolonSplitList(parsedline));
+                        }
                         break;
                 }
                 i++;
             }
-
-
-
         }
     }
 }

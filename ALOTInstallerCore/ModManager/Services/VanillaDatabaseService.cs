@@ -6,10 +6,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.Objects;
-using ALOTInstallerCore.Objects;
 using ME3ExplorerCore.Compression;
+using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Packages;
 using Serilog;
 
@@ -123,7 +122,7 @@ namespace ALOTInstallerCore.ModManager.Services
             var backupPath = BackupService.GetGameBackupPath(game, out var isVanilla);
             if (backupPath == null/* && target == null*/) return null; //can't fetch
 
-            string cookedPath = MEDirectories.CookedPath(game, backupPath);
+            string cookedPath = MEDirectories.GetCookedPath(game, backupPath);
 
             if (game >= MEGame.ME2)
             {
@@ -171,7 +170,7 @@ namespace ALOTInstallerCore.ModManager.Services
             var backupPath = BackupService.GetGameBackupPath(game, out var isVanilla);
             if (backupPath == null/* && target == null*/) return null; //can't fetch
 
-            string dlcPath = MEDirectories.DLCPath(game);
+            string dlcPath = MEDirectories.GetDLCPath(game);
             string dlcFolderPath = Path.Combine(dlcPath, dlcfoldername);
 
             string[] files = Directory.GetFiles(dlcFolderPath, Path.GetFileName(filename), SearchOption.AllDirectories);
@@ -359,7 +358,7 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <returns>List of DLC foldernames</returns>
         internal static List<string> GetInstalledDLCMods(GameTarget target)
         {
-            return MEDirectories.GetInstalledDLC(target).Where(x => !MEDirectories.OfficialDLC(target.Game).Contains(x, StringComparer.InvariantCultureIgnoreCase)).ToList();
+            return M3Directories.GetInstalledDLC(target).Where(x => !MEDirectories.OfficialDLC(target.Game).Contains(x, StringComparer.InvariantCultureIgnoreCase)).ToList();
         }
 
         /// <summary>
@@ -369,7 +368,7 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <returns>List of DLC foldernames</returns>
         internal static List<string> GetInstalledOfficialDLC(GameTarget target, bool includeDisabled = false)
         {
-            return MEDirectories.GetInstalledDLC(target, includeDisabled).Where(x => MEDirectories.OfficialDLC(target.Game).Contains(x.TrimStart('x'), StringComparer.InvariantCultureIgnoreCase)).ToList();
+            return M3Directories.GetInstalledDLC(target, includeDisabled).Where(x => MEDirectories.OfficialDLC(target.Game).Contains(x.TrimStart('x'), StringComparer.InvariantCultureIgnoreCase)).ToList();
         }
 
         internal static bool ValidateTargetDLCConsistency(GameTarget target, Action<string> inconsistentDLCCallback = null)
@@ -377,8 +376,8 @@ namespace ALOTInstallerCore.ModManager.Services
             if (target.Game != MEGame.ME3) return true; //No consistency check except for ME3
             bool allConsistent = true;
             var unpackedFileExtensions = new List<string>() { @".pcc", @".tlk", @".bin", @".dlc" };
-            var dlcDir = MEDirectories.DLCPath(target);
-            var dlcFolders = MEDirectories.GetInstalledDLC(target).Where(x => MEDirectories.OfficialDLC(target.Game).Contains(x)).Select(x => Path.Combine(dlcDir, x)).ToList();
+            var dlcDir = M3Directories.GetDLCPath(target);
+            var dlcFolders = M3Directories.GetInstalledDLC(target).Where(x => MEDirectories.OfficialDLC(target.Game).Contains(x)).Select(x => Path.Combine(dlcDir, x)).ToList();
             foreach (var dlcFolder in dlcFolders)
             {
                 string unpackedDir = Path.Combine(dlcFolder, @"CookedPCConsole");
@@ -443,11 +442,9 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <returns>Game source if supported, null otherwise</returns>
         internal static (string hash, string result) GetGameSource(GameTarget target)
         {
-            var exePath = MEDirectories.ExecutablePath(target);
+            var exePath = M3Directories.GetExecutablePath(target);
             if (File.Exists(exePath))
             {
-
-
                 var md5 = target.Game == MEGame.ME1 ? (string)null : Utilities.CalculateMD5(exePath);
                 switch (target.Game)
                 {

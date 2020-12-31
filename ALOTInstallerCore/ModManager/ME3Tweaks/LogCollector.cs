@@ -8,11 +8,11 @@ using System.Linq;
 using System.Management;
 using System.Text;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.gamefileformats;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Packages;
 #if WINDOWS
 using AuthenticodeExaminer;
@@ -249,7 +249,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 selectedDiagnosticTarget.ReloadGameTarget(false); //reload vars
                 TextureModInstallationInfo avi = selectedDiagnosticTarget.GetInstalledALOTInfo();
 
-                string exePath = MEDirectories.ExecutablePath(selectedDiagnosticTarget);
+                string exePath = M3Directories.GetExecutablePath(selectedDiagnosticTarget);
                 if (File.Exists(exePath))
                 {
 #if WINDOWS
@@ -306,7 +306,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (selectedDiagnosticTarget.Game == MEGame.ME1)
                     {
                         Log.Information(@"[AICORE] Getting additional ME1 executable information");
-                        var exeInfo = ME1ExecutableInfo.GetExecutableInfo(MEDirectories.ExecutablePath(selectedDiagnosticTarget), false);
+                        var exeInfo = ME1ExecutableInfo.GetExecutableInfo(M3Directories.GetExecutablePath(selectedDiagnosticTarget), false);
                         if (avi != null)
                         {
                             addDiagLine($"Large Address Aware: {exeInfo.HasLAAApplied}", exeInfo.HasLAAApplied ? Severity.GOOD : Severity.FATAL);
@@ -637,8 +637,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (!selectedDiagnosticTarget.TextureModded)
                     {
                         addDiagLine(@"The following basegame files have been modified:");
-                        var cookedPath = MEDirectories.CookedPath(selectedDiagnosticTarget);
-                        var markerPath = MEDirectories.ALOTMarkerPath(selectedDiagnosticTarget);
+                        var cookedPath = M3Directories.GetCookedPath(selectedDiagnosticTarget);
+                        var markerPath = M3Directories.GetTextureMarkerPath(selectedDiagnosticTarget);
                         foreach (var mf in modifiedFiles)
                         {
                             if (mf.StartsWith(cookedPath, StringComparison.InvariantCultureIgnoreCase))
@@ -685,17 +685,17 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 args = $@"--detect-bad-mods --gameid {gameID} --ipc";
                 var blacklistedMods = new List<string>();
                 MEMIPCHandler.RunMEMIPCUntilExit(args, i => exitcode = i, (string command, string param) =>
+                {
+                    switch (command)
                     {
-                        switch (command)
-                        {
-                            case @"ERROR":
-                                blacklistedMods.Add(param);
-                                break;
-                            default:
-                                Debug.WriteLine(@"oof?");
-                                break;
-                        }
-                    },
+                        case @"ERROR":
+                            blacklistedMods.Add(param);
+                            break;
+                        default:
+                            Debug.WriteLine(@"oof?");
+                            break;
+                    }
+                },
                     applicationExited: x => exitcode = x);
 
                 if (exitcode != 0)
@@ -732,7 +732,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 updateStatusCallback?.Invoke("Collecting DLC information");
 
-                var installedDLCs = MEDirectories.GetMetaMappedInstalledDLC(selectedDiagnosticTarget);
+                var installedDLCs = M3Directories.GetMetaMappedInstalledDLC(selectedDiagnosticTarget);
 
                 addDiagLine(@"Installed DLC", Severity.DIAGSECTION);
                 addDiagLine(@"The following DLC is installed:");
@@ -779,7 +779,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 Log.Information(@"[AICORE] Calculating supercedances");
 
-                var supercedanceList = MEDirectories.GetFileSupercedances(selectedDiagnosticTarget)
+                var supercedanceList = M3Directories.GetFileSupercedances(selectedDiagnosticTarget)
                     .Where(x => x.Value.Count > 1).ToList();
                 if (supercedanceList.Any())
                 {
@@ -818,7 +818,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                     addDiagLine(@"Texture File Cache (TFC) files", Severity.DIAGSECTION);
                     addDiagLine(@"The following TFC files are present in the game directory.");
-                    var bgPath = MEDirectories.BioGamePath(selectedDiagnosticTarget);
+                    var bgPath = M3Directories.GetBioGamePath(selectedDiagnosticTarget);
                     string[] tfcFiles = Directory.GetFiles(bgPath, @"*.tfc", SearchOption.AllDirectories);
                     if (tfcFiles.Any())
                     {
@@ -862,29 +862,29 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         List<string> addedFiles = new List<string>();
                         List<string> replacedFiles = new List<string>();
                         MEMIPCHandler.RunMEMIPCUntilExit(args, ipcCallback: (string command, string param) =>
+                        {
+                            switch (command)
                             {
-                                switch (command)
-                                {
-                                    case @"ERROR_REMOVED_FILE":
-                                        //.Add($" - File removed after textures were installed: {param}");
-                                        removedFiles.Add(param);
-                                        break;
-                                    case @"ERROR_ADDED_FILE":
-                                        //addedFiles.Add($"File was added after textures were installed" + param + " " + File.GetCreationTimeUtc(Path.Combine(gamePath, param));
-                                        addedFiles.Add(param);
-                                        break;
-                                    case @"ERROR_VANILLA_MOD_FILE":
-                                        if (!addedFiles.Contains(param))
-                                        {
-                                            replacedFiles.Add(param);
-                                        }
+                                case @"ERROR_REMOVED_FILE":
+                                    //.Add($" - File removed after textures were installed: {param}");
+                                    removedFiles.Add(param);
+                                    break;
+                                case @"ERROR_ADDED_FILE":
+                                    //addedFiles.Add($"File was added after textures were installed" + param + " " + File.GetCreationTimeUtc(Path.Combine(gamePath, param));
+                                    addedFiles.Add(param);
+                                    break;
+                                case @"ERROR_VANILLA_MOD_FILE":
+                                    if (!addedFiles.Contains(param))
+                                    {
+                                        replacedFiles.Add(param);
+                                    }
 
-                                        break;
-                                    default:
-                                        Debug.WriteLine(@"oof?");
-                                        break;
-                                }
-                            },
+                                    break;
+                                default:
+                                    Debug.WriteLine(@"oof?");
+                                    break;
+                            }
+                        },
                             applicationExited: i => exitcode = i);
                         if (exitcode != 0)
                         {
@@ -1110,7 +1110,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 updateStatusCallback?.Invoke("Collecting ASI information");
 
-                string asidir = MEDirectories.ASIPath(selectedDiagnosticTarget);
+                string asidir = M3Directories.GetASIPath(selectedDiagnosticTarget);
                 addDiagLine(@"Installed ASI mods", Severity.DIAGSECTION);
                 if (Directory.Exists(asidir))
                 {
@@ -1157,7 +1157,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     bool hadTocError = false;
                     string[] tocs = Directory.GetFiles(Path.Combine(gamePath, @"BIOGame"), @"PCConsoleTOC.bin",
                         SearchOption.AllDirectories);
-                    string markerfile = MEDirectories.ALOTMarkerPath(selectedDiagnosticTarget);
+                    string markerfile = M3Directories.GetTextureMarkerPath(selectedDiagnosticTarget);
                     foreach (string toc in tocs)
                     {
                         TOCBinFile tbf = new TOCBinFile(toc);
@@ -1281,17 +1281,13 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             StringComparison.InvariantCultureIgnoreCase)))
                     .ToList();
 
-                addDiagLine(
-                    $@"{selectedDiagnosticTarget.Game.ToGameName()} crash logs found in Event Viewer",
-                    Severity.DIAGSECTION);
+                addDiagLine($@"{selectedDiagnosticTarget.Game.ToGameName()} crash logs found in Event Viewer", Severity.DIAGSECTION);
                 if (entries.Any())
                 {
                     foreach (var entry in entries)
                     {
-                        string str = string.Join("\n",
-                            GenerateEventLogString(entry).Split('\n').ToList().Take(17).ToList()); //do not localize
-                        addDiagLine(
-                            $@"{selectedDiagnosticTarget.Game.ToGameName()} Event {entry.TimeGenerated}\n{str}"); // !!! ?
+                        string str = string.Join("\n", GenerateEventLogString(entry).Split('\n').ToList().Take(17).ToList()); //do not localize
+                        addDiagLine($"{selectedDiagnosticTarget.Game.ToGameName()} Event {entry.TimeGenerated}\n{str}"); // !!! ?
                     }
 
                 }
@@ -1310,7 +1306,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     Log.Information(@"[AICORE] Collecting ME3logger session log");
 
                     updateStatusCallback?.Invoke("Collecting ME3 session log");
-                    string me3logfilepath = Path.Combine(Directory.GetParent(MEDirectories.ExecutablePath(selectedDiagnosticTarget)).FullName, @"ME3Log.txt");
+                    string me3logfilepath = Path.Combine(M3Directories.GetExecutableDirectory(selectedDiagnosticTarget), @"ME3Log.txt");
                     if (File.Exists(me3logfilepath))
                     {
                         FileInfo fi = new FileInfo(me3logfilepath);
@@ -1348,18 +1344,38 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             finally
             {
                 //restore MEM setting
+                // This is M3 specific
                 //MEMIPCHandler.SetGamePath(selectedDiagnosticTarget.Game, oldMemGamePath);
             }
 
             return diagStringBuilder.ToString();
         }
 
+        private static void SeeIfIncompatibleDLCIsInstalled(GameTarget target, Action<string, Severity> addDiagLine)
+        {
+            var installedDLCMods = VanillaDatabaseService.GetInstalledDLCMods(target);
+            var metaFiles = M3Directories.GetMetaMappedInstalledDLC(target, false);
+
+            foreach (var v in metaFiles)
+            {
+                if (v.Value != null && v.Value.IncompatibleDLC.Any())
+                {
+                    // See if any DLC is not compatible
+                    var installedIncompatDLC = installedDLCMods.Intersect(v.Value.IncompatibleDLC, StringComparer.InvariantCultureIgnoreCase).ToList();
+                    foreach (var id in installedIncompatDLC)
+                    {
+                        var incompatName = ThirdPartyServices.GetThirdPartyModInfo(id, target.Game);
+                        addDiagLine($@"{v.Value.ModName} is not compatible with {incompatName?.modname ?? id}", Severity.FATAL);
+                    }
+                }
+            }
+        }
 
         private static void addLODStatusToDiag(GameTarget selectedDiagnosticTarget, Dictionary<string, string> lods,
             Action<string, Severity> addDiagLine)
         {
             addDiagLine(@"Texture Level of Detail (LOD) settings", Severity.DIAGSECTION);
-            string iniPath = MEDirectories.LODConfigFile(selectedDiagnosticTarget.Game);
+            string iniPath = MEDirectories.GetLODConfigFile(selectedDiagnosticTarget.Game);
             if (!File.Exists(iniPath))
             {
                 addDiagLine($@"Game config file is missing: {iniPath}", Severity.ERROR);
@@ -1568,8 +1584,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             string str = "";
             try
             {
-                ManagementObjectSearcher mosProcessor =
-    new ManagementObjectSearcher(@"SELECT * FROM Win32_Processor");
+                ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher(@"SELECT * FROM Win32_Processor");
 
                 foreach (ManagementObject moProcessor in mosProcessor.Get())
                 {

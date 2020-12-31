@@ -1,15 +1,12 @@
 ﻿#if WINDOWS
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq.Expressions;
 using System.Management;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.Text;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.GameDirectories;
+using ALOTInstallerCore.ModManager;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.PlatformSpecific.Windows;
 using Microsoft.Win32;
@@ -41,7 +38,7 @@ namespace ALOTInstallerCore
         /// <param name="me1Target"></param>
         public static void RemoveAppCompatForME1Path(GameTarget me1Target)
         {
-            var exePath = MEDirectories.ExecutablePath(me1Target);
+            var exePath = M3Directories.GetExecutablePath(me1Target);
             if (RegistryHandler.DeleteRegistryValue(Registry.CurrentUser, @"Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers", exePath))
             {
                 CoreAnalytics.TrackEvent?.Invoke("Removed appcompat settings from ME1", null);

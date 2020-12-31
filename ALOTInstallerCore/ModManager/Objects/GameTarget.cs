@@ -5,11 +5,11 @@ using System.IO;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.asi;
-using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using MassEffectModManagerCore.modmanager.asi;
+using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Packages;
 using Serilog;
 using Path = System.IO.Path;
@@ -308,7 +308,7 @@ namespace ALOTInstallerCore.ModManager.Objects
         private string getALOTMarkerFilePath()
         {
             // this used to be shared method
-            return MEDirectories.ALOTMarkerPath(this);
+            return M3Directories.GetTextureMarkerPath(this);
         }
 
         public ObservableCollectionExtended<ModifiedFileObject> ModifiedBasegameFiles { get; } = new ObservableCollectionExtended<ModifiedFileObject>();
@@ -352,8 +352,8 @@ namespace ALOTInstallerCore.ModManager.Objects
 
         public void PopulateDLCMods(bool includeDisabled, Func<InstalledDLCMod, bool> deleteConfirmationCallback = null, Action notifyDeleted = null, bool modNamePrefersTPMI = false)
         {
-            var dlcDir = MEDirectories.DLCPath(this);
-            var installedMods = MEDirectories.GetInstalledDLC(this, includeDisabled).Where(x => !MEDirectories.OfficialDLC(Game).Contains(x.TrimStart('x'), StringComparer.InvariantCultureIgnoreCase));
+            var dlcDir = M3Directories.GetDLCPath(this);
+            var installedMods = M3Directories.GetInstalledDLC(this, includeDisabled).Where(x => !MEDirectories.OfficialDLC(Game).Contains(x.TrimStart('x'), StringComparer.InvariantCultureIgnoreCase));
             //Must run on UI thread
             //#if WPF
             //Application.Current.Dispatcher.Invoke(delegate
@@ -686,7 +686,7 @@ namespace ALOTInstallerCore.ModManager.Objects
         /// </summary>
         public void PopulateExtras()
         {
-            var exeDir = MEDirectories.ExecutableDirectory(this);
+            var exeDir = M3Directories.GetExecutableDirectory(this);
             var dlls = Directory.GetFiles(exeDir, @"*.dll").Select(x => Path.GetFileName(x));
             var expectedDlls = MEDirectories.VanillaDlls(this.Game);
             var extraDlls = dlls.Except(expectedDlls, StringComparer.InvariantCultureIgnoreCase);
@@ -812,7 +812,7 @@ namespace ALOTInstallerCore.ModManager.Objects
             List<InstalledASIMod> installedASIs = new List<InstalledASIMod>();
             try
             {
-                string asiDirectory = MEDirectories.ASIPath(this);
+                string asiDirectory = M3Directories.GetASIPath(this);
                 if (asiDirectory != null && Directory.Exists(TargetPath))
                 {
                     if (!Directory.Exists(asiDirectory))

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using ALOTInstallerCore.ModManager.GameDirectories;
+using ALOTInstallerCore.ModManager;
 using ALOTInstallerCore.Objects;
 
 namespace ALOTInstallerCore.Helpers
@@ -124,7 +122,7 @@ namespace ALOTInstallerCore.Helpers
                     };
                 }
 
-                var biogame = MEDirectories.BioGamePath(target);
+                var biogame = M3Directories.GetBioGamePath(target);
                 foreach (var pcc in script.Where(x => x.StartsWith("pccs.Add(")))
                 {
                     var subBioPath = pcc.Substring("pccs.Add(\"".Length);
