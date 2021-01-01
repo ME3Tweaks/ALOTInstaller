@@ -2,8 +2,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using ALOTInstallerCore.ModManager.GameDirectories;
+using ALOTInstallerCore.ModManager;
 using ALOTInstallerCore.ModManager.Objects;
+using ME3ExplorerCore.GameFilesystem;
 using Serilog;
 
 namespace ALOTInstallerCore.Helpers
@@ -28,7 +29,7 @@ namespace ALOTInstallerCore.Helpers
 
             //get toc target folders, ensuring we clean up the inputs a bit.
             string baseDir = Path.GetFullPath(Path.Combine(target.TargetPath, @"BIOGame"));
-            string dlcDirRoot = MEDirectories.DLCPath(target);
+            string dlcDirRoot = M3Directories.GetDLCPath(target);
             if (!Directory.Exists(dlcDirRoot))
             {
                 Log.Error(@"[AICORE] Specified game directory does not appear to be a Mass Effect 3 root game directory (DLC folder missing).");

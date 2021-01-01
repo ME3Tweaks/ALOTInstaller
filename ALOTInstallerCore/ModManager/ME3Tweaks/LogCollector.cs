@@ -8,12 +8,14 @@ using System.Linq;
 using System.Management;
 using System.Text;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.gamefileformats;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Packages;
+using ALOTInstallerCore.ModManager.asi;
+using ME3ExplorerCore.Helpers;
 #if WINDOWS
 using AuthenticodeExaminer;
 using Microsoft.Win32;
@@ -138,6 +140,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             //    \_\/\ \
             //      \_\/
 
+            bool hasMEM = true; // This is to keep code parity with M3
+
             Log.Information($@"[AICORE] Beginning diagnostics for {selectedDiagnosticTarget.Game.ToGameName()}");
             Log.Information($@"[AICORE] Full textures check: {textureCheck}");
 
@@ -239,17 +243,17 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 progressIndeterminateCallback?.Invoke();
 
                 #region Game Information
+                Log.Information($@"[AICORE] Collecting basic game information");
 
                 updateStatusCallback?.Invoke("Collecting game information");
-                Log.Information($@"[AICORE] Collecting game information");
-
                 addDiagLine(@"Basic game information", Severity.DIAGSECTION);
                 addDiagLine($@"Game is installed at {gamePath}");
 
+                Log.Information(@"[AICORE] Reloading target for most up to date information");
                 selectedDiagnosticTarget.ReloadGameTarget(false); //reload vars
                 TextureModInstallationInfo avi = selectedDiagnosticTarget.GetInstalledALOTInfo();
 
-                string exePath = MEDirectories.ExecutablePath(selectedDiagnosticTarget);
+                string exePath = M3Directories.GetExecutablePath(selectedDiagnosticTarget);
                 if (File.Exists(exePath))
                 {
 #if WINDOWS
@@ -306,18 +310,18 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (selectedDiagnosticTarget.Game == MEGame.ME1)
                     {
                         Log.Information(@"[AICORE] Getting additional ME1 executable information");
-                        var exeInfo = ME1ExecutableInfo.GetExecutableInfo(MEDirectories.ExecutablePath(selectedDiagnosticTarget), false);
+                        var exeInfo = ME1ExecutableInfo.GetExecutableInfo(M3Directories.GetExecutablePath(selectedDiagnosticTarget), false);
                         if (avi != null)
                         {
-                            addDiagLine($"Large Address Aware: {exeInfo.HasLAAApplied}", exeInfo.HasLAAApplied ? Severity.GOOD : Severity.FATAL);
-                            addDiagLine($"No-admin patched: {exeInfo.HasLAAApplied}", exeInfo.HasProductNameChanged ? Severity.GOOD : Severity.WARN);
-                            addDiagLine($"enableLocalPhysXCore patched: {exeInfo.HasPhysXCoreChanged}", exeInfo.HasLAAApplied ? Severity.GOOD : Severity.WARN);
+                            addDiagLine($@"Large Address Aware: {exeInfo.HasLAAApplied}", exeInfo.HasLAAApplied ? Severity.GOOD : Severity.FATAL);
+                            addDiagLine($@"No-admin patched: {exeInfo.HasLAAApplied}", exeInfo.HasProductNameChanged ? Severity.GOOD : Severity.WARN);
+                            addDiagLine($@"enableLocalPhysXCore patched: {exeInfo.HasPhysXCoreChanged}", exeInfo.HasLAAApplied ? Severity.GOOD : Severity.WARN);
                         }
                         else
                         {
-                            addDiagLine($"Large Address Aware: {exeInfo.HasLAAApplied}");
-                            addDiagLine($"No-admin patched: {exeInfo.HasLAAApplied}");
-                            addDiagLine($"enableLocalPhysXCore patched: {exeInfo.HasLAAApplied}");
+                            addDiagLine($@"Large Address Aware: {exeInfo.HasLAAApplied}");
+                            addDiagLine($@"No-admin patched: {exeInfo.HasLAAApplied}");
+                            addDiagLine($@"enableLocalPhysXCore patched: {exeInfo.HasLAAApplied}");
                         }
                     }
 
@@ -371,7 +375,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     if (selectedDiagnosticTarget.Game == MEGame.ME1)
                     {
                         // Check for patched PhysX
-                        if (LegacyPhysXInstaller.IsPhysXLoaderPatchedLocalOnly(selectedDiagnosticTarget))
+                        if (ME1PhysXTools.IsPhysXLoaderPatchedLocalOnly(selectedDiagnosticTarget))
                         {
                             addDiagLine(@"PhysXLoader.dll is patched to force local PhysXCore.dll", Severity.GOOD);
                         }
@@ -411,6 +415,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #endregion
 
                 #region System Information
+
                 Log.Information(@"[AICORE] Collecting system information");
                 updateStatusCallback?.Invoke("Collecting system information");
 
@@ -428,6 +433,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     addDiagLine(@"This operating system is not supported", Severity.FATAL);
                     addDiagLine(@"Upgrade to a supported operating system if you want support", Severity.FATAL);
                 }
+
                 addDiagLine(verLine, os.Version < ALOTInstallerCoreLib.MIN_SUPPORTED_WINDOWS_OS ? Severity.ERROR : Severity.INFO);
 #endif
 
@@ -436,7 +442,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 addDiagLine();
                 addDiagLine(@"System Memory", Severity.BOLD);
                 long ramInBytes = (long)computerInfo.TotalPhysicalMemory;
-                addDiagLine(@"Total memory available: " + FileSizeFormatter.FormatSize(ramInBytes));
+                addDiagLine($@"Total memory available: {FileSize.FormatSize(ramInBytes)}");
 #if WINDOWS
                 addDiagLine(@"Processors", Severity.BOLD);
                 addDiagLine(GetProcessorInformationForDiag());
@@ -477,19 +483,21 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     string displayVal = null;
                     if (returnvalue is long size && size != 0)
                     {
-                        displayVal = FileSizeFormatter.FormatSize(size);
+                        displayVal = FileSize.FormatSize(size);
                     }
                     else
                     {
                         try
                         {
                             UInt32 wmiValue = (UInt32)obj[@"AdapterRam"];
-                            displayVal = FileSizeFormatter.FormatSize(wmiValue);
-                            // May need to uncomment this later. WMI sometimes returns 4GB when actual value is bigger
-                            //if (numBytes.MebiBytes == 4095)
-                            //{
-                            //    displayVal += @" (possibly more, variable is 32-bit unsigned)";
-                            //}
+                            var numBytes = (long)wmiValue;
+
+                            // TODO: UPDATE THIS FOR FILESIZE. NEEDS TESTING
+                            displayVal = FileSize.FormatSize(numBytes);
+                            if (numBytes == uint.MaxValue)
+                            {
+                                displayVal += @" (possibly more, variable is 32-bit unsigned)";
+                            }
                         }
                         catch (Exception)
                         {
@@ -507,6 +515,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 #endregion
 
                 #region Texture mod information
+
                 Log.Information(@"[AICORE] Getting texture mod installation info");
                 updateStatusCallback?.Invoke(@"Getting texture mod installation info");
                 addDiagLine(@"Current texture mod information", Severity.DIAGSECTION);
@@ -565,6 +574,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         {
                             addDiagLine("Texture install", Severity.BOLDBLUE);
                         }
+
                         addDiagLine($@"Marker version {tmii.MarkerExtendedVersion}");
                         addDiagLine(tmii.ToString());
                         if (tmii.MarkerExtendedVersion >= 3 && !string.IsNullOrWhiteSpace(tmii.InstallerVersionFullName))
@@ -586,15 +596,16 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                                 var modStr = @" - ";
                                 if (fi.ModType == TextureModInstallationInfo.InstalledTextureMod.InstalledTextureModType.USERFILE)
                                 {
-                                    modStr += "[USERFILE] ";
+                                    modStr += @"[USERFILE] ";
                                 }
+
                                 modStr += fi.ModName;
-                                if (string.IsNullOrWhiteSpace(fi.AuthorName))
+                                if (!string.IsNullOrWhiteSpace(fi.AuthorName))
                                 {
-                                    modStr += $" by {fi.AuthorName}";
+                                    modStr += $@" by {fi.AuthorName}";
                                 }
-                                
-                                addDiagLine(modStr,  fi.ModType == TextureModInstallationInfo.InstalledTextureMod.InstalledTextureModType.USERFILE ? Severity.WARN : Severity.GOOD);
+
+                                addDiagLine(modStr, fi.ModType == TextureModInstallationInfo.InstalledTextureMod.InstalledTextureModType.USERFILE ? Severity.WARN : Severity.GOOD);
                                 if (fi.ChosenOptions.Any())
                                 {
                                     addDiagLine(@"   Chosen options for install:");
@@ -612,9 +623,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 #endregion
 
-
-
                 #region Basegame file changes
+
                 Log.Information(@"[AICORE] Getting basegame file modifications");
                 addDiagLine(@"Basegame changes", Severity.DIAGSECTION);
 
@@ -636,28 +646,37 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 {
                     if (!selectedDiagnosticTarget.TextureModded)
                     {
-                        addDiagLine(@"The following basegame files have been modified:");
-                        var cookedPath = MEDirectories.CookedPath(selectedDiagnosticTarget);
-                        var markerPath = MEDirectories.ALOTMarkerPath(selectedDiagnosticTarget);
+                        var modifiedBGFiles = new List<string>();
+                        var cookedPath = M3Directories.GetCookedPath(selectedDiagnosticTarget);
+                        var markerPath = M3Directories.GetTextureMarkerPath(selectedDiagnosticTarget);
                         foreach (var mf in modifiedFiles)
                         {
                             if (mf.StartsWith(cookedPath, StringComparison.InvariantCultureIgnoreCase))
                             {
-                                if (mf.Equals(markerPath, StringComparison.InvariantCultureIgnoreCase))
-                                    continue; //don't report this file
-
-                                // BGFIS is not in this library... I think? Might make callout for it
-                                //var info = BasegameFileIdentificationService.GetBasegameFileSource(
-                                //    selectedDiagnosticTarget, mf); //todo: Handle this somehow
-                                //if (info != null)
-                                //{
-                                //    addDiagLine($@" - {mf.Substring(cookedPath.Length + 1)} - {info.source}");
-                                //}
-                                //else
-                                //{
-                                addDiagLine($@" - {mf.Substring(cookedPath.Length + 1)}");
-                                //}
+                                if (mf.Equals(markerPath, StringComparison.InvariantCultureIgnoreCase)) continue; //don't report this file
+                                var info = BasegameFileIdentificationService.GetBasegameFileSource(selectedDiagnosticTarget, mf);
+                                if (info != null)
+                                {
+                                    modifiedBGFiles.Add($@" - {mf.Substring(cookedPath.Length + 1)} - {info.source}");
+                                }
+                                else
+                                {
+                                    modifiedBGFiles.Add($@" - {mf.Substring(cookedPath.Length + 1)}");
+                                }
                             }
+                        }
+
+                        if (modifiedBGFiles.Any())
+                        {
+                            addDiagLine(@"The following basegame files have been modified:");
+                            foreach (var mbgf in modifiedBGFiles)
+                            {
+                                addDiagLine(mbgf);
+                            }
+                        }
+                        else
+                        {
+                            addDiagLine(@"No modified basegame files were found");
                         }
                     }
                     else
@@ -671,20 +690,23 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 #region Blacklisted mods check
 
-                void memExceptionOccured(string operation, string line)
+                if (hasMEM)
                 {
-                    addDiagLine($@"An exception occurred performing operation '{operation}': {line}",
-                        Severity.ERROR);
-                    addDiagLine(@"Check the Mod Manager application log for more information.", Severity.ERROR);
-                    addDiagLine(@"Report this to ALOT or ME3Tweaks Discord for further assistance.",
-                        Severity.ERROR);
-                }
+                    Log.Information(@"[AICORE] Checking for blacklisted mods");
 
-                Log.Information(@"[AICORE] Checking for blacklisted mods");
-                updateStatusCallback?.Invoke(@"Checking for blacklisted mods");
-                args = $@"--detect-bad-mods --gameid {gameID} --ipc";
-                var blacklistedMods = new List<string>();
-                MEMIPCHandler.RunMEMIPCUntilExit(args, i => exitcode = i, (string command, string param) =>
+                    void memExceptionOccured(string operation, string line)
+                    {
+                        addDiagLine($@"An exception occurred performing operation '{operation}': {line}",
+                            Severity.ERROR);
+                        addDiagLine(@"Check the Mod Manager application log for more information.", Severity.ERROR);
+                        addDiagLine(@"Report this to ALOT or ME3Tweaks Discord for further assistance.",
+                            Severity.ERROR);
+                    }
+
+                    updateStatusCallback?.Invoke(@"Checking for blacklisted mods");
+                    args = $@"--detect-bad-mods --gameid {gameID} --ipc";
+                    var blacklistedMods = new List<string>();
+                    MEMIPCHandler.RunMEMIPCUntilExit(args, ipcCallback: (string command, string param) =>
                     {
                         switch (command)
                         {
@@ -701,157 +723,165 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 if (exitcode != 0)
                 {
                     addDiagLine(
-                        $"MassEffectModderNoGui exited exited incompatible mod detection check with code {exitcode}",
+                        $@"MassEffectModderNoGui exited exited incompatible mod detection check with code {exitcode}",
                         Severity.ERROR);
                 }
 
-                if (blacklistedMods.Any())
-                {
-                    addDiagLine(@"The following blacklisted mods were found:", Severity.ERROR);
-                    foreach (var str in blacklistedMods)
+                    if (blacklistedMods.Any())
                     {
-                        addDiagLine(@" - " + str);
-                    }
-
-                    addDiagLine(
-                        @"These mods have been blacklisted by modding tools because of known issues they cause. Do not use these mods",
-                        Severity.ERROR);
-                }
-                else
-                {
-                    addDiagLine(@"No blacklisted mods were found installed");
-                }
-
-
-                #endregion
-
-                #region Installed DLCs
-
-                //Get DLCs
-                Log.Information(@"[AICORE] Getting DLC information");
-
-                updateStatusCallback?.Invoke("Collecting DLC information");
-
-                var installedDLCs = MEDirectories.GetMetaMappedInstalledDLC(selectedDiagnosticTarget);
-
-                addDiagLine(@"Installed DLC", Severity.DIAGSECTION);
-                addDiagLine(@"The following DLC is installed:");
-
-                bool metadataPresent = false;
-                bool hasUIMod = false;
-                bool compatPatchInstalled = false;
-                bool hasNonUIDLCMod = false;
-                Dictionary<int, string> priorities = new Dictionary<int, string>();
-                var officialDLC = MEDirectories.OfficialDLC(selectedDiagnosticTarget.Game);
-                foreach (var dlc in installedDLCs)
-                {
-                    string dlctext = dlc.Key;
-                    if (!officialDLC.Contains(dlc.Key, StringComparer.InvariantCultureIgnoreCase))
-                    {
-                        dlctext += @";;";
-                        if (dlc.Value != null)
+                        addDiagLine(@"The following blacklisted mods were found:", Severity.ERROR);
+                        foreach (var str in blacklistedMods)
                         {
-                            if (int.TryParse(dlc.Value.InstalledBy, out var _))
-                            {
-                                dlctext += @"Installed by Mod Manager Build " + dlc.Value.InstalledBy;
-                            }
-                            else
-                            {
-                                dlctext += @"Installed by " + dlc.Value.InstalledBy;
-                            }
-
-                            if (dlc.Value.Version != null)
-                            {
-                                dlctext += @";;" + dlc.Value.Version;
-                            }
+                            addDiagLine(@" - " + str);
                         }
-                        else
-                        {
-                            dlctext += @"Not installed by managed installer";
-                        }
-                    }
 
-                    addDiagLine(dlctext,
-                        officialDLC.Contains(dlc.Key, StringComparer.InvariantCultureIgnoreCase)
-                            ? Severity.OFFICIALDLC
-                            : Severity.DLC);
-                }
-
-                Log.Information(@"[AICORE] Calculating supercedances");
-
-                var supercedanceList = MEDirectories.GetFileSupercedances(selectedDiagnosticTarget)
-                    .Where(x => x.Value.Count > 1).ToList();
-                if (supercedanceList.Any())
-                {
-                    addDiagLine();
-                    addDiagLine(@"Superceding files", Severity.BOLD);
-                    addDiagLine(
-                        @"The following mod files supercede others due to same-named files. This may mean the mods are incompatible, or that these files are compatilibity patches. This information is for developer use only - DO NOT MODIFY YOUR GAME DIRECTORY MANUALLY.");
-
-                    bool isFirst = true;
-                    addDiagLine(@"Click to view list", Severity.SUB);
-                    foreach (var sl in supercedanceList)
-                    {
-                        if (isFirst)
-                            isFirst = false;
-                        else
-                            addDiagLine();
-
-                        addDiagLine(sl.Key);
-                        foreach (var dlc in sl.Value)
-                        {
-                            addDiagLine(dlc, Severity.TPMI);
-                        }
-                    }
-
-                    addDiagLine(@"[/SUB]");
-                }
-
-                #endregion
-
-                #region Get list of TFCs
-
-                if (selectedDiagnosticTarget.Game > MEGame.ME1)
-                {
-                    Log.Information(@"[AICORE] Getting list of TFCs");
-                    updateStatusCallback?.Invoke("Collecting TFC file information");
-
-                    addDiagLine(@"Texture File Cache (TFC) files", Severity.DIAGSECTION);
-                    addDiagLine(@"The following TFC files are present in the game directory.");
-                    var bgPath = MEDirectories.BioGamePath(selectedDiagnosticTarget);
-                    string[] tfcFiles = Directory.GetFiles(bgPath, @"*.tfc", SearchOption.AllDirectories);
-                    if (tfcFiles.Any())
-                    {
-                        foreach (string tfc in tfcFiles)
-                        {
-                            FileInfo fi = new FileInfo(tfc);
-                            long tfcSize = fi.Length;
-                            string tfcPath = tfc.Substring(bgPath.Length + 1);
-                            addDiagLine(
-                                $@" - {tfcPath}, {FileSizeFormatter.FormatSize(tfcSize)}"); //do not localize
-                        }
+                        addDiagLine(
+                            @"These mods have been blacklisted by modding tools because of known issues they cause. Do not use these mods",
+                            Severity.ERROR);
                     }
                     else
                     {
-                        addDiagLine(@"No TFC files were found - is this installation broken?", Severity.ERROR);
+                        addDiagLine(@"No blacklisted mods were found installed");
                     }
-                }
 
-                #endregion
+                    #endregion
 
-                #region Files added or removed after texture install
+                    #region Installed DLCs
+                    Log.Information(@"[AICORE] Getting DLC information");
 
-                args = $@"--check-game-data-mismatch --gameid {gameID} --ipc";
-                if (selectedDiagnosticTarget.TextureModded)
-                {
-                    // Is this correct on linux?
-                    Log.Information(@"[AICORE] Checking texture map is in sync with game state");
+                    //Get DLCs
+                    updateStatusCallback?.Invoke("Collecting DLC information");
 
-                    bool textureMapFileExists =
-                        File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
-                                    $@"\MassEffectModder\me{gameID}map.bin");
-                    addDiagLine(@"Files added or removed after texture mods were installed",
-                        Severity.DIAGSECTION);
+                    var installedDLCs = M3Directories.GetMetaMappedInstalledDLC(selectedDiagnosticTarget);
+
+                    addDiagLine(@"Installed DLC", Severity.DIAGSECTION);
+                    addDiagLine(@"The following DLC is installed:");
+
+                    var officialDLC = MEDirectories.OfficialDLC(selectedDiagnosticTarget.Game);
+                    foreach (var dlc in installedDLCs)
+                    {
+                        string dlctext = dlc.Key;
+                        if (!officialDLC.Contains(dlc.Key, StringComparer.InvariantCultureIgnoreCase))
+                        {
+                            dlctext += @";;";
+                            if (dlc.Value != null)
+                            {
+                                if (int.TryParse(dlc.Value.InstalledBy, out var _))
+                                {
+                                    dlctext += @"Installed by Mod Manager Build " + dlc.Value.InstalledBy;
+                                }
+                                else
+                                {
+                                    dlctext += @"Installed by " + dlc.Value.InstalledBy;
+                                }
+
+                                if (dlc.Value.Version != null)
+                                {
+                                    dlctext += @";;" + dlc.Value.Version;
+                                }
+                            }
+                            else
+                            {
+                                dlctext += @"Not installed by managed installer";
+                            }
+                        }
+
+                        var isOfficialDLC = officialDLC.Contains(dlc.Key, StringComparer.InvariantCultureIgnoreCase);
+                        addDiagLine(dlctext, isOfficialDLC ? Severity.OFFICIALDLC : Severity.DLC);
+
+                        if (!isOfficialDLC)
+                        {
+                            if (dlc.Value != null && dlc.Value.OptionsSelectedAtInstallTime.Any())
+                            {
+                                // Print options
+                                addDiagLine(@"   > The following options were chosen at install time:");
+                                foreach (var o in dlc.Value.OptionsSelectedAtInstallTime)
+                                {
+                                    addDiagLine(($@"     > {o}"));
+                                }
+                            }
+                        }
+                    }
+
+                    if (installedDLCs.Any())
+                    {
+                        SeeIfIncompatibleDLCIsInstalled(selectedDiagnosticTarget, addDiagLine);
+                    }
+
+                    Log.Information(@"[AICORE] Calculating supercedances");
+
+                    var supercedanceList = M3Directories.GetFileSupercedances(selectedDiagnosticTarget).Where(x => x.Value.Count > 1).ToList();
+                    if (supercedanceList.Any())
+                    {
+                        addDiagLine();
+                        addDiagLine(@"Superceding files", Severity.BOLD);
+                        addDiagLine(
+                            @"The following mod files supercede others due to same-named files. This may mean the mods are incompatible, or that these files are compatilibity patches. This information is for developer use only - DO NOT MODIFY YOUR GAME DIRECTORY MANUALLY.");
+
+                        bool isFirst = true;
+                        addDiagLine(@"Click to view list", Severity.SUB);
+                        foreach (var sl in supercedanceList)
+                        {
+                            if (isFirst)
+                                isFirst = false;
+                            else
+                                addDiagLine();
+
+                            addDiagLine(sl.Key);
+                            foreach (var dlc in sl.Value)
+                            {
+                                addDiagLine(dlc, Severity.TPMI);
+                            }
+                        }
+
+                        addDiagLine(@"[/SUB]");
+                    }
+
+                    #endregion
+
+                    #region Get list of TFCs
+
+                    if (selectedDiagnosticTarget.Game > MEGame.ME1)
+                    {
+                        Log.Information(@"[AICORE] Getting list of TFCs");
+                        updateStatusCallback?.Invoke("Collecting TFC file information");
+
+                        addDiagLine(@"Texture File Cache (TFC) files", Severity.DIAGSECTION);
+                        addDiagLine(@"The following TFC files are present in the game directory.");
+                        var bgPath = M3Directories.GetBioGamePath(selectedDiagnosticTarget);
+                        string[] tfcFiles = Directory.GetFiles(bgPath, @"*.tfc", SearchOption.AllDirectories);
+                        if (tfcFiles.Any())
+                        {
+                            foreach (string tfc in tfcFiles)
+                            {
+                                FileInfo fi = new FileInfo(tfc);
+                                long tfcSize = fi.Length;
+                                string tfcPath = tfc.Substring(bgPath.Length + 1);
+                                addDiagLine($@" - {tfcPath}, {FileSize.FormatSize(tfcSize)}"); //do not localize
+                            }
+                        }
+                        else
+                        {
+                            addDiagLine(@"No TFC files were found - is this installation broken?", Severity.ERROR);
+                        }
+                    }
+
+                    #endregion
+
+                    #region Files added or removed after texture install
+                    Log.Information(@"[AICORE] Finding files that have been added/replaced/removed after textures were installed");
+
+                    args = $@"--check-game-data-mismatch --gameid {gameID} --ipc";
+                    if (selectedDiagnosticTarget.TextureModded)
+                    {
+                        // Is this correct on linux?
+                        Log.Information(@"[AICORE] Checking texture map is in sync with game state");
+
+                        bool textureMapFileExists =
+                            File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +
+                                        $@"\MassEffectModder\me{gameID}map.bin");
+                        addDiagLine(@"Files added or removed after texture mods were installed",
+                            Severity.DIAGSECTION);
 
                     if (textureMapFileExists)
                     {
@@ -893,140 +923,140 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                                 Severity.ERROR);
                         }
 
-                        if (removedFiles.Any())
-                        {
-                            addDiagLine(
-                                @"The following problems were detected checking game consistency with the texture map file:",
-                                Severity.ERROR);
-                            foreach (var error in removedFiles)
+                            if (removedFiles.Any())
                             {
-                                addDiagLine(@" - " + error, Severity.ERROR);
+                                addDiagLine(
+                                    @"The following problems were detected checking game consistency with the texture map file:",
+                                    Severity.ERROR);
+                                foreach (var error in removedFiles)
+                                {
+                                    addDiagLine(@" - " + error, Severity.ERROR);
+                                }
                             }
-                        }
 
-                        if (addedFiles.Any())
-                        {
-                            addDiagLine(@"The following files were added after textures were installed:",
-                                Severity.ERROR);
-                            foreach (var error in addedFiles)
+                            if (addedFiles.Any())
                             {
-                                addDiagLine(@" - " + error, Severity.ERROR);
+                                addDiagLine(@"The following files were added after textures were installed:",
+                                    Severity.ERROR);
+                                foreach (var error in addedFiles)
+                                {
+                                    addDiagLine(@" - " + error, Severity.ERROR);
+                                }
                             }
-                        }
 
-                        if (replacedFiles.Any())
-                        {
-                            addDiagLine(@"The following files were replaced after textures were installed:",
-                                Severity.ERROR);
-                            foreach (var error in replacedFiles)
+                            if (replacedFiles.Any())
                             {
-                                addDiagLine(@" - " + error, Severity.ERROR);
+                                addDiagLine(@"The following files were replaced after textures were installed:",
+                                    Severity.ERROR);
+                                foreach (var error in replacedFiles)
+                                {
+                                    addDiagLine(@" - " + error, Severity.ERROR);
+                                }
                             }
-                        }
 
-                        if (replacedFiles.Any() || addedFiles.Any() || removedFiles.Any())
-                        {
-                            addDiagLine(
-                                @"Diagnostic detected that some files were added, removed or replaced after textures were installed.",
-                                Severity.ERROR);
-                            addDiagLine(
-                                @"Package files cannot be installed after a texture mod is installed - the texture pointers will be wrong.",
-                                Severity.ERROR);
+                            if (replacedFiles.Any() || addedFiles.Any() || removedFiles.Any())
+                            {
+                                addDiagLine(
+                                    @"Diagnostic detected that some files were added, removed or replaced after textures were installed.",
+                                    Severity.ERROR);
+                                addDiagLine(
+                                    @"Package files cannot be installed after a texture mod is installed - the texture pointers will be wrong.",
+                                    Severity.ERROR);
+                            }
+                            else
+                            {
+                                addDiagLine(
+                                    @"Diagnostic reports no files appear to have been added or removed since texture scan took place.");
+                            }
+
                         }
                         else
                         {
                             addDiagLine(
-                                @"Diagnostic reports no files appear to have been added or removed since texture scan took place.");
+                                $@"Texture map file is missing: {selectedDiagnosticTarget.Game.ToString().ToLower()}map.bin - was game migrated to new system or are you M3 on a different user account?");
                         }
-
                     }
-                    else
+
+                    #endregion
+
+                    #region Textures - full check
+
+                    //FULL CHECK
+                    if (textureCheck)
                     {
-                        addDiagLine(
-                            $@"Texture map file is missing: {selectedDiagnosticTarget.Game.ToString().ToLower()}map.bin - was game migrated to new system or are you M3 on a different user account?");
-                    }
-                }
+                        Log.Information(@"[AICORE] Performing full textures check. This will take some time");
 
-                #endregion
+                        var param = 0;
+                        updateStatusCallback?.Invoke("Running full textures check 0%");
+                        addDiagLine(@"Full Textures Check", Severity.DIAGSECTION);
+                        args = $@"--check-game-data-textures --gameid {gameID} --ipc";
+                        var emptyMipsNotRemoved = new List<string>();
+                        var badTFCReferences = new List<string>();
+                        var scanErrors = new List<string>();
+                        string lastMissingTFC = null;
+                        updateProgressCallback?.Invoke(0);
 
-                #region Textures - full check
-
-                //FULL CHECK
-                if (textureCheck)
-                {
-                    Log.Information(@"[AICORE] Performing full textures check. This will take some time");
-
-                    var param = 0;
-                    updateStatusCallback?.Invoke("Running full textures check 0%");
-                    addDiagLine(@"Full Textures Check", Severity.DIAGSECTION);
-                    args = $@"--check-game-data-textures --gameid {gameID} --ipc";
-                    var emptyMipsNotRemoved = new List<string>();
-                    var badTFCReferences = new List<string>();
-                    var scanErrors = new List<string>();
-                    string lastMissingTFC = null;
-                    updateProgressCallback?.Invoke(0);
-
-                    void handleIPC(string command, string param)
-                    {
-                        switch (command)
+                        void handleIPC(string command, string param)
                         {
-                            case @"ERROR_MIPMAPS_NOT_REMOVED":
-                                if (selectedDiagnosticTarget.TextureModded)
-                                {
-                                    //only matters when game is texture modded
-                                    emptyMipsNotRemoved.Add(param);
-                                }
-
-                                break;
-                            case @"TASK_PROGRESS":
-                                if (int.TryParse(param, out var progress))
-                                {
-                                    updateProgressCallback?.Invoke(progress);
-                                }
-
-                                updateStatusCallback?.Invoke($"Performing full textures check {param}%");
-                                break;
-                            case @"PROCESSING_FILE":
-                                //Don't think there's anything to do with this right now
-                                break;
-                            case @"ERROR_REFERENCED_TFC_NOT_FOUND":
-                                //badTFCReferences.Add(param);
-                                lastMissingTFC = param;
-                                break;
-                            case @"ERROR_TEXTURE_SCAN_DIAGNOSTIC":
-                                if (lastMissingTFC != null)
-                                {
-                                    if (lastMissingTFC.StartsWith(@"Textures_"))
+                            switch (command)
+                            {
+                                case @"ERROR_MIPMAPS_NOT_REMOVED":
+                                    if (selectedDiagnosticTarget.TextureModded)
                                     {
-                                        var foldername = Path.GetFileNameWithoutExtension(lastMissingTFC)
-                                            .Substring(@"Textures_".Length);
-                                        if (MEDirectories.OfficialDLC(selectedDiagnosticTarget.Game)
-                                            .Contains(foldername))
-                                        {
-                                            break; //dlc is packed still
-                                        }
+                                        //only matters when game is texture modded
+                                        emptyMipsNotRemoved.Add(param);
                                     }
 
-                                    badTFCReferences.Add(lastMissingTFC + @", " + param);
-                                }
-                                else
-                                {
-                                    scanErrors.Add(param);
-                                }
+                                    break;
+                                case @"TASK_PROGRESS":
+                                    if (int.TryParse(param, out var progress))
+                                    {
+                                        updateProgressCallback?.Invoke(progress);
+                                    }
 
-                                lastMissingTFC = null; //reset
-                                break;
-                            default:
-                                Debug.WriteLine($@"{command} {param}");
-                                break;
+                                    updateStatusCallback?.Invoke($"Performing full textures check {param}%");
+                                    break;
+                                case @"PROCESSING_FILE":
+                                    //Don't think there's anything to do with this right now
+                                    break;
+                                case @"ERROR_REFERENCED_TFC_NOT_FOUND":
+                                    //badTFCReferences.Add(param);
+                                    lastMissingTFC = param;
+                                    break;
+                                case @"ERROR_TEXTURE_SCAN_DIAGNOSTIC":
+                                    if (lastMissingTFC != null)
+                                    {
+                                        if (lastMissingTFC.StartsWith(@"Textures_"))
+                                        {
+                                            var foldername = Path.GetFileNameWithoutExtension(lastMissingTFC)
+                                                .Substring(@"Textures_".Length);
+                                            if (MEDirectories.OfficialDLC(selectedDiagnosticTarget.Game)
+                                                .Contains(foldername))
+                                            {
+                                                break; //dlc is packed still
+                                            }
+                                        }
+
+                                        badTFCReferences.Add(lastMissingTFC + @", " + param);
+                                    }
+                                    else
+                                    {
+                                        scanErrors.Add(param);
+                                    }
+
+                                    lastMissingTFC = null; //reset
+                                    break;
+                                default:
+                                    Debug.WriteLine($@"{command} {param}");
+                                    break;
+                            }
                         }
-                    }
 
-                    string memCrashText = null;
-                    MEMIPCHandler.RunMEMIPCUntilExit(args,
-                        ipcCallback: handleIPC,
-                        applicationExited: x => exitcode = x,
-                        setMEMCrashLog: x => memCrashText = x
+                        string memCrashText = null;
+                        MEMIPCHandler.RunMEMIPCUntilExit(args,
+                            ipcCallback: handleIPC,
+                            applicationExited: x => exitcode = x,
+                            setMEMCrashLog: x => memCrashText = x
                         );
 
                     if (exitcode != 0)
@@ -1034,28 +1064,28 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         addDiagLine($@"MassEffectModderNoGui exited full textures check with code {exitcode}", Severity.ERROR);
                     };
 
-                    if (emptyMipsNotRemoved.Any() || badTFCReferences.Any() || scanErrors.Any())
-                    {
-                        addDiagLine(@"Texture check reported errors", Severity.ERROR);
-                        if (emptyMipsNotRemoved.Any())
+                        if (emptyMipsNotRemoved.Any() || badTFCReferences.Any() || scanErrors.Any())
                         {
-                            addDiagLine();
-                            addDiagLine(@"The following textures contain empty mips, which typically means files were installed after texture mods were installed.:", Severity.ERROR);
-                            foreach (var em in emptyMipsNotRemoved)
+                            addDiagLine(@"Texture check reported errors", Severity.ERROR);
+                            if (emptyMipsNotRemoved.Any())
                             {
-                                addDiagLine(@" - " + em, Severity.ERROR);
+                                addDiagLine();
+                                addDiagLine(@"The following textures contain empty mips, which typically means files were installed after texture mods were installed.:", Severity.ERROR);
+                                foreach (var em in emptyMipsNotRemoved)
+                                {
+                                    addDiagLine(@" - " + em, Severity.ERROR);
+                                }
                             }
-                        }
 
-                        if (badTFCReferences.Any())
-                        {
-                            addDiagLine();
-                            addDiagLine(@"The following textures have bad TFC references, which means the mods were built wrong, dependent DLC is missing, or the mod was installed wrong:", Severity.ERROR);
-                            foreach (var br in badTFCReferences)
+                            if (badTFCReferences.Any())
                             {
-                                addDiagLine(@" - " + br, Severity.ERROR);
+                                addDiagLine();
+                                addDiagLine(@"The following textures have bad TFC references, which means the mods were built wrong, dependent DLC is missing, or the mod was installed wrong:", Severity.ERROR);
+                                foreach (var br in badTFCReferences)
+                                {
+                                    addDiagLine(@" - " + br, Severity.ERROR);
+                                }
                             }
-                        }
 
                         if (scanErrors.Any())
                         {
@@ -1078,29 +1108,42 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                     else
 
-                    {
-                        // Is this right?? We skipped check. We can't just print this
-                        addDiagLine(@"Texture check did not find any texture issues in this installation");
+                        {
+                            // Is this right?? We skipped check. We can't just print this
+                            addDiagLine(@"Texture check did not find any texture issues in this installation");
+                        }
+
                     }
 
-                }
+                    #endregion
 
-                #endregion
+                    progressIndeterminateCallback?.Invoke();
 
-                progressIndeterminateCallback?.Invoke();
+                    #region Texture LODs
 
-                #region Texture LODs
-
-                Log.Information(@"[AICORE] Collecting LOD info");
-                updateStatusCallback?.Invoke(@"Collecting LOD settings");
-                var lods = MEMIPCHandler.GetLODs(selectedDiagnosticTarget.Game);
-                if (lods != null)
-                {
-                    addLODStatusToDiag(selectedDiagnosticTarget, lods, addDiagLine);
+                    Log.Information(@"[AICORE] Collecting LOD info");
+                    updateStatusCallback?.Invoke(@"Collecting LOD settings");
+                    var lods = MEMIPCHandler.GetLODs(selectedDiagnosticTarget.Game);
+                    if (lods != null)
+                    {
+                        addLODStatusToDiag(selectedDiagnosticTarget, lods, addDiagLine);
+                    }
+                    else
+                    {
+                        addDiagLine($@"MassEffectModderNoGui exited --print-lods with error. See application log for more info.", Severity.ERROR);
+                    }
                 }
                 else
                 {
-                    addDiagLine(@"MassEffectModderNoGui exited --print-lods with error. See application log for more info.", Severity.ERROR);
+                    Log.Warning(@"MEM not available. Multiple collections were skipped");
+
+                    addDiagLine(@"Texture checks skipped", Severity.DIAGSECTION);
+                    addDiagLine(@"Mass Effect Modder No Gui was not available for use when this diagnostic was run.", Severity.WARN);
+                    addDiagLine(@"The following checks were skipped:", Severity.WARN);
+                    addDiagLine(@" - Files added or removed after texture install", Severity.WARN);
+                    addDiagLine(@" - Blacklisted mods check", Severity.WARN);
+                    addDiagLine(@" - Textures check", Severity.WARN);
+                    addDiagLine(@" - Texture LODs check", Severity.WARN);
                 }
 
                 #endregion
@@ -1110,7 +1153,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                 updateStatusCallback?.Invoke("Collecting ASI information");
 
-                string asidir = MEDirectories.ASIPath(selectedDiagnosticTarget);
+                string asidir = M3Directories.GetASIPath(selectedDiagnosticTarget);
                 addDiagLine(@"Installed ASI mods", Severity.DIAGSECTION);
                 if (Directory.Exists(asidir))
                 {
@@ -1122,14 +1165,43 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                     else
                     {
-                        foreach (string f in files)
+                        var installedASIs = selectedDiagnosticTarget.GetInstalledASIs();
+                        var nonUniqueItems = installedASIs.OfType<KnownInstalledASIMod>().SelectMany(
+                            x => installedASIs.OfType<KnownInstalledASIMod>().Where(
+                                y => x != y
+                                     && x.AssociatedManifestItem.OwningMod ==
+                                     y.AssociatedManifestItem.OwningMod)
+                            ).Distinct().ToList();
+
+                        foreach (var knownAsiMod in installedASIs.OfType<KnownInstalledASIMod>().Except(nonUniqueItems))
                         {
-                            addDiagLine(@" - " + Path.GetFileName(f));
+                            var str = $@" - {knownAsiMod.AssociatedManifestItem.Name} v{knownAsiMod.AssociatedManifestItem.Version} ({Path.GetFileName(knownAsiMod.InstalledPath)})";
+                            if (knownAsiMod.Outdated)
+                            {
+                                str += @" - Outdated";
+                            }
+                            addDiagLine(str, knownAsiMod.Outdated ? Severity.WARN : Severity.GOOD);
+                        }
+
+                        foreach (var unknownAsiMod in installedASIs.OfType<UnknownInstalledASIMod>())
+                        {
+                            addDiagLine($@" - {Path.GetFileName(unknownAsiMod.InstalledPath)} - Unknown ASI mod", Severity.WARN);
+                        }
+
+                        foreach (var duplicateItem in nonUniqueItems)
+                        {
+                            var str = $@" - {duplicateItem.AssociatedManifestItem.Name} v{duplicateItem.AssociatedManifestItem.Version} ({Path.GetFileName(duplicateItem.InstalledPath)})";
+                            if (duplicateItem.Outdated)
+                            {
+                                str += @" - Outdated";
+                            }
+
+                            str += @" - DUPLICATE ASI";
+                            addDiagLine(str, Severity.FATAL);
                         }
 
                         addDiagLine();
-                        addDiagLine(
-                            @"Ensure that only one version of an ASI is installed. If multiple copies of the same one are installed, the game may crash on startup.");
+                        addDiagLine(@"Ensure that only one version of an ASI is installed. If multiple copies of the same one are installed, the game may crash on startup.");
                     }
                 }
                 else
@@ -1157,7 +1229,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     bool hadTocError = false;
                     string[] tocs = Directory.GetFiles(Path.Combine(gamePath, @"BIOGame"), @"PCConsoleTOC.bin",
                         SearchOption.AllDirectories);
-                    string markerfile = MEDirectories.ALOTMarkerPath(selectedDiagnosticTarget);
+                    string markerfile = M3Directories.GetTextureMarkerPath(selectedDiagnosticTarget);
                     foreach (string toc in tocs)
                     {
                         TOCBinFile tbf = new TOCBinFile(toc);
@@ -1281,17 +1353,13 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             StringComparison.InvariantCultureIgnoreCase)))
                     .ToList();
 
-                addDiagLine(
-                    $@"{selectedDiagnosticTarget.Game.ToGameName()} crash logs found in Event Viewer",
-                    Severity.DIAGSECTION);
+                addDiagLine($@"{selectedDiagnosticTarget.Game.ToGameName()} crash logs found in Event Viewer", Severity.DIAGSECTION);
                 if (entries.Any())
                 {
                     foreach (var entry in entries)
                     {
-                        string str = string.Join("\n",
-                            GenerateEventLogString(entry).Split('\n').ToList().Take(17).ToList()); //do not localize
-                        addDiagLine(
-                            $@"{selectedDiagnosticTarget.Game.ToGameName()} Event {entry.TimeGenerated}\n{str}"); // !!! ?
+                        string str = string.Join("\n", GenerateEventLogString(entry).Split('\n').ToList().Take(17).ToList()); //do not localize
+                        addDiagLine($"{selectedDiagnosticTarget.Game.ToGameName()} Event {entry.TimeGenerated}\n{str}"); // !!! ?
                     }
 
                 }
@@ -1310,25 +1378,29 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     Log.Information(@"[AICORE] Collecting ME3logger session log");
 
                     updateStatusCallback?.Invoke("Collecting ME3 session log");
-                    string me3logfilepath =
-                        Path.Combine(
-                            Directory.GetParent(MEDirectories.ExecutablePath(selectedDiagnosticTarget)).FullName,
-                            @"me3log.txt");
+                    string me3logfilepath = Path.Combine(M3Directories.GetExecutableDirectory(selectedDiagnosticTarget), @"ME3Log.txt");
                     if (File.Exists(me3logfilepath))
                     {
-
                         FileInfo fi = new FileInfo(me3logfilepath);
-                        if (fi.Length < 10000)
+                        addDiagLine(@"Mass Effect 3 last session log", Severity.DIAGSECTION);
+                        addDiagLine(@"Last session log has modification date of " + fi.LastWriteTimeUtc.ToShortDateString());
+                        addDiagLine(@"Note that messages from this log can be highly misleading as they are context dependent!");
+                        addDiagLine();
+                        var log = Utilities.WriteSafeReadAllLines(me3logfilepath); //try catch needed?
+                        int lineNum = 0;
+                        foreach (string line in log)
                         {
-                            addDiagLine(@"Mass Effect 3 last session log", Severity.DIAGSECTION);
-                            addDiagLine(@"Last session log has modification date of " +
-                                        fi.LastWriteTimeUtc.ToShortDateString());
-                            addDiagLine();
-                            var log = Utilities.WriteSafeReadAllLines(me3logfilepath); //try catch needed?
-                            foreach (string line in log)
+                            addDiagLine(line, line.Contains("I/O failure", StringComparison.InvariantCultureIgnoreCase) ? Severity.FATAL : Severity.INFO);
+                            lineNum++;
+                            if (lineNum > 100)
                             {
-                                addDiagLine(line);
+                                break;
                             }
+                        }
+
+                        if (lineNum > 200)
+                        {
+                            addDiagLine("... log truncated ...");
                         }
                     }
                 }
@@ -1344,18 +1416,38 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             finally
             {
                 //restore MEM setting
+                // This is M3 specific
                 //MEMIPCHandler.SetGamePath(selectedDiagnosticTarget.Game, oldMemGamePath);
             }
 
             return diagStringBuilder.ToString();
         }
 
+        private static void SeeIfIncompatibleDLCIsInstalled(GameTarget target, Action<string, Severity> addDiagLine)
+        {
+            var installedDLCMods = VanillaDatabaseService.GetInstalledDLCMods(target);
+            var metaFiles = M3Directories.GetMetaMappedInstalledDLC(target, false);
+
+            foreach (var v in metaFiles)
+            {
+                if (v.Value != null && v.Value.IncompatibleDLC.Any())
+                {
+                    // See if any DLC is not compatible
+                    var installedIncompatDLC = installedDLCMods.Intersect(v.Value.IncompatibleDLC, StringComparer.InvariantCultureIgnoreCase).ToList();
+                    foreach (var id in installedIncompatDLC)
+                    {
+                        var incompatName = ThirdPartyServices.GetThirdPartyModInfo(id, target.Game);
+                        addDiagLine($@"{v.Value.ModName} is not compatible with {incompatName?.modname ?? id}", Severity.FATAL);
+                    }
+                }
+            }
+        }
 
         private static void addLODStatusToDiag(GameTarget selectedDiagnosticTarget, Dictionary<string, string> lods,
             Action<string, Severity> addDiagLine)
         {
             addDiagLine(@"Texture Level of Detail (LOD) settings", Severity.DIAGSECTION);
-            string iniPath = MEDirectories.LODConfigFile(selectedDiagnosticTarget.Game);
+            string iniPath = MEDirectories.GetLODConfigFile(selectedDiagnosticTarget.Game);
             if (!File.Exists(iniPath))
             {
                 addDiagLine($@"Game config file is missing: {iniPath}", Severity.ERROR);
@@ -1564,8 +1656,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             string str = "";
             try
             {
-                ManagementObjectSearcher mosProcessor =
-    new ManagementObjectSearcher(@"SELECT * FROM Win32_Processor");
+                ManagementObjectSearcher mosProcessor = new ManagementObjectSearcher(@"SELECT * FROM Win32_Processor");
 
                 foreach (ManagementObject moProcessor in mosProcessor.Get())
                 {

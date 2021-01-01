@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Xml.Linq;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
+using ALOTInstallerCore.ModManager;
 using ALOTInstallerCore.ModManager.asi;
-using ALOTInstallerCore.ModManager.GameDirectories;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
-using ALOTInstallerCore.Objects;
 using ME3ExplorerCore.Packages;
 using Serilog;
 
@@ -264,7 +262,7 @@ namespace MassEffectModManagerCore.modmanager.asi
             Log.Information($@"[AICORE] Processing ASI installation request: {asi.Name} v{asi.Version} -> {target.TargetPath}");
             string destinationFilename = $@"{asi.InstalledPrefix}-v{asi.Version}.asi";
             string cachedPath = Path.Combine(CachedASIsFolder, destinationFilename);
-            string destinationDirectory = MEDirectories.ASIPath(target);
+            string destinationDirectory = M3Directories.GetASIPath(target);
             if (!Directory.Exists(destinationDirectory))
             {
                 Log.Information(@"[AICORE] Creating ASI directory in game: " + destinationDirectory);

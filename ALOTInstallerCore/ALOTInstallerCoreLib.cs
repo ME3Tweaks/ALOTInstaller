@@ -5,6 +5,7 @@ using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Services;
 using ME3ExplorerCore;
+using ME3ExplorerCore.Helpers;
 using NickStrupat;
 using Serilog;
 
@@ -44,7 +45,7 @@ namespace ALOTInstallerCore
                 Log.Information(@"[AICORE] System information:");
                 Log.Information($@"[AICORE]     Operating system: {ci.OSFullName}");
                 Log.Information($@"[AICORE]     Processor:        {ci.CPUName}");
-                Log.Information($@"[AICORE]     Memory:           {FileSizeFormatter.FormatSize(ci.TotalPhysicalMemory)}");
+                Log.Information($@"[AICORE]     Memory:           {FileSize.FormatSize(ci.TotalPhysicalMemory)}");
             }
             catch (Exception e)
             {
@@ -80,6 +81,9 @@ namespace ALOTInstallerCore
         /// </summary>
         public static void PostCriticalStartup(Action<string> currentOperationCallback, Action<Action> runOnUiThreadCallback)
         {
+            // Load ME3ExplorerCore library
+            Log.Information(@"[AICORE] Loading ME3ExplorerCore library");
+            CoreLib.InitLib(CoreLib.SYNCHRONIZATION_CONTEXT, x => { Log.Error($"Error saving package: {x}"); });
 
             // Logs call in method
             Locations.LoadTargets();
@@ -95,9 +99,6 @@ namespace ALOTInstallerCore
 
             ThirdPartyIdentificationService.ModDatabase = OnlineContent.FetchThirdPartyIdentificationManifest();
 
-            // Load ME3ExplorerCore library
-            Log.Information(@"[AICORE] Loading ME3ExplorerCore library");
-            CoreLib.InitLib(CoreLib.SYNCHRONIZATION_CONTEXT, x => { Log.Error($"Error saving package: {x}"); });
             if (willcheckforupdates)
             {
                 Settings.LastContentCheck = DateTime.Now;

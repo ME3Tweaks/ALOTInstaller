@@ -1,17 +1,12 @@
-﻿#if WINDOWS
-using ALOTInstallerCore.PlatformSpecific.Windows;
-#endif
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using ALOTInstallerCore.ModManager.GameDirectories;
-using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Packages;
-using Microsoft.Win32;
 using PropertyChanged;
 using Serilog;
 
@@ -115,7 +110,7 @@ namespace ALOTInstallerCore.Helpers
                     else
                     {
                         var path = item.Value.TrimEnd(Path.DirectorySeparatorChar);
-                        string exePath = MEDirectories.ExecutablePath(game, path);
+                        string exePath = MEDirectories.GetExecutablePath(game, path);
 
                         if (File.Exists(exePath))
                         {

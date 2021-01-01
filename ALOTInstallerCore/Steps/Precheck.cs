@@ -4,21 +4,20 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
-using ALOTInstallerCore.ModManager.GameDirectories;
+using ALOTInstallerCore.ModManager;
 using ALOTInstallerCore.ModManager.gamefileformats.sfar;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
-using ME3ExplorerCore.Gammtek;
+using ME3ExplorerCore.GameFilesystem;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 using NickStrupat;
 using Serilog;
-using ME3Directory = ME3ExplorerCore.MEDirectories.ME3Directory;
 
 namespace ALOTInstallerCore.Steps
 {
@@ -110,7 +109,7 @@ namespace ALOTInstallerCore.Steps
 
             var blacklistedMods = pc.checkBlacklistedMods();
 
-            if (blacklistedMods.Any())
+            if (Enumerable.Any(blacklistedMods))
             {
                 // Mod(s) that have been blacklisted as incompatible are installed
                 CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
@@ -125,7 +124,7 @@ namespace ALOTInstallerCore.Steps
             {
                 // Sanity check for DLC
                 var inconsistentDLCs = pc.checkDLCConsistency();
-                if (inconsistentDLCs.Any())
+                if (Enumerable.Any(inconsistentDLCs))
                 {
                     CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
                     {
@@ -147,7 +146,7 @@ namespace ALOTInstallerCore.Steps
                 if (installInfo != null)
                 {
                     var replacedAddedRemovedFiles = pc.checkForReplacedAddedRemovedFiles();
-                    if (replacedAddedRemovedFiles.Any())
+                    if (Enumerable.Any(replacedAddedRemovedFiles))
                     {
                         CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
                         {
@@ -168,8 +167,8 @@ namespace ALOTInstallerCore.Steps
 
             if (installInfo == null && package.InstallTarget.Game >= MEGame.ME2)
             {
-                var tfcFiles = Directory.GetFiles(MEDirectories.BioGamePath(package.InstallTarget), "TexturesMEM*.tfc", SearchOption.AllDirectories).ToList();
-                if (tfcFiles.Any())
+                var tfcFiles = Directory.GetFiles(M3Directories.GetBioGamePath(package.InstallTarget), "TexturesMEM*.tfc", SearchOption.AllDirectories).ToList();
+                if (Enumerable.Any(tfcFiles))
                 {
                     CoreAnalytics.TrackEvent?.Invoke(@"Staging precheck failed", new Dictionary<string, string>()
                     {
@@ -251,8 +250,8 @@ namespace ALOTInstallerCore.Steps
                 // 3. Check for FPS counter (gross!)
                 if (!hasLightingFix)
                 {
-                    var dinput = Path.Combine(MEDirectories.ExecutableDirectory(package.InstallTarget), "dinput8.dll");
-                    var fpsCounter = Path.Combine(MEDirectories.ExecutableDirectory(package.InstallTarget), "FPSCounter", "FPSCounter.dll");
+                    var dinput = Path.Combine(M3Directories.GetExecutableDirectory(package.InstallTarget), "dinput8.dll");
+                    var fpsCounter = Path.Combine(M3Directories.GetExecutableDirectory(package.InstallTarget), "FPSCounter", "FPSCounter.dll");
                     if (File.Exists(dinput) && File.Exists(fpsCounter))
                     {
                         Log.Warning(@"[AICORE] Found FPSCounter dll. No need to advertise lighting fix to user. That is, if it works ;)");
@@ -351,10 +350,10 @@ namespace ALOTInstallerCore.Steps
                                 {
                                     // AMD Lighting Fix
                                     var diskLocation = Path.Combine(Locations.TempDirectory(), $"LightingFix{Path.GetExtension(sourceFileUrl)}");
-                                    downloadResult.result.WriteToFile(diskLocation);
+                                    Extensions.WriteToFile(downloadResult.result, diskLocation);
                                     Log.Information(@"[AICORE] Extracting DLC_MOD_AMDLightingFix to ME1 DLC directory");
-                                    Directory.CreateDirectory(MEDirectories.DLCPath(package.InstallTarget)); //Ensure DLC directory exists.
-                                    MEMIPCHandler.ExtractArchiveToDirectory(diskLocation, MEDirectories.DLCPath(package.InstallTarget));
+                                    Directory.CreateDirectory(M3Directories.GetDLCPath(package.InstallTarget)); //Ensure DLC directory exists.
+                                    MEMIPCHandler.ExtractArchiveToDirectory(diskLocation, M3Directories.GetDLCPath(package.InstallTarget));
                                     File.Delete(diskLocation);
                                 }
                                 else
@@ -366,7 +365,7 @@ namespace ALOTInstallerCore.Steps
                                     {
                                         // It def shouldn't be null since we hash checked this.
                                         Log.Information($@"[AICORE] Extracting {SILENT_PATCH_DLL_NAME} to ME1 Binaries directory");
-                                        dll.ExtractToFile(Path.Combine(MEDirectories.ExecutableDirectory(package.InstallTarget), SILENT_PATCH_DLL_NAME));
+                                        dll.ExtractToFile(Path.Combine(M3Directories.GetExecutableDirectory(package.InstallTarget), SILENT_PATCH_DLL_NAME));
                                     }
                                 }
                             }
@@ -395,7 +394,7 @@ namespace ALOTInstallerCore.Steps
 #if !WINDOWS
             return true;
 #else
-            var exePath = MEDirectories.ExecutablePath(package.InstallTarget);
+            var exePath = M3Directories.GetExecutablePath(package.InstallTarget);
             if (File.Exists(exePath))
             {
                 Version minVersionRequired = null;
@@ -495,7 +494,7 @@ namespace ALOTInstallerCore.Steps
                 }
             }
 
-            if (nonReadyRecommendedFiles.Any())
+            if (Enumerable.Any(nonReadyRecommendedFiles))
             {
                 // At least one recommended file for this game is not ready
                 var result = missingRecommandedItemsDialogCallback?.Invoke($"{(nonReadyRecommendedFiles.Count == 1 ? "1 file is" : $"{nonReadyRecommendedFiles.Count} files are")} not ready for installation",
@@ -521,7 +520,7 @@ namespace ALOTInstallerCore.Steps
         {
             List<string> inconsistentDLC = new List<string>();
             var dlcDir = Path.Combine(target.TargetPath, "BioGame", "DLC");
-            var dlcFolders = MEDirectories.GetInstalledDLC(target).Where(x => MEDirectories.OfficialDLC(target.Game).Contains(x)).Select(x => Path.Combine(dlcDir, x)).ToList();
+            var dlcFolders = M3Directories.GetInstalledDLC(target).Where(x => MEDirectories.OfficialDLC(target.Game).Contains(x)).Select(x => Path.Combine(dlcDir, x)).ToList();
             foreach (var dlcFolder in dlcFolders)
             {
                 string unpackedDir = Path.Combine(dlcFolder, @"CookedPCConsole");
@@ -746,7 +745,7 @@ namespace ALOTInstallerCore.Steps
             }
 
             var filesThatWillInstall = Directory.GetFiles(installationPackagesDir, "*.mem");
-            if (package.FilesToInstall.All(x => !(x is PreinstallMod)) && !filesThatWillInstall.Any())
+            if (package.FilesToInstall.All(x => !(x is PreinstallMod)) && !Enumerable.Any(filesThatWillInstall))
             {
                 // Preinstall mods don't use .mem packages (As of V4 ALOV 2020). As such there won't be any .mem packages
                 Log.Error(@"[AICORE] There were no mem files in the InstallationPackages directory. Staging precheck failed");
@@ -800,7 +799,7 @@ namespace ALOTInstallerCore.Steps
             if (targetDi.AvailableFreeSpace < requiredDiskSpace * 1.1)
             {
                 // Less than 10% buffer
-                return $"There is not enough space on the disk the game resides on to install textures. Note that the required space is only an estimate and includes required temporary space.\n\nDrive: {targetDi.Name}\nRequired space: {FileSizeFormatter.FormatSize(requiredDiskSpace)}\nAvailable space: {FileSizeFormatter.FormatSize(targetDi.AvailableFreeSpace)}\n\nYou can change storage locations in the application settings.";
+                return $"There is not enough space on the disk the game resides on to install textures. Note that the required space is only an estimate and includes required temporary space.\n\nDrive: {targetDi.Name}\nRequired space: {FileSize.FormatSize(requiredDiskSpace)}\nAvailable space: {FileSize.FormatSize(targetDi.AvailableFreeSpace)}\n\nYou can change storage locations in the application settings.";
             }
             return null;
         }

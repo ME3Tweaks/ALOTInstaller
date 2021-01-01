@@ -13,6 +13,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 using Serilog;
 
@@ -149,11 +150,24 @@ namespace ALOTInstallerCore.Steps
                                 // Must add this or we might filter out on extraction.
                                 extensions.Add(Path.GetExtension(mFile.UnpackedSingleFilename));
                             }
+
+                            if (mFile.MEUITMSettings != null)
+                            {
+                                if (!string.IsNullOrWhiteSpace(mFile.MEUITMSettings.MEUITMModeMusicPath))
+                                {
+                                    extensions.Add(Path.GetExtension(mFile.MEUITMSettings.MEUITMModeMusicPath));
+                                }
+                                if (!string.IsNullOrWhiteSpace(mFile.MEUITMSettings.MEUITMModeBackgroundPath))
+                                {
+                                    extensions.Add(Path.GetExtension(mFile.MEUITMSettings.MEUITMModeBackgroundPath));
+                                }
+                            }
                         }
                         extensions = extensions.Distinct().ToList();
                         // If any package files list TPFSource disable this space optimization
                         if (extensions.Count == 1 && instFile.PackageFiles.Where(x => x.ApplicableGames.HasFlag(targetGame)).All(x => x.TPFSource == null))
                         {
+                            
                             // We have only one extension type! We can filter what we extract with MEM
                             args += $" --filter-with-ext {extensions.First().Substring(1)}"; //remove the '.'
                         }
@@ -209,7 +223,7 @@ namespace ALOTInstallerCore.Steps
                 return;
             }
 
-            if (!_installOptions.FilesToInstall.Any())
+            if (!Enumerable.Any(_installOptions.FilesToInstall))
             {
                 // Abort!
                 Log.Error("[AICORE] There are no files to install! Is this a bug?");
@@ -258,9 +272,9 @@ namespace ALOTInstallerCore.Steps
             foreach (var v in _installOptions.FilesToInstall)
             {
 #if DEBUG
-                //if (v.FriendlyName.Contains("Default Fem"))
+                //if (!v.FriendlyName.Contains("ALOT"))
                 //{
-                block.Post(v);
+                    block.Post(v);
                 //}
 #else 
                 // Helps make sure I don't publish broken code
@@ -284,7 +298,7 @@ namespace ALOTInstallerCore.Steps
                 return;
             }
 
-            if (Directory.GetFiles(addonStagingPath).Any())
+            if (Enumerable.Any(Directory.GetFiles(addonStagingPath)))
             {
                 NotifyAddonBuild?.Invoke();
                 // Addon needs built
@@ -470,7 +484,7 @@ namespace ALOTInstallerCore.Steps
                     //// See if any files need decompiled (TPF)
                     var subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
                     var tpfsToDecomp = installerFile.PackageFiles.Where(x => x.TPFSource != null && x.ApplicableGames.HasFlag(targetGame)).Select(x => x.TPFSource).Distinct().ToList();
-                    if (!tpfsToDecomp.Any() && mf.UnpackedSingleFilename != null && installerFile.PackageFiles.All(x => !x.MoveDirectly && x.ApplicableGames.HasFlag(targetGame)) && Path.GetExtension(mf.UnpackedSingleFilename) == ".tpf")
+                    if (!Enumerable.Any(tpfsToDecomp) && mf.UnpackedSingleFilename != null && installerFile.PackageFiles.All(x => !x.MoveDirectly && x.ApplicableGames.HasFlag(targetGame)) && Path.GetExtension(mf.UnpackedSingleFilename) == ".tpf")
                     {
                         // Our files will always be in this
                         Log.Information($@"[AICORE] [{prefix}] No listed TPFs to decomp but we have a single file unpacked TPF, decompiling it");
@@ -491,7 +505,7 @@ namespace ALOTInstallerCore.Steps
                         decompiled = true;
                     }
 
-                    if (tpfsToDecomp.Any())
+                    if (Enumerable.Any(tpfsToDecomp))
                     {
                         // Recalculate
                         subfilesToExtract = Directory.GetFiles(outputDir, "*.*", SearchOption.AllDirectories).ToList();
@@ -523,7 +537,7 @@ namespace ALOTInstallerCore.Steps
                                     if (len != unpackedSize)
                                     {
                                         installerFile.StatusText = "Extraction produced incorrect file";
-                                        Log.Error($"[AICORE] [{prefix}] ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (MOVEDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
+                                        Log.Error($"[AICORE] [{prefix}] ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (MOVEDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSize.FormatSize(unpackedSize)}), Found: {len} ({FileSize.FormatSize(len)})");
                                         _abortStaging = true;
                                         return false;
                                     }
@@ -542,7 +556,7 @@ namespace ALOTInstallerCore.Steps
                                     if (len != unpackedSize)
                                     {
                                         installerFile.StatusText = "Extraction produced incorrect file";
-                                        Log.Error($"[AICORE] [{prefix}] ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (COPYDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSizeFormatter.FormatSize(unpackedSize)}), Found: {len} ({FileSizeFormatter.FormatSize(len)})");
+                                        Log.Error($"[AICORE] [{prefix}] ERROR ON ARCHIVE EXTRACTION FOR {installerFile.Filename}: EXTRACTED PACKAGE FILE IS WRONG SIZE (COPYDIRECTLY) FOR FILE {mpf.SourceName}. Expected: {unpackedSize} ({FileSize.FormatSize(unpackedSize)}), Found: {len} ({FileSize.FormatSize(len)})");
                                         _abortStaging = true;
                                         return false;
                                     }
@@ -556,7 +570,7 @@ namespace ALOTInstallerCore.Steps
                             // Could be multi-copy package file, e.g. one to many from source file
                         }
 
-                        if (!matchingPackageFiles.Any())
+                        if (!Enumerable.Any(matchingPackageFiles))
                         {
                             if (FiletypeRequiresDecompilation(sf) && !tpfsToDecomp.Contains(Path.GetFileName(sf)))
                             {
@@ -581,43 +595,56 @@ namespace ALOTInstallerCore.Steps
                     // Check if it's a .mem.
                     if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mem")
                     {
-                        var destF = Path.Combine(finalBuiltPackagesDestination,
-                            $"{installerFile.BuildID:D3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
-                        if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory.Name ==
-                            new DriveInfo(finalBuiltPackagesDestination).RootDirectory.Name)
+                        var destF = Path.Combine(finalBuiltPackagesDestination, $"{installerFile.BuildID:D3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
+
+                        bool linked = false;
+#if WINDOWS
+                        // Try symlinking first. This way we don't have to copy anything
+                        linked = Utilities.WinCreateFileSymbolicLink(destF, installerFile.GetUsedFilepath());
+#endif
+
+                        if (!linked)
                         {
-                            // Move
-                            Log.Information(
-                                $"[AICORE] [{prefix}] Moving unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                            File.Move(installerFile.GetUsedFilepath(), destF);
+                            if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory.Name ==
+                                new DriveInfo(finalBuiltPackagesDestination).RootDirectory.Name)
+                            {
+                                // Move
+                                Log.Information(
+                                    $"[AICORE] [{prefix}] Moving unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                                File.Move(installerFile.GetUsedFilepath(), destF);
+                            }
+                            else
+                            {
+                                //Copy
+                                Log.Information(
+                                    $"[AICORE] [{prefix}] Copying unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                                CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
+                                    (x, y) => { installerFile.StatusText = $"Copying file to installation packages {(int)(x * 100f / y)}%"; },
+                                    exception => { _abortStaging = true; });
+                            }
                         }
-                        else
-                        {
-                            //Copy
-                            Log.Information(
-                                $"[AICORE] [{prefix}] Copying unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                            CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
-                                (x, y) =>
-                                {
-                                    installerFile.StatusText = $"Copying file to installation packages {(int)(x * 100f / y)}%";
-                                },
-                                exception => { _abortStaging = true; });
-                        }
+
                         stage = false;
                     }
-                    else if (mfx.PackageFiles.Count == 1 && mfx.PackageFiles[0].MoveDirectly)
+                    else if (mfx.PackageFiles.Count(x => x.ApplicableGames.HasFlag(targetGame)) == 1 && mfx.PackageFiles.First(x => x.ApplicableGames.HasFlag(targetGame)).MoveDirectly)
                     {
                         // It's a TPF with MoveDirectly or something. We should copy this as addon staging files are not copied back
                         //Copy
                         var destF = Path.Combine(addonStagingPath, Path.GetFileName(installerFile.GetUsedFilepath()));
                         Log.Information(
                             $"[AICORE] [{prefix}] Copying unpacked file to addon staging directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                        CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
-                            (x, y) =>
-                            {
-                                installerFile.StatusText = $"Copying file to staging {(int)(x * 100f / y)}%";
-                            },
-                            exception => { _abortStaging = true; });
+                        bool linked = false;
+#if WINDOWS
+                        // Try symlinking first. This way we don't have to copy anything
+                        linked = Utilities.WinCreateFileSymbolicLink(destF, installerFile.GetUsedFilepath());
+#endif
+                        if (!linked)
+                        {
+
+                            CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
+                                (x, y) => { installerFile.StatusText = $"Copying file to staging {(int)(x * 100f / y)}%"; },
+                                exception => { _abortStaging = true; });
+                        }
                     }
                     else
                     {
@@ -634,7 +661,7 @@ namespace ALOTInstallerCore.Steps
                 {
                     // Files will be staged
                 }
-                else if (mf is PreinstallMod pm && !pm.PackageFiles.Any())
+                else if (mf is PreinstallMod pm && !Enumerable.Any(pm.PackageFiles))
                 {
                     // Nothing to stage. Will install before textures
                     stage = false;
@@ -751,7 +778,7 @@ namespace ALOTInstallerCore.Steps
                         }
                     }
 
-                    if (Directory.GetFiles(userFileBuildMemPath).Any())
+                    if (Enumerable.Any(Directory.GetFiles(userFileBuildMemPath)))
                     {
                         // Requires build
                         // don't add progress indicator here. We don't need more than the text
@@ -794,7 +821,7 @@ namespace ALOTInstallerCore.Steps
 
         private bool promptModConfiguration()
         {
-            foreach (var m in _installOptions.FilesToInstall.Where(x => x is ManifestFile mf && (mf.CopyFiles.Any() || mf.ChoiceFiles.Any() || mf.ZipFiles.Any())))
+            foreach (var m in _installOptions.FilesToInstall.Where(x => x is ManifestFile mf && (Enumerable.Any(mf.CopyFiles) || Enumerable.Any(mf.ChoiceFiles) || Enumerable.Any(mf.ZipFiles))))
             {
                 var mf = m as ManifestFile;
                 mf.PackageFiles.RemoveAll(x => x.Transient);
@@ -906,7 +933,7 @@ namespace ALOTInstallerCore.Steps
                 if (pair.Value.Count > 1)
                 {
                     // Has issue
-                    var chosenFile = ResolveMutualExclusiveMods?.Invoke(pair.Value);
+                    var chosenFile = ResolveMutualExclusiveMods?.Invoke(pair.Value.OfType<ManifestFile>().OrderByDescending(x=>x.Recommendation).OfType<InstallerFile>().ToList());
                     if (chosenFile == null) return null;//abort
                     files.Insert(0, chosenFile);
                 }

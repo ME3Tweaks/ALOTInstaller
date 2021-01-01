@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotinstallermanifest>
 	<!-- MEM Update Information -->
-	<highestapprovedmemversion>428</highestapprovedmemversion>
-	<soaktestingmemversion soakstartdate="2020-08-01">428</soaktestingmemversion>
+	<highestapprovedmemversion>431</highestapprovedmemversion>
+	<soaktestingmemversion soakstartdate="2020-12-07">432</soaktestingmemversion>
 	<!-- YYYY-MM-DD-->
+
+		<!-- DEFINE MANIFEST MODES THAT MANIFEST FILES CAN ATTACH TO -->
+	<manifest mode="MEUITM"
+					  description="Installs MEUITM with MEUITM defaults"
+					  version="3.0.1" />
+	<manifest mode="ALOT"
+					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
+					  version="7.0.8" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -110,7 +118,8 @@
 			<failureinfo resultcode="InstallFailed_PreinstallModFailed"
 						 failedtopmessage="Failed to install ALOV mod"
 						 failedbottommessage="Check installer log for more info"
-						 failedheadermessage="A Lot of Videos (ALOV) mod installs before textures are installed. The installer encountered an error during this procedure. Check the installer log for more information." />
+						 failedheadermessage="A Lot of Videos (ALOV) mod installs before textures are installed. The installer encountered an error during this procedure. Check the installer log for more information."
+						 showbottomtext="true" />
 			<failureinfo resultcode="InstallFailed_MEMExitedBeforeStageDone"
 						 failedtopmessage="Unknown error during texture install"
 						 failedbottommessage="Check installer log for more info"
@@ -193,7 +202,6 @@
 		<supportedhash game="me3"
 						 name="Origin (Russian)">70dc87862da9010aad1acd7d0c2c857b</supportedhash>
 	</supportedhashes>
-	
 	<!-- Compatibility prechecks (occurs in precheck step) -->
 	<compatibilityprechecks>
 		<!-- This check is disabled until 3.1 is out as it does not work on 3.0 -->
@@ -207,14 +215,6 @@
 			failuremessage="Project Variety is installed, but the ALOT patch was not applied when Project Variety was installed. This option must be chosen when installing Project Variety, otherwise the game will crash when combined with ALOT. Install Project Variety again, but with the ALOT patch option chosen."
 			/> -->
 	</compatibilityprechecks>
-	
-	<!-- DEFINE MANIFEST MODES THAT MANIFEST FILES CAN ATTACH TO -->
-	<manifest mode="MEUITM"
-					  description="Installs MEUITM with MEUITM defaults"
-					  version="3.0.1" />
-	<manifest mode="ALOT"
-					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.7" />
 	<!-- DEFINE MANIFEST FILES -->
 	<!-- MAKE SURE EACH MODE IS TAGGED -->
 	<manifestfiles>
@@ -1183,7 +1183,7 @@
 					  friendlyname="Improved Static Lighting for ME3 - Full"
 					  author="CreeperLava"
 					  installpriority="3"
-					  recommendationreason="Significantly improves the static shadows in level environments. Denoised and higher resolution. Uses more memory, but won't lower the framerate. Cannot be used when Project Variety or Expanded Galaxy Mod is installed."
+					  recommendationreason="Significantly improves the static shadows in level environments. Denoised and higher resolution. Uses more memory than the Lite version. Only recommended if you aren't using other mods."
 					  recommendation="Optional"
 					  optiongroup="ME3StaticLighting">
 			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
@@ -2836,13 +2836,14 @@
 		<!-- Preinstallmod objects are supersets of the manifestfiles, in that they support the same features (packagefile) but will have their archive extracted after dlc is unpacked, but before game scan takes place. -->
 		<preinstallmod mode="ALOT"
 					 friendlyname="A Lot of Videos for ME1 2.5 (1080p)"
+					 shortname="ALOV for ME1 2.5 (1080p)"
 					 author="Audemus"
 					 recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect"
 					 recommendation="Recommended"
 					 optiongroup="ME1ALOV"
 					 version="2.5"
 					 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect/mods/144"
+			<file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files"
 					  filename="ALOV for ME1 - v2.5 1080p-144-2-5-1604493731.7z"
 					  torrentfilename="ALOVforME1-1080p_2.5.7z"
 					  md5="f2faef46178a7f5596c127e00aa1eaa0"
@@ -2858,13 +2859,14 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 					 friendlyname="A Lot of Videos for ME1 2.5 (4K)"
+					 shortname="ALOV for ME1 2.5 (4K)"
 					 author="Audemus"
 					 recommendationreason="Optional due to large filesize and CPU requirements"
 					 recommendation="Optional"
 					 optiongroup="ME1ALOV"
 					 version="2.5"
 					 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect/mods/144"
+			<file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files"
 					  filename="ALOV for ME1 - v2.5 4K-144-2-5-1604494912.7z"
 					  torrentfilename="ALOVforME1-4K_2.5.7z"
 					  md5="9ffa18409884ebd6cf075f0bad3b12c2"
@@ -2880,14 +2882,15 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 					 friendlyname="A Lot of Videos for ME2 2.1 (1080p)"
+					 shortname="ALOV for ME2 2.1 (1080p)"
 					 author="Audemus"
 					 recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 2"
 					 recommendation="Recommended"
 					 optiongroup="ME2ALOV"
 					 version="2.1"
 					 uipriority="2">
-			<file downloadlink="https://drive.google.com/drive/folders/1kw7A-s75zOlvP0-xVHJVVPQTffWUZ-hV?usp=sharing"
-					  filename="ALOVforME2-1080p_2.1.7z"
+			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/245?tab=files"
+					  filename="ALOV for ME2 - v2.1 (1080p)-245-2-1-1607690014.7z"
 					  torrentfilename="ALOVforME2-1080p_2.1.7z"
 					  md5="360cc04cb42808d1c5f312165cbf0bcc"
 					  size="5733798620" />
@@ -2914,14 +2917,15 @@
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
 						 friendlyname="A Lot of Videos for ME2 2.1 (4K)"
+						 shortname="ALOV for ME2 2.1 (4K)"
 						 author="Audemus"
 						 recommendationreason="Optional due to large filesize and CPU requirements"
 						 recommendation="Optional"
 						 optiongroup="ME2ALOV"
 						 version="2.1"
 						 uipriority="2">
-			<file downloadlink="https://drive.google.com/drive/folders/1kw7A-s75zOlvP0-xVHJVVPQTffWUZ-hV?usp=sharing"
-					  filename="ALOVforME2-4K_2.1.7z"
+			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/245?tab=files"
+					  filename="ALOV for ME2 - v2.1 (4K)-245-2-1-1607688511.7z"
 					  torrentfilename="ALOVforME2-4K_2.1.7z"
 					  md5="b600441a78cd694044bb05a0b3abc265"
 					  size="15314602181" />
@@ -2955,8 +2959,8 @@
 					 version="2.1"
 					 optiongroup="ME3ALOV_BASE"
 					 uipriority="2">
-			<file downloadlink="https://drive.google.com/drive/folders/1RQMR1xmv8pvf2nASi4Y0wxOsabhlxeFj?usp=sharing"
-					  filename="ALOVforME3-1080p-Basegame_2.1+.7z"
+			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
+					  filename="ALOVforME3-1080p-Basegame_2.1-773-2-1-0-0-1607681809.7z"
 					  torrentfilename="ALOVforME3-1080p-Basegame_2.1+.7z"
 					  md5="a1fe9b91849998679fe6f9082e4a980d"
 					  size="6597773643" />
@@ -2977,8 +2981,8 @@
 					 version="2.1"
 					 optiongroup="ME3ALOV_DLC"
 					 uipriority="2">
-			<file downloadlink="https://drive.google.com/drive/folders/1RQMR1xmv8pvf2nASi4Y0wxOsabhlxeFj?usp=sharing"
-					  filename="ALOVforME3-1080p-DLCs_2.1+.7z"
+			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
+					  filename="ALOVforME3-1080p-DLCs_2.1-773-2-1-0-0-1607683226.7z"
 					  torrentfilename="ALOVforME3-1080p-DLCs_2.1+.7z"
 					  md5="8499bf8ff9d223049872dd9c404844e0"
 					  size="5955694266" />
@@ -3021,8 +3025,8 @@
 						 version="2.1"
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
-			<file downloadlink="https://drive.google.com/drive/folders/1RQMR1xmv8pvf2nASi4Y0wxOsabhlxeFj?usp=sharing"
-					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.0.0.7z"
+			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
+					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.0.0-773-2-1-0-0-1607683813.7z"
 					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.1.0.0.7z"
 					  md5="ef01ffb79fbad7544278304fadd7fa96"
 					  size="2299555141" />
@@ -3117,8 +3121,8 @@
 						 version="2.1"
 						 optiongroup="ME3ALOV_BASE"
 						 uipriority="2">
-			<file downloadlink="https://drive.google.com/drive/folders/1RQMR1xmv8pvf2nASi4Y0wxOsabhlxeFj?usp=sharing"
-					  filename="ALOVforME3-4K-Basegame_2.1+.7z"
+			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
+					  filename="ALOVforME3-4K-Basegame_2.1-773-2-1-0-0-1607674233.7z"
 					  torrentfilename="ALOVforME3-4K-Basegame_2.1+.7z"
 					  md5="c8b1a2cce0b2c8500921b519c6218d22"
 					  size="17659858128" />
@@ -3139,8 +3143,8 @@
 						 version="2.1"
 						 optiongroup="ME3ALOV_DLC"
 						 uipriority="2">
-			<file downloadlink="https://drive.google.com/drive/folders/1RQMR1xmv8pvf2nASi4Y0wxOsabhlxeFj?usp=sharing"
-					  filename="ALOVforME3-4K-DLCs_2.1+.7z"
+			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
+					  filename="ALOVforME3-4K-DLCs_2.1-773-2-1-0-0-1607677836.7z"
 					  torrentfilename="ALOVforME3-4K-DLCs_2.1+.7z"
 					  md5="2c902585919c0bceb3f28da62c08633e"
 					  size="16188195427" />
@@ -3183,8 +3187,8 @@
 						 version="2.1"
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
-			<file downloadlink="https://drive.google.com/drive/folders/1RQMR1xmv8pvf2nASi4Y0wxOsabhlxeFj?usp=sharing"
-					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.0.0.7z"
+			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
+					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.0.0-773-2-1-0-0-1607680138.7z"
 					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.1.0.0.7z"
 					  md5="306470b46e6f9b515d1ff328b47f45eb"
 					  size="10631492557" />

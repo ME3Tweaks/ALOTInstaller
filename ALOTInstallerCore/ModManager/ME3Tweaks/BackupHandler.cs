@@ -5,12 +5,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.GameDirectories;
+using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
-using ALOTInstallerCore.Objects;
 using Serilog;
-using ALOTInstallerCore.Helpers.AppSettings;
+using ME3ExplorerCore.GameFilesystem;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 #if WINDOWS
 using Microsoft.Win32;
@@ -182,7 +182,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     return x;
                 }).ToList();
                 List<string> installedDLC = VanillaDatabaseService.GetInstalledOfficialDLC(targetToBackup);
-                List<string> allOfficialDLC = MEDirectories.OfficialDLC(targetToBackup.Game);
+                List<string> allOfficialDLC = MEDirectories.OfficialDLC(targetToBackup.Game).ToList();
 
                 if (installedDLC.Count() < allOfficialDLC.Count())
                 {
@@ -226,7 +226,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         return false;
                     }
                 }
-                else if (dlcModsInstalled.Any())
+                else if (Enumerable.Any(dlcModsInstalled))
                 {
                     //Show UI for non vanilla
                     string message = "The following DLC mods were found to be installed. These mods are not part of the original game. You can continue making a backup, however other modding tools such as ME3Tweaks Mod Manager will not accept this as a valid backup source. It is highly recommended that all backups of a game be unmodified, as a broken modified backup is a worthless backup.";
@@ -287,7 +287,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         BackupProgressCallback?.Invoke(ProgressValue, ProgressMax);
                     }
 
-                    string dlcFolderpath = MEDirectories.DLCPath(targetToBackup) + Path.DirectorySeparatorChar;
+                    string dlcFolderpath = M3Directories.GetDLCPath(targetToBackup) + Path.DirectorySeparatorChar;
                     int dlcSubStringLen = dlcFolderpath.Length;
                     var officialDLCNames = MEDirectories.OfficialDLCNames(targetToBackup.Game);
 
@@ -403,7 +403,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 WriteBackupLocation(Game, backupPath);
 
                 // Write vanilla marker
-                if (isVanilla && !dlcModsInstalled.Any())
+                if (isVanilla && !Enumerable.Any(dlcModsInstalled))
                 {
                     var cmmvanilla = Path.Combine(backupPath, @"cmm_vanilla");
                     if (!File.Exists(cmmvanilla))
@@ -450,12 +450,12 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 //Check space
                 DriveInfo di = new DriveInfo(backupPath);
                 var requiredSpace = (long)(Utilities.GetSizeOfDirectory(new DirectoryInfo(targetToBackup.TargetPath)) * 1.1); //10% buffer
-                Log.Information($@"[AICORE] Backup space check. Backup size required: {FileSizeFormatter.FormatSize(requiredSpace)}, free space: {FileSizeFormatter.FormatSize(di.AvailableFreeSpace)}");
+                Log.Information($@"[AICORE] Backup space check. Backup size required: {FileSize.FormatSize(requiredSpace)}, free space: {FileSize.FormatSize(di.AvailableFreeSpace)}");
                 if (di.AvailableFreeSpace < requiredSpace)
                 {
                     //Not enough space.
                     Log.Error($@"[AICORE] Not enough disk space to create backup at {backupPath}");
-                    BlockingActionCallback?.Invoke("Not enough free disk space", $"There is not enough free disk space to make a game backup at this location.\n\nFree space: {FileSizeFormatter.FormatSize(di.AvailableFreeSpace)}\nRequired space: {FileSizeFormatter.FormatSize(requiredSpace)}");
+                    BlockingActionCallback?.Invoke("Not enough free disk space", $"There is not enough free disk space to make a game backup at this location.\n\nFree space: {FileSize.FormatSize(di.AvailableFreeSpace)}\nRequired space: {FileSize.FormatSize(requiredSpace)}");
                     return false;
                 }
 
@@ -624,7 +624,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     UpdateStatusCallback?.Invoke("Deleting existing game installation");
                     if (Directory.Exists(destinationDirectory))
                     {
-                        if (Directory.GetFiles(destinationDirectory).Any() || Directory.GetDirectories(destinationDirectory).Any())
+                        if (Enumerable.Any(Directory.GetFiles(destinationDirectory)) || Enumerable.Any(Directory.GetDirectories(destinationDirectory)))
                         {
                             Log.Information(@"[AICORE] Deleting existing game directory: " + destinationDirectory);
                             try
@@ -676,7 +676,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         }
                     }
 
-                    string dlcFolderpath = MEDirectories.DLCPath(backupPath, Game) + Path.DirectorySeparatorChar; //\ at end makes sure we are restoring a subdir
+                    string dlcFolderpath = MEDirectories.GetDLCPath(Game, backupPath) + Path.DirectorySeparatorChar; //\ at end makes sure we are restoring a subdir
                     int dlcSubStringLen = dlcFolderpath.Length;
                     //Debug.WriteLine(@"DLC Folder: " + dlcFolderpath);
                     //Debug.Write(@"DLC Folder path len:" + dlcFolderpath);

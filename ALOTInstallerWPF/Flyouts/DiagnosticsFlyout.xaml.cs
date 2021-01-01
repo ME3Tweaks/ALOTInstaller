@@ -364,7 +364,7 @@ namespace ALOTInstallerWPF.Flyouts
             {
                 this.FilePath = filepath;
                 ShortName = Path.GetFileName(FilePath);
-                FileSize = FileSizeFormatter.FormatSize(new FileInfo(FilePath).Length);
+                FileSize = ME3ExplorerCore.Helpers.FileSize.FormatSize(new FileInfo(FilePath).Length);
             }
         }
 

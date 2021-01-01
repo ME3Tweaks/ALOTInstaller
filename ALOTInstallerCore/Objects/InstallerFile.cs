@@ -29,7 +29,7 @@ namespace ALOTInstallerCore.Objects
         /// </summary>
         None,
         /// <summary>
-        /// Strays from vanilla
+        /// Strays from vanilla or should not be chosen in event of mutual exclusive
         /// </summary>
         Optional,
         /// <summary>

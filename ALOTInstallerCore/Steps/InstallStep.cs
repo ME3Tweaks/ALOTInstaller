@@ -4,18 +4,19 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Timers;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
-using ALOTInstallerCore.ModManager.GameDirectories;
+using ALOTInstallerCore.ModManager;
 using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps.Installer;
 using MassEffectModManagerCore.modmanager.asi;
 using ME3ExplorerCore;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 using ME3ExplorerCore.Unreal;
 using ME3ExplorerCore.Unreal.BinaryConverters;
@@ -187,7 +188,7 @@ namespace ALOTInstallerCore.Steps
             Log.Information(@"[AICORE] Beginning InstallTextures() thread.");
             #region Presetup variables
             var filesThatWillInstall = Directory.GetFiles(memInputPath, "*.mem");
-            var mainInstallStageWillCommence = filesThatWillInstall.Any();
+            var mainInstallStageWillCommence = Enumerable.Any(filesThatWillInstall);
             Log.Information($@"[AICORE] Main texture installation step (+ supporting steps) will commence: {mainInstallStageWillCommence}");
 
             #endregion
@@ -312,7 +313,7 @@ namespace ALOTInstallerCore.Steps
                 if (!applyModManagerMods())
                 {
                     destroyWakeTimer();
-                    doWorkEventArgs.Result = InstallResult.InstallFailed_TextureExportFixFailed;
+                    doWorkEventArgs.Result = InstallResult.InstallFailed_PreinstallModFailed;
                     return;
                 }
             }
@@ -400,15 +401,34 @@ namespace ALOTInstallerCore.Steps
                             updateCurrentStage();
                             break;
                         case "WARN_4K_NORM_FOUND":
-                            var fourKNormArgs = param.Split(' ');
-                            if (fourKNormArgs.Length == 3)
                             {
-                                Log.Warning($@"Found a 4K norm during scan step, these waste significant amounts of memory for no benefit. File: {fourKNormArgs[2]}.pcc, Export {fourKNormArgs[0]} {fourKNormArgs[1]}");
-                                CoreAnalytics.TrackEvent(@"Found 4K Norm", new Dictionary<string, string>()
+                                var fourKNormArgs = param.Split(' ');
+                                if (fourKNormArgs.Length == 3)
                                 {
-                                    {"File", fourKNormArgs[2]},
-                                    {"Export", $"{fourKNormArgs[0]} {fourKNormArgs[1]}"}
-                                });
+                                    Log.Warning($@"[AICORE] Found a 4K norm during scan step, these waste significant amounts of memory for no benefit. File: {fourKNormArgs[2]}.pcc, Export {fourKNormArgs[0]} {fourKNormArgs[1]}");
+                                    CoreAnalytics.TrackEvent(@"Found 4K Norm", new Dictionary<string, string>()
+                                    {
+                                        {"File", fourKNormArgs[2]},
+                                        {"Export", $"{fourKNormArgs[0]} {fourKNormArgs[1]}"}
+                                    });
+                                }
+                            }
+                            break;
+                        case "WARN_REMOVING_4K_NORM":
+                            {
+                                var fourKNormArgs = param.Split(' ');
+                                if (fourKNormArgs.Length == 3)
+                                {
+                                    // 0 = File
+                                    // 1 = Export #
+                                    // 2 = ObjectName
+                                    Log.Warning($@"[AICORE] Dropping unused preexisting 4K norm in file: {fourKNormArgs[0]}, Export {fourKNormArgs[1]} {fourKNormArgs[2]}");
+                                    CoreAnalytics.TrackEvent(@"Dropped 4K Norm", new Dictionary<string, string>()
+                                    {
+                                        {"File", fourKNormArgs[0]},
+                                        {"Export", $"{fourKNormArgs[1]} {fourKNormArgs[2]}"}
+                                    });
+                                }
                             }
                             break;
                         case "STAGE_TIMING":
@@ -475,7 +495,7 @@ namespace ALOTInstallerCore.Steps
 
                 if (cacheAmountPercent != null)
                 {
-                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSizeFormatter.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
+                    Log.Information($"[AICORE] Tuning MEM memory usage: will use up to {cacheAmountPercent}% of system memory ({FileSize.FormatSize((long)((cacheAmountPercent.Value * 1f / 100) * computerInfo.TotalPhysicalMemory))})");
                     args += $" --cache-amount {cacheAmountPercent}";
                 }
 
@@ -599,7 +619,7 @@ namespace ALOTInstallerCore.Steps
             if (package.InstallTarget.Game == MEGame.ME3)
             {
                 // Install ASIs.
-                Log.Information(@"Installing supporting ASIs");
+                Log.Information(@"[AICORE] Installing supporting ASIs");
                 SetBottomTextCallback?.Invoke("Installing troubleshooting files");
                 ASIManager.LoadManifest();
                 ASIManager.InstallASIToTargetByGroupID(22, package.InstallTarget); //Garbage Collection Forcer
@@ -619,7 +639,7 @@ namespace ALOTInstallerCore.Steps
             {
                 try
                 {
-                    hasWarning |= !LegacyPhysXInstaller.PatchPhysXLoaderME1(package.InstallTarget);
+                    hasWarning |= !ME1PhysXTools.PatchPhysXLoaderME1(package.InstallTarget);
                 }
                 catch (Exception e)
                 {
@@ -758,7 +778,7 @@ namespace ALOTInstallerCore.Steps
                     lastExitCode = x;
                 });
 
-            return !badFiles.Any();
+            return !Enumerable.Any(badFiles);
         }
 
         private int? getCacheSizeToUse(ComputerInfo ci)
@@ -868,7 +888,7 @@ namespace ALOTInstallerCore.Steps
                             streamStates = trigStream2.GetProperty<ArrayProperty<StructProperty>>("StreamingStates");
 
                             // Cleanup visible assets
-                            if (streamStates != null && streamStates.Any())
+                            if (streamStates != null && Enumerable.Any(streamStates))
                             {
                                 var visibleChunkNames = streamStates[0].GetProp<ArrayProperty<NameProperty>>("VisibleChunkNames");
                                 if (visibleChunkNames != null)
@@ -1221,13 +1241,44 @@ namespace ALOTInstallerCore.Steps
                 if (exitcode != 0)
                 {
                     Log.Error($"[AICORE] MassEffectModderNoGui exited with non zero code {exitcode} extracting {modAddon.FriendlyName}");
+
+                    // Delete staged files
+                    Utilities.DeleteFilesAndFoldersRecursively(stagingPath);
+
+                    // Check hash of archive
+                    try
+                    {
+                        using var fStream = File.OpenRead(modAddon.GetUsedFilepath());
+                        var sizeToHash = fStream.Length;
+                        var hash = HashAlgorithmExtensions.ComputeHashAsync(MD5.Create(), fStream,
+                            progress: x =>
+                            {
+                                //UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file {(int) (x * 100f / sizeToHash)}%");
+                                SetBottomTextCallback?.Invoke($"Verifying file {(int)(x * 100f / sizeToHash)}%");
+                            }).Result;
+                        if (hash != modAddon.FileMD5)
+                        {
+                            Log.Error($@"{modAddon.FriendlyName} file is corrupt and must be redownloaded. Filepath: {modAddon.FileMD5}, Expected hash: {modAddon.FileMD5}, Calculated hash: {hash}");
+                            SetBottomTextCallback?.Invoke("File in texture library is corrupt");
+                        }
+                        else
+                        {
+                            Log.Warning($@"Failed to extract {modAddon.FriendlyName}, but file hash is correct. Perhaps file permissions, disk space, other issues are preventing successful extraction?");
+                            SetBottomTextCallback?.Invoke("Failed to extract archive");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($@"Error calculating MD5 of {modAddon.GetUsedFilepath()}: {e.Message}");
+                    }
+
                     return false;
                 }
 
                 SetBottomTextCallback?.Invoke("Installing files");
 
                 //Check requirements for this extraction rule to fire.
-                var dlcDirectory = MEDirectories.DLCPath(package.InstallTarget);
+                var dlcDirectory = M3Directories.GetDLCPath(package.InstallTarget);
 
                 try
                 {
@@ -1268,7 +1319,7 @@ namespace ALOTInstallerCore.Steps
                             }
 
                             //Check if any required file size is wrong
-                            if (requiredFilesSizes.Any())
+                            if (Enumerable.Any(requiredFilesSizes))
                             {
                                 bool doNotInstall = false;
                                 for (int i = 0; i < requiredFilesSizes.Count; i++)

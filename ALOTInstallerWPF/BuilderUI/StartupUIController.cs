@@ -21,6 +21,7 @@ using ControlzEx.Theming;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using ME3ExplorerCore.Compression;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
@@ -28,6 +29,7 @@ using Microsoft.AppCenter.Crashes;
 using Microsoft.Win32;
 using NickStrupat;
 using Serilog;
+using Utilities = ALOTInstallerCore.Utilities;
 
 namespace ALOTInstallerWPF.BuilderUI
 {
@@ -181,7 +183,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     (done, total) =>
                     {
                         pd.SetProgress(done * 1d / total);
-                        pd.SetMessage($"Downloading update {FileSizeFormatter.FormatSize(done)} / {FileSizeFormatter.FormatSize(total)}");
+                        pd.SetMessage($"Downloading update {FileSize.FormatSize(done)} / {FileSize.FormatSize(total)}");
                     },
                     () =>
                     {
@@ -241,15 +243,8 @@ namespace ALOTInstallerWPF.BuilderUI
                     pd.SetMessage(message);
                 }
 
-                pd.SetMessage("Checking for MassEffectModderNoGui updates");
-                MEMUpdater.UpdateMEM(downloadProgressChanged, errorUpdating, setStatus);
-
                 try
                 {
-                    pd.SetMessage("Loading installer framework");
-                    handleM3Passthrough();
-
-                    ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
                     pd.SetMessage("Loading installer manifests");
                     var alotManifestModePackage = ManifestHandler.LoadMasterManifest(x => pd.SetMessage(x));
 
@@ -267,6 +262,14 @@ namespace ALOTInstallerWPF.BuilderUI
                     {
                         // This shouldn't happen...
                     }
+
+                    pd.SetMessage("Checking for MassEffectModderNoGui updates");
+                    MEMUpdater.UpdateMEM(downloadProgressChanged, errorUpdating, setStatus);
+
+                    // Must come after MEM update check to help ensure we have MEM available
+                    pd.SetMessage("Loading installer framework");
+                    handleM3Passthrough();
+                    ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
 
                     pd.SetMessage("Performing startup checks");
                     StartupCheck.PerformStartupCheck((title, message) =>

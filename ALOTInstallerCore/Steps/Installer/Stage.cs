@@ -101,6 +101,10 @@ namespace ALOTInstallerCore.Steps.Installer
         public string FailureTopText { get; set; }
         public string FailureBottomText { get; set; }
         public string FailureIPCTrigger { get; set; }
+        /// <summary>
+        /// If the third line in installer should be shown on failure. By default it's hidden.
+        /// </summary>
+        public bool ShowBottomText { get; set; }
         public InstallStep.InstallResult FailureResultCode { get; set; }
         public bool Warning { get; set; }
     }

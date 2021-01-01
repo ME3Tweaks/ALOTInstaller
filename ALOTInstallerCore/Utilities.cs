@@ -25,6 +25,7 @@ using System.Management;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects.Manifest;
 using ME3ExplorerCore.Gammtek.Extensions.Reflection;
+using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerCore
@@ -47,7 +48,7 @@ namespace ALOTInstallerCore
             Log.Information($"[AICORE] Operating system: {ci.OSFullName}");
             //sb.AppendLine("Version " + osBuildVersion);
             //sb.AppendLine(GetCPUString());
-            Log.Information("[AICORE] System Memory: " + FileSizeFormatter.FormatSize(ci.TotalPhysicalMemory));
+            Log.Information("[AICORE] System Memory: " + FileSize.FormatSize(ci.TotalPhysicalMemory));
             Log.Information($"[AICORE] System Culture: {ci.InstalledUICulture.Name}");
             //+ Thread.CurrentThread.CurrentCulture.Name);
             //return sb.ToString();
