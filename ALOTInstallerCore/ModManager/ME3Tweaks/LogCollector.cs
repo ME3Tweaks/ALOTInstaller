@@ -1103,9 +1103,9 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         if (memCrashText != null)
                         {
                             addDiagLine(@"MassEffectModder crashed with info:");
-                            addDiagLines(memCrashText.Split("\n"), Severity.ERROR);
+                            addDiagLines(memCrashText.Split("\n"), Severity.ERROR); //do not localize
                         }
-                    }
+                        }
                     else
 
                         {
