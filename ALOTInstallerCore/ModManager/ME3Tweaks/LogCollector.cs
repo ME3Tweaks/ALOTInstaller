@@ -525,8 +525,8 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         addDiagLine($@"ALOT version: {latestInstall.ALOTVER}.{latestInstall.ALOTUPDATEVER}.{latestInstall.ALOTHOTFIXVER}");
                         if (latestInstall.MEUITMVER != 0)
                         {
-                            var meuitmName = selectedDiagnosticTarget.Game == MEGame.ME1 ? "MEUITM" : $"MEUITM{selectedDiagnosticTarget.Game.ToGameNum()}";
-                            addDiagLine($"{meuitmName} version: {latestInstall.MEUITMVER}");
+                            var meuitmName = selectedDiagnosticTarget.Game == MEGame.ME1 ? @"MEUITM" : $@"MEUITM{selectedDiagnosticTarget.Game.ToGameNum()}";
+                            addDiagLine($@"{meuitmName} version: {latestInstall.MEUITMVER}");
                         }
                     }
                     else
@@ -701,7 +701,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 if (exitcode != 0)
                 {
                     addDiagLine(
-                        $"MassEffectModderNoGuiexited incompatible mod detection check with code {exitcode}",
+                        $"MassEffectModderNoGui exited exited incompatible mod detection check with code {exitcode}",
                         Severity.ERROR);
                 }
 
@@ -889,7 +889,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         if (exitcode != 0)
                         {
                             addDiagLine(
-                                $"MassEffectModderNoGuiexited texture map consistency check with code {exitcode}",
+                                $@"MassEffectModderNoGuiexited exited texture map consistency check with code {exitcode}",
                                 Severity.ERROR);
                         }
 
@@ -1031,7 +1031,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 
                     if (exitcode != 0)
                     {
-                        addDiagLine($"MassEffectModderNoGui exited full textures check with code {exitcode}", Severity.ERROR);
+                        addDiagLine($@"MassEffectModderNoGui exited full textures check with code {exitcode}", Severity.ERROR);
                     };
 
                     if (emptyMipsNotRemoved.Any() || badTFCReferences.Any() || scanErrors.Any())
@@ -1072,7 +1072,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         addDiagLine(@"Texture check failed");
                         if (memCrashText != null)
                         {
-                            addDiagLine("MassEffectModder crashed with info:");
+                            addDiagLine(@"MassEffectModder crashed with info:");
                             addDiagLines(memCrashText.Split("\n"), Severity.ERROR);
                         }
                     }
@@ -1100,7 +1100,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                 }
                 else
                 {
-                    addDiagLine($"MassEffectModderNoGui exited --print-lods with error. See application log for more info.", Severity.ERROR);
+                    addDiagLine(@"MassEffectModderNoGui exited --print-lods with error. See application log for more info.", Severity.ERROR);
                 }
 
                 #endregion
