@@ -621,7 +621,6 @@ namespace ALOTInstallerCore.Steps
                 // Install ASIs.
                 Log.Information(@"[AICORE] Installing supporting ASIs");
                 SetBottomTextCallback?.Invoke("Installing troubleshooting files");
-                ASIManager.LoadManifest();
                 ASIManager.InstallASIToTargetByGroupID(22, package.InstallTarget); //Garbage Collection Forcer
                 if (package.InstallTarget.Supported)
                 {

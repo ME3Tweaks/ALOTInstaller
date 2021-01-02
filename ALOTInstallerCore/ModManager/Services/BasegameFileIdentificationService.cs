@@ -3,7 +3,6 @@ using System.Linq;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
-using ALOTInstallerCore.Objects;
 
 namespace ALOTInstallerCore.ModManager.Services
 {

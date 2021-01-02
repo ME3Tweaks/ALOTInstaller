@@ -636,8 +636,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     modifiedFiles.Add(file);
                 }
 
-                var isVanilla =
-                    VanillaDatabaseService.ValidateTargetAgainstVanilla(selectedDiagnosticTarget, failedCallback, logBadFiles: false);
+                var isVanilla = VanillaDatabaseService.ValidateTargetAgainstVanilla(selectedDiagnosticTarget, failedCallback, logBadFiles: false);
                 if (isVanilla)
                 {
                     addDiagLine(@"No modified basegame files were found.");

@@ -4,6 +4,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Services;
+using MassEffectModManagerCore.modmanager.asi;
 using ME3ExplorerCore;
 using ME3ExplorerCore.Helpers;
 using NickStrupat;
@@ -94,10 +95,11 @@ namespace ALOTInstallerCore
             Log.Information("[AICORE] Loading ME3Tweaks service: Basegame File Identification Service (BGFIS)");
 
             var willcheckforupdates = OnlineContent.CanFetchContentThrottleCheck();
-            BasegameFileIdentificationService.BasegameFileIdentificationServiceDB = OnlineContent.FetchBasegameFileIdentificationServiceManifest();
+            BasegameFileIdentificationService.LoadService();
+            
             Log.Information("[AICORE] Loading ME3Tweaks service: Third Party Mod Identification Service (TPMI)");
-
             ThirdPartyIdentificationService.ModDatabase = OnlineContent.FetchThirdPartyIdentificationManifest();
+            ASIManager.LoadManifest();
 
             if (willcheckforupdates)
             {
