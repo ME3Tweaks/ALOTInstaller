@@ -7,7 +7,6 @@ using System.Linq;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager;
-using ALOTInstallerCore.ModManager.gamefileformats.sfar;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
@@ -16,6 +15,7 @@ using ALOTInstallerCore.Objects.Manifest;
 using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
+using ME3ExplorerCore.Unreal;
 using NickStrupat;
 using Serilog;
 
