@@ -268,8 +268,8 @@ namespace ALOTInstallerWPF.BuilderUI
 
                     // Must come after MEM update check to help ensure we have MEM available
                     pd.SetMessage("Loading installer framework");
-                    handleM3Passthrough();
                     ALOTInstallerCoreLib.PostCriticalStartup(x => pd.SetMessage(x), RunOnUIThread);
+                    handleM3Passthrough();
 
                     pd.SetMessage("Performing startup checks");
                     StartupCheck.PerformStartupCheck((title, message) =>
