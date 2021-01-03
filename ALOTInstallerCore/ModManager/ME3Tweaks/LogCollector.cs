@@ -8,7 +8,6 @@ using System.Linq;
 using System.Management;
 using System.Text;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.gamefileformats;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
@@ -16,6 +15,7 @@ using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Packages;
 using ALOTInstallerCore.ModManager.asi;
 using ME3ExplorerCore.Helpers;
+using ME3ExplorerCore.Unreal;
 #if WINDOWS
 using AuthenticodeExaminer;
 using Microsoft.Win32;
@@ -636,8 +636,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     modifiedFiles.Add(file);
                 }
 
-                var isVanilla =
-                    VanillaDatabaseService.ValidateTargetAgainstVanilla(selectedDiagnosticTarget, failedCallback, logBadFiles: false);
+                var isVanilla = VanillaDatabaseService.ValidateTargetAgainstVanilla(selectedDiagnosticTarget, failedCallback, logBadFiles: false);
                 if (isVanilla)
                 {
                     addDiagLine(@"No modified basegame files were found.");
