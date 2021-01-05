@@ -40,7 +40,7 @@ namespace ALOTInstallerCore.ModManager.Objects
             }
         }
 
-        public bool Supported => GameSource != null;
+        public bool Supported => !string.IsNullOrEmpty(GameSource);
         public bool IsPolishME1 { get; private set; }
 
         /// <summary>

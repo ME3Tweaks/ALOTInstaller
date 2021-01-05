@@ -451,7 +451,7 @@ namespace ALOTInstallerCore.ModManager.Services
                     case MEGame.ME1:
                         var me1Info = ME1ExecutableInfo.GetExecutableInfo(exePath, true);
                         SUPPORTED_HASHES_ME1.TryGetValue(me1Info.OriginalExecutableHash, out var me1result);
-                        return (md5, me1result);
+                        return (me1Info.OriginalExecutableHash, me1result);
                     case MEGame.ME2:
                         SUPPORTED_HASHES_ME2.TryGetValue(md5, out var me2result);
                         return (md5, me2result);

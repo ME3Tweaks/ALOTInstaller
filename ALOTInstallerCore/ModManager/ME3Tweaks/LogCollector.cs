@@ -263,7 +263,11 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 #else
                     addDiagLine($@"Version information cannot be read on non-windows platforms");
 #endif
-
+                    if (selectedDiagnosticTarget.Game == MEGame.ME1 && selectedDiagnosticTarget.IsPolishME1)
+                    {
+                        Log.Warning(@"Detected this is Polish build of ME1. This version is a different build of ME1 than the rest of the localizations");
+                        addDiagLine(@"POLISH BUILD OF ME1", Severity.WARN);
+                    }
                     // Disk type
 #if WINDOWS
                     string pathroot = Path.GetPathRoot(gamePath);
@@ -719,12 +723,12 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     },
                     applicationExited: x => exitcode = x);
 
-                if (exitcode != 0)
-                {
-                    addDiagLine(
-                        $@"MassEffectModderNoGui exited exited incompatible mod detection check with code {exitcode}",
-                        Severity.ERROR);
-                }
+                    if (exitcode != 0)
+                    {
+                        addDiagLine(
+                            $@"MassEffectModderNoGui exited exited incompatible mod detection check with code {exitcode}",
+                            Severity.ERROR);
+                    }
 
                     if (blacklistedMods.Any())
                     {
@@ -882,45 +886,45 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         addDiagLine(@"Files added or removed after texture mods were installed",
                             Severity.DIAGSECTION);
 
-                    if (textureMapFileExists)
-                    {
-                        // check for replaced files (file size changes)
-                        updateStatusCallback?.Invoke(
-                            "Checking texture map consistency");
-                        List<string> removedFiles = new List<string>();
-                        List<string> addedFiles = new List<string>();
-                        List<string> replacedFiles = new List<string>();
-                        MEMIPCHandler.RunMEMIPCUntilExit(args, ipcCallback: (string command, string param) =>
-                            {
-                                switch (command)
-                                {
-                                    case @"ERROR_REMOVED_FILE":
-                                        //.Add($" - File removed after textures were installed: {param}");
-                                        removedFiles.Add(param);
-                                        break;
-                                    case @"ERROR_ADDED_FILE":
-                                        //addedFiles.Add($"File was added after textures were installed" + param + " " + File.GetCreationTimeUtc(Path.Combine(gamePath, param));
-                                        addedFiles.Add(param);
-                                        break;
-                                    case @"ERROR_VANILLA_MOD_FILE":
-                                        if (!addedFiles.Contains(param))
-                                        {
-                                            replacedFiles.Add(param);
-                                        }
-
-                                        break;
-                                    default:
-                                        Debug.WriteLine(@"oof?");
-                                        break;
-                                }
-                            },
-                            applicationExited: i => exitcode = i);
-                        if (exitcode != 0)
+                        if (textureMapFileExists)
                         {
-                            addDiagLine(
-                                $@"MassEffectModderNoGuiexited exited texture map consistency check with code {exitcode}",
-                                Severity.ERROR);
-                        }
+                            // check for replaced files (file size changes)
+                            updateStatusCallback?.Invoke(
+                                "Checking texture map consistency");
+                            List<string> removedFiles = new List<string>();
+                            List<string> addedFiles = new List<string>();
+                            List<string> replacedFiles = new List<string>();
+                            MEMIPCHandler.RunMEMIPCUntilExit(args, ipcCallback: (string command, string param) =>
+                                {
+                                    switch (command)
+                                    {
+                                        case @"ERROR_REMOVED_FILE":
+                                            //.Add($" - File removed after textures were installed: {param}");
+                                            removedFiles.Add(param);
+                                            break;
+                                        case @"ERROR_ADDED_FILE":
+                                            //addedFiles.Add($"File was added after textures were installed" + param + " " + File.GetCreationTimeUtc(Path.Combine(gamePath, param));
+                                            addedFiles.Add(param);
+                                            break;
+                                        case @"ERROR_VANILLA_MOD_FILE":
+                                            if (!addedFiles.Contains(param))
+                                            {
+                                                replacedFiles.Add(param);
+                                            }
+
+                                            break;
+                                        default:
+                                            Debug.WriteLine(@"oof?");
+                                            break;
+                                    }
+                                },
+                                applicationExited: i => exitcode = i);
+                            if (exitcode != 0)
+                            {
+                                addDiagLine(
+                                    $@"MassEffectModderNoGuiexited exited texture map consistency check with code {exitcode}",
+                                    Severity.ERROR);
+                            }
 
                             if (removedFiles.Any())
                             {
@@ -1058,10 +1062,10 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                             setMEMCrashLog: x => memCrashText = x
                         );
 
-                    if (exitcode != 0)
-                    {
-                        addDiagLine($@"MassEffectModderNoGui exited full textures check with code {exitcode}", Severity.ERROR);
-                    };
+                        if (exitcode != 0)
+                        {
+                            addDiagLine($@"MassEffectModderNoGui exited full textures check with code {exitcode}", Severity.ERROR);
+                        };
 
                         if (emptyMipsNotRemoved.Any() || badTFCReferences.Any() || scanErrors.Any())
                         {
@@ -1086,26 +1090,26 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                                 }
                             }
 
-                        if (scanErrors.Any())
-                        {
-                            addDiagLine();
-                            addDiagLine(@"The following textures failed to scan:", Severity.ERROR);
-                            foreach (var fts in scanErrors)
+                            if (scanErrors.Any())
                             {
-                                addDiagLine(@" - " + fts, Severity.ERROR);
+                                addDiagLine();
+                                addDiagLine(@"The following textures failed to scan:", Severity.ERROR);
+                                foreach (var fts in scanErrors)
+                                {
+                                    addDiagLine(@" - " + fts, Severity.ERROR);
+                                }
                             }
                         }
-                    }
-                    else if (exitcode != 0)
-                    {
-                        addDiagLine(@"Texture check failed");
-                        if (memCrashText != null)
+                        else if (exitcode != 0)
                         {
-                            addDiagLine(@"MassEffectModder crashed with info:");
-                            addDiagLines(memCrashText.Split("\n"), Severity.ERROR); //do not localize
+                            addDiagLine(@"Texture check failed");
+                            if (memCrashText != null)
+                            {
+                                addDiagLine(@"MassEffectModder crashed with info:");
+                                addDiagLines(memCrashText.Split("\n"), Severity.ERROR); //do not localize
+                            }
                         }
-                        }
-                    else
+                        else
 
                         {
                             // Is this right?? We skipped check. We can't just print this

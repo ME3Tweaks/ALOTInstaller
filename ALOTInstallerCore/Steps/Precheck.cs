@@ -51,45 +51,7 @@ namespace ALOTInstallerCore.Steps
                 package = package
             };
 
-#if WINDOWS
-            // Check for PhysX legacy. Require it to be installed at this point in time
 
-            // Obsolete due to PhysXLoader.dll patch
-            //if (package.InstallTarget.Game == MEGame.ME1)
-            //{
-            //    if (!LegacyPhysXInstaller.IsPhysxKeyWritable() && !LegacyPhysXInstaller.IsLegacyPhysXInstalled())
-            //    {
-            //        Log.Information("[AICORE] Precheck: Legacy PhysX is not detected. Prompting for install");
-            //        if (ShowConfirmationDialog("Legacy PhysX is not installed",
-            //            "Legacy PhysX must be installed to correct issues with poor programming practices in Mass Effect that can cause other older games (such as Mirror's Edge) to not work, due to how PhyX was designed back in 2007.\n\nALOT Installer will install Legacy PhysX and implement changes that prevent Mass Effect from interfering with other games. The next page has important information about this fix.",
-            //            "Continue", "Abort install"))
-            //        {
-            //            void setProgressCallback(long done, long total)
-            //            {
-            //                SetPreinstallCheckText($"Downloading Legacy PhysX {Math.Round(done * 100.0 / total)}%");
-            //            }
-
-            //            var physxInstallResult = LegacyPhysXInstaller.InstallLegacyPhysX(setProgressCallback,
-            //                SetPreinstallCheckText,
-            //                ShowConfirmationDialog,
-            //                ShowNormalDialog, null).Result;
-            //            if (physxInstallResult != null)
-            //            {
-            //                return physxInstallResult;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            return
-            //                "Legacy PhysX is not installed. Legacy PhysX must be installed to fix issues with Mass Effect when the game is texture modded."; //Technically it's exe modded but still
-            //        }
-            //    }
-            //    else
-            //    {
-            //        Log.Information("[AICORE] Precheck: Legacy PhysX is installed");
-            //    }
-            //}
-#endif
             SetPreinstallCheckText("Performing precheck");
             if (!pc.checkOneOptionSelected(out var noOptionsSelectedReason))
             {
