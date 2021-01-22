@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.8" />
+					  version="7.0.9" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -3017,19 +3017,19 @@
 						 me3="true" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME3 2.1 - Third Party Mods (1080p)"
+						 friendlyname="A Lot of Videos for ME3 2.1.1 - Third Party Mods (1080p)"
 						 shortname="ALOV for ME3 - Third Party Mods (1080p)"
 						 author="Mellin"
 						 recommendationreason="Upgrades third party mod's videos where permission was granted, and they are not using 1080p videos already."
 						 recommendation="Optional"
-						 version="2.1"
+						 version="2.1.1"
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
 			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.0.0-773-2-1-0-0-1607683813.7z"
-					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.1.0.0.7z"
-					  md5="ef01ffb79fbad7544278304fadd7fa96"
-					  size="2299555141" />
+					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.0-773-2-1-0-0-1607683813.7z"
+					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.0.7z"
+					  md5="5979d870095d6706d23a9c3bf0ed1ea9"
+					  size="2299586310" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_Patches"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches"
@@ -3108,6 +3108,10 @@
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies"
 						  optionalrequireddlc="DLC_CON_MtoC;DLC_EXP_CEML"
 						  loggingname="(MEHEM and CEM) CEM Lite" />
+			<extractionredirect archiverootpath="Patches_Alternates\TEB"
+						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies"
+						  optionalrequireddlc="DLC_MOD_LONDON"
+						  loggingname="Take Earth Back" />
 			<games me1="false"
 						 me2="false"
 						 me3="true" />
@@ -3189,9 +3193,9 @@
 						 uipriority="2">
 			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
 					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.0.0-773-2-1-0-0-1607680138.7z"
-					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.1.0.0.7z"
-					  md5="306470b46e6f9b515d1ff328b47f45eb"
-					  size="10631492557" />
+					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.1.1.0.7z"
+					  md5="7749fb66b1b7c1f709af9f732ca80c72"
+					  size="10776556521" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_Patches"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches"
@@ -3290,6 +3294,10 @@
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies"
 						  optionalrequireddlc="DLC_CON_MtoC;DLC_EXP_CEML"
 						  loggingname="(MEHEM and CEM) CEM Lite" />
+			<extractionredirect archiverootpath="Patches_Alternates\TEB"
+						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies"
+						  optionalrequireddlc="DLC_MOD_LONDON"
+						  loggingname="Take Earth Back" />
 			<games me1="false"
 						 me2="false"
 						 me3="true" />
