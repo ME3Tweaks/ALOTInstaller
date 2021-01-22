@@ -3108,10 +3108,6 @@
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies"
 						  optionalrequireddlc="DLC_CON_MtoC;DLC_EXP_CEML"
 						  loggingname="(MEHEM and CEM) CEM Lite" />
-			<extractionredirect archiverootpath="Patches_Alternates\TEB"
-						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies"
-						  optionalrequireddlc="DLC_MOD_LONDON"
-						  loggingname="Take Earth Back" />
 			<games me1="false"
 						 me2="false"
 						 me3="true" />
