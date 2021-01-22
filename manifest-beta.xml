@@ -3183,16 +3183,16 @@
 						 me3="true" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME3 2.1 - Third Party Mods (4K)"
+						 friendlyname="A Lot of Videos for ME3 2.1.1 - Third Party Mods (4K)"
 						 shortname="ALOV for ME3 - Third Party Mods (4K)"
 						 author="Mellin"
 						 recommendationreason="Optional due to large filesize and CPU requirements"
 						 recommendation="Optional"
-						 version="2.1"
+						 version="2.1.1"
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
 			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.0.0-773-2-1-0-0-1607680138.7z"
+					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.1.0-773-2-1-0-0-1607680138.7z"
 					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.1.1.0.7z"
 					  md5="7749fb66b1b7c1f709af9f732ca80c72"
 					  size="10776556521" />
