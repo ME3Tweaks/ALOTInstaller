@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.9" />
+					  version="7.0.10" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -3026,7 +3026,7 @@
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
 			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.0-773-2-1-0-0-1607683813.7z"
+					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.0-773-2-1-1-0-1611470387.7z"
 					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.0.7z"
 					  md5="5979d870095d6706d23a9c3bf0ed1ea9"
 					  size="2299586310" />
@@ -3188,7 +3188,7 @@
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
 			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.1.0-773-2-1-0-0-1607680138.7z"
+					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.1.0-773-2-1-1-0-1611473943.7z"
 					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.1.1.0.7z"
 					  md5="7749fb66b1b7c1f709af9f732ca80c72"
 					  size="10776556521" />
