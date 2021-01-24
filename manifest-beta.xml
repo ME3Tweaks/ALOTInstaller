@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotinstallermanifest>
 	<!-- MEM Update Information -->
-	<highestapprovedmemversion>431</highestapprovedmemversion>
+	<highestapprovedmemversion>432</highestapprovedmemversion>
 	<soaktestingmemversion soakstartdate="2020-12-07">432</soaktestingmemversion>
 	<!-- YYYY-MM-DD-->
 
