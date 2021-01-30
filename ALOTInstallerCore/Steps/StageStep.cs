@@ -167,7 +167,7 @@ namespace ALOTInstallerCore.Steps
                         // If any package files list TPFSource disable this space optimization
                         if (extensions.Count == 1 && instFile.PackageFiles.Where(x => x.ApplicableGames.HasFlag(targetGame)).All(x => x.TPFSource == null))
                         {
-                            
+
                             // We have only one extension type! We can filter what we extract with MEM
                             args += $" --filter-with-ext {extensions.First().Substring(1)}"; //remove the '.'
                         }
@@ -274,7 +274,7 @@ namespace ALOTInstallerCore.Steps
 #if DEBUG
                 //if (!v.FriendlyName.Contains("ALOT"))
                 //{
-                    block.Post(v);
+                block.Post(v);
                 //}
 #else 
                 // Helps make sure I don't publish broken code
@@ -396,6 +396,8 @@ namespace ALOTInstallerCore.Steps
                 {
                     // There was an error
                     //UpdateStatusCallback?.Invoke($"Error extracting {installerFile.FriendlyName}, checking file");
+                    Log.Error($@"[AICORE] [{prefix}] Error extracting archive, checksumming...");
+
                     installerFile.StatusText = "Error extracting, checking archive";
                     using var sourcefStream = File.OpenRead(installerFile.GetUsedFilepath());
                     long sizeToHash = sourcefStream.Length;
@@ -409,15 +411,18 @@ namespace ALOTInstallerCore.Steps
                             }).Result;
                         if (hash == mf.GetBackingHash())
                         {
+                            Log.Error($@"[AICORE] [{prefix}] Error extracting archive, however checksum matches manifest - possible disk issues...?");
                             ErrorStagingCallback?.Invoke($"Error extracting {installerFile.GetUsedFilepath()}, but file matches manifest - possible disk issues?");
                         }
                         else
                         {
+                            Log.Error($@"[AICORE] [{prefix}] Error extracting archive, checksums don't match expected values, file is corrupt");
                             ErrorStagingCallback?.Invoke($"File is corrupt: {installerFile.GetUsedFilepath()}, this file should be deleted and redownloaded.\nExpected hash:{mf.GetBackingHash()}\nHash of file: {hash}");
                         }
                     }
                     else
                     {
+                        Log.Error($@"[AICORE] [{prefix}] Error extracting archive, size is zero bytes");
                         ErrorStagingCallback?.Invoke($"Unable to read {installerFile.GetUsedFilepath()}, size is 0 bytes");
                     }
                     _abortStaging = true;
@@ -585,6 +590,9 @@ namespace ALOTInstallerCore.Steps
                             }
                         }
                     }
+                } else
+                {
+                    Log.Warning($@"[AICORE] [{prefix}] Fell through archiveextracted() (TEST MESSAGE)");
                 }
 
                 // Single file unpacked
@@ -933,7 +941,7 @@ namespace ALOTInstallerCore.Steps
                 if (pair.Value.Count > 1)
                 {
                     // Has issue
-                    var chosenFile = ResolveMutualExclusiveMods?.Invoke(pair.Value.OfType<ManifestFile>().OrderByDescending(x=>x.Recommendation).OfType<InstallerFile>().ToList());
+                    var chosenFile = ResolveMutualExclusiveMods?.Invoke(pair.Value.OfType<ManifestFile>().OrderByDescending(x => x.Recommendation).OfType<InstallerFile>().ToList());
                     if (chosenFile == null) return null;//abort
                     files.Insert(0, chosenFile);
                 }

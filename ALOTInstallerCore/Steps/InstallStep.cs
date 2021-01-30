@@ -188,7 +188,7 @@ namespace ALOTInstallerCore.Steps
             Log.Information(@"[AICORE] Beginning InstallTextures() thread.");
             #region Presetup variables
             var filesThatWillInstall = Directory.GetFiles(memInputPath, "*.mem");
-            var mainInstallStageWillCommence = Enumerable.Any(filesThatWillInstall);
+            var mainInstallStageWillCommence = filesThatWillInstall.Any();
             Log.Information($@"[AICORE] Main texture installation step (+ supporting steps) will commence: {mainInstallStageWillCommence}");
 
             #endregion
@@ -350,7 +350,7 @@ namespace ALOTInstallerCore.Steps
                 Log.Information("[AICORE] The following files are going to be installed:");
                 foreach (var f in filesThatWillInstall)
                 {
-                    Log.Information(Path.GetFileName(f));
+                    Log.Information($@"[AICORE] {Path.GetFileName(f)}");
                 }
 
                 SetMiddleTextCallback?.Invoke("Setting up texture installer");
