@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.11" />
+					  version="7.0.12" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1170,7 +1170,7 @@
 					  installpriority="1">
 			<file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
 					  tooltipname="ALOT for ME1 12.1 - Update"
-					  filename="ALOT for ME1 12.1 - Update.zip"
+					  filename="ALOT for ME1 12.1 - Update.7z"
 					  size="112917"
 					  md5="2910166be94d4deca8cec211dde6ef91"
 					  unpackedsinglefilename="ALOT_UPDATE_ME1_v12.mem"
@@ -1191,7 +1191,7 @@
 					  installpriority="1">
 			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
 					  tooltipname="ALOT for ME2 12.1 - Update"
-					  filename="ALOT for ME2 12.1 - Update.zip"
+					  filename="ALOT for ME2 12.1 - Update.7z"
 					  size="216995438"
 					  md5="a73b5cfa8809e2fabcdb74390c96347b"
 					  unpackedsinglefilename="ALOT_UPDATE_ME2_v12.mem"
@@ -1212,7 +1212,7 @@
 					  installpriority="1">
 			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
 					  tooltipname="ALOT for ME3 12.1 - Update"
-					  filename="ALOT for ME3 12.1 - Update.zip"
+					  filename="ALOT for ME3 12.1 - Update.7z"
 					  size="132572100"
 					  md5="2910166be94d4deca8cec211dde6ef91"
 					  unpackedsinglefilename="ALOT_UPDATE_ME3_v12.mem"
