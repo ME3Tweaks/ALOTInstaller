@@ -1202,7 +1202,7 @@
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-					  appliestomainversion="12"
+					  alotversion="12"
 					  alotupdateversion="1"
 					  friendlyname="ALOT for ME3 12.1 - Update"
 					  author="CreeperLava"
