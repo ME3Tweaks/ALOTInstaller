@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.12" />
+					  version="7.0.13" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1160,7 +1160,7 @@
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-					  appliestomainversion="12"
+					  alotversion="12"
 					  alotupdateversion="1"
 					  friendlyname="ALOT for ME1 12.1 - Update"
 					  author="CreeperLava"
@@ -1181,7 +1181,7 @@
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-					  appliestomainversion="12"
+					  alotversion="12"
 					  alotupdateversion="1"
 					  friendlyname="ALOT for ME2 12.1 - Update"
 					  author="CreeperLava"
