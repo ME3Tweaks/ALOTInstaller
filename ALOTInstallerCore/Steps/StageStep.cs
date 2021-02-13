@@ -592,7 +592,7 @@ namespace ALOTInstallerCore.Steps
                     }
                 } else
                 {
-                    Log.Warning($@"[AICORE] [{prefix}] Fell through archiveextracted() (TEST MESSAGE)");
+                    //Log.Warning($@"[AICORE] [{prefix}] Fell through archiveextracted() (TEST MESSAGE)");
                 }
 
                 // Single file unpacked
@@ -908,7 +908,7 @@ namespace ALOTInstallerCore.Steps
             }
 
         }
-
+        
         private List<InstallerFile> resolveMutualExclusiveGroups()
         {
             var files = new List<InstallerFile>();
