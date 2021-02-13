@@ -458,6 +458,12 @@ namespace ALOTInstallerCore.Steps
                             Log.Information("[AICORE] Processing file " + param);
                             lastProcessedFile = param;
                             break;
+                        case "ERROR_FILE_NOT_COMPATIBLE":
+                            Log.Error($"File is listed as not compatible, may have broken header: {param}");
+                            break;
+                        case "ERROR":
+                            Log.Error($"MassEffectModderNoGui reported an error: {param}");
+                            break;
                         default:
                             var failureIPCTriggered = pm?.CurrentStage?.FailureInfos?.FirstOrDefault(x => x.FailureIPCTrigger == command && !x.Warning);
                             if (failureIPCTriggered != null)
@@ -475,7 +481,7 @@ namespace ALOTInstallerCore.Steps
                                 break;
                             }
 
-                            Debug.WriteLine($"Unhandled IPC: {command} {param}");
+                            Log.Warning($"Unhandled IPC command: {command} {param}");
                             break;
                     }
                 }
