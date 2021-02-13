@@ -644,7 +644,9 @@ namespace ALOTInstallerCore.Steps
                         bool linked = false;
 #if WINDOWS
                         // Try symlinking first. This way we don't have to copy anything
-                        linked = Utilities.WinCreateFileSymbolicLink(destF, installerFile.GetUsedFilepath());
+                        //linked = Utilities.WinCreateFileSymbolicLink(destF, installerFile.GetUsedFilepath());
+                        // Dont' use symlink
+                        linked = false;
 #endif
                         if (!linked)
                         {
