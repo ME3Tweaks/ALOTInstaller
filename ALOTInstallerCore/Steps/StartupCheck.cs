@@ -137,7 +137,7 @@ namespace ALOTInstallerCore.Steps
                 else
                 {
                     Log.Error("[AICORE] We have no uncapped or available pagefiles to use! Very high chance application will run out of memory");
-                    messageCallback?.Invoke($"Pagefile is off or size has been capped", "The system pagefile (virtual memory) settings are not currently managed by Windows, or the pagefile is off. {Utilities.GetAppPrefixedName()} Installer uses large amounts of memory and will very often run out of memory and crash if virtual memory is capped or turned off. You should not change your pagefile settings.");
+                    messageCallback?.Invoke($"Pagefile is off or size has been capped", $"The system pagefile (virtual memory) settings are not currently managed by Windows, or the pagefile is off. {Utilities.GetAppPrefixedName()} Installer uses large amounts of memory and will very often run out of memory and crash if virtual memory is capped or turned off. You should not change your pagefile settings.");
                 }
             }
             catch (Exception e)
