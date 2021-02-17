@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.14" />
+					  version="7.0.15" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -3045,10 +3045,10 @@
 					 optiongroup="ME3ALOV_DLC"
 					 uipriority="2">
 			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-1080p-DLCs_2.1-773-2-1-0-0-1607683226.7z"
-					  torrentfilename="ALOVforME3-1080p-DLCs_2.1+.7z"
-					  md5="8499bf8ff9d223049872dd9c404844e0"
-					  size="5955694266" />
+					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.1.7z"
+					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.1.7z"
+					  md5="33bdd213335226a399aeffd95ef25504"
+					  size="2160242881" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_DLC"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC"
@@ -3088,11 +3088,11 @@
 						 version="2.1.1"
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.0-773-2-1-1-0-1611470387.7z"
-					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.0.7z"
-					  md5="5979d870095d6706d23a9c3bf0ed1ea9"
-					  size="2299586310" />
+			<file downloadlink="https://tessatheterror.xyz/index.php/s/83C9ydgxLxkdPPL"
+					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.1.7z"
+					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.1.7z"
+					  md5="33bdd213335226a399aeffd95ef25504"
+					  size="2160242881" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_Patches"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches"
@@ -3122,10 +3122,6 @@
 						  optionalrequiredfiles="BIOGame\DLC\DLC_CON_LIME\Movies\End03_D_NormandyChaseExt.bik"
 						  optionalrequiredfilessizes="43174424"
 						  loggingname="LIME WWP + FLOW" />
-			<extractionredirect archiverootpath="Patches_Alternates\OP_RE"
-						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies"
-						  optionalrequireddlc="DLC_MOD_OpRemaster"
-						  loggingname="ME3 Opening Remaster" />
 			<extractionredirect archiverootpath="Patches_Alternates\TALI"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches\Movies"
 						  optionalrequireddlc="DLC_CON_TaliMaster"
@@ -3250,11 +3246,11 @@
 						 version="2.1.1"
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.1.0-773-2-1-1-0-1611473943.7z"
-					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.1.1.0.7z"
-					  md5="7749fb66b1b7c1f709af9f732ca80c72"
-					  size="10776556521" />
+			<file downloadlink="https://tessatheterror.xyz/index.php/s/83C9ydgxLxkdPPL"
+					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.1.1.7z"
+					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.1.1.1.7z"
+					  md5="e9b6c26a9a0cb7511329bf621eccea13"
+					  size="11633442063" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_Patches"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches"
