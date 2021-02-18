@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.15" />
+					  version="7.0.16" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -3045,10 +3045,10 @@
 					 optiongroup="ME3ALOV_DLC"
 					 uipriority="2">
 			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.1.7z"
-					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.1.7z"
-					  md5="33bdd213335226a399aeffd95ef25504"
-					  size="2160242881" />
+					  filename="ALOVforME3-1080p-DLCs_2.1-773-2-1-0-0-1607683226.7z"
+					  torrentfilename="ALOVforME3-1080p-DLCs_2.1+.7z"
+					  md5="8499bf8ff9d223049872dd9c404844e0"
+					  size="5955694266" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_DLC"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC"
