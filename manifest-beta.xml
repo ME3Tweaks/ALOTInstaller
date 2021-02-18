@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.16" />
+					  version="7.0.17" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -3080,7 +3080,7 @@
 						 me3="true" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME3 2.1.1 - Third Party Mods (1080p)"
+						 friendlyname="A Lot of Videos for ME3 2.1.1.1 - Third Party Mods (1080p)"
 						 shortname="ALOV for ME3 - Third Party Mods (1080p)"
 						 author="Mellin"
 						 recommendationreason="Upgrades third party mod's videos where permission was granted, and they are not using 1080p videos already."
@@ -3238,7 +3238,7 @@
 						 me3="true" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME3 2.1.1 - Third Party Mods (4K)"
+						 friendlyname="A Lot of Videos for ME3 2.1.1.1 - Third Party Mods (4K)"
 						 shortname="ALOV for ME3 - Third Party Mods (4K)"
 						 author="Mellin"
 						 recommendationreason="Optional due to large filesize and CPU requirements"
