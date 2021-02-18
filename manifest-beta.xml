@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.18" />
+					  version="7.0.19" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1171,11 +1171,11 @@
 			<file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
 					  tooltipname="ALOT for ME1 12.1 - Update"
 					  filename="ALOT for ME1 12.1 - Update.zip"
-					  size="24702405"
-					  md5="b8106450a277e2d530a7a48f28c27972"
+					  size="31673743"
+					  md5="a214d4b58643ae3d136f6a065b73a19b"
 					  unpackedsinglefilename="ALOT_UPDATE_ME1_v12.mem"
-					  unpackedsize="24702225"
-					  unpackedmd5="5000e22e57cde25943f73766e56d727a" />
+					  unpackedsize="31673563"
+					  unpackedmd5="3dee39f571ce7eb94c6a47a2bbbb4c81" />
 			<packagefile me1="true"
 						 sourcename="ALOT_UPDATE_ME1_v12.mem"
 						 movedirectly="true" />
@@ -1192,11 +1192,11 @@
 			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
 					  tooltipname="ALOT for ME2 12.1 - Update"
 					  filename="ALOT for ME2 12.1 - Update.zip"
-					  size="216995464"
-					  md5="f716f1d14978499c9a4119cf84f32345"
+					  size="355911993"
+					  md5="9233163c835afdcc7dcaaee392b3601d"
 					  unpackedsinglefilename="ALOT_UPDATE_ME2_v12.mem"
-					  unpackedsize="216995284"
-					  unpackedmd5="7bd827cc9165f53b5e4d7e2f106936d4" />
+					  unpackedsize="355911813"
+					  unpackedmd5="9e51e665ca8618fc9cca0f260ccea2d6" />
 			<packagefile me2="true"
 						 sourcename="ALOT_UPDATE_ME2_v12.mem"
 						 movedirectly="true" />
@@ -1213,11 +1213,11 @@
 			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
 					  tooltipname="ALOT for ME3 12.1 - Update"
 					  filename="ALOT for ME3 12.1 - Update.zip"
-					  size="150692238"
-					  md5="e6722b162dad16963fabbaca6f6e4d18"
+					  size="182004537"
+					  md5="e74682a23b016a2046ebc668497b65c6"
 					  unpackedsinglefilename="ALOT_UPDATE_ME3_v12.mem"
-					  unpackedsize="150692058"
-					  unpackedmd5="87735d8cac3128f0070bdbec40c59153" />
+					  unpackedsize="182004357"
+					  unpackedmd5="1da3c300d28bd159c2c2057275223622" />
 			<packagefile me3="true"
 						 sourcename="ALOT_UPDATE_ME3_v12.mem"
 						 movedirectly="true" />
