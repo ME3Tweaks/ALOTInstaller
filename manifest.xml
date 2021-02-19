@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.0.10" />
+					  version="7.1.0" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1119,6 +1119,69 @@
 					  unpackedmd5="a6ed5bd423c87abca202192e6ca11363" />
 			<packagefile me3="true"
 						 sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v12.mem"
+						 movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
+					  alotversion="12"
+					  alotupdateversion="1"
+					  friendlyname="ALOT for ME1 12.1 - Update"
+					  author="CreeperLava"
+					  uipriority="0"
+					  recommendationreason="Update to the main ALOT file, required"
+					  recommendation="Required"
+					  installpriority="1">
+			<file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+					  tooltipname="ALOT for ME1 12.1 - Update"
+					  filename="ALOT for ME1 12.1 - Update.zip"
+					  size="31673743"
+					  md5="a214d4b58643ae3d136f6a065b73a19b"
+					  unpackedsinglefilename="ALOT_UPDATE_ME1_v12.mem"
+					  unpackedsize="31673563"
+					  unpackedmd5="3dee39f571ce7eb94c6a47a2bbbb4c81" />
+			<packagefile me1="true"
+						 sourcename="ALOT_UPDATE_ME1_v12.mem"
+						 movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
+					  alotversion="12"
+					  alotupdateversion="1"
+					  friendlyname="ALOT for ME2 12.1 - Update"
+					  author="CreeperLava"
+					  uipriority="0"
+					  recommendationreason="Update to the main ALOT file, required"
+					  recommendation="Required"
+					  installpriority="1">
+			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+					  tooltipname="ALOT for ME2 12.1 - Update"
+					  filename="ALOT for ME2 12.1 - Update.zip"
+					  size="355911993"
+					  md5="9233163c835afdcc7dcaaee392b3601d"
+					  unpackedsinglefilename="ALOT_UPDATE_ME2_v12.mem"
+					  unpackedsize="355911813"
+					  unpackedmd5="9e51e665ca8618fc9cca0f260ccea2d6" />
+			<packagefile me2="true"
+						 sourcename="ALOT_UPDATE_ME2_v12.mem"
+						 movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
+					  alotversion="12"
+					  alotupdateversion="1"
+					  friendlyname="ALOT for ME3 12.1 - Update"
+					  author="CreeperLava"
+					  uipriority="0"
+					  recommendationreason="Update to the main ALOT file, required"
+					  recommendation="Required"
+					  installpriority="1">
+			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
+					  tooltipname="ALOT for ME3 12.1 - Update"
+					  filename="ALOT for ME3 12.1 - Update.zip"
+					  size="182004537"
+					  md5="e74682a23b016a2046ebc668497b65c6"
+					  unpackedsinglefilename="ALOT_UPDATE_ME3_v12.mem"
+					  unpackedsize="182004357"
+					  unpackedmd5="1da3c300d28bd159c2c2057275223622" />
+			<packagefile me3="true"
+						 sourcename="ALOT_UPDATE_ME3_v12.mem"
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
