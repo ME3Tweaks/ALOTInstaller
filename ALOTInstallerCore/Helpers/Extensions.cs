@@ -153,22 +153,6 @@ namespace ALOTInstallerCore.Helpers
             return res;
         }
 
-        public static int ToGameNum(this MEGame game)
-        {
-            if (game == MEGame.ME1) return 1;
-            if (game == MEGame.ME2) return 2;
-            if (game == MEGame.ME3) return 3;
-            return 0;
-        }
-
-        public static string ToGameName(this MEGame game)
-        {
-            if (game == MEGame.ME1) return "Mass Effect";
-            if (game == MEGame.ME2) return "Mass Effect 2";
-            if (game == MEGame.ME3) return "Mass Effect 3";
-            return "UNKNOWN GAME";
-        }
-
         /// <summary>
         /// Checks if a list is ascending basded on the given comparison function.
         /// </summary>
