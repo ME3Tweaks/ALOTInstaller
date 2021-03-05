@@ -8,6 +8,9 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
 {
     public static class RegistryHandler
     {
+        public static string RegistrySettingsPath = RegistrySettingsPath;
+        public static string CurrentUserRegistrySubpath = @"Software\ALOTAddon";
+
         /// <summary>
         /// Tests if a registry key is writable by writing a randomly named value into it and then attempting to delete it.
         /// </summary>
@@ -77,29 +80,29 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
             }
         }
 
-        internal static void WriteRegistrySettingBool(string keyname, bool value)
+        public static void WriteRegistrySettingBool(string keyname, bool value)
         {
-            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value);
+            WriteRegistryKey(Registry.CurrentUser, CurrentUserRegistrySubpath, keyname, value);
         }
 
         internal static void WriteRegistrySettingString(string keyname, string value)
         {
-            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value);
+            WriteRegistryKey(Registry.CurrentUser, CurrentUserRegistrySubpath, keyname, value);
         }
 
         internal static void WriteRegistrySettingInt(string keyname, int value)
         {
-            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value);
+            WriteRegistryKey(Registry.CurrentUser, CurrentUserRegistrySubpath, keyname, value);
         }
 
         internal static void WriteRegistrySettingLong(string keyname, long value)
         {
-            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value);
+            WriteRegistryKey(Registry.CurrentUser, CurrentUserRegistrySubpath, keyname, value);
         }
 
         internal static void WriteRegistrySettingFloat(string keyname, float value)
         {
-            WriteRegistryKey(Registry.CurrentUser, "Software\\ALOTAddon", keyname, value);
+            WriteRegistryKey(Registry.CurrentUser, CurrentUserRegistrySubpath, keyname, value);
         }
 
         /// <summary>
@@ -109,8 +112,7 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         /// <returns></returns>
         public static string GetRegistryString(string name)
         {
-            string softwareKey = @"HKEY_CURRENT_USER\Software\ALOTAddon";
-            return (string)Registry.GetValue(softwareKey, name, null);
+            return (string)Registry.GetValue(RegistrySettingsPath, name, null);
         }
 
         /// <summary>
@@ -143,10 +145,7 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         /// <returns></returns>
         public static bool? GetRegistrySettingBool(string name)
         {
-
-            string softwareKey = @"HKEY_CURRENT_USER\Software\ALOTAddon";
-
-            int? value = (int?)Registry.GetValue(softwareKey, name, null);
+            int? value = (int?)Registry.GetValue(RegistrySettingsPath, name, null);
             if (value != null)
             {
                 return value > 0;
@@ -178,8 +177,7 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
 
         public static long? GetRegistrySettingLong(string name)
         {
-            string softwareKey = @"HKEY_CURRENT_USER\Software\ALOTAddon";
-            return (long?)Registry.GetValue(softwareKey, name, null);
+            return (long?)Registry.GetValue(RegistrySettingsPath, name, null);
         }
 
         /// <summary>

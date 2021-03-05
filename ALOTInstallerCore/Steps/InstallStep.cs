@@ -16,6 +16,7 @@ using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps.Installer;
 using MassEffectModManagerCore.modmanager.asi;
 using ME3ExplorerCore;
+using ME3ExplorerCore.Gammtek.Extensions;
 using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 using ME3ExplorerCore.Unreal;
@@ -846,7 +847,7 @@ namespace ALOTInstallerCore.Steps
 
                 SetBottomTextCallback?.Invoke("Fixing Mars to Citadel transition");
                 Log.Information("[AICORE] Fixing post-mars hackett cutscene memory issue");
-                CoreLib.InitLib(package.UiThreadScheduler, x =>
+                ME3ExplorerCoreLib.InitLib(package.UiThreadScheduler, x =>
                 {
                     Log.Error($"Error saving package: {x}");
                 });

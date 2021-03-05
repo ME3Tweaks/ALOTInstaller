@@ -14,6 +14,7 @@ using ALOTInstallerCore.Objects;
 using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Packages;
 using ALOTInstallerCore.ModManager.asi;
+using ME3ExplorerCore.Gammtek.Extensions;
 using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Unreal;
 #if WINDOWS
@@ -31,7 +32,6 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         /// </summary>
         public static ILogger CreateLogger()
         {
-            var logsDir =
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.File(Path.Combine(LogDir, $"{Utilities.GetHostingProcessname().ToLower()}log.txt"), rollingInterval: RollingInterval.Day, flushToDiskInterval: new TimeSpan(0, 0, 15))
@@ -40,6 +40,26 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
 #endif
                 .CreateLogger();
             return Log.Logger;
+        }
+
+        public static List<LogItem> GetLogsList()
+        {
+            var logs = Directory.GetFiles(LogDir, "*.txt");
+            return logs.Select(x => new LogItem(x)).ToList();
+        }
+
+        public class LogItem
+        {
+            public string filepath;
+            public LogItem(string filepath)
+            {
+                this.filepath = filepath;
+            }
+
+            public override string ToString()
+            {
+                return $"{Path.GetFileName(filepath)} - {FileSize.FormatSize(new FileInfo(filepath).Length)}";
+            }
         }
 
         /// <summary>

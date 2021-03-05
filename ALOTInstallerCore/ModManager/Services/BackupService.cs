@@ -9,6 +9,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Gammtek.Extensions;
 using ME3ExplorerCore.Packages;
 using Serilog;
 #if WINDOWS
@@ -105,11 +106,13 @@ namespace ALOTInstallerCore.ModManager.Services
                     if (log) Log.Information($@"[AICORE] BackupService: {Game} {BackupStatus}, {BackupLocationStatus}");
                     LinkActionText = "Unlink backup";
                     BackupActionText = "Restore game";
+                    BackedUp = true;
                     return;
                 }
                 bPath = GetGameBackupPath(Game, out _, forceCmmVanilla, forceReturnPath: true);
                 if (bPath == null)
                 {
+                    BackedUp = false;
                     BackupStatus = "Not backed up";
                     BackupLocationStatus = "Game has not been backed up";
                     if (log) Log.Information($@"[AICORE] BackupService: {Game} {BackupStatus}, {BackupLocationStatus}");
@@ -119,6 +122,7 @@ namespace ALOTInstallerCore.ModManager.Services
                 }
                 else if (!Directory.Exists(bPath))
                 {
+                    BackedUp = false;
                     BackupStatus = "Backup unavailable";
                     BackupLocationStatus = $"Backup path not accessible: {bPath}";
                     if (log) Log.Information($@"[AICORE] BackupService: {Game} {BackupStatus}, {BackupLocationStatus}");
@@ -130,6 +134,7 @@ namespace ALOTInstallerCore.ModManager.Services
 
                 if (!installed)
                 {
+                    //BackedUp = false; // Not sure if this is the right call, maybe we shouldn't modify this
                     BackupStatus = "Game not installed";
                     BackupLocationStatus = "Game not installed. Run at least once to ensure game is fully setup";
                     if (log) Log.Information($@"[AICORE] BackupService: {Game} {BackupStatus}, {BackupLocationStatus}");

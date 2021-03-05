@@ -80,14 +80,15 @@ namespace ALOTInstallerCore
         /// This is a continuation of the startup for the library. This method should be called after Startup() and any critical work is done, such as checkingk for updates. The
         /// rest of the library should not load until the update check is done as it may be the source of a crash the update is designed to fix
         /// </summary>
-        public static void PostCriticalStartup(Action<string> currentOperationCallback, Action<Action> runOnUiThreadCallback)
+        public static void PostCriticalStartup(Action<string> currentOperationCallback, Action<Action> runOnUiThreadCallback, bool loadTargets = true)
         {
             // Load ME3ExplorerCore library
             Log.Information(@"[AICORE] Loading ME3ExplorerCore library");
-            CoreLib.InitLib(CoreLib.SYNCHRONIZATION_CONTEXT, x => { Log.Error($"Error saving package: {x}"); });
+            ME3ExplorerCoreLib.InitLib(ME3ExplorerCoreLib.SYNCHRONIZATION_CONTEXT, x => { Log.Error($"Error saving package: {x}"); });
 
             // Logs call in method
-            Locations.LoadTargets();
+            if (loadTargets)
+                Locations.LoadTargets();
             Log.Information("[AICORE] Starting backup service");
             BackupService.InitBackupService(runOnUiThreadCallback);
 
@@ -96,7 +97,7 @@ namespace ALOTInstallerCore
 
             var willcheckforupdates = OnlineContent.CanFetchContentThrottleCheck();
             BasegameFileIdentificationService.LoadService();
-            
+
             Log.Information("[AICORE] Loading ME3Tweaks service: Third Party Mod Identification Service (TPMI)");
             ThirdPartyIdentificationService.ModDatabase = OnlineContent.FetchThirdPartyIdentificationManifest();
             ASIManager.LoadManifest();
@@ -105,7 +106,7 @@ namespace ALOTInstallerCore
             {
                 Settings.LastContentCheck = DateTime.Now;
             }
-            
+
             Log.Information(@"[AICORE] Starting periodic refresh");
             PeriodicRefresh.StartPeriodicRefresh();
         }
