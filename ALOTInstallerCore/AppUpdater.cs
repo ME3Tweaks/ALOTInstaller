@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define APPUPDATESUPPORT
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -414,7 +416,7 @@ namespace ALOTInstallerCore
         private static void applyUpdate(string newExecutable, Action<string> setDialogText = null)
         {
             string args = @"--update-boot";
-            Log.Information($@"[AICORE] Booting new version of the installer to perform first time extraction: {newExecutable} {args}");
+            Log.Information($@"[AICORE] Booting new version of the application to perform first time extraction: {newExecutable} {args}");
 
             Process process = new Process();
             // Stop the process from opening a new window
@@ -427,7 +429,7 @@ namespace ALOTInstallerCore
             process.Start();
             process.WaitForExit();
 
-            setDialogText?.Invoke($"Restarting {Utilities.GetAppPrefixedName()} Installer");
+            setDialogText?.Invoke($"Restarting application");
             Thread.Sleep(2000);
             args = $"--update-dest-path \"{Utilities.GetExecutablePath()}\"";
             Log.Information($@"[AICORE] Running proxy update: {newExecutable} {args}");
@@ -441,7 +443,7 @@ namespace ALOTInstallerCore
             process.StartInfo.FileName = newExecutable;
             process.StartInfo.Arguments = args;
             process.Start();
-            Log.Information(@"[AICORE] Stopping installer to allow executable swap");
+            Log.Information(@"[AICORE] Stopping application to allow executable swap");
             Log.CloseAndFlush();
 
             // If this throws exception and the app dies... oh well, I guess?
