@@ -28,7 +28,7 @@ namespace ALOTInstallerCore
         /// </summary>
         /// <param name="setCallingLoggerCallback">Function to pass this library's logger back</param>
         /// <param name="runOnUiThreadCallback">Callback that contains method that should be wrapped in a UI-thread only runner. Some object initialization can only be performed on the UI thread</param>
-        public static void Startup(Action<ILogger> setCallingLoggerCallback, Action<Action> runOnUiThreadCallback, Action startTelemetryCallback = null, Action stopTelemetryCallback = null)
+        public static void Startup(Action<ILogger> setCallingLoggerCallback, Action<Action> runOnUiThreadCallback, Action startTelemetryCallback = null, Action stopTelemetryCallback = null, string firstLogMessage = null)
         {
             if (startedUp) return;
             startedUp = true;
@@ -37,6 +37,10 @@ namespace ALOTInstallerCore
             LogCollector.SetWrapperLogger = setCallingLoggerCallback;
             setCallingLoggerCallback?.Invoke(LogCollector.CreateLogger());
             Log.Information(LogCollector.SessionStartString);
+            if (firstLogMessage != null)
+            {
+                Log.Information($@"[AICORE] {firstLogMessage}");
+            }
             Log.Information("[AICORE] ALOTInstallerCore library is booting");
             Log.Information($"[AICORE] Library version: {Utilities.GetLibraryVersion()}");
 

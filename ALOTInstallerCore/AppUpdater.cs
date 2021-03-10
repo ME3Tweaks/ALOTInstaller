@@ -14,42 +14,78 @@ using Serilog;
 
 namespace ALOTInstallerCore
 {
+
+    public class AppUpdateInteropPackage
+    {
+        public string GithubOwner { get; set; }
+        public string GithubReponame { get; set; }
+        public string UpdateAssetPrefix { get; set; }
+        public string UpdateFilenameInArchive { get; set; }
+        /// <summary>
+        /// Invoked when an update prompt should be shown with title, description, and two buttons. Returns true if accepted, false if declined
+        /// </summary>
+        public Func<string, string, string, string, bool> ShowUpdatePromptCallback { get; set; }
+        /// <summary>
+        /// Invoked when a dialog that has a piece of text (title, description, can be canceled) should be updated
+        /// </summary>
+        public Action<string, string, bool> ShowUpdateProgressDialogCallback { get; set; } // title, message, cancancel
+        /// <summary>
+        /// Invoked when the update dialog box's text should be updated
+        /// </summary>
+        public Action<string> SetUpdateDialogTextCallback { get; set; }
+        /// <summary>
+        /// Invoked when there is progress to be shown.
+        /// </summary>
+        public Action<long, long> ProgressCallback { get; set; }
+        /// <summary>
+        /// Invoked when progress should be set as indeterminate
+        /// </summary>
+        public Action ProgressIndeterminateCallback { get; set; }
+        /// <summary>
+        /// Invoked when a message needs to be shown
+        /// </summary>
+        public Action<string, string> ShowMessageCallback { get; set; }
+        /// <summary>
+        /// Invoked if the latest release is a beta release
+        /// </summary>
+        public Action NotifyBetaAvailable { get; set; }
+        /// <summary>
+        /// Invoked when the download has completed and the cancel button (if any) should be hidden
+        /// </summary>
+        public Action DownloadCompleted { get; set; } // When we should hide cancel button
+        /// <summary>
+        /// Invoked when the update is canceled.
+        /// </summary>
+        public CancellationTokenSource cancellationTokenSource { get; set; }
+        /// <summary>
+        /// Request header that is required for sending to GitHub. Can be any non-empty string.
+        /// </summary>
+        public string RequestHeader { get; set; }
+        /// <summary>
+        /// Text that is used for logging
+        /// </summary>
+        public string ApplicationName { get; set; }
+        /// <summary>
+        /// The amount of applicable releases that are newer than ours that can exist before we force the client to upgrade without prompt. Set to zero to disable this feature. This can be used to prevent people from using very outdated downloads
+        /// </summary>
+        public int ForcedUpgradeMaxReleaseAge { get; set; }
+    }
+
     public class AppUpdater
     {
         /// <summary>
-        /// Checks for application updates. The hosting app must implement the reboot and swap logic.
+        /// Checks for application updates. The hosting app must implement the reboot and swap logic
         /// </summary>
-        /// <param name="owner"></param>
-        /// <param name="repo"></param>
-        /// <param name="assetPrefix"></param>
-        /// <param name="updateFilenameInArchive"></param>
-        /// <param name="showUpdatePromptCallback"></param>
-        /// <param name="showUpdateProgressDialogCallback"></param>
-        /// <param name="setUpdateDialogTextCallback"></param>
-        /// <param name="progressCallback"></param>
-        /// <param name="progressIndeterminateCallback"></param>
-        /// <param name="showMessageCallback"></param>
-        /// <param name="notifyBetaAvailable"></param>
-        public static async void PerformGithubAppUpdateCheck(string owner, string repo, string assetPrefix,
-            string updateFilenameInArchive,
-            Func<string, string, string, string, bool> showUpdatePromptCallback,
-            Action<string, string, bool> showUpdateProgressDialogCallback, // title, message, cancancel
-            Action<string> setUpdateDialogTextCallback,
-            Action<long, long> progressCallback,
-            Action progressIndeterminateCallback,
-            Action<string, string> showMessageCallback,
-            Action notifyBetaAvailable,
-            Action downloadCompleted, // When we should hide cancel button
-            CancellationTokenSource cancellationTokenSource)
+        public static async void PerformGithubAppUpdateCheck(AppUpdateInteropPackage interopPackage)
         {
 #if APPUPDATESUPPORT
             Log.Information($"[AICORE] Checking for application updates from github. Mode: {(Settings.BetaMode ? "Beta" : "Stable")}");
             var currentAppVersionInfo = Utilities.GetAppVersion();
-            var client = new GitHubClient(new ProductHeaderValue($"{Utilities.GetAppPrefixedName()}Installer"));
+            var client = new GitHubClient(new ProductHeaderValue(interopPackage.RequestHeader));
             try
             {
                 int myReleaseAge = 0;
-                var releases = client.Repository.Release.GetAll(owner, repo).Result;
+                var releases = client.Repository.Release.GetAll(interopPackage.GithubOwner, interopPackage.GithubReponame).Result;
                 if (releases.Count > 0)
                 {
                     Log.Information("[AICORE] Fetched application releases from github");
@@ -64,12 +100,12 @@ namespace ALOTInstallerCore
 
                         if (onlineReleaseVersion <= currentAppVersionInfo && ((Settings.BetaMode && onlineRelease.Prerelease) || !onlineRelease.Prerelease))
                         {
-                            Log.Information($@"[AICORE] The version of ALOT Installer that we have is higher than/equal to the latest release from github, no updates available. Latest applicable github release is {onlineReleaseVersion}");
+                            Log.Information($@"[AICORE] The version of {interopPackage.ApplicationName} that we have is higher than/equal to the latest release from github, no updates available. Latest applicable github release is {onlineReleaseVersion}");
                             break;
                         }
 
                         // Check if applicable
-                        if (onlineRelease.Assets.All(x => !x.Name.StartsWith(assetPrefix)))
+                        if (onlineRelease.Assets.All(x => !x.Name.StartsWith(interopPackage.UpdateAssetPrefix)))
                         {
                             continue; //This release is not applicable to us
                         }
@@ -102,9 +138,9 @@ namespace ALOTInstallerCore
                             bool upgrade = false;
                             bool canCancel = true;
                             Log.Information("[AICORE] Latest release is applicable to us.");
-                            if (myReleaseAge > 5)
+                            if (interopPackage.ForcedUpgradeMaxReleaseAge > 0 && myReleaseAge > interopPackage.ForcedUpgradeMaxReleaseAge)
                             {
-                                Log.Warning("[AICORE] This is an old release. We are force upgrading this client.");
+                                Log.Warning("[AICORE] This is an old release. We are force upgrading the application.");
                                 upgrade = true;
                                 canCancel = false;
                             }
@@ -131,75 +167,83 @@ namespace ALOTInstallerCore
                                 }
 
                                 uiVersionInfo += $"\nReleased: {ageStr}";
-                                string title = $"{Utilities.GetAppPrefixedName()} Installer {releaseName} is available";
+                                string title = $"{interopPackage.ApplicationName} {releaseName} is available";
 
                                 var message = latest.Body;
                                 var msgLines = latest.Body.Split('\n');
                                 message = string.Join('\n', msgLines.Where(x => !x.StartsWith("hash: "))).Trim();
-                                upgrade = showUpdatePromptCallback != null && showUpdatePromptCallback.Invoke(title, $"You are currently using version {currentAppVersionInfo}.{uiVersionInfo}\n\n{message}", "Update", "Later");
+                                upgrade = interopPackage.ShowUpdatePromptCallback != null && interopPackage.ShowUpdatePromptCallback.Invoke(title, $"You are currently using version {currentAppVersionInfo}.{uiVersionInfo}\n\n{message}", "Update", "Later");
                             }
                             if (upgrade)
                             {
                                 Log.Information("[AICORE] Downloading update for application");
                                 //there's an update
-                                string message = $"Downloading update for {Utilities.GetAppPrefixedName()} Installer...";
+                                string message = $"Downloading update for {interopPackage.ApplicationName}...";
                                 if (!canCancel)
                                 {
                                     if (!Settings.BetaMode)
                                     {
-                                        message = $"This copy of {Utilities.GetAppPrefixedName()} Installer is outdated and must be updated.";
+                                        message = $"This copy of {interopPackage.ApplicationName} is outdated and must be updated.";
                                     }
                                 }
 
-                                showUpdateProgressDialogCallback?.Invoke($"Updating {Utilities.GetAppPrefixedName()} Installer", message, canCancel);
+                                interopPackage.ShowUpdateProgressDialogCallback?.Invoke($"Updating {interopPackage.ApplicationName}", message, canCancel);
                                 // First here should be OK since we checked it above...
 
                                 // PATCH UPDATE
-                                if (attemptPatchUpdate(latest, progressCallback, progressIndeterminateCallback, setUpdateDialogTextCallback, downloadCompleted, cancellationTokenSource))
+                                if (attemptPatchUpdate(latest, interopPackage.ProgressCallback, interopPackage.ProgressIndeterminateCallback, interopPackage.SetUpdateDialogTextCallback, interopPackage.DownloadCompleted, interopPackage.cancellationTokenSource))
                                 {
                                     // Patch update succeeded. The code below is the default update
                                     return;
                                 }
 
 
-                                var asset = latest.Assets.First(x => x.Name.StartsWith(assetPrefix));
-                                var downloadResult = await OnlineContent.DownloadToMemory(asset.BrowserDownloadUrl, progressCallback,
-                                    logDownload: true, cancellationTokenSource: cancellationTokenSource);
+                                var asset = latest.Assets.First(x => x.Name.StartsWith(interopPackage.UpdateAssetPrefix));
+                                var downloadResult = await OnlineContent.DownloadToMemory(asset.BrowserDownloadUrl, interopPackage.ProgressCallback,
+                                    logDownload: true, cancellationTokenSource: interopPackage.cancellationTokenSource);
+
+                                // DEBUG ONLY
+                                //(MemoryStream result, string errorMessage) downloadResult = (new MemoryStream(File.ReadAllBytes(@"C:\Users\mgame\source\repos\ME2Randomizer\ME2Randomizer\Deployment\Releases\ME2Randomizer_0.9.1.0.7z")), null);
                                 if (downloadResult.result == null & downloadResult.errorMessage == null)
                                 {
                                     // Canceled
                                     Log.Warning("[AICORE] The download was canceled.");
                                     return;
                                 }
+
                                 if (downloadResult.errorMessage != null)
                                 {
                                     // There was an error downloading the update.
-                                    showMessageCallback?.Invoke("Update failed", $"There was an error downloading the update: {downloadResult.errorMessage}");
+                                    interopPackage.ShowMessageCallback?.Invoke("Update failed", $"There was an error downloading the update: {downloadResult.errorMessage}");
                                     return;
-
                                 }
+
+                                // Comment out if you are debug testing new use of update check
                                 if (downloadResult.result.Length != asset.Size)
                                 {
                                     // The download is wrong size
-                                    showMessageCallback?.Invoke("Update failed", "The downloaded file was incomplete.");
+                                    Log.Error($@"[AICORE] The downloaded file was incomplete. Downloaded size: {downloadResult.result.Length}, expected size: {asset.Size}");
+                                    interopPackage.ShowMessageCallback?.Invoke("Update failed", "The downloaded file was incomplete.");
                                     return;
                                 }
+
                                 // Download is OK
-                                downloadCompleted?.Invoke();
-                                progressIndeterminateCallback?.Invoke();
-                                showUpdateProgressDialogCallback?.Invoke($"Updating {Utilities.GetAppPrefixedName()} Installer", "Preparing to apply update", false);
-                                var updateFailedResult = extractUpdate(downloadResult.result, Path.GetFileName(asset.Name), updateFilenameInArchive, setUpdateDialogTextCallback);
+                                interopPackage.DownloadCompleted?.Invoke();
+                                interopPackage.ProgressIndeterminateCallback?.Invoke();
+                                interopPackage.ShowUpdateProgressDialogCallback?.Invoke($"Updating {interopPackage.ApplicationName}", "Preparing to apply update", false);
+                                var updateFailedResult = extractUpdate(downloadResult.result, Path.GetFileName(asset.Name), interopPackage.UpdateFilenameInArchive, interopPackage.SetUpdateDialogTextCallback);
                                 if (updateFailedResult != null)
                                 {
                                     // The download is wrong size
-                                    showMessageCallback?.Invoke("Update failed", $"Applying the update failed: {updateFailedResult}");
+                                    Log.Error($@"[AICORE] Applying the update failed: {updateFailedResult}");
+                                    interopPackage.ShowMessageCallback?.Invoke("Update failed", $"Applying the update failed: {updateFailedResult}");
                                     return;
                                 }
                             }
                             else
                             {
                                 Log.Warning("[AICORE] Application update was declined by user");
-                                showMessageCallback?.Invoke("Old versions are not supported", $"Outdated versions of {Utilities.GetAppPrefixedName()} Installer are not supported and may stop working when online components, such as the installation manifest, are updated.");
+                                interopPackage.ShowMessageCallback?.Invoke("Old versions are not supported", $"Outdated versions of {interopPackage.ApplicationName} Installer are not supported and may not work in the future.");
                             }
                         }
                         else
@@ -208,7 +252,7 @@ namespace ALOTInstallerCore
                             Log.Information("[AICORE] Application is up to date.");
                             if (betaAvailableButOnStable && Settings.LastBetaAdvert < (DateTime.UtcNow.AddDays(-3)))
                             {
-                                notifyBetaAvailable?.Invoke();
+                                interopPackage.NotifyBetaAvailable?.Invoke();
                                 Settings.LastBetaAdvert = DateTime.Now;
                             }
                         }
@@ -367,12 +411,12 @@ namespace ALOTInstallerCore
         }
 
 
-        private static string extractUpdate(MemoryStream ms, string assetFilename, string updateFileName, Action<string> setDialogText
- = null)
+        private static string extractUpdate(MemoryStream ms, string assetFilename, string updateFileName, Action<string> setDialogText = null)
         {
             var outDir = Path.Combine(Locations.TempDirectory(), Path.GetFileNameWithoutExtension(assetFilename));
             var archiveFile = Path.Combine(Locations.TempDirectory(), assetFilename);
             ms.WriteToFile(archiveFile);
+            setDialogText?.Invoke("Extracting update");
             if (LZMA.ExtractSevenZipArchive(archiveFile, outDir))
             {
                 // Extraction complete
