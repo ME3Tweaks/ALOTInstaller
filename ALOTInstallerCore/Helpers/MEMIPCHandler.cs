@@ -16,6 +16,7 @@ using CliWrap.EventStream;
 using ME3ExplorerCore.GameFilesystem;
 using ME3ExplorerCore.Gammtek.Extensions;
 using ME3ExplorerCore.Helpers;
+using ME3ExplorerCore.Misc;
 using ME3ExplorerCore.Packages;
 
 namespace ALOTInstallerCore.Helpers
@@ -390,17 +391,32 @@ namespace ALOTInstallerCore.Helpers
             }
             else if (setting == LodSetting.Vanilla)
             {
-                // Remove LODs
+                // Remove/Reset LODs
                 args = $"--remove-lods --gameid {game.ToGameNum()}";
             }
 
             int exitcode = -1;
-            // We don't care about IPC on this
-            MEMIPCHandler.RunMEMIPCUntilExit(args,
-                null,
-                null,
-                x => Log.Error($"[AICORE] StdError setting LODs: {x}"),
-                x => exitcode = x); //Change to catch exit code of non zero.        
+            if (game == MEGame.ME1) // me1 must have them explicitly set
+            {
+                // We don't care about IPC on this
+                MEMIPCHandler.RunMEMIPCUntilExit(args,
+                    null,
+                    null,
+                    x => Log.Error($"[AICORE] StdError setting LODs: {x}"),
+                    x => exitcode = x); //Change to catch exit code of non zero.        
+            }
+            else
+            {
+                // Just write out the gamersettings file without TextureLODSettings
+                DuplicatingIni di = DuplicatingIni.LoadIni(MEDirectories.GetLODConfigFile(game));
+                var tls = di.Sections.FirstOrDefault(x => x.Header == "TextureLODSettings");
+                if (tls != null)
+                {
+                    di.Sections.Remove(tls);
+                }
+                File.WriteAllText(MEDirectories.GetLODConfigFile(game), di.ToString());
+                exitcode = 0;
+            }
 
             if (configFileReadOnly)
             {
