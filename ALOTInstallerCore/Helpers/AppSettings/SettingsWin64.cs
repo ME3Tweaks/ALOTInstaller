@@ -27,10 +27,18 @@ namespace ALOTInstallerCore.Helpers.AppSettings
             set => SetProperty(ref _playMusic, value);
         }
 
-        public static void Load()
+        /// <summary>
+        /// Loads settings. Specify loadDirectories as false if you don't want it to create folders (if you aren't using them)
+        /// </summary>
+        /// <param name="loadDirectories"></param>
+        public static void Load(bool loadDirectories = true)
         {
-            TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, @"Downloaded_Mods", v => TextureLibrarySettingsLocation = v, v => TextureLibraryLocationExistedOnLoad = v);
-            StagingLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, @"Staging", v => StagingSettingsLocation = v, v => StagingLocationExistedOnLoad = v);
+            if (loadDirectories)
+            {
+                TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, @"Downloaded_Mods", v => TextureLibrarySettingsLocation = v, v => TextureLibraryLocationExistedOnLoad = v);
+                StagingLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, @"Staging", v => StagingSettingsLocation = v, v => StagingLocationExistedOnLoad = v);
+            }
+
             MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
             Telemetry = LoadSettingBool(SettingsKeys.SettingKeys.Telemetry, true);
             PlayMusic = LoadSettingBool(SettingsKeys.SettingKeys.PlayMusic, true);

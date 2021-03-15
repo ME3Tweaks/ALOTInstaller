@@ -28,7 +28,7 @@ namespace ALOTInstallerCore
         /// </summary>
         /// <param name="setCallingLoggerCallback">Function to pass this library's logger back</param>
         /// <param name="runOnUiThreadCallback">Callback that contains method that should be wrapped in a UI-thread only runner. Some object initialization can only be performed on the UI thread</param>
-        public static void Startup(Action<ILogger> setCallingLoggerCallback, Action<Action> runOnUiThreadCallback, Action startTelemetryCallback = null, Action stopTelemetryCallback = null, string firstLogMessage = null)
+        public static void Startup(Action<ILogger> setCallingLoggerCallback, Action<Action> runOnUiThreadCallback, Action startTelemetryCallback = null, Action stopTelemetryCallback = null, string firstLogMessage = null, bool loadSettingsFolders = true)
         {
             if (startedUp) return;
             startedUp = true;
@@ -58,7 +58,7 @@ namespace ALOTInstallerCore
             }
 
             Log.Information("[AICORE] Loading settings");
-            Settings.Load();
+            Settings.Load(loadSettingsFolders);
             if (Settings.Telemetry)
             {
                 Log.Information("[AICORE] Telemetry callback being invoked (if any is set)");
