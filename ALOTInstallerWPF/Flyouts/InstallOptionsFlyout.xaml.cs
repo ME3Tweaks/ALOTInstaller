@@ -26,6 +26,7 @@ using ALOTInstallerWPF.Objects;
 using MahApps.Metro.Actions;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using ME3ExplorerCore.Gammtek.Extensions;
 using ME3ExplorerCore.Packages;
 using Serilog;
 
