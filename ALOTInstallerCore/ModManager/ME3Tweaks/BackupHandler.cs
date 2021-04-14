@@ -10,6 +10,7 @@ using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using Serilog;
 using ME3ExplorerCore.GameFilesystem;
+using ME3ExplorerCore.Gammtek.Extensions;
 using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 #if WINDOWS

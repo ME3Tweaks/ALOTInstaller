@@ -14,6 +14,7 @@ using ALOTInstallerCore.Helpers.AppSettings;
 using CliWrap;
 using CliWrap.EventStream;
 using ME3ExplorerCore.GameFilesystem;
+using ME3ExplorerCore.Gammtek.Extensions;
 using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Packages;
 

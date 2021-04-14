@@ -16,6 +16,7 @@ using ME3ExplorerCore.Packages;
 using ALOTInstallerCore.ModManager.asi;
 using ME3ExplorerCore.Helpers;
 using ME3ExplorerCore.Unreal;
+using ME3ExplorerCore.Gammtek.Extensions;
 #if WINDOWS
 using AuthenticodeExaminer;
 using Microsoft.Win32;

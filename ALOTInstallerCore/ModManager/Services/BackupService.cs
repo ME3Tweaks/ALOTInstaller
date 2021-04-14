@@ -9,6 +9,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
+using ME3ExplorerCore.Gammtek.Extensions;
 using ME3ExplorerCore.Packages;
 using Serilog;
 #if WINDOWS

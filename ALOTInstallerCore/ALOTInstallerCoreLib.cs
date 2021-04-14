@@ -84,7 +84,7 @@ namespace ALOTInstallerCore
         {
             // Load ME3ExplorerCore library
             Log.Information(@"[AICORE] Loading ME3ExplorerCore library");
-            CoreLib.InitLib(CoreLib.SYNCHRONIZATION_CONTEXT, x => { Log.Error($"Error saving package: {x}"); });
+            ME3ExplorerCoreLib.InitLib(ME3ExplorerCoreLib.SYNCHRONIZATION_CONTEXT, x => { Log.Error($"Error saving package: {x}"); });
 
             // Logs call in method
             Locations.LoadTargets();
