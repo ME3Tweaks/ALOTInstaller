@@ -63,7 +63,7 @@ namespace ALOTInstallerCore.Helpers
             forcedMemPath = forcedPath;
         }
 #if WINDOWS
-        public static string MEMPath(bool forceCached = false) => !forceCached ? 
+        public static string MEMPath(bool forceCached = false) => !forceCached ?
             forcedMemPath ?? Path.Combine(AppDataFolder(), @"MassEffectModderNoGui.exe") :
             Path.Combine(AppDataFolder(), @"MassEffectModderNoGui.exe");
 #elif LINUX
@@ -212,9 +212,9 @@ namespace ALOTInstallerCore.Helpers
         /// This method must be run on a background thread or it will deadlock
         /// </summary>
         /// <param name="target"></param>
-        public static bool SetTarget(GameTarget target)
+        public static bool SetTarget(GameTarget target, bool setMEMPath = true)
         {
-            var successful = MEMIPCHandler.SetGamePath(target.Game, target.TargetPath);
+            var successful = !setMEMPath || MEMIPCHandler.SetGamePath(target.Game, target.TargetPath);
             switch (target.Game)
             {
                 case MEGame.ME1:

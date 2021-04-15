@@ -118,7 +118,7 @@ namespace ALOTInstallerWPF.BuilderUI
             NamedBackgroundWorker bw = new NamedBackgroundWorker("StartupThread");
             bw.DoWork += (a, b) =>
             {
-                
+
                 ALOTInstallerCoreLib.Startup(SetWrapperLogger, RunOnUIThread, startTelemetry, stopTelemetry);
                 // Logger is now available
 
@@ -141,8 +141,13 @@ namespace ALOTInstallerWPF.BuilderUI
                 {
                     ct.Cancel();
                 };
-                AppUpdater.PerformGithubAppUpdateCheck("ME3Tweaks", "ALOTInstaller", "ALOTInstallerWPF", "ALOTInstaller.exe",
-                    (title, text, updateButtonText, declineButtonText) =>
+                AppUpdateInteropPackage uip = new AppUpdateInteropPackage()
+                {
+                    GithubOwner = "ME3Tweaks",
+                    GithubReponame = "ALOTInstaller",
+                    UpdateAssetPrefix = "ALOTInstallerWPF",
+                    UpdateFilenameInArchive = "ALOTInstaller.exe",
+                    ShowUpdatePromptCallback = (title, text, updateButtonText, declineButtonText) =>
                     {
                         bool response = false;
                         object syncObj = new object();
@@ -169,27 +174,15 @@ namespace ALOTInstallerWPF.BuilderUI
                             Monitor.Wait(syncObj);
                         }
                         return response;
-                    }, (title, initialmessage, canCancel) =>
+                    },
+                    ShowUpdateProgressDialogCallback = (title, initialmessage, canCancel) =>
                     {
                         // We don't use this as we are already in a progress dialog
                         pd.SetCancelable(canCancel);
                         pd.SetMessage(initialmessage);
                         pd.SetTitle(title);
                     },
-                    s =>
-                    {
-                        pd.SetMessage(s);
-                    },
-                    (done, total) =>
-                    {
-                        pd.SetProgress(done * 1d / total);
-                        pd.SetMessage($"Downloading update {FileSize.FormatSize(done)} / {FileSize.FormatSize(total)}");
-                    },
-                    () =>
-                    {
-                        pd.SetIndeterminate();
-                    },
-                    (title, message) =>
+                    ShowMessageCallback = (title, message) =>
                     {
                         object syncObj = new object();
                         Application.Current.Dispatcher.Invoke(async () =>
@@ -208,16 +201,29 @@ namespace ALOTInstallerWPF.BuilderUI
                             Monitor.Wait(syncObj);
                         }
                     },
-                    () =>
+                    SetUpdateDialogTextCallback = s =>
                     {
-                        App.BetaAvailable = true;
+                        pd.SetMessage(s);
                     },
-                    () =>
+                    NotifyBetaAvailable = () => App.BetaAvailable = true,
+                    ProgressIndeterminateCallback = () => pd.SetIndeterminate(),
+                    ProgressCallback = (done, total) =>
+                    {
+                        pd.SetProgress(done * 1d / total);
+                        pd.SetMessage($"Downloading update {FileSize.FormatSize(done)} / {FileSize.FormatSize(total)}");
+                    },
+                    DownloadCompleted = () =>
                     {
                         pd.SetCancelable(false);
                     },
-                    ct
-                );
+                    cancellationTokenSource = ct,
+                    ForcedUpgradeMaxReleaseAge = 5,
+                    ApplicationName = "ALOT Installer WPF",
+                    RequestHeader = "ALOTInstallerWPF"
+                };
+
+                
+                AppUpdater.PerformGithubAppUpdateCheck(uip);
 
                 // If user aborts download
                 pd.SetCancelable(false);

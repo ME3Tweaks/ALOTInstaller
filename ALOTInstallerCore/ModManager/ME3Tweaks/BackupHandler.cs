@@ -5,7 +5,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using Serilog;
