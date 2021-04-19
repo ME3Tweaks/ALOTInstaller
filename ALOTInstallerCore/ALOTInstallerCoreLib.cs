@@ -51,6 +51,9 @@ namespace ALOTInstallerCore
                 Log.Information($@"[AICORE]     Operating system: {ci.OSFullName}");
                 Log.Information($@"[AICORE]     Processor:        {ci.CPUName}");
                 Log.Information($@"[AICORE]     Memory:           {FileSize.FormatSize(ci.TotalPhysicalMemory)}");
+#if WINDOWS
+                Utilities.GetAntivirusInfo();
+#endif
             }
             catch (Exception e)
             {

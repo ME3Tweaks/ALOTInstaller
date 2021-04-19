@@ -591,7 +591,8 @@ namespace ALOTInstallerCore.Steps
                             }
                         }
                     }
-                } else
+                }
+                else
                 {
                     //Log.Warning($@"[AICORE] [{prefix}] Fell through archiveextracted() (TEST MESSAGE)");
                 }
@@ -605,32 +606,22 @@ namespace ALOTInstallerCore.Steps
                     if (Path.GetExtension(installerFile.GetUsedFilepath()) == ".mem")
                     {
                         var destF = Path.Combine(finalBuiltPackagesDestination, $"{installerFile.BuildID:D3}_{Path.GetFileName(installerFile.GetUsedFilepath())}");
-
-                        bool linked = false;
-#if WINDOWS
-                        // Try symlinking first. This way we don't have to copy anything
-                        linked = Utilities.WinCreateFileSymbolicLink(destF, installerFile.GetUsedFilepath());
-#endif
-
-                        if (!linked)
+                        if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory.Name ==
+                            new DriveInfo(finalBuiltPackagesDestination).RootDirectory.Name)
                         {
-                            if (new DriveInfo(installerFile.GetUsedFilepath()).RootDirectory.Name ==
-                                new DriveInfo(finalBuiltPackagesDestination).RootDirectory.Name)
-                            {
-                                // Move
-                                Log.Information(
-                                    $"[AICORE] [{prefix}] Moving unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                                File.Move(installerFile.GetUsedFilepath(), destF);
-                            }
-                            else
-                            {
-                                //Copy
-                                Log.Information(
-                                    $"[AICORE] [{prefix}] Copying unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
-                                CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
-                                    (x, y) => { installerFile.StatusText = $"Copying file to installation packages {(int)(x * 100f / y)}%"; },
-                                    exception => { _abortStaging = true; });
-                            }
+                            // Move
+                            Log.Information(
+                                $"[AICORE] [{prefix}] Moving unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                            File.Move(installerFile.GetUsedFilepath(), destF);
+                        }
+                        else
+                        {
+                            //Copy
+                            Log.Information(
+                                $"[AICORE] [{prefix}] Copying unpacked file to install packages directory: {installerFile.GetUsedFilepath()} -> {destF}");
+                            CopyTools.CopyFileWithProgress(installerFile.GetUsedFilepath(), destF,
+                                (x, y) => { installerFile.StatusText = $"Copying file to installation packages {(int)(x * 100f / y)}%"; },
+                                exception => { _abortStaging = true; });
                         }
 
                         stage = false;
@@ -742,8 +733,8 @@ namespace ALOTInstallerCore.Steps
                             },
                             x =>
                             {
-                                // Do something here. Not sure what
-                                Log.Error($@"[AICORE] [{prefix}] Error occurred performing staging: {x.Message}");
+            // Do something here. Not sure what
+            Log.Error($@"[AICORE] [{prefix}] Error occurred performing staging: {x.Message}");
                                 error = true;
                                 installerFile.StatusText = $"Failed to stage file(s): {x.Message}";
                                 _abortStaging = true;
@@ -911,7 +902,7 @@ namespace ALOTInstallerCore.Steps
             }
 
         }
-        
+
         private List<InstallerFile> resolveMutualExclusiveGroups()
         {
             var files = new List<InstallerFile>();

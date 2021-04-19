@@ -19,39 +19,24 @@ namespace ALOTInstallerCore.Helpers.AppSettings
         private static DuplicatingIni settingsIni;
         public static readonly string SettingsPath = Path.Combine(Locations.AppDataFolder(), "settings.ini");
 
-        public static void Load()
+        public static void Load(bool loadSettingsFolders)
         {
             settingsIni = new DuplicatingIni();
             if (File.Exists(SettingsPath))
             {
                 settingsIni = DuplicatingIni.LoadIni(SettingsPath);
             }
-            TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller", "Downloaded_Mods"), true, v => TextureLibrarySettingsLocation = v, v => TextureLibraryLocationExistedOnLoad = v);
-            StagingLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller", "Staging"), true, v => StagingSettingsLocation = v, v => StagingLocationExistedOnLoad = v);
+
+            if (loadSettingsFolders)
+            {
+                TextureLibraryLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.TextureLibraryDirectory, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller", "Downloaded_Mods"), true, v => TextureLibrarySettingsLocation = v, v => TextureLibraryLocationExistedOnLoad = v);
+                StagingLocation = LoadDirectorySetting(SettingsKeys.SettingKeys.BuildLocation, Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ALOTInstaller", "Staging"), true, v => StagingSettingsLocation = v, v => StagingLocationExistedOnLoad = v);
+            }
+
             MoveFilesWhenImporting = LoadSettingBool(SettingsKeys.SettingKeys.ImportAsMove, false);
             Telemetry = LoadSettingBool(SettingsKeys.SettingKeys.Telemetry, true);
             BetaMode = LoadSettingBool(SettingsKeys.SettingKeys.BetaMode, false);
             LastContentCheck = LoadSettingDateTime(SettingsKeys.SettingKeys.LastContentCheck, DateTime.MinValue);
-            //AutoUpdateLODs = LoadSettingBool("ModManager", "AutoUpdateLODs", true);
-            //WebClientTimeout = LoadSettingInt("ModManager", "WebclientTimeout", 5);
-            //ModMakerControllerModOption = LoadSettingBool("ModMaker", "AutoAddControllerMixins", false);
-            //ModMakerAutoInjectCustomKeybindsOption = LoadSettingBool("ModMaker", "AutoInjectCustomKeybinds", false);
-
-
-            //UpdaterServiceUsername = LoadSettingString("UpdaterService", "Username", null);
-            //UpdaterServiceLZMAStoragePath = LoadSettingString("UpdaterService", "LZMAStoragePath", null);
-            //UpdaterServiceManifestStoragePath = LoadSettingString("UpdaterService", "ManifestStoragePath", null);
-
-            //LogModStartup = LoadSettingBool("Logging", "LogModStartup", false);
-            //LogMixinStartup = LoadSettingBool("Logging", "LogMixinStartup", false);
-            //EnableTelemetry = LoadSettingBool("Logging", "EnableTelemetry", true);
-            //LogModInstallation = LoadSettingBool("Logging", "LogModInstallation", false);
-            //LogModMakerCompiler = LoadSettingBool("Logging", "LogModMakerCompiler", false);
-
-            //ModLibraryPath = LoadSettingString("ModLibrary", "LibraryPath", null);
-
-            //DeveloperMode = LoadSettingBool("UI", "DeveloperMode", false);
-            //DarkTheme = LoadSettingBool("UI", "DarkTheme", false);
             Loaded = true;
         }
 
