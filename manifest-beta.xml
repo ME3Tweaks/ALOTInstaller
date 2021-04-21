@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.1.0" />
+					  version="7.1.1" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1101,24 +1101,24 @@
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-					  alotversion="12"
-					  friendlyname="ALOT for ME3 12.0"
+					  alotversion="13"
+					  friendlyname="ALOT for ME3 13.0"
 					  author="CreeperLava"
 					  uipriority="0"
 					  recommendationreason="Main ALOT file, required"
 					  recommendation="Required"
 					  installpriority="1">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
-					  tooltipname="ALOT for ME3 12.0"
-					  torrentfilename="ALOT for ME3 v12.zip"
-					  filename="ALOT for ME3 12.0-363-2021-12-0-1604625739.zip"
-					  size="9288229132"
-					  md5="746e6585f288b2a99219d92c34af5df9"
-					  unpackedsinglefilename="ALOT_ME3_v12.mem"
-					  unpackedsize="9209622947"
-					  unpackedmd5="a6ed5bd423c87abca202192e6ca11363" />
+			<file downloadlink="https://mega.nz/file/p1MzQS4L#MGzdJa2i3HwCyW_QrAnaEhd3LPhnhvhWB8Zc5nuCT7k"
+					  tooltipname="ALOT for ME3 13.0"
+					  torrentfilename="ALOT for ME3 v13.zip"
+					  filename="ALOT for ME3 v13.zip"
+					  size="9448904820"
+					  md5="f3da1e271d43aa54669d2269bb28c831"
+					  unpackedsinglefilename="ALOT_ME3_v13.mem"
+					  unpackedsize="9258219536"
+					  unpackedmd5="02680d55c302e26bdf1543b553c5f4c1" />
 			<packagefile me3="true"
-						 sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v12.mem"
+						 sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v13.mem"
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
