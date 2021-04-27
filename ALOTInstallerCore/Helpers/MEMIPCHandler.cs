@@ -414,6 +414,12 @@ namespace ALOTInstallerCore.Helpers
                 {
                     di.Sections.Remove(tls);
                 }
+
+                var ss = di.Sections.FirstOrDefault(x => x.Header == "SystemSettings");
+                if (ss != null)
+                {
+                    ss.Entries.RemoveAll(x => x.Key != null && x.Key.StartsWith("TEXTUREGROUP_"));
+                }
                 File.WriteAllText(MEDirectories.GetLODConfigFile(game), di.ToString());
                 exitcode = 0;
             }
