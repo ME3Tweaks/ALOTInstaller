@@ -396,7 +396,7 @@ namespace ALOTInstallerCore.Helpers
             }
 
             int exitcode = -1;
-            if (game == MEGame.ME1) // me1 must have them explicitly set
+            if (game == MEGame.ME1 || setting != LodSetting.Vanilla) // me1 must have them explicitly set. Set LODs with MEM if setting them to not vanilla
             {
                 // We don't care about IPC on this
                 MEMIPCHandler.RunMEMIPCUntilExit(args,
@@ -407,7 +407,7 @@ namespace ALOTInstallerCore.Helpers
             }
             else
             {
-                // Just write out the gamersettings file without TextureLODSettings
+                // Just write out the gamersettings file without TextureLODSettings (removing LODs - setting vanilla)
                 DuplicatingIni di = DuplicatingIni.LoadIni(MEDirectories.GetLODConfigFile(game));
                 var tls = di.Sections.FirstOrDefault(x => x.Header == "TextureLODSettings");
                 if (tls != null)
