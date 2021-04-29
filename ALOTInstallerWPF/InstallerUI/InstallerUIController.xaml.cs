@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -137,15 +138,39 @@ namespace ALOTInstallerWPF.InstallerUI
 
         private void loadTips()
         {
-            var installTipsFile = Path.Combine(Locations.ResourcesDir, "InstallerUI", "installtips.xml");
-            Debug.WriteLine(installTipsFile);
-            if (File.Exists(installTipsFile))
-            {
-                XDocument tipsDoc = XDocument.Load(installTipsFile);
-                codexTips.ReplaceAll(tipsDoc.Root.Element(InstallOptions.InstallTarget.Game.ToString().ToLower()).Descendants("tip").Select(x => x.Value));
-                codexTips.Shuffle();
-            }
+            var installTipsS = ExtractInternalFileToStream("ALOTInstallerWPF.InstallerUI.installtips.xml");
+            XDocument tipsDoc = XDocument.Parse(new StreamReader(installTipsS).ReadToEnd());
+            codexTips.ReplaceAll(tipsDoc.Root.Element(InstallOptions.InstallTarget.Game.ToString().ToLower()).Descendants("tip").Select(x => x.Value));
+            codexTips.Shuffle();
         }
+
+        #region AIWPF
+        /// <summary>
+        /// Gets a resource from ALOTInstallerWPF
+        /// </summary>
+        /// <param name="assemblyResource"></param>
+        /// <returns></returns>
+        private static Stream GetResourceStream(string assemblyResource)
+        {
+            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            var res = assembly.GetManifestResourceNames();
+            return assembly.GetManifestResourceStream(assemblyResource);
+        }
+
+
+        public static MemoryStream ExtractInternalFileToStream(string internalResourceName)
+        {
+            Log.Information("[AIWPF] Extracting embedded file: " + internalResourceName + " to memory");
+#if DEBUG
+            var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+#endif
+            using Stream stream = GetResourceStream(internalResourceName);
+            MemoryStream ms = new MemoryStream();
+            stream.CopyTo(ms);
+            ms.Position = 0;
+            return ms;
+        }
+        #endregion
 
         public GenericCommand ToggleMusicCommand { get; set; }
         public GenericCommand CloseInstallerCommand { get; set; }
@@ -411,7 +436,7 @@ namespace ALOTInstallerWPF.InstallerUI
             TipTimer?.Stop(); //Stop the tip rotation
             var installedInfo = InstallOptions.InstallTarget.GetInstalledALOTInfo();
             var installedTextures = InstallOptions.FilesToInstall.Any(x => !(x is PreinstallMod)); //Debug mode will not have files to install set
-            
+
             bool showBottomText = false;
             if (ir == InstallStep.InstallResult.InstallOK)
             {

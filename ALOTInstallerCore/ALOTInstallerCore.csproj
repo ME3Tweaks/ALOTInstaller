@@ -76,9 +76,9 @@
     <EmbeddedResource Include="ModManager\gamemd5\me3.bin" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Binaries\PermissionsGranter.exe" Condition=" '$(OS)' == 'Windows_NT' ">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <EmbeddedResource Include="Binaries\PermissionsGranter.exe" Condition=" '$(OS)' == 'Windows_NT' ">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ComputerInfo\ComputerInfo\ComputerInfo.csproj" />

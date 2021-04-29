@@ -199,14 +199,6 @@ namespace ALOTInstallerCore.Helpers
 
         public static ObservableCollectionExtended<GameTarget> GameTargets { get; } = new ObservableCollectionExtended<GameTarget>();
 
-#if WINDOWS
-        /// <summary>
-        /// Accesses the internal 'Resources' directory. This should only
-        /// </summary>
-
-        public static string ResourcesDir => Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName; //The internal 'resources' directory. Does not exist when running from Linux as it's fully single file
-#endif
-
         /// <summary>
         /// Sets the game path that MEM and ALOTInstallerCore will use for the game specified by the target.
         /// This method must be run on a background thread or it will deadlock

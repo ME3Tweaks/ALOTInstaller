@@ -575,7 +575,11 @@ namespace ALOTInstallerCore
 #if WINDOWS
                 // This works because the executable is extracted as part of the published single file package
                 // This method would NOT work on Linux single file as it doesn't extract!
-                var permissionsGranterExe = Path.Combine(Locations.ResourcesDir, "Binaries", "PermissionsGranter.exe");
+                var permissionsGranterExe = Locations.GetCachedExecutable("PermissionsGranter.exe");
+                if (!File.Exists(permissionsGranterExe))
+                {
+                    Utilities.ExtractInternalFile("ALOTInstallerCore.Binaries.PermissionsGranter.exe", permissionsGranterExe, true);
+                }
                 string args = "\"" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\" -create-directory \"" + directoryPath.TrimEnd('\\') + "\"";
                 try
                 {

@@ -170,7 +170,7 @@ namespace ALOTInstallerCore.Steps
 
                 bool isAdmin = Utilities.IsAdministrator();
 
-                if (directoriesToGrant.Any())
+                if (directoriesToGrant.Any() || true)
                 {
                     string args = "";
                     // Some directories not writable
@@ -185,7 +185,11 @@ namespace ALOTInstallerCore.Steps
                     }
 
                     args = $"\"{System.Security.Principal.WindowsIdentity.GetCurrent().Name}\" {args}";
-                    var permissionsGranterExe = Path.Combine(Locations.ResourcesDir, "Binaries", "PermissionsGranter.exe");
+                    var permissionsGranterExe = Path.Combine(Locations.GetCachedExecutable("PermissionsGranter.exe"));
+                    if (!File.Exists(permissionsGranterExe))
+                    {
+                        Utilities.ExtractInternalFile("ALOTInstallerCore.Binaries.PermissionsGranter.exe", permissionsGranterExe, true);
+                    }
 
                     //need to run write permissions program
                     if (isAdmin)
