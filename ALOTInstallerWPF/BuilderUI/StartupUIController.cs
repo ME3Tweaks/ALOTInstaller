@@ -218,7 +218,7 @@ namespace ALOTInstallerWPF.BuilderUI
                     },
                     cancellationTokenSource = ct,
                     ForcedUpgradeMaxReleaseAge = 5,
-                    ApplicationName = "ALOT Installer WPF",
+                    ApplicationName = Utilities.GetAppPrefixedName(),
                     RequestHeader = "ALOTInstallerWPF"
                 };
 
