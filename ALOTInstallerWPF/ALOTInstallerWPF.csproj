@@ -7,6 +7,7 @@
 		<Product>ALOT Installer</Product>
 		<Description>Texture installer for the original Mass Effect Trilogy</Description>
 		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 		<Configurations>WPFDebug;WPFRelease</Configurations>
 		<ApplicationIcon>ALOTInstallerIcon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
