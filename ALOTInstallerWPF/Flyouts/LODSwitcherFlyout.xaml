@@ -35,7 +35,7 @@
                    Margin="0,0,0,10"
                    Visibility="{Binding ShowMoreInfo, Converter={StaticResource BoolToVisibilityConverter}}"
                    TextAlignment="Center"
-                   Text="The 2K and 4K options are the size of the texture and NOT related at all to the size of your screen.The 2K option provides an improvement to texture quality (if a high resolution texture mod is installed) over the vanilla settings, and uses less memory, which can improve game stability as all games are limited to 3.5GB of memory. The 4K option is the default and will provide the best looking textures when paired with a high quality texture mod such as ALOT." 
+                   Text="The 2K and 4K options are the size of the texture and NOT related at all to the size of your screen. The 2K option provides an improvement to texture quality (if a high resolution texture mod is installed) over the vanilla settings, and uses less memory, which can improve game stability as all games are limited to 3.5GB of memory. The 4K option is the default and will provide the best looking textures when paired with a high quality texture mod such as ALOT." 
                    TextWrapping="Wrap" MaxWidth="700"/>
         <DockPanel DockPanel.Dock="Bottom" Height="130" Margin="0,10"  VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="{Binding LODGames.Any, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter='Not'}">
             <mah:ProgressRing HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
