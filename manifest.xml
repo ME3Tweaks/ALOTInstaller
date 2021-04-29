@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.1.3" />
+					  version="7.1.5" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1122,6 +1122,44 @@
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
+					  friendlyname="Improved Static Lighting for ME1"
+					  author="CreeperLava"
+					  installpriority="3"
+					  recommendationreason="Significantly improves the static shadows in level environments"
+					  recommendation="Recommended">
+			<file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+					  tooltipname="Improved Static Lighting for ME1"
+					  torrentfilename="LightMaps_ME1.zip"
+					  filename="Improved Static Lighting for ME1-83-2020-10-0-1573101555.zip"
+					  size="6610942066"
+					  md5="2234159c710d77ffd2e8a91fefe975ee"
+					  unpackedsinglefilename="LightMaps_ME1.mem"
+					  unpackedsize="6610941782"
+					  unpackedmd5="c7cc9fae7381de825b7943ef9b1a6f89" />
+			<packagefile me1="true"
+						 sourcename="LightMaps_ME1.mem"
+						 movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
+					  friendlyname="Improved Static Lighting for ME2"
+					  author="CreeperLava"
+					  installpriority="3"
+					  recommendationreason="Significantly improves the static shadows in level environments"
+					  recommendation="Recommended">
+			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
+					  tooltipname="Improved Static Lighting for ME2"
+					  torrentfilename="LightMaps_ME2.zip"
+					  filename="Improved Static Lighting for ME2-68-2020-10-0-1573098585.zip"
+					  size="665769837"
+					  md5="d78abde1cef08b7ce64c70eaa4c46b71"
+					  unpackedsinglefilename="LightMaps_ME2.mem"
+					  unpackedsize="665769669"
+					  unpackedmd5="cf3fe16cede255158312adbfafa277d2" />
+			<packagefile me2="true"
+						 sourcename="LightMaps_ME2.mem"
+						 movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
 					  alotversion="12"
 					  alotupdateversion="1"
 					  friendlyname="ALOT for ME1 12.1 - Update"
@@ -1161,44 +1199,6 @@
 					  unpackedmd5="9e51e665ca8618fc9cca0f260ccea2d6" />
 			<packagefile me2="true"
 						 sourcename="ALOT_UPDATE_ME2_v12.mem"
-						 movedirectly="true" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
-					  friendlyname="Improved Static Lighting for ME1"
-					  author="CreeperLava"
-					  installpriority="3"
-					  recommendationreason="Significantly improves the static shadows in level environments"
-					  recommendation="Recommended">
-			<file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
-					  tooltipname="Improved Static Lighting for ME1"
-					  torrentfilename="LightMaps_ME1.zip"
-					  filename="Improved Static Lighting for ME1-83-2020-10-0-1573101555.zip"
-					  size="6610942066"
-					  md5="2234159c710d77ffd2e8a91fefe975ee"
-					  unpackedsinglefilename="LightMaps_ME1.mem"
-					  unpackedsize="6610941782"
-					  unpackedmd5="c7cc9fae7381de825b7943ef9b1a6f89" />
-			<packagefile me1="true"
-						 sourcename="LightMaps_ME1.mem"
-						 movedirectly="true" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
-					  friendlyname="Improved Static Lighting for ME2"
-					  author="CreeperLava"
-					  installpriority="3"
-					  recommendationreason="Significantly improves the static shadows in level environments"
-					  recommendation="Recommended">
-			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
-					  tooltipname="Improved Static Lighting for ME2"
-					  torrentfilename="LightMaps_ME2.zip"
-					  filename="Improved Static Lighting for ME2-68-2020-10-0-1573098585.zip"
-					  size="665769837"
-					  md5="d78abde1cef08b7ce64c70eaa4c46b71"
-					  unpackedsinglefilename="LightMaps_ME2.mem"
-					  unpackedsize="665769669"
-					  unpackedmd5="cf3fe16cede255158312adbfafa277d2" />
-			<packagefile me2="true"
-						 sourcename="LightMaps_ME2.mem"
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
@@ -3059,19 +3059,19 @@
 						 me3="true" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME3 2.1.1.1 - Third Party Mods (1080p)"
+						 friendlyname="A Lot of Videos for ME3 2.1.1.2 - Third Party Mods (1080p)"
 						 shortname="ALOV for ME3 - Third Party Mods (1080p)"
 						 author="Mellin"
 						 recommendationreason="Upgrades third party mod's videos where permission was granted, and they are not using 1080p videos already."
 						 recommendation="Optional"
-						 version="2.1.1.1"
+						 version="2.1.1.2"
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.1-773-2-1-1-1-1613649025.7z"
-					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.1.7z"
-					  md5="33bdd213335226a399aeffd95ef25504"
-					  size="2160242881" />
+			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
+					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.2-773-2-1-1-2-1619677431.7z"
+					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.2.7z"
+					  md5="f263e92cbfcc22ae1b4810440422d89f"
+					  size="2160242877" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_Patches"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches"
@@ -3217,19 +3217,19 @@
 						 me3="true" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME3 2.1.1.1 - Third Party Mods (4K)"
+						 friendlyname="A Lot of Videos for ME3 2.1.1.2 - Third Party Mods (4K)"
 						 shortname="ALOV for ME3 - Third Party Mods (4K)"
 						 author="Mellin"
 						 recommendationreason="Optional due to large filesize and CPU requirements"
 						 recommendation="Optional"
-						 version="2.1.1.1"
+						 version="2.1.1.2"
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.1.1-773-2-1-1-1-1613646930.7z"
-					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.1.1.1.7z"
-					  md5="e9b6c26a9a0cb7511329bf621eccea13"
-					  size="11633442063" />
+			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
+					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.1.2-773-2-1-1-2-1619681354.7z"
+					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.1.1.2.7z"
+					  md5="1904052645664c71331492caa98215d6"
+					  size="11754860803" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_Patches"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches"
