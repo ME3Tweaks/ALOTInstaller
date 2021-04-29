@@ -170,7 +170,7 @@ namespace ALOTInstallerCore.Steps
 
                 bool isAdmin = Utilities.IsAdministrator();
 
-                if (directoriesToGrant.Any()remov)
+                if (directoriesToGrant.Any())
                 {
                     string args = "";
                     // Some directories not writable
