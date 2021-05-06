@@ -206,11 +206,6 @@ namespace ALOTInstallerCore.Objects
                 if (ifx is ManifestFile mf)
                 {
                     AuthorName = ifx.Author;
-                    if (mf.ChoiceFiles.Any())
-                    {
-                        Debug.WriteLine("hi");
-                    }
-
                     foreach (var cf in mf.ChoiceFiles)
                     {
                         var chosenFile = cf.GetChosenFile();

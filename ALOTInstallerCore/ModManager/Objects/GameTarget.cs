@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
@@ -433,6 +434,41 @@ namespace ALOTInstallerCore.ModManager.Objects
                     return "Invalid target: Missing file " + Path.GetFileName(f);
                 }
             }
+
+            // Check exe on first file
+#if WINDOWS
+            var exeInfo = FileVersionInfo.GetVersionInfo(validationFiles[0]);
+            switch (Game)
+            {
+                /*
+                MassEffect.exe 1.2.20608.0
+                MassEffect2.exe 1.2.1604.0 (File Version)
+                ME2Game.exe is the same
+                MassEffect3.exe 1.5.5427.124
+                */
+                case MEGame.ME1:
+                    if (exeInfo.FileVersion != @"1.2.20608.0")
+                    {
+                        // NOT SUPPORTED
+                        return $"Unsupported executable version: {exeInfo.FileVersion}. The only supported version of MassEffect.exe is 1.2.20608.0";
+                    }
+                    break;
+                case MEGame.ME2:
+                    if (exeInfo.FileVersion != @"1.2.1604.0" && exeInfo.FileVersion != @"01604.00") // Steam and Origin exes have different FileVersion for some reason
+                    {
+                        // NOT SUPPORTED
+                        return $"Unsupported executable version: {exeInfo.FileVersion}. The only supported version of MassEffect2.exe is 1.2.1604.0";
+                    }
+                    break;
+                case MEGame.ME3:
+                    if (exeInfo.FileVersion != @"05427.124") // not really sure what's going on here
+                    {
+                        // NOT SUPPORTED
+                        return $"Unsupported executable version: {exeInfo.FileVersion}. The only supported version of MassEffect3.exe is 1.5.5427.124";
+                    }
+                    break;
+            }
+#endif
 
             if (!ignoreCmmVanilla)
             {
