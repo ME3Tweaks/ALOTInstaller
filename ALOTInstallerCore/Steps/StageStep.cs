@@ -733,8 +733,8 @@ namespace ALOTInstallerCore.Steps
                             },
                             x =>
                             {
-            // Do something here. Not sure what
-            Log.Error($@"[AICORE] [{prefix}] Error occurred performing staging: {x.Message}");
+                                // Do something here. Not sure what
+                                Log.Error($@"[AICORE] [{prefix}] Error occurred performing staging: {x.Message}");
                                 error = true;
                                 installerFile.StatusText = $"Failed to stage file(s): {x.Message}";
                                 _abortStaging = true;
