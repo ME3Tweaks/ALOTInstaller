@@ -69,6 +69,7 @@ namespace ALOTInstallerCore
                             // Beta only release
                             continue;
                         }
+
                         if (r.Assets.Count == 0)
                         {
                             // Release has no assets
@@ -76,62 +77,67 @@ namespace ALOTInstallerCore
                         }
 
                         int releaseNameInt = Convert.ToInt32(r.TagName);
-                        if (releaseNameInt > memVersion && getApplicableAssetForPlatform(r) != null)
+                        if (releaseNameInt <= MEMGUIUpdater.MaxSupportedMEMVersion) // >= 500 is LE only
                         {
-                            ReleaseAsset applicableAsset = getApplicableAssetForPlatform(r);
-                            // This is an update...
-                            if (Settings.BetaMode)
+                            if (releaseNameInt > memVersion && getApplicableAssetForPlatform(r) != null)
                             {
-                                // Use this update
-                                latestReleaseWithApplicableAsset = r;
-                                break;
-                            }
-
-                            // Check if this is the soak testing build
-                            if (releaseNameInt == SoakTestingMEMVersion)
-                            {
-                                var comparisonAge = SoakStartDate == default ? DateTime.Now - r.PublishedAt.Value : DateTime.Now - SoakStartDate;
-                                int soakTestReleaseAge = (comparisonAge).Days;
-                                if (soakTestReleaseAge >= SoakThresholds.Length)
+                                ReleaseAsset applicableAsset = getApplicableAssetForPlatform(r);
+                                // This is an update...
+                                if (Settings.BetaMode)
                                 {
-                                    Log.Information("[AICORE] New MassEffectModderNoGui update is past soak period, accepting this release as an update");
+                                    // Use this update
                                     latestReleaseWithApplicableAsset = r;
                                     break;
                                 }
-                                int soakThreshold = SoakThresholds[soakTestReleaseAge];
 
-                                //Soak gating
-                                if (applicableAsset.DownloadCount > soakThreshold)
+                                // Check if this is the soak testing build
+                                if (releaseNameInt == SoakTestingMEMVersion)
                                 {
-                                    Log.Information($"[AICORE] New MassEffectModderNoGui update is soak testing and has reached the daily soak threshold of {soakThreshold}. This update is not applicable to us today, threshold will expand tomorrow.");
+                                    var comparisonAge = SoakStartDate == default ? DateTime.Now - r.PublishedAt.Value : DateTime.Now - SoakStartDate;
+                                    int soakTestReleaseAge = (comparisonAge).Days;
+                                    if (soakTestReleaseAge >= SoakThresholds.Length)
+                                    {
+                                        Log.Information("[AICORE] New MassEffectModderNoGui update is past soak period, accepting this release as an update");
+                                        latestReleaseWithApplicableAsset = r;
+                                        break;
+                                    }
+
+                                    int soakThreshold = SoakThresholds[soakTestReleaseAge];
+
+                                    //Soak gating
+                                    if (applicableAsset.DownloadCount > soakThreshold)
+                                    {
+                                        Log.Information($"[AICORE] New MassEffectModderNoGui update is soak testing and has reached the daily soak threshold of {soakThreshold}. This update is not applicable to us today, threshold will expand tomorrow.");
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        Log.Information("[AICORE] New MassEffectModderNoGui update is available and soaking, this client will participate in this soak test.");
+                                        latestReleaseWithApplicableAsset = r;
+                                        break;
+                                    }
+                                }
+
+                                // Check if this build is approved for stable
+                                if (!Settings.BetaMode && releaseNameInt > HighestSupportedMEMVersion)
+                                {
+                                    Log.Information("[AICORE] New MassEffectModderNoGui update is available, but is not yet approved for stable channel: " + releaseNameInt);
                                     continue;
                                 }
-                                else
+
+                                if (releaseNameInt > memVersion)
                                 {
-                                    Log.Information("[AICORE] New MassEffectModderNoGui update is available and soaking, this client will participate in this soak test.");
+                                    Log.Information($"[AICORE] New MassEffectModderNoGui update is available: {releaseNameInt}");
                                     latestReleaseWithApplicableAsset = r;
                                     break;
                                 }
-                            }
-                            // Check if this build is approved for stable
-                            if (!Settings.BetaMode && releaseNameInt > HighestSupportedMEMVersion)
-                            {
-                                Log.Information("[AICORE] New MassEffectModderNoGui update is available, but is not yet approved for stable channel: " + releaseNameInt);
-                                continue;
-                            }
 
-                            if (releaseNameInt > memVersion)
+                            }
+                            else
                             {
-                                Log.Information($"[AICORE] New MassEffectModderNoGui update is available: {releaseNameInt}");
-                                latestReleaseWithApplicableAsset = r;
+                                Log.Information("[AICORE] Latest release that is available and has been approved for use is v" + releaseNameInt + " - no update available for us");
                                 break;
                             }
-
-                        }
-                        else
-                        {
-                            Log.Information("[AICORE] Latest release that is available and has been approved for use is v" + releaseNameInt + " - no update available for us");
-                            break;
                         }
                     }
 

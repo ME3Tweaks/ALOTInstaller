@@ -268,7 +268,7 @@ namespace ALOTInstallerCore.Steps
 
             var block = new ActionBlock<InstallerFile>(
                 job => PrepareSingleFile(job, stagingDir, addonStagingPath, finalBuiltPackagesDestination, _installOptions.InstallTarget.Game.ToApplicableGame()),
-                new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 2 }); // How to maximize this?
+                new ExecutionDataflowBlockOptions { MaxDegreeOfParallelism = 1 }); // How to maximize this?
 
             foreach (var v in _installOptions.FilesToInstall)
             {

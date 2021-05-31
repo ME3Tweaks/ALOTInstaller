@@ -13,6 +13,10 @@ namespace ALOTInstallerCore.Helpers
 {
     public class MEMGUIUpdater
     {
+        /// <summary>
+        /// Versions 500 and above are LE only
+        /// </summary>
+        public static int MaxSupportedMEMVersion = 499;
 #if WINDOWS
         private static ReleaseAsset getPlatformApplicableAsset(Release release) => release.Assets.FirstOrDefault(x => x.Name.StartsWith("MassEffectModder-v"));
 #elif LINUX
@@ -52,7 +56,7 @@ namespace ALOTInstallerCore.Helpers
                     int latestReleaseNum = 0;
                     foreach (var release in releases)
                     {
-                        if (int.TryParse(release.TagName, out var version))
+                        if (int.TryParse(release.TagName, out var version) && version <= MaxSupportedMEMVersion)
                         {
                             if (hasPlatformApplicableAsset(release) && (latest == null || version > latestReleaseNum))
                             {
