@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <alotinstallermanifest>
 	<!-- MEM Update Information -->
-	<highestapprovedmemversion>432</highestapprovedmemversion>
-	<soaktestingmemversion soakstartdate="2020-12-07">432</soaktestingmemversion>
+	<highestapprovedmemversion>434</highestapprovedmemversion>
+	<soaktestingmemversion soakstartdate="2021-05-26">436</soaktestingmemversion>
 	<!-- YYYY-MM-DD-->
 
 		<!-- DEFINE MANIFEST MODES THAT MANIFEST FILES CAN ATTACH TO -->
@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.1.5" />
+					  version="7.1.6" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1339,25 +1339,6 @@
 						 destinationname="0x3B912C80.dds" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-					  friendlyname="Ashley Complexion Tweak"
-					  author="Ellise"
-					  recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
-					  recommendation="Optional"
-					  installpriority="10">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/569/?tab=files"
-					  tooltipname="Ash Complexion Tweak - .MEM"
-					  filename="el_Ashley Complexion Tweak.7z-569-1-0.7z"
-					  md5="e8a4283b6242aff68227bfc8bb145899"
-					  size="10154183"
-					  unpackedsinglefilename="el_Ashley Complexion Tweak.mem"
-					  unpackedsize="10148747"
-					  unpackedmd5="731e784bbeadb8b49e137af3adde1358"
-					  extrainstructions="Ensure you download the .MEM version - the first download in the list is not the correct one!" />
-			<packagefile me3="true"
-						 sourcename="el_Ashley Complexion Tweak.mem"
-						 movedirectly="true" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
 					  friendlyname="Jacob Complexion Tweak"
 					  author="Ellise"
 					  recommendationreason="Very good face textures, but a little different from vanilla and thus up to personal preference"
@@ -2235,120 +2216,6 @@
 						 destinationname="HMM_ARM_SHP_FBDj_Diff_0xFC4B849C.dds" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-					  friendlyname="Ashley Alternate Armor"
-					  author="Ottemis"
-					  installpriority="10"
-					  recommendationreason="Vanilla-friendly, high quality textures"
-					  recommendation="Recommended">
-			<file downloadlink="http://www.nexusmods.com/masseffect3/mods/13/?tab=files"
-					  filename="ME3 HR Ashley Alternate Armor for Texmod-13-1.rar"
-					  tooltipname="ME3 HR Ashley Alternate Armor"
-					  md5="da6939281b5faf7702dc021abd7bf61d"
-					  size="36815144"
-					  unpackedsinglefilename="ME3_Ashley_Combat_Blue_Ottemis.tpf"
-					  unpackedsize="36815046"
-					  unpackedmd5="f01c227b3b8348a0d825b609ddcb93f7" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x004C469C_Ash_hed_spec.dds"
-						 destinationname="HMF_HGRa_ASH_spec_0x004C469C.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x32A99FFC_Ash_diff.dds"
-						 destinationname="HMF_ARM_ASHb_Diff_0x32A99FFC.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x8000D282_ash_spec.dds"
-						 destinationname="HMF_ARM_ASHb_Spec_0x8000D282.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x8EE48F3F_Ash_hed_diff.dds"
-						 destinationname="HMF_HGRa_ASH_dif_0x8EE48F3F.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xEAA787FF_ash_norm.dds"
-						 destinationname="HMF_ARM_ASHb_Norm_0xEAA787FF.dds" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
-					  friendlyname="Ashley Alternate From Ashes Armor"
-					  author="Ottemis"
-					  installpriority="10"
-					  recommendationreason="Vanilla-friendly, high quality textures"
-					  recommendation="Recommended">
-			<file downloadlink="http://www.nexusmods.com/masseffect3/mods/15/?tab=files"
-					  filename="ME3 HR Ashley Alt From Ashes Armor for Texmod-15-1-0.rar"
-					  tooltipname="ME3 HR Ashley Alternate From Ashes Armor"
-					  md5="1ca4dcbf0100e07ee4fe91628e412b91"
-					  size="24737378"
-					  unpackedsinglefilename="ME3_Ashley_From_Ashes_Ottemis.tpf"
-					  unpackedsize="24737281"
-					  unpackedmd5="32979b480516f7985be1c882cc7b5f4d" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x0B6E3832_Ash_Diff.dds"
-						 destinationname="HMF_ARM_ASHf_Diff_0x0B6E3832.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x750DEC99_Ash_Spec.dds"
-						 destinationname="HMF_ARM_ASHf_Spec_0x750DEC99.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x79AF2C8F_Ash_norm.dds"
-						 destinationname="HMF_ARM_ASHf_Norm_0x79AF2C8F.dds" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
-					  friendlyname="Ashley CE Armor"
-					  author="Ottemis"
-					  installpriority="10"
-					  recommendationreason="Vanilla-friendly, high quality textures"
-					  recommendation="Recommended">
-			<file downloadlink="http://www.nexusmods.com/masseffect3/mods/95/?tab=files"
-					  filename="ME3 HR Ashley CE Armor for Texmod-95-1-0.rar"
-					  tooltipname="ME3 HR Ashley CE Armor"
-					  md5="a1c4ec876a40959046747a8de9c041af"
-					  size="26716539"
-					  unpackedsinglefilename="ME3_Ashley_CE_Red_Ottemis.tpf"
-					  unpackedsize="26716446"
-					  unpackedmd5="ef1afe11510ba1e2c8fb4ca9a4125eb9" />
-			<packagefile me3="true"
-						 sourcename="HMF_ARM_ASHa_Diff_0xDCEA8572_Otte.dds"
-						 destinationname="HMF_ARM_ASHe_Diff_0xDCEA8572.dds" />
-			<packagefile me3="true"
-						 sourcename="HMF_ARM_ASHe_Norm_0xB1A560A9_Otte.dds"
-						 destinationname="HMF_ARM_ASHe_Norm_0xB1A560A9.dds" />
-			<packagefile me3="true"
-						 sourcename="HMF_ARM_ASHe_Spec_0xC208CB56_Otte.dds"
-						 destinationname="HMF_ARM_ASHe_Spec_0xC208CB56.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xA7983BFB_squad.dds"
-						 destinationname="Ashley2Glow_0xA7983BFB.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xD43F8502_squad.dds"
-						 destinationname="Ashley2_0xD43F8502.dds" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
-					  friendlyname="Ashley Default"
-					  author="Ottemis"
-					  installpriority="10"
-					  recommendationreason="Vanilla-friendly, high quality textures"
-					  recommendation="Recommended">
-			<file downloadlink="http://www.nexusmods.com/masseffect3/mods/4/?tab=files"
-					  filename="ME3 HR Ashley Default for Texmod-4-1-1.rar"
-					  tooltipname="ME3 HR Ashley Default"
-					  md5="767ff17a47e4afd45510406f75054448"
-					  size="28999538"
-					  unpackedsinglefilename="ME3_Ashley_default_Ottemis.tpf"
-					  unpackedsize="28999444"
-					  unpackedmd5="9e7e809112a6436541b552159f051c22" />
-			<packagefile me3="true"
-						 sourcename="HMF_ARM_ASHa_Diff_4096x4096.dds"
-						 destinationname="HMF_ARM_ASHa_Diff_0xA1C88649.dds" />
-			<packagefile me3="true"
-						 sourcename="HMF_ARM_ASHa_Norm_2048x2048.dds"
-						 destinationname="HMF_ARM_ASHa_Norm_0x0EF68859.dds" />
-			<packagefile me3="true"
-						 sourcename="HMF_ARM_ASHa_Spec_4096x4096.dds"
-						 destinationname="HMF_ARM_ASHa_Spec_0x5B479723.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x3432581C_squad.dds"
-						 destinationname="Ashley0_0x3432581C.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x46AF2F43_squad.dds"
-						 destinationname="Ashley0Glow_0x46AF2F43.dds" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
 					  friendlyname="Citadel Enviromentals 102"
 					  author="Ottemis"
 					  installpriority="10"
@@ -2391,177 +2258,6 @@
 			<packagefile me3="true"
 						 sourcename="MASSEFFECT3.EXE_0xFB40CDAE_hovercar_spec.dds"
 						 destinationname="HoverCar01_Int_Roof_Spec_Cine_0xFB40CDAE.dds" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
-					  friendlyname="Combat Fatigues"
-					  author="Ottemis"
-					  installpriority="10"
-					  recommendationreason="Vanilla-friendly, high quality textures"
-					  recommendation="Recommended">
-			<file downloadlink="http://www.nexusmods.com/masseffect3/mods/141/?tab=files"
-					  tooltipname="HR Combat Fatigues"
-					  filename="HR Combat Fatigues for Texmod-141-1-0.rar"
-					  md5="dc5dfe08eb1d0b79adf5e3825eda2476"
-					  size="35761921"
-					  unpackedsinglefilename="ME3_Combat_Fatigues_Ottemis.tpf"
-					  unpackedsize="35761826"
-					  unpackedmd5="5ac15b2830263ed56ba84ee77755317d" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x150F70BF_Gellix_Male_diff.dds"
-						 destinationname="HMM_ARM_CTHb_Cer_Diff_0x150F70BF.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x1DC7A460_Grissom_Male_spec.dds"
-						 destinationname="HMM_ARM_CTHb_Gri_Spec_0x1DC7A460.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x2C128252_Gellix_Fem_Norm.dds"
-						 destinationname="HMF_ARM_CTHb_Cer_Norm_0x2C128252.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x41D66C03_Normandy_Fem_Norm.dds"
-						 destinationname="HMF_ARM_CTHb_Nav_Norm_Stack_0x41D66C03.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x43D7585A_Normandy_Male_diff.dds"
-						 destinationname="HMM_ARM_CTHb_Nav_Diff_Stack_0x43D7585A.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x49CE915C_Gellix_Fem_diff.dds"
-						 destinationname="HMF_ARM_CTHb_Cer_Diff_0x49CE915C.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x65D1F538_Grissom_Male_diff.dds"
-						 destinationname="HMM_ARM_CTHb_Gri_Diff_0x65D1F538.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x68602BEC_Grissom_Fem_Norm.dds"
-						 destinationname="HMF_ARM_CTHb_Gri_Norm_0x68602BEC.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x874BF960_NPC_Male_spec.dds"
-						 destinationname="HMM_ARM_CTHb_Tnt_Diff_0x874BF960.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x98A16C00_Normandy_Male_Norm.dds"
-						 destinationname="HMM_ARM_CTHb_Nav_Norm_Stack_0x98A16C00.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x998B4C11_Normandy_Fem_spec.dds"
-						 destinationname="HMF_ARM_CTHb_Nav_SPwr_Stack_0x998B4C11.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x9F8F1CC2_NPC_fem_spec.dds"
-						 destinationname="HMF_ARM_CTHb_Tnt_Diff_0x9F8F1CC2.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xA318B36B_Grissom_Fem_diff.dds"
-						 destinationname="HMF_ARM_CTHb_Gri_Diff_0xA318B36B.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xBED19D45_Gellix_Male_Norm.dds"
-						 destinationname="HMM_ARM_CTHb_Cer_Norm_0xBED19D45.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xD00A3D59_Normandy_Fem_diff.dds"
-						 destinationname="HMF_ARM_CTHb_Nav_Diff_Stack_0xD00A3D59.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xD9B0B3D8_Gellix_Fem_spec.dds"
-						 destinationname="HMF_ARM_CTHb_Cer_Spec_0xD9B0B3D8.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xE09AA6B9_Normandy_Male_spec.dds"
-						 destinationname="HMM_ARM_CTHb_Nav_Spwr_Stack_0xE09AA6B9.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xE0CA7646_Grissom_Fem_spec.dds"
-						 destinationname="HMF_ARM_CTHb_Gri_Spec_0xE0CA7646.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xE11C764C_Gellix_Male_spec.dds"
-						 destinationname="HMM_ARM_CTHb_Cer_Spec_0xE11C764C.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xE8B022DA_Grissom_Male_Norm.dds"
-						 destinationname="HMM_ARM_CTHb_Gri_Norm_0xE8B022DA.dds" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
-					  friendlyname="EDI Alternate Outfit"
-					  author="Ottemis"
-					  stagemodfiles="true"
-					  installpriority="10"
-					  recommendationreason="Vanilla-friendly, high quality textures"
-					  recommendation="Recommended">
-			<file downloadlink="http://www.nexusmods.com/masseffect3/mods/238/?tab=files"
-					  tooltipname="EDI Black Catsuit Outfit"
-					  filename="EDI Back Catsuit Outfit-238-1-3.rar"
-					  md5="f37cfc23e2468a167bea5b42e03a69bd"
-					  size="20913288" />
-			<packagefile me3="true"
-						 tpfsource="EDI_BlackCatsuit_Otte_3.0.1.tpf"
-						 sourcename="HMF_ARM_EDId_Diff_0xEDC36D3F_Otte.dds"
-						 destinationname="HMF_ARM_EDId_Diff_0xEDC36D3F.dds" />
-			<packagefile me3="true"
-						 tpfsource="EDI_BlackCatsuit_Otte_3.0.1.tpf"
-						 sourcename="HMF_ARM_EDId_Spec_0x6ADA93CE_Otte.dds"
-						 destinationname="HMF_ARM_EDId_Spec_0x6ADA93CE.dds" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
-					  friendlyname="EDI From Ashes Outfit"
-					  author="Ottemis"
-					  stagemodfiles="true"
-					  installpriority="10"
-					  recommendationreason="Vanilla-friendly, high quality textures"
-					  recommendation="Recommended">
-			<file downloadlink="http://www.nexusmods.com/masseffect3/mods/273/?tab=files"
-					  tooltipname="EDI From Ashes Outfit"
-					  filename="EDI From Ashes Outfit ALT version-273-1-0.rar"
-					  md5="9ca2e61af158f864fe2542c34ce55ae5"
-					  size="21642390" />
-			<packagefile me3="true"
-						 tpfsource="ME3_EDI_FromAshes_ALT_Ottemis.tpf"
-						 sourcename="HMF_ARM_EDIe_Diff_0x1608E029_Overlay_Otte.dds"
-						 destinationname="HMF_ARM_EDIe_Diff_0x1608E029.dds" />
-			<packagefile me3="true"
-						 tpfsource="ME3_EDI_FromAshes_ALT_Ottemis.tpf"
-						 sourcename="HMF_ARM_EDIe_Spec_0xAE0C176D_Overlay_Otte.dds"
-						 destinationname="HMF_ARM_EDIb_Spec_0xAE0C176D.dds" />
-			<packagefile me3="true"
-						 tpfsource="ME3_EDI_FromAshes_ALT_Ottemis.tpf"
-						 sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds"
-						 destinationname="HMF_ARM_EDIb_Norm_0x4C200F45.dds" />
-			<packagefile me3="true"
-						 tpfsource="ME3_EDI_FromAshes_ALT_Ottemis.tpf"
-						 sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds"
-						 destinationname="HMF_ARM_EDId_Norm_0x191C1B10.dds" />
-			<packagefile me3="true"
-						 tpfsource="ME3_EDI_FromAshes_ALT_Ottemis.tpf"
-						 sourcename="MASSEFFECT3.EXE_0x4C200F45_norm.dds"
-						 destinationname="HMF_ARM_EDIg_Norm_0xE3618AF0.dds" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
-					  friendlyname="Fourth Casual Black"
-					  author="Ottemis"
-					  installpriority="10"
-					  recommendationreason="Vanilla-friendly, high quality textures"
-					  recommendation="Recommended">
-			<file downloadlink="http://www.nexusmods.com/masseffect3/mods/301/?tab=files"
-					  filename="HR Fourth Casual Black-301-1-0.rar"
-					  tooltipname="HR Fourth Casual Black"
-					  md5="49288ba2d85905c4d05ac96cacae968f"
-					  size="13134921"
-					  unpackedsinglefilename="ME3_Casual04_Black_FM_Ottemis.tpf"
-					  unpackedsize="13134824"
-					  unpackedmd5="906e4b29d39cd91f7f7db6edf2e8066f" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x07CE12D3-Male.dds"
-						 destinationname="HMM_ARM_CTHi_CLN_DIFF_0x07CE12D3.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x1004C012_Male.dds"
-						 destinationname="HMM_ARM_CTHi_CLN_Spec_0x1004C012.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x2A69C435-Female.dds"
-						 destinationname="HMM_ARM_CTHi_Diff_0x2A69C435.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x39EFC4A6-Female.dds"
-						 destinationname="HMM_ARM_CTHi_SPEC_0x39EFC4A6.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x8FBB722E_Male_norm.dds"
-						 destinationname="HMM_ARM_CTHi_CLN_NORM_0x8FBB722E.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x8FBB722E_Male_norm.dds"
-						 destinationname="HMM_ARM_CTHi_DMG_Norm_0x44310CEE.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x9DF01FEC_Male_Blood.dds"
-						 destinationname="HMM_ARM_CTHi_DMG_Diff_0x9DF01FEC.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xAF098936_Female_norm.dds"
-						 destinationname="HMM_ARM_CTHi_NORM_0xAF098936.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xF750CD22_Female_Blood.dds"
-						 destinationname="HMM_ARM_CTHi_Diff_0xF750CD22.dds" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
 					  friendlyname="Garrus Alternate Armor"
@@ -2783,69 +2479,6 @@
 			<packagefile me3="true"
 						 sourcename="HMF_ARM_FTLa_Spec_0xBE1A9E16_Otte.dds"
 						 destinationname="HMF_ARM_FTLa_Spec_0xBE1A9E16.dds" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
-					  friendlyname="N7 Hoody"
-					  author="Ottemis"
-					  installpriority="10"
-					  recommendationreason="Vanilla-friendly, high quality textures"
-					  recommendation="Recommended">
-			<file downloadlink="http://www.nexusmods.com/masseffect3/mods/45/?tab=files"
-					  filename="ME3 HR N7 Hoody for Texmod-45-1.rar"
-					  tooltipname="ME3 HR N7 Hoody"
-					  md5="697e95d4672c3bbd7b4da7301f5f81e1"
-					  size="37304754"
-					  unpackedsinglefilename="ME3_Hoodie_N7_Greypocket_Ottemis.tpf"
-					  unpackedsize="37304654"
-					  unpackedmd5="527cecd39daab085bc03b707ae013a1e" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x2229B5FF_N7_Fem_spec.dds"
-						 destinationname="HMF_ARM_CTHj_SPEC_0x2229B5FF.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x39D0044D_N7_Fem_norm.dds"
-						 destinationname="HMF_ARM_CTHj_NM_0x39D0044D.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x8E26C08C_N7_Fem_diff.dds"
-						 destinationname="HMF_ARM_CTHj_DIF_0x8E26C08C.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xDA4751AD_N7_Male_diff.dds"
-						 destinationname="SHP_Hoddie_dif_0xDA4751AD.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xE2D2CA1F_N7_Male_spec.dds"
-						 destinationname="HMM_ARM_CTHk_SPEC_0xE2D2CA1F.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0xE6E3CF23_N7_Male_Norm.dds"
-						 destinationname="SHP_Hoddie_nm_0xE6E3CF23.dds" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
-					  friendlyname="Science Uniforms"
-					  author="Ottemis"
-					  installpriority="10"
-					  recommendationreason="Vanilla-friendly, high quality textures"
-					  recommendation="Recommended">)
-			<file downloadlink="http://www.nexusmods.com/masseffect3/mods/161/?tab=files"
-					  filename="ME3 HR Science Uniforms for Texmod-161-1-1.rar"
-					  tooltipname="ME3 HR Science Uniforms"
-					  md5="357399b12a0d602d6ed8b6ac85cd8c45"
-					  size="98028226"
-					  unpackedsinglefilename="ME3_Science_Outfits_Ottemis.tpf"
-					  unpackedsize="98028131"
-					  unpackedmd5="4cda4d93c2102f353a3cab8caa9ed3cb" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x185F7751_Science_RedF_diff.dds"
-						 destinationname="HMF_ARM_CTHh_Doc_Diff_Stack_0x185F7751.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x22B4602C_ScienceF_Liara_spec.dds"
-						 destinationname="HMF_ARM_CTHh_Liara_Spec_0x22B4602C.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x5FBF924F_ScienceM_spec.dds"
-						 destinationname="HMM_ARM_CTHh_Nor_Spec_0x5FBF924F.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x767E9347_ScienceF_spec.dds"
-						 destinationname="HMF_ARM_CTHh_Nor_SPwr_Stack_0x767E9347.dds" />
-			<packagefile me3="true"
-						 sourcename="MASSEFFECT3.EXE_0x9819D0EB_female_norm.dds"
-						 destinationname="HMF_ARM_CTHh_Doc_Norm_Stack_0x9819D0EB.dds" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
 					  friendlyname="Vega Alt From Ashes Armor in Original Blue"
