@@ -47,7 +47,7 @@ namespace ALOTInstallerCore.Helpers
                 if (fileVersion >= 500)
                 {
                     // Force downgrade
-                    Log.Warning(@"The local MEMGui version is higher than the supported version. We are forcibly downgrading this client.");
+                    Log.Warning(@"[AICORE] The local MEMGui version is higher than the supported version. We are forcibly downgrading this version of MEM");
                     fileVersion = 0;
                 }
             }

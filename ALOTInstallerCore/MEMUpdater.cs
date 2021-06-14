@@ -61,12 +61,12 @@ namespace ALOTInstallerCore
                 if (memVersion >= 500)
                 {
                     // Force downgrade
-                    Log.Warning(@"The local MEMNoGui version is higher than the supported version. We are forcibly downgrading this client.");
+                    Log.Warning(@"[AICORE] The local MEMNoGui version is higher than the supported version. We are forcibly downgrading this client.");
                     memVersion = 0;
                 }
                 else if (memVersion > SoakTestingMEMVersion && !Settings.BetaMode)
                 {
-                    Log.Information(@"We are downgrading this client's MEMNoGui version");
+                    Log.Information(@"[AICORE] We are downgrading this client's MEMNoGui version to a supported version for stable");
                     memVersion = 0;
                 }
 
