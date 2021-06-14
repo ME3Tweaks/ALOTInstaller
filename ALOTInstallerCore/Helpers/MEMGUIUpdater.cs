@@ -42,6 +42,14 @@ namespace ALOTInstallerCore.Helpers
                 // Don't think this will work on Linux...
                 var versInfo = FileVersionInfo.GetVersionInfo(memLocation);
                 fileVersion = versInfo.FileMajorPart;
+
+                Log.Information("[AICORE] Fetched MEMNOGui releases from github...");
+                if (fileVersion >= 500)
+                {
+                    // Force downgrade
+                    Log.Warning(@"The local MEMGui version is higher than the supported version. We are forcibly downgrading this client.");
+                    fileVersion = 0;
+                }
             }
 
             try

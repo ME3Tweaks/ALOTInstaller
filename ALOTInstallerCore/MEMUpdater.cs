@@ -58,6 +58,18 @@ namespace ALOTInstallerCore
                 var client = new GitHubClient(new ProductHeaderValue("ALOTInstaller"));
                 var releases = client.Repository.Release.GetAll("MassEffectModder", "MassEffectModder").Result;
                 Log.Information("[AICORE] Fetched MEMNOGui releases from github...");
+                if (memVersion >= 500)
+                {
+                    // Force downgrade
+                    Log.Warning(@"The local MEMNoGui version is higher than the supported version. We are forcibly downgrading this client.");
+                    memVersion = 0;
+                }
+                else if (memVersion > SoakTestingMEMVersion && !Settings.BetaMode)
+                {
+                    Log.Information(@"We are downgrading this client's MEMNoGui version");
+                    memVersion = 0;
+                }
+
                 Release latestReleaseWithApplicableAsset = null;
                 if (releases.Any())
                 {
