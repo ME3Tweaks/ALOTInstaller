@@ -14,6 +14,7 @@ using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerWPF.BuilderUI;
+using ALOTInstallerWPF.InstallerUI;
 using CommandLine;
 using LegendaryExplorerCore.Misc;
 using Serilog;

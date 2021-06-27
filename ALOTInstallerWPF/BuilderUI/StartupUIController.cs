@@ -140,12 +140,11 @@ namespace ALOTInstallerWPF.BuilderUI
                 {
                     ct.Cancel();
                 };
-                var appUpdatePackage = new AppUpdateInteropPackage()
+                AppUpdateInteropPackage uip = new AppUpdateInteropPackage()
                 {
                     GithubOwner = "ME3Tweaks",
                     GithubReponame = "ALOTInstaller",
                     UpdateAssetPrefix = "ALOTInstallerWPF",
-                    RequestHeader = "ALOTInstaller",
                     UpdateFilenameInArchive = "ALOTInstaller.exe",
                     ShowUpdatePromptCallback = (title, text, updateButtonText, declineButtonText) =>
                     {
@@ -184,19 +183,6 @@ namespace ALOTInstallerWPF.BuilderUI
                         pd.SetMessage(initialmessage);
                         pd.SetTitle(title);
                     },
-                    SetUpdateDialogTextCallback = s =>
-                    {
-                        pd.SetMessage(s);
-                    },
-                    ProgressCallback = (done, total) =>
-                    {
-                        pd.SetProgress(done * 1d / total);
-                        pd.SetMessage($"Downloading update {FileSize.FormatSize(done)} / {FileSize.FormatSize(total)}");
-                    },
-                    ProgressIndeterminateCallback = () =>
-                    {
-                        pd.SetIndeterminate();
-                    },
                     ShowMessageCallback = (title, message) =>
                     {
                         object syncObj = new object();
@@ -216,18 +202,29 @@ namespace ALOTInstallerWPF.BuilderUI
                             Monitor.Wait(syncObj);
                         }
                     },
-                    NotifyBetaAvailable = () =>
+                    SetUpdateDialogTextCallback = s =>
                     {
-                        App.BetaAvailable = true;
+                        pd.SetMessage(s);
+                    },
+                    NotifyBetaAvailable = () => App.BetaAvailable = true,
+                    ProgressIndeterminateCallback = () => pd.SetIndeterminate(),
+                    ProgressCallback = (done, total) =>
+                    {
+                        pd.SetProgress(done * 1d / total);
+                        pd.SetMessage($"Downloading update {FileSize.FormatSize(done)} / {FileSize.FormatSize(total)}");
                     },
                     DownloadCompleted = () =>
                     {
                         pd.SetCancelable(false);
                     },
-                    cancellationTokenSource = ct
+                    cancellationTokenSource = ct,
+                    ForcedUpgradeMaxReleaseAge = 5,
+                    ApplicationName = Utilities.GetAppPrefixedName(),
+                    RequestHeader = "ALOTInstallerWPF"
                 };
 
-                AppUpdater.PerformGithubAppUpdateCheck(appUpdatePackage);
+                
+                AppUpdater.PerformGithubAppUpdateCheck(uip);
 
                 // If user aborts download
                 pd.SetCancelable(false);

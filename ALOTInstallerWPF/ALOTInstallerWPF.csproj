@@ -7,6 +7,7 @@
 		<Product>ALOT Installer</Product>
 		<Description>Texture installer for the original Mass Effect Trilogy</Description>
 		<CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 		<Configurations>WPFDebug;WPFRelease</Configurations>
 		<ApplicationIcon>ALOTInstallerIcon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -42,10 +43,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="InstallerUI\installtips.xml">
+		<EmbeddedResource Include="InstallerUI\installtips.xml">
 			<SubType>Designer</SubType>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</EmbeddedResource>
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='WPFDebug'">

@@ -13,6 +13,10 @@ namespace ALOTInstallerCore.Helpers
 {
     public class MEMGUIUpdater
     {
+        /// <summary>
+        /// Versions 500 and above are LE only
+        /// </summary>
+        public static int MaxSupportedMEMVersion = 499;
 #if WINDOWS
         private static ReleaseAsset getPlatformApplicableAsset(Release release) => release.Assets.FirstOrDefault(x => x.Name.StartsWith("MassEffectModder-v"));
 #elif LINUX
@@ -38,6 +42,14 @@ namespace ALOTInstallerCore.Helpers
                 // Don't think this will work on Linux...
                 var versInfo = FileVersionInfo.GetVersionInfo(memLocation);
                 fileVersion = versInfo.FileMajorPart;
+
+                Log.Information("[AICORE] Fetched MEMNOGui releases from github...");
+                if (fileVersion >= 500)
+                {
+                    // Force downgrade
+                    Log.Warning(@"[AICORE] The local MEMGui version is higher than the supported version. We are forcibly downgrading this version of MEM");
+                    fileVersion = 0;
+                }
             }
 
             try
@@ -52,7 +64,7 @@ namespace ALOTInstallerCore.Helpers
                     int latestReleaseNum = 0;
                     foreach (var release in releases)
                     {
-                        if (int.TryParse(release.TagName, out var version))
+                        if (int.TryParse(release.TagName, out var version) && version <= MaxSupportedMEMVersion)
                         {
                             if (hasPlatformApplicableAsset(release) && (latest == null || version > latestReleaseNum))
                             {

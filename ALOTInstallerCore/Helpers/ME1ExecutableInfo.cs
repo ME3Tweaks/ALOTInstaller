@@ -84,8 +84,8 @@ namespace ALOTInstallerCore.Helpers
             var strLen = searchStr.Length;
             for (int i = startPos; i <= s.Length - strLen; i++) //Value will never appear before 0x1000000 so don't waste our time looking there
             {
-                if (i == 0x12E02D0)
-                    Debug.WriteLine("hi");
+                //if (i == 0x12E02D0)
+                //    Debug.WriteLine("hi");
                 s.Seek(i, SeekOrigin.Begin);
                 if (s.ReadByte() == searchStr[0])
                 {
