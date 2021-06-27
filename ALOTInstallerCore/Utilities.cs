@@ -24,9 +24,8 @@ using NickStrupat;
 using System.Management;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.Objects.Manifest;
-using ME3ExplorerCore.Gammtek.Extensions.Reflection;
-using ME3ExplorerCore.Helpers;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Helpers;
+using LegendaryExplorerCore.Packages;
 
 namespace ALOTInstallerCore
 {

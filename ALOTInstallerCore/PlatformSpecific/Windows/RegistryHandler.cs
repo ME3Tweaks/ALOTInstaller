@@ -8,7 +8,10 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
 {
     public static class RegistryHandler
     {
-        public static string RegistrySettingsPath = RegistrySettingsPath;
+        /// <summary>
+        /// The path of the registry settings for the application. The default is 
+        /// </summary>
+        public static string RegistrySettingsPath = null;
         public static string CurrentUserRegistrySubpath = @"Software\ALOTAddon";
 
         /// <summary>

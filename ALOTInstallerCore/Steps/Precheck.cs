@@ -12,11 +12,11 @@ using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
-using ME3ExplorerCore.GameFilesystem;
-using ME3ExplorerCore.Gammtek.Extensions;
-using ME3ExplorerCore.Helpers;
-using ME3ExplorerCore.Packages;
-using ME3ExplorerCore.Unreal;
+using LegendaryExplorerCore.GameFilesystem;
+using LegendaryExplorerCore.Gammtek.Extensions;
+using LegendaryExplorerCore.Helpers;
+using LegendaryExplorerCore.Packages;
+using LegendaryExplorerCore.Unreal;
 using NickStrupat;
 using Serilog;
 
@@ -377,7 +377,7 @@ namespace ALOTInstallerCore.Steps
 
                 if (diskVersion.ToVersion() < minVersionRequired)
                 {
-                    Log.Error($@"[AICORE] Executable for {package.InstallTarget.Game} is outdated and must be updated. Minimum version required: {minVersionRequired}, installed vesrion: {diskVersion}");
+                    Log.Error($@"[AICORE] Executable for {package.InstallTarget.Game} is outdated and must be updated. Minimum version required: {minVersionRequired}, installed version: {diskVersion}");
                     failureReason = $"{package.InstallTarget.Game.ToGameName()} is outdated and must be updated. The minimum version required for installation is {minVersionRequired}, while the installed version currently is {diskVersion.ToVersion()}.";
                     return false;
                 }

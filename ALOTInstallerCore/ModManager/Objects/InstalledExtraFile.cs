@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.ModManager.Objects

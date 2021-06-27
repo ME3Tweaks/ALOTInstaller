@@ -3,7 +3,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using ALOTInstallerCore.Helpers;
-using ME3ExplorerCore.Compression;
+using LegendaryExplorerCore.Compression;
 using Serilog;
 
 namespace ALOTInstallerCore.ModManager.ME3Tweaks

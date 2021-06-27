@@ -4,9 +4,9 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Services;
+using LegendaryExplorerCore;
+using LegendaryExplorerCore.Helpers;
 using MassEffectModManagerCore.modmanager.asi;
-using ME3ExplorerCore;
-using ME3ExplorerCore.Helpers;
 using NickStrupat;
 using Serilog;
 
@@ -88,7 +88,7 @@ namespace ALOTInstallerCore
         {
             // Load ME3ExplorerCore library
             Log.Information(@"[AICORE] Loading ME3ExplorerCore library");
-            ME3ExplorerCoreLib.InitLib(ME3ExplorerCoreLib.SYNCHRONIZATION_CONTEXT, x => { Log.Error($"Error saving package: {x}"); });
+            LegendaryExplorerCoreLib.InitLib(LegendaryExplorerCoreLib.SYNCHRONIZATION_CONTEXT, x => { Log.Error($"Error saving package: {x}"); });
 
             // Logs call in method
             if (loadTargets)

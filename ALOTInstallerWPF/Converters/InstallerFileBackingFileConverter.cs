@@ -3,7 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows.Data;
 using ALOTInstallerCore.Objects;
-using ME3ExplorerCore.Helpers;
+using LegendaryExplorerCore.Helpers;
 
 namespace ALOTInstallerWPF.Converters
 {

@@ -19,7 +19,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.Objects;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Packages;
 
 namespace ALOTInstallerWPF.Flyouts
 {

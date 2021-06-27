@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using ALOTInstallerCore.ModManager;
 using ALOTInstallerCore.Objects;
+using LegendaryExplorerCore.Helpers;
 
 namespace ALOTInstallerCore.Helpers
 {

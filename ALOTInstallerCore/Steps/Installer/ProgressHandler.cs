@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Objects;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps.Installer

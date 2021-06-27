@@ -12,7 +12,7 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Packages;
 using Serilog;
 using Path = System.IO.Path;
 
@@ -364,7 +364,7 @@ namespace ALOTInstallerWPF.Flyouts
             {
                 this.FilePath = filepath;
                 ShortName = Path.GetFileName(FilePath);
-                FileSize = ME3ExplorerCore.Helpers.FileSize.FormatSize(new FileInfo(FilePath).Length);
+                FileSize = LegendaryExplorerCore.Helpers.FileSize.FormatSize(new FileInfo(FilePath).Length);
             }
         }
 

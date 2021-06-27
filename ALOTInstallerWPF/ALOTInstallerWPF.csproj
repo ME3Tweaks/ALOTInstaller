@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net5.0-windows8.0</TargetFramework>
 		<UseWPF>true</UseWPF>
 		<Platforms>x64</Platforms>
 		<Product>ALOT Installer</Product>
@@ -31,14 +31,14 @@
 	<ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.8.0" />
 		<PackageReference Include="MahApps.Metro.IconPacks.Ionicons" Version="4.4.0" />
-		<PackageReference Include="Microsoft.AppCenter" Version="3.4.3" />
-		<PackageReference Include="Microsoft.AppCenter.Analytics" Version="3.4.3" />
-		<PackageReference Include="Microsoft.AppCenter.Crashes" Version="3.4.3" />
+		<PackageReference Include="Microsoft.AppCenter" Version="4.3.0" />
+		<PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.3.0" />
+		<PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.3.0" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Core" Version="1.1.0.2" />
 		<PackageReference Include="Microsoft.WindowsAPICodePack-Shell" Version="1.1.0" />
 		<PackageReference Include="PropertyChanged.Fody" Version="4.0.0" />
 		<PackageReference Include="Serilog" Version="2.10.0" />
-		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00887" />
+		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

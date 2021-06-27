@@ -10,7 +10,8 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using ALOTInstallerCore.Objects;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Helpers;
+using LegendaryExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.Helpers

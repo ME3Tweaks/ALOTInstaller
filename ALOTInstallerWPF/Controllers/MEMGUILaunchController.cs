@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using ALOTInstallerCore.Helpers;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
-using ME3ExplorerCore.Helpers;
 using Serilog;
 using Application = System.Windows.Application;
 using Exception = System.Exception;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -21,12 +20,13 @@ using ALOTInstallerCore.Steps;
 using ALOTInstallerCore.Steps.Installer;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Objects;
+using LegendaryExplorerCore.Packages;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
-using ME3ExplorerCore.Packages;
 using Microsoft.WindowsAPICodePack.Taskbar;
 using Serilog;
+using Brushes = System.Windows.Media.Brushes;
 
 namespace ALOTInstallerWPF.InstallerUI
 {
@@ -435,7 +435,7 @@ namespace ALOTInstallerWPF.InstallerUI
             else if (ir == InstallStep.InstallResult.InstallOKWithWarning)
             {
                 BigIconKind = PackIconIoniconsKind.WarningMD;
-                BigIconForeground = Brushes.Yellow;
+                BigIconForeground = System.Windows.Media.Brushes.Yellow;
                 InstallerTextTop = $"Installed {installString}";
                 InstallerTextMiddle = "Installation completed with warnings";
                 if (installedTextures)

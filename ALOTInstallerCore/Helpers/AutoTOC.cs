@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using ALOTInstallerCore.ModManager;
 using ALOTInstallerCore.ModManager.Objects;
-using ME3ExplorerCore.GameFilesystem;
+using LegendaryExplorerCore.GameFilesystem;
+using LegendaryExplorerCore.Packages;
+using LegendaryExplorerCore.Unreal;
 using Serilog;
 
 namespace ALOTInstallerCore.Helpers
@@ -127,7 +129,7 @@ namespace ALOTInstallerCore.Helpers
             }
 #endif
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            MemoryStream ms = TOCCreator.CreateTOCForDirectory(dlcDirectory);
+            MemoryStream ms = TOCCreator.CreateTOCForDirectory(dlcDirectory, MEGame.ME3);
             if (ms != null)
             {
                 string tocPath = Path.Combine(dlcDirectory, @"PCConsoleTOC.bin");

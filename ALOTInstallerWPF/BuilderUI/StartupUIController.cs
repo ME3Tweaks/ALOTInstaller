@@ -18,11 +18,10 @@ using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Telemetry;
 using ControlzEx.Theming;
+using LegendaryExplorerCore.Helpers;
+using LegendaryExplorerCore.Packages;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
-using ME3ExplorerCore.Compression;
-using ME3ExplorerCore.Helpers;
-using ME3ExplorerCore.Packages;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
 using Microsoft.AppCenter.Crashes;
@@ -118,7 +117,7 @@ namespace ALOTInstallerWPF.BuilderUI
             NamedBackgroundWorker bw = new NamedBackgroundWorker("StartupThread");
             bw.DoWork += (a, b) =>
             {
-                
+                RegistryHandler.RegistrySettingsPath = @"HKEY_CURRENT_USER\Software\ALOTAddon";
                 ALOTInstallerCoreLib.Startup(SetWrapperLogger, RunOnUIThread, startTelemetry, stopTelemetry);
                 // Logger is now available
 
@@ -141,8 +140,14 @@ namespace ALOTInstallerWPF.BuilderUI
                 {
                     ct.Cancel();
                 };
-                AppUpdater.PerformGithubAppUpdateCheck("ME3Tweaks", "ALOTInstaller", "ALOTInstallerWPF", "ALOTInstaller.exe",
-                    (title, text, updateButtonText, declineButtonText) =>
+                var appUpdatePackage = new AppUpdateInteropPackage()
+                {
+                    GithubOwner = "ME3Tweaks",
+                    GithubReponame = "ALOTInstaller",
+                    UpdateAssetPrefix = "ALOTInstallerWPF",
+                    RequestHeader = "ALOTInstaller",
+                    UpdateFilenameInArchive = "ALOTInstaller.exe",
+                    ShowUpdatePromptCallback = (title, text, updateButtonText, declineButtonText) =>
                     {
                         bool response = false;
                         object syncObj = new object();
@@ -150,12 +155,13 @@ namespace ALOTInstallerWPF.BuilderUI
                         {
                             if (Application.Current.MainWindow is MainWindow mw)
                             {
-                                var result = await mw.ShowMessageAsync(title, text, MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
-                                {
-                                    AffirmativeButtonText = updateButtonText,
-                                    NegativeButtonText = declineButtonText,
-                                    DefaultButtonFocus = MessageDialogResult.Affirmative
-                                },
+                                var result = await mw.ShowMessageAsync(title, text,
+                                    MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings()
+                                    {
+                                        AffirmativeButtonText = updateButtonText,
+                                        NegativeButtonText = declineButtonText,
+                                        DefaultButtonFocus = MessageDialogResult.Affirmative
+                                    },
                                     75);
                                 response = result == MessageDialogResult.Affirmative;
                                 lock (syncObj)
@@ -168,28 +174,30 @@ namespace ALOTInstallerWPF.BuilderUI
                         {
                             Monitor.Wait(syncObj);
                         }
+
                         return response;
-                    }, (title, initialmessage, canCancel) =>
+                    },
+                    ShowUpdateProgressDialogCallback = (title, initialmessage, canCancel) =>
                     {
                         // We don't use this as we are already in a progress dialog
                         pd.SetCancelable(canCancel);
                         pd.SetMessage(initialmessage);
                         pd.SetTitle(title);
                     },
-                    s =>
+                    SetUpdateDialogTextCallback = s =>
                     {
                         pd.SetMessage(s);
                     },
-                    (done, total) =>
+                    ProgressCallback = (done, total) =>
                     {
                         pd.SetProgress(done * 1d / total);
                         pd.SetMessage($"Downloading update {FileSize.FormatSize(done)} / {FileSize.FormatSize(total)}");
                     },
-                    () =>
+                    ProgressIndeterminateCallback = () =>
                     {
                         pd.SetIndeterminate();
                     },
-                    (title, message) =>
+                    ShowMessageCallback = (title, message) =>
                     {
                         object syncObj = new object();
                         Application.Current.Dispatcher.Invoke(async () =>
@@ -208,16 +216,18 @@ namespace ALOTInstallerWPF.BuilderUI
                             Monitor.Wait(syncObj);
                         }
                     },
-                    () =>
+                    NotifyBetaAvailable = () =>
                     {
                         App.BetaAvailable = true;
                     },
-                    () =>
+                    DownloadCompleted = () =>
                     {
                         pd.SetCancelable(false);
                     },
-                    ct
-                );
+                    cancellationTokenSource = ct
+                };
+
+                AppUpdater.PerformGithubAppUpdateCheck(appUpdatePackage);
 
                 // If user aborts download
                 pd.SetCancelable(false);
@@ -291,6 +301,8 @@ namespace ALOTInstallerWPF.BuilderUI
                             Monitor.Wait(o);
                         }
                     }, x => pd.SetMessage(x));
+
+
                 }
                 catch (Exception e)
                 {
@@ -319,23 +331,25 @@ namespace ALOTInstallerWPF.BuilderUI
                                 ContentWidthPercent: 75);
                         }
                     }
+
+
                 });
             };
             bw.RunWorkerCompleted += async (a, b) =>
-                    {
-                        if (ManifestHandler.MasterManifest != null)
                         {
-                            if (ManifestHandler.MasterManifest.Source < ManifestHandler.ManifestSource.Online)
+                            if (ManifestHandler.MasterManifest != null)
                             {
-                                window.Title += $" - Using {ManifestHandler.MasterManifest.Source} manifest";
+                                if (ManifestHandler.MasterManifest.Source < ManifestHandler.ManifestSource.Online)
+                                {
+                                    window.Title += $" - Using {ManifestHandler.MasterManifest.Source} manifest";
+                                }
+                                else if (ManifestHandler.MasterManifest.Source == ManifestHandler.ManifestSource.Failover)
+                                {
+                                    window.Title += " - FAILED TO LOAD MANIFEST";
+                                }
                             }
-                            else if (ManifestHandler.MasterManifest.Source == ManifestHandler.ManifestSource.Failover)
-                            {
-                                window.Title += " - FAILED TO LOAD MANIFEST";
-                            }
-                        }
 
-                        await pd.CloseAsync();
+                            await pd.CloseAsync();
 #if !DEBUG
                         //await window.ShowMessageAsync("This is a preview version of ALOT Installer V4",
                         //    "This is a preview version of ALOT Installer V4. Changes this program makes to you texture library will make those files incompatible with ALOT Installer V3. Please direct all feedback to the #v4-feedback channel on the ALOT Discord. Thanks!");

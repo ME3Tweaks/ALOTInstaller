@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.PlatformSpecific.Windows;
+using LegendaryExplorerCore.Misc;
 using Serilog;
 
 namespace ALOTInstallerCore.Helpers.AppSettings

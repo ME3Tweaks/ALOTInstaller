@@ -8,9 +8,10 @@ using ALOTInstallerCore.ModManager.asi;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
+using LegendaryExplorerCore.GameFilesystem;
+using LegendaryExplorerCore.Packages;
+using LegendaryExplorerCore.Helpers;
 using MassEffectModManagerCore.modmanager.asi;
-using ME3ExplorerCore.GameFilesystem;
-using ME3ExplorerCore.Packages;
 using Serilog;
 using Path = System.IO.Path;
 

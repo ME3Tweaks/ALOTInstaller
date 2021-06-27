@@ -8,8 +8,9 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerWPF.Helpers;
+using LegendaryExplorerCore.Gammtek.Extensions;
+using LegendaryExplorerCore.Packages;
 using MahApps.Metro.Controls.Dialogs;
-using ME3ExplorerCore.Packages;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.WindowsAPICodePack.Taskbar;
 

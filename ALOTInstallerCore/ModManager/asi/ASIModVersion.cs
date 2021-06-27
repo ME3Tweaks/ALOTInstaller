@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using ALOTInstallerCore.Objects;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Packages;
 
 namespace MassEffectModManagerCore.modmanager.asi
 {

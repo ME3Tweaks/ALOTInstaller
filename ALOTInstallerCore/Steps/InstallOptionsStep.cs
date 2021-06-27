@@ -4,7 +4,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.Steps

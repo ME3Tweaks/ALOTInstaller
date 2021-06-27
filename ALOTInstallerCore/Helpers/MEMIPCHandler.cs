@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 using ALOTInstallerCore.Helpers.AppSettings;
 using CliWrap;
 using CliWrap.EventStream;
-using ME3ExplorerCore.GameFilesystem;
-using ME3ExplorerCore.Gammtek.Extensions;
-using ME3ExplorerCore.Helpers;
-using ME3ExplorerCore.Misc;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.GameFilesystem;
+using LegendaryExplorerCore.Gammtek.Extensions;
+using LegendaryExplorerCore.Helpers;
+using LegendaryExplorerCore.Misc;
+using LegendaryExplorerCore.Packages;
 
 namespace ALOTInstallerCore.Helpers
 {

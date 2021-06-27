@@ -5,8 +5,8 @@ using System.Reflection;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
-using ME3ExplorerCore.GameFilesystem;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.GameFilesystem;
+using LegendaryExplorerCore.Packages;
 using PropertyChanged;
 using Serilog;
 

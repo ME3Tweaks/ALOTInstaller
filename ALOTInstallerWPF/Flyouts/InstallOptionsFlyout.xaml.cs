@@ -23,10 +23,11 @@ using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.BuilderUI;
 using ALOTInstallerWPF.Objects;
+using LegendaryExplorerCore.Gammtek.Extensions;
+using LegendaryExplorerCore.Packages;
 using MahApps.Metro.Actions;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
-using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerWPF.Flyouts

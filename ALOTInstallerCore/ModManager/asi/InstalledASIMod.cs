@@ -2,8 +2,8 @@
 using System.IO;
 using System.Linq;
 using ALOTInstallerCore.Objects;
+using LegendaryExplorerCore.Packages;
 using MassEffectModManagerCore.modmanager.asi;
-using ME3ExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.ModManager.asi

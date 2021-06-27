@@ -10,17 +10,17 @@ using System.Timers;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager;
-using ALOTInstallerCore.ModManager.GameINI;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps.Installer;
+using LegendaryExplorerCore;
+using LegendaryExplorerCore.Gammtek.Extensions;
+using LegendaryExplorerCore.Helpers;
+using LegendaryExplorerCore.Misc;
+using LegendaryExplorerCore.Packages;
+using LegendaryExplorerCore.Unreal;
+using LegendaryExplorerCore.Unreal.BinaryConverters;
 using MassEffectModManagerCore.modmanager.asi;
-using ME3ExplorerCore;
-using ME3ExplorerCore.Gammtek.Extensions;
-using ME3ExplorerCore.Helpers;
-using ME3ExplorerCore.Packages;
-using ME3ExplorerCore.Unreal;
-using ME3ExplorerCore.Unreal.BinaryConverters;
 using Serilog;
 using NickStrupat;
 #if WINDOWS
@@ -189,7 +189,7 @@ namespace ALOTInstallerCore.Steps
             Log.Information(@"[AICORE] Beginning InstallTextures() thread.");
             #region Presetup variables
             var filesThatWillInstall = Directory.GetFiles(memInputPath, "*.mem");
-            var mainInstallStageWillCommence = filesThatWillInstall.Any();
+            var mainInstallStageWillCommence = Enumerable.Any(filesThatWillInstall);
             Log.Information($@"[AICORE] Main texture installation step (+ supporting steps) will commence: {mainInstallStageWillCommence}");
 
             #endregion
@@ -847,7 +847,7 @@ namespace ALOTInstallerCore.Steps
 
                 SetBottomTextCallback?.Invoke("Fixing Mars to Citadel transition");
                 Log.Information("[AICORE] Fixing post-mars hackett cutscene memory issue");
-                ME3ExplorerCoreLib.InitLib(package.UiThreadScheduler, x =>
+                LegendaryExplorerCoreLib.InitLib(package.UiThreadScheduler, x =>
                 {
                     Log.Error($"Error saving package: {x}");
                 });

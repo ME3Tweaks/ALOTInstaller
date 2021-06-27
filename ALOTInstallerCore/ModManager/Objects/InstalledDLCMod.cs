@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Packages;
 
 namespace ALOTInstallerCore.ModManager.Objects
 {

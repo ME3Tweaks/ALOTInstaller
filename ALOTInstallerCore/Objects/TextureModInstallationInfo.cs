@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using ME3ExplorerCore.Helpers;
+using LegendaryExplorerCore.Helpers;
 using ALOTInstallerCore.Objects.Manifest;
-using ME3ExplorerCore.Gammtek.Extensions.Collections.Generic;
+using LegendaryExplorerCore.Gammtek.Extensions.Collections.Generic;
 
 namespace ALOTInstallerCore.Objects
 {

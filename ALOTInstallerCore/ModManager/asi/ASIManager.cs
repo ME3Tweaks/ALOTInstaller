@@ -11,7 +11,7 @@ using ALOTInstallerCore.ModManager;
 using ALOTInstallerCore.ModManager.asi;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Packages;
 using Serilog;
 
 namespace MassEffectModManagerCore.modmanager.asi

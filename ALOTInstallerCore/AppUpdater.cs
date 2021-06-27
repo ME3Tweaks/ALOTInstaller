@@ -8,7 +8,7 @@ using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.ME3Tweaks;
 using AuthenticodeExaminer;
-using ME3ExplorerCore.Compression;
+using LegendaryExplorerCore.Compression;
 using Octokit;
 using Serilog;
 

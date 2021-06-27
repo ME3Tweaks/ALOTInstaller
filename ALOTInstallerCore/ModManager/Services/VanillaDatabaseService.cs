@@ -7,9 +7,11 @@ using System.Text;
 using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.ModManager.Objects;
-using ME3ExplorerCore.Compression;
-using ME3ExplorerCore.GameFilesystem;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Compression;
+using LegendaryExplorerCore.GameFilesystem;
+using LegendaryExplorerCore.Gammtek.Extensions;
+using LegendaryExplorerCore.Packages;
+using LegendaryExplorerCore.Helpers;
 using Serilog;
 
 namespace ALOTInstallerCore.ModManager.Services
@@ -504,7 +506,7 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <param name="game"></param>
         internal static void CheckAndTagBackup(MEGame game)
         {
-            Log.Information(@"[AICORE] Validating backup for " + game.GetGameName());
+            Log.Information(@"[AICORE] Validating backup for " + game.ToGameName());
             var targetPath = BackupService.GetGameBackupPath(game, out var isVanillaBU, false);
             Log.Information(@"[AICORE] Backup location: " + targetPath);
             BackupService.SetStatus(game, "Checking backup", "Please wait");

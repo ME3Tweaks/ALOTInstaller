@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using ALOTInstallerCore.Objects;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Packages;
 
 namespace ALOTInstallerCore.ModManager.Services
 {

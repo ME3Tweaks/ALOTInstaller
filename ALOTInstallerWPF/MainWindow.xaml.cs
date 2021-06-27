@@ -21,8 +21,8 @@ using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.InstallerUI;
 using ALOTInstallerWPF.Objects;
+using LegendaryExplorerCore.Packages;
 using MahApps.Metro.Controls;
-using ME3ExplorerCore.Packages;
 using Octokit;
 
 namespace ALOTInstallerWPF

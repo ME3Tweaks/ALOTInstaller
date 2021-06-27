@@ -9,26 +9,22 @@
 		<Configurations>WinDebug;WinRelease;LinuxDebug;LinuxRelease</Configurations>
 		<ApplicationIcon>ALOTInstallerIcon.ico</ApplicationIcon>
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-		<DebugType>embedded</DebugType>
+    <TargetFramework>net5.0</TargetFramework>
+    <DebugType>embedded</DebugType>
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 	<Import Project="..\SharedAssemblyInfo.proj" />
 	<PropertyGroup Condition="'$(Configuration)'=='WinDebug'">
 		<DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='WinRelease'">
 		<DefineConstants>WINDOWS</DefineConstants>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='LinuxDebug'">
 		<DefineConstants>TRACE;DEBUG;LINUX</DefineConstants>
-		<TargetFramework>net5.0</TargetFramework>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='LinuxRelease'">
 		<DefineConstants>LINUX</DefineConstants>
-		<!-- Can't load libcoreclr issue in packed mode so we downgrade to 3.1 -->
-		<TargetFramework>net5.0</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Fody" Version="6.3.0">
@@ -36,7 +32,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="PropertyChanged.Fody" Version="4.0.0" />
-		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0-dev-00887" />
+		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
