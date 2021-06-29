@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.2.0" />
+					  version="7.2.1" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1080,24 +1080,24 @@
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-					  alotversion="12"
-					  friendlyname="ALOT for ME2 12.0"
+					  alotversion="14"
+					  friendlyname="ALOT for ME2 14.0"
 					  author="CreeperLava"
 					  uipriority="0"
 					  recommendationreason="Main ALOT file, required"
 					  recommendation="Required"
 					  installpriority="1">
-			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
-					  tooltipname="ALOT for ME2 12.0"
-					  torrentfilename="ALOT for ME2 v12.zip"
-					  filename="ALOT for ME2 12.0-68-2021-12-0-1604620707.zip"
+			<file downloadlink="http://wearetheborg.net/ALOT/ALOT_ME2_v14.mem"
+					  tooltipname="ALOT for ME2 14.0"
+					  torrentfilename="ALOT for ME2 v14.zip"
+					  filename="ALOT for ME2 14.zip"
 					  size="6169019512"
 					  md5="22c3f49b421db0794c616a863a38a971"
-					  unpackedsinglefilename="ALOT_ME2_v12.mem"
-					  unpackedsize="6090413327"
-					  unpackedmd5="1368aef987826fde34d5025440f6adca" />
+					  unpackedsinglefilename="ALOT_ME2_v14.mem"
+					  unpackedsize="4789443253"
+					  unpackedmd5="446668005dc71730ac1a218939cb9a8e" />
 			<packagefile me2="true"
-						 sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v12.mem"
+						 sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v14.mem"
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
