@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.2.1" />
+					  version="7.2.2" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1087,7 +1087,7 @@
 					  recommendationreason="Main ALOT file, required"
 					  recommendation="Required"
 					  installpriority="1">
-			<file downloadlink="http://wearetheborg.net/ALOT/ALOT_ME2_v14.mem"
+			<file downloadlink="http://wearetheborg.net/files/ALOT/ALOT_ME2_v14.mem"
 					  tooltipname="ALOT for ME2 14.0"
 					  torrentfilename="ALOT for ME2 v14.zip"
 					  filename="ALOT for ME2 14.zip"
