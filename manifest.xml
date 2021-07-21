@@ -2,7 +2,7 @@
 <alotinstallermanifest>
 	<!-- MEM Update Information -->
 	<highestapprovedmemversion>438</highestapprovedmemversion>
-	<soaktestingmemversion soakstartdate="2021-07-18">439</soaktestingmemversion>
+	<soaktestingmemversion soakstartdate="2021-07-16">439</soaktestingmemversion>
 	<!-- YYYY-MM-DD-->
 
 		<!-- DEFINE MANIFEST MODES THAT MANIFEST FILES CAN ATTACH TO -->
