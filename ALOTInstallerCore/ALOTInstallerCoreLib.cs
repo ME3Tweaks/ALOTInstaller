@@ -90,14 +90,17 @@ namespace ALOTInstallerCore
         public static void PostCriticalStartup(Action<string> currentOperationCallback, Action<Action> runOnUiThreadCallback, bool loadTargets = true)
         {
             // Load ME3ExplorerCore library
-            Log.Information(@"[AICORE] Loading ME3ExplorerCore library");
+            Log.Information(@"[AICORE] Loading LegendaryExplorerCore library");
             LegendaryExplorerCoreLib.InitLib(LegendaryExplorerCoreLib.SYNCHRONIZATION_CONTEXT, x => { Log.Error($"Error saving package: {x}"); });
 
             // Logs call in method
             if (loadTargets)
                 Locations.LoadTargets();
             Log.Information("[AICORE] Starting backup service");
-            BackupService.InitBackupService(runOnUiThreadCallback);
+            BackupService.InitBackupService(runOnUiThreadCallback, false);
+            BackupService.MigrateBackupPaths();
+            BackupService.RefreshBackupStatus(Locations.GetAllAvailableTargets(), false, log: true);
+
 
             currentOperationCallback?.Invoke("Loading ME3Tweaks services");
             Log.Information("[AICORE] Loading ME3Tweaks service: Basegame File Identification Service (BGFIS)");

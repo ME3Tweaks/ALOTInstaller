@@ -446,36 +446,37 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                         return false;
                     }
                 }
-    if (!targetToBackup.IsCustomOption){
-
-                //Check space
-                DriveInfo di = new DriveInfo(backupPath);
-                var requiredSpace = (long)(Utilities.GetSizeOfDirectory(new DirectoryInfo(targetToBackup.TargetPath)) * 1.1); //10% buffer
-                Log.Information($@"[AICORE] Backup space check. Backup size required: {FileSize.FormatSize(requiredSpace)}, free space: {FileSize.FormatSize(di.AvailableFreeSpace)}");
-                if (di.AvailableFreeSpace < requiredSpace)
+                if (!targetToBackup.IsCustomOption)
                 {
-                    //Not enough space.
-                    Log.Error($@"[AICORE] Not enough disk space to create backup at {backupPath}");
-                    BlockingActionCallback?.Invoke("Not enough free disk space", $"There is not enough free disk space to make a game backup at this location.\n\nFree space: {FileSize.FormatSize(di.AvailableFreeSpace)}\nRequired space: {FileSize.FormatSize(requiredSpace)}");
-                    return false;
-                }
+
+                    //Check space
+                    DriveInfo di = new DriveInfo(backupPath);
+                    var requiredSpace = (long)(Utilities.GetSizeOfDirectory(new DirectoryInfo(targetToBackup.TargetPath)) * 1.1); //10% buffer
+                    Log.Information($@"[AICORE] Backup space check. Backup size required: {FileSize.FormatSize(requiredSpace)}, free space: {FileSize.FormatSize(di.AvailableFreeSpace)}");
+                    if (di.AvailableFreeSpace < requiredSpace)
+                    {
+                        //Not enough space.
+                        Log.Error($@"[AICORE] Not enough disk space to create backup at {backupPath}");
+                        BlockingActionCallback?.Invoke("Not enough free disk space", $"There is not enough free disk space to make a game backup at this location.\n\nFree space: {FileSize.FormatSize(di.AvailableFreeSpace)}\nRequired space: {FileSize.FormatSize(requiredSpace)}");
+                        return false;
+                    }
 
                     //Check writable
                     var writable = Utilities.IsDirectoryWritable(backupPath);
-                if (!writable)
-                {
-                    //Not enough space.
-                    Log.Error($@"[AICORE] Backup destination selected is not writable.");
-                    BlockingActionCallback?.Invoke("Invalid backup destination", "Selected backup folder does not have write permissions from this account. Select a different directory.");
-                    return false;
+                    if (!writable)
+                    {
+                        //Not enough space.
+                        Log.Error($@"[AICORE] Backup destination selected is not writable.");
+                        BlockingActionCallback?.Invoke("Invalid backup destination", "Selected backup folder does not have write permissions from this account. Select a different directory.");
+                        return false;
+                    }
                 }
-}
                 //Check is Documents folder
                 var docsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), @"BioWare", targetToBackup.Game.ToGameName());
                 if (backupPath.Equals(docsPath, StringComparison.InvariantCultureIgnoreCase) || backupPath.IsSubPathOf(docsPath))
                 {
                     Log.Error(@"[AICORE] User chose path in or around the documents path for the game - not allowed as game can load files from here.");
-                
+
                     BlockingActionCallback?.Invoke($"Invalid backup destination", $"The backup destination cannot be a subdirectory of the Documents/BioWare/{targetToBackup.Game.ToGameName()} folder. Select a different directory.");
                     return false;
                 }
@@ -493,7 +494,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     }
                 }
 
-                return true;                
+                return true;
             }
 
 
@@ -848,14 +849,12 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
         }
 
         #endregion
-        //#if WINDOWS
-        private const string REGISTRY_KEY_ME3CMM = @"Software\Mass Effect 3 Mod Manager";
+        public const string LEGACY_REGISTRY_KEY_ME3CMM = @"Software\Mass Effect 3 Mod Manager";
 
         /// <summary>
         /// ALOT Addon Registry Key, used for ME1 and ME2 backups
         /// </summary>
-        private const string BACKUP_REGISTRY_KEY = @"Software\ALOTAddon"; //Shared. Do not change
-                                                                          //#endif
+        public const string LEGACY_BACKUP_REGISTRY_KEY = @"Software\ALOTAddon"; //Shared. Do not change
 
         private static void WriteBackupLocation(MEGame game, string backupPath)
         {
@@ -864,10 +863,10 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
             {
                 case MEGame.ME1:
                 case MEGame.ME2:
-                    RegistryHandler.WriteRegistryKey(Registry.CurrentUser, BACKUP_REGISTRY_KEY, game + @"VanillaBackupLocation", backupPath);
+                    RegistryHandler.WriteRegistryKey(Registry.CurrentUser, LEGACY_BACKUP_REGISTRY_KEY, game + @"VanillaBackupLocation", backupPath);
                     break;
                 case MEGame.ME3:
-                    RegistryHandler.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY_ME3CMM, @"VanillaCopyLocation", backupPath);
+                    RegistryHandler.WriteRegistryKey(Registry.CurrentUser, LEGACY_REGISTRY_KEY_ME3CMM, @"VanillaCopyLocation", backupPath);
                     break;
             }
 #else
@@ -888,24 +887,7 @@ namespace ALOTInstallerCore.ModManager.ME3Tweaks
                     File.Delete(cmmVanilla);
                 }
             }
-#if WINDOWS
-
-            switch (meGame)
-            {
-                case MEGame.ME1:
-                case MEGame.ME2:
-                    RegistryHandler.DeleteRegistryValue(Registry.CurrentUser, BACKUP_REGISTRY_KEY,
-                        meGame + @"VanillaBackupLocation");
-                    break;
-                case MEGame.ME3:
-                    RegistryHandler.DeleteRegistryValue(Registry.CurrentUser, REGISTRY_KEY_ME3CMM,
-                        @"VanillaCopyLocation");
-                    break;
-            }
-#elif LINUX
-            // Remove backup here
-#endif
-
+            BackupService.RemoveBackupPath(meGame);
         }
     }
 }

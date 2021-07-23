@@ -460,6 +460,10 @@ namespace ALOTInstallerCore.ModManager.Services
                     case MEGame.ME3:
                         SUPPORTED_HASHES_ME3.TryGetValue(md5, out var me3result);
                         return (md5, me3result);
+                    case MEGame.LE1:
+                    case MEGame.LE2:
+                    case MEGame.LE3:
+                        return (md5, "Please make ME3TweaksCore");
                     default:
                         throw new Exception(@"Cannot vanilla check against game that is not ME1/ME2/ME3");
                 }

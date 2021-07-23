@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-using ALOTInstallerConsole.UserControls;
 using ALOTInstallerCore;
 using ALOTInstallerCore.Helpers;
-using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects.Manifest;
-using ME3ExplorerCore;
-using NickStrupat;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI

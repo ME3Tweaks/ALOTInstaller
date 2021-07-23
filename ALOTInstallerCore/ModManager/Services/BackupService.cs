@@ -7,10 +7,12 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using ALOTInstallerCore.Helpers;
 using ALOTInstallerCore.Helpers.AppSettings;
+using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using LegendaryExplorerCore.Gammtek.Extensions;
 using LegendaryExplorerCore.Packages;
+using Microsoft.Win32;
 using Serilog;
 #if WINDOWS
 using ALOTInstallerCore.PlatformSpecific.Windows;
@@ -149,7 +151,7 @@ namespace ALOTInstallerCore.ModManager.Services
         /// <summary>
         /// Initializes the backup service.
         /// </summary>
-        public static void InitBackupService(Action<Action> runCodeOnUIThreadCallback)
+        public static void InitBackupService(Action<Action> runCodeOnUIThreadCallback, bool refreshStatuses = true)
         {
             object obj = new object(); //Syncobj to ensure the UI thread method has finished invoking
             void runOnUiThread()
@@ -157,9 +159,15 @@ namespace ALOTInstallerCore.ModManager.Services
                 GameBackupStatuses.Add(new GameBackupStatus(MEGame.ME1));
                 GameBackupStatuses.Add(new GameBackupStatus(MEGame.ME2));
                 GameBackupStatuses.Add(new GameBackupStatus(MEGame.ME3));
+#if LESUPPORT
+                GameBackupStatuses.Add(new GameBackupStatus(MEGame.LE1));
+                GameBackupStatuses.Add(new GameBackupStatus(MEGame.LE2));
+                GameBackupStatuses.Add(new GameBackupStatus(MEGame.LE3));
+#endif
             }
             runCodeOnUIThreadCallback.Invoke(runOnUiThread);
-            RefreshBackupStatus(Locations.GetAllAvailableTargets(), false, log: true);
+            if (refreshStatuses)
+                RefreshBackupStatus(Locations.GetAllAvailableTargets(), false, log: true);
         }
 
         //private static bool _me1BackedUp;
@@ -329,27 +337,35 @@ namespace ALOTInstallerCore.ModManager.Services
         //}
 
 
+        /// <summary>
+        /// Deletes the registry key used to store the backup location
+        /// </summary>
+        /// <param name="game"></param>
+        public static void RemoveBackupPath(MEGame game)
+        {
+#if WINDOWS
+            RegistryHandler.DeleteRegistryValue(Registry.CurrentUser, @"Software\ME3Tweaks", game + @"VanillaBackupLocation");
+
+            // Strip pre 7.0
+            switch (game)
+            {
+                case MEGame.ME1:
+                case MEGame.ME2:
+                    RegistryHandler.DeleteRegistryValue(Registry.CurrentUser, BackupHandler.LEGACY_BACKUP_REGISTRY_KEY, $"{game}VanillaBackupLocation");
+                    break;
+                case MEGame.ME3:
+                    RegistryHandler.DeleteRegistryValue(Registry.CurrentUser, BackupHandler.LEGACY_REGISTRY_KEY_ME3CMM, @"VanillaCopyLocation");
+                    break;
+            }
+#elif LINUX
+            Settings.RemoveBackupPath(game);
+#endif
+        }
 
         public static string GetGameBackupPath(MEGame game, out bool isVanilla, bool forceCmmVanilla = true, bool logReturnedPath = false, bool forceReturnPath = false)
         {
 #if WINDOWS
-            string path;
-            switch (game)
-            {
-                case MEGame.ME1:
-                    path = RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\ALOTAddon", @"ME1VanillaBackupLocation");
-                    break;
-                case MEGame.ME2:
-                    path = RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\ALOTAddon", @"ME2VanillaBackupLocation");
-                    break;
-                case MEGame.ME3:
-                    //Check for backup via registry - Use Mod Manager's game backup key to find backup.
-                    path = RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\Mass Effect 3 Mod Manager", @"VanillaCopyLocation");
-                    break;
-                default:
-                    isVanilla = false;
-                    return null;
-            }
+            var path = RegistryHandler.GetRegistryString(@"HKEY_CURRENT_USER\Software\ME3Tweaks", $@"{game}VanillaBackupLocation");
 
 #else
             // Fetch via the Settings INI
@@ -466,6 +482,47 @@ namespace ALOTInstallerCore.ModManager.Services
         public static void UpdateBackupStatus(MEGame game, bool forceCmmVanilla)
         {
             GameBackupStatuses.FirstOrDefault(x => x.Game == game)?.RefreshBackupStatus(true, forceCmmVanilla, false);
+        }
+
+        /// <summary>
+        /// ME3Tweaks Shared Registry Key
+        /// </summary>
+        internal const string REGISTRY_KEY_ME3TWEAKS = @"Software\ME3Tweaks";
+
+        /// <summary>
+        /// Copies ME1/ME2/ME3 backup paths to the new location if they are not defined there.
+        /// </summary>
+        public static void MigrateBackupPaths()
+        {
+#if WINDOWS
+            if (GetGameBackupPath(MEGame.ME1, out _, false) == null)
+            {
+                var storedPath = RegistryHandler.GetRegistryString(@"ME1VanillaBackupLocation");
+                if (storedPath != null)
+                {
+                    Log.Information(@"[AICORE] Migrating ALOT key backup location for ME1");
+                    RegistryHandler.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY_ME3TWEAKS, @"ME1VanillaBackupLocation", storedPath);
+                }
+            }
+            if (GetGameBackupPath(MEGame.ME2, out _, false) == null)
+            {
+                var storedPath = RegistryHandler.GetRegistryString("ME2VanillaBackupLocation");
+                if (storedPath != null)
+                {
+                    Log.Information(@"[AICORE] Migrating ALOT key backup location for ME2");
+                    RegistryHandler.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY_ME3TWEAKS, @"ME2VanillaBackupLocation", storedPath);
+                }
+            }
+            if (GetGameBackupPath(MEGame.ME3, out _, false) == null)
+            {
+                var storedPath = RegistryHandler.GetRegistryString($@"HKEY_CURRENT_USER\{BackupHandler.LEGACY_REGISTRY_KEY_ME3CMM}", @"VanillaCopyLocation"); // what a disaster this is
+                if (storedPath != null)
+                {
+                    Log.Information(@"[AICORE] Migrating ME3CMM key backup location for ME3");
+                    RegistryHandler.WriteRegistryKey(Registry.CurrentUser, REGISTRY_KEY_ME3TWEAKS, @"ME3VanillaBackupLocation", storedPath);
+                }
+            }
+#endif
         }
     }
 }

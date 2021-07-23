@@ -76,6 +76,12 @@ namespace ALOTInstallerCore.Helpers
         public static GameTarget ME2Target { get; set; }
         public static GameTarget ME3Target { get; set; }
 
+#if LESUPPORT
+        public static GameTarget LE1Target { get; set; }
+        public static GameTarget LE2Target { get; set; }
+        public static GameTarget LE3Target { get; set; }
+#endif
+
         /// <summary>
         /// UI display string of the ME1 target path. Do not trust this value as a true path, use the target instead.
         /// </summary>
@@ -88,6 +94,21 @@ namespace ALOTInstallerCore.Helpers
         /// UI display string of the ME3 target path. Do not trust this value as a true path, use the target instead.
         /// </summary>
         [DependsOn(nameof(ME3Target))] public static string ME3GamePath => ME3Target?.TargetPath ?? "Not installed";
+
+#if LESUPPORT
+        /// <summary>
+        /// UI display string of the LE1 target path. Do not trust this value as a true path, use the target instead.
+        /// </summary>
+        [DependsOn(nameof(LE1Target))] public static string LE1GamePath => LE1Target?.TargetPath ?? "Not installed";
+        /// <summary>
+        /// UI display string of the LE2 target path. Do not trust this value as a true path, use the target instead.
+        /// </summary>
+        [DependsOn(nameof(LE2Target))] public static string LE2GamePath => LE2Target?.TargetPath ?? "Not installed";
+        /// <summary>
+        /// UI display string of the LE3 target path. Do not trust this value as a true path, use the target instead.
+        /// </summary>
+        [DependsOn(nameof(LE3Target))] public static string LE3GamePath => LE3Target?.TargetPath ?? "Not installed";
+#endif
 
         public static string ConfigPathME1 { get; set; }
         public static string ConfigPathME2 { get; set; }
@@ -187,6 +208,17 @@ namespace ALOTInstallerCore.Helpers
                 case MEGame.ME3:
                     ME3Target = gt;
                     return true;
+#if LESUPPORT
+                case MEGame.LE1:
+                    LE1Target = gt;
+                    return true;
+                case MEGame.LE2:
+                    LE2Target = gt;
+                    return true;
+                case MEGame.LE3:
+                    LE3Target = gt;
+                    return true;
+#endif
             }
 
             return false; // DEFAULT
@@ -218,6 +250,17 @@ namespace ALOTInstallerCore.Helpers
                 case MEGame.ME3:
                     ME3Target = target;
                     break;
+#if LESUPPORT
+                case MEGame.LE1:
+                    LE1Target = target;
+                    break;
+                case MEGame.LE2:
+                    LE2Target = target;
+                    break;
+                case MEGame.LE3:
+                    LE3Target = target;
+                    break;
+#endif
             }
             return successful;
             // Manual method
@@ -258,6 +301,14 @@ namespace ALOTInstallerCore.Helpers
                     return ME2Target;
                 case MEGame.ME3:
                     return ME3Target;
+#if LESUPPORT
+                case MEGame.LE1:
+                    return LE1Target;
+                case MEGame.LE2:
+                    return LE2Target;
+                case MEGame.LE3:
+                    return LE3Target;
+#endif
                 default:
                     return null;
             }

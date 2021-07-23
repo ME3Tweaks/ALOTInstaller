@@ -129,7 +129,7 @@ namespace ALOTInstallerCore.Helpers
             }
 #endif
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            MemoryStream ms = TOCCreator.CreateTOCForDirectory(dlcDirectory, MEGame.ME3);
+            MemoryStream ms = TOCCreator.CreateDLCTOCForDirectory(dlcDirectory, MEGame.ME3);
             if (ms != null)
             {
                 string tocPath = Path.Combine(dlcDirectory, @"PCConsoleTOC.bin");
@@ -137,7 +137,7 @@ namespace ALOTInstallerCore.Helpers
                 ms.Close();
                 watch.Stop();
                 var elapsedMs = watch.ElapsedMilliseconds;
-                Log.Information(@"[AICORE] {Path.GetFileName(dlcDirectory)} - {dlcDirectory} Ran Unpacked TOC, took {elapsedMs}ms");
+                Log.Information($@"[AICORE] {Path.GetFileName(dlcDirectory)} - {dlcDirectory} Ran Unpacked TOC, took {elapsedMs}ms");
             }
             else
             {

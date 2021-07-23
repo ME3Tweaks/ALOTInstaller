@@ -222,7 +222,6 @@ namespace ALOTInstallerWPF.BuilderUI
                     ApplicationName = Utilities.GetAppPrefixedName(),
                     RequestHeader = "ALOTInstallerWPF"
                 };
-
                 
                 AppUpdater.PerformGithubAppUpdateCheck(uip);
 

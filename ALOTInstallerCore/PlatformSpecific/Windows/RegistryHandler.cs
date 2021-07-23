@@ -126,7 +126,6 @@ namespace ALOTInstallerCore.PlatformSpecific.Windows
         /// <returns></returns>
         public static string GetRegistryString(string key, string valueName)
         {
-
             return (string)Registry.GetValue(key, valueName, null);
         }
 

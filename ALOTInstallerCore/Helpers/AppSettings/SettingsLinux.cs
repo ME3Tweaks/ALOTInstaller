@@ -1,12 +1,8 @@
 ﻿#if LINUX
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Runtime.CompilerServices;
-using ALOTInstallerCore.ModManager.GameINI;
-using ALOTInstallerCore.Objects;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Misc;
+using LegendaryExplorerCore.Packages;
 using Serilog;
 
 namespace ALOTInstallerCore.Helpers.AppSettings
@@ -159,6 +155,11 @@ namespace ALOTInstallerCore.Helpers.AppSettings
         {
             settingsIni["BackupPaths"][SettingsKeys.SettingsKeyMapping[Enum.Parse<SettingsKeys.SettingKeys>($"{game}BackupPath")]].Value = path;
             File.WriteAllText(SettingsPath, settingsIni.ToString());
+        }
+
+        public static void RemoveBackupPath(MEGame game)
+        {
+            settingsIni["BackupPaths"].RemoveAllNamedEntries($"{game}BackupPath");
         }
     }
 }
