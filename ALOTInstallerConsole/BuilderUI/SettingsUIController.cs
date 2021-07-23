@@ -6,8 +6,8 @@ using ALOTInstallerCore.Helpers.AppSettings;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.Objects;
 using ALOTInstallerCore;
-using ME3ExplorerCore.Gammtek.Extensions;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Gammtek.Extensions;
+using LegendaryExplorerCore.Packages;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI

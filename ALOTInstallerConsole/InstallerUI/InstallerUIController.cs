@@ -7,7 +7,7 @@ using ALOTInstallerCore.Steps;
 using ALOTInstallerCore.Steps.Installer;
 using Terminal.Gui;
 using System.Threading;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Packages;
 
 namespace ALOTInstallerConsole.InstallerUI
 {

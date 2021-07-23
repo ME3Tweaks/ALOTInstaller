@@ -9,8 +9,8 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
-using ME3ExplorerCore.Gammtek.Extensions;
-using ME3ExplorerCore.Packages;
+using LegendaryExplorerCore.Gammtek.Extensions;
+using LegendaryExplorerCore.Packages;
 using Terminal.Gui;
 
 namespace ALOTInstallerConsole.BuilderUI

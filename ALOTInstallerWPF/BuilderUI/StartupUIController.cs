@@ -12,7 +12,6 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
-using ALOTInstallerCore.PlatformSpecific.Windows;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Helpers;
@@ -29,6 +28,9 @@ using Microsoft.Win32;
 using NickStrupat;
 using Serilog;
 using Utilities = ALOTInstallerCore.Utilities;
+#if WINDOWS
+using ALOTInstallerCore.PlatformSpecific.Windows;
+#endif
 
 namespace ALOTInstallerWPF.BuilderUI
 {
