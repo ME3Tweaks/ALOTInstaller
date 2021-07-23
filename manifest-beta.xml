@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.2.3" />
+					  version="7.2.4" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1066,17 +1066,17 @@
 					  recommendationreason="Main ALOT file, required"
 					  recommendation="Required"
 					  installpriority="1">
-			<file downloadlink="http://wearetheborg.net/files/ALOT/ALOT_ME1_v14.mem"
+			<file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
 					  tooltipname="ALOT for ME1 14.0"
-					  torrentfilename="ALOT for ME1 v12.zip"
-					  filename="ALOT for ME1 12.0-83-2021-12-0-1604601699.zip"
-					  size="4401598618"
-					  md5="cbd7dccb5a0909dd5882472dac9f24c9"
+					  torrentfilename="A Lot Of Textures (ALOT) for ME1.zip"
+					  filename="ALOT for ME1 14.0-83-2021-14-0-1626971653.zip"
+					  size="3491128375"
+					  md5="d66e40619fb6d7af37e122e0b25a0e89"
 					  unpackedsinglefilename="ALOT_ME1_v14.mem"
 					  unpackedsize="3308211231"
 					  unpackedmd5="75074ef5a8ba858e967291c416a66a71" />
 			<packagefile me1="true"
-						 sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME1_v12.mem"
+						 sourcename="A Lot Of Textures (ALOT) for ME1\Downloaded_Mods\ALOT_ME1_v14.mem"
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
@@ -1087,17 +1087,17 @@
 					  recommendationreason="Main ALOT file, required"
 					  recommendation="Required"
 					  installpriority="1">
-			<file downloadlink="http://wearetheborg.net/files/ALOT/ALOT_ME2_v14.mem"
+			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/68/?tab=files"
 					  tooltipname="ALOT for ME2 14.0"
-					  torrentfilename="ALOT for ME2 v14.zip"
-					  filename="ALOT for ME2 14.zip"
-					  size="6169019512"
-					  md5="22c3f49b421db0794c616a863a38a971"
+					  torrentfilename="A Lot Of Textures (ALOT) for ME2.zip"
+					  filename="ALOT for ME2 14.0-68-2021-14-0-1627028935.zip"
+					  size="4975873461"
+					  md5="30092eee33a746273105ef6b53755b50"
 					  unpackedsinglefilename="ALOT_ME2_v14.mem"
-					  unpackedsize="4789443253"
-					  unpackedmd5="446668005dc71730ac1a218939cb9a8e" />
+					  unpackedsize="4792956201"
+					  unpackedmd5="348f854e198afe05ee1e3e7927ea1612" />
 			<packagefile me2="true"
-						 sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME2_v14.mem"
+						 sourcename="A Lot Of Textures (ALOT) for ME2\Downloaded_Mods\ALOT_ME2_v14.mem"
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
@@ -1108,17 +1108,17 @@
 					  recommendationreason="Main ALOT file, required"
 					  recommendation="Required"
 					  installpriority="1">
-			<file downloadlink="https://mega.nz/file/V1USETjK#usqIJdG8i8bUC0dsNNyezoIe9rP1JVi2MG_IVP_JvHI"
+			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
 					  tooltipname="ALOT for ME3 14.0"
-					  torrentfilename="ALOT for ME3 v14.zip"
-					  filename="ALOT for ME3 14.zip"
-					  size="9448904820"
-					  md5="f3da1e271d43aa54669d2269bb28c831"
+					  torrentfilename="A Lot Of Textures (ALOT) for ME3.zip"
+					  filename="ALOT for ME3 14.0-363-2021-14-0-1627039082.zip"
+					  size="9153179217"
+					  md5="bd9868f74cd2825ce4a6bcbb7e4e31da"
 					  unpackedsinglefilename="ALOT_ME3_v14.mem"
-					  unpackedsize="8962014894"
-					  unpackedmd5="2cf210f28870a5222fdcbc6c59e576dc" />
+					  unpackedsize="8970261957"
+					  unpackedmd5="c2a55f0b8f68e37320ac8da5e634ea89" />
 			<packagefile me3="true"
-						 sourcename="A Lot Of Textures (ALOT)\Downloaded_Mods\ALOT_ME3_v14.mem"
+						 sourcename="A Lot Of Textures (ALOT) for ME3\Downloaded_Mods\ALOT_ME3_v14.mem"
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
