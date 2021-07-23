@@ -17,6 +17,7 @@ using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Helpers;
 using ALOTInstallerWPF.Telemetry;
 using ControlzEx.Theming;
+using LegendaryExplorerCore.Compression;
 using LegendaryExplorerCore.Helpers;
 using LegendaryExplorerCore.Packages;
 using MahApps.Metro.Controls;
