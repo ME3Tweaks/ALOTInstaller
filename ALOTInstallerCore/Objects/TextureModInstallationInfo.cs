@@ -227,14 +227,14 @@ namespace ALOTInstallerCore.Objects
             {
                 // V4 marker version - DEFAULT
                 ModType = (InstalledTextureModType)inStream.ReadByte();
-                ModName = inStream.ReadUnrealString();
+                ModName = markerVersion <= 0x4 ? inStream.ReadUnrealString() : inStream.ReadStringUnicodeNull();
                 if (ModType == InstalledTextureModType.MANIFESTFILE)
                 {
-                    AuthorName = inStream.ReadUnrealString();
+                    AuthorName = markerVersion <= 0x4 ? inStream.ReadUnrealString() : inStream.ReadStringUnicodeNull();
                     var numChoices = inStream.ReadInt32();
                     while (numChoices > 0)
                     {
-                        ChosenOptions.Add(inStream.ReadUnrealString());
+                        ChosenOptions.Add(markerVersion <= 0x4 ? inStream.ReadUnrealString() : inStream.ReadStringUnicodeNull());
                         numChoices--;
                     }
                 }
@@ -247,14 +247,14 @@ namespace ALOTInstallerCore.Objects
             public void WriteToMarker(Stream fs)
             {
                 fs.WriteByte((byte)ModType); // user file = 0, manifest file = 1
-                fs.WriteUnrealStringUnicode(ModName);
+                fs.WriteStringUnicodeNull(ModName);
                 if (ModType == InstalledTextureModType.MANIFESTFILE)
                 {
-                    fs.WriteUnrealStringUnicode(AuthorName);
+                    fs.WriteStringUnicodeNull(AuthorName);
                     fs.WriteInt32(ChosenOptions.Count);
                     foreach (var c in ChosenOptions)
                     {
-                        fs.WriteUnrealStringUnicode(c);
+                        fs.WriteStringUnicodeNull(c);
                     }
                 }
             }
