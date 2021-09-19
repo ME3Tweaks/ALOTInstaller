@@ -554,15 +554,23 @@ namespace ALOTInstallerCore.Helpers
                 {
                     case "GAMEPATH":
                         {
-                            var keyname = Enum.Parse<GameDirPath>($"ME{gameId}GamePath");
-                            if (param.Length > 1)
+                            if (Enum.TryParse<GameDirPath>($"ME{gameId}GamePath", out var keyname))
                             {
-                                result[keyname] = path;
+
+                                if (param.Length > 1)
+                                {
+                                    result[keyname] = path;
+                                }
+                                else
+                                {
+                                    result[keyname] = null;
+                                }
                             }
                             else
                             {
-                                result[keyname] = null;
+                                Log.Error($@"[AICORE] MEMIPCHANDLER ERROR: ME{gameId}GamePath is not a valid game path. This is a bug in the program!");
                             }
+
                             break;
                         }
                     case "GAMECONFIGPATH":

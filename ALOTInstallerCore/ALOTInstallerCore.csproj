@@ -82,7 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ComputerInfo\ComputerInfo\ComputerInfo.csproj" />
-    <ProjectReference Include="..\ME3ExplorerLib\LegendaryExplorer\LegendaryExplorerCore\LegendaryExplorerCore.csproj" />
+    <ProjectReference Include="..\LegendaryExplorer\LegendaryExplorer\LegendaryExplorerCore\LegendaryExplorerCore.csproj" />
   </ItemGroup>
   <Target Name="PreBuildWindows" Condition="'$(OS)' == 'Windows_NT'" BeforeTargets="PreBuildEvent">
     <Exec Command="if not exist &quot;$(ProjectDir)BundledManifest&quot; mkdir &quot;$(ProjectDir)BundledManifest&quot;&#xD;&#xA;if $(ConfigurationName) == WPFRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == WinRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;if $(ConfigurationName) == LinuxRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)&#xD;&#xA;::if $(ConfigurationName) == MacRelease (powershell Compress-Archive -Path '$(ProjectDir)..\manifest.xml' -DestinationPath '$(ProjectDir)BundledManifest\bundledmanifest.zip' -Force)" />

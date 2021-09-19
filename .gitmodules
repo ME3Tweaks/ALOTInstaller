@@ -14,3 +14,6 @@
 [submodule "ComputerInfo"]
 	path = ComputerInfo
 	url = https://github.com/ME3Tweaks/ComputerInfo.git
+[submodule "LegendaryExplorer"]
+	path = LegendaryExplorer
+	url = https://github.com/ME3Tweaks/LegendaryExplorer.git

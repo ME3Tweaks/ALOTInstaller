@@ -13,7 +13,7 @@ using Serilog;
 namespace ALOTInstallerCore
 {
     /// <summary>
-    /// Handles updates to MEM
+    /// Handles updates to MEM (NoGui)
     /// </summary>
     public class MEMUpdater
     {
@@ -143,9 +143,8 @@ namespace ALOTInstallerCore
                                     latestReleaseWithApplicableAsset = r;
                                     break;
                                 }
-
                             }
-                            else
+                            else if (releaseNameInt <= memVersion)
                             {
                                 Log.Information("[AICORE] Latest release that is available and has been approved for use is v" + releaseNameInt + " - no update available for us");
                                 break;
