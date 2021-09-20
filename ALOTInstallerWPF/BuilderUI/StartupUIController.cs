@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -12,6 +13,7 @@ using ALOTInstallerCore.ModManager.ME3Tweaks;
 using ALOTInstallerCore.ModManager.Objects;
 using ALOTInstallerCore.ModManager.Services;
 using ALOTInstallerCore.Objects;
+using ALOTInstallerCore.Objects.Manifest;
 using ALOTInstallerCore.Steps;
 using ALOTInstallerWPF.Flyouts;
 using ALOTInstallerWPF.Helpers;
@@ -301,7 +303,17 @@ namespace ALOTInstallerWPF.BuilderUI
                         }
                     }, x => pd.SetMessage(x));
 
-
+                    // TEST
+                    //TextureModInstallationInfo tmii = TextureModInstallationInfo.CalculateMarker(Locations.ME3Target.GetInstalledALOTInfo(), ManifestHandler.GetManifestFilesForMode(ManifestMode.ALOT).Where(x => (x.ApplicableGames & ApplicableGame.ME3) != 0).ToList());
+                    //tmii.ALOT_INSTALLER_VERSION_USED = (short)Utilities.GetLibraryVersion().Build;
+                    //int version = 0;
+                    //// If the current version doesn't support the --version --ipc, we just assume it is 0.
+                    //tmii.MEM_VERSION_USED = MEMIPCHandler.GetMemVersion();
+                    //tmii.SetInstalledFiles(ManifestHandler.GetManifestFilesForMode(ManifestMode.ALOT).Where(x => (x.ApplicableGames & ApplicableGame.ME3) != 0).ToList());
+                    //tmii.InstallationTimestamp = DateTime.Now;
+                    //Locations.ME3Target.StampTextureModificationInfo(tmii);
+                    //Locations.ME3Target.ReloadGameTarget();
+                    //Debug.WriteLine("hi");
                 }
                 catch (Exception e)
                 {
