@@ -227,14 +227,14 @@ namespace ALOTInstallerCore.Objects
             {
                 // V4 marker version - DEFAULT
                 ModType = (InstalledTextureModType)inStream.ReadByte();
-                ModName = markerVersion <= 0x4 ? inStream.ReadUnrealString() : inStream.ReadStringUnicodeNull();
+                ModName = markerVersion == 0x4 ? inStream.ReadUnrealString() : inStream.ReadStringUnicodeNull();
                 if (ModType == InstalledTextureModType.MANIFESTFILE)
                 {
-                    AuthorName = markerVersion <= 0x4 ? inStream.ReadUnrealString() : inStream.ReadStringUnicodeNull();
+                    AuthorName = markerVersion == 0x4 ? inStream.ReadUnrealString() : inStream.ReadStringUnicodeNull();
                     var numChoices = inStream.ReadInt32();
                     while (numChoices > 0)
                     {
-                        ChosenOptions.Add(markerVersion <= 0x4 ? inStream.ReadUnrealString() : inStream.ReadStringUnicodeNull());
+                        ChosenOptions.Add(markerVersion == 0x4 ? inStream.ReadUnrealString() : inStream.ReadStringUnicodeNull());
                         numChoices--;
                     }
                 }
@@ -247,14 +247,14 @@ namespace ALOTInstallerCore.Objects
             public void WriteToMarker(Stream fs)
             {
                 fs.WriteByte((byte)ModType); // user file = 0, manifest file = 1
-                fs.WriteStringUnicodeNull(ModName);
+                fs.WriteUnrealStringUnicode(ModName); // This needs updated for when doing on LE as it's marker format uses UnicodeNull
                 if (ModType == InstalledTextureModType.MANIFESTFILE)
                 {
-                    fs.WriteStringUnicodeNull(AuthorName);
+                    fs.WriteUnrealStringUnicode(AuthorName); // This needs updated for when doing on LE as it's marker format uses UnicodeNull
                     fs.WriteInt32(ChosenOptions.Count);
                     foreach (var c in ChosenOptions)
                     {
-                        fs.WriteStringUnicodeNull(c);
+                        fs.WriteUnrealStringUnicode(c); // This needs updated for when doing on LE as it's marker format uses UnicodeNull
                     }
                 }
             }
