@@ -1385,19 +1385,19 @@
 						 me3="false" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-					 friendlyname="A Lot of Videos for ME2 2.1 (1080p)"
-					 shortname="ALOV for ME2 2.1 (1080p)"
+					 friendlyname="A Lot of Videos for ME2 3.0 (1080p)"
+					 shortname="ALOV for ME2 3.0 (1080p)"
 					 author="Audemus"
 					 recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 2"
 					 recommendation="Recommended"
 					 optiongroup="ME2ALOV"
 					 version="2.1"
 					 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/245?tab=files"
-					  filename="ALOV for ME2 - v2.1 (1080p)-245-2-1-1607690014.7z"
-					  torrentfilename="ALOVforME2-1080p_2.1.7z"
-					  md5="360cc04cb42808d1c5f312165cbf0bcc"
-					  size="5733798620" />
+			<file downloadlink="https://drive.google.com/drive/folders/1-tXhO3PyMKsqIPaJGVFKVlZQEZ_cODIN?usp=sharing"
+					  filename="ALOV for ME2 - v3.0 (1080p)-245-2-1-1607690014.7z"
+					  torrentfilename="ALOVforME2-1080p_3.0.7z"
+					  md5="143db15df7fe61872462ea1dcd08c79b"
+					  size="6288351740" />
 			<extractionredirect archiverootpath="BASEGAME\Movies"
 						  relativedestinationdirectory="BioGame\Movies" />
 			<extractionredirect archiverootpath="ARRIVAL\Movies"
@@ -1420,19 +1420,19 @@
 						 me3="false" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME2 2.1 (4K)"
-						 shortname="ALOV for ME2 2.1 (4K)"
+						 friendlyname="A Lot of Videos for ME2 3.0 (4K)"
+						 shortname="ALOV for ME2 3.0 (4K)"
 						 author="Audemus"
 						 recommendationreason="Optional due to large filesize and CPU requirements"
 						 recommendation="Optional"
 						 optiongroup="ME2ALOV"
-						 version="2.1"
+						 version="3.0"
 						 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/245?tab=files"
-					  filename="ALOV for ME2 - v2.1 (4K)-245-2-1-1607688511.7z"
-					  torrentfilename="ALOVforME2-4K_2.1.7z"
-					  md5="b600441a78cd694044bb05a0b3abc265"
-					  size="15314602181" />
+			<file downloadlink="https://drive.google.com/drive/folders/1-tXhO3PyMKsqIPaJGVFKVlZQEZ_cODIN?usp=sharing"
+					  filename="ALOV for ME2 - v3.0 (4K)-245-2-1-1607688511.7z"
+					  torrentfilename="ALOVforME2-4K_3.0.7z"
+					  md5="eea1ad3171526ee6ac143a47d019c79f"
+					  size="16801154115" />
 			<extractionredirect archiverootpath="BASEGAME\Movies"
 						  relativedestinationdirectory="BioGame\Movies" />
 			<extractionredirect archiverootpath="ARRIVAL\Movies"
