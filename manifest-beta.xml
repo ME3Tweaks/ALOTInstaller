@@ -1160,27 +1160,6 @@
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
-					  alotversion="12"
-					  alotupdateversion="1"
-					  friendlyname="ALOT for ME1 12.1 - Update"
-					  author="CreeperLava"
-					  uipriority="0"
-					  recommendationreason="Update to the main ALOT file, required"
-					  recommendation="Required"
-					  installpriority="1">
-			<file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
-					  tooltipname="ALOT for ME1 12.1 - Update"
-					  filename="ALOT for ME1 12.1 - Update-83-2021-12-1-1613740238.zip"
-					  size="31673743"
-					  md5="a214d4b58643ae3d136f6a065b73a19b"
-					  unpackedsinglefilename="ALOT_UPDATE_ME1_v12.mem"
-					  unpackedsize="31673563"
-					  unpackedmd5="3dee39f571ce7eb94c6a47a2bbbb4c81" />
-			<packagefile me1="true"
-						 sourcename="ALOT_UPDATE_ME1_v12.mem"
-						 movedirectly="true" />
-		</manifestfile>
-		<manifestfile mode="ALOT"
 					  friendlyname="Improved Static Lighting for ME3 - Lite"
 					  author="CreeperLava"
 					  installpriority="3"
