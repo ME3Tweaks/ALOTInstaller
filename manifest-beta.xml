@@ -1339,19 +1339,19 @@
 		<!-- These are Mod Manager mods. They must be explicitly supported to work through the installer core -->
 		<!-- Preinstallmod objects are supersets of the manifestfiles, in that they support the same features (packagefile) but will have their archive extracted after dlc is unpacked, but before game scan takes place. -->
 		<preinstallmod mode="ALOT"
-					 friendlyname="A Lot of Videos for ME1 2.5 (1080p)"
-					 shortname="ALOV for ME1 2.5 (1080p)"
+					 friendlyname="A Lot of Videos for ME1 3.0 (1080p)"
+					 shortname="ALOV for ME1 3.0 (1080p)"
 					 author="Audemus"
 					 recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect"
 					 recommendation="Recommended"
 					 optiongroup="ME1ALOV"
-					 version="2.5"
+					 version="3.0"
 					 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files"
-					  filename="ALOV for ME1 - v2.5 1080p-144-2-5-1604493731.7z"
-					  torrentfilename="ALOVforME1-1080p_2.5.7z"
-					  md5="f2faef46178a7f5596c127e00aa1eaa0"
-					  size="2549439194" />
+			<file downloadlink="https://drive.google.com/drive/folders/1Aw3auTSX-ZsgVLxT6jq6KM82yaa0feVK?usp=sharing"
+					  filename="ALOV for ME1 - v3.0 TO UPDATE 1080p-144-2-5-1604493731.7z"
+					  torrentfilename="ALOVforME1-1080p_3.0.7z"
+					  md5="58c826a210cbe5dabe0063a65e9f09d0"
+					  size="1610472191" />
 			<extractionredirect archiverootpath="BASEGAME"
 						  relativedestinationdirectory="BioGame\CookedPC" />
 			<extractionredirect archiverootpath="BDTS"
@@ -1362,19 +1362,19 @@
 						 me3="false" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-					 friendlyname="A Lot of Videos for ME1 2.5 (4K)"
-					 shortname="ALOV for ME1 2.5 (4K)"
+					 friendlyname="A Lot of Videos for ME1 3.0 (4K)"
+					 shortname="ALOV for ME1 3.0 (4K)"
 					 author="Audemus"
 					 recommendationreason="Optional due to large filesize and CPU requirements"
 					 recommendation="Optional"
 					 optiongroup="ME1ALOV"
-					 version="2.5"
+					 version="3.0"
 					 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files"
-					  filename="ALOV for ME1 - v2.5 4K-144-2-5-1604494912.7z"
-					  torrentfilename="ALOVforME1-4K_2.5.7z"
-					  md5="9ffa18409884ebd6cf075f0bad3b12c2"
-					  size="4424888819" />
+			<file downloadlink="https://drive.google.com/drive/folders/1Aw3auTSX-ZsgVLxT6jq6KM82yaa0feVK?usp=sharing"
+					  filename="ALOV for ME1 - v3.0 4K-144-2-5-1604494912.7z"
+					  torrentfilename="ALOVforME1-4K_3.0.7z"
+					  md5="b2b6b69192a94a46f9e1fe0e00547a50"
+					  size="16801154115" />
 			<extractionredirect archiverootpath="BASEGAME"
 						  relativedestinationdirectory="BioGame\CookedPC" />
 			<extractionredirect archiverootpath="BDTS"
