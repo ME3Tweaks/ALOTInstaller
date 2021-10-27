@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.2.4" />
+					  version="7.3.0" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1318,19 +1318,19 @@
 		<!-- These are Mod Manager mods. They must be explicitly supported to work through the installer core -->
 		<!-- Preinstallmod objects are supersets of the manifestfiles, in that they support the same features (packagefile) but will have their archive extracted after dlc is unpacked, but before game scan takes place. -->
 		<preinstallmod mode="ALOT"
-					 friendlyname="A Lot of Videos for ME1 2.5 (1080p)"
-					 shortname="ALOV for ME1 2.5 (1080p)"
+					 friendlyname="A Lot of Videos for ME1 3.0 (1080p)"
+					 shortname="ALOV for ME1 3.0 (1080p)"
 					 author="Audemus"
 					 recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect"
 					 recommendation="Recommended"
 					 optiongroup="ME1ALOV"
-					 version="2.5"
+					 version="3.0"
 					 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files"
-					  filename="ALOV for ME1 - v2.5 1080p-144-2-5-1604493731.7z"
-					  torrentfilename="ALOVforME1-1080p_2.5.7z"
-					  md5="f2faef46178a7f5596c127e00aa1eaa0"
-					  size="2549439194" />
+			<file downloadlink="https://drive.google.com/drive/folders/1Aw3auTSX-ZsgVLxT6jq6KM82yaa0feVK?usp=sharing"
+					  filename="ALOV for ME1 - v3.0 (1080p)-144-3-0-1635330771.7z"
+					  torrentfilename="ALOVforME1-1080p_3.0.7z"
+					  md5="58c826a210cbe5dabe0063a65e9f09d0"
+					  size="1610472191" />
 			<extractionredirect archiverootpath="BASEGAME"
 						  relativedestinationdirectory="BioGame\CookedPC" />
 			<extractionredirect archiverootpath="BDTS"
@@ -1341,19 +1341,19 @@
 						 me3="false" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-					 friendlyname="A Lot of Videos for ME1 2.5 (4K)"
-					 shortname="ALOV for ME1 2.5 (4K)"
+					 friendlyname="A Lot of Videos for ME1 3.0 (4K)"
+					 shortname="ALOV for ME1 3.0 (4K)"
 					 author="Audemus"
 					 recommendationreason="Optional due to large filesize and CPU requirements"
 					 recommendation="Optional"
 					 optiongroup="ME1ALOV"
-					 version="2.5"
+					 version="3.0"
 					 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect/mods/144?tab=files"
-					  filename="ALOV for ME1 - v2.5 4K-144-2-5-1604494912.7z"
-					  torrentfilename="ALOVforME1-4K_2.5.7z"
-					  md5="9ffa18409884ebd6cf075f0bad3b12c2"
-					  size="4424888819" />
+			<file downloadlink="https://drive.google.com/drive/folders/1Aw3auTSX-ZsgVLxT6jq6KM82yaa0feVK?usp=sharing"
+					  filename="ALOV for ME1 - v3.0 (4K)-144-3-0-1635330072.7z"
+					  torrentfilename="ALOVforME1-4K_3.0.7z"
+					  md5="b2b6b69192a94a46f9e1fe0e00547a50"
+					  size="4141620477" />
 			<extractionredirect archiverootpath="BASEGAME"
 						  relativedestinationdirectory="BioGame\CookedPC" />
 			<extractionredirect archiverootpath="BDTS"
@@ -1364,19 +1364,19 @@
 						 me3="false" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-					 friendlyname="A Lot of Videos for ME2 2.1 (1080p)"
-					 shortname="ALOV for ME2 2.1 (1080p)"
+					 friendlyname="A Lot of Videos for ME2 3.0 (1080p)"
+					 shortname="ALOV for ME2 3.0 (1080p)"
 					 author="Audemus"
 					 recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 2"
 					 recommendation="Recommended"
 					 optiongroup="ME2ALOV"
-					 version="2.1"
+					 version="3.0"
 					 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/245?tab=files"
-					  filename="ALOV for ME2 - v2.1 (1080p)-245-2-1-1607690014.7z"
-					  torrentfilename="ALOVforME2-1080p_2.1.7z"
-					  md5="360cc04cb42808d1c5f312165cbf0bcc"
-					  size="5733798620" />
+			<file downloadlink="https://drive.google.com/drive/folders/1-tXhO3PyMKsqIPaJGVFKVlZQEZ_cODIN?usp=sharing"
+					  filename="ALOVforME2-1080p_3.0-245-3-0-1635344287.7z"
+					  torrentfilename="ALOVforME2-1080p_3.0.7z"
+					  md5="143db15df7fe61872462ea1dcd08c79b"
+					  size="6288351740" />
 			<extractionredirect archiverootpath="BASEGAME\Movies"
 						  relativedestinationdirectory="BioGame\Movies" />
 			<extractionredirect archiverootpath="ARRIVAL\Movies"
@@ -1399,19 +1399,19 @@
 						 me3="false" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME2 2.1 (4K)"
-						 shortname="ALOV for ME2 2.1 (4K)"
+						 friendlyname="A Lot of Videos for ME2 3.0 (4K)"
+						 shortname="ALOV for ME2 3.0 (4K)"
 						 author="Audemus"
 						 recommendationreason="Optional due to large filesize and CPU requirements"
 						 recommendation="Optional"
 						 optiongroup="ME2ALOV"
-						 version="2.1"
+						 version="3.0"
 						 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/245?tab=files"
-					  filename="ALOV for ME2 - v2.1 (4K)-245-2-1-1607688511.7z"
-					  torrentfilename="ALOVforME2-4K_2.1.7z"
-					  md5="b600441a78cd694044bb05a0b3abc265"
-					  size="15314602181" />
+			<file downloadlink="https://drive.google.com/drive/folders/1-tXhO3PyMKsqIPaJGVFKVlZQEZ_cODIN?usp=sharing"
+					  filename="ALOVforME2-4K_3.0-245-3-0-1635347551.7z"
+					  torrentfilename="ALOVforME2-4K_3.0.7z"
+					  md5="eea1ad3171526ee6ac143a47d019c79f"
+					  size="16801154115" />
 			<extractionredirect archiverootpath="BASEGAME\Movies"
 						  relativedestinationdirectory="BioGame\Movies" />
 			<extractionredirect archiverootpath="ARRIVAL\Movies"
@@ -1434,41 +1434,42 @@
 						 me3="false" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-					 friendlyname="A Lot of Videos for ME3 2.1 - Basegame (1080p)"
+					 friendlyname="A Lot of Videos for ME3 3.0 - Basegame (1080p)"
 					 shortname="ALOV for ME3 - Basegame (1080p)"
 					 author="Mellin"
 					 recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3. This file covers the basegame, no DLC or mods."
 					 recommendation="Recommended"
-					 version="2.1"
+					 version="3.0"
 					 optiongroup="ME3ALOV_BASE"
 					 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-1080p-Basegame_2.1-773-2-1-0-0-1607681809.7z"
-					  torrentfilename="ALOVforME3-1080p-Basegame_2.1+.7z"
-					  md5="a1fe9b91849998679fe6f9082e4a980d"
-					  size="6597773643" />
+			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
+					  filename="ALOVforME3-1080p-Basegame_3.0-773-3-0-0-0-1635340303.7z"
+					  torrentfilename="ALOVforME3-1080p-Basegame_3.0.7z"
+					  md5="f975f2bc5f654314ea6da2f5780e4a2a"
+					  size="6663308641" />
 			<extractionredirect archiverootpath="DLC_MOD_ALOV"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV"
-						  loggingname="ALOV for ME3 1080p 2.1 - Basegame"
+						  loggingname="ALOV for ME3 1080p 3.0 - Basegame"
 						  isdlc="true" />
 			<games me1="false"
 						 me2="false"
 						 me3="true" />
 		</preinstallmod>
+
 		<preinstallmod mode="ALOT"
-					 friendlyname="A Lot of Videos for ME3 2.1 - Official DLC (1080p)"
+					 friendlyname="A Lot of Videos for ME3 3.0 - Official DLC (1080p)"
 					 shortname="ALOV for ME3 - Official DLC (1080p)"
 					 author="Mellin"
 					 recommendationreason="Significantly upgrades the pre-rendered videos for Mass Effect 3. This file covers the official BioWare DLCs."
 					 recommendation="Recommended"
-					 version="2.1"
+					 version="3.0"
 					 optiongroup="ME3ALOV_DLC"
 					 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-1080p-DLCs_2.1-773-2-1-0-0-1607683226.7z"
-					  torrentfilename="ALOVforME3-1080p-DLCs_2.1+.7z"
-					  md5="8499bf8ff9d223049872dd9c404844e0"
-					  size="5955694266" />
+			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
+					  filename="ALOVforME3-1080p-DLCs_3.0-773-3-0-0-0-1635341087.7z"
+					  torrentfilename="ALOVforME3-1080p-DLCs_3.0.7z"
+					  md5="2d046827f1c640c54bc0be0cca435a3c"
+					  size="6085955627" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_DLC"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC"
@@ -1500,23 +1501,23 @@
 						 me3="true" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME3 2.1.1.2 - Third Party Mods (1080p)"
+						 friendlyname="A Lot of Videos for ME3 3.0.0.0 - Third Party Mods (1080p)"
 						 shortname="ALOV for ME3 - Third Party Mods (1080p)"
 						 author="Mellin"
 						 recommendationreason="Upgrades third party mod's videos where permission was granted, and they are not using 1080p videos already."
 						 recommendation="Optional"
-						 version="2.1.1.2"
+						 version="3.0.0.0"
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
-					  filename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.2-773-2-1-1-2-1619677431.7z"
-					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_2.1.1.2.7z"
-					  md5="f263e92cbfcc22ae1b4810440422d89f"
-					  size="2160242877" />
+			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
+					  filename="ALOVforME3-1080p-ThirdPartyMods_3.0.0.0-773-3-0-0-0-1635341350.7z"
+					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_3.0.0.0.7z"
+					  md5="05aa42bad8198eb48319a53e5ac8172f"
+					  size="2131458730" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_Patches"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches"
-						  loggingname="ALOV for ME3 1080p 2.1 - Third Party"
+						  loggingname="ALOV for ME3 1080p 3.0 TPM - Third Party"
 						  isdlc="true" />
 			<!-- Third Party DLC components. Generated with M3-->
 			<extractionredirect archiverootpath="Patches_Alternates\CEM_F"
@@ -1592,19 +1593,19 @@
 						 me3="true" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME3 2.1 - Basegame (4K)"
+						 friendlyname="A Lot of Videos for ME3 3.0 - Basegame (4K)"
 						 shortname="ALOV for ME3 - Basegame (4K)"
 						 author="Mellin"
 						 recommendationreason="Optional due to large filesize and CPU requirements"
 						 recommendation="Optional"
-						 version="2.1"
+						 version="3.0"
 						 optiongroup="ME3ALOV_BASE"
 						 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-4K-Basegame_2.1-773-2-1-0-0-1607674233.7z"
-					  torrentfilename="ALOVforME3-4K-Basegame_2.1+.7z"
-					  md5="c8b1a2cce0b2c8500921b519c6218d22"
-					  size="17659858128" />
+			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
+					  filename="ALOVforME3-4K-Basegame_3.0-773-3-0-1635334744.7z"
+					  torrentfilename="ALOVforME3-4K-Basegame_3.0.7z"
+					  md5="c036c586c7d4558103a7d73c62561779"
+					  size="17852591140" />
 			<extractionredirect archiverootpath="DLC_MOD_ALOV"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV"
 						  loggingname="ALOV for ME3 4K 2.1 - Basegame"
@@ -1614,19 +1615,19 @@
 						 me3="true" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME3 2.1 - Official DLC (4K)"
+						 friendlyname="A Lot of Videos for ME3 3.0 - Official DLC (4K)"
 						 shortname="ALOV for ME3 - Official DLC (4K)"
 						 author="Mellin"
 						 recommendationreason="Optional due to large filesize and CPU requirements"
 						 recommendation="Optional"
-						 version="2.1"
+						 version="3.0"
 						 optiongroup="ME3ALOV_DLC"
 						 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773?tab=files"
-					  filename="ALOVforME3-4K-DLCs_2.1-773-2-1-0-0-1607677836.7z"
-					  torrentfilename="ALOVforME3-4K-DLCs_2.1+.7z"
-					  md5="2c902585919c0bceb3f28da62c08633e"
-					  size="16188195427" />
+			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
+					  filename="ALOVforME3-4K-DLCs_3.0-773-3-0-0-0-1635337651.7z"
+					  torrentfilename="ALOVforME3-4K-DLCs_3.0.7z"
+					  md5="77acb7537ef62a0a5ee4c1416a582658"
+					  size="16482801370" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_DLC"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC"
@@ -1658,23 +1659,23 @@
 						 me3="true" />
 		</preinstallmod>
 		<preinstallmod mode="ALOT"
-						 friendlyname="A Lot of Videos for ME3 2.1.1.2 - Third Party Mods (4K)"
+						 friendlyname="A Lot of Videos for ME3 3.0.0.0 - Third Party Mods (4K)"
 						 shortname="ALOV for ME3 - Third Party Mods (4K)"
 						 author="Mellin"
 						 recommendationreason="Optional due to large filesize and CPU requirements"
 						 recommendation="Optional"
-						 version="2.1.1.2"
+						 version="3.0.0.0"
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
-			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/773"
-					  filename="ALOVforME3-4K-ThirdPartyMods_2.1.1.2-773-2-1-1-2-1619681354.7z"
-					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_2.1.1.2.7z"
-					  md5="1904052645664c71331492caa98215d6"
-					  size="11754860803" />
+			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
+					  filename="ALOVforME3-4K-ThirdPartyMods_3.0.0.0-773-3-0-0-0-1635339494.7z"
+					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_3.0.0.0.7z"
+					  md5="783269ff4b6c385cf55f71f5dd793011"
+					  size="11727809856" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_Patches"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_Patches"
-						  loggingname="ALOV for ME3 4K 2.1 - Third Party"
+						  loggingname="ALOV for ME3 4K TPM 3.0 - Third Party"
 						  isdlc="true" />
 			<!-- Third Party DLC components. Generated with M3-->
 			<extractionredirect archiverootpath="Patches_Alternates\ARK_MOD"
