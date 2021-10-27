@@ -1327,7 +1327,7 @@
 					 version="3.0"
 					 uipriority="2">
 			<file downloadlink="https://drive.google.com/drive/folders/1Aw3auTSX-ZsgVLxT6jq6KM82yaa0feVK?usp=sharing"
-					  filename="ALOV for ME1 - v3.0 TO UPDATE 1080p-144-2-5-1604493731.7z"
+					  filename="ALOV for ME1 - v3.0 (1080p)-144-3-0-1635330771.7z"
 					  torrentfilename="ALOVforME1-1080p_3.0.7z"
 					  md5="58c826a210cbe5dabe0063a65e9f09d0"
 					  size="1610472191" />
@@ -1350,7 +1350,7 @@
 					 version="3.0"
 					 uipriority="2">
 			<file downloadlink="https://drive.google.com/drive/folders/1Aw3auTSX-ZsgVLxT6jq6KM82yaa0feVK?usp=sharing"
-					  filename="ALOV for ME1 - v3.0 4K-144-2-5-1604494912.7z"
+					  filename="ALOV for ME1 - v3.0 (4K)-144-3-0-1635330072.7z"
 					  torrentfilename="ALOVforME1-4K_3.0.7z"
 					  md5="b2b6b69192a94a46f9e1fe0e00547a50"
 					  size="4141620477" />
@@ -1373,7 +1373,7 @@
 					 version="3.0"
 					 uipriority="2">
 			<file downloadlink="https://drive.google.com/drive/folders/1-tXhO3PyMKsqIPaJGVFKVlZQEZ_cODIN?usp=sharing"
-					  filename="ALOV for ME2 - v3.0 (1080p)-245-2-1-1607690014.7z"
+					  filename="ALOVforME2-1080p_3.0-245-3-0-1635344287.7z"
 					  torrentfilename="ALOVforME2-1080p_3.0.7z"
 					  md5="143db15df7fe61872462ea1dcd08c79b"
 					  size="6288351740" />
@@ -1408,7 +1408,7 @@
 						 version="3.0"
 						 uipriority="2">
 			<file downloadlink="https://drive.google.com/drive/folders/1-tXhO3PyMKsqIPaJGVFKVlZQEZ_cODIN?usp=sharing"
-					  filename="ALOV for ME2 - v3.0 (4K)-245-2-1-1607688511.7z"
+					  filename="ALOVforME2-4K_3.0-245-3-0-1635347551.7z"
 					  torrentfilename="ALOVforME2-4K_3.0.7z"
 					  md5="eea1ad3171526ee6ac143a47d019c79f"
 					  size="16801154115" />
@@ -1443,10 +1443,10 @@
 					 optiongroup="ME3ALOV_BASE"
 					 uipriority="2">
 			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
-					  filename="ALOVforME3-1080p-Basegame_3.0-773-2-1-0-0-1607681809.7z"
+					  filename="ALOVforME3-1080p-Basegame_3.0-773-3-0-0-0-1635340303.7z"
 					  torrentfilename="ALOVforME3-1080p-Basegame_3.0.7z"
-					  md5="5ef9c8aba85b0f36952a98c74cac5c57"
-					  size="6662070690" />
+					  md5="f975f2bc5f654314ea6da2f5780e4a2a"
+					  size="6663308641" />
 			<extractionredirect archiverootpath="DLC_MOD_ALOV"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV"
 						  loggingname="ALOV for ME3 1080p 3.0 - Basegame"
@@ -1466,10 +1466,10 @@
 					 optiongroup="ME3ALOV_DLC"
 					 uipriority="2">
 			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
-					  filename="ALOVforME3-1080p-DLCs_3.0-773-2-1-0-0-1607683226.7z"
+					  filename="ALOVforME3-1080p-DLCs_3.0-773-3-0-0-0-1635341087.7z"
 					  torrentfilename="ALOVforME3-1080p-DLCs_3.0.7z"
-					  md5="347f9e101a34b83be48e4d1305e2b52b"
-					  size="6085101985" />
+					  md5="2d046827f1c640c54bc0be0cca435a3c"
+					  size="6085955627" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_DLC"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC"
@@ -1510,7 +1510,7 @@
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
 			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
-					  filename="ALOVforME3-1080p-ThirdPartyMods_3.0.0.0-773-2-1-1-2-1619677431.7z"
+					  filename="ALOVforME3-1080p-ThirdPartyMods_3.0.0.0-773-3-0-0-0-1635341350.7z"
 					  torrentfilename="ALOVforME3-1080p-ThirdPartyMods_3.0.0.0.7z"
 					  md5="05aa42bad8198eb48319a53e5ac8172f"
 					  size="2131458730" />
@@ -1602,10 +1602,10 @@
 						 optiongroup="ME3ALOV_BASE"
 						 uipriority="2">
 			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
-					  filename="ALOVforME3-4K-Basegame_3.0-773-2-1-0-0-1607674233.7z"
+					  filename="ALOVforME3-4K-Basegame_3.0-773-3-0-1635334744.7z"
 					  torrentfilename="ALOVforME3-4K-Basegame_3.0.7z"
-					  md5="d4837a6daccd816fe2f111d9e125d806"
-					  size="17850155624" />
+					  md5="c036c586c7d4558103a7d73c62561779"
+					  size="17852591140" />
 			<extractionredirect archiverootpath="DLC_MOD_ALOV"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV"
 						  loggingname="ALOV for ME3 4K 2.1 - Basegame"
@@ -1624,10 +1624,10 @@
 						 optiongroup="ME3ALOV_DLC"
 						 uipriority="2">
 			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
-					  filename="ALOVforME3-4K-DLCs_2.1-773-2-1-0-0-1607677836.7z"
+					  filename="ALOVforME3-4K-DLCs_3.0-773-3-0-0-0-1635337651.7z"
 					  torrentfilename="ALOVforME3-4K-DLCs_3.0.7z"
 					  md5="77acb7537ef62a0a5ee4c1416a582658"
-					  size="16481283586" />
+					  size="16482801370" />
 			<!-- main DLC mod folder. Must exist for extraction redirects to work -->
 			<extractionredirect archiverootpath="DLC_MOD_ALOV_DLC"
 						  relativedestinationdirectory="BIOGame\DLC\DLC_MOD_ALOV_DLC"
@@ -1668,7 +1668,7 @@
 						 optiongroup="ME3ALOV_THIRDPARTY"
 						 uipriority="2">
 			<file downloadlink="https://drive.google.com/drive/folders/1x_PsZ5ZOkCg76KXSvwYc3HoekCYe9xlF?usp=sharing"
-					  filename="ALOVforME3-4K-ThirdPartyMods_2.0.0.0-773-2-1-1-2-1619681354.7z"
+					  filename="ALOVforME3-4K-ThirdPartyMods_3.0.0.0-773-3-0-0-0-1635339494.7z"
 					  torrentfilename="ALOVforME3-4K-ThirdPartyMods_3.0.0.0.7z"
 					  md5="783269ff4b6c385cf55f71f5dd793011"
 					  size="11727809856" />
