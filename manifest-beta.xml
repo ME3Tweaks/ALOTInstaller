@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.3.0" />
+					  version="7.3.1" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1119,6 +1119,69 @@
 					  unpackedmd5="c2a55f0b8f68e37320ac8da5e634ea89" />
 			<packagefile me3="true"
 						 sourcename="A Lot Of Textures (ALOT) for ME3\Downloaded_Mods\ALOT_ME3_v14.mem"
+						 movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
+					  alotversion="14"
+					  alotupdateversion="1"
+					  friendlyname="ALOT for ME1 14.1 - Update"
+					  author="CreeperLava"
+					  uipriority="0"
+					  recommendationreason="Update to the main ALOT file, required"
+					  recommendation="Required"
+					  installpriority="1">
+			<file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+					  tooltipname="ALOT for ME1 14.1 - Update"
+					  filename="ALOT_UPDATE_ME1_v14.1.zip"
+					  size="7194331"
+					  md5="31c1f53b5c7cbb9a959a5d084efec837"
+					  unpackedsinglefilename="ALOT_UPDATE_ME1_v14.1.mem"
+					  unpackedsize="7194147"
+					  unpackedmd5="b5aa3a3ffeddf2fd042de7103dfaa408" />
+			<packagefile me1="true"
+						 sourcename="ALOT_UPDATE_ME1_v14.1.mem"
+						 movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
+					  alotversion="14"
+					  alotupdateversion="1"
+					  friendlyname="ALOT for ME2 14.1 - Update"
+					  author="CreeperLava"
+					  uipriority="0"
+					  recommendationreason="Update to the main ALOT file, required"
+					  recommendation="Required"
+					  installpriority="1">
+			<file downloadlink="https://www.nexusmods.com/masseffect2/mods/63/?tab=files"
+					  tooltipname="ALOT for ME2 14.1 - Update"
+					  filename="ALOT_UPDATE_ME2_v14.1.zip"
+					  size="46638113"
+					  md5="b4887e1cacd9deb0136bb20d06539e9f"
+					  unpackedsinglefilename="ALOT_UPDATE_ME2_v14.1.mem"
+					  unpackedsize="46637929"
+					  unpackedmd5="425cbb46126eb0dae312792d0db7daf8" />
+			<packagefile me2="true"
+						 sourcename="ALOT_UPDATE_ME2_v14.1.mem"
+						 movedirectly="true" />
+		</manifestfile>
+		<manifestfile mode="ALOT"
+					  alotversion="14"
+					  alotupdateversion="1"
+					  friendlyname="ALOT for ME3 14.1 - Update"
+					  author="CreeperLava"
+					  uipriority="0"
+					  recommendationreason="Update to the main ALOT file, required"
+					  recommendation="Required"
+					  installpriority="1">
+			<file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+					  tooltipname="ALOT for ME3 14.1 - Update"
+					  filename="ALOT_UPDATE_ME3_v14.1.zip"
+					  size="80091329"
+					  md5="d56b022c671d4a69223a0e18374b2f8c"
+					  unpackedsinglefilename="ALOT_UPDATE_ME3_v14.1.mem"
+					  unpackedsize="80091145"
+					  unpackedmd5="0b2bb3a7db949de6b53d2825a63c12ed" />
+			<packagefile me3="true"
+						 sourcename="ALOT_UPDATE_ME3_v14.1.mem"
 						 movedirectly="true" />
 		</manifestfile>
 		<manifestfile mode="ALOT"
