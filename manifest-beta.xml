@@ -1175,11 +1175,11 @@
 			<file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
 					  tooltipname="ALOT for ME3 14.1 - Update"
 					  filename="ALOT_UPDATE_ME3_v14.1.zip"
-					  size="80091329"
-					  md5="d56b022c671d4a69223a0e18374b2f8c"
+					  size="82456255"
+					  md5="8698fd38b00c715ac98f418df30223be"
 					  unpackedsinglefilename="ALOT_UPDATE_ME3_v14.1.mem"
-					  unpackedsize="80091145"
-					  unpackedmd5="0b2bb3a7db949de6b53d2825a63c12ed" />
+					  unpackedsize="82456071"
+					  unpackedmd5="195fe4ae4cf91a6dab37efb24a64fcfa" />
 			<packagefile me3="true"
 						 sourcename="ALOT_UPDATE_ME3_v14.1.mem"
 						 movedirectly="true" />
