@@ -11,7 +11,7 @@
 					  version="3.0.1" />
 	<manifest mode="ALOT"
 					  description="Installs ALOT, ALOT Addons, and MEUITM (ME1 only) with ALOT defaults"
-					  version="7.3.2" />
+					  version="7.3.3" />
 	<!-- Stages, weights, UI messages -->
 	<stages>
 		<stage name="STAGE_PRESCAN"
@@ -1172,7 +1172,7 @@
 					  recommendationreason="Update to the main ALOT file, required"
 					  recommendation="Required"
 					  installpriority="1">
-			<file downloadlink="https://www.nexusmods.com/masseffect/mods/83/?tab=files"
+			<file downloadlink="https://www.nexusmods.com/masseffect3/mods/363/?tab=files"
 					  tooltipname="ALOT for ME3 14.1 - Update"
 					  filename="ALOT for ME3 14.1 - Update-363-2021-14-1-1636284867.zip"
 					  size="82456255"
