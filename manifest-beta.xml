@@ -11,7 +11,7 @@
               version="3.0.1"/>
     <manifest mode="ALOT"
               description="Installs ALOT, ALOT Addons, and MEUITM with ALOT defaults"
-              version="7.4.0"/>
+              version="7.4.1"/>
     <!-- Stages, weights, UI messages -->
     <stages>
         <stage name="STAGE_PRESCAN"
@@ -1409,7 +1409,7 @@
             <file downloadlink="https://www.nexusmods.com/masseffect2/mods/331"
                   tooltipname="MEUITM2"
                   torrentfilename="MEUITM2.zip"
-                  filename="MEUITM2.zip"
+                  filename="MEUITM2-331-2-1636306884.zip"
                   size="4136353002"
                   md5="d984d28da59b9bf2543cd7fbe9bc6df6"/>
             <meuitmmodesettings modebackgroundpicture="MEUITM2\MEUITM2.jpg"
