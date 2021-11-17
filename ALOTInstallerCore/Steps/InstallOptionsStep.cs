@@ -299,10 +299,9 @@ namespace ALOTInstallerCore.Steps
                 }
 
                 // MEUITM
-                if (gameTarget.Game == MEGame.ME1)
+                if (gameTarget.Game == MEGame.ME1 || gameTarget.Game == MEGame.ME2)
                 {
-                    var meuitmFile = filesForTarget.FirstOrDefault(x =>
-                    x.AlotVersionInfo.MEUITMVER > 0);
+                    var meuitmFile = filesForTarget.FirstOrDefault(x => x.AlotVersionInfo.MEUITMVER > 0);
                     if (meuitmFile == null)
                     {
                         // Not in manifest...?

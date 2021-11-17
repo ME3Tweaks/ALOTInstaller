@@ -408,9 +408,9 @@ namespace ALOTInstallerCore.Steps
         /// <returns></returns>
         public static bool CheckMEUITM(InstallOptionsPackage package, Func<string, string, string, List<string>, bool> missingRecommandedItemsDialogCallback)
         {
-            if (package.InstallerMode != ManifestMode.ALOT || package.InstallTarget.Game != MEGame.ME1) return true; // Only work in ALOT mode. Always say this check is OK if not ME1
+            if (package.InstallerMode != ManifestMode.ALOT || package.InstallTarget.Game != MEGame.ME1 || package.InstallTarget.Game != MEGame.ME2) return true; // Only work in ALOT mode. Always say this check is OK if not ME1
             var installedInfo = package.InstallTarget.GetInstalledALOTInfo();
-            var shouldCheck = installedInfo == null || installedInfo.MEUITMVER == 0; //if MEUITM is ever updated, this should probably be changed.
+            var shouldCheck = installedInfo == null || installedInfo.MEUITMVER == 0; // if MEUITM is ever updated, this should probably be changed.
 
             if (shouldCheck)
             {
@@ -418,7 +418,7 @@ namespace ALOTInstallerCore.Steps
                 if (meuitmFile == null)
                 {
                     var result = missingRecommandedItemsDialogCallback?.Invoke("MEUITM not available for installation",
-                        $"Mass Effect Updated and Improved Textures Mod (MEUITM) is highly recommended when installing ALOT for ME1, as it provides a very large amount of the textures that improve the look of Mass Effect. Without MEUITM, the game will look significantly worse. This file should be imported into the library before installing textures.",
+                        $"Mass Effect Updated and Improved Textures Mod (MEUITM) is highly recommended when installing ALOT for ME1 and ME2, as it provides a very large amount of the textures that improve the look of Mass Effect. Without MEUITM, the game will look significantly worse. This file should be imported into the library before installing textures.",
                         "Install anyways (NOT RECOMMENDED)?", new List<string>());
                     return result.HasValue && result.Value;
                 }

@@ -562,7 +562,7 @@ namespace ALOTInstallerConsole.BuilderUI
                                 "Abort install", "Continue with missing files") == 1)) return;
                 }
 
-                if (optionsPackage.InstallTarget.Game == MEGame.ME1)
+                if (optionsPackage.InstallTarget.Game == MEGame.ME1 || optionsPackage.InstallTarget.Game == MEGame.ME2)
                 {
                     //Check MEUITM
                     if (!Precheck.CheckMEUITM(optionsPackage,
