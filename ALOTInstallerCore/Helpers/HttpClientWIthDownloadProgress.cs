@@ -10,7 +10,7 @@ using Serilog;
 namespace ALOTInstallerCore.Helpers
 {
     /// <summary>
-    /// Use HttpClient instead of WebClient, microsoft says! Oh yeah, we also removeda ll of hte useful things from webclient. Oh and we also
+    /// Use HttpClient instead of WebClient, microsoft says! Oh yeah, we also removed all of hte useful things from webclient. Oh and we also
     /// made webclient CancelAsync() not actually cancel it. Cause you didn't really want to cancel that right?
     /// </summary>
     public class HttpClientDownloadWithProgress : IDisposable
