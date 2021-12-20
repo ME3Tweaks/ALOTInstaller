@@ -139,12 +139,8 @@
         </stage>
     </stages>
     <!-- Mirrors for music pack -->
-    <musicpackmirror hash="04eed88382dda6963a489be93823c5ba">
-        https://github.com/ME3Tweaks/ALOTInstaller/releases/download/3.0.586.5600/alotinstaller_music_pack-v4.zip
-    </musicpackmirror>
-    <musicpackmirror hash="04eed88382dda6963a489be93823c5ba">
-        https://me3tweaks.com/alotinstaller/alotinstaller_music_pack-v4.7z
-    </musicpackmirror>
+    <musicpackmirror hash="04eed88382dda6963a489be93823c5ba">https://github.com/ME3Tweaks/ALOTInstaller/releases/download/3.0.586.5600/alotinstaller_music_pack-v4.zip</musicpackmirror>
+    <musicpackmirror hash="04eed88382dda6963a489be93823c5ba">https://me3tweaks.com/alotinstaller/alotinstaller_music_pack-v4.7z</musicpackmirror>
     <!-- Tutorials and comparisons -->
     <tutorial link="https://imgur.com/a/WBJQD"
               text="Installation Guide (2020)"
