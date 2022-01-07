@@ -243,8 +243,8 @@
         <!-- MEUITM MODE STUFF-->
         <manifestfile mode="MEUITM"
                           meuitm="true"
-                          meuitmver="1"
-                          friendlyname="MEUITM"
+                          meuitmver="3"
+                          friendlyname="MEUITM 2021"
                           author="CATACHRISM"
                           installpriority="0"
                           recommendationreason="Fully customizable with both vanilla friendly and ME3 continuity options where applicable"
@@ -1728,8 +1728,8 @@
         </manifestfile>
         <manifestfile mode="ALOT"
                       meuitm="true"
-                      meuitmver="1"
-                      friendlyname="MEUITM"
+                      meuitmver="3"
+                      friendlyname="MEUITM 2021"
                       author="CATACHRISM"
                       installpriority="2"
                       recommendationreason="Fully customizable with both vanilla friendly and ME3 continuity options where applicable"
