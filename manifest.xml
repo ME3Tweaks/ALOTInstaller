@@ -805,8 +805,6 @@
                 me3="false" />
         </manifestfile>
         <manifestfile mode="MEUITM"
-                          meuitm="true"
-                          meuitmver="1"
                           friendlyname="MERLIN"
                           author="CATACHRISM"
                           installpriority="2"
@@ -2290,8 +2288,6 @@
                              me3="false" />
         </manifestfile>
         <manifestfile mode="ALOT"
-                    meuitm="true"
-                    meuitmver="1"
                     friendlyname="MERLIN"
                     author="CATACHRISM"
                     installpriority="3"
