@@ -823,7 +823,7 @@ namespace ALOTInstallerCore.Steps
 
         private bool promptModConfiguration()
         {
-            foreach (var m in _installOptions.FilesToInstall.Where(x => x is ManifestFile mf && (Enumerable.Any(mf.CopyFiles) || Enumerable.Any(mf.ChoiceFiles) || Enumerable.Any(mf.ZipFiles))))
+            foreach (var m in _installOptions.FilesToInstall.Where(x => x is ManifestFile mf && (mf.CopyFiles.Any() || mf.ChoiceFiles.Any() || mf.ZipFiles.Any())))
             {
                 var mf = m as ManifestFile;
                 mf.PackageFiles.RemoveAll(x => x.Transient);

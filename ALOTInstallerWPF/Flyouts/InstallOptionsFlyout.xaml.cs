@@ -137,7 +137,7 @@ namespace ALOTInstallerWPF.Flyouts
                 return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 &&
                                                            x.AlotVersionInfo.ALOTUPDATEVER == 0 && x.ApplicableGames.HasFlag(InstallTarget.Game.ToApplicableGame()))?.FriendlyName ?? "ALOT");
             if (option == InstallOptionsStep.InstallOption.ALOTUpdate) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0 && x.ApplicableGames.HasFlag(InstallTarget.Game.ToApplicableGame()))?.FriendlyName ?? "ALOT update");
-            if (option == InstallOptionsStep.InstallOption.Addon) return "ALOT Addon";
+            if (option == InstallOptionsStep.InstallOption.Addon) return $"{ManifestHandler.CurrentMode} Addon";
             if (option == InstallOptionsStep.InstallOption.MEUITM) return "MEUITM";
             if (option == InstallOptionsStep.InstallOption.UserFiles) return "User files";
             if (option == InstallOptionsStep.InstallOption.ALOVMods) return "ALOV";

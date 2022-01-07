@@ -162,13 +162,13 @@ namespace ALOTInstallerCore.Helpers
             List<ManifestFile> importedFiles = new List<ManifestFile>();
 
             var filesInFolder = Directory.GetFiles(folder, "*.*", SearchOption.TopDirectoryOnly);
-            foreach (var v in manifestFiles.Where(x => !x.Ready))
+            foreach (var manifestFileToCheck in manifestFiles.Where(x => !x.Ready))
             {
                 void importFinished(bool imported, string failureReason)
                 {
                     if (imported)
                     {
-                        importedFiles.Add(v);
+                        importedFiles.Add(manifestFileToCheck);
                     }
                     else
                     {
@@ -182,29 +182,36 @@ namespace ALOTInstallerCore.Helpers
                 }
 
                 // Main file
-                var matchingFile = filesInFolder.FirstOrDefault(x =>
-                    Path.GetFileName(x).Equals(v.Filename, StringComparison.InvariantCultureIgnoreCase));
-                if (matchingFile != null && new FileInfo(matchingFile).Length == v.FileSize)
+                var matchingFolderFile = filesInFolder.FirstOrDefault(x =>
+                    Path.GetFileName(x).Equals(manifestFileToCheck.Filename, StringComparison.InvariantCultureIgnoreCase));
+
+                if (matchingFolderFile != null && new FileInfo(matchingFolderFile).Length == manifestFileToCheck.FileSize)
                 {
                     // Import
-                    importFileToLibrary(v, matchingFile, false, progressCallback, importFinished);
+                    importFileToLibrary(manifestFileToCheck, matchingFolderFile, false, progressCallback, importFinished);
                     lock (syncObj)
                     {
                         Monitor.Wait(syncObj);
                     }
 
+                    foreach (var mf in manifestFiles.Where(x => !x.Ready && x.Filename == manifestFileToCheck.Filename ))
+                    {
+                        // Multiple manifest files are tied to this single file (multiple modes)
+                        // We should update the status
+                        mf.UpdateReadyStatus(); // Update all of them
+                    }
                     continue;
                 }
 
                 // Torrent file
-                if (v.TorrentFilename != null)
+                if (manifestFileToCheck.TorrentFilename != null)
                 {
-                    matchingFile = filesInFolder.FirstOrDefault(x =>
-                        Path.GetFileName(x).Equals(v.TorrentFilename, StringComparison.InvariantCultureIgnoreCase));
-                    if (matchingFile != null && new FileInfo(matchingFile).Length == v.FileSize)
+                    matchingFolderFile = filesInFolder.FirstOrDefault(x =>
+                        Path.GetFileName(x).Equals(manifestFileToCheck.TorrentFilename, StringComparison.InvariantCultureIgnoreCase));
+                    if (matchingFolderFile != null && new FileInfo(matchingFolderFile).Length == manifestFileToCheck.FileSize)
                     {
                         // Import
-                        importFileToLibrary(v, matchingFile, false, progressCallback, importFinished);
+                        importFileToLibrary(manifestFileToCheck, matchingFolderFile, false, progressCallback, importFinished);
                         lock (syncObj)
                         {
                             Monitor.Wait(syncObj);
@@ -215,15 +222,15 @@ namespace ALOTInstallerCore.Helpers
                 }
 
                 // Unpacked file
-                if (v.UnpackedSingleFilename != null)
+                if (manifestFileToCheck.UnpackedSingleFilename != null)
                 {
-                    matchingFile = filesInFolder.FirstOrDefault(x =>
-                        Path.GetFileName(x).Equals(v.UnpackedSingleFilename,
+                    matchingFolderFile = filesInFolder.FirstOrDefault(x =>
+                        Path.GetFileName(x).Equals(manifestFileToCheck.UnpackedSingleFilename,
                             StringComparison.InvariantCultureIgnoreCase));
-                    if (matchingFile != null && new FileInfo(matchingFile).Length == v.UnpackedFileSize)
+                    if (matchingFolderFile != null && new FileInfo(matchingFolderFile).Length == manifestFileToCheck.UnpackedFileSize)
                     {
                         // Import
-                        importFileToLibrary(v, matchingFile, true, progressCallback, importFinished);
+                        importFileToLibrary(manifestFileToCheck, matchingFolderFile, true, progressCallback, importFinished);
                         lock (syncObj)
                         {
                             Monitor.Wait(syncObj);
@@ -305,6 +312,11 @@ namespace ALOTInstallerCore.Helpers
         private static void importFileToLibrary(ManifestFile mf, string sourceFile, bool isUnpacked,
             Action<string, long, long> progressCallback = null, Action<bool, string> importFinishedCallback = null)
         {
+            // Precheck file is not already ready, which might occur if user does stuff manually
+            // or we have multiple same-files
+            if (mf.Ready)
+                return; // File is already ready, nothing to do
+
             Log.Information($"[AICORE] Importing {sourceFile} into texture library");
             // This may need to be WINDOWS ONLY for roots
             string importingfrom = Path.GetPathRoot(sourceFile);

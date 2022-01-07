@@ -687,8 +687,7 @@ namespace ALOTInstallerConsole.BuilderUI
 
             if (option.Key == InstallOptionsStep.InstallOption.ALOT) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER == 0 && x.ApplicableGames.HasFlag(installTarget.Game.ToApplicableGame()))?.FriendlyName ?? "ALOT") + suffix;
             if (option.Key == InstallOptionsStep.InstallOption.ALOTUpdate) return (installerFiles.FirstOrDefault(x => x.AlotVersionInfo.ALOTVER > 0 && x.AlotVersionInfo.ALOTUPDATEVER != 0 && x.ApplicableGames.HasFlag(installTarget.Game.ToApplicableGame()))?.FriendlyName ?? "ALOT update") + suffix;
-            if (option.Key == InstallOptionsStep.InstallOption.Addon) return "ALOT Addon" + suffix;
-            if (option.Key == InstallOptionsStep.InstallOption.MEUITM) return "MEUITM" + suffix;
+            if (option.Key == InstallOptionsStep.InstallOption.Addon) return $"{ManifestHandler.CurrentMode} Addon" + suffix;
             if (option.Key == InstallOptionsStep.InstallOption.UserFiles) return "User files" + suffix;
             if (option.Key == InstallOptionsStep.InstallOption.ALOVMods) return "ALOV" + suffix;
             return "UNKNOWN OPTION";

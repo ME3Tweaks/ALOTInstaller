@@ -135,6 +135,19 @@ namespace ALOTInstallerCore.Steps
                     }
                 }
 
+                // MERLIN is considered an addon file.
+                // CHECK ADDONS
+                if (filesForTarget.Any(x =>
+                    x is ManifestFile mf && mf.AlotVersionInfo.IsNotVersioned && !(x is PreinstallMod) && x.Ready && !x.Disabled))
+                {
+                    options[InstallOption.Addon] = (OptionState.CheckedVisible, "Addon files are the non-required files, but should be installed to complete the experience");
+                }
+                else
+                {
+                    options[InstallOption.Addon] = (OptionState.DisabledVisible, "No Addon files are imported");
+                }
+
+
                 // MEUITM mode user files
                 if (filesForTarget.Any(x => x is UserFile && x.Ready && !x.Disabled))
                 {
